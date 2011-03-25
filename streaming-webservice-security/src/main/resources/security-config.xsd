@@ -58,10 +58,18 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
+  <xs:complexType name="PropertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="NAME"/>
+        <xs:attribute type="xs:string" name="VAL"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
   <xs:complexType name="SignatureAlgorithmType">
     <xs:simpleContent>
       <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="URI" use="required"/>
+        <xs:attribute type="xs:anyURI" name="URI" use="required"/>
         <xs:attribute type="xs:string" name="JAVACLASS" use="required"/>
       </xs:extension>
     </xs:simpleContent>
@@ -107,6 +115,7 @@
   </xs:complexType>
   <xs:complexType name="ConfigurationType">
     <xs:sequence>
+      <xs:element type="con:PropertiesType" name="Properties" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:SecurityHeaderHandlersType" name="SecurityHeaderHandlers" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:CanonicalizationMethodsType" name="CanonicalizationMethods" xmlns:con="http://www.xmlsecurity.org/NS/configuration">
         <xs:annotation>
@@ -123,6 +132,11 @@
       <xs:element type="con:ResourceResolversType" name="ResourceResolvers" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
     </xs:sequence>
     <xs:attribute type="xs:string" name="target"/>
+  </xs:complexType>
+  <xs:complexType name="PropertiesType">
+    <xs:sequence>
+      <xs:element type="con:PropertyType" name="Property" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
+    </xs:sequence>
   </xs:complexType>
   <xs:complexType name="AlgorithmsType">
     <xs:sequence>

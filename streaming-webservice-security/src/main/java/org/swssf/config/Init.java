@@ -34,11 +34,11 @@ import java.net.URL;
  */
 public class Init {
 
-    private static boolean initialized = false;
+    private static String initialized = null;
 
     @SuppressWarnings("unchecked")
     public synchronized static void init(URL url) throws WSSecurityException {
-        if (!initialized) {
+        if (initialized == null || (url != null && !url.toExternalForm().equals(initialized))) {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance("org.xmlsecurity.ns.configuration");
                 final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -52,13 +52,14 @@ public class Init {
                     configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshaller.unmarshal(Init.class.getClassLoader().getResourceAsStream("security-config.xml"));
                 }
 
-                JCEAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getJCEAlgorithmMappings());
+                ConfigurationProperties.init(configurationTypeJAXBElement.getValue().getProperties());
                 SecurityHeaderHandlerMapper.init(configurationTypeJAXBElement.getValue().getSecurityHeaderHandlers());
+                JCEAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getJCEAlgorithmMappings());
 
             } catch (Exception e) {
                 throw new WSSecurityException(e);
             }
-            initialized = true;
+            initialized = "security-config.xml";
         }
     }
 }

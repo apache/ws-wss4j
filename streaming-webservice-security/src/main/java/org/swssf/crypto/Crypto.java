@@ -207,6 +207,16 @@ public interface Crypto {
     public CertificateFactory getCertificateFactory() throws WSSecurityException;
 
     /**
+     * Uses the CertPath API to validate a given certificate
+     * <p/>
+     *
+     * @param cert Certificate to validate
+     * @return true if the certificate is valid, false otherwise
+     * @throws WSSecurityException
+     */
+    public void validateCert(X509Certificate cert) throws WSSecurityException;
+
+    /**
      * Uses the CertPath API to validate a given certificate chain
      * <p/>
      *

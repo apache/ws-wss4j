@@ -18,9 +18,12 @@ package org.swssf.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.config.ConfigurationProperties;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
@@ -49,7 +52,7 @@ public abstract class CryptoBase implements Crypto {
     protected static Map certFactMap = new HashMap();
     protected KeyStore keystore = null;
     static String SKI_OID = "2.5.29.14";
-    protected KeyStore cacerts = null;
+    protected static KeyStore cacerts = null;
     /**
      * OID For the NameConstraints Extension to X.509
      * <p/>
@@ -74,6 +77,30 @@ public abstract class CryptoBase implements Crypto {
      * Constructor
      */
     protected CryptoBase() {
+        if (cacerts == null) {
+            InputStream cacertsIs = null;
+
+            try {
+                String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+                cacertsIs = new FileInputStream(cacertsPath);
+                //todo security property?:
+                String cacertsPasswd = ConfigurationProperties.getProperty("CACertKeyStorePassword");
+
+                cacerts = KeyStore.getInstance(KeyStore.getDefaultType());
+                cacerts.load(cacertsIs, cacertsPasswd.toCharArray());
+
+            } catch (Exception e) {
+                log.warn("CA certs could not be loaded: " + e.getMessage());
+            } finally {
+                if (cacertsIs != null) {
+                    try {
+                        cacertsIs.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -699,6 +726,63 @@ public abstract class CryptoBase implements Crypto {
             certs[(reverse) ? (l.size() - 1 - i) : i] = (X509Certificate) iterator.next();
         }
         return certs;
+    }
+
+    public void validateCert(X509Certificate x509Certificate) throws WSSecurityException {
+
+        Set<TrustAnchor> trustedCerts = new HashSet<TrustAnchor>();
+
+        try {
+            if (cacerts != null) {
+                Enumeration<String> aliases = cacerts.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    X509Certificate x509Cert = (X509Certificate) cacerts.getCertificate(alias);
+                    TrustAnchor trustAnchor = new TrustAnchor(x509Cert, null);
+                    trustedCerts.add(trustAnchor);
+                }
+            }
+
+            if (getKeyStore() != null) {
+                Enumeration<String> aliases = getKeyStore().aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    X509Certificate x509Cert = (X509Certificate) getKeyStore().getCertificate(alias);
+                    TrustAnchor trustAnchor = new TrustAnchor(x509Cert, null);
+                    trustedCerts.add(trustAnchor);
+                }
+            }
+
+            X509CertSelector x509CertSelector = new X509CertSelector();
+            x509CertSelector.setCertificate(x509Certificate);
+
+            PKIXBuilderParameters pkixBuilderParameters = new PKIXBuilderParameters(trustedCerts, x509CertSelector);
+            pkixBuilderParameters.setRevocationEnabled(false);
+
+            String provider = getCryptoProvider();
+            CertStore intermediateCertStore;
+            CertPathBuilder certPathBuilder;
+            if (provider == null || provider.length() == 0) {
+                intermediateCertStore = CertStore.getInstance("Collection", new CollectionCertStoreParameters(trustedCerts));
+                certPathBuilder = CertPathBuilder.getInstance("PKIX");
+            } else {
+                intermediateCertStore = CertStore.getInstance("Collection", new CollectionCertStoreParameters(trustedCerts), provider);
+                certPathBuilder = CertPathBuilder.getInstance("PKIX", provider);
+            }
+            pkixBuilderParameters.addCertStore(intermediateCertStore);
+            PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) certPathBuilder.build(pkixBuilderParameters);
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(e.getMessage(), e);
+        } catch (CertPathBuilderException e) {
+            throw new WSSecurityException(e.getMessage(), e);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new WSSecurityException(e.getMessage(), e);
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(e.getMessage(), e);
+        } catch (NoSuchProviderException e) {
+            throw new WSSecurityException(e.getMessage(), e);
+        }
     }
 
     /**

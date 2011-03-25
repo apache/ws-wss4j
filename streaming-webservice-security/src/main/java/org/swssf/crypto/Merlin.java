@@ -18,6 +18,7 @@ package org.swssf.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.config.ConfigurationProperties;
 
 import java.io.IOException;
 
@@ -35,9 +36,6 @@ import java.io.IOException;
 public class Merlin extends CryptoBase {
 
     private static final Log log = LogFactory.getLog(Merlin.class.getName());
-    private static final boolean doDebug = log.isDebugEnabled();
-
-    private String defaultX509Alias;
 
     /**
      * This allows providing a custom class loader to load the resources, etc
@@ -45,52 +43,16 @@ public class Merlin extends CryptoBase {
      * @throws java.io.IOException
      */
     public Merlin() throws IOException {
-
-        /**
-         * Load cacerts
-         */
-
-        //todo:
-        /*
-        String loadCacerts =
-                properties.getProperty(
-                        "org.apache.ws.security.crypto.merlin.load.cacerts",
-                        "true"
-                );
-        if (Boolean.valueOf(loadCacerts).booleanValue()) {
-            String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
-            InputStream cacertsIs = new FileInputStream(cacertsPath);
-            try {
-                String cacertsPasswd =
-                        properties.getProperty(
-                                "org.apache.ws.security.crypto.merlin.cacerts.password",
-                                "changeit"
-                        );
-                this.cacerts = load(cacertsIs, cacertsPasswd, null, KeyStore.getDefaultType());
-                if (doDebug) {
-                    log.debug("CA certs have been loaded");
-                }
-            } finally {
-                cacertsIs.close();
-            }
-        } else {
-            if (doDebug) {
-                log.debug("CA certs have not been loaded");
-            }
-        }
-        */
     }
 
     protected String getCryptoProvider() {
-        //return properties.getProperty("org.apache.ws.security.crypto.merlin.cert.provider");
-        //todo
-        return null;
+        return ConfigurationProperties.getProperty("CertProvider");
     }
 
     //todo remove?:
 
     public String getDefaultX509Alias() {
-        return defaultX509Alias;
+        return ConfigurationProperties.getProperty("DefaultX509Alias");
     }
 
 }

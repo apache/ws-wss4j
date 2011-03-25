@@ -25,14 +25,11 @@ import org.w3._2000._09.xmldsig_.X509DataType;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.*;
-import java.security.cert.*;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
+import java.security.Key;
+import java.security.PublicKey;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 
 /**
  * Factory to create SecurityToken Objects from keys in XML
@@ -42,45 +39,10 @@ import java.util.Set;
  */
 public class SecurityTokenFactory {
 
-    private static KeyStore cacerts;
-    private static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
-
     private SecurityTokenFactory() {
     }
 
     public synchronized static SecurityTokenFactory newInstance() throws WSSecurityException {
-        if (cacerts == null) {
-
-            InputStream cacertsIs = null;
-
-            try {
-                String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
-                cacertsIs = new FileInputStream(cacertsPath);
-                //todo security property?:
-                String cacertsPasswd = "changeit";
-
-                cacerts = KeyStore.getInstance(KeyStore.getDefaultType());
-                cacerts.load(cacertsIs, cacertsPasswd.toCharArray());
-
-            } catch (CertificateException e) {
-                throw new WSSecurityException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(e);
-            } catch (KeyStoreException e) {
-                throw new WSSecurityException(e);
-            } catch (IOException e) {
-                throw new WSSecurityException(e);
-            } finally {
-                if (cacertsIs != null) {
-                    try {
-                        cacertsIs.close();
-                    } catch (IOException e) {
-                        //ignore
-                    }
-                }
-            }
-        }
-
         return new SecurityTokenFactory();
     }
 
@@ -215,70 +177,17 @@ public class SecurityTokenFactory {
         }
 
         public void verify() throws WSSecurityException {
-            //todo verify certificate chain??
             try {
                 X509Certificate x509Certificate = getX509Certificate();
                 if (x509Certificate != null) {
                     x509Certificate.checkValidity();
                 }
-
-                verifyTrust(x509Certificate);
-
+                getCrypto().validateCert(x509Certificate);
             } catch (org.swssf.crypto.WSSecurityException e) {
                 throw new WSSecurityException(e);
             } catch (CertificateExpiredException e) {
                 throw new WSSecurityException(e);
             } catch (CertificateNotYetValidException e) {
-                throw new WSSecurityException(e);
-            }
-        }
-
-        private void verifyTrust(X509Certificate x509Certificate) throws WSSecurityException {
-
-            Set<TrustAnchor> trustedCerts = new HashSet<TrustAnchor>();
-
-            try {
-                if (cacerts != null) {
-                    Enumeration<String> aliases = cacerts.aliases();
-                    while (aliases.hasMoreElements()) {
-                        String alias = aliases.nextElement();
-                        X509Certificate x509Cert = (X509Certificate) cacerts.getCertificate(alias);
-                        TrustAnchor trustAnchor = new TrustAnchor(x509Cert, null);
-                        trustedCerts.add(trustAnchor);
-                    }
-                }
-
-                if (getCrypto().getKeyStore() != null) {
-                    Enumeration<String> aliases = getCrypto().getKeyStore().aliases();
-                    while (aliases.hasMoreElements()) {
-                        String alias = aliases.nextElement();
-                        X509Certificate x509Cert = (X509Certificate) getCrypto().getKeyStore().getCertificate(alias);
-                        TrustAnchor trustAnchor = new TrustAnchor(x509Cert, null);
-                        trustedCerts.add(trustAnchor);
-                    }
-                }
-
-                X509CertSelector x509CertSelector = new X509CertSelector();
-                x509CertSelector.setCertificate(x509Certificate);
-
-                PKIXBuilderParameters pkixBuilderParameters = new PKIXBuilderParameters(trustedCerts, x509CertSelector);
-                pkixBuilderParameters.setRevocationEnabled(false);
-                //todo provider?:
-                CertStore intermediateCertStore = CertStore.getInstance("Collection", new CollectionCertStoreParameters(trustedCerts));
-                pkixBuilderParameters.addCertStore(intermediateCertStore);
-
-                //todo provider?:
-                CertPathBuilder certPathBuilder = null;
-                certPathBuilder = CertPathBuilder.getInstance("PKIX");
-                PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) certPathBuilder.build(pkixBuilderParameters);
-
-            } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(e);
-            } catch (CertPathBuilderException e) {
-                throw new WSSecurityException(e);
-            } catch (InvalidAlgorithmParameterException e) {
-                throw new WSSecurityException(e);
-            } catch (KeyStoreException e) {
                 throw new WSSecurityException(e);
             }
         }
@@ -290,8 +199,6 @@ public class SecurityTokenFactory {
         public String getKeyWrappingTokenAlgorithm() {
             return null;
         }
-
-        //todo return whole certpath for validation??
 
         public X509Certificate getX509Certificate() throws org.swssf.crypto.WSSecurityException {
             if (this.x509Certificate == null) {
