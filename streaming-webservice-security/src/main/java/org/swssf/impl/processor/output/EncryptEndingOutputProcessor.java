@@ -56,7 +56,6 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
         this.symmetricKey = encryptOutputProcessor.getSymmetricKey();
         this.symmetricKeyId = encryptOutputProcessor.getSymmetricKeyId();
         this.encryptionPartDefList = encryptOutputProcessor.getEncryptionPartDefList();
-        //todo throw exception when list is empty?
     }
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
@@ -212,7 +211,6 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
 
-            //todo probably we can reuse BinarySecurityTokenOutputProcessor??
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
@@ -224,7 +222,6 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
-
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
         } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
 

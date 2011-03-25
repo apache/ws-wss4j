@@ -57,7 +57,6 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         super(securityProperties);
         this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
-        //todo throw exception when list is empty?
     }
 
     @Override
@@ -291,7 +290,6 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             }
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
 
-            //todo probably we can reuse BinarySecurityTokenOutputProcessor??
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
             if (useSingleCert) {

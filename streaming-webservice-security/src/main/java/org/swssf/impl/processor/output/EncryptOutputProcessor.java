@@ -170,14 +170,12 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(securityProperties.getEncryptionSymAlgorithm());
             Cipher symmetricCipher = Cipher.getInstance(jceAlgorithm);
 
-            // Should internally generate an IV
-            // todo - allow user to set an IV
+            //Should internally generate an IV
             symmetricCipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
             byte[] iv = symmetricCipher.getIV();
 
             characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator, encoding);
             //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
-            //todo play around to find optimal size
             Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
             base64EncoderStream.write(iv);
 

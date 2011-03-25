@@ -28,8 +28,6 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
-    private int level = 0;
-
     public SecurityHeaderOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
         super(securityProperties);
         setPhase(Constants.Phase.PREPROCESSING);
@@ -37,15 +35,15 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
-        //todo test first occuring element must be soap-envelope?
-
         boolean eventHandled = false;
+        int level = outputProcessorChain.getDocumentContext().getDocumentLevel();
 
         if (xmlEvent.isStartElement()) {
-            level++;
             StartElement startElement = xmlEvent.asStartElement();
 
-            if (level == 2 && startElement.getName().equals(Constants.TAG_soap11_Header)) {
+            if (level == 1 && !startElement.getName().equals(Constants.TAG_soap11_Envelope)) {
+                throw new WSSecurityException("Root Element must be " + Constants.TAG_soap11_Envelope + " but was " + startElement.getName());
+            } else if (level == 2 && startElement.getName().equals(Constants.TAG_soap11_Header)) {
                 //output current soap-header event
                 outputProcessorChain.processEvent(xmlEvent);
 
@@ -77,8 +75,6 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
                 eventHandled = true;
             }
-        } else if (xmlEvent.isEndElement()) {
-            level--;
         }
 
         if (!eventHandled) {
