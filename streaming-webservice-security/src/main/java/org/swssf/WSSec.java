@@ -30,8 +30,6 @@ import java.security.Security;
  */
 public class WSSec {
 
-    //todo replace overall "BC" with getProvider somewhere
-
     static {
         try {
             Class c = WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");

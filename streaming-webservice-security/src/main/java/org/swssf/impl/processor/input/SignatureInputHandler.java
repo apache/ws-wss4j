@@ -23,6 +23,7 @@ import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer
 import org.swssf.impl.util.SignerOutputStream;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -140,8 +141,8 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, WSSecurityException {
-            String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
-            Signature signature = Signature.getInstance(signatureAlgorithm, "BC");
+            AlgorithmType signatureAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
+            Signature signature = Signature.getInstance(signatureAlgorithm.getJCEName(), signatureAlgorithm.getJCEProvider());
 
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext);

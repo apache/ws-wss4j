@@ -14,6 +14,8 @@
  */
 package org.swssf.impl.processor.output;
 
+import org.apache.commons.codec.binary.Base64;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
@@ -21,8 +23,7 @@ import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCom
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.RFC2253Parser;
 import org.swssf.impl.util.SignerOutputStream;
-import org.apache.commons.codec.binary.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -144,10 +145,10 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             throw new WSSecurityException("noPassword " + alias);
         }
 
-        String signatureAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getSignatureAlgorithm());
+        AlgorithmType signatureAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureAlgorithm());
         Signature signature = null;
         try {
-            signature = Signature.getInstance(signatureAlgorithm, "BC");
+            signature = Signature.getInstance(signatureAlgorithm.getJCEName(), signatureAlgorithm.getJCEProvider());
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(e);
         } catch (NoSuchProviderException e) {

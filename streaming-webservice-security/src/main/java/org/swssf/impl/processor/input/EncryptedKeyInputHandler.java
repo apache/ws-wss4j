@@ -20,6 +20,7 @@ import org.swssf.ext.*;
 import org.swssf.impl.SecurityTokenFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2001._04.xmlenc_.EncryptedKeyType;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -56,8 +57,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     final byte[] secretToken;
                     try {
                         algorithmURI = encryptedKeyType.getEncryptionMethod().getAlgorithm();
-                        String asyncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-                        Cipher cipher = Cipher.getInstance(asyncEncAlgo, "BC");
+                        AlgorithmType asyncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
+                        Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
 
                         KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
                         securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getDecryptionCrypto(), securityProperties.getCallbackHandler(), inputProcessorChain.getSecurityContext());

@@ -22,6 +22,7 @@ import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SignedElementSecurityEvent;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -142,8 +143,8 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         }
 
         private void createMessageDigest() throws NoSuchAlgorithmException, NoSuchProviderException {
-            String digestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(referenceType.getDigestMethod().getAlgorithm());
-            MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm, "BC");
+            AlgorithmType digestAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(referenceType.getDigestMethod().getAlgorithm());
+            MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm.getJCEName(), digestAlgorithm.getJCEProvider());
             this.digestOutputStream = new DigestOutputStream(messageDigest);
             this.bufferedDigestOutputStream = new BufferedOutputStream(this.digestOutputStream);
         }

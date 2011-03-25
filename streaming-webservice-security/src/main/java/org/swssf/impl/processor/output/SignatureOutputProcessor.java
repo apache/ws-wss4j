@@ -19,6 +19,7 @@ import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
 import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -128,8 +129,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
             this.signaturePartDef = signaturePartDef;
             this.startElement = startElement;
 
-            String algorithmID = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getSignatureDigestAlgorithm());
-            MessageDigest messageDigest = MessageDigest.getInstance(algorithmID, "BC");
+            AlgorithmType algorithmID = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureDigestAlgorithm());
+            MessageDigest messageDigest = MessageDigest.getInstance(algorithmID.getJCEName(), algorithmID.getJCEProvider());
             this.digestOutputStream = new org.swssf.impl.util.DigestOutputStream(messageDigest);
             this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
 

@@ -119,24 +119,28 @@
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="MD5"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#ripemd160"
                     Description="RIPEMD-160 message digest"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="OPTIONAL"
+                    JCEProvider="BC"
                     JCEName="RIPEMD160"/>
 
          <Algorithm URI="http://www.w3.org/2000/09/xmldsig#sha1"
                     Description="SHA-1 message digest"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="REQUIRED"
+                    JCEProvider="BC"
                     JCEName="SHA-1"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#sha256"
                     Description="SHA-1 message digest with 256 bit"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="RECOMMENDED"
+                    JCEProvider="BC"
                     JCEName="SHA-256"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#sha384"
@@ -144,12 +148,14 @@
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="SHA-384"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#sha512"
                     Description="SHA-1 message digest with 512 bit"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="OPTIONAL"
+                    JCEProvider="BC"
                     JCEName="SHA-512"/>
 
          <!-- Signature Algorithms -->
@@ -157,6 +163,7 @@
                     Description="Digital Signature Algorithm with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="REQUIRED"
+                    JCEProvider="BC"
                     JCEName="SHA1withDSA"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-md5"
@@ -164,6 +171,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="MD5withRSA"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160"
@@ -171,12 +179,14 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="RIPEMD160withRSA"/>
 
          <Algorithm URI="http://www.w3.org/2000/09/xmldsig#rsa-sha1"
                     Description="RSA Signature with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="RECOMMENDED"
+                    JCEProvider="BC"
                     JCEName="SHA1withRSA"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
@@ -184,6 +194,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="SHA256withRSA"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"
@@ -191,6 +202,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="SHA384withRSA"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
@@ -198,6 +210,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="SHA512withRSA"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"
@@ -205,6 +218,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="ECDSAwithSHA1"/>
 
          <!-- MAC Algorithms -->
@@ -213,6 +227,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="HmacMD5"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160"
@@ -220,12 +235,14 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="HMACRIPEMD160"/>
 
          <Algorithm URI="http://www.w3.org/2000/09/xmldsig#hmac-sha1"
                     Description="Message Authentication code using SHA1"
                     AlgorithmClass="Mac"
                     RequirementLevel="REQUIRED"
+                    JCEProvider="BC"
                     JCEName="HmacSHA1"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"
@@ -233,6 +250,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="HmacSHA256"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-sha384"
@@ -240,6 +258,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="HmacSHA384"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-sha512"
@@ -247,6 +266,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    JCEProvider="BC"
                     JCEName="HmacSHA512"/>
 
          <!-- Block encryption Algorithms -->
@@ -256,6 +276,7 @@
                     RequirementLevel="REQUIRED"
                     KeyLength="192"
                     RequiredKey="DESede"
+                    JCEProvider="BC"
                     JCEName="DESede/CBC/ISO10126Padding"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#aes128-cbc"
@@ -264,6 +285,7 @@
                     RequirementLevel="REQUIRED"
                     KeyLength="128"
                     RequiredKey="AES"
+                    JCEProvider="BC"
                     JCEName="AES/CBC/ISO10126Padding"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#aes192-cbc"
@@ -272,6 +294,7 @@
                     RequirementLevel="OPTIONAL"
                     KeyLength="192"
                     RequiredKey="AES"
+                    JCEProvider="BC"
                     JCEName="AES/CBC/ISO10126Padding"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#aes256-cbc"
@@ -280,6 +303,7 @@
                     RequirementLevel="REQUIRED"
                     KeyLength="256"
                     RequiredKey="AES"
+                    JCEProvider="BC"
                     JCEName="AES/CBC/ISO10126Padding"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#rsa-1_5"
@@ -287,6 +311,7 @@
                     AlgorithmClass="KeyTransport"
                     RequirementLevel="REQUIRED"
                     RequiredKey="RSA"
+                    JCEProvider="BC"
                     JCEName="RSA/ECB/PKCS1Padding"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"
@@ -294,12 +319,15 @@
                     AlgorithmClass="KeyTransport"
                     RequirementLevel="REQUIRED"
                     RequiredKey="RSA"
+                    JCEProvider="BC"
                     JCEName="RSA/ECB/OAEPWithSHA1AndMGF1Padding"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#dh"
                     Description="Key Agreement Diffie-Hellman"
                     AlgorithmClass="KeyAgreement"
-                    RequirementLevel="OPTIONAL"/>
+                    RequirementLevel="OPTIONAL"
+                    JCEProvider=""
+                    JCEName=""/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#kw-tripledes"
                     Description="Symmetric Key Wrap using Triple DES"
@@ -307,6 +335,7 @@
                     RequirementLevel="REQUIRED"
                     KeyLength="192"
                     RequiredKey="DESede"
+                    JCEProvider="BC"
                     JCEName="DESedeWrap"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#kw-aes128"
@@ -315,6 +344,7 @@
                     RequirementLevel="REQUIRED"
                     KeyLength="128"
                     RequiredKey="AES"
+                    JCEProvider="BC"
                     JCEName="AESWrap"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#kw-aes192"
@@ -323,6 +353,7 @@
                     RequirementLevel="OPTIONAL"
                     KeyLength="192"
                     RequiredKey="AES"
+                    JCEProvider="BC"
                     JCEName="AESWrap"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#kw-aes256"
@@ -331,6 +362,7 @@
                     RequirementLevel="REQUIRED"
                     KeyLength="256"
                     RequiredKey="AES"
+                    JCEProvider="BC"
                     JCEName="AESWrap"/>
 
       </Algorithms>

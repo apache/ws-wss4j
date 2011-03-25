@@ -31,7 +31,6 @@ public class JCEAlgorithmMapper {
 
     private static Map<String, String> uriToJCEName;
     private static Map<String, AlgorithmType> algorithmsMap;
-    private static String providerName = null;
 
     private JCEAlgorithmMapper() {
     }
@@ -66,25 +65,5 @@ public class JCEAlgorithmMapper {
 
     public static String getJCEKeyAlgorithmFromURI(String AlgorithmURI) {
         return algorithmsMap.get(AlgorithmURI).getRequiredKey();
-    }
-
-    //todo providers:
-
-    /**
-     * Gets the default Provider for obtaining the security algorithms
-     *
-     * @return the default providerId.
-     */
-    public static String getProviderId() {
-        return providerName;
-    }
-
-    /**
-     * Sets the default Provider for obtaining the security algorithms
-     *
-     * @param provider the default providerId.
-     */
-    public static void setProviderId(String provider) {
-        providerName = provider;
     }
 }

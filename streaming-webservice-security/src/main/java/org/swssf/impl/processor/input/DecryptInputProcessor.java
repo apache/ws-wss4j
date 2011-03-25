@@ -25,6 +25,7 @@ import org.swssf.securityEvent.*;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
 import org.w3._2001._04.xmlenc_.ReferenceList;
 import org.w3._2001._04.xmlenc_.ReferenceType;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -473,8 +474,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             secretKey = securityToken.getSecretKey(algorithmURI);
 
             try {
-                String syncEncAlgo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-                symmetricCipher = Cipher.getInstance(syncEncAlgo, "BC");
+                AlgorithmType syncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
+                symmetricCipher = Cipher.getInstance(syncEncAlgo.getJCEName(), syncEncAlgo.getJCEProvider());
                 //we have to defer the initialization of the cipher until we can extract the IV...
             } catch (NoSuchAlgorithmException e) {
                 throw new WSSecurityException(e);
