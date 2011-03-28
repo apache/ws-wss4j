@@ -68,13 +68,28 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
 
         // Verify trust on the signature
         if (assertion.isSigned()) {
-            Credential trustCredential = new Credential();
-            SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
-            trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
-            trustCredential.setCertificates(samlKeyInfo.getCerts());
-            super.validate(trustCredential, data);
+            verifySignedAssertion(assertion, data);
         }
         return credential;
+    }
+    
+    /**
+     * Verify trust in the signature of a signed Assertion. This method is separate so that
+     * the user can override if if they want.
+     * @param assertion The signed Assertion
+     * @param data The RequestData context
+     * @return A Credential instance
+     * @throws WSSecurityException
+     */
+    protected Credential verifySignedAssertion(
+        AssertionWrapper assertion,
+        RequestData data
+    ) throws WSSecurityException {
+        Credential trustCredential = new Credential();
+        SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
+        trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
+        trustCredential.setCertificates(samlKeyInfo.getCerts());
+        return super.validate(trustCredential, data);
     }
     
 }

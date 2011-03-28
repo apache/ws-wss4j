@@ -19,6 +19,9 @@
 
 package org.apache.ws.security.validate;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.commons.logging.Log;
@@ -28,14 +31,22 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
+import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.X509Security;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 /**
@@ -157,6 +168,51 @@ public class ValidatorTest extends org.junit.Assert {
         wssConfig.setValidator(WSSecurityEngine.USERNAME_TOKEN, NoOpValidator.class);
         verify(signedDoc, wssConfig, new UsernamePasswordCallbackHandler(), null);
     }
+    
+    /**
+     * In this test, a BinarySecurityToken is added to the SOAP header. A custom processor
+     * validates the BST and transforms it into a SAML Assertion.
+     */
+    @org.junit.Test
+    public void testTransformedBST() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        X509Security bst = new X509Security(doc);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        bst.setX509Certificate(certs[0]);
+        
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("BST output");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidator(WSSecurityEngine.BINARY_TOKEN, new BSTValidator());
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.setWssConfig(config);
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, null, crypto);
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        BinarySecurity token =
+            (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+        assert token != null;
+        
+        AssertionWrapper assertion = 
+            (AssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
+        assert assertion != null;
+    }
 
 
     /**
@@ -171,6 +227,36 @@ public class ValidatorTest extends org.junit.Assert {
     ) throws Exception {
         secEngine.setWssConfig(wssConfig);
         return secEngine.processSecurityHeader(doc, null, cb, crypto);
+    }
+    
+    
+    /**
+     * A validator for a BST token.
+     */
+    private static class BSTValidator implements Validator {
+
+        public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
+            BinarySecurity token = credential.getBinarySecurityToken();
+            if (token == null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE);
+            }
+
+            try {
+                SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+                callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+                callbackHandler.setIssuer("www.example.com");
+                
+                SAMLParms samlParms = new SAMLParms();
+                samlParms.setCallbackHandler(callbackHandler);
+                AssertionWrapper assertion = new AssertionWrapper(samlParms);
+    
+                credential.setTransformedToken(assertion);
+                return credential;
+            } catch (Exception ex) {
+                throw new WSSecurityException(WSSecurityException.FAILURE);
+            }
+        }
+        
     }
     
     

@@ -41,6 +41,7 @@ public class Credential {
     private UsernameToken usernametoken;
     private BinarySecurity binarySecurityToken;
     private AssertionWrapper assertion;
+    private AssertionWrapper transformedToken;
     private Principal principal;
     
     /**
@@ -137,6 +138,22 @@ public class Credential {
      */
     public AssertionWrapper getAssertion() {
         return assertion;
+    }
+    
+    /**
+     * Set an AssertionWrapper instance which corresponds to a Transformed Token.
+     * @param transformedToken a transformed AssertionWrapper instance
+     */
+    public void setTransformedToken(AssertionWrapper transformedToken) {
+        this.transformedToken = transformedToken;
+    }
+    
+    /**
+     * Get an AssertionWrapper instance which corresponds to a Transformed Token.
+     * @return a transformed AssertionWrapper instance
+     */
+    public AssertionWrapper getTransformedToken() {
+        return transformedToken;
     }
     
     /**

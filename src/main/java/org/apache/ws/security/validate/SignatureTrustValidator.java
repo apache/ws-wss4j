@@ -94,7 +94,8 @@ public class SignatureTrustValidator implements Validator {
      * Validate the certificates by checking the validity of each cert
      * @throws WSSecurityException
      */
-    private void validateCertificates(X509Certificate[] certificates) throws WSSecurityException {
+    protected void validateCertificates(X509Certificate[] certificates) 
+        throws WSSecurityException {
         try {
             for (int i = 0; i < certificates.length; i++) {
                 certificates[i].checkValidity();
@@ -124,7 +125,8 @@ public class SignatureTrustValidator implements Validator {
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
      */
-    private boolean verifyTrustInCert(X509Certificate[] certificates, Crypto crypto) throws WSSecurityException {
+    protected boolean verifyTrustInCert(X509Certificate[] certificates, Crypto crypto) 
+        throws WSSecurityException {
         X509Certificate cert = certificates[0];
         
         String subjectString = cert.getSubjectX500Principal().getName();
@@ -215,7 +217,7 @@ public class SignatureTrustValidator implements Validator {
      * @return true if cert is in the keystore
      * @throws WSSecurityException
      */
-    private boolean isCertificateInKeyStore(
+    protected boolean isCertificateInKeyStore(
         Crypto crypto,
         X509Certificate cert
     ) throws WSSecurityException {
@@ -254,7 +256,8 @@ public class SignatureTrustValidator implements Validator {
      * @return true if the certificate chain is trusted, false if not
      * @throws WSSecurityException
      */
-    private boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto) throws WSSecurityException {
+    protected boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto)
+        throws WSSecurityException {
         String subjectString = certificates[0].getSubjectX500Principal().getName();
         //
         // Use the validation method from the crypto to check whether the subjects' 
@@ -285,7 +288,8 @@ public class SignatureTrustValidator implements Validator {
      * Validate a public key
      * @throws WSSecurityException
      */
-    private boolean validatePublicKey(PublicKey publicKey, Crypto crypto) throws WSSecurityException {
+    protected boolean validatePublicKey(PublicKey publicKey, Crypto crypto) 
+        throws WSSecurityException {
         return crypto.verifyTrust(publicKey);
     }
     

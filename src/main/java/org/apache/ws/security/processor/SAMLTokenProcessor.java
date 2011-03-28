@@ -48,7 +48,13 @@ public class SAMLTokenProcessor implements Processor {
             log.debug("Found SAML Assertion element");
         }
         
-        AssertionWrapper assertion = handleSAMLToken(elem, data, wsDocInfo);
+        Credential credential = handleSAMLToken(elem, data, wsDocInfo);
+        AssertionWrapper assertion = credential.getAssertion();
+        if (log.isDebugEnabled()) {
+            log.debug("SAML Assertion issuer " + assertion.getIssuerString());
+            log.debug(DOM2Writer.nodeToString(elem));
+        }
+        
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (assertion.isSigned()) {
@@ -58,11 +64,16 @@ public class SAMLTokenProcessor implements Processor {
         }
         String id = assertion.getId();
         result.put(WSSecurityEngineResult.TAG_ID, id);
+        if (credential.getTransformedToken() != null) {
+            result.put(
+                WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
+            );
+        }
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
 
-    public AssertionWrapper handleSAMLToken(
+    public Credential handleSAMLToken(
         Element token, 
         RequestData data,
         WSDocInfo docInfo
@@ -79,14 +90,7 @@ public class SAMLTokenProcessor implements Processor {
                                                           token.getLocalName()));
         Credential credential = new Credential();
         credential.setAssertion(assertion);
-        validator.validate(credential, data);
-        
-        if (log.isDebugEnabled()) {
-            log.debug("SAML Assertion issuer " + assertion.getIssuerString());
-            log.debug(DOM2Writer.nodeToString(token));
-        }
-        
-        return assertion;
+        return validator.validate(credential, data);
     }
 
 }

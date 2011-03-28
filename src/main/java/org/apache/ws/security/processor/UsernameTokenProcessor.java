@@ -49,7 +49,8 @@ public class UsernameTokenProcessor implements Processor {
             log.debug("Found UsernameToken list element");
         }
         
-        UsernameToken token = handleUsernameToken(elem, data);
+        Credential credential = handleUsernameToken(elem, data);
+        UsernameToken token = credential.getUsernametoken();
         
         WSUsernameTokenPrincipal principal = 
             new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
@@ -65,6 +66,11 @@ public class UsernameTokenProcessor implements Processor {
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(action, token, principal);
         result.put(WSSecurityEngineResult.TAG_ID, token.getID());
+        if (credential.getTransformedToken() != null) {
+            result.put(
+                WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
+            );
+        }
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
@@ -75,10 +81,10 @@ public class UsernameTokenProcessor implements Processor {
      *
      * @param token the DOM element that contains the UsernameToken
      * @param data The RequestData object from which to obtain configuration
-     * @return UsernameToken the UsernameToken object that was parsed
+     * @return a Credential object corresponding to the (validated) Username Token
      * @throws WSSecurityException
      */
-    public UsernameToken 
+    public Credential 
     handleUsernameToken(
         Element token, 
         RequestData data
@@ -103,9 +109,7 @@ public class UsernameTokenProcessor implements Processor {
         if (validator == null) {
             validator = new UsernameTokenValidator();
         }
-        validator.validate(credential, data);
-
-        return ut;
+        return validator.validate(credential, data);
     }
 
 }

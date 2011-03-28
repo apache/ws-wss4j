@@ -70,13 +70,19 @@ public class BinarySecurityTokenProcessor implements Processor {
         Credential credential = new Credential();
         credential.setBinarySecurityToken(token);
         
-        validator.validate(credential, data);
+        Credential returnedCredential = validator.validate(credential, data);
         
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         wsDocInfo.addTokenElement(elem);
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         result.put(WSSecurityEngineResult.TAG_ID, id);
+        if (returnedCredential.getTransformedToken() != null) {
+            result.put(
+                WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
+                returnedCredential.getTransformedToken()
+            );
+        }
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }

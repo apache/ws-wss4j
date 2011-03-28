@@ -93,6 +93,18 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_BINARY_SECURITY_TOKEN = "binary-security-token";
     
+    /**
+     * Tag denoting a Transformed Token. For certain tokens, the Validator may return
+     * an AssertionWrapper instance which corresponds to a transformed version of the
+     * initial token. For example, a Username Token credential might be validated
+     * by an STS and transformed into a SAML Assertion. This tag then holds the 
+     * transformed AssertionWrapper instance, as a component of the Result corresponding
+     * to the Username Token.
+     * 
+     * The value under this tag is of type AssertionWrapper.
+     */
+    public static final String TAG_TRANSFORMED_TOKEN = "transformed-token";
+    
     //
     // Keys and certs
     //
