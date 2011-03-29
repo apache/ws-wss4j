@@ -18,6 +18,7 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * Parseable interface to parse and validate xml
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -32,6 +33,7 @@ public interface Parseable {
 
     /**
      * Validates the XML-Object structure
+     *
      * @throws ParseException thrown when the the object-structure is invalid
      */
     public void validate() throws ParseException;

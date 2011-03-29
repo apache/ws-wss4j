@@ -30,7 +30,8 @@ import java.util.Iterator;
 
 /**
  * A custom implementation of a XMLStreamReader to get back from the XMLEventReader world
- * to XMLStreamReader 
+ * to XMLStreamReader
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

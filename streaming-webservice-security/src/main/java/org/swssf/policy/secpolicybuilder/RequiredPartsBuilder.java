@@ -15,17 +15,17 @@
  */
 package org.swssf.policy.secpolicybuilder;
 
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.AssertionBuilder;
 import org.swssf.policy.secpolicy.PolicyUtil;
 import org.swssf.policy.secpolicy.SP12Constants;
 import org.swssf.policy.secpolicy.SP13Constants;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.policy.secpolicy.model.Header;
 import org.swssf.policy.secpolicy.model.RequiredParts;
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMElement;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.AssertionBuilderFactory;
-import org.apache.neethi.builders.AssertionBuilder;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

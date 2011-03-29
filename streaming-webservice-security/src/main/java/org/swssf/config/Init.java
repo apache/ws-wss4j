@@ -14,6 +14,7 @@
  */
 package org.swssf.config;
 
+import org.swssf.ext.WSSConfigurationException;
 import org.swssf.ext.WSSecurityException;
 import org.xmlsecurity.ns.configuration.ConfigurationType;
 
@@ -57,7 +58,7 @@ public class Init {
                 JCEAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getJCEAlgorithmMappings());
 
             } catch (Exception e) {
-                throw new WSSecurityException(e);
+                throw new WSSConfigurationException(WSSecurityException.FAILURE, null, e);
             }
             initialized = "security-config.xml";
         }

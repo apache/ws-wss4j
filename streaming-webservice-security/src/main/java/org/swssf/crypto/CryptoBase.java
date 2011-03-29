@@ -19,6 +19,7 @@ package org.swssf.crypto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.config.ConfigurationProperties;
+import org.swssf.ext.WSSecurityException;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
@@ -175,15 +176,9 @@ public abstract class CryptoBase implements Crypto {
                 }
                 certFactMap.put(factory.getProvider().getName(), factory);
             } catch (CertificateException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType",
-                        null, e
-                );
+                throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e);
             } catch (NoSuchProviderException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider",
-                        null, e
-                );
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
             }
         }
         return factory;
@@ -202,10 +197,7 @@ public abstract class CryptoBase implements Crypto {
         try {
             cert = (X509Certificate) getCertificateFactory().generateCertificate(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError",
-                    null, e
-            );
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", e);
         }
         return cert;
     }
@@ -219,23 +211,36 @@ public abstract class CryptoBase implements Crypto {
      * @return The private key
      * @throws Exception
      */
-    public PrivateKey getPrivateKey(String alias, String password) throws Exception {
+    public PrivateKey getPrivateKey(String alias, String password) throws WSSecurityException {
         if (alias == null) {
-            throw new Exception("alias is null");
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "aliasIsNull");
         }
-        boolean b = keystore.isKeyEntry(alias);
-        if (!b) {
-            String msg = "Cannot find key for alias: [" + alias + "]";
-            String logMsg = createKeyStoreErrorMessage(keystore);
-            log.error(msg + logMsg);
-            throw new Exception(msg);
+        try {
+            boolean b = keystore.isKeyEntry(alias);
+            if (!b) {
+                String msg = "Cannot find key for alias: [" + alias + "]";
+                String logMsg = createKeyStoreErrorMessage(keystore);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "keyError", new Object[]{msg + logMsg});
+            }
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
         }
-        Key keyTmp = keystore.getKey(alias, password.toCharArray());
-        if (!(keyTmp instanceof PrivateKey)) {
-            String msg = "Key is not a private key, alias: [" + alias + "]";
-            String logMsg = createKeyStoreErrorMessage(keystore);
-            log.error(msg + logMsg);
-            throw new Exception(msg);
+
+        Key keyTmp;
+        try {
+            keyTmp = keystore.getKey(alias, password.toCharArray());
+            if (!(keyTmp instanceof PrivateKey)) {
+                String msg = "Key is not a private key, alias: [" + alias + "]";
+                String logMsg = null;
+                logMsg = createKeyStoreErrorMessage(keystore);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "keyError", new Object[]{msg + logMsg});
+            }
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+        } catch (UnrecoverableKeyException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
         }
         return (PrivateKey) keyTmp;
     }
@@ -361,7 +366,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", e);
         }
         return null;
     }
@@ -407,7 +412,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", e);
         }
         return null;
     }
@@ -442,7 +447,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", e);
         }
         return null;
     }
@@ -485,7 +490,7 @@ public abstract class CryptoBase implements Crypto {
                 return null;
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", null, e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", e);
         }
 
         X509Certificate[] x509certs = new X509Certificate[certs.length];
@@ -516,9 +521,7 @@ public abstract class CryptoBase implements Crypto {
             sha = MessageDigest.getInstance("SHA-1");
             sha.reset();
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "noSHA1availabe", null, e
-            );
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", e);
         }
         try {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
@@ -539,10 +542,7 @@ public abstract class CryptoBase implements Crypto {
                 try {
                     sha.update(cert.getEncoded());
                 } catch (CertificateEncodingException ex) {
-                    throw new WSSecurityException(
-                            WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
-                            null, ex
-                    );
+                    throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", ex);
                 }
                 byte[] data = sha.digest();
 
@@ -551,9 +551,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "keystore", null, e
-            );
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", e);
         }
         return null;
     }
@@ -591,10 +589,7 @@ public abstract class CryptoBase implements Crypto {
         if (cert.getVersion() < 3 || derEncodedValue == null) {
             PublicKey key = cert.getPublicKey();
             if (!(key instanceof RSAPublicKey)) {
-                throw new WSSecurityException(
-                        1,
-                        "noSKIHandling",
-                        new Object[]{"Support for RSA key only"});
+                throw new WSSecurityException(1, "noSKIHandling", new Object[]{"Support for RSA key only"});
             }
             byte[] encoded = key.getEncoded();
             // remove 22-byte algorithm ID and header
@@ -684,15 +679,9 @@ public abstract class CryptoBase implements Crypto {
             CertPath path = getCertificateFactory().generateCertPath(list);
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
-                    null, e
-            );
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e);
         } catch (CertificateException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError",
-                    null, e
-            );
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", e);
         }
     }
 
@@ -705,18 +694,16 @@ public abstract class CryptoBase implements Crypto {
      *                the last in the array
      * @return An array of X509 certificates, ordered according to
      *         the reverse flag
-     * @throws WSSecurityException
+     * @throws org.swssf.ext.WSSecurityException
+     *
      */
-    public X509Certificate[] getX509Certificates(byte[] data, boolean reverse)
-            throws WSSecurityException {
+    public X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException {
         InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
         try {
             path = getCertificateFactory().generateCertPath(in);
         } catch (CertificateException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", null, e
-            );
+            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "parseError", e);
         }
         List l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
@@ -771,16 +758,24 @@ public abstract class CryptoBase implements Crypto {
             pkixBuilderParameters.addCertStore(intermediateCertStore);
             PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) certPathBuilder.build(pkixBuilderParameters);
 
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(e.getMessage(), e);
-        } catch (CertPathBuilderException e) {
-            throw new WSSecurityException(e.getMessage(), e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new WSSecurityException(e.getMessage(), e);
-        } catch (KeyStoreException e) {
-            throw new WSSecurityException(e.getMessage(), e);
-        } catch (NoSuchProviderException e) {
-            throw new WSSecurityException(e.getMessage(), e);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[]{ex.getMessage()},
+                    ex);
+        } catch (CertPathBuilderException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[]{ex.getMessage()},
+                    ex);
+        } catch (InvalidAlgorithmParameterException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[]{ex.getMessage()},
+                    ex);
+        } catch (KeyStoreException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE,
+                    "certpath", new Object[]{ex.getMessage()},
+                    ex);
+        } catch (NoSuchProviderException ex) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", ex);
         }
     }
 
@@ -837,9 +832,7 @@ public abstract class CryptoBase implements Crypto {
             }
             certPathValidator.validate(path, param);
         } catch (NoSuchProviderException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILURE,
-                    "certpath", new Object[]{ex.getMessage()},
-                    (Throwable) ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", ex);
         } catch (NoSuchAlgorithmException ex) {
             throw new WSSecurityException(WSSecurityException.FAILURE,
                     "certpath", new Object[]{ex.getMessage()},
@@ -893,9 +886,7 @@ public abstract class CryptoBase implements Crypto {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "keystore", null, e
-            );
+            throw new WSSecurityException(WSSecurityException.FAILURE, "keystore", e);
         }
         return aliases;
     }

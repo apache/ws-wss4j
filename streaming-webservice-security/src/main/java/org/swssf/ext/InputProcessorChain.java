@@ -19,6 +19,7 @@ import javax.xml.stream.events.XMLEvent;
 
 /**
  * The InputProcessorChain manages the InputProcessors and controls the XMLEvent flow
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -28,50 +29,57 @@ public interface InputProcessorChain extends ProcessorChain {
      * Adds an InputProcessor to the chain. The place where it
      * will be applied can be controlled through the Phase,
      * getBeforeProcessors and getAfterProcessors. @see Interface InputProcessor
+     *
      * @param inputProcessor The InputProcessor which should be placed in the chain
      */
     public void addProcessor(InputProcessor inputProcessor);
 
     /**
      * Removes the specified InputProcessor from this chain.
+     *
      * @param inputProcessor to remove
      */
     public void removeProcessor(InputProcessor inputProcessor);
 
     /**
      * The actual processed document's security context
+     *
      * @return The SecurityContext
      */
     public SecurityContext getSecurityContext();
 
     /**
-     * The actual processed document's document context 
-     * @return The DocumentContext 
+     * The actual processed document's document context
+     *
+     * @return The DocumentContext
      */
     public DocumentContext getDocumentContext();
 
     /**
      * Create a new SubChain. The XMLEvents will be only be processed from the given InputProcessor to the end.
-     * All earlier InputProcessors don't get these events. In other words the chain will be splitted in two parts.  
+     * All earlier InputProcessors don't get these events. In other words the chain will be splitted in two parts.
+     *
      * @param inputProcessor The InputProcessor position the XMLEvents should be processed over this SubChain.
      * @return A new InputProcessorChain
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, WSSecurityException;
 
     /**
      * Requests the next security header XMLEvent from the next processor in the chain.
+     *
      * @return The next XMLEvent from the previous processor
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLEvent processHeaderEvent() throws XMLStreamException, WSSecurityException;
 
     /**
      * Requests the next XMLEvent from the next processor in the chain.
+     *
      * @return The next XMLEvent from the previous processor
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLEvent processEvent() throws XMLStreamException, WSSecurityException;

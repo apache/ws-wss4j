@@ -16,6 +16,7 @@ package org.swssf.ext;
 
 /**
  * Class to describe which and how an element must be secured
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -41,6 +42,7 @@ public class SecurePart {
 
     /**
      * The name of the element to be secured
+     *
      * @return The Element-Local-Name
      */
     public String getName() {
@@ -53,6 +55,7 @@ public class SecurePart {
 
     /**
      * The namespace of the element to be secured
+     *
      * @return The Element Namespace
      */
     public String getNamespace() {
@@ -65,6 +68,7 @@ public class SecurePart {
 
     /**
      * The Modifier: Element or Content
+     *
      * @return The String "Element" or "Content"
      */
     public String getModifier() {
@@ -77,6 +81,7 @@ public class SecurePart {
 
     /**
      * The id of the Element
+     *
      * @return The id
      */
     public String getId() {

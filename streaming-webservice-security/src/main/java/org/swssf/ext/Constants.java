@@ -39,9 +39,9 @@ public class Constants {
 
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
     public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
-    public static final String NS_WSSE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    public static final String NS_WSSE10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static final String NS_WSSE11 = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";
-    public static final String NS_WSU = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    public static final String NS_WSU10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String NS_SOAP11 = "http://schemas.xmlsoap.org/soap/envelope/";
     public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
 
@@ -59,7 +59,7 @@ public class Constants {
     public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
 
     public static final String PREFIX_WSSE = "wsse";
-    public static final QName TAG_wsse_Security = new QName(NS_WSSE, "Security", PREFIX_WSSE);
+    public static final QName TAG_wsse_Security = new QName(NS_WSSE10, "Security", PREFIX_WSSE);
 
     public static final String PREFIX_XENC = "xenc";
     public static final QName TAG_xenc_EncryptedKey = new QName(NS_XMLENC, "EncryptedKey", PREFIX_XENC);
@@ -74,11 +74,11 @@ public class Constants {
     public static final String PREFIX_DSIG = "dsig";
     public static final QName TAG_dsig_KeyInfo = new QName(NS_DSIG, "KeyInfo", PREFIX_DSIG);
 
-    public static final QName TAG_wsse_SecurityTokenReference = new QName(NS_WSSE, "SecurityTokenReference", PREFIX_WSSE);
-    public static final QName TAG_wsse_Reference = new QName(NS_WSSE, "Reference", PREFIX_WSSE);
-    public static final QName ATT_wsse_Usage = new QName(NS_WSSE, "Usage", PREFIX_WSSE);
+    public static final QName TAG_wsse_SecurityTokenReference = new QName(NS_WSSE10, "SecurityTokenReference", PREFIX_WSSE);
+    public static final QName TAG_wsse_Reference = new QName(NS_WSSE10, "Reference", PREFIX_WSSE);
+    public static final QName ATT_wsse_Usage = new QName(NS_WSSE10, "Usage", PREFIX_WSSE);
 
-    public static final QName TAG_wsse_KeyIdentifier = new QName(NS_WSSE, "KeyIdentifier", PREFIX_WSSE);
+    public static final QName TAG_wsse_KeyIdentifier = new QName(NS_WSSE10, "KeyIdentifier", PREFIX_WSSE);
     public static final QName ATT_NULL_EncodingType = new QName(null, "EncodingType");
     public static final QName ATT_NULL_ValueType = new QName(null, "ValueType");
 
@@ -93,9 +93,9 @@ public class Constants {
     public static final QName TAG_xenc_DataReference = new QName(NS_XMLENC, "DataReference", PREFIX_XENC);
     public static final QName ATT_NULL_URI = new QName(null, "URI");
 
-    public static final QName TAG_wsse_BinarySecurityToken = new QName(NS_WSSE, "BinarySecurityToken", PREFIX_WSSE);
+    public static final QName TAG_wsse_BinarySecurityToken = new QName(NS_WSSE10, "BinarySecurityToken", PREFIX_WSSE);
     public static final String PREFIX_WSU = "wsu";
-    public static final QName ATT_wsu_Id = new QName(NS_WSU, "Id", PREFIX_WSU);
+    public static final QName ATT_wsu_Id = new QName(NS_WSU10, "Id", PREFIX_WSU);
 
     public static final QName TAG_xenc_EncryptedData = new QName(NS_XMLENC, "EncryptedData", PREFIX_XENC);
 
@@ -122,9 +122,9 @@ public class Constants {
 
     public static final QName TAG_dsig_SignatureValue = new QName(NS_DSIG, "SignatureValue", PREFIX_DSIG);
 
-    public static final QName TAG_wsu_Timestamp = new QName(NS_WSU, "Timestamp", PREFIX_WSU);
-    public static final QName TAG_wsu_Created = new QName(NS_WSU, "Created", PREFIX_WSU);
-    public static final QName TAG_wsu_Expires = new QName(NS_WSU, "Expires", PREFIX_WSU);
+    public static final QName TAG_wsu_Timestamp = new QName(NS_WSU10, "Timestamp", PREFIX_WSU);
+    public static final QName TAG_wsu_Created = new QName(NS_WSU10, "Created", PREFIX_WSU);
+    public static final QName TAG_wsu_Expires = new QName(NS_WSU10, "Expires", PREFIX_WSU);
 
     public static final QName TAG_dsig_X509Data = new QName(NS_DSIG, "X509Data", PREFIX_DSIG);
     public static final QName TAG_dsig_X509IssuerSerial = new QName(NS_DSIG, "X509IssuerSerial", PREFIX_DSIG);
@@ -160,4 +160,49 @@ public class Constants {
         EMBEDDED_KEYNAME,
         //EMBED_SECURITY_TOKEN_REF,
     }
+
+
+    /****************************************************************************
+     * Fault codes defined in the WSS 1.1 spec under section 12, Error handling
+     */
+
+    /**
+     * An unsupported token was provided
+     */
+    public static final QName UNSUPPORTED_SECURITY_TOKEN = new QName(NS_WSSE10, "UnsupportedSecurityToken");
+
+    /**
+     * An unsupported signature or encryption algorithm was used
+     */
+    public static final QName UNSUPPORTED_ALGORITHM = new QName(NS_WSSE10, "UnsupportedAlgorithm");
+
+    /**
+     * An error was discovered processing the <Security> header
+     */
+    public static final QName INVALID_SECURITY = new QName(NS_WSSE10, "InvalidSecurity");
+
+    /**
+     * An invalid security token was provided
+     */
+    public static final QName INVALID_SECURITY_TOKEN = new QName(NS_WSSE10, "InvalidSecurityToken");
+
+    /**
+     * The security token could not be authenticated or authorized
+     */
+    public static final QName FAILED_AUTHENTICATION = new QName(NS_WSSE10, "FailedAuthentication");
+
+    /**
+     * The signature or decryption was invalid
+     */
+    public static final QName FAILED_CHECK = new QName(NS_WSSE10, "FailedCheck");
+
+    /**
+     * Referenced security token could not be retrieved
+     */
+    public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName(NS_WSSE10, "SecurityTokenUnavailable");
+
+    /**
+     * The message has expired
+     */
+    public static final QName MESSAGE_EXPIRED = new QName(NS_WSSE10, "MessageExpired");
 }

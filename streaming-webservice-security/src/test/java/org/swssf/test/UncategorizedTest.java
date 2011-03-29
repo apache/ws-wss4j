@@ -22,7 +22,6 @@ import org.testng.annotations.Test;
 import java.net.URL;
 
 /**
- *
  * @author $Author: $
  * @version $Revision: $ $Date: $
  */
@@ -35,7 +34,8 @@ public class UncategorizedTest {
             Init.init(url);
             Assert.fail();
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "javax.xml.bind.UnmarshalException\n" +
+            Assert.assertEquals(e.getMessage(), "General security error; nested exception is: \n" +
+                    "\tjavax.xml.bind.UnmarshalException\n" +
                     " - with linked exception:\n" +
                     "[org.xml.sax.SAXParseException: cvc-elt.1: Cannot find the declaration of element 'env:Envelope'.]");
         }

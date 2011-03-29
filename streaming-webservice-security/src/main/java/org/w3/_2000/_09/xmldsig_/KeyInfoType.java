@@ -8,11 +8,11 @@
 
 package org.w3._2000._09.xmldsig_;
 
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.swssf.ext.Constants;
 import org.swssf.ext.ParseException;
 import org.swssf.ext.Parseable;
 import org.swssf.ext.Utils;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBElement;

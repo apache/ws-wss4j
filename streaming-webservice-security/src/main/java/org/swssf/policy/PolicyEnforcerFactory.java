@@ -14,9 +14,6 @@
  */
 package org.swssf.policy;
 
-import org.swssf.ext.Constants;
-import org.swssf.policy.secpolicy.WSSPolicyException;
-import org.swssf.policy.secpolicybuilder.*;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
@@ -25,6 +22,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.swssf.ext.Constants;
+import org.swssf.policy.secpolicy.WSSPolicyException;
+import org.swssf.policy.secpolicybuilder.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -46,6 +46,7 @@ import java.util.*;
 /**
  * PolicyEnforcerFactory builds a map of all the possible effective Policies
  * and caches them for reuse
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

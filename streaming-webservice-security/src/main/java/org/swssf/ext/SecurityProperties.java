@@ -28,6 +28,7 @@ import java.util.List;
  * Main configuration class to supply keys etc.
  * This class is subject to change in the future.
  * Probably we will allow to configure the framework per WSDL
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -37,6 +38,7 @@ public class SecurityProperties {
 
     /**
      * Add an additional, non standard, InputProcessor to the chain
+     *
      * @param inputProcessor The InputProcessor to add
      */
     public void addInputProcessor(InputProcessor inputProcessor) {
@@ -45,6 +47,7 @@ public class SecurityProperties {
 
     /**
      * Returns the currently registered additional InputProcessors
+     *
      * @return the List with the InputProcessors
      */
     public List<InputProcessor> getInputProcessorList() {
@@ -57,6 +60,7 @@ public class SecurityProperties {
 
     /**
      * Returns the decryption keystore
+     *
      * @return A keystore for decryption operation
      */
     public KeyStore getDecryptionKeyStore() {
@@ -65,7 +69,8 @@ public class SecurityProperties {
 
     /**
      * loads a java keystore from the given url for decrypt operations
-     * @param url The URL to the keystore
+     *
+     * @param url              The URL to the keystore
      * @param keyStorePassword The keyStorePassword
      * @throws Exception thrown if something goes wrong while loading the keystore
      */
@@ -77,6 +82,7 @@ public class SecurityProperties {
 
     /**
      * Returns the decryption crypto class
+     *
      * @return
      */
     public Class getDecryptionCryptoClass() {
@@ -85,6 +91,7 @@ public class SecurityProperties {
 
     /**
      * Sets a custom decryption class
+     *
      * @param decryptionCryptoClass
      */
     public void setDecryptionCryptoClass(Class decryptionCryptoClass) {
@@ -97,13 +104,14 @@ public class SecurityProperties {
 
     /**
      * returns the decryptionCrypto for the key-management
+     *
      * @return A Crypto instance
      * @throws WSSecurityException thrown if something goes wrong
      */
     public Crypto getDecryptionCrypto() throws WSSecurityException {
 
         if (this.getDecryptionKeyStore() == null) {
-            throw new WSSecurityException(new SecurityConfigurationException("Decryption KeyStore is not set"));
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "decryptionKeyStoreNotSet");
         }
 
         if (this.getDecryptionCryptoClass() == cachedDecryptionCryptoClass
@@ -115,7 +123,7 @@ public class SecurityProperties {
         if (this.getDecryptionCryptoClass() != null) {
             decryptionCryptoClass = this.getDecryptionCryptoClass();
             if (!decryptionCryptoClass.isAssignableFrom(CryptoBase.class)) {
-                throw new WSSecurityException("DecryptionCryptoClass must be a sub-class of CryptoBase");
+                throw new WSSConfigurationException(WSSecurityException.FAILURE, "decryptionCryptoClassWrong");
             }
         }
 
@@ -127,12 +135,13 @@ public class SecurityProperties {
             cachedDecryptionKeyStore = this.getDecryptionKeyStore();
             return decryptionCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("DecryptionCrypto instantiation failed", e);
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "decryptionCryptoFailure", e);
         }
     }
 
     /**
      * returns the password callback handler
+     *
      * @return
      */
     public CallbackHandler getCallbackHandler() {
@@ -141,6 +150,7 @@ public class SecurityProperties {
 
     /**
      * sets the password callback handler
+     *
      * @param callbackHandler
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
@@ -160,6 +170,7 @@ public class SecurityProperties {
 
     /**
      * Returns the encryption keystore
+     *
      * @return A keystore for encryption operation
      */
     public KeyStore getEncryptionKeyStore() {
@@ -168,7 +179,8 @@ public class SecurityProperties {
 
     /**
      * loads a java keystore from the given url for encrypt operations
-     * @param url The URL to the keystore
+     *
+     * @param url              The URL to the keystore
      * @param keyStorePassword The keyStorePassword
      * @throws Exception thrown if something goes wrong while loading the keystore
      */
@@ -180,6 +192,7 @@ public class SecurityProperties {
 
     /**
      * Returns the encryption crypto class
+     *
      * @return
      */
     public Class getEncryptionCryptoClass() {
@@ -188,6 +201,7 @@ public class SecurityProperties {
 
     /**
      * Sets a custom encryption class
+     *
      * @param encryptionCryptoClass
      */
     public void setEncryptionCryptoClass(Class encryptionCryptoClass) {
@@ -200,13 +214,14 @@ public class SecurityProperties {
 
     /**
      * returns the encryptionCrypto for the key-management
+     *
      * @return A Crypto instance
      * @throws WSSecurityException thrown if something goes wrong
      */
     public Crypto getEncryptionCrypto() throws WSSecurityException {
 
         if (this.getEncryptionKeyStore() == null) {
-            throw new WSSecurityException(new SecurityConfigurationException("Encryption KeyStore is not set"));
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
         }
 
         if (this.getEncryptionCryptoClass() == cachedEncryptionCryptoClass
@@ -218,10 +233,10 @@ public class SecurityProperties {
         if (this.getEncryptionCryptoClass() != null) {
             encryptionCryptoClass = this.getEncryptionCryptoClass();
             if (!CryptoBase.class.isAssignableFrom(encryptionCryptoClass)) {
-                throw new WSSecurityException("EncryptionCryptoClass must be a sub-class of CryptoBase");
+                throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionCryptoClassWrong");
             }
         }
-        
+
         try {
             CryptoBase encryptionCrypto = (CryptoBase) encryptionCryptoClass.newInstance();
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
@@ -230,12 +245,13 @@ public class SecurityProperties {
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("EncryptionCrypto instantiation failed", e);
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionCryptoFailure", e);
         }
     }
 
     /**
-     * Adds a part which must be encrypted by the framework 
+     * Adds a part which must be encrypted by the framework
+     *
      * @param securePart
      */
     public void addEncryptionPart(SecurePart securePart) {
@@ -244,6 +260,7 @@ public class SecurityProperties {
 
     /**
      * Returns the encryption parts which are actually set
+     *
      * @return A List of SecurePart's
      */
     public List<SecurePart> getEncryptionSecureParts() {
@@ -251,8 +268,9 @@ public class SecurityProperties {
     }
 
     /**
-     * Returns the Encryption-Algo 
-     * @return the Encryption-Algo as String 
+     * Returns the Encryption-Algo
+     *
+     * @return the Encryption-Algo as String
      */
     public String getEncryptionSymAlgorithm() {
         return encryptionSymAlgorithm;
@@ -260,6 +278,7 @@ public class SecurityProperties {
 
     /**
      * Specifies the encryption algorithm
+     *
      * @param encryptionSymAlgorithm The algo to use for encryption
      */
     public void setEncryptionSymAlgorithm(String encryptionSymAlgorithm) {
@@ -268,6 +287,7 @@ public class SecurityProperties {
 
     /**
      * Returns the encryption key transport algorithm
+     *
      * @return the key transport algorithm as string
      */
     public String getEncryptionKeyTransportAlgorithm() {
@@ -275,8 +295,10 @@ public class SecurityProperties {
     }
 
     /**
-     * Specifies the encryption key transport algorithm 
-     * @param encryptionKeyTransportAlgorithm the encryption key transport algorithm as string 
+     * Specifies the encryption key transport algorithm
+     *
+     * @param encryptionKeyTransportAlgorithm
+     *         the encryption key transport algorithm as string
      */
     public void setEncryptionKeyTransportAlgorithm(String encryptionKeyTransportAlgorithm) {
         this.encryptionKeyTransportAlgorithm = encryptionKeyTransportAlgorithm;
@@ -292,6 +314,7 @@ public class SecurityProperties {
 
     /**
      * Returns the alias for the encryption key in the keystore
+     *
      * @return the alias for the encryption key in the keystore as string
      */
     public String getEncryptionUser() {
@@ -300,6 +323,7 @@ public class SecurityProperties {
 
     /**
      * Specifies the the alias for the encryption key in the keystore
+     *
      * @param encryptionUser the the alias for the encryption key in the keystore as string
      */
     public void setEncryptionUser(String encryptionUser) {
@@ -308,6 +332,7 @@ public class SecurityProperties {
 
     /**
      * returns the KeyIdentifierType which will be used in the secured document
+     *
      * @return The KeyIdentifierType
      */
     public Constants.KeyIdentifierType getEncryptionKeyIdentifierType() {
@@ -316,6 +341,7 @@ public class SecurityProperties {
 
     /**
      * Specifies the KeyIdentifierType to use in the secured document
+     *
      * @param encryptionKeyIdentifierType
      */
     public void setEncryptionKeyIdentifierType(Constants.KeyIdentifierType encryptionKeyIdentifierType) {
@@ -388,7 +414,7 @@ public class SecurityProperties {
     public Crypto getSignatureCrypto() throws WSSecurityException {
 
         if (this.getSignatureKeyStore() == null) {
-            throw new WSSecurityException(new SecurityConfigurationException("Signature KeyStore is not set"));
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureKeyStoreNotSet");
         }
 
         if (this.getSignatureCryptoClass() == cachedSignatureCryptoClass
@@ -400,7 +426,7 @@ public class SecurityProperties {
         if (this.getSignatureCryptoClass() != null) {
             signatureCryptoClass = this.getSignatureCryptoClass();
             if (!CryptoBase.class.isAssignableFrom(signatureCryptoClass)) {
-                throw new WSSecurityException("SignatureCryptoClass must be a sub-class of CryptoBase");
+                throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureCryptoClassWrong");
             }
         }
 
@@ -412,7 +438,7 @@ public class SecurityProperties {
             cachedSignatureKeyStore = this.getSignatureKeyStore();
             return signatureCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("SignatureCrypto instantiation failed", e);
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureCryptoFailure", e);
         }
     }
 
@@ -437,6 +463,7 @@ public class SecurityProperties {
 
     /**
      * Returns the actual set actions
+     *
      * @return The Actions in applied order
      */
     public Constants.Action[] getOutAction() {
@@ -444,7 +471,8 @@ public class SecurityProperties {
     }
 
     /**
-     * Specifies how to secure the document eg. Timestamp, Signature, Encrypt 
+     * Specifies how to secure the document eg. Timestamp, Signature, Encrypt
+     *
      * @param outAction
      */
     public void setOutAction(Constants.Action[] outAction) {
@@ -490,7 +518,7 @@ public class SecurityProperties {
     public Crypto getSignatureVerificationCrypto() throws WSSecurityException {
 
         if (this.getSignatureVerificationKeyStore() == null) {
-            throw new WSSecurityException(new SecurityConfigurationException("Signature verification KeyStore is not set"));
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureVerificationKeyStoreNotSet");
         }
 
         if (this.getSignatureVerificationCryptoClass() == cachedSignatureVerificationCryptoClass
@@ -500,7 +528,7 @@ public class SecurityProperties {
 
         Class signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
         if (!CryptoBase.class.isAssignableFrom(signatureVerificationCryptoClass)) {
-            throw new WSSecurityException("SignatureVerificationCryptoClass must be a sub-class of CryptoBase");
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureVerificationCryptoClassWrong");
         }
 
         try {
@@ -511,7 +539,7 @@ public class SecurityProperties {
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
         } catch (Exception e) {
-            throw new WSSecurityException("SignatureVerificationCrypto instantiation failed", e);
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureVerificationCryptoFailure", e);
         }
     }
 
@@ -529,6 +557,7 @@ public class SecurityProperties {
 
     /**
      * Returns if the framework is skipping document-events
+     *
      * @return true if document-events will be skipped, false otherwise
      */
     public boolean isSkipDocumentEvents() {
@@ -537,6 +566,7 @@ public class SecurityProperties {
 
     /**
      * specifies if the framework should forward Document-Events or not
+     *
      * @param skipDocumentEvents set to true when document events should be discarded, false otherwise
      */
     public void setSkipDocumentEvents(boolean skipDocumentEvents) {

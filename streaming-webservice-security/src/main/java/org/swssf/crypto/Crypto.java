@@ -17,6 +17,8 @@
 
 package org.swssf.crypto;
 
+import org.swssf.ext.WSSecurityException;
+
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyStore;
@@ -81,7 +83,7 @@ public interface Crypto {
      * @return The private key
      * @throws Exception
      */
-    public PrivateKey getPrivateKey(String alias, String password) throws Exception;
+    public PrivateKey getPrivateKey(String alias, String password) throws WSSecurityException;
 
     /**
      * get the list of certificates for a given alias. This method

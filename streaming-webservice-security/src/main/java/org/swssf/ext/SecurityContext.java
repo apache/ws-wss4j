@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * The document security context
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -36,13 +37,15 @@ public interface SecurityContext {
 
     /**
      * Register a new SecurityTokenProvider.
-     * @param id A unique id
+     *
+     * @param id                    A unique id
      * @param securityTokenProvider The actual SecurityTokenProvider to register.
      */
     public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider);
 
     /**
      * Returns a registered SecurityTokenProvider with the given id or null if not found
+     *
      * @param id The SecurityTokenProvider's id
      * @return The SecurityTokenProvider
      */
@@ -50,12 +53,14 @@ public interface SecurityContext {
 
     /**
      * Registers a SecurityEventListener to receive Security-Events
-     * @param securityEventListener The SecurityEventListener 
+     *
+     * @param securityEventListener The SecurityEventListener
      */
     public void setSecurityEventListener(SecurityEventListener securityEventListener);
 
     /**
-     * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener  
+     * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener
+     *
      * @param securityEvent The security event for the SecurityEventListener
      * @throws WSSecurityException when the event will not be accepted (e.g. policy-violation)
      */

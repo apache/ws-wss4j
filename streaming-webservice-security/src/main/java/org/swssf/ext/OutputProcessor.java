@@ -19,7 +19,8 @@ import javax.xml.stream.events.XMLEvent;
 import java.util.Set;
 
 /**
- * This is the Interface which every OutputProcessor must implement. 
+ * This is the Interface which every OutputProcessor must implement.
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -27,35 +28,40 @@ public interface OutputProcessor {
 
     /**
      * This OutputProcessor will be added before the processors in this set
+     *
      * @return The set with the named OutputProcessor
      */
     Set<String> getBeforeProcessors();
 
     /**
      * This OutputProcessor will be added after the processors in this set
+     *
      * @return The set with the named OutputProcessor
      */
     Set<String> getAfterProcessors();
 
     /**
      * The Phase in which this OutputProcessor should be applied
+     *
      * @return The Phase
      */
     Constants.Phase getPhase();
 
     /**
      * Will be called from the framework for every XMLEvent
-     * @param xmlEvent The next XMLEvent to process
+     *
+     * @param xmlEvent             The next XMLEvent to process
      * @param outputProcessorChain
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException;
 
     /**
      * Will be called when the whole document is processed.
+     *
      * @param outputProcessorChain
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException;

@@ -38,17 +38,17 @@ public abstract class AbstractInputSecurityHeaderHandler {
         Iterator<XMLEvent> iterator = eventDeque.descendingIterator();
         //skip to <XY> Element
         int i = 0;
-        while (i < index){
+        while (i < index) {
             iterator.next();
             i++;
         }
 
         if (!iterator.hasNext()) {
-            throw new WSSecurityException("No Element");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "unexpectedEndOfXML");
         }
         XMLEvent xmlEvent = iterator.next();
         if (!xmlEvent.isStartElement()) {
-            throw new WSSecurityException("No StartElement");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "notAStartElement");
         }
         Parseable parseable = getParseable(xmlEvent.asStartElement());
 
@@ -59,7 +59,7 @@ public abstract class AbstractInputSecurityHeaderHandler {
             }
             parseable.validate();
         } catch (ParseException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
         }
         return parseable;
     }

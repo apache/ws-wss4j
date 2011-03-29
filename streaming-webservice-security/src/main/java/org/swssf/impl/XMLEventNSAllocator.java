@@ -14,10 +14,10 @@
  */
 package org.swssf.impl;
 
+import com.ctc.wstx.evt.DefaultEventAllocator;
 import org.swssf.ext.ComparableAttribute;
 import org.swssf.ext.ComparableNamespace;
 import org.swssf.ext.XMLEventNS;
-import com.ctc.wstx.evt.DefaultEventAllocator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
@@ -34,7 +34,7 @@ import java.util.*;
 
 /**
  * todo this class needs some love...
- *
+ * <p/>
  * An extended XMLEventAllocator to collect namespaces and C14N relevant attributes
  *
  * @author $Author: giger $

@@ -95,9 +95,12 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                 xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
-                                throw new WSSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(
+                                        WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                        new Object[]{"No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()}, e
+                                );
                             } catch (NoSuchProviderException e) {
-                                throw new WSSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
                             }
 
                             activeInternalSignatureOutputProcessor = internalSignatureOutputProcessor;
@@ -157,7 +160,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {
-                        throw new WSSecurityException(e);
+                        throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
                     }
                     String calculatedDigest = new String(org.bouncycastle.util.encoders.Base64.encode(this.digestOutputStream.getDigestValue()));
                     logger.debug("Calculated Digest: " + calculatedDigest);

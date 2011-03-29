@@ -16,10 +16,10 @@
 
 package org.swssf.policy.secpolicy.model;
 
-import org.swssf.policy.secpolicy.SPConstants;
-import org.swssf.securityEvent.SecurityEvent;
 import org.apache.axiom.om.OMElement;
 import org.apache.neethi.Policy;
+import org.swssf.policy.secpolicy.SPConstants;
+import org.swssf.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

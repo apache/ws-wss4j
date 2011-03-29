@@ -19,11 +19,11 @@ import org.swssf.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.securityEvent.*;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 /**
  * Processor to generate SecurityEvents regarding not secured elements
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -65,7 +65,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             try {
                 policyEnforcer.doFinal();
             } catch (PolicyViolationException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
             }
         }
 

@@ -16,13 +16,13 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.InitiatorEncryptionTokenAssertionState;
 import org.swssf.policy.assertionStates.RecipientEncryptionTokenAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
-import org.apache.neethi.PolicyComponent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

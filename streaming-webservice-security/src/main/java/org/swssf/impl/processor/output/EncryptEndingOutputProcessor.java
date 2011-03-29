@@ -14,12 +14,12 @@
  */
 package org.swssf.impl.processor.output;
 
+import org.apache.commons.codec.binary.Base64;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.EncryptionPartDef;
 import org.swssf.impl.util.RFC2253Parser;
-import org.apache.commons.codec.binary.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -37,8 +37,10 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-/** Processor buffers encrypted XMLEvents, builds the EncryptedKey Security-Header,
+/**
+ * Processor buffers encrypted XMLEvents, builds the EncryptedKey Security-Header,
  * and forwards then the buffered events.
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -100,15 +102,11 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
         if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
             x509Certificate = getSecurityProperties().getEncryptionUseThisCertificate();
         } else {
-            try {
-                X509Certificate[] certs = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
-                if (certs == null || certs.length <= 0) {
-                    throw new WSSecurityException("noUserCertsFound for encryption for user " + getSecurityProperties().getEncryptionUser());
-                }
-                x509Certificate = certs[0];
-            } catch (org.swssf.crypto.WSSecurityException e) {
-                throw new WSSecurityException(e);
+            X509Certificate[] certs = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
+            if (certs == null || certs.length <= 0) {
+                throw new WSSecurityException("noUserCertsFound for encryption for user " + getSecurityProperties().getEncryptionUser());
             }
+            x509Certificate = certs[0];
         }
 
         //the following if-else section builds the key references
@@ -128,7 +126,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
         }
@@ -159,19 +157,15 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
         } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
             // As per the 1.1 specification, SKI can only be used for a V3 certificate
             if (x509Certificate.getVersion() != 3) {
-                throw new WSSecurityException("invalidCertForSKI");
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "invalidCertForSKI");
             }
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509SubjectKeyIdentifier);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
-            try {
-                byte data[] = getSecurityProperties().getEncryptionCrypto().getSKIBytesFromCert(x509Certificate);
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
-            } catch (org.swssf.crypto.WSSecurityException e) {
-                throw new WSSecurityException(e);
-            }
+            byte data[] = getSecurityProperties().getEncryptionCrypto().getSKIBytesFromCert(x509Certificate);
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
 
@@ -182,7 +176,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
@@ -200,9 +194,9 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
             } catch (CertificateEncodingException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
@@ -219,7 +213,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
@@ -231,7 +225,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
         } else {
-            throw new WSSecurityException("Unsupported SecurityToken: " + getSecurityProperties().getEncryptionKeyIdentifierType().name());
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "unsupportedSecurityToken", new Object[]{getSecurityProperties().getEncryptionKeyIdentifierType().name()});
         }
 
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
@@ -249,22 +243,23 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
 
             int blockSize = cipher.getBlockSize();
             if (blockSize > 0 && blockSize < ephemeralKey.length) {
-                throw new WSSecurityException("unsupportedKeyTransp" + " public key algorithm too weak to encrypt symmetric key");
+                throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyTransp", new Object[]{"public key algorithm too weak to encrypt symmetric key"}
+                );
             }
             byte[] encryptedEphemeralKey = cipher.doFinal(ephemeralKey);
 
             createCharactersAndOutputAsEvent(subOutputProcessorChain, new String(org.bouncycastle.util.encoders.Base64.encode(encryptedEphemeralKey)));
 
         } catch (NoSuchPaddingException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
         } catch (BadPaddingException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
         } catch (IllegalBlockSizeException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
         }
 
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_xenc_CipherValue);

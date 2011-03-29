@@ -18,15 +18,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.Deque;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
  * An abstract InputProcessor class for reusabilty
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -70,5 +68,5 @@ public abstract class AbstractInputProcessor implements InputProcessor {
 
     public SecurityProperties getSecurityProperties() {
         return securityProperties;
-    }    
+    }
 }

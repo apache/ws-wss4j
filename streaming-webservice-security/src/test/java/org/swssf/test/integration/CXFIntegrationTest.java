@@ -14,7 +14,6 @@
  */
 package org.swssf.test.integration;
 
-import org.swssf.test.WSS4JCallbackHandlerImpl;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
@@ -24,6 +23,7 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.swssf.test.WSS4JCallbackHandlerImpl;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

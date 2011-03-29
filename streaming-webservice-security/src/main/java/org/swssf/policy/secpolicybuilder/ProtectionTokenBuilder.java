@@ -15,15 +15,15 @@
  */
 package org.swssf.policy.secpolicybuilder;
 
-import org.swssf.policy.secpolicy.*;
-import org.swssf.policy.secpolicy.model.ProtectionToken;
-import org.swssf.policy.secpolicy.model.Token;
 import org.apache.axiom.om.OMElement;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.swssf.policy.secpolicy.*;
+import org.swssf.policy.secpolicy.model.ProtectionToken;
+import org.swssf.policy.secpolicy.model.Token;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

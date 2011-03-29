@@ -65,7 +65,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         try {
             keyGen = KeyGenerator.getInstance(keyAlgorithm);
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
         }
         keyGen.init(keyLength);
 
@@ -117,13 +117,13 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                                 outputProcessorChain.getDocumentContext().getEncoding()
                                         );
                             } catch (NoSuchAlgorithmException e) {
-                                throw new WSSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
                             } catch (NoSuchPaddingException e) {
-                                throw new WSSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
                             } catch (InvalidKeyException e) {
-                                throw new WSSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
                             } catch (IOException e) {
-                                throw new WSSecurityException(e.getMessage(), e);
+                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
                             }
 
                             activeInternalEncryptionOutputProcessor = internalEncryptionOutputProcessor;

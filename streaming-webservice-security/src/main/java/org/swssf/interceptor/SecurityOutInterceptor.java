@@ -14,10 +14,6 @@
  */
 package org.swssf.interceptor;
 
-import org.swssf.WSSec;
-import org.swssf.ext.OutboundWSSec;
-import org.swssf.ext.SecurityProperties;
-import org.swssf.ext.WSSecurityException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
@@ -29,6 +25,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.swssf.WSSec;
+import org.swssf.ext.OutboundWSSec;
+import org.swssf.ext.SecurityProperties;
+import org.swssf.ext.WSSecurityException;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;

@@ -14,9 +14,9 @@
  */
 package org.swssf.ext;
 
-import org.swssf.impl.XMLEventNSAllocator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.impl.XMLEventNSAllocator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -27,6 +27,7 @@ import java.util.Set;
 
 /**
  * An abstract OutputProcessor class for reusabilty
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

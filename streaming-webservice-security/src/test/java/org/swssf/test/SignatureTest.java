@@ -14,12 +14,12 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;

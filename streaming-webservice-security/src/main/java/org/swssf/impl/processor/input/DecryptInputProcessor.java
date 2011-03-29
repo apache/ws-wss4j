@@ -151,7 +151,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             logger.debug("Found encryption reference: " + refId.getValue() + " on element" + startElement.getName());
                             //duplicate id's are forbidden
                             if (referenceType.isProcessed()) {
-                                throw new WSSecurityException("duplicate id encountered!");
+                                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "duplicateId");
                             }
 
                             if (encryptedHeader) {
@@ -201,7 +201,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 try {
                                     currentEncryptedDataType.parseXMLEvent(encryptedDataXMLEvent);
                                 } catch (ParseException e) {
-                                    throw new WSSecurityException(e);
+                                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
                                 }
                             }
                             while (!(encryptedDataXMLEvent.isStartElement() && encryptedDataXMLEvent.asStartElement().getName().equals(Constants.TAG_xenc_CipherValue)));
@@ -209,7 +209,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             try {
                                 currentEncryptedDataType.validate();
                             } catch (ParseException e) {
-                                throw new WSSecurityException(e);
+                                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
                             }
 
                             //create a new Thread for streaming decryption
@@ -281,7 +281,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         while (referenceTypeIterator.hasNext()) {
             ReferenceType referenceType = referenceTypeIterator.next();
             if (!referenceType.isProcessed()) {
-                throw new WSSecurityException("Some encryption references where not processed... Probably security header ordering problem?");
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "unprocessedEncryptionReferences");
             }
         }
         inputProcessorChain.doFinal();
@@ -474,11 +474,17 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 symmetricCipher = Cipher.getInstance(syncEncAlgo.getJCEName(), syncEncAlgo.getJCEProvider());
                 //we have to defer the initialization of the cipher until we can extract the IV...
             } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(e);
-            } catch (NoSuchProviderException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(
+                        WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                        new Object[]{"No such algorithm: " + algorithmURI}, e
+                );
             } catch (NoSuchPaddingException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(
+                        WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                        new Object[]{"No such padding: " + algorithmURI}, e
+                );
+            } catch (NoSuchProviderException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
             }
 
             //fire an AlgorithmSuiteSecurityEvent
@@ -609,7 +615,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             decryptOutputStream.write(xmlEvent.asCharacters().getData().getBytes(inputProcessorChain.getDocumentContext().getEncoding()));
                             break;
                         default:
-                            throw new WSSecurityException("Unexpected event: " + Utils.getXMLEventAsString(xmlEvent));
+                            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "unexpectedXMLEvent", new Object[]{Utils.getXMLEventAsString(xmlEvent)});
                     }
                 }
 

@@ -14,16 +14,16 @@
  */
 package org.swssf.interceptor;
 
-import org.swssf.WSSec;
-import org.swssf.ext.Constants;
-import org.swssf.ext.InboundWSSec;
-import org.swssf.ext.SecurityProperties;
-import org.swssf.ext.WSSecurityException;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.swssf.WSSec;
+import org.swssf.ext.Constants;
+import org.swssf.ext.InboundWSSec;
+import org.swssf.ext.SecurityProperties;
+import org.swssf.ext.WSSecurityException;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

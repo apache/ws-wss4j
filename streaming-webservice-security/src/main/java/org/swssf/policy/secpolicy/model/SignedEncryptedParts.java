@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.PolicyComponent;
 import org.swssf.ext.Constants;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
@@ -23,7 +24,6 @@ import org.swssf.policy.assertionStates.EncryptedPartAssertionState;
 import org.swssf.policy.assertionStates.SignedPartAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
-import org.apache.neethi.PolicyComponent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

@@ -46,12 +46,14 @@ public class WSSec {
      *
      * @param securityProperties The user-defined security configuration
      * @return A new OutboundWSSec
-     * @throws org.swssf.ext.WSSecurityException           if the initialisation failed
-     * @throws SecurityConfigurationException if the configuration is invalid
+     * @throws org.swssf.ext.WSSecurityException
+     *          if the initialisation failed
+     * @throws org.swssf.ext.WSSConfigurationException
+     *          if the configuration is invalid
      */
-    public static OutboundWSSec getOutboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, SecurityConfigurationException {
+    public static OutboundWSSec getOutboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, WSSConfigurationException {
         if (securityProperties == null) {
-            throw new WSSecurityException("SecurityProperties must not be null!");
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "missingSecurityProperties");
         }
 
         Init.init(null);
@@ -65,12 +67,14 @@ public class WSSec {
      *
      * @param securityProperties The user-defined security configuration
      * @return A new InboundWSSec
-     * @throws org.swssf.ext.WSSecurityException           if the initialisation failed
-     * @throws SecurityConfigurationException if the configuration is invalid
+     * @throws org.swssf.ext.WSSecurityException
+     *          if the initialisation failed
+     * @throws org.swssf.ext.WSSConfigurationException
+     *          if the configuration is invalid
      */
-    public static InboundWSSec getInboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, SecurityConfigurationException {
+    public static InboundWSSec getInboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, WSSConfigurationException {
         if (securityProperties == null) {
-            throw new WSSecurityException("SecurityProperties must not be null!");
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "missingSecurityProperties");
         }
 
         Init.init(null);
@@ -84,11 +88,12 @@ public class WSSec {
      *
      * @param securityProperties The configuration to validate
      * @return The validated configuration
-     * @throws SecurityConfigurationException if the configuration is invalid
+     * @throws org.swssf.ext.WSSConfigurationException
+     *          if the configuration is invalid
      */
-    public static SecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(SecurityProperties securityProperties) throws SecurityConfigurationException {
+    public static SecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(SecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getOutAction() == null) {
-            throw new SecurityConfigurationException("NoOutputAction");
+            throw new WSSConfigurationException(WSSecurityException.FAILURE, "noOutputAction");
         }
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
             Constants.Action action = securityProperties.getOutAction()[i];
@@ -100,13 +105,13 @@ public class WSSec {
                     break;
                 case SIGNATURE:
                     if (securityProperties.getSignatureKeyStore() == null) {
-                        throw new SecurityConfigurationException("NoSignatureKeyStore");
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureKeyStoreNotSet");
                     }
                     if (securityProperties.getSignatureUser() == null) {
-                        throw new SecurityConfigurationException("NoSignatureUser");
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noSignatureUser");
                     }
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new SecurityConfigurationException("NoCallbackHandler");
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noSignatureCallbackHandler");
                     }
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
                         securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));
@@ -128,10 +133,10 @@ public class WSSec {
                 case ENCRYPT:
                     if (securityProperties.getEncryptionUseThisCertificate() == null
                             && securityProperties.getEncryptionKeyStore() == null) {
-                        throw new SecurityConfigurationException("NoEncryptionKeyStoreNorEncryptionUseThisCertificate");
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
                     }
                     if (securityProperties.getEncryptionUser() == null && securityProperties.getEncryptionUseThisCertificate() == null) {
-                        throw new SecurityConfigurationException("NoEncryptionUser");
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noEncryptionUser");
                     }
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {
                         securityProperties.addEncryptionPart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -160,9 +165,10 @@ public class WSSec {
      *
      * @param securityProperties The configuration to validate
      * @return The validated configuration
-     * @throws SecurityConfigurationException if the configuration is invalid
+     * @throws org.swssf.ext.WSSConfigurationException
+     *          if the configuration is invalid
      */
-    public static SecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(SecurityProperties securityProperties) throws SecurityConfigurationException {
+    public static SecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(SecurityProperties securityProperties) throws WSSConfigurationException {
         //todo clone securityProperties
         return securityProperties;
     }

@@ -14,6 +14,12 @@
  */
 package org.swssf.policy;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyOperator;
 import org.swssf.ext.WSSecurityException;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.WSSPolicyException;
@@ -21,18 +27,13 @@ import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
 import org.swssf.securityEvent.OperationSecurityEvent;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
-import org.apache.neethi.PolicyOperator;
 
 import java.util.*;
 
 /**
  * The PolicyEnforcer verifies the Policy assertions
  * The Assertion will be validated in realtime as far as possible
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -106,6 +107,7 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     /**
      * tries to verify a SecurityEvent in realtime.
+     *
      * @param securityEvent
      * @throws WSSPolicyException
      */
@@ -139,7 +141,8 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     /**
      * verifies the whole policy to try to find a satisfied alternative
-     * @throws WSSPolicyException throws when the policy is invalid
+     *
+     * @throws WSSPolicyException       throws when the policy is invalid
      * @throws PolicyViolationException thrown when no alternative could be satisifed
      */
     private void verifyPolicy() throws WSSPolicyException, PolicyViolationException {
@@ -228,7 +231,8 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     /**
-     * the final Policy validation to find a satisfied alternative 
+     * the final Policy validation to find a satisfied alternative
+     *
      * @throws PolicyViolationException if no alternative could be satisfied
      */
     public void doFinal() throws PolicyViolationException {

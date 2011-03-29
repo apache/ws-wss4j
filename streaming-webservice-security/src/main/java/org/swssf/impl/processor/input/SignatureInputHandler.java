@@ -136,7 +136,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             try {
                 createSignatureAlgorithm();
             } catch (Exception e) {
-                throw new WSSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             }
         }
 
@@ -160,12 +160,12 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             try {
                 bufferedSignerOutputStream.close();
                 if (!signerOutputStream.verify(Base64.decode(signatureType.getSignatureValue().getValue()))) {
-                    throw new WSSecurityException("Signature verification failed");
+                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
             } catch (SignatureException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             } catch (IOException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             }
         }
     }

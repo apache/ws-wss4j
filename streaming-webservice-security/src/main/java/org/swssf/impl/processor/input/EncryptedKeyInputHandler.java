@@ -52,36 +52,50 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                 public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
 
                     //decrypt the containing token and register it as a new SecurityToken:
-                    final String algorithmURI;
+                    String algorithmURI = null;
                     final SecurityToken securityToken;
                     final byte[] secretToken;
                     try {
                         algorithmURI = encryptedKeyType.getEncryptionMethod().getAlgorithm();
+                        if (algorithmURI == null) {
+                            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo");
+                        }
                         AlgorithmType asyncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
                         Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
 
                         KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
-                        securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getDecryptionCrypto(), securityProperties.getCallbackHandler(), inputProcessorChain.getSecurityContext());
+                        securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                                keyInfoType,
+                                securityProperties.getDecryptionCrypto(),
+                                securityProperties.getCallbackHandler(),
+                                inputProcessorChain.getSecurityContext()
+                        );
                         cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey(algorithmURI));
 
                         byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(encryptedKeyType.getCipherData().getCipherValue());
                         secretToken = cipher.doFinal(encryptedEphemeralKey);
 
                     } catch (NoSuchPaddingException e) {
-                        throw new WSSecurityException(e);
+                        throw new WSSecurityException(
+                                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                new Object[]{"No such padding: " + algorithmURI}, e
+                        );
                     } catch (NoSuchAlgorithmException e) {
-                        throw new WSSecurityException(e);
+                        throw new WSSecurityException(
+                                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                new Object[]{"No such algorithm: " + algorithmURI}, e
+                        );
                     } catch (BadPaddingException e) {
-                        throw new WSSecurityException(e);
+                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
                     } catch (IllegalBlockSizeException e) {
-                        throw new WSSecurityException(e);
-                    } catch (NoSuchProviderException e) {
-                        throw new WSSecurityException(e);
+                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
                     } catch (InvalidKeyException e) {
-                        throw new WSSecurityException(e);
-                    } catch (Exception e) {
-                        throw new WSSecurityException(e);
+                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                    } catch (NoSuchProviderException e) {
+                        throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
                     }
+
+                    final String algorithm = algorithmURI;
 
                     return new SecurityToken() {
 
@@ -114,7 +128,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         }
 
                         public String getKeyWrappingTokenAlgorithm() {
-                            return algorithmURI;
+                            return algorithm;
                         }
 
                         public Constants.KeyIdentifierType getKeyIdentifierType() {

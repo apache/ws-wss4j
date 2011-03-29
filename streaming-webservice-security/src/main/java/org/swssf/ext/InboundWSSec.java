@@ -14,6 +14,8 @@
  */
 package org.swssf.ext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.impl.DocumentContextImpl;
 import org.swssf.impl.InputProcessorChainImpl;
 import org.swssf.impl.XMLEventNSAllocator;
@@ -22,8 +24,6 @@ import org.swssf.impl.processor.input.LogInputProcessor;
 import org.swssf.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.impl.processor.input.XMLEventReaderInputProcessor;
 import org.swssf.securityEvent.SecurityEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -35,6 +35,7 @@ import java.util.List;
 /**
  * Inbound Streaming-WebService-Security
  * An instance of this class can be retrieved over the WSSec class
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -56,12 +57,13 @@ public class InboundWSSec {
      * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
      * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
      * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
-     *
+     * <p/>
      * This method is the entry point for the incoming security-engine.
      * Hand over the original XMLStreamReader and use the returned one for further processing
+     *
      * @param xmlStreamReader The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
@@ -76,13 +78,14 @@ public class InboundWSSec {
      * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
      * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
      * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
-     *
+     * <p/>
      * This method is the entry point for the incoming security-engine.
      * Hand over the original XMLStreamReader and use the returned one for further processing
-     * @param xmlStreamReader The original XMLStreamReader
+     *
+     * @param xmlStreamReader       The original XMLStreamReader
      * @param securityEventListener A SecurityEventListener to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
-     * @throws XMLStreamException thrown when a streaming error occurs
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {

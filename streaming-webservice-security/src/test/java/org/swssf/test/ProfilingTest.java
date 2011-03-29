@@ -11,13 +11,16 @@ import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.annotations.Test;
 
-import javax.xml.stream.*;
-import java.io.*;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author giger
  */
 public class ProfilingTest extends AbstractTestBase {
@@ -33,7 +36,7 @@ public class ProfilingTest extends AbstractTestBase {
         transformer.transform(new DOMSource(securedDocument), new StreamResult(new FileOutputStream("ICHAGCompany-3000-sig-enc.xml")));
     }
  */
-    
+
     @Test(invocationCount = 1)
     public void testStreamingSecOutbound() throws Exception {
 /*
@@ -57,7 +60,7 @@ public class ProfilingTest extends AbstractTestBase {
 
  */
     }
-      
+
 
 /*
     @Test(invocationCount = 1)
@@ -67,7 +70,7 @@ public class ProfilingTest extends AbstractTestBase {
         Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(sourceDocument), action);
     }
 */
-    
+
     @Test(invocationCount = 1, dependsOnMethods = {"testStreamingSecOutbound"})
     public void testStreamingSecInbound() throws Exception {
 
@@ -90,8 +93,8 @@ public class ProfilingTest extends AbstractTestBase {
                         throw new RuntimeException(e);
                     }
                     System.gc();
-                    times.add(((int)(System.currentTimeMillis() - currentTime - sleepTime)));
-                    memory.add(((int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024)));
+                    times.add(((int) (System.currentTimeMillis() - currentTime - sleepTime)));
+                    memory.add(((int) ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024)));
                     currentTime = System.currentTimeMillis();
                 }
             }
@@ -161,51 +164,50 @@ public class ProfilingTest extends AbstractTestBase {
             this.stop = stop;
         }
     }
-     
 
 
 /*
-    @Test(invocationCount = 1)
-    public void testStreamingSecOutbound() throws Exception {
-        SecurityProperties securityProperties = new SecurityProperties();
-        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.setEncryptionUser("receiver");
-        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        securityProperties.setSignatureUser("transmitter");
-        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
-        securityProperties.setOutAction(actions);
-        securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
+   @Test(invocationCount = 1)
+   public void testStreamingSecOutbound() throws Exception {
+       SecurityProperties securityProperties = new SecurityProperties();
+       securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+       securityProperties.setEncryptionUser("receiver");
+       securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+       securityProperties.setSignatureUser("transmitter");
+       securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+       Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};
+       securityProperties.setOutAction(actions);
+       securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
 
-        InputStream sourceDocument = new BufferedInputStream(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
-        OutboundWSSec xmlSecOut = WSSec.getOutboundWSSec(securityProperties);
-        XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream("plain-soap-sig-enc.xml"));
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
-        XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-        xmlStreamWriter.close();
-        xmlStreamReader.close();
-    }
+       InputStream sourceDocument = new BufferedInputStream(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+       OutboundWSSec xmlSecOut = WSSec.getOutboundWSSec(securityProperties);
+       XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream("plain-soap-sig-enc.xml"));
+       XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
+       XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+       xmlStreamWriter.close();
+       xmlStreamReader.close();
+   }
 
-    @Test(invocationCount = 1, dependsOnMethods = {"testStreamingSecOutbound"})
-    public void testStreamingSecInbound() throws Exception {
+   @Test(invocationCount = 1, dependsOnMethods = {"testStreamingSecOutbound"})
+   public void testStreamingSecInbound() throws Exception {
 
-        InputStream sourceDocument = new FileInputStream("plain-soap-sig-enc.xml");
+       InputStream sourceDocument = new FileInputStream("plain-soap-sig-enc.xml");
 
-        SecurityProperties securityProperties = new SecurityProperties();
-        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+       SecurityProperties securityProperties = new SecurityProperties();
+       securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+       securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+       securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        InboundWSSec xmlSec = WSSec.getInboundWSSec(securityProperties);
-        XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(sourceDocument));
+       InboundWSSec xmlSec = WSSec.getInboundWSSec(securityProperties);
+       XMLStreamReader outXmlStreamReader = xmlSec.processInMessage(xmlInputFactory.createXMLStreamReader(sourceDocument));
 
-        XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
-        XmlReaderToWriter.writeAll(outXmlStreamReader, xmlOutputFactory.createXMLStreamWriter(new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                //dev/null
-            }
-        }));
-    }
- */
+       XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
+       XmlReaderToWriter.writeAll(outXmlStreamReader, xmlOutputFactory.createXMLStreamWriter(new OutputStream() {
+           @Override
+           public void write(int b) throws IOException {
+               //dev/null
+           }
+       }));
+   }
+*/
 }

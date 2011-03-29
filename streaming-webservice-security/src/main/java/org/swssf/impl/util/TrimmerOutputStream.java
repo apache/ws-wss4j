@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Trimms the start and the end of a stream 
+ * Trimms the start and the end of a stream
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

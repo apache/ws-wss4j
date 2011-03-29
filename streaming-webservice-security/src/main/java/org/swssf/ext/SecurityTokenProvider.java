@@ -18,6 +18,7 @@ import org.swssf.crypto.Crypto;
 
 /**
  * A SecurityTokenProvider is a object which provides a Token for cryptographic operations
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -25,6 +26,7 @@ public interface SecurityTokenProvider {
 
     /**
      * Returns the represented SecurityToken of this object
+     *
      * @param crypto The Crypto to use to restore the Token
      * @return The SecurityToken
      * @throws WSSecurityException if the token couldn't be loaded

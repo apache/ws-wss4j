@@ -15,13 +15,13 @@
  */
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AlgorithmSuiteAssertionState;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.securityEvent.SecurityEvent;
-import org.apache.neethi.PolicyComponent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

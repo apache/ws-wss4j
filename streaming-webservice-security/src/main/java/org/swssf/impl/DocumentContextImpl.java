@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * A concrete DocumentContext Implementation
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -44,8 +45,7 @@ public class DocumentContextImpl implements DocumentContext {
     public String getSOAPMessageVersionNamespace() {
         if (path.size() >= 1 && path.get(0).equals(Constants.TAG_soap11_Envelope)) {
             return Constants.NS_SOAP11;
-        }
-        else if (path.size() >= 1 && path.get(0).equals(Constants.TAG_soap12_Envelope)) {
+        } else if (path.size() >= 1 && path.get(0).equals(Constants.TAG_soap12_Envelope)) {
             return Constants.NS_SOAP12;
         }
         return null;

@@ -50,7 +50,7 @@ public class SecurityTokenFactory {
         if (keyInfoType != null) {
             final SecurityTokenReferenceType securityTokenReferenceType = keyInfoType.getSecurityTokenReferenceType();
             if (securityTokenReferenceType == null) {
-                throw new WSSecurityException("No SecurityTokenReference found");
+                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noSecTokRef");
             }
 
             if (securityTokenReferenceType.getX509DataType() != null) {
@@ -96,7 +96,7 @@ public class SecurityTokenFactory {
                     //stored in the context. Otherwise we will abort now.
                     SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
                     if (securityTokenProvider == null) {
-                        throw new WSSecurityException("No SecurityToken found");
+                        throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "noToken", new Object[]{uri});
                     }
                     return securityTokenProvider.getSecurityToken(crypto);
                 }
@@ -104,14 +104,14 @@ public class SecurityTokenFactory {
         } else if (crypto.getDefaultX509Alias() != null) {
             return new X509DefaultSecurityToken(crypto, callbackHandler, crypto.getDefaultX509Alias());
         }
-        throw new WSSecurityException("No SecurityToken found");
+        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
     }
 
     public SecurityToken getSecurityToken(BinarySecurityTokenType binarySecurityTokenType, Crypto crypto, CallbackHandler callbackHandler) throws WSSecurityException {
 
         //only Base64Encoding is supported
         if (!Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
-            throw new WSSecurityException("Unsupported BST Encoding: " + binarySecurityTokenType.getEncodingType());
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badEncoding", new Object[]{binarySecurityTokenType.getEncodingType()});
         }
 
         byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
@@ -121,7 +121,7 @@ public class SecurityTokenFactory {
         } else if (Constants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
             return new X509PKIPathv1SecurityToken(crypto, callbackHandler, securityTokenData);
         } else {
-            throw new WSSecurityException("unsupportedBinaryTokenType" + binarySecurityTokenType.getValueType());
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{binarySecurityTokenType.getValueType()});
         }
     }
 
@@ -156,26 +156,17 @@ public class SecurityTokenFactory {
         }
 
         public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-            try {
-                WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
-                Utils.doCallback(getCallbackHandler(), pwCb);
-                Key key = getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
-                return key;
-            } catch (Exception e) {
-                throw new WSSecurityException(e);
-            }
+            WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
+            Utils.doCallback(getCallbackHandler(), pwCb);
+            return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
         }
 
         public PublicKey getPublicKey() throws WSSecurityException {
-            try {
-                X509Certificate x509Certificate = getX509Certificate();
-                if (x509Certificate == null) {
-                    return null;
-                }
-                return x509Certificate.getPublicKey();
-            } catch (org.swssf.crypto.WSSecurityException e) {
-                throw new WSSecurityException(e);
+            X509Certificate x509Certificate = getX509Certificate();
+            if (x509Certificate == null) {
+                return null;
             }
+            return x509Certificate.getPublicKey();
         }
 
         //todo testing:
@@ -186,12 +177,10 @@ public class SecurityTokenFactory {
                     x509Certificate.checkValidity();
                 }
                 getCrypto().validateCert(x509Certificate);
-            } catch (org.swssf.crypto.WSSecurityException e) {
-                throw new WSSecurityException(e);
             } catch (CertificateExpiredException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             } catch (CertificateNotYetValidException e) {
-                throw new WSSecurityException(e);
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             }
         }
 
@@ -203,7 +192,7 @@ public class SecurityTokenFactory {
             return null;
         }
 
-        public X509Certificate getX509Certificate() throws org.swssf.crypto.WSSecurityException {
+        public X509Certificate getX509Certificate() throws WSSecurityException {
             if (this.x509Certificate == null) {
                 X509Certificate[] x509Certificates = getCrypto().getCertificates(getAlias());
                 if (x509Certificates.length == 0) {
@@ -214,7 +203,7 @@ public class SecurityTokenFactory {
             return this.x509Certificate;
         }
 
-        protected abstract String getAlias() throws org.swssf.crypto.WSSecurityException;
+        protected abstract String getAlias() throws WSSecurityException;
     }
 
     class ThumbprintSHA1SecurityToken extends X509SecurityToken {
@@ -226,7 +215,7 @@ public class SecurityTokenFactory {
             this.binaryContent = binaryContent;
         }
 
-        protected String getAlias() throws org.swssf.crypto.WSSecurityException {
+        protected String getAlias() throws WSSecurityException {
             if (this.alias == null) {
                 this.alias = getCrypto().getAliasForX509CertThumb(binaryContent);
             }
@@ -247,7 +236,7 @@ public class SecurityTokenFactory {
             this.binaryContent = binaryContent;
         }
 
-        protected String getAlias() throws org.swssf.crypto.WSSecurityException {
+        protected String getAlias() throws WSSecurityException {
             if (this.alias == null) {
                 this.alias = getCrypto().getAliasForX509Cert(binaryContent);
             }
@@ -265,14 +254,10 @@ public class SecurityTokenFactory {
 
         X509_V3SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent) throws WSSecurityException {
             super(crypto, callbackHandler);
-            try {
-                this.x509Certificate = getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent));
-            } catch (org.swssf.crypto.WSSecurityException e) {
-                throw new WSSecurityException(e);
-            }
+            this.x509Certificate = getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent));
         }
 
-        protected String getAlias() throws org.swssf.crypto.WSSecurityException {
+        protected String getAlias() throws WSSecurityException {
             if (this.alias == null) {
                 this.alias = getCrypto().getAliasForX509Cert(this.x509Certificate);
             }
@@ -280,7 +265,7 @@ public class SecurityTokenFactory {
         }
 
         @Override
-        public X509Certificate getX509Certificate() throws org.swssf.crypto.WSSecurityException {
+        public X509Certificate getX509Certificate() throws WSSecurityException {
             return this.x509Certificate;
         }
 
@@ -295,17 +280,13 @@ public class SecurityTokenFactory {
 
         X509PKIPathv1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent) throws WSSecurityException {
             super(crypto, callbackHandler);
-            try {
-                X509Certificate[] x509Certificates = crypto.getX509Certificates(binaryContent, false);
-                if (x509Certificates != null && x509Certificates.length > 0) {
-                    this.x509Certificate = x509Certificates[0];
-                }
-            } catch (org.swssf.crypto.WSSecurityException e) {
-                throw new WSSecurityException(e);
+            X509Certificate[] x509Certificates = crypto.getX509Certificates(binaryContent, false);
+            if (x509Certificates != null && x509Certificates.length > 0) {
+                this.x509Certificate = x509Certificates[0];
             }
         }
 
-        protected String getAlias() throws org.swssf.crypto.WSSecurityException {
+        protected String getAlias() throws WSSecurityException {
             if (this.alias == null) {
                 this.alias = getCrypto().getAliasForX509Cert(this.x509Certificate);
             }
@@ -313,7 +294,7 @@ public class SecurityTokenFactory {
         }
 
         @Override
-        public X509Certificate getX509Certificate() throws org.swssf.crypto.WSSecurityException {
+        public X509Certificate getX509Certificate() throws WSSecurityException {
             return this.x509Certificate;
         }
 
@@ -331,7 +312,7 @@ public class SecurityTokenFactory {
             this.x509DataType = x509DataType;
         }
 
-        protected String getAlias() throws org.swssf.crypto.WSSecurityException {
+        protected String getAlias() throws WSSecurityException {
             if (this.alias == null) {
                 this.alias = getCrypto().getAliasForX509Cert(x509DataType.getX509IssuerSerialType().getX509IssuerName(), x509DataType.getX509IssuerSerialType().getX509SerialNumber());
             }
@@ -351,7 +332,7 @@ public class SecurityTokenFactory {
             this.alias = alias;
         }
 
-        protected String getAlias() throws org.swssf.crypto.WSSecurityException {
+        protected String getAlias() throws WSSecurityException {
             return this.alias;
         }
 

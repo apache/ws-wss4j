@@ -14,13 +14,13 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.Constants;
 import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.XmlReaderToWriter;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 

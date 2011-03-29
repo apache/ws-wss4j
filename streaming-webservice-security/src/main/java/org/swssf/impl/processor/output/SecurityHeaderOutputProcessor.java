@@ -44,8 +44,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
             String soapMessageVersion = outputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace();
             if (level == 1 && soapMessageVersion == null) {
-                throw new WSSecurityException("Root Element must be " + Constants.TAG_soap11_Envelope +
-                        " or " + Constants.TAG_soap12_Envelope + " but was " + startElement.getName());
+                throw new WSSecurityException(WSSecurityException.FAILURE, "notASOAPMessage");
             } else if (level == 2
                     && startElement.getName().getLocalPart().equals(Constants.TAG_soap_Header_LocalName)
                     && startElement.getName().getNamespaceURI().equals(soapMessageVersion)) {

@@ -14,6 +14,7 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
@@ -23,7 +24,6 @@ import org.swssf.policy.PolicyEnforcerFactory;
 import org.swssf.policy.PolicyInputProcessor;
 import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.test.utils.CustomW3CDOMStreamReader;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Attr;
@@ -98,7 +98,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertTrue(throwable instanceof WSSecurityException);
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
-            Assert.assertEquals(throwable.getMessage(), "No SecurityToken found");
+            Assert.assertTrue(throwable.getMessage().startsWith("Referenced security token could not be retrieved (Reference "));
         }
     }
 
@@ -263,7 +263,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(), "Digest verification failed");
+            Assert.assertEquals(throwable.getMessage(), "The signature or decryption was invalid (Digest verification failed)");
         }
     }
 

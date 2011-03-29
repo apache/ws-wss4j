@@ -24,7 +24,8 @@ import java.io.OutputStream;
 
 /**
  * Processor which outputs the XMLEvents to an outputStream
- * This Processor can be extended to allow to write to a StAX writer instead of directly to an output stream 
+ * This Processor can be extended to allow to write to a StAX writer instead of directly to an output stream
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -43,7 +44,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         try {
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, encoding);
         } catch (XMLStreamException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
         }
     }
 
@@ -55,7 +56,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         try {
             xmlEventWriter.flush();
         } catch (XMLStreamException e) {
-            throw new WSSecurityException(e.getMessage(), e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
         }
     }
 }

@@ -15,14 +15,14 @@
  */
 package org.swssf.policy.secpolicybuilder;
 
-import org.swssf.policy.secpolicy.*;
-import org.swssf.policy.secpolicy.model.Wss10;
 import org.apache.axiom.om.OMElement;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.swssf.policy.secpolicy.*;
+import org.swssf.policy.secpolicy.model.Wss10;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

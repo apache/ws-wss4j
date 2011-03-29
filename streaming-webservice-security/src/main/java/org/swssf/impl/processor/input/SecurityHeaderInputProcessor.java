@@ -26,7 +26,10 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Deque;
 
 /**
  * Processor for the Security-Header XML Structure.
@@ -74,7 +77,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                 if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 1) {
                     if (subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace() == null) {
-                        throw new WSSecurityException("No SOAP Message");
+                        throw new WSSecurityException(WSSecurityException.FAILURE, "notASOAPMessage");
                     }
                 } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                         && subInputProcessorChain.getDocumentContext().isInSOAPHeader()
@@ -88,8 +91,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                         && subInputProcessorChain.getDocumentContext().isInSecurityHeader()) {
                     startIndexForProcessor = eventCount - 1;
                 }
-            }
-            else if (xmlEvent.isEndElement()) {
+            } else if (xmlEvent.isEndElement()) {
                 EndElement endElement = xmlEvent.asEndElement();
                 if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 2
                         && endElement.getName().equals(Constants.TAG_wsse_Security)) {
@@ -124,7 +126,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 && xmlEvent.asStartElement().getName().getNamespaceURI().equals(subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace())
         ));
         //if we reach this state we didn't find a security header
-        throw new WSSecurityException("No Security");
+        throw new WSSecurityException(WSSecurityException.FAILURE, "missingSecurityHeader");
     }
 
     private static void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain,
@@ -160,20 +162,15 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 Class parameterType = parameterTypes[j];
                 if (parameterType.isAssignableFrom(inputProcessorChain.getClass())) {
                     parameterObjects[j] = inputProcessorChain;
-                }
-                else if (parameterType.isAssignableFrom(securityProperties.getClass())) {
+                } else if (parameterType.isAssignableFrom(securityProperties.getClass())) {
                     parameterObjects[j] = securityProperties;
-                }
-                else if (parameterType.isAssignableFrom(eventQueue.getClass())) {
+                } else if (parameterType.isAssignableFrom(eventQueue.getClass())) {
                     parameterObjects[j] = eventQueue;
-                }
-                else if (parameterType.isAssignableFrom(index.getClass())) {
+                } else if (parameterType.isAssignableFrom(index.getClass())) {
                     parameterObjects[j] = index;
-                }
-                else if (parameterType.isAssignableFrom(elementName.getClass())) {
+                } else if (parameterType.isAssignableFrom(elementName.getClass())) {
                     parameterObjects[j] = elementName;
-                }
-                else {
+                } else {
                     ok = false;
                     break;
                 }
@@ -188,9 +185,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 } catch (InvocationTargetException e) {
                     Throwable cause = e.getCause();
                     if (cause instanceof WSSecurityException) {
-                        throw (WSSecurityException)cause;
+                        throw (WSSecurityException) cause;
                     } else if (cause instanceof XMLStreamException) {
-                        throw (XMLStreamException)cause;
+                        throw (XMLStreamException) cause;
                     } else {
                         throw new RuntimeException(e.getCause());
                     }

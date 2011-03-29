@@ -14,12 +14,12 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -189,7 +189,7 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "invalidTimestamp The security semantics of the message have expired");
+                Assert.assertEquals(e.getCause().getMessage(), "The message has expired (WSSecurityEngine: Invalid timestamp: The security semantics of the message have expired)");
             }
         }
     }
@@ -227,7 +227,7 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "invalidTimestamp The security semantics of the message have expired");
+                Assert.assertEquals(e.getCause().getMessage(), "The message has expired (WSSecurityEngine: Invalid timestamp: The security semantics of the message have expired)");
             }
         }
     }
@@ -276,7 +276,7 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "invalidTimestamp The security semantics of the message is invalid");
+                Assert.assertEquals(e.getCause().getMessage(), "The message has expired (WSSecurityEngine: Invalid timestamp: The security semantics of the message is invalid)");
             }
         }
     }
@@ -341,7 +341,7 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "invalidTimestampTTL The security semantics of the message have expired");
+                Assert.assertEquals(e.getCause().getMessage(), "The message has expired (WSSecurityEngine: Invalid timestamp: The security semantics of the message have expired)");
             }
         }
     }
@@ -502,7 +502,7 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                Assert.assertEquals(throwable.getMessage(), "Timestamp Message contains two or more timestamps");
+                Assert.assertEquals(throwable.getMessage(), "The message has expired (WSSecurityEngine: Invalid timestamp: Message contains two or more timestamps)");
             }
         }
     }

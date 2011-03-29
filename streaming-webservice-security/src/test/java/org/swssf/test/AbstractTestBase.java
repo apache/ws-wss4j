@@ -14,11 +14,6 @@
  */
 package org.swssf.test;
 
-import org.swssf.WSSec;
-import org.swssf.ext.*;
-import org.swssf.securityEvent.SecurityEventListener;
-import org.swssf.test.utils.StAX2DOM;
-import org.swssf.test.utils.XmlReaderToWriter;
 import com.ctc.wstx.api.WstxInputProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +25,11 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.handler.WSS4JHandler;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.swssf.WSSec;
+import org.swssf.ext.*;
+import org.swssf.securityEvent.SecurityEventListener;
+import org.swssf.test.utils.StAX2DOM;
+import org.swssf.test.utils.XmlReaderToWriter;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -80,19 +80,19 @@ public abstract class AbstractTestBase {
         xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlStreamReader, null);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, SecurityConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
         XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventListener);
         Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
@@ -267,9 +267,9 @@ public abstract class AbstractTestBase {
                         } else if (org.swssf.ext.Constants.PREFIX_SOAPENV.equals(prefix)) {
                             return org.swssf.ext.Constants.NS_SOAP11;
                         } else if (org.swssf.ext.Constants.PREFIX_WSSE.equals(prefix)) {
-                            return org.swssf.ext.Constants.NS_WSSE;
+                            return org.swssf.ext.Constants.NS_WSSE10;
                         } else if (org.swssf.ext.Constants.PREFIX_WSU.equals(prefix)) {
-                            return org.swssf.ext.Constants.NS_WSU;
+                            return org.swssf.ext.Constants.NS_WSU10;
                         } else if (org.swssf.ext.Constants.PREFIX_XENC.equals(prefix)) {
                             return org.swssf.ext.Constants.NS_XMLENC;
                         } else {
@@ -282,9 +282,9 @@ public abstract class AbstractTestBase {
                             return org.swssf.ext.Constants.PREFIX_DSIG;
                         } else if (org.swssf.ext.Constants.NS_SOAP11.equals(namespaceURI)) {
                             return org.swssf.ext.Constants.PREFIX_SOAPENV;
-                        } else if (org.swssf.ext.Constants.NS_WSSE.equals(namespaceURI)) {
+                        } else if (org.swssf.ext.Constants.NS_WSSE10.equals(namespaceURI)) {
                             return org.swssf.ext.Constants.PREFIX_WSSE;
-                        } else if (org.swssf.ext.Constants.NS_WSU.equals(namespaceURI)) {
+                        } else if (org.swssf.ext.Constants.NS_WSU10.equals(namespaceURI)) {
                             return org.swssf.ext.Constants.PREFIX_WSU;
                         } else if (org.swssf.ext.Constants.NS_XMLENC.equals(namespaceURI)) {
                             return org.swssf.ext.Constants.PREFIX_XENC;

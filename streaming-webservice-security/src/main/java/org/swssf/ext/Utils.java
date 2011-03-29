@@ -31,8 +31,9 @@ public class Utils {
 
     /**
      * Returns the Id reference without the leading #
+     *
      * @param reference The reference on which to drop the #
-     * @return The reference without a leading # 
+     * @return The reference without a leading #
      */
     public static String dropReferenceMarker(String reference) {
         if (reference.startsWith("#")) {
@@ -43,6 +44,7 @@ public class Utils {
 
     /**
      * Returns the XMLEvent type in String form
+     *
      * @param xmlEvent
      * @return The XMLEvent type as string representation
      */
@@ -76,7 +78,8 @@ public class Utils {
     }
 
     /**
-     * Executes the Callback handling. Typically used to fetch passwords 
+     * Executes the Callback handling. Typically used to fetch passwords
+     *
      * @param callbackHandler
      * @param callback
      * @throws WSSecurityException if the callback couldn't be executed
@@ -86,9 +89,9 @@ public class Utils {
             Callback[] callbacks = new Callback[]{callback};
             callbackHandler.handle(callbacks);
         } catch (IOException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
         } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(e);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
         }
     }
 

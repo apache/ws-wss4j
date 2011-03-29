@@ -14,9 +14,9 @@
  */
 package org.swssf.impl;
 
-import org.swssf.ext.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.ext.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -25,7 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Implementation of a InputProcessorChain 
+ * Implementation of a InputProcessorChain
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

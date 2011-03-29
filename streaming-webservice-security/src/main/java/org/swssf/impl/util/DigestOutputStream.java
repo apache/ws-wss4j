@@ -22,6 +22,7 @@ import java.security.MessageDigest;
 
 /**
  * A Streaming based message-digest implementation
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

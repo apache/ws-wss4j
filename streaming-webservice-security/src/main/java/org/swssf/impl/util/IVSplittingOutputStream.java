@@ -27,6 +27,7 @@ import java.security.Key;
  * IV splitting from the first few bytes in the stream.
  * When the iv is completely received the cipher will be initialized
  * and this output stream will be removed from chain of output streams
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

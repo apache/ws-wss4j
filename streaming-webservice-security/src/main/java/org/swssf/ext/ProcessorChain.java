@@ -17,7 +17,8 @@ package org.swssf.ext;
 import javax.xml.stream.XMLStreamException;
 
 /**
- * Basic interface for Output- and Input-Processor chains 
+ * Basic interface for Output- and Input-Processor chains
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
@@ -30,7 +31,8 @@ public interface ProcessorChain {
 
     /**
      * Will finally be called when the whole document is processed
-     * @throws XMLStreamException thrown when a streaming error occurs
+     *
+     * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public void doFinal() throws XMLStreamException, WSSecurityException;

@@ -17,7 +17,8 @@ package org.swssf.impl;
 import java.security.Key;
 
 /**
- * SignaturePartDef holds information about parts to be signed 
+ * SignaturePartDef holds information about parts to be signed
+ *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */

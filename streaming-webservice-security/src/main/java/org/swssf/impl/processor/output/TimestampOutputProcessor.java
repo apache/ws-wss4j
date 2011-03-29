@@ -61,7 +61,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Expires);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Timestamp);
                 } catch (DatatypeConfigurationException e) {
-                    throw new WSSecurityException(e);
+                    throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
                 }
 
                 outputProcessorChain.removeProcessor(this);

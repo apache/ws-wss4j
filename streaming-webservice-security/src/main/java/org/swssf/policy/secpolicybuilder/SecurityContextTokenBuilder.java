@@ -15,13 +15,13 @@
  */
 package org.swssf.policy.secpolicybuilder;
 
-import org.swssf.policy.secpolicy.*;
-import org.swssf.policy.secpolicy.model.SecurityContextToken;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.swssf.policy.secpolicy.*;
+import org.swssf.policy.secpolicy.model.SecurityContextToken;
 
 import javax.xml.namespace.QName;
 

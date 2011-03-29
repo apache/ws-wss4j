@@ -14,10 +14,10 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.test.utils.CustomW3CDOMStreamReader;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -129,7 +129,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                         // > /dev/null
                     }
                 }
-        ));        
+        ));
     }
 
     /* Not supported ATM: Timestamp encrypted and then Signed
