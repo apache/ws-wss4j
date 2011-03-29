@@ -53,15 +53,15 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
 
         if (xmlEvent.isStartElement()) {
-            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPBody()
-                    && Constants.TAG_soap11_Body.equals(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()))) {
-
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
                 OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent(SecurityEvent.Event.Operation);
                 operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             }
         } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 1
-                && xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(Constants.TAG_soap11_Envelope)) {
+                && xmlEvent.isEndElement()
+                //ns mismatch should be detected by the xml parser so a local-name equality check should be enough
+                && xmlEvent.asEndElement().getName().getLocalPart().equals(Constants.TAG_soap_Envelope_LocalName)) {
             try {
                 policyEnforcer.doFinal();
             } catch (PolicyViolationException e) {

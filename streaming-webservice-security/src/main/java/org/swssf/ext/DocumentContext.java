@@ -30,6 +30,11 @@ public interface DocumentContext {
     public String getEncoding();
 
     /**
+     * @return The SOAP Version used
+     */
+    public String getSOAPMessageVersionNamespace();
+
+    /**
      * Adds a Element to the path
      *
      * @param qName The QName of the path element

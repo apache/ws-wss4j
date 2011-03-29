@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
@@ -230,13 +231,13 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
-        super.getAssertions(assertionStateMap);
+    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+        super.getAssertions(assertionStateMap, operationPolicy);
         if (initiatorToken != null) {
-            initiatorToken.getAssertions(assertionStateMap);
+            initiatorToken.getAssertions(assertionStateMap, operationPolicy);
         }
         if (recipientToken != null) {
-            recipientToken.getAssertions(assertionStateMap);
+            recipientToken.getAssertions(assertionStateMap, operationPolicy);
         }
     }
 

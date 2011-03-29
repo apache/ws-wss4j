@@ -16,6 +16,7 @@ package org.swssf.impl.processor.output;
 
 import org.swssf.ext.*;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -41,9 +42,13 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 
-            if (level == 1 && !startElement.getName().equals(Constants.TAG_soap11_Envelope)) {
-                throw new WSSecurityException("Root Element must be " + Constants.TAG_soap11_Envelope + " but was " + startElement.getName());
-            } else if (level == 2 && startElement.getName().equals(Constants.TAG_soap11_Header)) {
+            String soapMessageVersion = outputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace();
+            if (level == 1 && soapMessageVersion == null) {
+                throw new WSSecurityException("Root Element must be " + Constants.TAG_soap11_Envelope +
+                        " or " + Constants.TAG_soap12_Envelope + " but was " + startElement.getName());
+            } else if (level == 2
+                    && startElement.getName().getLocalPart().equals(Constants.TAG_soap_Header_LocalName)
+                    && startElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
                 //output current soap-header event
                 outputProcessorChain.processEvent(xmlEvent);
 
@@ -56,16 +61,20 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.removeProcessor(this);
 
                 eventHandled = true;
-            } else if (level == 2 && startElement.getName().equals(Constants.TAG_soap11_Body)) {
+            } else if (level == 2
+                    && startElement.getName().getLocalPart().equals(Constants.TAG_soap_Body_LocalName)
+                    && startElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
                 //hmm it seems we don't have a soap header in the current document
                 //so output one and add securityHeader
 
                 //create subchain and output soap-header and securityHeader
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_soap11_Header, null);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain,
+                        new QName(soapMessageVersion, Constants.TAG_soap_Header_LocalName, Constants.PREFIX_SOAPENV), null);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security, null);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Security);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_soap11_Header);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain,
+                        new QName(soapMessageVersion, Constants.TAG_soap_Header_LocalName, Constants.PREFIX_SOAPENV));
 
                 //output current soap-header event
                 outputProcessorChain.processEvent(xmlEvent);

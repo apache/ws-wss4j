@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
@@ -110,10 +111,10 @@ public class RecipientToken extends AbstractSecurityAssertion implements TokenWr
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
         if (receipientToken != null) {
             receipientToken.setResponsibleAssertionEvents(new SecurityEvent.Event[]{SecurityEvent.Event.RecipientEncryptionToken});
-            receipientToken.getAssertions(assertionStateMap);
+            receipientToken.getAssertions(assertionStateMap, operationPolicy);
         }
     }
 

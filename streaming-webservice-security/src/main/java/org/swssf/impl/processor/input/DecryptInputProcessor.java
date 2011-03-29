@@ -169,8 +169,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             if (EncryptionPartDef.Modifier.Content.getModifier().equals(currentEncryptedDataType.getType())) {
                                 QName parentElement = inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType());
                                 if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
-                                        && inputProcessorChain.getDocumentContext().isInSOAPBody()
-                                        && Constants.TAG_soap11_Body.equals(parentElement)) {
+                                        && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
                                     //soap:body content encryption counts as EncryptedPart
                                     EncryptedPartSecurityEvent encryptedPartSecurityEvent =
                                             new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);

@@ -98,7 +98,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
         } else if (policyComponent instanceof AbstractSecurityAssertion) {
             AbstractSecurityAssertion abstractSecurityAssertion = (AbstractSecurityAssertion) policyComponent;
-            abstractSecurityAssertion.getAssertions(assertionStateMap);
+            abstractSecurityAssertion.getAssertions(assertionStateMap, effectivePolicy);
         } else {
             throw new WSSPolicyException("Unknown PolicyComponent: " + policyComponent + " " + policyComponent.getType());
         }

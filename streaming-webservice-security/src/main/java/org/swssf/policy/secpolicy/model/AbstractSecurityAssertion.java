@@ -15,6 +15,7 @@
  */
 package org.swssf.policy.secpolicy.model;
 
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
@@ -78,7 +79,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
 
     public abstract SecurityEvent.Event[] getResponsibleAssertionEvents();
 
-    public abstract void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap);
+    public abstract void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy);
 
     public boolean isAsserted(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
 

@@ -57,7 +57,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
@@ -105,7 +105,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         Document securedDocument;
 
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
@@ -144,7 +144,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Content"));
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
@@ -187,7 +187,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         Document securedDocument;
 
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Content}{http://www.w3.org/1999/XMLSchema}complexType;");
@@ -227,7 +227,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", "Element"));
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -298,7 +298,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             //wss4j just encrypts the first found element and not all!
@@ -381,7 +381,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUseThisCertificate((X509Certificate) keyStore.getCertificate("receiver"));
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -439,7 +439,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -470,7 +470,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "IssuerSerial");
@@ -512,7 +512,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -543,7 +543,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
@@ -578,7 +578,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
@@ -623,7 +623,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.BST_EMBEDDED);
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -671,7 +671,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -702,7 +702,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
@@ -744,7 +744,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -775,7 +775,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "SKIKeyIdentifier");
@@ -817,7 +817,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 
@@ -848,7 +848,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "Thumbprint");
@@ -890,7 +890,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
 

@@ -59,7 +59,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -70,7 +70,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -89,7 +89,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
@@ -129,7 +129,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -165,7 +165,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://www.w3.org/1999/XMLSchema}complexType;");
@@ -207,7 +207,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -222,7 +222,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -241,7 +241,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "IssuerSerial");
@@ -285,7 +285,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -300,7 +300,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -319,7 +319,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
@@ -363,7 +363,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -378,7 +378,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -417,7 +417,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -432,7 +432,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -451,7 +451,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "X509KeyIdentifier");
@@ -495,7 +495,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -510,7 +510,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -529,7 +529,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "SKIKeyIdentifier");
@@ -572,7 +572,7 @@ public class SignatureTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -587,7 +587,7 @@ public class SignatureTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            nodeList = document.getElementsByTagNameNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
@@ -606,7 +606,7 @@ public class SignatureTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");

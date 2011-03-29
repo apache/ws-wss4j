@@ -92,7 +92,6 @@ public class SecurityTokenFactory {
                     BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
                     return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler);
                 } else {//referenced BST:
-                    //todo
                     //we have to search BST somewhere in the doc. First we will check for a BST already processed and
                     //stored in the context. Otherwise we will abort now.
                     SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
@@ -158,7 +157,6 @@ public class SecurityTokenFactory {
 
         public Key getSecretKey(String algorithmURI) throws WSSecurityException {
             try {
-                //todo overall caching...not just here
                 WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
                 Utils.doCallback(getCallbackHandler(), pwCb);
                 Key key = getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());

@@ -14,6 +14,7 @@
  */
 package org.swssf.policy;
 
+import org.swssf.ext.Constants;
 import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.policy.secpolicybuilder.*;
 import org.apache.axiom.om.OMAbstractFactory;
@@ -148,10 +149,12 @@ public class PolicyEnforcerFactory {
                             SOAPOperation soapOperation = (SOAPOperation) extensibilityElement;
                             String soapActionUri = soapOperation.getSoapActionURI();
                             operationPolicy.setOperationAction(soapActionUri);
+                            operationPolicy.setSoapMessageVersionNamespace(Constants.NS_SOAP11);
                         } else if (extensibilityElement instanceof SOAP12Operation) {
                             SOAP12Operation soap12Operation = (SOAP12Operation) extensibilityElement;
                             String soapActionUri = soap12Operation.getSoapActionURI();
                             operationPolicy.setOperationAction(soapActionUri);
+                            operationPolicy.setSoapMessageVersionNamespace(Constants.NS_SOAP12);
                         }
                     }
 

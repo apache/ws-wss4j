@@ -17,6 +17,7 @@
 package org.swssf.policy.secpolicy.model;
 
 import org.swssf.ext.Constants;
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.IncludeTimeStampAssertionState;
 import org.swssf.policy.assertionStates.SignedElementAssertionState;
@@ -113,18 +114,18 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
         if (algorithmSuite != null) {
-            algorithmSuite.getAssertions(assertionStateMap);
+            algorithmSuite.getAssertions(assertionStateMap, operationPolicy);
         }
         if (layout != null) {
-            layout.getAssertions(assertionStateMap);
+            layout.getAssertions(assertionStateMap, operationPolicy);
         }
         if (signedSupportingToken != null) {
-            signedSupportingToken.getAssertions(assertionStateMap);
+            signedSupportingToken.getAssertions(assertionStateMap, operationPolicy);
         }
         if (signedEndorsingSupportingTokens != null) {
-            signedEndorsingSupportingTokens.getAssertions(assertionStateMap);
+            signedEndorsingSupportingTokens.getAssertions(assertionStateMap, operationPolicy);
         }
 
         Collection<AssertionState> timestampAssertionStates = assertionStateMap.get(SecurityEvent.Event.Timestamp);

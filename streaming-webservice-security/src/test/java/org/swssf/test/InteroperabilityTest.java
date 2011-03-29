@@ -22,11 +22,11 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.xml.soap.SOAPConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.*;
@@ -41,7 +41,7 @@ public class InteroperabilityTest extends AbstractTestBase {
     @Test(invocationCount = 1)
     public void testInteroperabilityInbound() throws Exception {
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
@@ -68,9 +68,38 @@ public class InteroperabilityTest extends AbstractTestBase {
     }
 
     @Test(invocationCount = 1)
+    public void testInteroperabilityInboundSOAP12() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test(invocationCount = 1)
     public void testInteroperabilityEncryptedSignatureInbound() throws Exception {
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
@@ -107,7 +136,7 @@ public class InteroperabilityTest extends AbstractTestBase {
     @Test(invocationCount = 1)
     public void testInteroperabilitySignedEncryptedTimestampInbound() throws Exception {
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE;
         Properties properties = new Properties();
@@ -144,7 +173,7 @@ public class InteroperabilityTest extends AbstractTestBase {
     @Test(invocationCount = 1)
     public void testInteroperabilityInboundReverseOrder() throws Exception {
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
@@ -180,7 +209,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         securityProperties.setOutAction(actions);
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
@@ -199,7 +228,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT, Constants.Action.SIGNATURE, Constants.Action.TIMESTAMP};
         securityProperties.setOutAction(actions);
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
         String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
@@ -218,7 +247,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE};
         securityProperties.setOutAction(actions);
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
         String action = WSHandlerConstants.SIGNATURE;
@@ -228,7 +257,7 @@ public class InteroperabilityTest extends AbstractTestBase {
     @Test(invocationCount = 1)
     public void testInteroperabilityInboundSecurityHeaderTimestampOrder() throws Exception {
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();

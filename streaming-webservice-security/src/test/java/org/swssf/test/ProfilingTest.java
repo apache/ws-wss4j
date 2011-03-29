@@ -177,7 +177,7 @@ public class ProfilingTest extends AbstractTestBase {
         securityProperties.setOutAction(actions);
         securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
 
-        InputStream sourceDocument = new BufferedInputStream(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+        InputStream sourceDocument = new BufferedInputStream(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         OutboundWSSec xmlSecOut = WSSec.getOutboundWSSec(securityProperties);
         XMLStreamWriter xmlStreamWriter = xmlSecOut.processOutMessage(new FileOutputStream("plain-soap-sig-enc.xml"));
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);

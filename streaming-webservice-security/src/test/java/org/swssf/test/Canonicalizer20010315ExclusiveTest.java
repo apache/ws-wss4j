@@ -206,7 +206,7 @@ public class Canonicalizer20010315ExclusiveTest {
         Canonicalizer20010315ExclWithCommentsTransformer c = new Canonicalizer20010315ExclWithCommentsTransformer(null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
-                this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml")
+                this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml")
         );
 
         XMLEvent xmlEvent = null;

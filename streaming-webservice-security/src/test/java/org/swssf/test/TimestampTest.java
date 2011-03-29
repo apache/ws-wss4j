@@ -54,7 +54,7 @@ public class TimestampTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -91,7 +91,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
@@ -127,7 +127,7 @@ public class TimestampTest extends AbstractTestBase {
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml"));
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
@@ -164,7 +164,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
@@ -199,7 +199,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
@@ -237,7 +237,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
@@ -286,7 +286,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
@@ -315,7 +315,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "300");
@@ -351,7 +351,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
@@ -392,7 +392,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
@@ -427,7 +427,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
@@ -475,7 +475,7 @@ public class TimestampTest extends AbstractTestBase {
 
         Document securedDocument;
         {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 

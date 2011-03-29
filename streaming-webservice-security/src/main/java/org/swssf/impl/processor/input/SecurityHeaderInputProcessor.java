@@ -71,7 +71,12 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
-                if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+
+                if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 1) {
+                    if (subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace() == null) {
+                        throw new WSSecurityException("No SOAP Message");
+                    }
+                } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                         && subInputProcessorChain.getDocumentContext().isInSOAPHeader()
                         && startElement.getName().equals(Constants.TAG_wsse_Security)) {
 
@@ -84,8 +89,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     startIndexForProcessor = eventCount - 1;
                 }
             }
-
-            if (xmlEvent.isEndElement()) {
+            else if (xmlEvent.isEndElement()) {
                 EndElement endElement = xmlEvent.asEndElement();
                 if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 2
                         && endElement.getName().equals(Constants.TAG_wsse_Security)) {
@@ -115,7 +119,10 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 }
             }
 
-        } while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_soap11_Body)));
+        } while (!(xmlEvent.isStartElement()
+                && xmlEvent.asStartElement().getName().getLocalPart().equals(Constants.TAG_soap_Body_LocalName)
+                && xmlEvent.asStartElement().getName().getNamespaceURI().equals(subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace())
+        ));
         //if we reach this state we didn't find a security header
         throw new WSSecurityException("No Security");
     }

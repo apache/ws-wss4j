@@ -51,7 +51,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
      */
     @Test
     public void testRecursiveKeyReferencesDOS() throws Exception {
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
@@ -106,7 +106,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
     Todo correct this test.
     @Test
     public void testRecursiveKeyReferencesDOS2() throws Exception {
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
@@ -157,12 +157,12 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
-        outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
-        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
+        outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, "Element"));
+        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, "Element"));
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
 
 
@@ -188,7 +188,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     @Test
     public void testSignedBodyRelocationToHeader() throws Exception {
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
@@ -201,7 +201,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element soapEnvElement = (Element) bodyElement.getParentNode();
         soapEnvElement.removeChild(bodyElement);
 
-        Element newBody = securedDocument.createElementNS(Constants.TAG_soap11_Body.getNamespaceURI(), Constants.TAG_soap11_Body.getLocalPart());
+        Element newBody = securedDocument.createElementNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
         soapEnvElement.appendChild(newBody);
 
         xPathExpression = getXPath("/env:Envelope/env:Header");
@@ -237,7 +237,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
      */
     @Test
     public void test_publicURIReferenceDOS() throws Exception {
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
@@ -279,7 +279,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     @Test
     public void test_DosAttackWithRecursiveEntity() throws Exception {
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();

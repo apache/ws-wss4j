@@ -19,7 +19,6 @@ import org.swssf.ext.WSSecurityException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.net.URL;
 
 /**
@@ -31,7 +30,7 @@ public class UncategorizedTest {
 
     @Test
     public void testConfigurationLoadFromUrl() throws Exception {
-        URL url = this.getClass().getClassLoader().getResource("testdata/plain-soap.xml");
+        URL url = this.getClass().getClassLoader().getResource("testdata/plain-soap-1.1.xml");
         try {
             Init.init(url);
             Assert.fail();

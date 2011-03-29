@@ -46,9 +46,17 @@ public class Constants {
     public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
 
     public static final String PREFIX_SOAPENV = "env";
-    public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, "Envelope", PREFIX_SOAPENV);
-    public static final QName TAG_soap11_Header = new QName(NS_SOAP11, "Header", PREFIX_SOAPENV);
-    public static final QName TAG_soap11_Body = new QName(NS_SOAP11, "Body", PREFIX_SOAPENV);
+    public static final String TAG_soap_Envelope_LocalName = "Envelope";
+    public static final String TAG_soap_Header_LocalName = "Header";
+    public static final String TAG_soap_Body_LocalName = "Body";
+
+    public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap11_Header = new QName(NS_SOAP11, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap11_Body = new QName(NS_SOAP11, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
+
+    public static final QName TAG_soap12_Envelope = new QName(NS_SOAP12, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap12_Header = new QName(NS_SOAP12, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
 
     public static final String PREFIX_WSSE = "wsse";
     public static final QName TAG_wsse_Security = new QName(NS_WSSE, "Security", PREFIX_WSSE);
@@ -123,17 +131,17 @@ public class Constants {
     public static final QName TAG_dsig_X509IssuerName = new QName(NS_DSIG, "X509IssuerName", PREFIX_DSIG);
     public static final QName TAG_dsig_X509SerialNumber = new QName(NS_DSIG, "X509SerialNumber", PREFIX_DSIG);
 
-    public static final String NS10_SOAPMESSAGE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
-    public static final String NS11_SOAPMESSAGE = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
+    public static final String NS10_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
+    public static final String NS11_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
 
     public static final String NS_X509TOKEN = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
 
     public static final String NS_X509_V3_TYPE = NS_X509TOKEN + "#X509v3";
     public static final String NS_X509PKIPathv1 = NS_X509TOKEN + "#X509PKIPathv1";
     public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN + "#X509SubjectKeyIdentifier";
-    public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE + "#ThumbprintSHA1";
+    public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE_SECURITY + "#ThumbprintSHA1";
 
-    public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE + "#Base64Binary";
+    public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE_SECURITY + "#Base64Binary";
 
     public enum Action {
         TIMESTAMP,

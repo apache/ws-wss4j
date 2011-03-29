@@ -48,15 +48,15 @@ public class PolicyTest extends AbstractTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
-        outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Element"));
+        outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, "Element"));
         //outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), "Element"));
         outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_wsu_Created.getLocalPart(), Constants.TAG_wsu_Created.getNamespaceURI(), "Element"));
         outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_wsu_Expires.getLocalPart(), Constants.TAG_wsu_Expires.getNamespaceURI(), "Content"));
-        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap11_Body.getLocalPart(), Constants.TAG_soap11_Body.getNamespaceURI(), "Content"));
+        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, "Content"));
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
-        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap.xml");
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
 
 

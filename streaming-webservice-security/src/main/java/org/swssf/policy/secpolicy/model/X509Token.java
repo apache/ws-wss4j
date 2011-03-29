@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.InitiatorEncryptionTokenAssertionState;
 import org.swssf.policy.assertionStates.RecipientEncryptionTokenAssertionState;
@@ -202,7 +203,7 @@ public class X509Token extends Token {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
 
         SecurityEvent.Event[] responsibleAssertionEvents = getResponsibleAssertionEvents();
         for (int i = 0; i < responsibleAssertionEvents.length; i++) {

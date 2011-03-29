@@ -25,6 +25,7 @@ public class OperationPolicy {
     private String operationName;
     private String operationAction;
     private Policy policy;
+    private String soapMessageVersionNamespace;
 
     public OperationPolicy(String operationName) {
         this.operationName = operationName;
@@ -52,6 +53,14 @@ public class OperationPolicy {
 
     public void setPolicy(Policy policy) {
         this.policy = policy;
+    }
+
+    public String getSoapMessageVersionNamespace() {
+        return soapMessageVersionNamespace;
+    }
+
+    public void setSoapMessageVersionNamespace(String soapMessageVersionNamespace) {
+        this.soapMessageVersionNamespace = soapMessageVersionNamespace;
     }
 
     @Override

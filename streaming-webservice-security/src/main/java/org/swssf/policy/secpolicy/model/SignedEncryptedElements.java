@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.EncryptedElementAssertionState;
 import org.swssf.policy.assertionStates.SignedElementAssertionState;
@@ -157,7 +158,7 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
         if (isSignedElements()) {
             Collection<AssertionState> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
             signedElementAssertionStates.add(new SignedElementAssertionState(this, true, getQNamesFromXPath()));

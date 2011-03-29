@@ -110,10 +110,14 @@ public abstract class AbstractTestBase {
     }
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws org.apache.ws.security.WSSecurityException {
+        return doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
+    }
+
+    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
         WSS4JHandler wss4JHandler = new WSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
-        MessageContext messageContext = getMessageContext(sourceDocument);
+        MessageContext messageContext = getMessageContext(sourceDocument, soapProtocol);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, WSHandlerConstants.NO_SERIALIZATION + " " + action);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "transmitter");
         Properties sigProperties = new Properties();
@@ -156,10 +160,14 @@ public abstract class AbstractTestBase {
     }
 
     protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action) throws Exception {
+        return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL);
+    }
+
+    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
-        MessageContext messageContext = getMessageContext(document);
+        MessageContext messageContext = getMessageContext(document, soapProtocol);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, action);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "receiver");
         //handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTOR, "receiver");
@@ -191,15 +199,15 @@ public abstract class AbstractTestBase {
         return messageContext;
     }
 
-    private MessageContext getMessageContext(InputStream inputStream) {
-        return getMessageContext(new StreamSource(inputStream));
+    private MessageContext getMessageContext(InputStream inputStream, String soapProtocol) {
+        return getMessageContext(new StreamSource(inputStream), soapProtocol);
     }
 
-    private MessageContext getMessageContext(Document document) {
-        return getMessageContext(new DOMSource(document));
+    private MessageContext getMessageContext(Document document, String soapProtocol) {
+        return getMessageContext(new DOMSource(document), soapProtocol);
     }
 
-    private MessageContext getMessageContext(final Source inSource) {
+    private MessageContext getMessageContext(final Source inSource, final String soapProtocol) {
         MessageContext messageContext = new SOAPMessageContext() {
 
             private Map properties = new HashMap();
@@ -226,7 +234,8 @@ public abstract class AbstractTestBase {
 
             public SOAPMessage getMessage() {
                 try {
-                    MessageFactory messageFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+                    //MessageFactory messageFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+                    MessageFactory messageFactory = MessageFactory.newInstance(soapProtocol);
                     SOAPMessage soapMessage = messageFactory.createMessage();
                     soapMessage.getSOAPPart().setContent(inSource);
                     setProperty(WSHandlerConstants.SND_SECURITY, soapMessage.getSOAPHeader().getOwnerDocument());

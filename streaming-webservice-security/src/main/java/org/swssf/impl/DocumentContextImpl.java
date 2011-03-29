@@ -41,6 +41,16 @@ public class DocumentContextImpl implements DocumentContext {
         this.encoding = encoding;
     }
 
+    public String getSOAPMessageVersionNamespace() {
+        if (path.size() >= 1 && path.get(0).equals(Constants.TAG_soap11_Envelope)) {
+            return Constants.NS_SOAP11;
+        }
+        else if (path.size() >= 1 && path.get(0).equals(Constants.TAG_soap12_Envelope)) {
+            return Constants.NS_SOAP12;
+        }
+        return null;
+    }
+
     public void addPathElement(QName qName) {
         path.add(qName);
     }
@@ -74,11 +84,15 @@ public class DocumentContextImpl implements DocumentContext {
     }
 
     public boolean isInSOAPHeader() {
-        return (path.size() > 1 && path.get(1).equals(Constants.TAG_soap11_Header));
+        return (path.size() > 1
+                && path.get(1).getLocalPart().equals(Constants.TAG_soap_Header_LocalName)
+                && path.get(0).getNamespaceURI().equals(path.get(1).getNamespaceURI()));
     }
 
     public boolean isInSOAPBody() {
-        return (path.size() > 1 && path.get(1).equals(Constants.TAG_soap11_Body));
+        return (path.size() > 1
+                && path.get(1).getLocalPart().equals(Constants.TAG_soap_Body_LocalName)
+                && path.get(0).getNamespaceURI().equals(path.get(1).getNamespaceURI()));
     }
 
     public int getDocumentLevel() {

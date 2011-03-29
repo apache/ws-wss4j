@@ -17,6 +17,7 @@
 package org.swssf.policy.secpolicy.model;
 
 import org.swssf.ext.Constants;
+import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.EncryptedPartAssertionState;
 import org.swssf.policy.assertionStates.SignedPartAssertionState;
@@ -164,7 +165,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
         //here we add just one AssertionState for all Parts to get a fail-fast behavior
         //when we add multiple AssertionStates some of them return true, becauce they don't match
         //as a result the policy is temporary satisfied for the current event and can only be falsified at last 
@@ -172,14 +173,14 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
             Collection<AssertionState> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
             List<QName> qNames = getQNamesFromHeaders();
             if (isBody()) {
-                qNames.add(Constants.TAG_soap11_Body);
+                qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), Constants.TAG_soap_Body_LocalName));
             }
             signedPartsAssertionStates.add(new SignedPartAssertionState(this, true, qNames));
         } else {
             Collection<AssertionState> encryptedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedPart);
             List<QName> qNames = getQNamesFromHeaders();
             if (isBody()) {
-                qNames.add(Constants.TAG_soap11_Body);
+                qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), Constants.TAG_soap_Body_LocalName));
             }
             encryptedPartsAssertionStates.add(new EncryptedPartAssertionState(this, true, qNames));
         }
