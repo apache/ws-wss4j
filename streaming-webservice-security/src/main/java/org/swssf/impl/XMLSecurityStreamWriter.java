@@ -67,8 +67,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private void outputOpenStartElement() throws XMLStreamException {
         if (openStartElement != null) {
-            //todo extend XMLEventNSAllocator and delegate create* methods in AbstractOutput processors to it.
-            //replace all create" methods calls in this class with an delegate to XMLEventNSAllocator
+            //todo replace all create" methods calls in this class with an delegate to XMLEventNSAllocator
             //chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
             //add namespace of current element to the list (important for C14N)
             //currentNamespaces.add(xmlEventNSAllocator.createNamespace(openStartElement.getPrefix(), openStartElement.getNamespaceURI()));
@@ -86,12 +85,10 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
             String[] splittedName = localName.split(":");
             qName = new QName(null, splittedName[1], splittedName[0]);
         } else {
-            //todo: Writes a start tag to the output. All writeStartElement methods open a new scope in the internal namespace context. Writing the corresponding EndElement causes the scope to be closed.
             qName = new QName(localName);
         }
         startElementStack.push(qName);
         openStartElement = qName;
-        //chainProcessEvent(xmlEventFactory.createStartElement(qName, null, null));
     }
 
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
@@ -101,12 +98,10 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
             String[] splittedName = localName.split(":");
             qName = new QName(null, splittedName[1], splittedName[0]);
         } else {
-            //todo: Writes a start tag to the output. All writeStartElement methods open a new scope in the internal namespace context. Writing the corresponding EndElement causes the scope to be closed.
             qName = new QName(namespaceURI, localName);
         }
         startElementStack.push(qName);
         openStartElement = qName;
-        //chainProcessEvent(xmlEventFactory.createStartElement(qName, null, null));
     }
 
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
@@ -114,7 +109,6 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         QName qName = new QName(namespaceURI, localName, prefix);
         startElementStack.push(qName);
         openStartElement = qName;
-        //chainProcessEvent(xmlEventFactory.createStartElement(qName, null, null));
     }
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
@@ -137,7 +131,6 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public void writeEndElement() throws XMLStreamException {
         outputOpenStartElement();
-        //chainProcessEvent(xmlEventFactory.createEndElement(startElementStack.pop(), null));
         chainProcessEvent(xmlEventNSAllocator.createEndElement(startElementStack.pop()));
     }
 
@@ -159,11 +152,9 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void flush() throws XMLStreamException {
-        //todo? outputstream flush?
     }
 
     public void writeAttribute(String localName, String value) throws XMLStreamException {
-        //chainProcessEvent();
         currentAttributes.add(xmlEventFactory.createAttribute(localName, value));
     }
 
