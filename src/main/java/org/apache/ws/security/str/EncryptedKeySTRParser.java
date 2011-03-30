@@ -213,4 +213,15 @@ public class EncryptedKeySTRParser implements STRParser {
         return null;
     }
     
+    /**
+     * Get whether the returned credential is already trusted or not. This is currently
+     * applicable in the case of a credential extracted from a trusted HOK SAML Assertion,
+     * and a BinarySecurityToken that has been processed by a Validator. In these cases,
+     * the SignatureProcessor does not need to verify trust on the credential.
+     * @return true if trust has already been verified on the returned Credential
+     */
+    public boolean isTrustedCredential() {
+        return false;
+    }
+    
 }

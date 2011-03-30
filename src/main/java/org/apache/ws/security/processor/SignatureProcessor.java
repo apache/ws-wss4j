@@ -21,7 +21,6 @@ package org.apache.ws.security.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -44,7 +43,6 @@ import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.transform.STRTransformUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.ws.security.validate.Validator;
 
 import org.w3c.dom.Document;
@@ -104,9 +102,6 @@ public class SignatureProcessor implements Processor {
         String signatureMethod = getSignatureMethod(elem);
 
         Validator validator = data.getValidator(WSSecurityEngine.SIGNATURE);
-        if (validator == null) {
-            validator = new SignatureTrustValidator();
-        }
         if (keyInfoElement == null) {
             certs = getDefaultCerts(data.getSigCrypto());
             principal = certs[0].getSubjectX500Principal();
@@ -131,11 +126,13 @@ public class SignatureProcessor implements Processor {
                 
             if (strElements.isEmpty()) {
                 publicKey = parseKeyValue(keyInfoElement);
-                Credential credential = new Credential();
-                credential.setPublicKey(publicKey);
-                principal = new PublicKeyPrincipal(publicKey);
-                credential.setPrincipal(principal);
-                validator.validate(credential, data);
+                if (validator != null) {
+                    Credential credential = new Credential();
+                    credential.setPublicKey(publicKey);
+                    principal = new PublicKeyPrincipal(publicKey);
+                    credential.setPrincipal(principal);
+                    validator.validate(credential, data);
+                }
             } else {
                 STRParser strParser = new SignatureSTRParser();
                 Map<String, Object> parameters = new HashMap<String, Object>();
@@ -151,15 +148,11 @@ public class SignatureProcessor implements Processor {
                 publicKey = strParser.getPublicKey();
                 secretKey = strParser.getSecretKey();
                 
-                boolean trusted = false;
-                // See if the certs come from a trusted SAML Assertion
-                if (principal instanceof CustomTokenPrincipal) {
-                    trusted = ((CustomTokenPrincipal)principal).isTrusted();
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Direct Trust for subject credential of a trusted SAML Assertion");
-                    }
+                boolean trusted = strParser.isTrustedCredential();
+                if (trusted && LOG.isDebugEnabled()) {
+                    LOG.debug("Direct Trust for SAML/BST credential");
                 }
-                if (!trusted && (publicKey != null || certs != null)) {
+                if (!trusted && (publicKey != null || certs != null) && (validator != null)) {
                     Credential credential = new Credential();
                     credential.setPublicKey(publicKey);
                     credential.setCertificates(certs);
@@ -210,6 +203,9 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
+        if (validator != null) {
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+        }
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }

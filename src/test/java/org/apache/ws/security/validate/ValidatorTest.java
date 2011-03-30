@@ -213,6 +213,50 @@ public class ValidatorTest extends org.junit.Assert {
             (AssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
         assert assertion != null;
     }
+    
+    /**
+     * In this test, a SOAP request is constructed where the SOAP body is signed via a 
+     * BinarySecurityToken. The receiving side does not trust the BST, and so the test fails.
+     * The second time, a custom Validator (NoOpValidator for this case) is installed for the
+     * BST, and so trust verification passes on the Signature. 
+     */
+    @org.junit.Test
+    public void testValidatedBSTSignature() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, CryptoFactory.getInstance(), secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+        WSSConfig config = WSSConfig.getNewInstance();
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.setWssConfig(config);
+        try {
+            secEngine.processSecurityHeader(doc, null, null, crypto);
+            fail("Expected failure on untrusted signature");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        config.setValidator(WSSecurityEngine.BINARY_TOKEN, new BSTValidator());
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, null, crypto);
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        BinarySecurity token =
+            (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+        assert token != null;
+    }
 
 
     /**

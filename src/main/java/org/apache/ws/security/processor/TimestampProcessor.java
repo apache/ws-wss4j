@@ -30,7 +30,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.TimestampValidator;
 import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
@@ -56,15 +55,17 @@ public class TimestampProcessor implements Processor {
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
         
-        Validator validator = data.getValidator(WSSecurityEngine.TIMESTAMP);
-        if (validator == null) {
-            validator = new TimestampValidator();
-        }
-        validator.validate(credential, data);
-        
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.TS, timestamp);
         result.put(WSSecurityEngineResult.TAG_ID, timestamp.getID());
+        
+        Validator validator = data.getValidator(WSSecurityEngine.TIMESTAMP);
+        if (validator != null) {
+            validator.validate(credential, data);
+            
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+        }
+        
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);

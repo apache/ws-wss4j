@@ -105,6 +105,16 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_TRANSFORMED_TOKEN = "transformed-token";
     
+    /**
+     * Tag denoting that the TAG_*_TOKEN result has been validated by a Validator 
+     * implementation. Some of the processors do not have a default validator implementation,
+     * and so this is not set. Note that this is set for the NoOpValidator if it is 
+     * configured.
+     * 
+     * The value under this tag is a Boolean instance.
+     */
+    public static final String TAG_VALIDATED_TOKEN = "validated-token";
+    
     //
     // Keys and certs
     //
@@ -199,6 +209,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     ) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SAML_ASSERTION, ass);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
 
     public WSSecurityEngineResult(
@@ -214,6 +225,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         if (certs != null) {
             put(TAG_X509_CERTIFICATE, certs[0]);
         }
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
 
     public
@@ -238,6 +250,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_SECRET, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_DATA_REF_URIS, dataRefUris);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(
@@ -255,32 +268,38 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         if (certs != null) {
             put(TAG_X509_CERTIFICATE, certs[0]);
         }
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(int act, List<WSDataRef> dataRefUris) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_DATA_REF_URIS, dataRefUris);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(int act, Timestamp tstamp) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_TIMESTAMP, tstamp);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(int act, SecurityContextToken sct) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SECURITY_CONTEXT_TOKEN, sct);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SIGNATURE_CONFIRMATION, sc);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(int act, UsernameToken usernameToken, Principal principal) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_USERNAME_TOKEN, usernameToken);
         put(TAG_PRINCIPAL, principal);
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
 
     public WSSecurityEngineResult(int act, BinarySecurity token, X509Certificate[] certs) {
@@ -290,6 +309,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         if (certs != null) {
             put(TAG_X509_CERTIFICATE, certs[0]);
         }
+        put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
 
     

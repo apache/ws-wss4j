@@ -31,7 +31,6 @@ import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.UsernameTokenValidator;
 import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
@@ -49,7 +48,8 @@ public class UsernameTokenProcessor implements Processor {
             log.debug("Found UsernameToken list element");
         }
         
-        Credential credential = handleUsernameToken(elem, data);
+        Validator validator = data.getValidator(WSSecurityEngine.USERNAME_TOKEN);
+        Credential credential = handleUsernameToken(elem, validator, data);
         UsernameToken token = credential.getUsernametoken();
         
         WSUsernameTokenPrincipal principal = 
@@ -71,6 +71,10 @@ public class UsernameTokenProcessor implements Processor {
                 WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
             );
         }
+        
+        if (validator != null) {
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+        }
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
@@ -87,6 +91,7 @@ public class UsernameTokenProcessor implements Processor {
     public Credential 
     handleUsernameToken(
         Element token, 
+        Validator validator,
         RequestData data
     ) throws WSSecurityException {
         boolean allowNamespaceQualifiedPasswordTypes = false;
@@ -105,11 +110,10 @@ public class UsernameTokenProcessor implements Processor {
             new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, bspCompliant);
         Credential credential = new Credential();
         credential.setUsernametoken(ut);
-        Validator validator = data.getValidator(WSSecurityEngine.USERNAME_TOKEN);
-        if (validator == null) {
-            validator = new UsernameTokenValidator();
+        if (validator != null) {
+            return validator.validate(credential, data);
         }
-        return validator.validate(credential, data);
+        return credential;
     }
 
 }

@@ -48,7 +48,9 @@ public class SAMLTokenProcessor implements Processor {
             log.debug("Found SAML Assertion element");
         }
         
-        Credential credential = handleSAMLToken(elem, data, wsDocInfo);
+        Validator validator = 
+            data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
+        Credential credential = handleSAMLToken(elem, data, validator, wsDocInfo);
         AssertionWrapper assertion = credential.getAssertion();
         if (log.isDebugEnabled()) {
             log.debug("SAML Assertion issuer " + assertion.getIssuerString());
@@ -69,6 +71,9 @@ public class SAMLTokenProcessor implements Processor {
                 WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
             );
         }
+        if (validator != null) {
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+        }
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
@@ -76,6 +81,7 @@ public class SAMLTokenProcessor implements Processor {
     public Credential handleSAMLToken(
         Element token, 
         RequestData data,
+        Validator validator,
         WSDocInfo docInfo
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
@@ -86,11 +92,12 @@ public class SAMLTokenProcessor implements Processor {
         assertion.parseHOKSubject(data, docInfo);
             
         // Now delegate the rest of the verification to the Validator
-        Validator validator = data.getValidator(new QName(token.getNamespaceURI(),
-                                                          token.getLocalName()));
         Credential credential = new Credential();
         credential.setAssertion(assertion);
-        return validator.validate(credential, data);
+        if (validator != null) {
+            return validator.validate(credential, data);
+        }
+        return credential;
     }
 
 }

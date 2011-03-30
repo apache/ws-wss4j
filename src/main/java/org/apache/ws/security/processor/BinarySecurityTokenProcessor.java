@@ -30,7 +30,6 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.NoOpValidator;
 import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
@@ -57,32 +56,34 @@ public class BinarySecurityTokenProcessor implements Processor {
         Validator validator = data.getValidator(new QName(elem.getNamespaceURI(),
                                                           elem.getLocalName()));
         
-        if (validator == null) {
-            validator = new NoOpValidator();
-        }
         if (data.getSigCrypto() == null) {
             certs = getCertificatesTokenReference(token, data.getDecCrypto());
         } else {
             certs = getCertificatesTokenReference(token, data.getSigCrypto());
         }
         
-        // Hook to allow the user to validate the BinarySecurityToken
-        Credential credential = new Credential();
-        credential.setBinarySecurityToken(token);
-        
-        Credential returnedCredential = validator.validate(credential, data);
-        
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         wsDocInfo.addTokenElement(elem);
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         result.put(WSSecurityEngineResult.TAG_ID, id);
-        if (returnedCredential.getTransformedToken() != null) {
-            result.put(
-                WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
-                returnedCredential.getTransformedToken()
-            );
+        
+        if (validator != null) {
+            // Hook to allow the user to validate the BinarySecurityToken
+            Credential credential = new Credential();
+            credential.setBinarySecurityToken(token);
+            
+            Credential returnedCredential = validator.validate(credential, data);
+            
+            if (returnedCredential.getTransformedToken() != null) {
+                result.put(
+                    WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
+                    returnedCredential.getTransformedToken()
+                );
+            }
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }
+        
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }

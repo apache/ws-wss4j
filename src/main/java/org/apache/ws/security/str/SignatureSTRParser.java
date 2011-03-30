@@ -77,6 +77,8 @@ public class SignatureSTRParser implements STRParser {
     
     private Principal principal;
     
+    private boolean trustedCredential;
+    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -194,6 +196,11 @@ public class SignatureSTRParser implements STRParser {
                     }
                     certs = 
                         (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+                    Boolean validatedToken = 
+                        (Boolean)result.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
+                    if (validatedToken.booleanValue()) {
+                        trustedCredential = true;
+                    }
                 } else if (WSConstants.ENCR == action) {
                     if (bspCompliant) {
                         BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
@@ -323,6 +330,17 @@ public class SignatureSTRParser implements STRParser {
         return secretKey;
     }
     
+    /**
+     * Get whether the returned credential is already trusted or not. This is currently
+     * applicable in the case of a credential extracted from a trusted HOK SAML Assertion,
+     * and a BinarySecurityToken that has been processed by a Validator. In these cases,
+     * the SignatureProcessor does not need to verify trust on the credential.
+     * @return true if trust has already been verified on the returned Credential
+     */
+    public boolean isTrustedCredential() {
+        return trustedCredential;
+    }
+    
     
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
@@ -385,7 +403,7 @@ public class SignatureSTRParser implements STRParser {
      * @param assertion An AssertionWrapper object
      * @return A principal
      */
-    private static Principal createPrincipalFromSAML(
+    private Principal createPrincipalFromSAML(
         AssertionWrapper assertion
     ) {
         Principal principal = new CustomTokenPrincipal(assertion.getId());
@@ -396,7 +414,7 @@ public class SignatureSTRParser implements STRParser {
             confirmMethod = methods.get(0);
         }
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && assertion.isSigned()) {
-            ((CustomTokenPrincipal)principal).setIsTrusted(true);
+            trustedCredential = true;
         }
         return principal;
     }
