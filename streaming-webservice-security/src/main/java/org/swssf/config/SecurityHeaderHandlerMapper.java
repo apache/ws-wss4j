@@ -50,8 +50,13 @@ public class SecurityHeaderHandlerMapper {
 
     public static Class getSecurityHeaderHandler(QName name) {
         HandlerType handlerType = handlerMap.get(name);
+        if (handlerType == null) {
+            logger.warn("No handler for " + name + " found");
+            return null;
+        }
         String javaClass = handlerType.getJAVACLASS();
         if (javaClass == null) {
+            logger.warn("No handler for " + name + " found");
             return null;
         }
         try {

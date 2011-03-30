@@ -137,6 +137,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             throws WSSecurityException, XMLStreamException {
 
         Class clazz = SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
+        if (clazz == null) {
+            return;
+        }
         Constructor[] constructors = clazz.getConstructors();
         Comparator<Constructor> comparator = new Comparator<Constructor>() {
             public int compare(Constructor o1, Constructor o2) {
