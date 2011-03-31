@@ -14,6 +14,7 @@
  */
 package org.swssf.impl.processor.output;
 
+import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
@@ -162,7 +163,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     } catch (IOException e) {
                         throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
                     }
-                    String calculatedDigest = new String(org.bouncycastle.util.encoders.Base64.encode(this.digestOutputStream.getDigestValue()));
+                    String calculatedDigest = new String(Base64.encodeBase64(this.digestOutputStream.getDigestValue()));
                     logger.debug("Calculated Digest: " + calculatedDigest);
                     signaturePartDef.setDigestValue(calculatedDigest);
 

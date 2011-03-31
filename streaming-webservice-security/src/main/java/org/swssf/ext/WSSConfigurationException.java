@@ -15,7 +15,6 @@
 package org.swssf.ext;
 
 /**
- * Todo: WSSEcurityException as superclass?
  * Exception when configuration errors are detected
  *
  * @author $Author: giger $

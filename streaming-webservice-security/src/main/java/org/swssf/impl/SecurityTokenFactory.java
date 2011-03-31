@@ -18,18 +18,24 @@ import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
+import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.X509DataType;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.CallbackHandler;
 import java.io.ByteArrayInputStream;
-import java.security.Key;
-import java.security.PublicKey;
+import java.io.UnsupportedEncodingException;
+import java.security.*;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Factory to create SecurityToken Objects from keys in XML
@@ -66,7 +72,7 @@ public class SecurityTokenFactory {
 
                 byte[] binaryContent;
                 if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
-                    binaryContent = org.bouncycastle.util.encoders.Base64.decode(keyIdentifierType.getValue());
+                    binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
                 } else {
                     binaryContent = keyIdentifierType.getValue().getBytes();
                 }
@@ -125,6 +131,10 @@ public class SecurityTokenFactory {
         }
     }
 
+    public SecurityToken getSecurityToken(UsernameTokenType usernameTokenType) throws WSSecurityException {
+            return new UsernameSecurityToken(usernameTokenType);
+    }
+
     abstract class AbstractSecurityToken implements SecurityToken {
 
         private Crypto crypto;
@@ -141,6 +151,197 @@ public class SecurityTokenFactory {
 
         public CallbackHandler getCallbackHandler() {
             return callbackHandler;
+        }
+    }
+
+    public class UsernameSecurityToken implements SecurityToken {
+
+        private static final int DEFAULT_ITERATION = 1000;
+
+        private UsernameTokenType usernameTokenType;
+
+        public UsernameSecurityToken(UsernameTokenType usernameTokenType) {
+            this.usernameTokenType = usernameTokenType;
+        }
+
+        private String getCreated() {
+            return usernameTokenType.getCreated();
+        }
+
+        private String getNonce() {
+            return usernameTokenType.getNonce();
+        }
+
+        private byte[] getSalt() {
+            return Base64.decodeBase64(usernameTokenType.getSalt());
+        }
+
+        private Integer getIteration() {
+            return Integer.parseInt(usernameTokenType.getIteration());
+        }
+
+        /**
+         * This method generates a derived key as defined in WSS Username
+         * Token Profile.
+         *
+         * @param password  The password to include in the key generation
+         * @param salt      The Salt value
+         * @param iteration The Iteration value. If zero (0) is given the method uses the
+         *                  default value
+         * @return Returns the derived key a byte array
+         * @throws WSSecurityException
+         */
+        public byte[] generateDerivedKey(String rawPassword, byte[] salt, int iteration) throws WSSecurityException {
+            if (iteration == 0) {
+                iteration = DEFAULT_ITERATION;
+            }
+            byte[] pwBytes = null;
+            try {
+                pwBytes = rawPassword.getBytes("UTF-8");
+            } catch (final java.io.UnsupportedEncodingException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            }
+
+            byte[] pwSalt = new byte[salt.length + pwBytes.length];
+            System.arraycopy(pwBytes, 0, pwSalt, 0, pwBytes.length);
+            System.arraycopy(salt, 0, pwSalt, pwBytes.length, salt.length);
+
+            MessageDigest sha = null;
+            try {
+                sha = MessageDigest.getInstance("SHA-1");
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", null, e);
+            }
+            sha.reset();
+
+            // Make the first hash round with start value
+            byte[] k = sha.digest(pwSalt);
+
+            // Perform the 1st up to iteration-1 hash rounds
+            for (int i = 1; i < iteration; i++) {
+                k = sha.digest(k);
+            }
+            return k;
+        }
+
+        /**
+         * Gets the secret key as per WS-Trust spec.
+         *
+         * @param keylen      How many bytes to generate for the key
+         * @param labelString the label used to generate the seed
+         * @return a secret key constructed from information contained in this
+         *         username token
+         */
+        private byte[] getSecretKey(String rawPassword, int keylen, String labelString) throws WSSecurityException {
+            byte[] key = null;
+            try {
+                Mac mac = Mac.getInstance("HMACSHA1");
+                byte[] password = rawPassword.getBytes("UTF-8");
+                byte[] label = labelString.getBytes("UTF-8");
+                byte[] nonce = Base64.decodeBase64(getNonce());
+                byte[] created = getCreated().getBytes("UTF-8");
+                byte[] seed = new byte[label.length + nonce.length + created.length];
+
+                int offset = 0;
+                System.arraycopy(label, 0, seed, offset, label.length);
+                offset += label.length;
+
+                System.arraycopy(nonce, 0, seed, offset, nonce.length);
+                offset += nonce.length;
+
+                System.arraycopy(created, 0, seed, offset, created.length);
+
+                key = P_hash(password, seed, mac, keylen);
+
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noHMACSHA1available", null, e);
+            } catch (UnsupportedEncodingException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            }
+            return key;
+        }
+
+        /**
+         * P_hash as defined in RFC 2246 for TLS.
+         *
+         * @param secret   is the key for the HMAC
+         * @param seed     the seed value to start the generation - A(0)
+         * @param mac      the HMAC algorithm
+         * @param required number of bytes to generate
+         * @return a byte array that contains a secret key
+         * @throws Exception
+         */
+        private byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required) throws WSSecurityException {
+            byte[] out = new byte[required];
+            int offset = 0;
+            int toCopy;
+            byte[] a, tmp;
+
+            try {
+                // a(0) is the seed
+                a = seed;
+                SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
+                mac.init(key);
+                while (required > 0) {
+                    mac.update(a);
+                    a = mac.doFinal();
+                    mac.update(a);
+                    mac.update(seed);
+                    tmp = mac.doFinal();
+                    toCopy = Math.min(required, tmp.length);
+                    System.arraycopy(tmp, 0, out, offset, toCopy);
+                    offset += toCopy;
+                    required -= toCopy;
+                }
+            } catch (InvalidKeyException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            }
+            return out;
+        }
+
+        public boolean isAsymmetric() {
+            return false;
+        }
+
+        private Map<String, Key> keyTable = new Hashtable<String, Key>();
+
+        public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+            byte[] secretToken = null;
+            if (usernameTokenType.getSalt() != null && usernameTokenType.getIteration() != null) {
+                int iteration = getIteration();
+                byte[] salt = getSalt();
+                secretToken = generateDerivedKey(usernameTokenType.getPassword(), salt, iteration);
+            } else {
+                secretToken = getSecretKey(usernameTokenType.getPassword(), Constants.WSE_DERIVED_KEY_LEN, Constants.LABEL_FOR_DERIVED_KEY);
+            }
+
+            if (keyTable.containsKey(algorithmURI)) {
+                return keyTable.get(algorithmURI);
+            } else {
+                String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                Key key = new SecretKeySpec(secretToken, algoFamily);
+                keyTable.put(algorithmURI, key);
+                return key;
+            }
+        }
+
+        public PublicKey getPublicKey() throws WSSecurityException {
+            return null;
+        }
+
+        public void verify() throws WSSecurityException {
+        }
+
+        public SecurityToken getKeyWrappingToken() {
+            return null;
+        }
+
+        public String getKeyWrappingTokenAlgorithm() {
+            return null;
+        }
+
+        public Constants.KeyIdentifierType getKeyIdentifierType() {
+            return null;
         }
     }
 

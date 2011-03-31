@@ -134,14 +134,30 @@ public class Constants {
     public static final String NS10_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
     public static final String NS11_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
 
-    public static final String NS_X509TOKEN = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
+    public static final String NS_X509TOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
 
-    public static final String NS_X509_V3_TYPE = NS_X509TOKEN + "#X509v3";
-    public static final String NS_X509PKIPathv1 = NS_X509TOKEN + "#X509PKIPathv1";
-    public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN + "#X509SubjectKeyIdentifier";
+    public static final String NS_X509_V3_TYPE = NS_X509TOKEN_PROFILE + "#X509v3";
+    public static final String NS_X509PKIPathv1 = NS_X509TOKEN_PROFILE + "#X509PKIPathv1";
+    public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
     public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE_SECURITY + "#ThumbprintSHA1";
 
     public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE_SECURITY + "#Base64Binary";
+
+    public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken");
+    public static final QName TAG_wsse_Username = new QName(NS_WSSE10, "Username");
+    public static final QName TAG_wsse_Password = new QName(NS_WSSE10, "Password");
+    public static final QName TAG_wsse_Nonce = new QName(NS_WSSE10, "Nonce");
+    public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt");
+    public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration");
+
+    public static final String NS_USERNAMETOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE + "#PasswordDigest";
+
+    /**
+     * Length of UsernameToken derived key used by .NET WSE to sign a message.
+     */
+    public static final int WSE_DERIVED_KEY_LEN = 16;
+    public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
 
     public enum Action {
         TIMESTAMP,

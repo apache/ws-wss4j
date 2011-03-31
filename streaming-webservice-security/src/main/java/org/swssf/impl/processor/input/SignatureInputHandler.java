@@ -14,7 +14,7 @@
  */
 package org.swssf.impl.processor.input;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SecurityTokenFactory;
@@ -142,6 +142,9 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
         private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, WSSecurityException {
             AlgorithmType signatureAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
+            if (signatureAlgorithm == null) {
+                throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, "unknownSignatureAlgorithm", new Object[]{signatureType.getSignedInfo().getSignatureMethod().getAlgorithm()});
+            }
             Signature signature = Signature.getInstance(signatureAlgorithm.getJCEName(), signatureAlgorithm.getJCEProvider());
 
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
@@ -159,7 +162,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
         public void doFinal() throws WSSecurityException {
             try {
                 bufferedSignerOutputStream.close();
-                if (!signerOutputStream.verify(Base64.decode(signatureType.getSignatureValue().getValue()))) {
+                if (!signerOutputStream.verify(Base64.decodeBase64(signatureType.getSignatureValue().getValue()))) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
             } catch (SignatureException e) {

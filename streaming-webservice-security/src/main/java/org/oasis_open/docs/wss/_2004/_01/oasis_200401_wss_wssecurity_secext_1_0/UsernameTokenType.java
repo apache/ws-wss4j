@@ -8,16 +8,22 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
+import org.swssf.ext.Constants;
+import org.swssf.ext.ParseException;
+import org.swssf.ext.Parseable;
+import org.swssf.ext.Utils;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.util.*;
 
 
 /**
@@ -45,68 +51,274 @@ import java.util.Map;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "UsernameTokenType", propOrder = {
         "username",
-        "any"
+        "password",
+        "nonce",
+        "created",
+        "salt",
+        "iteration"
 })
-public class UsernameTokenType {
+public class UsernameTokenType implements Parseable {
 
     @XmlElement(name = "Username", required = true)
-    protected AttributedString username;
-    @XmlAnyElement(lax = true)
-    protected List<Object> any;
+    protected String username;
+    @XmlElement(name = "Password", required = false)
+    protected String password;
+    @XmlAttribute(name = "Type", required = false)
+    protected String passwordType;
+    @XmlElement(name = "Nonce", required = false)
+    protected String nonce;
+    @XmlAttribute(name = "EncodingType", required = false)
+    protected String nonceEncodingType;
+    @XmlElement(name = "Created", required = false)
+    protected String created;
+    @XmlElement(name = "Salt", required = false)
+    protected String salt;
+    @XmlElement(name = "Iteration", required = false)
+    protected String iteration;
     @XmlAttribute(name = "Id", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
     protected String id;
-    @XmlAnyAttribute
-    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
-    /**
-     * Gets the value of the username property.
-     *
-     * @return possible object is
-     *         {@link AttributedString }
-     */
-    public AttributedString getUsername() {
+    private QName startElementName;
+    private Parseable currentParseable;
+
+    public UsernameTokenType(StartElement startElement) {
+        this.startElementName = startElement.getName();
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute attribute = attributeIterator.next();
+            if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+                CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
+                this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
+            }
+        }
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
+                if (startElement.getName().equals(Constants.TAG_wsse_Username)) {
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    username = xmlEvent.asCharacters().getData();
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else if (startElement.getName().equals(Constants.TAG_wsse_Password)) {
+                    Attribute attribute = startElement.getAttributeByName(Constants.ATT_NULL_Type);
+                    if (attribute != null) {
+                        passwordType = attribute.getValue();
+                    }
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    password = xmlEvent.asCharacters().getData();
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else if (startElement.getName().equals(Constants.TAG_wsse_Nonce)) {
+                    Attribute attribute = startElement.getAttributeByName(Constants.ATT_NULL_EncodingType);
+                    if (attribute != null) {
+                        nonceEncodingType = attribute.getValue();
+                    }
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    nonce = xmlEvent.asCharacters().getData();
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else if (startElement.getName().equals(Constants.TAG_wsu_Created)) {
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    created = xmlEvent.asCharacters().getData();
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else if (startElement.getName().equals(Constants.TAG_wsse11_Salt)) {
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    salt = xmlEvent.asCharacters().getData();
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else if (startElement.getName().equals(Constants.TAG_wsse11_Iteration)) {
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    iteration = xmlEvent.asCharacters().getData();
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                }
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(startElementName)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (username == null) {
+            throw new ParseException("Element \"Username\" is missing");
+        }
+    }
+
+    public String getUsername() {
         return username;
     }
 
-    /**
-     * Sets the value of the username property.
-     *
-     * @param value allowed object is
-     *              {@link AttributedString }
-     */
-    public void setUsername(AttributedString value) {
-        this.username = value;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    /**
-     * Gets the value of the any property.
-     * <p/>
-     * <p/>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the any property.
-     * <p/>
-     * <p/>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getAny().add(newItem);
-     * </pre>
-     * <p/>
-     * <p/>
-     * <p/>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Element }
-     * {@link Object }
-     */
-    public List<Object> getAny() {
-        if (any == null) {
-            any = new ArrayList<Object>();
-        }
-        return this.any;
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPasswordType() {
+        return passwordType;
+    }
+
+    public void setPasswordType(String passwordType) {
+        this.passwordType = passwordType;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
+    }
+
+    public String getNonceEncodingType() {
+        return nonceEncodingType;
+    }
+
+    public void setNonceEncodingType(String nonceEncodingType) {
+        this.nonceEncodingType = nonceEncodingType;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public String getIteration() {
+        return iteration;
+    }
+
+    public void setIteration(String iteration) {
+        this.iteration = iteration;
     }
 
     /**
@@ -128,21 +340,4 @@ public class UsernameTokenType {
     public void setId(String value) {
         this.id = value;
     }
-
-    /**
-     * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * <p/>
-     * <p/>
-     * the map is keyed by the name of the attribute and
-     * the value is the string value of the attribute.
-     * <p/>
-     * the map returned by this method is live, and you can add new attribute
-     * by updating the map directly. Because of this design, there's no setter.
-     *
-     * @return always non-null
-     */
-    public Map<QName, String> getOtherAttributes() {
-        return otherAttributes;
-    }
-
 }

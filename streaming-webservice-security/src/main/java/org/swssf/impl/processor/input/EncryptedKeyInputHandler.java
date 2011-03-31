@@ -14,6 +14,7 @@
  */
 package org.swssf.impl.processor.input;
 
+import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
@@ -32,6 +33,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.security.*;
 import java.util.Deque;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Prozessor for the EncryptedKey XML Structure
@@ -72,7 +74,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         );
                         cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey(algorithmURI));
 
-                        byte[] encryptedEphemeralKey = org.bouncycastle.util.encoders.Base64.decode(encryptedKeyType.getCipherData().getCipherValue());
+                        byte[] encryptedEphemeralKey = Base64.decodeBase64(encryptedKeyType.getCipherData().getCipherValue());
                         secretToken = cipher.doFinal(encryptedEphemeralKey);
 
                     } catch (NoSuchPaddingException e) {
@@ -99,7 +101,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
                     return new SecurityToken() {
 
-                        private Hashtable<String, Key> keyTable = new Hashtable<String, Key>();
+                        private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
                         public boolean isAsymmetric() {
                             return false;

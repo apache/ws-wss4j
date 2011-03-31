@@ -97,6 +97,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
         } catch (DatatypeConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+        } catch (IllegalArgumentException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
         }
     }
 

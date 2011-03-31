@@ -85,6 +85,9 @@ public class Utils {
      * @throws WSSecurityException if the callback couldn't be executed
      */
     public static void doCallback(CallbackHandler callbackHandler, Callback callback) throws WSSecurityException {
+        if (callbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
+        }
         try {
             Callback[] callbacks = new Callback[]{callback};
             callbackHandler.handle(callbacks);

@@ -111,7 +111,7 @@ public class WSSec {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noSignatureUser");
                     }
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noSignatureCallbackHandler");
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
                     }
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
                         securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));

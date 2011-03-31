@@ -108,8 +108,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
         boolean encryptedHeader = false;
 
-        //todo overall null checks
-
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
 

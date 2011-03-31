@@ -14,6 +14,7 @@
  */
 package org.swssf.impl.processor.input;
 
+import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
@@ -186,11 +187,11 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     }
 
                     byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
-                    byte[] storedDigest = org.bouncycastle.util.encoders.Base64.decode(referenceType.getDigestValue());
+                    byte[] storedDigest = Base64.decodeBase64(referenceType.getDigestValue());
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Calculated Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(calculatedDigest)));
-                        logger.debug("Stored Digest: " + new String(org.bouncycastle.util.encoders.Base64.encode(storedDigest)));
+                        logger.debug("Calculated Digest: " + new String(Base64.encodeBase64(calculatedDigest)));
+                        logger.debug("Stored Digest: " + new String(Base64.encodeBase64(storedDigest)));
                     }
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
