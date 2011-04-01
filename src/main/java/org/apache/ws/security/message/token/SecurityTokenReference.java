@@ -759,6 +759,14 @@ public class SecurityTokenReference {
     public void setID(String id) {
         element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
+    
+    /**
+     * Get the id
+     * @return the wsu ID of the element
+     */
+    public String getID() {
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
+    }
 
     /**
      * return the string representation.

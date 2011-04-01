@@ -366,7 +366,8 @@ public class AssertionWrapper {
      * @return Element
      */
     public Element toDOM(Document doc) throws WSSecurityException {
-        return OpenSAMLUtil.toDom(xmlObject, doc);
+        assertionElement = OpenSAMLUtil.toDom(xmlObject, doc);
+        return assertionElement;
     }
 
     /**
