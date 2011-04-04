@@ -21,10 +21,9 @@ import org.swssf.ext.WSSecurityException;
 import javax.security.auth.callback.CallbackHandler;
 
 /**
-*
-* @author $Author: $
-* @version $Revision: $ $Date: $
-*/
+ * @author $Author: $
+ * @version $Revision: $ $Date: $
+ */
 public class ThumbprintSHA1SecurityToken extends X509SecurityToken {
     private String alias = null;
     private byte[] binaryContent;

@@ -20,8 +20,6 @@ import org.swssf.ext.WSSecurityException;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 
 import java.io.OutputStream;
-import java.security.Signature;
-import java.security.SignatureException;
 
 /**
  * @author $Author: giger $

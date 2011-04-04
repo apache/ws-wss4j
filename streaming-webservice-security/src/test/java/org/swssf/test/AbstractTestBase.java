@@ -27,6 +27,7 @@ import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
+import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
@@ -102,7 +103,7 @@ public abstract class AbstractTestBase {
     protected ByteArrayOutputStream doOutboundSecurity(SecurityProperties securityProperties, InputStream sourceDocument) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -114,6 +115,11 @@ public abstract class AbstractTestBase {
     }
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
+        MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
+        return (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+    }
+
+    protected MessageContext doOutboundSecurityWithWSS4J_1(InputStream sourceDocument, String action, Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
         WSS4JHandler wss4JHandler = new WSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
@@ -151,7 +157,7 @@ public abstract class AbstractTestBase {
         requestData.setMsgContext(messageContext);
         wss4JHandler.doSender(messageContext, requestData, true);
 
-        return (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+        return messageContext;
     }
 
     protected Document doInboundSecurityWithWSS4J(Document document, String action) throws Exception {
@@ -164,6 +170,10 @@ public abstract class AbstractTestBase {
     }
 
     protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol) throws Exception {
+        return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL, null);
+    }
+
+    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol, Vector sigv) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
@@ -191,6 +201,8 @@ public abstract class AbstractTestBase {
         wss4JHandler.setPassword(messageContext, "default");
         messageContext.setProperty(WSHandlerConstants.DEC_PROP_REF_ID, "" + decProperties.hashCode());
         messageContext.setProperty("" + decProperties.hashCode(), decProperties);
+
+        messageContext.setProperty(WSHandlerConstants.SEND_SIGV, sigv);
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);

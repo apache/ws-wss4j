@@ -16,12 +16,14 @@ package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.ext.*;
-import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.SignerOutputStream;
+import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
+import org.swssf.securityEvent.SecurityEvent;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
@@ -31,7 +33,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.Deque;
 import java.util.Iterator;
@@ -144,6 +148,11 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext);
             securityToken.verify();
+
+            InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = new InitiatorSignatureTokenSecurityEvent(SecurityEvent.Event.InitiatorSignatureToken);
+            initiatorSignatureTokenSecurityEvent.setSecurityToken(securityToken);
+            initiatorSignatureTokenSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
+            securityContext.registerSecurityEvent(initiatorSignatureTokenSecurityEvent);
 
             SignatureAlgorithm signatureAlgorithm = SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
             if (securityToken.isAsymmetric()) {

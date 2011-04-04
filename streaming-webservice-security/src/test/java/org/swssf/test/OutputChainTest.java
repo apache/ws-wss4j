@@ -18,6 +18,7 @@ import org.swssf.WSSec;
 import org.swssf.ext.Constants;
 import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurityProperties;
+import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -30,6 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 /**
  * @author $Author: giger $
@@ -47,7 +49,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -90,7 +92,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -122,7 +124,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8");
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

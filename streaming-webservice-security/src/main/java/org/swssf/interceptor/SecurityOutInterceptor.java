@@ -60,7 +60,8 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
 
         XMLStreamWriter newXMLStreamWriter;
         try {
-            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding);
+            //todo securityEvents argument from context
+            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, null);
             soapMessage.setContent(XMLStreamWriter.class, newXMLStreamWriter);
         } catch (WSSecurityException e) {
             throw new Fault(e);

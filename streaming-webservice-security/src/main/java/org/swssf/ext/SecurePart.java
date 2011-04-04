@@ -27,6 +27,7 @@ public class SecurePart {
     private String modifier;
     private String id;
 
+    //todo modifier enum!
     public SecurePart(String name, String namespace, String modifier) {
         this.name = name;
         this.namespace = namespace;

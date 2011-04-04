@@ -79,7 +79,7 @@ public class ReferenceType implements Parseable {
                     return true;
                 }
             case XMLStreamConstants.START_ELEMENT:
-               throw new ParseException("Unsupported Element: " + xmlEvent.asStartElement().getName());
+                throw new ParseException("Unsupported Element: " + xmlEvent.asStartElement().getName());
             default:
                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
         }

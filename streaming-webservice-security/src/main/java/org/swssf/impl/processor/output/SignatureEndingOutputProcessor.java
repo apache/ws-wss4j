@@ -16,7 +16,6 @@ package org.swssf.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
-import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
@@ -25,7 +24,6 @@ import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCom
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.RFC2253Parser;
 import org.swssf.impl.util.SignerOutputStream;
-import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -34,7 +32,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -148,7 +148,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
         SecurityTokenProvider securityTokenProvider = null;
         if (alias != null) {
-            signatureAlgorithm.engineInitSign(getSecurityProperties().getSignatureCrypto().getPrivateKey(alias,password));
+            signatureAlgorithm.engineInitSign(getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password));
         } else if (getSecurityProperties().getTokenUser() != null) {
             securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(getSecurityProperties().getTokenUser());
             if (securityTokenProvider == null) {

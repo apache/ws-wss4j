@@ -29,10 +29,9 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
-*
-* @author $Author: $
-* @version $Revision: $ $Date: $
-*/
+ * @author $Author: $
+ * @version $Revision: $ $Date: $
+ */
 public class UsernameSecurityToken implements SecurityToken {
 
     private static final int DEFAULT_ITERATION = 1000;
@@ -96,6 +95,7 @@ public class UsernameSecurityToken implements SecurityToken {
      *                  default value
      * @return Returns the derived key a byte array
      * @throws org.swssf.ext.WSSecurityException
+     *
      */
     public byte[] generateDerivedKey(String rawPassword, byte[] salt, int iteration) throws WSSecurityException {
         if (iteration == 0) {

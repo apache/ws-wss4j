@@ -22,10 +22,9 @@ import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 
 /**
-*
-* @author $Author: $
-* @version $Revision: $ $Date: $
-*/
+ * @author $Author: $
+ * @version $Revision: $ $Date: $
+ */
 public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     private String alias = null;
     private X509Certificate x509Certificate;

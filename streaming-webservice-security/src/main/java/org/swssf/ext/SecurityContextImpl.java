@@ -45,10 +45,20 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void putAsList(Class key, T value) {
+    public <T extends List> void putList(Class key, T value) {
         List<T> entry = (List<T>) content.get(key);
         if (entry == null) {
-            entry = new ArrayList();
+            entry = new ArrayList<T>();
+            content.put(key, entry);
+        }
+        entry.addAll(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends List> void putAsList(Class key, T value) {
+        List<T> entry = (List<T>) content.get(key);
+        if (entry == null) {
+            entry = new ArrayList<T>();
             content.put(key, entry);
         }
         entry.add(value);

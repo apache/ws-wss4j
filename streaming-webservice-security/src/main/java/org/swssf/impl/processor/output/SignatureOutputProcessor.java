@@ -75,7 +75,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                 signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
 
                                 signaturePartDefList.add(signaturePartDef);
-                                internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
 
                                 List<Namespace> namespaceList = new ArrayList<Namespace>();
                                 Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
@@ -90,7 +89,13 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                                 while (attributeIterator.hasNext()) {
                                     Attribute attribute = attributeIterator.next();
                                     attributeList.add(attribute);
+                                    if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+                                        signaturePartDef.setSigRefId(attribute.getValue());
+                                    }
                                 }
+
+                                internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
+
                                 attributeList.add(outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
                                 //todo the NSStack should be corrected...
                                 xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);

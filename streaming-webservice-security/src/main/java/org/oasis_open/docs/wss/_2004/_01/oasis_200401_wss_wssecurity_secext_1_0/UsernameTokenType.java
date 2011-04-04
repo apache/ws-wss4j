@@ -12,7 +12,6 @@ import org.swssf.ext.Constants;
 import org.swssf.ext.ParseException;
 import org.swssf.ext.Parseable;
 import org.swssf.ext.Utils;
-import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -23,7 +22,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.*;
+import java.util.Iterator;
 
 
 /**

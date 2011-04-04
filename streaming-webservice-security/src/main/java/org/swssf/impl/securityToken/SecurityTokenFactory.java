@@ -121,7 +121,7 @@ public class
     }
 
     public SecurityToken getSecurityToken(UsernameTokenType usernameTokenType) throws WSSecurityException {
-            return new UsernameSecurityToken(usernameTokenType);
+        return new UsernameSecurityToken(usernameTokenType);
     }
 
 }

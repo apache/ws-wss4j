@@ -18,9 +18,11 @@ import org.swssf.impl.DocumentContextImpl;
 import org.swssf.impl.OutputProcessorChainImpl;
 import org.swssf.impl.XMLSecurityStreamWriter;
 import org.swssf.impl.processor.output.*;
+import org.swssf.securityEvent.SecurityEvent;
 
 import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * Outbound Streaming-WebService-Security
@@ -45,11 +47,11 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents) throws WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
-
-        DocumentContextImpl documentContext = new DocumentContextImpl();
+        securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
+        final DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(encoding);
 
         OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
@@ -85,6 +87,11 @@ public class OutboundWSSec {
                     SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
                     processorChain.addProcessor(signatureOutputProcessor);
                     processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
+                    break;
+                }
+                case SIGNATURE_CONFIRMATION: {
+                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor = new SignatureConfirmationOutputProcessor(securityProperties);
+                    processorChain.addProcessor(signatureConfirmationOutputProcessor);
                     break;
                 }
             }

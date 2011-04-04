@@ -28,10 +28,9 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
 /**
-*
-* @author $Author: $
-* @version $Revision: $ $Date: $
-*/
+ * @author $Author: $
+ * @version $Revision: $ $Date: $
+ */
 public abstract class X509SecurityToken extends AbstractSecurityToken {
     private X509Certificate x509Certificate = null;
 

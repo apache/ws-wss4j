@@ -159,17 +159,20 @@ public class Constants {
 
     public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE_SECURITY + "#Base64Binary";
 
-    public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken");
-    public static final QName TAG_wsse_Username = new QName(NS_WSSE10, "Username");
-    public static final QName TAG_wsse_Password = new QName(NS_WSSE10, "Password");
-    public static final QName TAG_wsse_Nonce = new QName(NS_WSSE10, "Nonce");
-    public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt");
-    public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration");
+    public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken", PREFIX_WSSE);
+    public static final QName TAG_wsse_Username = new QName(NS_WSSE10, "Username", PREFIX_WSSE);
+    public static final QName TAG_wsse_Password = new QName(NS_WSSE10, "Password", PREFIX_WSSE);
+    public static final QName TAG_wsse_Nonce = new QName(NS_WSSE10, "Nonce", PREFIX_WSSE);
+    public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
+    public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
 
     public static final String NS_USERNAMETOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE + "#PasswordDigest";
     public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE + "#PasswordText";
     public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE + "#UsernameToken";
+
+    public static final QName TAG_wsse11_SignatureConfirmation = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
+    public static final QName ATT_NULL_Value = new QName(null, "Value");
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.
@@ -183,6 +186,7 @@ public class Constants {
         ENCRYPT,
         USERNAMETOKEN,
         USERNAMETOKEN_SIGN,
+        SIGNATURE_CONFIRMATION,
     }
 
     public enum KeyIdentifierType {

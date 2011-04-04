@@ -12,32 +12,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.swssf.impl.securityToken;
+package org.swssf.securityEvent;
 
-import org.swssf.crypto.Crypto;
 import org.swssf.ext.SecurityToken;
 
-import javax.security.auth.callback.CallbackHandler;
-
 /**
- * @author $Author: $
- * @version $Revision: $ $Date: $
+ * @author $Author: giger $
+ * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public abstract class AbstractSecurityToken implements SecurityToken {
+public class RecipientSignatureTokenSecurityEvent extends SecurityEvent {
 
-    private Crypto crypto;
-    private CallbackHandler callbackHandler;
+    private SecurityToken securityToken;
 
-    AbstractSecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
-        this.crypto = crypto;
-        this.callbackHandler = callbackHandler;
+    public RecipientSignatureTokenSecurityEvent(Event securityEventType) {
+        super(securityEventType);
     }
 
-    public Crypto getCrypto() {
-        return crypto;
+    public SecurityToken getSecurityToken() {
+        return securityToken;
     }
 
-    public CallbackHandler getCallbackHandler() {
-        return callbackHandler;
+    public void setSecurityToken(SecurityToken securityToken) {
+        this.securityToken = securityToken;
     }
 }

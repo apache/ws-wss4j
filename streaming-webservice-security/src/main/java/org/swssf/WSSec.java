@@ -19,6 +19,9 @@ import org.swssf.ext.*;
 
 import java.security.Provider;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is the central class of the streaming webservice-security framework.<br/>
@@ -95,6 +98,17 @@ public class WSSec {
         if (securityProperties.getOutAction() == null) {
             throw new WSSConfigurationException(WSSecurityException.FAILURE, "noOutputAction");
         }
+
+        int pos = Arrays.binarySearch(securityProperties.getOutAction(), Constants.Action.SIGNATURE_CONFIRMATION);
+        if (pos >= 0) {
+            if (Arrays.binarySearch(securityProperties.getOutAction(), Constants.Action.SIGNATURE) < 0) {
+                List<Constants.Action> actionList = new ArrayList<Constants.Action>(securityProperties.getOutAction().length);
+                actionList.addAll(Arrays.asList(securityProperties.getOutAction()));
+                actionList.add(pos, Constants.Action.SIGNATURE);
+                securityProperties.setOutAction(actionList.toArray(new Constants.Action[securityProperties.getOutAction().length + 1]));
+            }
+        }
+
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
             Constants.Action action = securityProperties.getOutAction()[i];
             switch (action) {
@@ -190,6 +204,8 @@ public class WSSec {
                         securityProperties.setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                     }
                     break;
+                case SIGNATURE_CONFIRMATION:
+                    securityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsse11_SignatureConfirmation.getLocalPart(), Constants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), "Element"));
             }
         }
         //todo clone securityProperties

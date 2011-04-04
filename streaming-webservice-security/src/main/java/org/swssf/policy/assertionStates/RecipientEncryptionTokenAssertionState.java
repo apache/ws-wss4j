@@ -16,7 +16,6 @@ package org.swssf.policy.assertionStates;
 
 import org.swssf.ext.SecurityToken;
 import org.swssf.ext.WSSecurityException;
-import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.securityToken.X509SecurityToken;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.policy.secpolicy.model.*;

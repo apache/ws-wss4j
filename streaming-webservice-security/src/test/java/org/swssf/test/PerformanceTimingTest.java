@@ -20,6 +20,7 @@ import org.swssf.ext.Constants;
 import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
+import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -30,6 +31,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -60,7 +62,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream(source));
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
 
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(new FileOutputStream(output), "UTF-8");
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(new FileOutputStream(output), "UTF-8", new ArrayList<SecurityEvent>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

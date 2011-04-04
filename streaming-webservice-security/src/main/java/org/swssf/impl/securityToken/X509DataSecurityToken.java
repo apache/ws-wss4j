@@ -22,10 +22,9 @@ import org.w3._2000._09.xmldsig_.X509DataType;
 import javax.security.auth.callback.CallbackHandler;
 
 /**
-*
-* @author $Author: $
-* @version $Revision: $ $Date: $
-*/
+ * @author $Author: $
+ * @version $Revision: $ $Date: $
+ */
 public class X509DataSecurityToken extends X509SecurityToken {
     private String alias = null;
     protected X509DataType x509DataType;
