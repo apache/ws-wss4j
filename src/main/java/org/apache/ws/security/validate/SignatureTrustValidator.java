@@ -67,7 +67,7 @@ public class SignatureTrustValidator implements Validator {
             validateCertificates(certs);
             boolean trust = false;
             if (certs.length == 1) {
-                trust = verifyTrustInCert(certs, crypto);
+                trust = verifyTrustInCert(certs[0], crypto);
             } else {
                 trust = verifyTrustInCerts(certs, crypto);
             }
@@ -122,13 +122,12 @@ public class SignatureTrustValidator implements Validator {
      * might be fooled by a phony DN (String!)
      *
      * @param cert the certificate that should be validated against the keystore
+     * @param crypto A crypto instance to use for trust validation
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
      */
-    protected boolean verifyTrustInCert(X509Certificate[] certificates, Crypto crypto) 
+    protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto) 
         throws WSSecurityException {
-        X509Certificate cert = certificates[0];
-        
         String subjectString = cert.getSubjectX500Principal().getName();
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
