@@ -63,6 +63,11 @@ public class WSConstants {
     public static final String SAML_ASSERTION_ID = "SAMLAssertionID";
     
     /*
+     * The SAMLID relative URI string (without #)
+     */
+    public static final String SAML2_ASSERTION_ID = "SAMLID";
+    
+    /*
      * The EncryptedKeyToken value type URI used in wsse:Reference 
      */
     public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";
@@ -122,9 +127,15 @@ public class WSConstants {
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
     public static final String ASSERTION_LN = "Assertion";
-    public static final String WSS_SAML_NS = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#";
+    public static final String WSS_SAML_NS = 
+        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#";
+    public static final String SAMLTOKEN_NS11 = 
+        "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
     public static final String WSS_SAML_ASSERTION = "SAMLAssertion-1.1";
     public static final String WSS_SAML_KI_VALUE_TYPE = WSS_SAML_NS + SAML_ASSERTION_ID;
+    public static final String WSS_SAML2_KI_VALUE_TYPE = SAMLTOKEN_NS11 + "#" + SAML2_ASSERTION_ID;
+    public static final String WSS_SAML_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV1.1";
+    public static final String WSS_SAML2_TOKEN_TYPE = SAMLTOKEN_NS11 + "#SAMLV2.0";
 
     //
     // SOAP-ENV Namespaces
