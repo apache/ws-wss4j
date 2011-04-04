@@ -80,7 +80,7 @@ done
 #
 # Build the web site
 #
-#cd ${WSS4J_SRC_ROOT}
-#mvn site || exit 1
-#cp -r target/site ${WSS4J_STAGE_ROOT}/site
+cd ${WSS4J_SRC_ROOT}
+mvn site || exit 1
+cp -r target/site ${WSS4J_STAGE_ROOT}/site
 
