@@ -5,6 +5,123 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.0
+=============
+
+Bug
+
+    * [WSS-40] - WSSecurityEngine does not support chained certificates
+    * [WSS-81] - Compatibility between WSS4J and WebLogic 9 for Encryption
+    * [WSS-90] - SamlUtil.java throws XMLSecurityException when SAML SubjectConfirmation element doesn't have KeyInfo child
+    * [WSS-99] - JCE provider ordering on solaris
+    * [WSS-117] - WSS4J does not supports KeyIdentifiers to reference SAML tokens but this is allowed by the WSS specification. Integration tesitng with owsm failed.
+    * [WSS-136] - POM files needed in Maven repository for OpenSAML, WSS4J, and XML Security
+    * [WSS-147] - WCF interop issue: Security header ordering constraint
+    * [WSS-175] - Remove static class variables from WSHandler
+    * [WSS-176] - Problem with WSSecurityUtil.prependChildElement and JBossWS
+    * [WSS-178] - signature verification failure of signed saml token due to The Reference for URI (bst-saml-uri) has no XMLSignatureInput
+    * [WSS-182] - Encryption with symmetric key with encryptSymmKey set to false generates invalid xml without xenc defined
+    * [WSS-185] - NullPointerException on empty UsernameToken
+    * [WSS-196] - STRTransform not compatible with Sun's SAAJ implementation
+    * [WSS-198] - Problem when body is signed and then an XPath is encrypted
+    * [WSS-201] - Some of the processors use the wrong Crypto implementation
+    * [WSS-205] - WSS4J Handler passes null to MessageContext.setProperty
+    * [WSS-206] - The way referncelist processing of SAML issued tokens doesn't work properly and need to extract necessary information to do algorithm validation
+    * [WSS-209] - NPE in AbstractCrypto.getCryptoProvider()
+    * [WSS-210] - NPE in CryptoBase.getAliasForX509Cert(Certificate cert) if Keystore does not contain a Certifcate entry for each alias
+    * [WSS-211] - WSS4J does not support ThumbprintSHA1 in DerivedKeyTokens
+    * [WSS-212] - Replace deprecated references to getSubject/IssuerDN
+    * [WSS-219] - empty/blank password not supported in username token. value read by wss4j is null instead of empty string
+    * [WSS-220] - WSHandler is using default configuration
+    * [WSS-221] - UUIDGenerator generates duplicate identifiers when used in a multi-threaded environment
+    * [WSS-222] - SignatureProcessor does not provide correct signature coverage results with STR Dereference Transform
+    * [WSS-223] - Incorrect xpath set on WSDataRef when decrypting an EncryptedHeader instance.
+    * [WSS-224] - SAMLTokenSignedAction and WSSecSignatureSAML do not honor signature algorithm or digest algorithm from WSSHandler configuration
+    * [WSS-225] - 'Unprintable' characters in Distinguished Name causing comparison failure
+    * [WSS-226] - Interoperability b/w Java consumer of .NET Web Service with WS-Security on WSE 2.0
+    * [WSS-227] - CryptoBase.getPrivateKey() unable to handle empty (null) passwords
+    * [WSS-234] - Comment as first element in document causes NPE
+    * [WSS-241] - WSS4j needs to export a version in it's Export-Package directive.
+    * [WSS-242] - Signing EncryptedData or EncryptedKey elements creates extraneous Id attributes
+    * [WSS-243] - Can't use Password Digest on Z/OS
+    * [WSS-244] - Loading of Signature and Encryption property files not trimming trailing whitespace - Leads to ClassNotFoundException
+    * [WSS-245] - WSHandlerConstants.PW_CALLBACK_REF isn't correctly searched for
+    * [WSS-254] - Encryption/signing of multiple message parts with same name not working
+    * [WSS-258] - Newer version of SecureConversation not recognised for derived key algorithm
+    * [WSS-260] - WSS4J can't process a STR to a SAML Assertion that is not in the SOAP message
+    * [WSS-261] - Rampart failing to extract keyinfo from SAML assertion
+    * [WSS-262] - WSS4J accepts Timestamps that are "Created" in the future
+    * [WSS-270] - No need to ensure Crypto object is non-null for SAML signature verification using a secret key
+
+Improvement
+
+    * [WSS-69] - maven2
+    * [WSS-84] - Make the use of the VM-wide keystore (lib/security/cacerts) optional
+    * [WSS-131] - no support for extension of SecurityHeader
+    * [WSS-146] - Upgrade opensaml dependency to 2.x line
+    * [WSS-158] - Upgrade to BouncyCastle 1.43
+    * [WSS-169] - Add an EncodingType attribute for a UsernameToken nonce
+    * [WSS-170] - SignatureAction does not set DigestAlgorithm on WSSecSignature instance
+    * [WSS-171] - Improve XML encryption processing
+    * [WSS-173] - Remove unnecessary namespace definitions
+    * [WSS-174] - Remove deprecated APIs
+    * [WSS-177] - Allow encryption using a symmetric key and EncryptedKeySHA1
+    * [WSS-179] - Allow signature using a symmetric key and EncryptedKeySHA1
+    * [WSS-180] - Support symmetric signature/encryption via configuration
+    * [WSS-183] - Change the UsernameTokenProcessor to validate plaintext passwords
+    * [WSS-184] - Specifying alternate cacerts keystore via properties?
+    * [WSS-186] - Move TTL validation to the TimestampProcessor
+    * [WSS-188] - CallbackHandler behaviour for derived keys
+    * [WSS-189] - Refactor signature confirmation code
+    * [WSS-190] - Replace all Vector references with Lists.
+    * [WSS-191] - Move certificate validation our of WSHandler and into SignatureProcessor
+    * [WSS-192] - Share code between the EncryptedKeyProcessor and the ReferenceListProcessor
+    * [WSS-195] - More detailed exception thrown from CryptoBase.getPrivateKey()
+    * [WSS-199] - Add support for WCF non-standard Username Tokens
+    * [WSS-202] - Upgrade to XML Security 1.4.3.
+    * [WSS-203] - Move trunk to use JSR-105 APIs instead of custom XML-Security APIs for XML digital signature functionality.
+    * [WSS-215] - SignatureProcessor is not reusing results from WSDocInfo for the Reference case.
+    * [WSS-216] - SignatureProcessor does not support directly referencing a SecurityContextToken
+    * [WSS-217] - Add ability to specify a reference to an absolute URI in the derived key functionality
+    * [WSS-229] - UsernameTokenProcessor should be able to act as a UsernameToken parser only and not enforce the validation of passwords
+    * [WSS-232] - Performance Improvement in WSSConfig
+    * [WSS-233] - Allow configuration of UsernameTokenSpec 1.1 derived key functionality through WSHandler
+    * [WSS-236] - Provide signature digest algorithm in signature processor results.
+    * [WSS-237] - Provide key transport algorithm in encryption processor results
+    * [WSS-238] - Switch to wsse:KeyIdentifier instead of wsse:Reference for SAML references within SOAP:body EncryptedData elements.
+    * [WSS-239] - Need ability to handle password "equivalent" between WSPasswordCallback and UsernameToken when it's binary data
+    * [WSS-240] - Support KeyValue in SAML subject
+    * [WSS-247] - Upgrade to XML Security 1.4.4
+    * [WSS-253] - UsernameTokenProcessor logs the password to the log
+    * [WSS-257] - Avoid converting the SOAP Body to DOM on the processing side if possible
+    * [WSS-259] - Improve outbound DOM element location
+    * [WSS-263] - Store secret key from signature processor
+    * [WSS-264] - OSGi bundle should NOT specify the universal DynamicImport-Package: *
+    * [WSS-266] - Provide better support for pluggable authentication/verification of security tokens
+    * [WSS-271] - Add support for custom validation of BinarySecurityTokens
+    * [WSS-274] - Add support for allowing future-dated Timestamps
+    * [WSS-275] - Use SLF4J for logging framework for 1.6
+
+New Feature
+
+    * [WSS-194] - Support overriding KeyStore alias for signature so that it can be different than user name used for UsernameToken
+    * [WSS-204] - Support validating SAML 2.0 tokens
+    * [WSS-255] - Add support for enforcing a text or digest password type when processing a UsernameToken
+
+Task
+
+    * [WSS-246] - Upgrade to BouncyCastle 1.45
+    * [WSS-248] - Remove Axis1 artifacts in WSS4J 1.6
+    * [WSS-249] - Parameterize Collections in WSS4J 1.6
+    * [WSS-250] - Refactor testing
+    * [WSS-256] - Review Basic Security Profile and Reliable Secure Profile spec compliance
+    * [WSS-268] - Upload Opensaml2 artifacts, and dependencies, to Maven Central
+    * [WSS-269] - Refactor the Crypto interface
+
+Test
+
+    * [WSS-172] - Test encrypted headers
+
 Release 1.5.11
 =============
 
