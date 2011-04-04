@@ -15,6 +15,11 @@
 package org.swssf.ext;
 
 import javax.xml.namespace.QName;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Constants for global use
@@ -24,11 +29,18 @@ import javax.xml.namespace.QName;
  */
 public class Constants {
 
-    public static final String XMLEVENT_NS_ALLOCATOR = "XMLEventNSAllocator";
-    public static final String XMLINPUTFACTORY = "XMLInputFactory";
-    public static final String TIMESTAMP_PROCESSED = "TimestampProcessed";
-
     private Constants() {
+    }
+
+    public static final SecureRandom secureRandom;
+
+    static {
+        try {
+            secureRandom = SecureRandom.getInstance("SHA1PRNG");
+            secureRandom.setSeed(System.currentTimeMillis());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public enum Phase {
@@ -36,6 +48,10 @@ public class Constants {
         PROCESSING,
         POSTPROCESSING,
     }
+
+    public static final String XMLEVENT_NS_ALLOCATOR = "XMLEventNSAllocator";
+    public static final String XMLINPUTFACTORY = "XMLInputFactory";
+    public static final String TIMESTAMP_PROCESSED = "TimestampProcessed";
 
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
     public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
@@ -152,6 +168,8 @@ public class Constants {
 
     public static final String NS_USERNAMETOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE + "#PasswordDigest";
+    public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE + "#PasswordText";
+    public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE + "#UsernameToken";
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.
@@ -163,6 +181,8 @@ public class Constants {
         TIMESTAMP,
         SIGNATURE,
         ENCRYPT,
+        USERNAMETOKEN,
+        USERNAMETOKEN_SIGN,
     }
 
     public enum KeyIdentifierType {
@@ -174,7 +194,34 @@ public class Constants {
         SKI_KEY_IDENTIFIER,
         THUMBPRINT_IDENTIFIER,
         EMBEDDED_KEYNAME,
+        USERNAMETOKEN_SIGNED,
         //EMBED_SECURITY_TOKEN_REF,
+    }
+
+    public enum UsernameTokenPasswordType {
+        PASSWORD_NONE(null),
+        PASSWORD_TEXT(NS_PASSWORD_TEXT),
+        PASSWORD_DIGEST(NS_PASSWORD_DIGEST);
+
+        private String namespace;
+        private static final Map<String, UsernameTokenPasswordType> lookup = new HashMap<String, UsernameTokenPasswordType>();
+
+        static {
+            for (UsernameTokenPasswordType u : EnumSet.allOf(UsernameTokenPasswordType.class))
+                lookup.put(u.getNamespace(), u);
+        }
+
+        UsernameTokenPasswordType(String namespace) {
+            this.namespace = namespace;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public static UsernameTokenPasswordType getUsernameTokenPasswordType(String namespace) {
+            return lookup.get(namespace);
+        }
     }
 
 

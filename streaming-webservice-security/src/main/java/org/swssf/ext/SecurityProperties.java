@@ -572,4 +572,23 @@ public class SecurityProperties {
     public void setSkipDocumentEvents(boolean skipDocumentEvents) {
         this.skipDocumentEvents = skipDocumentEvents;
     }
+
+    private String tokenUser;
+    private Constants.UsernameTokenPasswordType usernameTokenPasswordType;
+
+    public String getTokenUser() {
+        return tokenUser;
+    }
+
+    public void setTokenUser(String tokenUser) {
+        this.tokenUser = tokenUser;
+    }
+
+    public Constants.UsernameTokenPasswordType getUsernameTokenPasswordType() {
+        return usernameTokenPasswordType;
+    }
+
+    public void setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType usernameTokenPasswordType) {
+        this.usernameTokenPasswordType = usernameTokenPasswordType;
+    }
 }

@@ -18,14 +18,18 @@ import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
-import org.swssf.impl.SecurityTokenFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
+import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.UsernameTokenSecurityEvent;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Deque;
+import java.util.GregorianCalendar;
 
 /**
  * Prozessor for the BinarySecurityToken XML Structure
@@ -36,6 +40,13 @@ import java.util.Deque;
 public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     public UsernameTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+
+        //todo:
+        /*
+        It is RECOMMENDED that used nonces be cached for a period at least as long as
+        the timestamp freshness limitation period, above, and that UsernameToken with
+        nonces that have already been used (and are thus in the cache) be rejected
+        */
 
         final UsernameTokenType usernameTokenType = (UsernameTokenType) parseStructure(eventQueue, index);
 
@@ -49,16 +60,45 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             return;
         }
 
-        boolean hashed = false;
-        if (usernameTokenType.getPasswordType() != null && Constants.NS_PASSWORD_DIGEST.equals(usernameTokenType.getPasswordType())) {
+        Integer iteration = null;
+        if (usernameTokenType.getIteration() != null) {
+            iteration = Integer.parseInt(usernameTokenType.getIteration());
+        }
+
+        GregorianCalendar createdCal = null;
+        byte[] nonceVal = null;
+
+        Constants.UsernameTokenPasswordType usernameTokenPasswordType = Constants.UsernameTokenPasswordType.PASSWORD_NONE;
+        if (usernameTokenType.getPasswordType() != null) {
+            usernameTokenPasswordType = Constants.UsernameTokenPasswordType.getUsernameTokenPasswordType(usernameTokenType.getPasswordType());
+        }
+
+        if (usernameTokenPasswordType == Constants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
             if (usernameTokenType.getNonce() == null || usernameTokenType.getCreated() == null) {
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01");
             }
-            hashed = true;
-        }
 
-        if (hashed) {
-            WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(), null, usernameTokenType.getPasswordType(), WSPasswordCallback.USERNAME_TOKEN);
+            DatatypeFactory datatypeFactory = null;
+            try {
+                datatypeFactory = DatatypeFactory.newInstance();
+            } catch (DatatypeConfigurationException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            }
+            XMLGregorianCalendar xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar(usernameTokenType.getCreated());
+            createdCal = xmlGregorianCalendar.toGregorianCalendar();
+            GregorianCalendar now = new GregorianCalendar();
+            if (createdCal.after(now)) {
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            }
+            now.add(Calendar.MINUTE, 5);
+            if (createdCal.after(now)) {
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            }
+
+            WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(),
+                    null,
+                    usernameTokenType.getPasswordType(),
+                    WSPasswordCallback.USERNAME_TOKEN);
             try {
                 Utils.doCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
@@ -69,14 +109,18 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
 
-            String passDigest = doPasswordDigest(usernameTokenType.getNonce(), usernameTokenType.getCreated(), pwCb.getPassword());
+            nonceVal = Base64.decodeBase64(usernameTokenType.getNonce());
+
+            String passDigest = Utils.doPasswordDigest(nonceVal, usernameTokenType.getCreated(), pwCb.getPassword());
             if (!usernameTokenType.getPassword().equals(passDigest)) {
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
             usernameTokenType.setPassword(pwCb.getPassword());
-        }
-        else {
-            WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(), usernameTokenType.getPassword(), usernameTokenType.getPasswordType(), WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
+        } else {
+            WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(),
+                    usernameTokenType.getPassword(),
+                    usernameTokenType.getPasswordType(),
+                    WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
             try {
                 Utils.doCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
@@ -85,42 +129,26 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             usernameTokenType.setPassword(pwCb.getPassword());
         }
 
-        //todo securityEvent
+        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
+        usernameTokenSecurityEvent.setUsername(usernameTokenType.getUsername());
+        usernameTokenSecurityEvent.setPassword(usernameTokenType.getPassword());
+        usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
+        usernameTokenSecurityEvent.setNonce(nonceVal);
+        usernameTokenSecurityEvent.setCreated(createdCal);
+        usernameTokenSecurityEvent.setSalt(usernameTokenType.getSalt());
+        usernameTokenSecurityEvent.setIteration(iteration);
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(usernameTokenSecurityEvent);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
             public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
                 return SecurityTokenFactory.newInstance().getSecurityToken(usernameTokenType);
             }
+
+            public String getId() {
+                return usernameTokenType.getId();
+            }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(usernameTokenType.getId(), securityTokenProvider);
-    }
-
-    private String doPasswordDigest(String nonce, String created, String password) throws WSSecurityException {
-        try {
-            byte[] b1 = nonce != null ? Base64.decodeBase64(nonce) : new byte[0];
-            byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
-            byte[] b3 = password.getBytes("UTF-8");
-            byte[] b4 = new byte[b1.length + b2.length + b3.length];
-            int offset = 0;
-            System.arraycopy(b1, 0, b4, offset, b1.length);
-            offset += b1.length;
-
-            System.arraycopy(b2, 0, b4, offset, b2.length);
-            offset += b2.length;
-
-            System.arraycopy(b3, 0, b4, offset, b3.length);
-
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            sha.reset();
-            sha.update(b4);
-            return new String(Base64.encodeBase64(sha.digest()));
-        } catch (NoSuchAlgorithmException e) {
-            logger.fatal(e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", null, e);
-        } catch (UnsupportedEncodingException e) {
-            logger.fatal(e.getMessage(), e);
-        }
-        return null;
     }
 
     @Override

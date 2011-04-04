@@ -82,38 +82,6 @@
       <TransformAlgorithm URI="http://www.w3.org/2002/06/xmldsig-filter2"
                           JAVACLASS="org.apache.xml.security.transforms.implementations.TransformXPath2Filter" />
    </TransformAlgorithms>
-   <SignatureAlgorithms>
-      <SignatureAlgorithm URI="http://www.w3.org/2000/09/xmldsig#dsa-sha1"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureDSA" />
-      <SignatureAlgorithm URI="http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureBaseRSA$SignatureRSASHA1" />
-      <SignatureAlgorithm URI="http://www.w3.org/2000/09/xmldsig#hmac-sha1"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.IntegrityHmac$IntegrityHmacSHA1" />
-
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-md5"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureBaseRSA$SignatureRSAMD5" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureBaseRSA$SignatureRSARIPEMD160" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureBaseRSA$SignatureRSASHA256" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureBaseRSA$SignatureRSASHA384" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureBaseRSA$SignatureRSASHA512" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.SignatureECDSA$SignatureECDSASHA1" />
-
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-md5"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.IntegrityHmac$IntegrityHmacMD5" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.IntegrityHmac$IntegrityHmacRIPEMD160" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.IntegrityHmac$IntegrityHmacSHA256" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-sha384"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.IntegrityHmac$IntegrityHmacSHA384" />
-      <SignatureAlgorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-sha512"
-                          JAVACLASS="org.apache.xml.security.algorithms.implementations.IntegrityHmac$IntegrityHmacSHA512" />
-   </SignatureAlgorithms>
    <JCEAlgorithmMappings>
       <Algorithms>
          <!-- MessageDigest Algorithms -->
@@ -166,6 +134,7 @@
                     Description="Digital Signature Algorithm with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="REQUIRED"
+                    RequiredKey="SHA1withDSA"
                     JCEProvider="BC"
                     JCEName="SHA1withDSA"/>
 
@@ -174,6 +143,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="MD5withRSA"
                     JCEProvider="BC"
                     JCEName="MD5withRSA"/>
 
@@ -182,6 +152,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="RIPEMD160withRSA"
                     JCEProvider="BC"
                     JCEName="RIPEMD160withRSA"/>
 
@@ -189,6 +160,7 @@
                     Description="RSA Signature with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="RECOMMENDED"
+                    RequiredKey="SHA1withRSA"
                     JCEProvider="BC"
                     JCEName="SHA1withRSA"/>
 
@@ -197,6 +169,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="SHA256withRSA"
                     JCEProvider="BC"
                     JCEName="SHA256withRSA"/>
 
@@ -205,6 +178,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="SHA384withRSA"
                     JCEProvider="BC"
                     JCEName="SHA384withRSA"/>
 
@@ -213,6 +187,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="SHA512withRSA"
                     JCEProvider="BC"
                     JCEName="SHA512withRSA"/>
 
@@ -221,6 +196,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="ECDSAwithSHA1"
                     JCEProvider="BC"
                     JCEName="ECDSAwithSHA1"/>
 
@@ -230,6 +206,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="HmacMD5"
                     JCEProvider="BC"
                     JCEName="HmacMD5"/>
 
@@ -238,6 +215,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="HMACRIPEMD160"
                     JCEProvider="BC"
                     JCEName="HMACRIPEMD160"/>
 
@@ -245,6 +223,7 @@
                     Description="Message Authentication code using SHA1"
                     AlgorithmClass="Mac"
                     RequirementLevel="REQUIRED"
+                    RequiredKey="HmacSHA1"
                     JCEProvider="BC"
                     JCEName="HmacSHA1"/>
 
@@ -253,6 +232,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="HmacSHA256"
                     JCEProvider="BC"
                     JCEName="HmacSHA256"/>
 
@@ -261,6 +241,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="HmacSHA384"
                     JCEProvider="BC"
                     JCEName="HmacSHA384"/>
 
@@ -269,6 +250,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    RequiredKey="HmacSHA512"
                     JCEProvider="BC"
                     JCEName="HmacSHA512"/>
 
@@ -329,8 +311,9 @@
                     Description="Key Agreement Diffie-Hellman"
                     AlgorithmClass="KeyAgreement"
                     RequirementLevel="OPTIONAL"
-                    JCEProvider=""
-                    JCEName=""/>
+                    RequiredKey="DH"
+                    JCEProvider="BC"
+                    JCEName="DH"/>
 
          <Algorithm URI="http://www.w3.org/2001/04/xmlenc#kw-tripledes"
                     Description="Symmetric Key Wrap using Triple DES"
@@ -370,14 +353,6 @@
 
       </Algorithms>
    </JCEAlgorithmMappings>
-   <ResourceBundles defaultLanguageCode="en" defaultCountryCode="US">
-      <ResourceBundle LanguageCode="en"
-                      CountryCode="US"
-                      LOCATION="org.apache.xml.security/resource/xmlsecurity_en.properties" />
-      <ResourceBundle LanguageCode="de"
-                      CountryCode="DE"
-                      LOCATION="org.apache.xml.security/resource/xmlsecurity_de.properties" />
-   </ResourceBundles>
    <ResourceResolvers>
       <Resolver JAVACLASS="org.apache.xml.security.utils.resolver.implementations.ResolverDirectHTTP"
                 DESCRIPTION="A simple resolver for requests to HTTP space" />

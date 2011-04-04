@@ -31,6 +31,7 @@ public abstract class SecurityEvent {
         EncryptedPart,
         EncryptedElement,
         ContentEncrypted,
+        UsernameToken,
     }
 
     private Event securityEventType;

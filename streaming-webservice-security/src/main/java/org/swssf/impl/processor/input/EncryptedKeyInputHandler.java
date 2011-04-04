@@ -18,7 +18,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
-import org.swssf.impl.SecurityTokenFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2001._04.xmlenc_.EncryptedKeyType;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
@@ -137,6 +137,10 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             return Constants.KeyIdentifierType.BST_EMBEDDED;
                         }
                     };
+                }
+
+                public String getId() {
+                    return encryptedKeyType.getId();
                 }
             };
             //register the key token for decryption:

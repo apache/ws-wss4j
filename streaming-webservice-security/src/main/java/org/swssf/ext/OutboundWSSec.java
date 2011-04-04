@@ -58,19 +58,35 @@ public class OutboundWSSec {
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
             Constants.Action action = securityProperties.getOutAction()[i];
             switch (action) {
-                case TIMESTAMP:
+                case TIMESTAMP: {
                     processorChain.addProcessor(new TimestampOutputProcessor(securityProperties));
                     break;
-                case SIGNATURE:
+                }
+                case SIGNATURE: {
                     SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
                     processorChain.addProcessor(signatureOutputProcessor);
                     processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
                     break;
-                case ENCRYPT:
+                }
+                case ENCRYPT: {
                     EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor(securityProperties);
                     processorChain.addProcessor(encryptOutputProcessor);
                     processorChain.addProcessor(new EncryptEndingOutputProcessor(securityProperties, encryptOutputProcessor));
                     break;
+                }
+                case USERNAMETOKEN: {
+                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor(securityProperties);
+                    processorChain.addProcessor(usernameTokenOutputProcessor);
+                    break;
+                }
+                case USERNAMETOKEN_SIGN: {
+                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor(securityProperties);
+                    processorChain.addProcessor(usernameTokenOutputProcessor);
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
+                    processorChain.addProcessor(signatureOutputProcessor);
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
+                    break;
+                }
             }
         }
 

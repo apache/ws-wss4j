@@ -31,11 +31,6 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  <xs:complexType name="SignatureAlgorithmsType">
-    <xs:sequence>
-      <xs:element type="con:SignatureAlgorithmType" name="SignatureAlgorithm" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-    </xs:sequence>
-  </xs:complexType>
   <xs:complexType name="AlgorithmType">
     <xs:simpleContent>
       <xs:extension base="xs:string">
@@ -107,13 +102,6 @@
       <xs:element type="con:HandlerType" name="Handler" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="ResourceBundlesType">
-    <xs:sequence>
-      <xs:element type="con:ResourceBundleType" name="ResourceBundle" maxOccurs="unbounded" minOccurs="0" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="defaultLanguageCode"/>
-    <xs:attribute type="xs:string" name="defaultCountryCode"/>
-  </xs:complexType>
   <xs:complexType name="ConfigurationType">
     <xs:sequence>
       <xs:element type="con:PropertiesType" name="Properties" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
@@ -127,9 +115,7 @@
         </xs:annotation>
       </xs:element>
       <xs:element type="con:TransformAlgorithmsType" name="TransformAlgorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-      <xs:element type="con:SignatureAlgorithmsType" name="SignatureAlgorithms" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:JCEAlgorithmMappingsType" name="JCEAlgorithmMappings" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
-      <xs:element type="con:ResourceBundlesType" name="ResourceBundles" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
       <xs:element type="con:ResourceResolversType" name="ResourceResolvers" xmlns:con="http://www.xmlsecurity.org/NS/configuration"/>
     </xs:sequence>
     <xs:attribute type="xs:string" name="target"/>

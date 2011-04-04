@@ -12,26 +12,32 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.swssf.ext;
+package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
+import org.swssf.ext.Constants;
+import org.swssf.ext.WSSecurityException;
+
+import javax.security.auth.callback.CallbackHandler;
 
 /**
- * A SecurityTokenProvider is a object which provides a Token for cryptographic operations
- *
- * @author $Author: giger $
- * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
- */
-public interface SecurityTokenProvider {
+*
+* @author $Author: $
+* @version $Revision: $ $Date: $
+*/
+public class X509DefaultSecurityToken extends X509SecurityToken {
+    private String alias = null;
 
-    /**
-     * Returns the represented SecurityToken of this object
-     *
-     * @param crypto The Crypto to use to restore the Token
-     * @return The SecurityToken
-     * @throws WSSecurityException if the token couldn't be loaded
-     */
-    public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException;
+    X509DefaultSecurityToken(Crypto crypto, CallbackHandler callbackHandler, String alias) {
+        super(crypto, callbackHandler);
+        this.alias = alias;
+    }
 
-    public String getId();
+    protected String getAlias() throws WSSecurityException {
+        return this.alias;
+    }
+
+    public Constants.KeyIdentifierType getKeyIdentifierType() {
+        return Constants.KeyIdentifierType.NO_TOKEN;
+    }
 }

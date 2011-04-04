@@ -19,6 +19,8 @@ import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
+import org.swssf.impl.algorithms.SignatureAlgorithm;
+import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.RFC2253Parser;
@@ -54,6 +56,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
     public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws WSSecurityException {
         super(securityProperties);
         this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
+        this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
     }
 
@@ -92,10 +95,13 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
         String alias = getSecurityProperties().getSignatureUser();
+        X509Certificate[] x509Certificates = null;
 
-        X509Certificate[] x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
-        if (x509Certificates == null || x509Certificates.length == 0) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noUserCertsFound");
+        if (alias != null) {
+            x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
+            if (x509Certificates == null || x509Certificates.length == 0) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noUserCertsFound");
+            }
         }
 
         String certUri = "CertId-" + UUID.randomUUID().toString();
@@ -130,26 +136,32 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noPassword", new Object[]{alias});
         }
 
-        AlgorithmType signatureAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureAlgorithm());
-        Signature signature = null;
+        SignatureAlgorithm signatureAlgorithm;
+
         try {
-            signature = Signature.getInstance(signatureAlgorithm.getJCEName(), signatureAlgorithm.getJCEProvider());
+            signatureAlgorithm = SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(getSecurityProperties().getSignatureAlgorithm());
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
         } catch (NoSuchProviderException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
         }
 
-        try {
-            signature.initSign(
-                    getSecurityProperties().getSignatureCrypto().getPrivateKey(
-                            alias,
-                            password));
-        } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+        SecurityTokenProvider securityTokenProvider = null;
+        if (alias != null) {
+            signatureAlgorithm.engineInitSign(getSecurityProperties().getSignatureCrypto().getPrivateKey(alias,password));
+        } else if (getSecurityProperties().getTokenUser() != null) {
+            securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(getSecurityProperties().getTokenUser());
+            if (securityTokenProvider == null) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
+            }
+            SecurityToken securityToken = securityTokenProvider.getSecurityToken(null);
+            if (securityToken == null) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
+            }
+            signatureAlgorithm.engineInitSign(securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm()));
         }
 
-        SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), signature);
+        SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), signatureAlgorithm);
         subOutputProcessorChain.addProcessor(signedInfoProcessor);
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignedInfo, null);
@@ -299,6 +311,12 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             attributes.put(Constants.ATT_NULL_ValueType, referencedBinarySecurityTokenType.getValueType());
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
+        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
+            attributes = new HashMap<QName, String>();
+            attributes.put(Constants.ATT_NULL_URI, "#" + securityTokenProvider.getId());
+            attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_USERNAMETOKEN_PROFILE_UsernameToken);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "unsupportedSecurityToken", new Object[]{getSecurityProperties().getSignatureKeyIdentifierType().name()});
         }
@@ -347,11 +365,11 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         private OutputStream bufferedSignerOutputStream;
         private Canonicalizer20010315Transformer canonicalizer20010315Transformer;
 
-        SignedInfoProcessor(SecurityProperties securityProperties, Signature signature) throws WSSecurityException {
+        SignedInfoProcessor(SecurityProperties securityProperties, SignatureAlgorithm signatureAlgorithm) throws WSSecurityException {
             super(securityProperties);
             this.getAfterProcessors().add(SignatureEndingOutputProcessor.class.getName());
 
-            signerOutputStream = new SignerOutputStream(signature);
+            signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
             canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
         }
@@ -360,8 +378,6 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
             try {
                 bufferedSignerOutputStream.close();
                 return signerOutputStream.sign();
-            } catch (SignatureException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             }

@@ -18,7 +18,7 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.EncryptionPartDef;
-import org.swssf.impl.SecurityTokenFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.util.IVSplittingOutputStream;
 import org.swssf.impl.util.ReplaceableOuputStream;
 import org.swssf.securityEvent.*;

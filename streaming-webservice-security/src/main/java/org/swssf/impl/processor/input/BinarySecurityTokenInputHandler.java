@@ -17,7 +17,7 @@ package org.swssf.impl.processor.input;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
-import org.swssf.impl.SecurityTokenFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -40,6 +40,10 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
                 public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
                     return SecurityTokenFactory.newInstance().getSecurityToken(binarySecurityTokenType, crypto, securityProperties.getCallbackHandler());
+                }
+
+                public String getId() {
+                    return binarySecurityTokenType.getId();
                 }
             };
 

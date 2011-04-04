@@ -14,11 +14,16 @@
  */
 package org.swssf.ext;
 
+import org.apache.commons.codec.binary.Base64;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author $Author: giger $
@@ -100,5 +105,31 @@ public class Utils {
 
     public static Class loadClass(String className) throws ClassNotFoundException {
         return Thread.currentThread().getContextClassLoader().loadClass(className);
+    }
+
+    public static String doPasswordDigest(byte[] nonce, String created, String password) throws WSSecurityException {
+        try {
+            byte[] b1 = nonce != null ? nonce : new byte[0];
+            byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
+            byte[] b3 = password.getBytes("UTF-8");
+            byte[] b4 = new byte[b1.length + b2.length + b3.length];
+            int offset = 0;
+            System.arraycopy(b1, 0, b4, offset, b1.length);
+            offset += b1.length;
+
+            System.arraycopy(b2, 0, b4, offset, b2.length);
+            offset += b2.length;
+
+            System.arraycopy(b3, 0, b4, offset, b3.length);
+
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            sha.reset();
+            sha.update(b4);
+            return new String(Base64.encodeBase64(sha.digest()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", null, e);
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+        }
     }
 }

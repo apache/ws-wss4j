@@ -15,15 +15,15 @@
 package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
-import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
-import org.swssf.impl.SecurityTokenFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
+import org.swssf.impl.algorithms.SignatureAlgorithm;
+import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.SignerOutputStream;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
-import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -141,17 +141,17 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, WSSecurityException {
-            AlgorithmType signatureAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
-            if (signatureAlgorithm == null) {
-                throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, "unknownSignatureAlgorithm", new Object[]{signatureType.getSignedInfo().getSignatureMethod().getAlgorithm()});
-            }
-            Signature signature = Signature.getInstance(signatureAlgorithm.getJCEName(), signatureAlgorithm.getJCEProvider());
-
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext);
             securityToken.verify();
-            signature.initVerify(securityToken.getPublicKey());
-            signerOutputStream = new SignerOutputStream(signature);
+
+            SignatureAlgorithm signatureAlgorithm = SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
+            if (securityToken.isAsymmetric()) {
+                signatureAlgorithm.engineInitVerify(securityToken.getPublicKey());
+            } else {
+                signatureAlgorithm.engineInitVerify(securityToken.getSecretKey(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm()));
+            }
+            signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
         }
 
@@ -165,8 +165,6 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
                 if (!signerOutputStream.verify(Base64.decodeBase64(signatureType.getSignatureValue().getValue()))) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
-            } catch (SignatureException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             }

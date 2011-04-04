@@ -16,6 +16,8 @@ package org.swssf.impl.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.ext.WSSecurityException;
+import org.swssf.impl.algorithms.SignatureAlgorithm;
 
 import java.io.OutputStream;
 import java.security.Signature;
@@ -29,10 +31,10 @@ public class SignerOutputStream extends OutputStream {
 
     protected static final transient Log log = LogFactory.getLog(SignerOutputStream.class);
 
-    private final Signature signature;
+    private final SignatureAlgorithm signatureAlgorithm;
 
-    public SignerOutputStream(Signature signature) {
-        this.signature = signature;
+    public SignerOutputStream(SignatureAlgorithm signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
     }
 
     public void write(byte[] arg0) {
@@ -41,25 +43,25 @@ public class SignerOutputStream extends OutputStream {
 
     public void write(int arg0) {
         try {
-            signature.update((byte) arg0);
-        } catch (SignatureException e) {
+            signatureAlgorithm.engineUpdate((byte) arg0);
+        } catch (WSSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void write(byte[] arg0, int arg1, int arg2) {
         try {
-            signature.update(arg0, arg1, arg2);
-        } catch (SignatureException e) {
+            signatureAlgorithm.engineUpdate(arg0, arg1, arg2);
+        } catch (WSSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public boolean verify(byte[] signatureValue) throws SignatureException {
-        return signature.verify(signatureValue);
+    public boolean verify(byte[] signatureValue) throws WSSecurityException {
+        return signatureAlgorithm.engineVerify(signatureValue);
     }
 
-    public byte[] sign() throws SignatureException {
-        return signature.sign();
+    public byte[] sign() throws WSSecurityException {
+        return signatureAlgorithm.engineSign();
     }
 }

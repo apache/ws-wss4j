@@ -55,6 +55,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
     public EncryptEndingOutputProcessor(SecurityProperties securityProperties, EncryptOutputProcessor encryptOutputProcessor) throws WSSecurityException {
         super(securityProperties);
         this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
+        this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
         this.symmetricKey = encryptOutputProcessor.getSymmetricKey();
         this.symmetricKeyId = encryptOutputProcessor.getSymmetricKeyId();
         this.encryptionPartDefList = encryptOutputProcessor.getEncryptionPartDefList();

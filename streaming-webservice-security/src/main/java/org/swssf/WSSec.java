@@ -154,6 +154,42 @@ public class WSSec {
                         securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
                     }
                     break;
+                case USERNAMETOKEN:
+                    if (securityProperties.getTokenUser() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noTokenUser");
+                    }
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                    }
+                    if (securityProperties.getUsernameTokenPasswordType() == null) {
+                        securityProperties.setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+                    }
+                    break;
+                case USERNAMETOKEN_SIGN:
+                    if (securityProperties.getTokenUser() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noTokenUser");
+                    }
+                    securityProperties.setSignatureUser(null);
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                    }
+                    if (securityProperties.getSignatureSecureParts().isEmpty()) {
+                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));
+                    }
+                    if (securityProperties.getSignatureAlgorithm() == null) {
+                        securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+                    }
+                    if (securityProperties.getSignatureDigestAlgorithm() == null) {
+                        securityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
+                    }
+                    if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+                        securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+                    }
+                    securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED);
+                    if (securityProperties.getUsernameTokenPasswordType() == null) {
+                        securityProperties.setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+                    }
+                    break;
             }
         }
         //todo clone securityProperties

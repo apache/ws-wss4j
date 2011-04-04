@@ -16,7 +16,8 @@ package org.swssf.policy.assertionStates;
 
 import org.swssf.ext.SecurityToken;
 import org.swssf.ext.WSSecurityException;
-import org.swssf.impl.SecurityTokenFactory;
+import org.swssf.impl.securityToken.SecurityTokenFactory;
+import org.swssf.impl.securityToken.X509SecurityToken;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.policy.secpolicy.model.*;
 import org.swssf.securityEvent.InitiatorEncryptionTokenSecurityEvent;
@@ -86,11 +87,11 @@ public class RecipientEncryptionTokenAssertionState extends AssertionState {
     }
 
     private void assertX509Token(X509Token x509Token, SecurityToken securityToken) {
-        if (!(securityToken instanceof SecurityTokenFactory.X509SecurityToken)) {
+        if (!(securityToken instanceof X509SecurityToken)) {
             setAsserted(false);
             setErrorMessage("Expected a X509 Token");
         }
-        SecurityTokenFactory.X509SecurityToken x509SecurityToken = (SecurityTokenFactory.X509SecurityToken) securityToken;
+        X509SecurityToken x509SecurityToken = (X509SecurityToken) securityToken;
 
         setAsserted(true);
 

@@ -365,7 +365,7 @@ public abstract class AbstractTestBase {
             * a password.
             */
             CallbackHandler cbHandler = null;
-            if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
+            if ((doAction & (WSConstants.ENCR | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
                 cbHandler = getPasswordCB(reqData);
             }
 
