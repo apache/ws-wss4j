@@ -203,6 +203,7 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
+        result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }

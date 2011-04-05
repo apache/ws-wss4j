@@ -152,6 +152,11 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_SECRET = "secret";
     
+    /**
+     * Tag denoting a PublicKey associated with this token
+     */
+    public static final String TAG_PUBLIC_KEY = "public-key";
+    
     //
     // General tags
     //

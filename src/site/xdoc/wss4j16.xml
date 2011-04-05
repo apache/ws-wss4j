@@ -40,7 +40,8 @@ Support for Crypto trust-stores</a>: WSS4J 1.6 separates the concept of keystore
 Crypto implementations.
 </li>
 <li>
-New Validator interface: WSS4J 1.6 moves all validation of security tokens into a new Validator
+<a href="http://coheigea.blogspot.com/2011/04/wss4j-16-introducing-validators.html">
+New Validator interface</a>: WSS4J 1.6 moves all validation of security tokens into a new Validator
 interface, which allows for custom validation of specific tokens.
 </li>
 </ul>
@@ -151,6 +152,10 @@ SECRET_KEY is a new identifier for finding secret keys. It replaces the occasion
 CUSTOM_TOKEN, as well as KEY_NAME and ENCRYPTED_KEY_TOKEN. 
 </li>
 </ol>
+</li>
+<li>
+Timestamp validation and signature trust verification is not done by the WSHandler implementation
+any more, but is performed when the security header is processed.
 </li>
 </ul>
 </subsection>
