@@ -164,7 +164,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             //only fire here ContentEncryptedElementEvents
                             //the other ones will be fired later, because we don't know the encrypted element name yet
-                            if (EncryptionPartDef.Modifier.Content.getModifier().equals(currentEncryptedDataType.getType())) {
+                            if (SecurePart.Modifier.Content.getModifier().equals(currentEncryptedDataType.getType())) {
                                 QName parentElement = inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType());
                                 if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                                         && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
@@ -218,7 +218,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             receiverThread.setName("decrypting thread");
 
                             DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = new DecryptedEventReaderInputProcessor(getSecurityProperties(),
-                                    EncryptionPartDef.Modifier.getModifier(currentEncryptedDataType.getType()), encryptedHeader);
+                                    SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()), encryptedHeader);
 
                             //when an exception in the decryption thread occurs, we want to forward them:
                             receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
@@ -292,18 +292,18 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     class DecryptedEventReaderInputProcessor extends AbstractInputProcessor implements Thread.UncaughtExceptionHandler {
 
         private XMLEventReader xmlEventReader;
-        private EncryptionPartDef.Modifier encryptionModifier;
+        private SecurePart.Modifier encryptionModifier;
         private boolean encryptedHeader = false;
         private int documentLevel = 0;
 
         private boolean rootElementProcessed;
 
-        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, EncryptionPartDef.Modifier encryptionModifier, boolean encryptedHeader) {
+        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, SecurePart.Modifier encryptionModifier, boolean encryptedHeader) {
             super(securityProperties);
             getAfterProcessors().add(DecryptInputProcessor.class.getName());
             getAfterProcessors().add(DecryptedEventReaderInputProcessor.class.getName());
             this.encryptionModifier = encryptionModifier;
-            rootElementProcessed = encryptionModifier != EncryptionPartDef.Modifier.Element;
+            rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
             this.encryptedHeader = encryptedHeader;
         }
 

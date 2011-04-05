@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 /**
- * TODO: class description
  *
  * @author $Author: $
  * @version $Revision: $ $Date: $

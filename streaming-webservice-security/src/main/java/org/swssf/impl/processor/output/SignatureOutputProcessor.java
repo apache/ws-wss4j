@@ -71,7 +71,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                             InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
                             try {
                                 SignaturePartDef signaturePartDef = new SignaturePartDef();
-                                signaturePartDef.setModifier(SignaturePartDef.Modifier.valueOf(securePart.getModifier()));
                                 signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
 
                                 signaturePartDefList.add(signaturePartDef);

@@ -103,7 +103,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                             InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
                             try {
                                 EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
-                                encryptionPartDef.setModifier(EncryptionPartDef.Modifier.valueOf(securePart.getModifier()));
+                                encryptionPartDef.setModifier(securePart.getModifier());
                                 encryptionPartDef.setEncRefId("EncDataId-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
                                 encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
                                 encryptionPartDef.setSymmetricKey(symmetricKey);
@@ -199,14 +199,14 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 if (startElement.getName().equals(this.startElement.getName()) && elementCounter == 0) {
                     //if the user selected element encryption we have to encrypt the current element-event...
-                    if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Element) {
+                    if (encryptionPartDef.getModifier() == SecurePart.Modifier.Element) {
                         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         processEventInternal(subOutputProcessorChain);
                         //encrypt the current element event
                         encryptEvent(xmlEvent);
 
                     } //...the user selected content encryption, so we let pass this event as usual  
-                    else if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Content) {
+                    else if (encryptionPartDef.getModifier() == SecurePart.Modifier.Content) {
                         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         outputAsEvent(subOutputProcessorChain, xmlEvent);
                         processEventInternal(subOutputProcessorChain);
@@ -224,7 +224,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 if (endElement.getName().equals(this.startElement.getName()) && elementCounter == 0) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                    if (encryptionPartDef.getModifier() == EncryptionPartDef.Modifier.Element) {
+                    if (encryptionPartDef.getModifier() == SecurePart.Modifier.Element) {
                         encryptEvent(xmlEvent);
                         doFinalInternal(subOutputProcessorChain);
                     } else {

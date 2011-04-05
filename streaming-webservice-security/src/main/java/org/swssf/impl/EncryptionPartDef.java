@@ -14,10 +14,9 @@
  */
 package org.swssf.impl;
 
+import org.swssf.ext.SecurePart;
+
 import java.security.Key;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * EncryptionPartDef holds information about parts to be encrypt
@@ -27,43 +26,16 @@ import java.util.Map;
  */
 public class EncryptionPartDef {
 
-    public enum Modifier {
-        Element("http://www.w3.org/2001/04/xmlenc#Element"),
-        Content("http://www.w3.org/2001/04/xmlenc#Content");
-
-        private String modifier;
-
-        Modifier(String modifier) {
-            this.modifier = modifier;
-        }
-
-        public String getModifier() {
-            return this.modifier;
-        }
-
-        private static final Map<String, Modifier> modifierMap = new HashMap<String, Modifier>();
-
-        static {
-            for (Modifier modifier : EnumSet.allOf(Modifier.class)) {
-                modifierMap.put(modifier.getModifier(), modifier);
-            }
-        }
-
-        public static Modifier getModifier(String modifier) {
-            return modifierMap.get(modifier);
-        }
-    }
-
-    private Modifier modifier;
+    private SecurePart.Modifier modifier;
     private Key symmetricKey;
     private String keyId;
     private String encRefId;
 
-    public Modifier getModifier() {
+    public SecurePart.Modifier getModifier() {
         return modifier;
     }
 
-    public void setModifier(Modifier modifier) {
+    public void setModifier(SecurePart.Modifier modifier) {
         this.modifier = modifier;
     }
 

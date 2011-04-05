@@ -52,7 +52,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.setEncryptionUser("receiver");
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        securityProperties.addEncryptionPart(new SecurePart("test", "http://www.example.com", "Content"));
+        securityProperties.addEncryptionPart(new SecurePart("test", "http://www.example.com", SecurePart.Modifier.Content));
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT};

@@ -14,8 +14,6 @@
  */
 package org.swssf.impl;
 
-import java.security.Key;
-
 /**
  * SignaturePartDef holds information about parts to be signed
  *
@@ -24,49 +22,8 @@ import java.security.Key;
  */
 public class SignaturePartDef {
 
-    public enum Modifier {
-        Element("http://www.w3.org/2001/04/xmlenc#Element");
-
-        private String modifier;
-
-        Modifier(String modifier) {
-            this.modifier = modifier;
-        }
-
-        public String getModifier() {
-            return this.modifier;
-        }
-    }
-
-    private Modifier modifier;
-    private Key symmetricKey;
-    private String keyId;
     private String sigRefId;
     private String digestValue;
-
-    public Modifier getModifier() {
-        return modifier;
-    }
-
-    public void setModifier(Modifier modifier) {
-        this.modifier = modifier;
-    }
-
-    public Key getSymmetricKey() {
-        return symmetricKey;
-    }
-
-    public void setSymmetricKey(Key symmetricKey) {
-        this.symmetricKey = symmetricKey;
-    }
-
-    public String getKeyId() {
-        return keyId;
-    }
-
-    public void setKeyId(String keyId) {
-        this.keyId = keyId;
-    }
 
     public String getSigRefId() {
         return sigRefId;

@@ -14,6 +14,10 @@
  */
 package org.swssf.ext;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class to describe which and how an element must be secured
  *
@@ -22,19 +26,45 @@ package org.swssf.ext;
  */
 public class SecurePart {
 
+    public enum Modifier {
+        Element("http://www.w3.org/2001/04/xmlenc#Element"),
+        Content("http://www.w3.org/2001/04/xmlenc#Content");
+
+        private String modifier;
+
+        Modifier(String modifier) {
+            this.modifier = modifier;
+        }
+
+        public String getModifier() {
+            return this.modifier;
+        }
+
+        private static final Map<String, Modifier> modifierMap = new HashMap<String, Modifier>();
+
+        static {
+            for (Modifier modifier : EnumSet.allOf(Modifier.class)) {
+                modifierMap.put(modifier.getModifier(), modifier);
+            }
+        }
+
+        public static Modifier getModifier(String modifier) {
+            return modifierMap.get(modifier);
+        }
+    }
+
     private String name;
     private String namespace;
-    private String modifier;
+    private Modifier modifier;
     private String id;
 
-    //todo modifier enum!
-    public SecurePart(String name, String namespace, String modifier) {
+    public SecurePart(String name, String namespace, Modifier modifier) {
         this.name = name;
         this.namespace = namespace;
         this.modifier = modifier;
     }
 
-    public SecurePart(String name, String namespace, String modifier, String id) {
+    public SecurePart(String name, String namespace, Modifier modifier, String id) {
         this.name = name;
         this.namespace = namespace;
         this.modifier = modifier;
@@ -72,11 +102,11 @@ public class SecurePart {
      *
      * @return The String "Element" or "Content"
      */
-    public String getModifier() {
+    public Modifier getModifier() {
         return modifier;
     }
 
-    public void setModifier(String modifier) {
+    public void setModifier(Modifier modifier) {
         this.modifier = modifier;
     }
 

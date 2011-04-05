@@ -129,7 +129,7 @@ public class WSSec {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
                     }
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));
+                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", SecurePart.Modifier.Element));
                     }
                     if (securityProperties.getSignatureAlgorithm() == null) {
                         securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
@@ -157,7 +157,7 @@ public class WSSec {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noEncryptionUser");
                     }
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {
-                        securityProperties.addEncryptionPart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+                        securityProperties.addEncryptionPart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", SecurePart.Modifier.Content));
                     }
                     if (securityProperties.getEncryptionSymAlgorithm() == null) {
                         securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
@@ -192,7 +192,7 @@ public class WSSec {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
                     }
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Element"));
+                        securityProperties.addSignaturePart(new SecurePart("Body", "http://schemas.xmlsoap.org/soap/envelope/", SecurePart.Modifier.Element));
                     }
                     if (securityProperties.getSignatureAlgorithm() == null) {
                         securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
@@ -209,7 +209,7 @@ public class WSSec {
                     }
                     break;
                 case SIGNATURE_CONFIRMATION:
-                    securityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsse11_SignatureConfirmation.getLocalPart(), Constants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), "Element"));
+                    securityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsse11_SignatureConfirmation.getLocalPart(), Constants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), SecurePart.Modifier.Element));
             }
         }
         //todo clone securityProperties
