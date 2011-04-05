@@ -29,10 +29,14 @@ import org.swssf.WSSec;
 import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.ext.WSSecurityException;
+import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SecurityEventListener;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author: giger $
@@ -58,10 +62,17 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
 
         String encoding = getEncoding(soapMessage);
 
+        final List<SecurityEvent> outgoingSecurityEventList = new ArrayList<SecurityEvent>();
+        SecurityEventListener securityEventListener = new SecurityEventListener() {
+            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+                outgoingSecurityEventList.add(securityEvent);
+            }
+        };
+        soapMessage.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
+
         XMLStreamWriter newXMLStreamWriter;
         try {
-            //todo securityEvents argument from context
-            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, null);
+            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".in"), securityEventListener);
             soapMessage.setContent(XMLStreamWriter.class, newXMLStreamWriter);
         } catch (WSSecurityException e) {
             throw new Fault(e);

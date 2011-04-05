@@ -24,11 +24,15 @@ import org.swssf.ext.Constants;
 import org.swssf.ext.InboundWSSec;
 import org.swssf.ext.SecurityProperties;
 import org.swssf.ext.WSSecurityException;
+import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SecurityEventListener;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,8 +62,16 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
         XMLStreamReader newXmlStreamReader = null;
 
+        final List<SecurityEvent> incomingSecurityEventList = new ArrayList<SecurityEvent>();
+        SecurityEventListener securityEventListener = new SecurityEventListener() {
+            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+                incomingSecurityEventList.add(securityEvent);
+            }
+        };
+        soapMessage.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
+
         try {
-            newXmlStreamReader = inboundWSSec.processInMessage(originalXmlStreamReader);
+            newXmlStreamReader = inboundWSSec.processInMessage(originalXmlStreamReader, (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out"), securityEventListener);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
             //todo correct faults per WSS-spec
         } catch (WSSecurityException e) {

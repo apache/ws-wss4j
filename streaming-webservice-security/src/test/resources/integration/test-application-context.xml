@@ -34,30 +34,45 @@
 
     <bean name="securityInInterceptor" class="org.swssf.interceptor.SecurityInInterceptor">
         <constructor-arg index="0" value="post-stream"/>
-        <constructor-arg index="1" ref="securityProperties"/>
+        <constructor-arg index="1" ref="inSecurityProperties"/>
     </bean>
 
     <bean name="securityOutInterceptor" class="org.swssf.interceptor.SecurityOutInterceptor">
         <constructor-arg index="0" value="pre-stream"/>
-        <constructor-arg index="1" ref="securityProperties"/>
+        <constructor-arg index="1" ref="outSecurityProperties"/>
     </bean>
 
-    <bean name="securityProperties" class="org.swssf.ext.SecurityProperties">
+    <bean name="inSecurityProperties" class="org.swssf.ext.SecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <!--<value>TIMESTAMP</value>
-                <value>SIGNATURE</value>-->
+                <value>TIMESTAMP</value>
+                <value>SIGNATURE</value>
                 <value>ENCRYPT</value>
             </list>
         </property>
-        <property name="encryptionUser" value="transmitter"/>
+        <!--<property name="encryptionUser" value="transmitter"/>-->
+        <property name="useReqSigCertForEncryption" value="true"/>
+        <property name="skipDocumentEvents" value="true"/>
+    </bean>
+
+    <bean name="outSecurityProperties" class="org.swssf.ext.SecurityProperties">
+        <property name="callbackHandler" ref="callbackHandler"/>
+        <property name="outAction">
+            <list>
+                <value>TIMESTAMP</value>
+                <value>SIGNATURE</value>
+                <value>ENCRYPT</value>
+            </list>
+        </property>
+        <property name="signatureUser" value="receiver"/>
+        <property name="useReqSigCertForEncryption" value="true"/>
         <property name="skipDocumentEvents" value="true"/>
     </bean>
 
     <!-- set decryptionKeystore in securityProperties -->
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="securityProperties"/>
+        <property name="targetObject" ref="inSecurityProperties"/>
         <property name="targetMethod" value="loadDecryptionKeystore"/>
         <property name="arguments">
             <list>
@@ -69,7 +84,7 @@
 
     <!-- set signature verfiication Keystore in securityProperties -->
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="securityProperties"/>
+        <property name="targetObject" ref="inSecurityProperties"/>
         <property name="targetMethod" value="loadSignatureVerificationKeystore"/>
         <property name="arguments">
             <list>
@@ -81,27 +96,29 @@
 
     <!-- set signature Keystore in securityProperties -->
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="securityProperties"/>
+        <property name="targetObject" ref="outSecurityProperties"/>
         <property name="targetMethod" value="loadSignatureKeyStore"/>
         <property name="arguments">
             <list>
-                <value>classpath:transmitter.jks</value>
+                <value>classpath:receiver.jks</value>
                 <value>default</value>
             </list>
         </property>
     </bean>
 
-    <!-- set signature Keystore in securityProperties -->
+    <!-- set encryption Keystore in securityProperties -->
+    <!--
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="securityProperties"/>
+        <property name="targetObject" ref="outSecurityProperties"/>
         <property name="targetMethod" value="loadEncryptionKeystore"/>
         <property name="arguments">
             <list>
-                <value>classpath:transmitter.jks</value>
+                <value>classpath:receiver.jks</value>
                 <value>default</value>
             </list>
         </property>
     </bean>
+    -->
 
     <bean name="callbackHandler" class="org.swssf.test.CallbackHandlerImpl">
     </bean>
@@ -121,7 +138,7 @@
     <bean name="wss4jInInterceptor" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
         <property name="properties">
             <map>
-                <entry key="action" value="Encrypt"/>
+                <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="passwordCallbackRef" value-ref="passwordCallbackHandlerWSS4J"/>
                 <entry key="decryptionPropFile" value="integration/receiver-crypto.properties"/>
                 <entry key="signaturePropFile" value="integration/receiver-crypto.properties"/>
@@ -132,7 +149,7 @@
     <bean name="wss4jOutInterceptor" class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
         <property name="properties">
             <map>
-                <entry key="action" value="Encrypt"/>
+                <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="passwordCallbackRef" value-ref="passwordCallbackHandlerWSS4J"/>
                 <entry key="encryptionPropFile" value="integration/transmitter-crypto.properties"/>
                 <entry key="signaturePropFile" value="integration/receiver-crypto.properties"/>
