@@ -8,6 +8,7 @@
 
 package org.oasis_open.docs.wss.oasis_wss_wssecurity_secext_1_1;
 
+import org.apache.commons.codec.binary.Base64;
 import org.swssf.ext.Constants;
 import org.swssf.ext.ParseException;
 import org.swssf.ext.Parseable;
@@ -48,15 +49,18 @@ public class SignatureConfirmationType implements Parseable {
     @XmlSchemaType(name = "ID")
     protected String id;
     @XmlAttribute(name = "Value", required = true)
-    protected String value;
+    protected byte[] value;
+
+    private StartElement startElement;
 
     public SignatureConfirmationType(StartElement startElement) {
         super();
+        this.startElement = startElement;
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
             if (attribute.getName().equals(Constants.ATT_NULL_Value)) {
-                this.value = attribute.getValue();
+                this.value = Base64.decodeBase64(attribute.getValue());
             } else if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
                 this.id = attribute.getValue();
             }
@@ -64,7 +68,10 @@ public class SignatureConfirmationType implements Parseable {
     }
 
     public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
-        throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        if (!xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(this.startElement.getName())) {
+            throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return true;
     }
 
     public void validate() throws ParseException {
@@ -96,7 +103,7 @@ public class SignatureConfirmationType implements Parseable {
      * @return possible object is
      *         byte[]
      */
-    public String getValue() {
+    public byte[] getValue() {
         return value;
     }
 
@@ -106,7 +113,7 @@ public class SignatureConfirmationType implements Parseable {
      * @param value allowed object is
      *              byte[]
      */
-    public void setValue(String value) {
+    public void setValue(byte[] value) {
         this.value = value;
     }
 

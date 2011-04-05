@@ -591,4 +591,14 @@ public class SecurityProperties {
     public void setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType usernameTokenPasswordType) {
         this.usernameTokenPasswordType = usernameTokenPasswordType;
     }
+
+    private boolean enableSignatureConfirmationVerification = false;
+
+    public boolean isEnableSignatureConfirmationVerification() {
+        return enableSignatureConfirmationVerification;
+    }
+
+    public void setEnableSignatureConfirmationVerification(boolean enableSignatureConfirmationVerification) {
+        this.enableSignatureConfirmationVerification = enableSignatureConfirmationVerification;
+    }
 }

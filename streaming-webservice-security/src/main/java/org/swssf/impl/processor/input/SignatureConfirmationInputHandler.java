@@ -14,26 +14,15 @@
  */
 package org.swssf.impl.processor.input;
 
-import org.apache.commons.codec.binary.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.oasis_open.docs.wss.oasis_wss_wssecurity_secext_1_1.SignatureConfirmationType;
-import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
-import org.swssf.impl.securityToken.SecurityTokenFactory;
-import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.securityEvent.UsernameTokenSecurityEvent;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.Calendar;
 import java.util.Deque;
-import java.util.GregorianCalendar;
 
 /**
- * Prozessor for the BinarySecurityToken XML Structure
+ * Processor for the SignatureConfirmation XML Structure
  *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
@@ -42,12 +31,12 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
 
     public SignatureConfirmationInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
-        final SignatureConfirmationType signatureConfirmationType = (SignatureConfirmationType)parseStructure(eventQueue, index);
-
+        final SignatureConfirmationType signatureConfirmationType = (SignatureConfirmationType) parseStructure(eventQueue, index);
+        inputProcessorChain.getSecurityContext().putAsList(SignatureConfirmationType.class, signatureConfirmationType);
     }
 
     @Override
     protected Parseable getParseable(StartElement startElement) {
-        return new UsernameTokenType(startElement);
+        return new SignatureConfirmationType(startElement);
     }
 }

@@ -24,6 +24,8 @@ import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCom
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.RFC2253Parser;
 import org.swssf.impl.util.SignerOutputStream;
+import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SignatureValueSecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -205,7 +207,8 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         subOutputProcessorChain.removeProcessor(signedInfoProcessor);
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue, null);
-        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(signedInfoProcessor.getSignatureValue()));
+        final byte[] signatureValue = signedInfoProcessor.getSignatureValue();
+        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(signatureValue));
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue);
 
         attributes = new HashMap<QName, String>();
@@ -357,6 +360,10 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
                 </ds:KeyInfo>
             </ds:Signature>
         */
+
+        SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent(SecurityEvent.Event.SignatureValue);
+        signatureValueSecurityEvent.setSignatureValue(signatureValue);
+        outputProcessorChain.getSecurityContext().registerSecurityEvent(signatureValueSecurityEvent);
     }
 
     class SignedInfoProcessor extends AbstractOutputProcessor {

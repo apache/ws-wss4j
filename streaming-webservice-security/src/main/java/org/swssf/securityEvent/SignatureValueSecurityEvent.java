@@ -18,36 +18,19 @@ package org.swssf.securityEvent;
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public abstract class SecurityEvent {
+public class SignatureValueSecurityEvent extends SecurityEvent {
 
-    public enum Event {
-        Operation,
-        Timestamp,
-        SignedPart,
-        SignedElement,
-        InitiatorEncryptionToken,
-        RecipientEncryptionToken,
-        AlgorithmSuite,
-        EncryptedPart,
-        EncryptedElement,
-        ContentEncrypted,
-        UsernameToken,
-        InitiatorSignatureToken,
-        RecipientSignatureToken,
-        SignatureValue,
+    private byte[] signatureValue;
+
+    public SignatureValueSecurityEvent(Event securityEventType) {
+        super(securityEventType);
     }
 
-    private Event securityEventType;
-
-    protected SecurityEvent(Event securityEventType) {
-        this.securityEventType = securityEventType;
+    public byte[] getSignatureValue() {
+        return signatureValue;
     }
 
-    public Event getSecurityEventType() {
-        return securityEventType;
-    }
-
-    public void setSecurityEventType(Event securityEventType) {
-        this.securityEventType = securityEventType;
+    public void setSignatureValue(byte[] signatureValue) {
+        this.signatureValue = signatureValue;
     }
 }

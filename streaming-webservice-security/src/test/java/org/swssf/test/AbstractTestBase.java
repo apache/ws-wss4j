@@ -95,7 +95,7 @@ public abstract class AbstractTestBase {
 
     public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventListener);
+        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
         Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
         return document;
     }
@@ -115,7 +115,7 @@ public abstract class AbstractTestBase {
     }
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
-        MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
+        MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, soapProtocol);
         return (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
     }
 
@@ -150,7 +150,7 @@ public abstract class AbstractTestBase {
         Enumeration enumeration = properties.propertyNames();
         while (enumeration.hasMoreElements()) {
             String s = (String) enumeration.nextElement();
-            messageContext.setProperty(s, properties.getProperty(s));
+            messageContext.setProperty(s, properties.get(s));
         }
 
         RequestData requestData = new RequestData();
@@ -170,10 +170,10 @@ public abstract class AbstractTestBase {
     }
 
     protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol) throws Exception {
-        return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL, null);
+        return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL, new Properties());
     }
 
-    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol, Vector sigv) throws Exception {
+    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol, Properties properties) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
@@ -202,7 +202,11 @@ public abstract class AbstractTestBase {
         messageContext.setProperty(WSHandlerConstants.DEC_PROP_REF_ID, "" + decProperties.hashCode());
         messageContext.setProperty("" + decProperties.hashCode(), decProperties);
 
-        messageContext.setProperty(WSHandlerConstants.SEND_SIGV, sigv);
+        Enumeration enumeration = properties.propertyNames();
+        while (enumeration.hasMoreElements()) {
+            String s = (String) enumeration.nextElement();
+            messageContext.setProperty(s, properties.get(s));
+        }
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);

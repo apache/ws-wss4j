@@ -46,6 +46,9 @@ public class SecurityContextImpl implements SecurityContext {
 
     @SuppressWarnings("unchecked")
     public <T extends List> void putList(Class key, T value) {
+        if (value == null) {
+            return;
+        }
         List<T> entry = (List<T>) content.get(key);
         if (entry == null) {
             entry = new ArrayList<T>();
@@ -55,7 +58,7 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends List> void putAsList(Class key, T value) {
+    public <T> void putAsList(Class key, T value) {
         List<T> entry = (List<T>) content.get(key);
         if (entry == null) {
             entry = new ArrayList<T>();

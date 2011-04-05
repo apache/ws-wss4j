@@ -99,6 +99,7 @@ public class WSSec {
             throw new WSSConfigurationException(WSSecurityException.FAILURE, "noOutputAction");
         }
 
+        //todo encrypt sigconf when original signature was encrypted
         int pos = Arrays.binarySearch(securityProperties.getOutAction(), Constants.Action.SIGNATURE_CONFIRMATION);
         if (pos >= 0) {
             if (Arrays.binarySearch(securityProperties.getOutAction(), Constants.Action.SIGNATURE) < 0) {

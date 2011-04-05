@@ -22,13 +22,16 @@ import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.XMLSecurityStreamReader;
 import org.swssf.impl.processor.input.LogInputProcessor;
 import org.swssf.impl.processor.input.SecurityHeaderInputProcessor;
+import org.swssf.impl.processor.input.SignatureConfirmationInputProcessor;
 import org.swssf.impl.processor.input.XMLEventReaderInputProcessor;
+import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,7 +70,7 @@ public class InboundWSSec {
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
-        return this.processInMessage(xmlStreamReader, null);
+        return this.processInMessage(xmlStreamReader, new ArrayList<SecurityEvent>(), null);
     }
 
     /**
@@ -88,9 +91,10 @@ public class InboundWSSec {
      * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
+        securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.setSecurityEventListener(securityEventListener);
 
         final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
@@ -105,6 +109,10 @@ public class InboundWSSec {
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContextImpl, documentContext);
         inputProcessorChain.addProcessor(new XMLEventReaderInputProcessor(securityProperties, xmlEventReader));
         inputProcessorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
+
+        if (securityProperties.isEnableSignatureConfirmationVerification()) {
+            inputProcessorChain.addProcessor(new SignatureConfirmationInputProcessor(securityProperties));
+        }
 
         if (log.isTraceEnabled()) {
             inputProcessorChain.addProcessor(new LogInputProcessor(securityProperties));

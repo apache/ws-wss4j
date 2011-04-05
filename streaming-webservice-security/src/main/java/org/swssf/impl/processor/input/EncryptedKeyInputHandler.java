@@ -36,7 +36,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- * Prozessor for the EncryptedKey XML Structure
+ * Processor for the EncryptedKey XML Structure
  *
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $

@@ -25,6 +25,9 @@
         <Handler NAME="UsernameToken"
                  URI="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
                  JAVACLASS="org.swssf.impl.processor.input.UsernameTokenInputHandler"/>
+        <Handler NAME="SignatureConfirmation"
+                 URI="http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd"
+                 JAVACLASS="org.swssf.impl.processor.input.SignatureConfirmationInputHandler"/>
     </SecurityHeaderHandlers>
    <CanonicalizationMethods>
       <CanonicalizationMethod URI="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
