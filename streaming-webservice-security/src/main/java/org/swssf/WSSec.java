@@ -147,10 +147,13 @@ public class WSSec {
 
                 case ENCRYPT:
                     if (securityProperties.getEncryptionUseThisCertificate() == null
-                            && securityProperties.getEncryptionKeyStore() == null) {
+                            && securityProperties.getEncryptionKeyStore() == null
+                            && !securityProperties.isUseReqSigCertForEncryption()) {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
                     }
-                    if (securityProperties.getEncryptionUser() == null && securityProperties.getEncryptionUseThisCertificate() == null) {
+                    if (securityProperties.getEncryptionUser() == null
+                            && securityProperties.getEncryptionUseThisCertificate() == null
+                            && !securityProperties.isUseReqSigCertForEncryption()) {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noEncryptionUser");
                     }
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {

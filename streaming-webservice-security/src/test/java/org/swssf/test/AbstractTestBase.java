@@ -170,20 +170,28 @@ public abstract class AbstractTestBase {
     }
 
     protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol) throws Exception {
-        return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL, new Properties());
+        return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL, new Properties(), false);
     }
 
-    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol, Properties properties) throws Exception {
+    protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol, Properties properties, boolean client) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
         MessageContext messageContext = getMessageContext(document, soapProtocol);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, action);
-        handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "receiver");
+        if (client) {
+            handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "transmitter");
+        } else {
+            handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "receiver");
+        }
         //handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTOR, "receiver");
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
+        if (client) {
+            sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
+        } else {
+            sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
+        }
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
         sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
@@ -194,7 +202,11 @@ public abstract class AbstractTestBase {
 
         Properties decProperties = new Properties();
         decProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-        decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
+        if (client) {
+            decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
+        } else {
+            decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
+        }
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
         decProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");

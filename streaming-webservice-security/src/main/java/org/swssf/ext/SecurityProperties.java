@@ -601,4 +601,14 @@ public class SecurityProperties {
     public void setEnableSignatureConfirmationVerification(boolean enableSignatureConfirmationVerification) {
         this.enableSignatureConfirmationVerification = enableSignatureConfirmationVerification;
     }
+
+    private boolean useReqSigCertForEncryption = false;
+
+    public boolean isUseReqSigCertForEncryption() {
+        return useReqSigCertForEncryption;
+    }
+
+    public void setUseReqSigCertForEncryption(boolean useReqSigCertForEncryption) {
+        this.useReqSigCertForEncryption = useReqSigCertForEncryption;
+    }
 }

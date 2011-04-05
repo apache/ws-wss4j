@@ -86,8 +86,8 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE_CONFIRMATION};
             securityProperties.setOutAction(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            securityProperties.setSignatureUser("transmitter");
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("receiver");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -121,7 +121,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.SEND_SIGV, sigv);
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, true);
         }
     }
 
@@ -201,7 +201,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setEnableSignatureConfirmationVerification(true);
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument), securityEventList, null);
@@ -283,7 +283,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setEnableSignatureConfirmationVerification(true);
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument), securityEventList, null);

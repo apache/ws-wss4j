@@ -19,7 +19,10 @@ import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.EncryptionPartDef;
+import org.swssf.impl.securityToken.X509SecurityToken;
 import org.swssf.impl.util.RFC2253Parser;
+import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
+import org.swssf.securityEvent.SecurityEvent;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -99,15 +102,18 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
         //fetch the Certificate with the public key for symmetric session key encryption:
-        X509Certificate x509Certificate;
-        if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
-            x509Certificate = getSecurityProperties().getEncryptionUseThisCertificate();
-        } else {
-            X509Certificate[] certs = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
-            if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException("noUserCertsFound for encryption for user " + getSecurityProperties().getEncryptionUser());
+        X509Certificate x509Certificate = getReqSigCert(outputProcessorChain.getSecurityContext());
+
+        if (!getSecurityProperties().isUseReqSigCertForEncryption() || x509Certificate == null) {
+            if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
+                x509Certificate = getSecurityProperties().getEncryptionUseThisCertificate();
+            } else {
+                X509Certificate[] certs = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
+                if (certs == null || certs.length <= 0) {
+                    throw new WSSecurityException("noUserCertsFound for encryption for user " + getSecurityProperties().getEncryptionUser());
+                }
+                x509Certificate = certs[0];
             }
-            x509Certificate = certs[0];
         }
 
         //the following if-else section builds the key references
@@ -302,5 +308,23 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
            </xenc:ReferenceList>
        </xenc:EncryptedKey>
         */
+    }
+
+    private X509Certificate getReqSigCert(SecurityContext securityContext) throws WSSecurityException {
+        List<SecurityEvent> securityEventList = securityContext.getAsList(SecurityEvent.class);
+        if (securityEventList != null) {
+            for (int i = 0; i < securityEventList.size(); i++) {
+                SecurityEvent securityEvent = securityEventList.get(i);
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.InitiatorSignatureToken) {
+                    InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = (InitiatorSignatureTokenSecurityEvent)securityEvent;
+                    SecurityToken securityToken = initiatorSignatureTokenSecurityEvent.getSecurityToken();
+                    if (securityToken instanceof X509SecurityToken) {
+                        X509SecurityToken x509SecurityToken = (X509SecurityToken)securityToken;
+                        return x509SecurityToken.getX509Certificate();
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
