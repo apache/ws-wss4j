@@ -26,13 +26,9 @@
     <name>WSS4J</name>
     <version>1.6-SNAPSHOT</version>
     <description>
-        Apache WSS4J is an implementation of the Web Services Security
-        (WS-Security) being developed at OASIS Web Services Security TC.
-        WSS4J is a primarily a Java library that can be used to sign and
-        verify SOAP Messages with WS-Security information. WSS4J will
-        use Apache Axis and Apache XML-Security projects and will be
-        interoperable with JAX-RPC based server/clients and .NET
-        server/clients.
+        The Apache WSS4J project provides a Java implementation of the primary security standards 
+        for Web Services, namely the OASIS Web Services Security (WS-Security) specifications 
+        from the OASIS Web Services Security TC.
     </description>
     <url>http://ws.apache.org/wss4j/</url>
     <issueManagement>

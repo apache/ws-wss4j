@@ -5,7 +5,7 @@
 <section name="Apache WSS4J - Web Services Security for Java">
 <subsection name="The Project">
 <p> 
-The <b>Apache WSS4J&#8482;</b> project is aimed at providing implementation of the primary security 
+The <b>Apache WSS4J&#8482;</b> project provides a Java implementation of the primary security 
 standards for Web Services, namely the OASIS Web Services Security (WS-Security) specifications from 
 the <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services 
 Security TC</a>. WSS4J provides an implementation of the following WS-Security standards:
