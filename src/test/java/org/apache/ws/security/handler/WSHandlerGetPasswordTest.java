@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -36,7 +34,8 @@ import javax.security.auth.callback.CallbackHandler;
  * <p/>
  */
 public class WSHandlerGetPasswordTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(WSHandlerGetPasswordTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(WSHandlerGetPasswordTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**

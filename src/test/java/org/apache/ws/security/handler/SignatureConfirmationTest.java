@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -47,7 +45,8 @@ import javax.security.auth.callback.CallbackHandler;
  * A set of test-cases for SignatureConfirmation.
  */
 public class SignatureConfirmationTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SignatureConfirmationTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureConfirmationTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;

@@ -21,8 +21,6 @@ package org.apache.ws.security.saml.ext;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.opensaml.xml.*;
 import org.opensaml.xml.io.*;
@@ -39,7 +37,8 @@ import org.w3c.dom.Node;
  * Created on May 18, 2009
  */
 public class OpenSAMLUtil {
-    private static final Log log = LogFactory.getLog(OpenSAMLUtil.class);
+    private static final org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
 
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;

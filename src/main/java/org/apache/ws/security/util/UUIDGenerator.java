@@ -25,15 +25,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * UUID generator (taken from Axis2)
  */
 public class UUIDGenerator {
 
-    private static final Log log = LogFactory.getLog(UUIDGenerator.class);
+    private static final org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(UUIDGenerator.class);
 
     private static String baseUUID = null;
     private static long incrementingValue = 0;

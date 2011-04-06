@@ -26,8 +26,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -57,7 +55,8 @@ import org.w3c.dom.Text;
  */
 public class WSSecEncryptedKey extends WSSecBase {
 
-    private static Log log = LogFactory.getLog(WSSecEncryptedKey.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecEncryptedKey.class);
 
     protected Document document;
 

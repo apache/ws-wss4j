@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
@@ -68,7 +66,8 @@ import java.util.List;
  * 
  */
 public class SignatureCertTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SignatureCertTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureCertTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     private Crypto cryptoCA = null;

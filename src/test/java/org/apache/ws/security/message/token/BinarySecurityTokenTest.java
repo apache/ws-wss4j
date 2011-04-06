@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
@@ -41,7 +39,8 @@ import java.util.List;
  * This is a test for constructing and processing BinarySecurityTokens.
  */
 public class BinarySecurityTokenTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(BinarySecurityTokenTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(BinarySecurityTokenTest.class);
     private Crypto crypto = null;
     
     public BinarySecurityTokenTest() throws Exception {

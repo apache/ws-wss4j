@@ -22,8 +22,6 @@ package org.apache.ws.security.transform;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityException;
@@ -39,7 +37,8 @@ import org.w3c.dom.Text;
  * Utility class exposing the dereferencing logic of the {@link STRTransform} implementation.
  */
 public class STRTransformUtil {
-    private static Log log = LogFactory.getLog(STRTransformUtil.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(STRTransformUtil.class);
 
     /**
      * Retrieves the element representing the referenced content of a STR.

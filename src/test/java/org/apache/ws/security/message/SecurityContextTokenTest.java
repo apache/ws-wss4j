@@ -21,8 +21,6 @@ package org.apache.ws.security.message;
 
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SecretKeyCallbackHandler;
@@ -39,7 +37,8 @@ import org.w3c.dom.Document;
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class SecurityContextTokenTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SecurityContextTokenTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SecurityContextTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
     private Crypto crypto = null;

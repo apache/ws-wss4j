@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -34,7 +32,8 @@ import org.w3c.dom.Element;
  */
 
 public class WSSecSignatureConfirmation extends WSSecBase {
-    private static Log log = LogFactory.getLog(WSSecSignatureConfirmation.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecSignatureConfirmation.class);
 
     private SignatureConfirmation sc = null;
 

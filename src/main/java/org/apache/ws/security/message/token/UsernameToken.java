@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
@@ -67,7 +65,8 @@ public class UsernameToken {
     public static final QName TOKEN = 
         new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
     
-    private static final Log LOG = LogFactory.getLog(UsernameToken.class.getName());
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(UsernameToken.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     protected Element element = null;

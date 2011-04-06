@@ -24,8 +24,6 @@ import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
@@ -55,7 +53,8 @@ import org.w3c.dom.Element;
  * 
  */
 public class EncryptedKeyDataRefTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(EncryptedKeyDataRefTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(EncryptedKeyDataRefTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;

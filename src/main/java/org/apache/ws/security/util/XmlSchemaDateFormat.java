@@ -27,9 +27,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * A {@link DateFormat} for the format of the dateTime simpleType as specified in the
  * XML Schema specification. See <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">
@@ -47,7 +44,8 @@ public class XmlSchemaDateFormat extends DateFormat {
     /**
      * Logger.
      */
-    private static Log log = LogFactory.getLog(XmlSchemaDateFormat.class);
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(XmlSchemaDateFormat.class);
 
     /**
      * DateFormat for Zulu (UTC) form of an XML Schema dateTime string.

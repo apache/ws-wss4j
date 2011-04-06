@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -49,7 +47,8 @@ import java.util.List;
  * and sign, as per wsc:DerivedKeyToken.
  */
 public class UTDerivedKeyTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(UTDerivedKeyTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(UTDerivedKeyTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;

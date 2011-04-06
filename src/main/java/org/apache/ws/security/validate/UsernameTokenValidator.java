@@ -24,8 +24,6 @@ import java.io.IOException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -40,7 +38,8 @@ import org.apache.ws.security.util.Base64;
  */
 public class UsernameTokenValidator implements Validator {
     
-    private static Log log = LogFactory.getLog(UsernameTokenValidator.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(UsernameTokenValidator.class);
     
     /**
      * Validate the credential argument. It must contain a non-null UsernameToken. A 

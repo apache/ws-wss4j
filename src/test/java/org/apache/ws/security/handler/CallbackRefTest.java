@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
@@ -36,7 +34,8 @@ import javax.security.auth.callback.CallbackHandler;
  * https://issues.apache.org/jira/browse/WSS-245
  */
 public class CallbackRefTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(CallbackRefTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(CallbackRefTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     
     /**

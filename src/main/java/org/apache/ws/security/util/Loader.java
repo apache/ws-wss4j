@@ -19,9 +19,6 @@
 
 package org.apache.ws.security.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.AccessController;
@@ -34,7 +31,8 @@ import java.security.PrivilegedAction;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Loader {
-    private static Log log = LogFactory.getLog(Loader.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(Loader.class);
 
     /**
      * This method will search for <code>resource</code> in different

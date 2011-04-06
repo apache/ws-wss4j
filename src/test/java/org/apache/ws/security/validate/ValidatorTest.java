@@ -24,8 +24,6 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -54,7 +52,8 @@ import org.w3c.dom.Document;
  * Validator implementations.
  */
 public class ValidatorTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(ValidatorTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(ValidatorTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**

@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -49,7 +47,8 @@ import java.util.List;
  * This is a test for the Kerberos Token Profile 1.1
  */
 public class BSTKerberosTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(BSTKerberosTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(BSTKerberosTest.class);
     private static final String AP_REQ = 
         "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
     private static final String BASE64_NS = 

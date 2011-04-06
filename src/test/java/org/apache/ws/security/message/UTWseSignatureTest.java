@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
@@ -41,7 +39,8 @@ import javax.security.auth.callback.CallbackHandler;
  * @author Werner Dittmann (Wern.erDittmann@siemens.com)
  */
 public class UTWseSignatureTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(UTWseSignatureTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(UTWseSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 

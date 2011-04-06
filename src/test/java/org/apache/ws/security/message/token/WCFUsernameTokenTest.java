@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSConfig;
@@ -38,7 +36,8 @@ import javax.security.auth.callback.CallbackHandler;
  * qualified (incorrectly). WSS-199 added the ability to process these Username Tokens.
  */
 public class WCFUsernameTokenTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(WCFUsernameTokenTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(WCFUsernameTokenTest.class);
     private static final String SOAPUTMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "

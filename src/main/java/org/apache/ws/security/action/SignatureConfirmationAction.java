@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.action;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -37,7 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SignatureConfirmationAction implements Action {
-    protected static Log log = LogFactory.getLog(WSHandler.class.getName());
+    protected static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)

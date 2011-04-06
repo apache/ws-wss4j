@@ -25,9 +25,6 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
@@ -39,7 +36,8 @@ import org.apache.ws.security.handler.RequestData;
  */
 public class SignatureTrustValidator implements Validator {
     
-    private static Log LOG = LogFactory.getLog(SignatureTrustValidator.class.getName());
+    private static org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureTrustValidator.class);
     
     /**
      * Validate the credential argument. It must contain a non-null X509Certificate chain

@@ -19,9 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -38,7 +35,8 @@ import org.w3c.dom.Element;
  */
 public class WSSecSAMLToken extends WSSecBase {
 
-    private static Log log = LogFactory.getLog(WSSecSAMLToken.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecSAMLToken.class);
     
     private Document document = null;
     

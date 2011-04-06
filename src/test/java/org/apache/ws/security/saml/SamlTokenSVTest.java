@@ -19,9 +19,6 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSConfig;
@@ -53,7 +50,8 @@ import javax.security.auth.callback.CallbackHandler;
  * Test-case for sending and processing a signed (sender vouches) SAML Assertion.
  */
 public class SamlTokenSVTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SamlTokenSVTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SamlTokenSVTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;

@@ -19,8 +19,6 @@
 
 package org.apache.ws.security;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.handler.RequestData;
@@ -46,7 +44,8 @@ import java.util.List;
  * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public class WSSecurityEngine {
-    private static Log log = LogFactory.getLog(WSSecurityEngine.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecurityEngine.class);
 
     /**
      * The WSSConfig instance used by this SecurityEngine to

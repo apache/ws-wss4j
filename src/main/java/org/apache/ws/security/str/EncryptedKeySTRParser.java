@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.str;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -50,7 +48,8 @@ import javax.xml.namespace.QName;
  */
 public class EncryptedKeySTRParser implements STRParser {
     
-    private static final Log LOG = LogFactory.getLog(EncryptedKeySTRParser.class.getName());
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(EncryptedKeySTRParser.class);
     
     private X509Certificate[] certs;
     

@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
@@ -60,8 +58,8 @@ public class SecurityTokenReference {
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
     public static final String ENC_KEY_SHA1_URI = 
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
-    private static Log log =
-        LogFactory.getLog(SecurityTokenReference.class.getName());
+    private static org.apache.commons.logging.Log log =
+        org.apache.commons.logging.LogFactory.getLog(SecurityTokenReference.class);
     protected Element element = null;
     private DOMX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;

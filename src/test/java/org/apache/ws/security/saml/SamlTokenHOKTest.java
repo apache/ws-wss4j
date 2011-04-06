@@ -19,9 +19,6 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -49,7 +46,8 @@ import java.util.List;
  * information in the SAML Subject to sign the SOAP body.
  */
 public class SamlTokenHOKTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SamlTokenHOKTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     

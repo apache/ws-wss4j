@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
@@ -36,7 +34,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
 public class X509Util {
-    private static Log log = LogFactory.getLog(X509Util.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(X509Util.class);
 
     public static boolean isContent(Node encBodyData) {
         if (encBodyData != null) {

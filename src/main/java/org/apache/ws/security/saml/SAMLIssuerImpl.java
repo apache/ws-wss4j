@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -39,7 +37,8 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class SAMLIssuerImpl implements SAMLIssuer {
 
-    private static final Log log = LogFactory.getLog(SAMLIssuerImpl.class.getName());
+    private static final org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(SAMLIssuerImpl.class);
 
     private Properties properties = null;
     

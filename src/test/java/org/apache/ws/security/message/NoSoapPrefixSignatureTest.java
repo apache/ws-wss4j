@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
@@ -34,7 +32,8 @@ import org.w3c.dom.Document;
  * http://issues.apache.org/jira/browse/WSS-60
  */
 public class NoSoapPrefixSignatureTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(NoSoapPrefixSignatureTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(NoSoapPrefixSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     

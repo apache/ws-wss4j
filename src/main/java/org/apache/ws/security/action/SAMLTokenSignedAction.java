@@ -21,9 +21,6 @@ package org.apache.ws.security.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -39,7 +36,8 @@ import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
     
-    private static Log log = LogFactory.getLog(SAMLTokenSignedAction.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(SAMLTokenSignedAction.class);
 
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {

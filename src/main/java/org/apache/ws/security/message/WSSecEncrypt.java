@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
@@ -57,7 +55,8 @@ import java.util.List;
  * @author Werner Dittmann (Werner.Dittmann@apache.org).
  */
 public class WSSecEncrypt extends WSSecEncryptedKey {
-    private static Log log = LogFactory.getLog(WSSecEncrypt.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecEncrypt.class);
     
     protected String symEncAlgo = WSConstants.AES_128;
 

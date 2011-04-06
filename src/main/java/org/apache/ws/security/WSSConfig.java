@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
@@ -48,7 +46,8 @@ import org.apache.ws.security.validate.Validator;
  */
 public class WSSConfig {
     
-    private static final Log log = LogFactory.getLog(WSSConfig.class.getName());
+    private static final org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSConfig.class);
 
     /**
      * The default collection of actions supported by the toolkit.

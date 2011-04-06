@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAP11Constants;
 import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
@@ -60,7 +58,8 @@ import java.util.List;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class WSSecurityUtil {
-    private static Log log = LogFactory.getLog(WSSecurityUtil.class);
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecurityUtil.class);
 
     /**
      * A cached pseudo-random number generator

@@ -26,8 +26,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -44,7 +42,8 @@ import org.w3c.dom.Document;
  * be different than user name used for UsernameToken".
  */
 public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHandler {
-    private static final Log LOG = LogFactory.getLog(SignatureUTAliasTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureUTAliasTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**

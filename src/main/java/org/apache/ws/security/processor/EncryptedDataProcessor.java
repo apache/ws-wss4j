@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -46,7 +44,8 @@ import java.util.List;
  */
 public class EncryptedDataProcessor implements Processor {
     
-    private static Log log = LogFactory.getLog(EncryptedDataProcessor.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(EncryptedDataProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem,

@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
@@ -61,7 +59,8 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
  */
 public class WSSecDKSign extends WSSecDerivedKeyBase {
 
-    private static Log log = LogFactory.getLog(WSSecDKSign.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecDKSign.class);
 
     private String sigAlgo = WSConstants.HMAC_SHA1;
     private String digestAlgo = WSConstants.SHA1;

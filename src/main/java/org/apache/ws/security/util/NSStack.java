@@ -19,9 +19,6 @@
 
 package org.apache.ws.security.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +44,8 @@ import java.util.List;
  * @author Sam Ruby (rubys@us.ibm.com)
  */
 public class NSStack {
-    protected static Log log =
-            LogFactory.getLog(NSStack.class.getName());
+    protected static org.apache.commons.logging.Log log =
+        org.apache.commons.logging.LogFactory.getLog(NSStack.class);
 
     private Mapping[] stack;
     private int top = 0;

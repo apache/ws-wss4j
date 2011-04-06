@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -36,7 +34,8 @@ import org.w3c.dom.Element;
  */
 
 public class WSSecTimestamp extends WSSecBase {
-    private static Log log = LogFactory.getLog(WSSecTimestamp.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecTimestamp.class);
 
     private Timestamp ts = null;
 

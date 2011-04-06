@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -40,7 +38,8 @@ import java.util.List;
  * WS-Security, it's necessary to support it for WCF interop.
  */
 public class SignatureKeyValueTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SignatureKeyValueTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureKeyValueTest.class);
     private Crypto crypto = null;
     
     public SignatureKeyValueTest() throws Exception {

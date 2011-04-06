@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.components.crypto;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.Loader;
 
@@ -37,7 +35,8 @@ import java.util.Properties;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class CryptoFactory {
-    private static final Log log = LogFactory.getLog(CryptoFactory.class);
+    private static final org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(CryptoFactory.class);
     private static final Class<? extends Crypto> defaultCryptoClass = 
         org.apache.ws.security.components.crypto.Merlin.class;
 

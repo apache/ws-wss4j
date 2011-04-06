@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.components.crypto;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.Loader;
@@ -104,7 +102,8 @@ public class Merlin extends CryptoBase {
     public static final String TRUSTSTORE_TYPE =
         "org.apache.ws.security.crypto.merlin.truststore.type";
     
-    private static final Log log = LogFactory.getLog(Merlin.class.getName());
+    private static final org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(Merlin.class);
     private static final boolean doDebug = log.isDebugEnabled();
 
     protected static CertificateFactory certFact;

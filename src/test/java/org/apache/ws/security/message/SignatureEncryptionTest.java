@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
@@ -47,7 +45,8 @@ import java.util.ArrayList;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class SignatureEncryptionTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SignatureEncryptionTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureEncryptionTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "

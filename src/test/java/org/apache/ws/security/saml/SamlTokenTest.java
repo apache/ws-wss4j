@@ -19,9 +19,6 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -50,7 +47,8 @@ import java.util.List;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class SamlTokenTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SamlTokenTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SamlTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     public SamlTokenTest() {

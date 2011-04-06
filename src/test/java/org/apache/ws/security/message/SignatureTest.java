@@ -24,8 +24,6 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -48,7 +46,8 @@ import org.w3c.dom.Document;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class SignatureTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SignatureTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureTest.class);
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();

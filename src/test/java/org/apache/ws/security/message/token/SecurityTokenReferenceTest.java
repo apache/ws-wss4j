@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.SOAPUtil;
@@ -32,7 +30,8 @@ import org.w3c.dom.Element;
  * Some tests for the SecurityTokenReference class.
  */
 public class SecurityTokenReferenceTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SecurityTokenReferenceTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SecurityTokenReferenceTest.class);
     
     /**
      * Test for a Reference with no URI

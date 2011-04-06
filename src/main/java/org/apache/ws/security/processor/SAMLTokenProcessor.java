@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -37,7 +35,8 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 public class SAMLTokenProcessor implements Processor {
-    private static Log log = LogFactory.getLog(SAMLTokenProcessor.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(SAMLTokenProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

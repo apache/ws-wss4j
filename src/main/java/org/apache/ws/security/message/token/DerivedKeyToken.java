@@ -25,8 +25,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
@@ -60,7 +58,8 @@ import org.w3c.dom.Text;
  */
 public class DerivedKeyToken {
 
-    private Log log = LogFactory.getLog(DerivedKeyToken.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(DerivedKeyToken.class);
 
     // These are the elements that are used to create the SecurityContextToken
     protected Element element = null;

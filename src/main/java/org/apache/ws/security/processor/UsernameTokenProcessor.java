@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -37,7 +35,8 @@ import org.w3c.dom.Element;
 import java.util.List;
 
 public class UsernameTokenProcessor implements Processor {
-    private static Log log = LogFactory.getLog(UsernameTokenProcessor.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(UsernameTokenProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -42,7 +40,8 @@ import java.util.List;
  * WS-Security Test Case for Timestamps.
  */
 public class TimestampTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(TimestampTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(TimestampTest.class);
 
     /**
      * This is a test for processing a valid Timestamp.

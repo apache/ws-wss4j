@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
@@ -39,7 +37,8 @@ import javax.security.auth.callback.CallbackHandler;
  * password type. See WSS-255.
  */
 public class PasswordTypeTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(PasswordTypeTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(PasswordTypeTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**

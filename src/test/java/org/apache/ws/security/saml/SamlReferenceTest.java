@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
@@ -60,7 +58,8 @@ import javax.security.auth.callback.CallbackHandler;
  * WSS-265 is fixed: https://issues.apache.org/jira/browse/WSS-265
  */
 public class SamlReferenceTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(SamlReferenceTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SamlReferenceTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");

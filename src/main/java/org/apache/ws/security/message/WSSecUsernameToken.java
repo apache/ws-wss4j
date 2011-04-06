@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -38,7 +36,8 @@ import org.w3c.dom.Element;
  * @author Werner Dittmann (werner@apache.org).
  */
 public class WSSecUsernameToken extends WSSecBase {
-    private static Log log = LogFactory.getLog(WSSecUsernameToken.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecUsernameToken.class);
 
     private String passwordType = WSConstants.PASSWORD_DIGEST;
     private UsernameToken ut = null;

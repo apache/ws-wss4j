@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
@@ -48,8 +46,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class ReferenceListProcessor implements Processor {
-    private static Log log = 
-        LogFactory.getLog(ReferenceListProcessor.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(ReferenceListProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

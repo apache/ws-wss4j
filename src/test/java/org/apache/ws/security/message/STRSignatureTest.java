@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSConstants;
@@ -42,7 +40,8 @@ import java.util.ArrayList;
  * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class STRSignatureTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(STRSignatureTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(STRSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     

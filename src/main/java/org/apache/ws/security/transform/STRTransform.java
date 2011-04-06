@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.transform;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.message.token.PKIPathSecurity;
@@ -68,7 +66,8 @@ public class STRTransform extends TransformService {
     
     private Element transformElement;
     
-    private static Log log = LogFactory.getLog(STRTransform.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(STRTransform.class);
 
     private static boolean doDebug = false;
     

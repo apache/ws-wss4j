@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
@@ -51,7 +49,8 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
  */
 public class WSSecSignatureBase extends WSSecBase {
     
-    private static Log log = LogFactory.getLog(WSSecSignatureBase.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSSecSignatureBase.class);
     
     public WSSecSignatureBase() {
         super();

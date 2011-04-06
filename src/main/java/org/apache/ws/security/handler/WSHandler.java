@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
@@ -59,7 +57,8 @@ import java.util.Properties;
  * @author Marcel Ammerlaan (marcel.ammerlaan@gmail.com).
  */
 public abstract class WSHandler {
-    private static Log log = LogFactory.getLog(WSHandler.class.getName());
+    private static org.apache.commons.logging.Log log = 
+        org.apache.commons.logging.LogFactory.getLog(WSHandler.class);
     protected WSSecurityEngine secEngine = new WSSecurityEngine();
     protected Map<String, Crypto> cryptos = new HashMap<String, Crypto>();
 

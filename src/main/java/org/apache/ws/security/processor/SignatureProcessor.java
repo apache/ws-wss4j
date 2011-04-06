@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -75,7 +73,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SignatureProcessor implements Processor {
-    private static Log LOG = LogFactory.getLog(SignatureProcessor.class.getName());
+    private static org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SignatureProcessor.class);
     
     private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
     

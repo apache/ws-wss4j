@@ -19,8 +19,6 @@
 
 package org.apache.ws.security.components.crypto;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
@@ -48,7 +46,8 @@ import java.security.cert.X509Certificate;
  * OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE"
  */
 public class CryptoProviderTest extends org.junit.Assert {
-    private static final Log LOG = LogFactory.getLog(CryptoProviderTest.class);
+    private static final org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(CryptoProviderTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;
