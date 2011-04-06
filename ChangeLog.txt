@@ -100,7 +100,6 @@ Improvement
     * [WSS-266] - Provide better support for pluggable authentication/verification of security tokens
     * [WSS-271] - Add support for custom validation of BinarySecurityTokens
     * [WSS-274] - Add support for allowing future-dated Timestamps
-    * [WSS-275] - Use SLF4J for logging framework for 1.6
 
 New Feature
 
