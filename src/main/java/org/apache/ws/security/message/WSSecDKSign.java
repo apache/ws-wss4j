@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
@@ -269,6 +270,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 );
             }
             URIDereferencer dereferencer = new DOMURIDereferencer();
+            signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
             wsDocInfo.setCallbackLookup(callbackLookup);
             ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
             signContext.setURIDereferencer(dereferencer);

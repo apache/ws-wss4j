@@ -270,7 +270,7 @@ public class SecurityTokenReference {
         if (callbackLookup == null) {
             callbackLookup = new DOMCallbackLookup(doc);
         }
-        return callbackLookup.getElement(uri, type, true);
+        return callbackLookup.getElement(id, type, true);
     }
     
     /**
