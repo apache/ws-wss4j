@@ -151,6 +151,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                             xmlAttributeList = xmlEventNS.getAttributeList();
 
                             //add all defined namespaces up to current element to the outputted
+/*
                             for (int i = 1; i < xmlEventNS.getNamespaceList().length; i++) {
                                 List<ComparableNamespace> comparableNamespaces = xmlEventNS.getNamespaceList()[i];
                                 for (int j = 0; j < comparableNamespaces.size(); j++) {
@@ -179,6 +180,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                                     }
                                 }
                             }
+*/
 
                         }
                         firstCall = false;

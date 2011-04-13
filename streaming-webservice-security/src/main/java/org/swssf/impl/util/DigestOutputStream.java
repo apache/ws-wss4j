@@ -31,7 +31,6 @@ public class DigestOutputStream extends OutputStream {
     protected static final transient Log log = LogFactory.getLog(DigestOutputStream.class);
 
     private MessageDigest messageDigest;
-
     private StringBuffer stringBuffer;
 
     public DigestOutputStream(MessageDigest messageDigest) {

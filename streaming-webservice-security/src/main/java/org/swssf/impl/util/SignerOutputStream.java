@@ -30,9 +30,13 @@ public class SignerOutputStream extends OutputStream {
     protected static final transient Log log = LogFactory.getLog(SignerOutputStream.class);
 
     private final SignatureAlgorithm signatureAlgorithm;
+    private StringBuffer stringBuffer;
 
     public SignerOutputStream(SignatureAlgorithm signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
+        if (log.isDebugEnabled()) {
+            stringBuffer = new StringBuffer();
+        }
     }
 
     public void write(byte[] arg0) {
@@ -42,6 +46,9 @@ public class SignerOutputStream extends OutputStream {
     public void write(int arg0) {
         try {
             signatureAlgorithm.engineUpdate((byte) arg0);
+            if (log.isDebugEnabled()) {
+                stringBuffer.append(new String(new byte[]{(byte) arg0}));
+            }
         } catch (WSSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -50,16 +57,31 @@ public class SignerOutputStream extends OutputStream {
     public void write(byte[] arg0, int arg1, int arg2) {
         try {
             signatureAlgorithm.engineUpdate(arg0, arg1, arg2);
+            if (log.isDebugEnabled()) {
+                stringBuffer.append(new String(arg0, arg1, arg2));
+            }
         } catch (WSSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
     public boolean verify(byte[] signatureValue) throws WSSecurityException {
+        if (log.isDebugEnabled()) {
+            log.debug("Pre Signed: ");
+            log.debug(stringBuffer.toString());
+            log.debug("End pre Signed ");
+            stringBuffer = new StringBuffer();
+        }
         return signatureAlgorithm.engineVerify(signatureValue);
     }
 
     public byte[] sign() throws WSSecurityException {
+        if (log.isDebugEnabled()) {
+            log.debug("Pre Signed: ");
+            log.debug(stringBuffer.toString());
+            log.debug("End pre Signed ");
+            stringBuffer = new StringBuffer();
+        }
         return signatureAlgorithm.engineSign();
     }
 }

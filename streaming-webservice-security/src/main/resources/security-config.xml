@@ -29,6 +29,7 @@
                  URI="http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd"
                  JAVACLASS="org.swssf.impl.processor.input.SignatureConfirmationInputHandler"/>
     </SecurityHeaderHandlers>
+    <!-- todo remove? they are listed in TransformAlgorithms below -->
    <CanonicalizationMethods>
       <CanonicalizationMethod URI="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
                               JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315OmitCommentsTransformer" />
@@ -47,15 +48,12 @@
       -->
    </CanonicalizationMethods>
    <TransformAlgorithms>
-      <!-- Base64 -->
-      <TransformAlgorithm URI="http://www.w3.org/2000/09/xmldsig#base64"
-                          JAVACLASS="org.apache.xml.security.transforms.implementations.TransformBase64Decode" />
       <!-- c14n omitting comments -->
       <TransformAlgorithm URI="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-                          JAVACLASS="org.apache.xml.security.transforms.implementations.TransformC14N" />
+                          JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315OmitCommentsTransformer" />
       <!-- c14n with comments -->
       <TransformAlgorithm URI="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"
-                          JAVACLASS="org.apache.xml.security.transforms.implementations.TransformC14NWithComments" />
+                          JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315WithCommentsTransformer" />
       <!-- c14n 1.1 omitting comments -->
       <TransformAlgorithm URI="http://www.w3.org/2006/12/xml-c14n11"
                           JAVACLASS="org.apache.xml.security.transforms.implementations.TransformC14N11" />
@@ -64,10 +62,14 @@
                           JAVACLASS="org.apache.xml.security.transforms.implementations.TransformC14N11_WithComments" />
       <!-- exclusive c14n omitting comments -->
       <TransformAlgorithm URI="http://www.w3.org/2001/10/xml-exc-c14n#"
-                          JAVACLASS="org.apache.xml.security.transforms.implementations.TransformC14NExclusive" />
+                          JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer" />
       <!-- exclusive c14n with comments -->
       <TransformAlgorithm URI="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"
-                          JAVACLASS="org.apache.xml.security.transforms.implementations.TransformC14NExclusiveWithComments" />
+                          JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclWithCommentsTransformer" />
+       
+       <!-- Base64 -->
+      <TransformAlgorithm URI="http://www.w3.org/2000/09/xmldsig#base64"
+                          JAVACLASS="org.apache.xml.security.transforms.implementations.TransformBase64Decode" />
 
       <!-- XPath transform -->
       <TransformAlgorithm URI="http://www.w3.org/TR/1999/REC-xpath-19991116"

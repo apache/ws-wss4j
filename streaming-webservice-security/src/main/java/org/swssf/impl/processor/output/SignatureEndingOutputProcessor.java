@@ -16,11 +16,11 @@ package org.swssf.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
+import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.RFC2253Parser;
 import org.swssf.impl.util.SignerOutputStream;
@@ -29,11 +29,12 @@ import org.swssf.securityEvent.SignatureValueSecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -45,15 +46,11 @@ import java.util.*;
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
+public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProcessor {
 
     private List<SignaturePartDef> signaturePartDefList;
     //todo implement or remove?:
     private boolean useSingleCert = true;
-
-    //todo try to use a hint how much elements are expected from other processors? 
-    //private List<XMLEvent> xmlEventBuffer = new ArrayList<XMLEvent>(100);
-    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
 
     public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws WSSecurityException {
         super(securityProperties);
@@ -62,37 +59,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
     }
 
-    @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-        xmlEventBuffer.push(xmlEvent);
-    }
-
-    @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-
-        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-
-        Iterator<XMLEvent> xmlEventIterator = xmlEventBuffer.descendingIterator();
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
-                    subOutputProcessorChain.reset();
-                    subOutputProcessorChain.processEvent(xmlEvent);
-                    processHeaderEvent(subOutputProcessorChain);
-                    continue;
-                }
-            }
-            subOutputProcessorChain.reset();
-            subOutputProcessorChain.processEvent(xmlEvent);
-        }
-        subOutputProcessorChain.reset();
-        subOutputProcessorChain.doFinal();
-        subOutputProcessorChain.removeProcessor(this);
-    }
-
-    private void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
+    protected void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
@@ -370,7 +337,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
         private SignerOutputStream signerOutputStream;
         private OutputStream bufferedSignerOutputStream;
-        private Canonicalizer20010315Transformer canonicalizer20010315Transformer;
+        private Transformer transformer;
 
         SignedInfoProcessor(SecurityProperties securityProperties, SignatureAlgorithm signatureAlgorithm) throws WSSecurityException {
             super(securityProperties);
@@ -378,7 +345,24 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
             signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
-            canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
+
+            Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+            try {
+                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
+                    transformer = constructor.newInstance((String) null);
+                } else {
+                    transformer = transformerClass.newInstance();
+                }
+            } catch (NoSuchMethodException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            } catch (InstantiationException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            } catch (IllegalAccessException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            } catch (InvocationTargetException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            }
         }
 
         public byte[] getSignatureValue() throws WSSecurityException {
@@ -392,7 +376,7 @@ public class SignatureEndingOutputProcessor extends AbstractOutputProcessor {
 
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-            canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
+            transformer.transform(xmlEvent, bufferedSignerOutputStream);
             outputProcessorChain.processEvent(xmlEvent);
         }
     }

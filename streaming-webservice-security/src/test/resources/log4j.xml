@@ -24,7 +24,16 @@
     <logger name="org.swssf.impl.util">
         <level value="INFO"/>
     </logger>
+    <logger name="org.swssf.impl.util.SignerOutputStream">
+        <level value="INFO"/>
+    </logger>
+    <logger name="org.swssf.impl.util.DigestOutputStream">
+        <level value="INFO"/>
+    </logger>
     <logger name="org.apache.xml.security.utils.DigesterOutputStream">
+        <level value="INFO"/>
+    </logger>
+    <logger name="org.apache.xml.security.utils.SignerOutputStream">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.xml">

@@ -16,18 +16,23 @@ package org.swssf.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
+import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
-import org.swssf.impl.XMLEventNSAllocator;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -75,29 +80,22 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
                                 signaturePartDefList.add(signaturePartDef);
 
-                                List<Namespace> namespaceList = new ArrayList<Namespace>();
-                                Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
-                                while (namespaceIterator.hasNext()) {
-                                    Namespace namespace = namespaceIterator.next();
-                                    namespaceList.add(namespace);
-                                }
-                                namespaceList.add(outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createNamespace(Constants.ATT_wsu_Id.getPrefix(), Constants.ATT_wsu_Id.getNamespaceURI()));
-
+                                boolean found = false;
                                 List<Attribute> attributeList = new ArrayList<Attribute>();
                                 Iterator<Attribute> attributeIterator = startElement.getAttributes();
                                 while (attributeIterator.hasNext()) {
                                     Attribute attribute = attributeIterator.next();
-                                    attributeList.add(attribute);
                                     if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
                                         signaturePartDef.setSigRefId(attribute.getValue());
+                                        found = true;
                                     }
+                                }
+                                if (!found) {
+                                    attributeList.add(createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                                    xmlEvent = cloneStartElementEvent(xmlEvent, attributeList);
                                 }
 
                                 internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
-
-                                attributeList.add(outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
-                                //todo the NSStack should be corrected...
-                                xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createStartElement(startElement.getName(), namespaceList, attributeList);
 
                             } catch (NoSuchAlgorithmException e) {
                                 throw new WSSecurityException(
@@ -142,7 +140,26 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
             this.digestOutputStream = new org.swssf.impl.util.DigestOutputStream(messageDigest);
             this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
 
-            transformers.add(new Canonicalizer20010315ExclOmitCommentsTransformer(null));
+            Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+            Transformer transformer = null;
+            try {
+                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
+                    transformer = constructor.newInstance((String) null);
+                } else {
+                    transformer = transformerClass.newInstance();
+                }
+            } catch (NoSuchMethodException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            } catch (InstantiationException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            } catch (IllegalAccessException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            } catch (InvocationTargetException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            }
+
+            transformers.add(transformer);
         }
 
         @Override
@@ -175,7 +192,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     //from now on signature is possible again
                     activeInternalSignatureOutputProcessor = null;
                     //todo the NSStack should be corrected...
-                    xmlEvent = outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR).createEndElement(startElement);
+                    xmlEvent = createEndElement(startElement);
                 }
             }
             outputProcessorChain.processEvent(xmlEvent);

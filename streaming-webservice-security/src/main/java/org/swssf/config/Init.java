@@ -56,6 +56,7 @@ public class Init {
                 ConfigurationProperties.init(configurationTypeJAXBElement.getValue().getProperties());
                 SecurityHeaderHandlerMapper.init(configurationTypeJAXBElement.getValue().getSecurityHeaderHandlers());
                 JCEAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getJCEAlgorithmMappings());
+                TransformerAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getTransformAlgorithms());
 
             } catch (Exception e) {
                 throw new WSSConfigurationException(WSSecurityException.FAILURE, null, e);

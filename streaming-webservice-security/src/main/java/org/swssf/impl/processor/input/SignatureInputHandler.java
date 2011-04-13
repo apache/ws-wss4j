@@ -15,11 +15,11 @@
 package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.impl.securityToken.SecurityTokenFactory;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.SignerOutputStream;
 import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
@@ -33,6 +33,8 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -130,7 +132,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
         private SignerOutputStream signerOutputStream;
         private OutputStream bufferedSignerOutputStream;
-        private Canonicalizer20010315Transformer canonicalizer20010315Transformer = new Canonicalizer20010315ExclOmitCommentsTransformer(null);
+        private Transformer transformer;
 
         public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext, SecurityProperties securityProperties) throws WSSecurityException {
             this.signatureType = signatureType;
@@ -162,10 +164,28 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             }
             signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
+
+            Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
+            try {
+                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
+                    transformer = constructor.newInstance((String) null);
+                } else {
+                    transformer = transformerClass.newInstance();
+                }
+            } catch (NoSuchMethodException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            } catch (InstantiationException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            } catch (IllegalAccessException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            } catch (InvocationTargetException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            }
         }
 
         public void processEvent(XMLEvent xmlEvent) throws XMLStreamException {
-            canonicalizer20010315Transformer.transform(xmlEvent, bufferedSignerOutputStream);
+            transformer.transform(xmlEvent, bufferedSignerOutputStream);
         }
 
         public void doFinal() throws WSSecurityException {

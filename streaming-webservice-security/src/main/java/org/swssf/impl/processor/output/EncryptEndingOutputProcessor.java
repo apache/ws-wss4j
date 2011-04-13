@@ -30,8 +30,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -47,13 +45,11 @@ import java.util.*;
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
-public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
+public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcessor {
 
     private Key symmetricKey;
     private String symmetricKeyId;
     private List<EncryptionPartDef> encryptionPartDefList;
-
-    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
 
     public EncryptEndingOutputProcessor(SecurityProperties securityProperties, EncryptOutputProcessor encryptOutputProcessor) throws WSSecurityException {
         super(securityProperties);
@@ -64,40 +60,7 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
         this.encryptionPartDefList = encryptOutputProcessor.getEncryptionPartDefList();
     }
 
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-        xmlEventBuffer.push(xmlEvent);
-    }
-
-    @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-
-        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-
-        //forward all buffered XMLEvents until the Security Header event occurs,
-        //then build the EncryptedKey Header,
-        //flush the rest of the buffer:
-        Iterator<XMLEvent> xmlEventIterator = xmlEventBuffer.descendingIterator();
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
-                    subOutputProcessorChain.reset();
-                    subOutputProcessorChain.processEvent(xmlEvent);
-                    //call processHeaderEvent() to build the EncryptedKey Header
-                    processHeaderEvent(subOutputProcessorChain);
-                    continue;
-                }
-            }
-            subOutputProcessorChain.reset();
-            subOutputProcessorChain.processEvent(xmlEvent);
-        }
-        subOutputProcessorChain.reset();
-        subOutputProcessorChain.doFinal();
-        subOutputProcessorChain.removeProcessor(this);
-    }
-
-    private void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
+    protected void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
@@ -316,10 +279,10 @@ public class EncryptEndingOutputProcessor extends AbstractOutputProcessor {
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
                 if (securityEvent.getSecurityEventType() == SecurityEvent.Event.InitiatorSignatureToken) {
-                    InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = (InitiatorSignatureTokenSecurityEvent)securityEvent;
+                    InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = (InitiatorSignatureTokenSecurityEvent) securityEvent;
                     SecurityToken securityToken = initiatorSignatureTokenSecurityEvent.getSecurityToken();
                     if (securityToken instanceof X509SecurityToken) {
-                        X509SecurityToken x509SecurityToken = (X509SecurityToken)securityToken;
+                        X509SecurityToken x509SecurityToken = (X509SecurityToken) securityToken;
                         return x509SecurityToken.getX509Certificate();
                     }
                 }

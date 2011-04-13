@@ -16,13 +16,15 @@ package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
+import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclOmitCommentsTransformer;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.util.DigestOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SignedElementSecurityEvent;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
+import org.w3._2000._09.xmldsig_.TransformType;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
@@ -34,6 +36,8 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -137,7 +141,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             this.referenceType = referenceType;
             try {
                 createMessageDigest();
-                buildTransformerChain();
+                buildTransformerChain(referenceType);
             } catch (Exception e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             }
@@ -150,8 +154,21 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             this.bufferedDigestOutputStream = new BufferedOutputStream(this.digestOutputStream);
         }
 
-        private void buildTransformerChain() {
-            transformers.add(new Canonicalizer20010315ExclOmitCommentsTransformer(null));
+        private void buildTransformerChain(ReferenceType referenceType) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
+            for (int i = 0; i < transformTypeList.size(); i++) {
+                TransformType transformType = transformTypeList.get(i);
+
+                Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(transformType.getAlgorithm());
+                Transformer transformer;
+                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
+                    transformer = constructor.newInstance((String) null);
+                } else {
+                    transformer = transformerClass.newInstance();
+                }
+                transformers.add(transformer);
+            }
         }
 
         @Override

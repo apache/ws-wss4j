@@ -35,7 +35,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
     private static final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
     static {
-        xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+        xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
     }
 
     public FinalOutputProcessor(OutputStream outputStream, String encoding, SecurityProperties securityProperties) throws WSSecurityException {

@@ -18,11 +18,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.ext.*;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of a OutputProcessorChain
@@ -37,6 +39,9 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     private List<OutputProcessor> outputProcessors = Collections.synchronizedList(new ArrayList<OutputProcessor>());
     private int startPos = 0;
     private int curPos = 0;
+
+    private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
+    private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
 
     private SecurityContext securityContext;
     private DocumentContextImpl documentContext;
@@ -85,6 +90,22 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     private void setOutputProcessors(List<OutputProcessor> outputProcessors) {
         this.outputProcessors = outputProcessors;
+    }
+
+    private ArrayDeque<List<ComparableNamespace>> getNsStack() {
+        return nsStack.clone();
+    }
+
+    private void setNsStack(ArrayDeque<List<ComparableNamespace>> nsStack) {
+        this.nsStack = nsStack;
+    }
+
+    private ArrayDeque<List<ComparableAttribute>> getAttrStack() {
+        return attrStack;
+    }
+
+    private void setAttrStack(ArrayDeque<List<ComparableAttribute>> attrStack) {
+        this.attrStack = attrStack.clone();
     }
 
     public void addProcessor(OutputProcessor newOutputProcessor) {
@@ -177,6 +198,14 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException {
+        if (this.curPos == this.startPos) {
+            xmlEvent = createXMLEventNS(xmlEvent);
+            if (xmlEvent.isStartElement()) {
+                getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+            } else if (xmlEvent.isEndElement()) {
+                getDocumentContext().removePathElement();
+            }
+        }
         outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
     }
 
@@ -189,6 +218,72 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContext, documentContext.clone(),
                 outputProcessors.indexOf(outputProcessor) + 1);
         outputProcessorChain.setOutputProcessors(this.outputProcessors);
+        outputProcessorChain.setNsStack(getNsStack());
+        outputProcessorChain.setAttrStack(getAttrStack());
         return outputProcessorChain;
+    }
+
+    private XMLEvent createXMLEventNS(XMLEvent xmlEvent) {
+        if (xmlEvent.isStartElement()) {
+            StartElement startElement = xmlEvent.asStartElement();
+            QName startElementName = startElement.getName();
+
+            List<String> prefixList = new LinkedList<String>();
+            prefixList.add(startElementName.getPrefix());
+
+            List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
+
+            ComparableNamespace curElementNamespace = new ComparableNamespace(startElementName.getPrefix(), startElementName.getNamespaceURI());
+            comparableNamespaceList.add(curElementNamespace);
+
+            Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
+            while (namespaceIterator.hasNext()) {
+                Namespace namespace = namespaceIterator.next();
+                String prefix = namespace.getPrefix();
+
+                if (prefix != null && prefix.length() == 0 && namespace.getNamespaceURI().length() == 0) {
+                    continue;
+                }
+
+                if (!prefixList.contains(prefix)) {
+                    prefixList.add(prefix);
+                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, namespace.getNamespaceURI());
+                    comparableNamespaceList.add(tmpNameSpace);
+                }
+            }
+
+            List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
+
+            Iterator<Attribute> attributeIterator = startElement.getAttributes();
+            while (attributeIterator.hasNext()) {
+                Attribute attribute = attributeIterator.next();
+                String prefix = attribute.getName().getPrefix();
+
+                if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
+                    continue;
+                }
+                if ("xml".equals(prefix)) {
+                    continue;
+                }
+
+                comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
+
+                //does an attribute have an namespace?
+                if (!prefixList.contains(prefix)) {
+                    prefixList.add(prefix);
+                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, attribute.getName().getNamespaceURI());
+                    comparableNamespaceList.add(tmpNameSpace);
+                }
+            }
+
+            nsStack.push(comparableNamespaceList);
+            attrStack.push(comparableAttributeList);
+
+            return new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+        } else if (xmlEvent.isEndElement()) {
+            nsStack.pop();
+            attrStack.pop();
+        }
+        return xmlEvent;
     }
 }

@@ -14,7 +14,6 @@
  */
 package org.swssf.impl;
 
-import org.swssf.ext.Constants;
 import org.swssf.ext.OutputProcessorChain;
 import org.swssf.ext.WSSecurityException;
 
@@ -24,6 +23,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
 import java.util.*;
@@ -37,22 +37,15 @@ import java.util.*;
 public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
-    XMLEventNSAllocator xmlEventNSAllocator = new XMLEventNSAllocator();
 
     private OutputProcessorChain outputProcessorChain;
 
     public XMLSecurityStreamWriter(OutputProcessorChain outputProcessorChain) {
         this.outputProcessorChain = outputProcessorChain;
-        this.outputProcessorChain.getSecurityContext().put(Constants.XMLEVENT_NS_ALLOCATOR, xmlEventNSAllocator);
     }
 
     private void chainProcessEvent(XMLEvent xmlEvent) throws XMLStreamException {
         try {
-            if (xmlEvent.isStartElement()) {
-                outputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
-            } else if (xmlEvent.isEndElement()) {
-                outputProcessorChain.getDocumentContext().removePathElement();
-            }
             outputProcessorChain.reset();
             outputProcessorChain.processEvent(xmlEvent);
         } catch (WSSecurityException e) {
@@ -71,7 +64,8 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
             //chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
             //add namespace of current element to the list (important for C14N)
             //currentNamespaces.add(xmlEventNSAllocator.createNamespace(openStartElement.getPrefix(), openStartElement.getNamespaceURI()));
-            chainProcessEvent(xmlEventNSAllocator.createStartElement(openStartElement, currentNamespaces, currentAttributes));
+            //chainProcessEvent(xmlEventNSAllocator.createStartElement(openStartElement, currentNamespaces, currentAttributes));
+            chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
             currentAttributes.clear();
             currentNamespaces.clear();
             openStartElement = null;
@@ -131,14 +125,19 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public void writeEndElement() throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventNSAllocator.createEndElement(startElementStack.pop()));
+
+        List<Namespace> namespaceList = new LinkedList<Namespace>();
+        QName element = startElementStack.pop();
+        namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
+        EndElement endElement = xmlEventFactory.createEndElement(element, namespaceList.iterator());
+        chainProcessEvent(endElement);
     }
 
     public void writeEndDocument() throws XMLStreamException {
         outputOpenStartElement();
         Iterator<QName> startElements = startElementStack.iterator();
         while (startElements.hasNext()) {
-            chainProcessEvent(xmlEventNSAllocator.createEndElement(startElementStack.pop()));
+            chainProcessEvent(xmlEventFactory.createEndElement(startElementStack.pop(), null));
         }
     }
 

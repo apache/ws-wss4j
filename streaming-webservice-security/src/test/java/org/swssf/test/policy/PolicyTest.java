@@ -59,7 +59,6 @@ public class PolicyTest extends AbstractTestBase {
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
 
-
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());

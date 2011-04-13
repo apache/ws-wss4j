@@ -18,11 +18,11 @@ import com.ctc.wstx.api.WstxInputProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.handler.WSS4JHandler;
+import org.apache.ws.security.action.SignatureAction;
+import org.apache.ws.security.handler.*;
+import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.swssf.WSSec;
@@ -119,7 +119,7 @@ public abstract class AbstractTestBase {
         return (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
     }
 
-    protected MessageContext doOutboundSecurityWithWSS4J_1(InputStream sourceDocument, String action, Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
+    protected MessageContext doOutboundSecurityWithWSS4J_1(InputStream sourceDocument, String action, final Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
         WSS4JHandler wss4JHandler = new WSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
@@ -155,6 +155,48 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setAction(new Integer(WSConstants.SIGN), new SignatureAction() {
+            @Override
+            public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData) throws org.apache.ws.security.WSSecurityException {
+                String password =
+                        handler.getPassword(
+                                reqData.getSignatureUser(),
+                                actionToDo,
+                                WSHandlerConstants.PW_CALLBACK_CLASS,
+                                WSHandlerConstants.PW_CALLBACK_REF, reqData
+                        ).getPassword();
+
+                WSSecSignature wsSign = new WSSecSignature();
+                wsSign.setWsConfig(reqData.getWssConfig());
+
+                if (reqData.getSigKeyId() != 0) {
+                    wsSign.setKeyIdentifierType(reqData.getSigKeyId());
+                }
+                if (reqData.getSigAlgorithm() != null) {
+                    wsSign.setSignatureAlgorithm(reqData.getSigAlgorithm());
+                }
+                if (reqData.getSigDigestAlgorithm() != null) {
+                    wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
+                }
+                if (properties.getProperty("CanonicalizationAlgo") != null) {
+                    wsSign.setSigCanonicalization(properties.getProperty("CanonicalizationAlgo"));
+                }
+
+                wsSign.setUserInfo(reqData.getSignatureUser(), password);
+                if (reqData.getSignatureParts().size() > 0) {
+                    wsSign.setParts(reqData.getSignatureParts());
+                }
+
+                try {
+                    wsSign.build(doc, reqData.getSigCrypto(), reqData.getSecHeader());
+                    reqData.getSignatureValues().add(wsSign.getSignatureValue());
+                } catch (org.apache.ws.security.WSSecurityException e) {
+                    throw new org.apache.ws.security.WSSecurityException("Error during Signature: ", e);
+                }
+            }
+        });
+        requestData.setWssConfig(wssConfig);
         wss4JHandler.doSender(messageContext, requestData, true);
 
         return messageContext;

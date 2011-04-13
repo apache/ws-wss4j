@@ -23,6 +23,7 @@ import org.xmlsecurity.ns.configuration.SecurityHeaderHandlersType;
 import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Security-header handler mapper
@@ -34,36 +35,34 @@ public class SecurityHeaderHandlerMapper {
 
     private static final transient Log logger = LogFactory.getLog(SecurityHeaderHandlerMapper.class);
 
-    private static HashMap<QName, HandlerType> handlerMap;
+    private static Map<QName, HandlerType> handlerMap;
+    private static Map<QName, Class> handlerClassMap;
 
     private SecurityHeaderHandlerMapper() {
     }
 
     protected static void init(SecurityHeaderHandlersType securityHeaderHandlersType) throws Exception {
         handlerMap = new HashMap<QName, HandlerType>();
+        handlerClassMap = new HashMap<QName, Class>();
         List<HandlerType> handlerList = securityHeaderHandlersType.getHandler();
         for (int i = 0; i < handlerList.size(); i++) {
             HandlerType handlerType = handlerList.get(i);
-            handlerMap.put(new QName(handlerType.getURI(), handlerType.getNAME()), handlerType);
+            QName qName = new QName(handlerType.getURI(), handlerType.getNAME());
+            handlerMap.put(qName, handlerType);
+            handlerClassMap.put(qName, Utils.loadClass(handlerType.getJAVACLASS()));
         }
     }
 
     public static Class getSecurityHeaderHandler(QName name) {
-        HandlerType handlerType = handlerMap.get(name);
-        if (handlerType == null) {
+        Class clazz = handlerClassMap.get(name);
+        if (clazz == null) {
             logger.warn("No handler for " + name + " found");
             return null;
         }
-        String javaClass = handlerType.getJAVACLASS();
-        if (javaClass == null) {
-            logger.warn("No handler for " + name + " found");
-            return null;
-        }
-        try {
-            return Utils.loadClass(javaClass);
-        } catch (ClassNotFoundException e) {
-            logger.warn("No handler for " + name + " found: " + e.getMessage());
-        }
-        return null;
+        return clazz;
+    }
+
+    public static HandlerType getHandlerMapping(QName name) {
+        return handlerMap.get(name);
     }
 }

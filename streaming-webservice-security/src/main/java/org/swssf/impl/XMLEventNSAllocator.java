@@ -20,17 +20,15 @@ import org.swssf.ext.ComparableNamespace;
 import org.swssf.ext.XMLEventNS;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.util.XMLEventAllocator;
 import javax.xml.stream.util.XMLEventConsumer;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * todo this class needs some love...
@@ -46,7 +44,6 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
     private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
     private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
-    private static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
 
     public XMLEventNSAllocator() {
     }
@@ -64,6 +61,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
         if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
 
             List<ComparableNamespace> namespaceList = new LinkedList<ComparableNamespace>();
+
             for (int i = 0; i < reader.getNamespaceCount(); i++) {
                 ComparableNamespace namespace;
                 if (reader.getNamespacePrefix(i) == null) {
@@ -110,149 +108,5 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
     public void allocate(XMLStreamReader reader, XMLEventConsumer consumer) throws XMLStreamException {
         xmlEventAllocator.allocate(reader, consumer);
-    }
-
-
-    /*
-        Begin allocation methods for output-processors
-     */
-
-    public XMLEvent createStartElement(QName element, Map<QName, String> attributes) throws XMLStreamException {
-
-        List<String> prefixList = new LinkedList<String>();
-        prefixList.add(element.getPrefix());
-
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
-        ComparableNamespace curElementNamespace = new ComparableNamespace(element.getPrefix(), element.getNamespaceURI());
-        namespaceList.add(curElementNamespace);
-
-        List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
-        comparableNamespaceList.add(curElementNamespace);
-
-        List<Attribute> attributeList = new LinkedList<Attribute>();
-        List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
-
-        if (attributes != null) {
-            Iterator<Map.Entry<QName, String>> attributesEntrySet = attributes.entrySet().iterator();
-            while (attributesEntrySet.hasNext()) {
-                Map.Entry<QName, String> qNameStringEntry = attributesEntrySet.next();
-                ComparableAttribute attribute = new ComparableAttribute(qNameStringEntry.getKey(), qNameStringEntry.getValue());
-                attributeList.add(attribute);
-                comparableAttributeList.add(attribute);
-                String prefix = qNameStringEntry.getKey().getPrefix();
-                if (!prefixList.contains(prefix)) {
-                    /*
-                    if (prefix != null && "".equals(prefix) && "".equals(attribute.getName().getNamespaceURI())) {
-                        continue;
-                    }
-                    */
-                    if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
-                        continue;
-                    }
-
-                    prefixList.add(prefix);
-                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, qNameStringEntry.getKey().getNamespaceURI());
-                    namespaceList.add(tmpNameSpace);
-                    comparableNamespaceList.add(tmpNameSpace);
-                }
-            }
-        }
-
-        nsStack.push(comparableNamespaceList);
-        attrStack.push(comparableAttributeList);
-
-        //return Constants.xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator());
-        return new XMLEventNS(xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-    }
-
-    public XMLEvent createStartElement(QName element, List<Namespace> namespaces, List<Attribute> attributes) throws XMLStreamException {
-
-        List<String> prefixList = new LinkedList<String>();
-        prefixList.add(element.getPrefix());
-
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
-        List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
-
-        ComparableNamespace curElementNamespace = new ComparableNamespace(element.getPrefix(), element.getNamespaceURI());
-        namespaceList.add(curElementNamespace);
-        comparableNamespaceList.add(curElementNamespace);
-
-        Iterator<Namespace> namespaceIterator = namespaces.iterator();
-        while (namespaceIterator.hasNext()) {
-            Namespace namespace = namespaceIterator.next();
-            String prefix = namespace.getPrefix();
-
-            /*
-            if (prefix != null && "".equals(prefix) && "".equals(namespace.getNamespaceURI())) {
-                continue;
-            }
-            */
-            if (prefix != null && prefix.length() == 0 && namespace.getNamespaceURI().length() == 0) {
-                continue;
-            }
-
-            if (!prefixList.contains(prefix)) {
-                prefixList.add(prefix);
-                ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, namespace.getNamespaceURI());
-                namespaceList.add(tmpNameSpace);
-                comparableNamespaceList.add(tmpNameSpace);
-            }
-        }
-
-        List<Attribute> attributeList = new LinkedList<Attribute>();
-        List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
-
-        Iterator<Attribute> attributeIterator = attributes.iterator();
-        while (attributeIterator.hasNext()) {
-            Attribute attribute = attributeIterator.next();
-            attributeList.add(attribute);
-            comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
-            String prefix = attribute.getName().getPrefix();
-
-            /*
-            if (prefix != null && "".equals(prefix) && "".equals(attribute.getName().getNamespaceURI())) {
-                continue;
-            }
-            */
-            if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
-                continue;
-            }
-
-            if (!prefixList.contains(prefix)) {
-                prefixList.add(prefix);
-                ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, attribute.getName().getNamespaceURI());
-                namespaceList.add(tmpNameSpace);
-                comparableNamespaceList.add(tmpNameSpace);
-            }
-        }
-
-        nsStack.push(comparableNamespaceList);
-        attrStack.push(comparableAttributeList);
-        //todo we have a little problem;-) every call to createStartElement methods must have an equivalent call to createEndElement to hold the stack small and correct!!   
-        return new XMLEventNS(xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-    }
-
-    public XMLEvent createEndElement(QName element) {
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
-        namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
-
-        XMLEventNS xmlEventNS = new XMLEventNS(xmlEventFactory.createEndElement(element, namespaceList.iterator()), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-
-        nsStack.pop();
-        attrStack.pop();
-
-        return xmlEventNS;
-    }
-
-    public Characters createCharacters(String characters) {
-        return xmlEventFactory.createCharacters(characters);
-    }
-
-    public Attribute createAttribute(QName attribute, String attributeValue) {
-        return xmlEventFactory.createAttribute(attribute, attributeValue);
-    }
-
-    public Namespace createNamespace(String prefix, String uri) {
-        return xmlEventFactory.createNamespace(prefix, uri);
     }
 }

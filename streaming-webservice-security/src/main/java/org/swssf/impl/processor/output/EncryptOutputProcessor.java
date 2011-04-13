@@ -18,7 +18,6 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.EncryptionPartDef;
-import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.util.TrimmerOutputStream;
 
 import javax.crypto.Cipher;
@@ -113,7 +112,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                                 getSecurityProperties(),
                                                 encryptionPartDef,
                                                 startElement,
-                                                outputProcessorChain.getSecurityContext().<XMLEventNSAllocator>get(Constants.XMLEVENT_NS_ALLOCATOR),
                                                 outputProcessorChain.getDocumentContext().getEncoding()
                                         );
                             } catch (NoSuchAlgorithmException e) {
@@ -143,7 +141,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
      */
     class InternalEncryptionOutputProcessor extends AbstractOutputProcessor {
 
-        private XMLEventNSAllocator xmlEventNSAllocator;
         private EncryptionPartDef encryptionPartDef;
         private CharacterEventGeneratorOutputStream characterEventGeneratorOutputStream;
         //private Writer streamWriter;
@@ -153,16 +150,16 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private StartElement startElement;
         private int elementCounter = 0;
         private boolean doEncryptedHeader = false;
+        private OutputProcessorChain subOutputProcessorChain;
 
         InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef,
-                                          StartElement startElement, XMLEventNSAllocator xmlEventNSAllocator, String encoding)
-                throws WSSecurityException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
+                                          StartElement startElement, String encoding)
+                throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
             super(securityProperties);
             this.getBeforeProcessors().add(EncryptEndingOutputProcessor.class.getName());
             this.getBeforeProcessors().add(InternalEncryptionOutputProcessor.class.getName());
             this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
-            this.xmlEventNSAllocator = xmlEventNSAllocator;
             this.encryptionPartDef = encryptionPartDef;
             this.startElement = startElement;
 
@@ -174,7 +171,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             symmetricCipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
             byte[] iv = symmetricCipher.getIV();
 
-            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(xmlEventNSAllocator, encoding);
+            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(encoding);
             //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
             Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
             base64EncoderStream.write(iv);
@@ -200,15 +197,15 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 if (startElement.getName().equals(this.startElement.getName()) && elementCounter == 0) {
                     //if the user selected element encryption we have to encrypt the current element-event...
                     if (encryptionPartDef.getModifier() == SecurePart.Modifier.Element) {
-                        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                        subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         processEventInternal(subOutputProcessorChain);
                         //encrypt the current element event
                         encryptEvent(xmlEvent);
 
                     } //...the user selected content encryption, so we let pass this event as usual  
                     else if (encryptionPartDef.getModifier() == SecurePart.Modifier.Content) {
-                        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                        outputAsEvent(subOutputProcessorChain, xmlEvent);
+                        outputProcessorChain.processEvent(xmlEvent);
+                        subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                         processEventInternal(subOutputProcessorChain);
                     }
                 } else {
@@ -223,7 +220,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 EndElement endElement = xmlEvent.asEndElement();
 
                 if (endElement.getName().equals(this.startElement.getName()) && elementCounter == 0) {
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     if (encryptionPartDef.getModifier() == SecurePart.Modifier.Element) {
                         encryptEvent(xmlEvent);
                         doFinalInternal(subOutputProcessorChain);
@@ -232,6 +228,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                         outputAsEvent(subOutputProcessorChain, xmlEvent);
                     }
                     subOutputProcessorChain.removeProcessor(this);
+                    subOutputProcessorChain = null;
                     //from now on encryption is possible again
                     activeInternalEncryptionOutputProcessor = null;
 
@@ -244,7 +241,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 encryptEvent(xmlEvent);
 
                 //push all buffered encrypted character events through the chain
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 Iterator<Characters> charactersIterator = characterEventGeneratorOutputStream.getCharactersBuffer().iterator();
                 while (charactersIterator.hasNext()) {
                     Characters characters = charactersIterator.next();
@@ -323,7 +319,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 </xenc:CipherData>
             </xenc:EncryptedData>
              */
-            // outputProcessorChain.processHeaderEvent(xmlEvent);
         }
 
         private void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
@@ -361,11 +356,9 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
     class CharacterEventGeneratorOutputStream extends OutputStream {
 
         private List<Characters> charactersBuffer = new Vector<Characters>();
-        private XMLEventNSAllocator xmlEventNSAllocator;
         private String encoding;
 
-        CharacterEventGeneratorOutputStream(XMLEventNSAllocator xmlEventNSAllocator, String encoding) {
-            this.xmlEventNSAllocator = xmlEventNSAllocator;
+        CharacterEventGeneratorOutputStream(String encoding) {
             this.encoding = encoding;
         }
 
@@ -375,17 +368,17 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
         @Override
         public void write(int b) throws IOException {
-            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(new byte[]{((byte) b)}, encoding)).asCharacters());
+            charactersBuffer.add(createCharacters(new String(new byte[]{((byte) b)}, encoding)).asCharacters());
         }
 
         @Override
         public void write(byte[] b) throws IOException {
-            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(b, encoding)).asCharacters());
+            charactersBuffer.add(createCharacters(new String(b, encoding)).asCharacters());
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            charactersBuffer.add(xmlEventNSAllocator.createCharacters(new String(b, off, len, encoding)).asCharacters());
+            charactersBuffer.add(createCharacters(new String(b, off, len, encoding)).asCharacters());
         }
     }
 }
