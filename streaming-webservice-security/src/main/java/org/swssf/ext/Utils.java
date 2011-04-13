@@ -19,11 +19,19 @@ import org.apache.commons.codec.binary.Base64;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author $Author: giger $
@@ -131,5 +139,72 @@ public class Utils {
         } catch (UnsupportedEncodingException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
         }
+    }
+
+    public static XMLEvent createXMLEventNS(XMLEvent xmlEvent, Deque<List<ComparableNamespace>> nsStack, Deque<List<ComparableAttribute>> attrStack) {
+        if (xmlEvent.isStartElement()) {
+            StartElement startElement = xmlEvent.asStartElement();
+            QName startElementName = startElement.getName();
+
+            List<String> prefixList = new LinkedList<String>();
+            prefixList.add(startElementName.getPrefix());
+
+            List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
+
+            ComparableNamespace curElementNamespace = new ComparableNamespace(startElementName.getPrefix(), startElementName.getNamespaceURI());
+            comparableNamespaceList.add(curElementNamespace);
+
+            Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
+            while (namespaceIterator.hasNext()) {
+                Namespace namespace = namespaceIterator.next();
+                String prefix = namespace.getPrefix();
+
+                if (prefix != null && prefix.length() == 0 && namespace.getNamespaceURI().length() == 0) {
+                    continue;
+                }
+
+                if (!prefixList.contains(prefix)) {
+                    prefixList.add(prefix);
+                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, namespace.getNamespaceURI());
+                    comparableNamespaceList.add(tmpNameSpace);
+                }
+            }
+
+            List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
+
+            Iterator<Attribute> attributeIterator = startElement.getAttributes();
+            while (attributeIterator.hasNext()) {
+                Attribute attribute = attributeIterator.next();
+                String prefix = attribute.getName().getPrefix();
+
+                if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
+                    continue;
+                }
+                if (!"xml".equals(prefix)) {
+                    if (!"".equals(prefix)) {
+                        //does an attribute have an namespace?
+                        if (!prefixList.contains(prefix)) {
+                            prefixList.add(prefix);
+                            ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, attribute.getName().getNamespaceURI());
+                            comparableNamespaceList.add(tmpNameSpace);
+                        }
+                        continue;
+                    }
+                }
+                //add all attrs with xml - prefix (eg. xml:lang to attr list;
+                comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
+            }
+
+            nsStack.push(comparableNamespaceList);
+            attrStack.push(comparableAttributeList);
+
+            return new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+        } else if (xmlEvent.isEndElement()) {
+            XMLEventNS xmlEventNS = new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
+            nsStack.pop();
+            attrStack.pop();
+            return xmlEventNS;
+        }
+        return xmlEvent;
     }
 }

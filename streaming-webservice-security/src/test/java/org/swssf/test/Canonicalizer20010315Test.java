@@ -14,10 +14,10 @@
  */
 package org.swssf.test;
 
-import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315OmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315WithCommentsTransformer;
+import org.swssf.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.Test;
 
 import javax.xml.stream.XMLEventReader;

@@ -36,7 +36,7 @@ import java.util.*;
  */
 public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
-    XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
+    private XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
 
     private OutputProcessorChain outputProcessorChain;
 
@@ -60,11 +60,6 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private void outputOpenStartElement() throws XMLStreamException {
         if (openStartElement != null) {
-            //todo replace all create" methods calls in this class with an delegate to XMLEventNSAllocator
-            //chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
-            //add namespace of current element to the list (important for C14N)
-            //currentNamespaces.add(xmlEventNSAllocator.createNamespace(openStartElement.getPrefix(), openStartElement.getNamespaceURI()));
-            //chainProcessEvent(xmlEventNSAllocator.createStartElement(openStartElement, currentNamespaces, currentAttributes));
             chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
             currentAttributes.clear();
             currentNamespaces.clear();

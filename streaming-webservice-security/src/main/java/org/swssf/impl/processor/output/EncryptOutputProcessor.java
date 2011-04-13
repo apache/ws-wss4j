@@ -181,7 +181,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
             //we create a new StAX writer for optimized namespace writing.
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-            xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+            xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
             //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream, "UTF-8");
             //we have to output a fake element to workaround text-only encryption:

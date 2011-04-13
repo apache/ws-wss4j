@@ -15,9 +15,9 @@
 package org.swssf.test;
 
 import org.swssf.ext.Constants;
-import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclWithCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315WithCommentsTransformer;
+import org.swssf.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

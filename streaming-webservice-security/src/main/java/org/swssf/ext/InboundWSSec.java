@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.impl.DocumentContextImpl;
 import org.swssf.impl.InputProcessorChainImpl;
-import org.swssf.impl.XMLEventNSAllocator;
 import org.swssf.impl.XMLSecurityStreamReader;
 import org.swssf.impl.processor.input.LogInputProcessor;
 import org.swssf.impl.processor.input.SecurityHeaderInputProcessor;
@@ -100,7 +99,6 @@ public class InboundWSSec {
         final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-        xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
         securityContextImpl.put(Constants.XMLINPUTFACTORY, xmlInputFactory);
         final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);
 

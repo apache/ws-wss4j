@@ -18,13 +18,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.ext.*;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implementation of a OutputProcessorChain
@@ -199,7 +198,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException {
         if (this.curPos == this.startPos) {
-            xmlEvent = createXMLEventNS(xmlEvent);
+            xmlEvent = Utils.createXMLEventNS(xmlEvent, nsStack, attrStack);
             if (xmlEvent.isStartElement()) {
                 getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
             } else if (xmlEvent.isEndElement()) {
@@ -221,69 +220,5 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         outputProcessorChain.setNsStack(getNsStack());
         outputProcessorChain.setAttrStack(getAttrStack());
         return outputProcessorChain;
-    }
-
-    private XMLEvent createXMLEventNS(XMLEvent xmlEvent) {
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            QName startElementName = startElement.getName();
-
-            List<String> prefixList = new LinkedList<String>();
-            prefixList.add(startElementName.getPrefix());
-
-            List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
-
-            ComparableNamespace curElementNamespace = new ComparableNamespace(startElementName.getPrefix(), startElementName.getNamespaceURI());
-            comparableNamespaceList.add(curElementNamespace);
-
-            Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
-            while (namespaceIterator.hasNext()) {
-                Namespace namespace = namespaceIterator.next();
-                String prefix = namespace.getPrefix();
-
-                if (prefix != null && prefix.length() == 0 && namespace.getNamespaceURI().length() == 0) {
-                    continue;
-                }
-
-                if (!prefixList.contains(prefix)) {
-                    prefixList.add(prefix);
-                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, namespace.getNamespaceURI());
-                    comparableNamespaceList.add(tmpNameSpace);
-                }
-            }
-
-            List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
-
-            Iterator<Attribute> attributeIterator = startElement.getAttributes();
-            while (attributeIterator.hasNext()) {
-                Attribute attribute = attributeIterator.next();
-                String prefix = attribute.getName().getPrefix();
-
-                if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
-                    continue;
-                }
-                if ("xml".equals(prefix)) {
-                    continue;
-                }
-
-                comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
-
-                //does an attribute have an namespace?
-                if (!prefixList.contains(prefix)) {
-                    prefixList.add(prefix);
-                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, attribute.getName().getNamespaceURI());
-                    comparableNamespaceList.add(tmpNameSpace);
-                }
-            }
-
-            nsStack.push(comparableNamespaceList);
-            attrStack.push(comparableAttributeList);
-
-            return new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-        } else if (xmlEvent.isEndElement()) {
-            nsStack.pop();
-            attrStack.pop();
-        }
-        return xmlEvent;
     }
 }

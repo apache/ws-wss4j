@@ -44,8 +44,6 @@ import java.util.Properties;
  */
 public class SignatureTest extends AbstractTestBase {
 
-    //todo C14N inclusive
-
     @Test
     public void testSignatureDefaultConfigurationOutbound() throws Exception {
 

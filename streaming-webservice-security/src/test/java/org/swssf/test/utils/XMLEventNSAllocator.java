@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.swssf.impl;
+package org.swssf.test.utils;
 
 import com.ctc.wstx.evt.DefaultEventAllocator;
 import org.swssf.ext.ComparableAttribute;
@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * todo this class needs some love...
  * <p/>
  * An extended XMLEventAllocator to collect namespaces and C14N relevant attributes
  *
@@ -60,50 +59,60 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
     public XMLEvent allocate(XMLStreamReader reader) throws XMLStreamException {
         if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
 
-            List<ComparableNamespace> namespaceList = new LinkedList<ComparableNamespace>();
+            List<String> prefixList = new LinkedList<String>();
+            prefixList.add(reader.getPrefix());
+
+            List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
+
+            //add current nsto the list
+            ComparableNamespace curElementNamespace = new ComparableNamespace(reader.getName().getPrefix(), reader.getName().getNamespaceURI());
+            comparableNamespaceList.add(curElementNamespace);
 
             for (int i = 0; i < reader.getNamespaceCount(); i++) {
-                ComparableNamespace namespace;
-                if (reader.getNamespacePrefix(i) == null) {
-                    namespace = new ComparableNamespace(reader.getNamespaceURI(i));
-                } else {
-                    namespace = new ComparableNamespace(reader.getNamespacePrefix(i), reader.getNamespaceURI(i));
+                String prefix = reader.getNamespacePrefix(i);
+                String namespaceURI = reader.getNamespaceURI(i);
+                if (prefix != null && prefix.length() == 0 && namespaceURI.length() == 0) {
+                    continue;
                 }
-                namespaceList.add(namespace);
+
+                if (!prefixList.contains(prefix)) {
+                    prefixList.add(prefix);
+                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, namespaceURI);
+                    comparableNamespaceList.add(tmpNameSpace);
+                }
             }
 
-            List<ComparableAttribute> attributeList = new LinkedList<ComparableAttribute>();
+            List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
+
             for (int i = 0; i < reader.getAttributeCount(); i++) {
                 QName attrName = reader.getAttributeName(i);
+
+                if (attrName.getPrefix() != null && attrName.getPrefix().length() == 0 && attrName.getNamespaceURI().length() == 0) {
+                    continue;
+                }
+
                 if (!"xml".equals(attrName.getPrefix())) {
                     if (!"".equals(attrName.getPrefix())) {
                         ComparableNamespace comparableNamespace = new ComparableNamespace(attrName.getPrefix(), attrName.getNamespaceURI());
-                        namespaceList.add(comparableNamespace);
+                        comparableNamespaceList.add(comparableNamespace);
                     }
                     continue;
                 }
                 //add all attrs with xml - prefix (eg. xml:lang to attr list;
-                ComparableAttribute attribute = new ComparableAttribute(attrName, reader.getAttributeValue(i));
-                attributeList.add(attribute);
+                comparableAttributeList.add(new ComparableAttribute(attrName, reader.getAttributeValue(i)));
             }
-            attrStack.push(attributeList);
 
-            //add current ns also to the list if not already there
-            ComparableNamespace comparableNamespace = new ComparableNamespace(reader.getName().getPrefix(), reader.getName().getNamespaceURI());
-            if (!namespaceList.contains(comparableNamespace)) {
-                namespaceList.add(comparableNamespace);
-            }
-            nsStack.push(namespaceList);
+            attrStack.push(comparableAttributeList);
+            nsStack.push(comparableNamespaceList);
 
             return new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-
         } else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT) {
             XMLEventNS xmlEventNS = new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
             nsStack.pop();
             attrStack.pop();
             return xmlEventNS;
         }
-        return new XMLEventNS(xmlEventAllocator.allocate(reader), null, null);
+        return xmlEventAllocator.allocate(reader);
     }
 
     public void allocate(XMLStreamReader reader, XMLEventConsumer consumer) throws XMLStreamException {

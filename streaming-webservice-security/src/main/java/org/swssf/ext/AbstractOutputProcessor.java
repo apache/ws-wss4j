@@ -74,12 +74,11 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return securityProperties;
     }
 
-    protected XMLEvent cloneStartElementEvent(XMLEvent xmlEvent, List<Attribute> attributeList) throws XMLStreamException {
-        if (!xmlEvent.isStartElement()) {
-            return xmlEvent;
-        }
-
+    protected XMLEventNS cloneStartElementEvent(XMLEvent xmlEvent, List<Attribute> attributeList) throws XMLStreamException {
         XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
+        if (!xmlEvent.isStartElement()) {
+            return xmlEventNS;
+        }
 
         List<ComparableNamespace>[] xmlEventNSNamespaces = xmlEventNS.getNamespaceList();
         List<ComparableAttribute>[] xmlEventNsAttributes = xmlEventNS.getAttributeList();
@@ -112,9 +111,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
         StartElement startElement = xmlEventFactory.createStartElement(xmlEvent.asStartElement().getName(), attributeList.iterator(), namespaceList.iterator());
 
-        xmlEvent = new XMLEventNS(startElement, xmlEventNSNamespaces, xmlEventNsAttributes);
-
-        return xmlEvent;
+        return new XMLEventNS(startElement, xmlEventNSNamespaces, xmlEventNsAttributes);
     }
 
     protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, WSSecurityException {

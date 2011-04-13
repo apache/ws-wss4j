@@ -151,9 +151,19 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "duplicateId");
                             }
 
+                            XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
+                            List<ComparableNamespace>[] comparableNamespaceList;
+                            List<ComparableAttribute>[] comparableAttributeList;
+
                             if (encryptedHeader) {
                                 tmpXmlEventList.clear();
                                 inputProcessorChain.getDocumentContext().removePathElement();
+
+                                comparableNamespaceList = Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 2, xmlEventNS.getNamespaceList().length);
+                                comparableAttributeList = Arrays.copyOfRange(xmlEventNS.getAttributeList(), 2, xmlEventNS.getNamespaceList().length);
+                            } else {
+                                comparableNamespaceList = Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 1, xmlEventNS.getNamespaceList().length);
+                                comparableAttributeList = Arrays.copyOfRange(xmlEventNS.getAttributeList(), 1, xmlEventNS.getNamespaceList().length);
                             }
 
                             EncryptedDataType currentEncryptedDataType = new EncryptedDataType(startElement);
@@ -211,13 +221,13 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             //create a new Thread for streaming decryption
                             DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent,
-                                    currentEncryptedDataType, (XMLEventNS) xmlEvent);
+                                    currentEncryptedDataType, xmlEventNS);
 
                             Thread receiverThread = new Thread(decryptionThread);
                             receiverThread.setName("decrypting thread");
 
                             DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = new DecryptedEventReaderInputProcessor(getSecurityProperties(),
-                                    SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()), encryptedHeader);
+                                    SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()), encryptedHeader, comparableNamespaceList, comparableAttributeList);
 
                             //when an exception in the decryption thread occurs, we want to forward them:
                             receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
@@ -291,19 +301,29 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
     class DecryptedEventReaderInputProcessor extends AbstractInputProcessor implements Thread.UncaughtExceptionHandler {
 
         private XMLEventReader xmlEventReader;
+        private Deque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
+        private Deque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
         private SecurePart.Modifier encryptionModifier;
         private boolean encryptedHeader = false;
         private int documentLevel = 0;
 
         private boolean rootElementProcessed;
 
-        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, SecurePart.Modifier encryptionModifier, boolean encryptedHeader) {
+        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, SecurePart.Modifier encryptionModifier, boolean encryptedHeader, List<ComparableNamespace>[] namespaceList, List<ComparableAttribute>[] attributeList) {
             super(securityProperties);
             getAfterProcessors().add(DecryptInputProcessor.class.getName());
             getAfterProcessors().add(DecryptedEventReaderInputProcessor.class.getName());
             this.encryptionModifier = encryptionModifier;
             rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
             this.encryptedHeader = encryptedHeader;
+            for (int i = 0; i < namespaceList.length; i++) {
+                List<ComparableNamespace> namespaces = namespaceList[i];
+                nsStack.push(namespaces);
+            }
+            for (int i = 0; i < attributeList.length; i++) {
+                List<ComparableAttribute> attributes = attributeList[i];
+                attrStack.push(attributes);
+            }
         }
 
         public void setXmlEventReader(XMLEventReader xmlEventReader) {
@@ -327,7 +347,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             //instead from the processor-chain as we normally would do
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
 
-            //wrapper element skipping logic
             if (xmlEvent.isStartElement()) {
                 documentLevel++;
 
@@ -398,6 +417,9 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 documentLevel--;
             }
 
+            if (!(xmlEvent instanceof XMLEventNS)) {
+                xmlEvent = Utils.createXMLEventNS(xmlEvent, nsStack, attrStack);
+            }
             return xmlEvent;
         }
 
@@ -407,7 +429,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             this.thrownException = e;
         }
 
-        public void testAndThrowUncaughtException() throws XMLStreamException {
+        private void testAndThrowUncaughtException() throws XMLStreamException {
             if (this.thrownException != null) {
                 if (this.thrownException instanceof UncheckedWSSecurityException) {
                     UncheckedWSSecurityException uxse = (UncheckedWSSecurityException) this.thrownException;

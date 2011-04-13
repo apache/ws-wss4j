@@ -19,6 +19,9 @@ import org.swssf.ext.*;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
 
 /**
  * The XMLEventReaderInputProcessor reads requested XMLEvents from the original XMLEventReader
@@ -30,6 +33,8 @@ import javax.xml.stream.events.XMLEvent;
 public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
 
     private XMLEventReader xmlEventReader;
+    private Deque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
+    private Deque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
 
     public XMLEventReaderInputProcessor(SecurityProperties securityProperties, XMLEventReader xmlEventReader) {
         super(securityProperties);
@@ -48,7 +53,7 @@ public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
     }
 
     private XMLEvent processNextEventInternal(InputProcessorChain inputProcessorChain) throws XMLStreamException {
-        XMLEvent xmlEvent = xmlEventReader.nextEvent();
+        XMLEvent xmlEvent = Utils.createXMLEventNS(xmlEventReader.nextEvent(), nsStack, attrStack);
         if (xmlEvent.isStartElement()) {
             inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
         } else if (xmlEvent.isEndElement()) {

@@ -191,7 +191,6 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     outputProcessorChain.removeProcessor(this);
                     //from now on signature is possible again
                     activeInternalSignatureOutputProcessor = null;
-                    //todo the NSStack should be corrected...
                     xmlEvent = createEndElement(startElement);
                 }
             }
