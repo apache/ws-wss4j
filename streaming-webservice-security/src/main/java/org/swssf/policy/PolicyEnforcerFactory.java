@@ -39,7 +39,14 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -53,6 +60,7 @@ import java.util.*;
 public class PolicyEnforcerFactory {
 
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcerFactory.class);
+    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
 
     private Definition wsdlDefinition;
 
@@ -310,8 +318,20 @@ public class PolicyEnforcerFactory {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
         XMLStreamReader xmlStreamReader;
         try {
-            xmlStreamReader = xmlInputFactory.createXMLStreamReader(new DOMSource(element));
+            //because of old JAXP implementation in the jdk 1.6 we get the
+            //following exception when we try to create an XMLStreamReader from DOMSource:
+            //java.lang.UnsupportedOperationException: Cannot create XMLStreamReader or XMLEventReader from a javax.xml.transform.dom.DOMSource
+            //xmlStreamReader = xmlInputFactory.createXMLStreamReader(new DOMSource(element));
+            //so we serialize / deserialze the xml...
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(element), new StreamResult(baos));
+            xmlStreamReader = xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray()));
         } catch (XMLStreamException e) {
+            throw new WSSPolicyException(e.getMessage(), e);
+        } catch (TransformerConfigurationException e) {
+            throw new WSSPolicyException(e.getMessage(), e);
+        } catch (TransformerException e) {
             throw new WSSPolicyException(e.getMessage(), e);
         }
         OMElement omElement = OMXMLBuilderFactory.createStAXOMBuilder(OMAbstractFactory.getOMFactory(), xmlStreamReader).getDocumentElement();

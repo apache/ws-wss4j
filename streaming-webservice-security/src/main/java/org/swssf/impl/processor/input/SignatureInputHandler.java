@@ -14,7 +14,6 @@
  */
 package org.swssf.impl.processor.input;
 
-import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
@@ -191,7 +190,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
         public void doFinal() throws WSSecurityException {
             try {
                 bufferedSignerOutputStream.close();
-                if (!signerOutputStream.verify(Base64.decodeBase64(signatureType.getSignatureValue().getValue()))) {
+                if (!signerOutputStream.verify(signatureType.getSignatureValue().getValue())) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
             } catch (IOException e) {

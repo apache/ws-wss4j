@@ -132,7 +132,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
 
                             final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
                             //found means the prefix matched. so check the ns further
-                            if (found != null && comparableNamespace.getNamespaceURI().equals(found.getNamespaceURI())) {
+                            if (found != null && found.getNamespaceURI() != null && found.getNamespaceURI().equals(comparableNamespace.getNamespaceURI())) {
                                 continue;
                             }
 
@@ -169,7 +169,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                         ComparableNamespace namespace = namespaceIterator.next();
 
                         if (!namespaceIsAbsolute(namespace.getNamespaceURI())) {
-                            throw new XMLStreamException("namespace is relative encountered");
+                            throw new XMLStreamException("namespace is relative encountered: " + namespace.getNamespaceURI());
                         }
 
                         if (namespace.isDefaultNamespaceDeclaration()) {
@@ -229,7 +229,7 @@ public class Canonicalizer20010315Transformer implements Transformer {
                     UtfHelpper.writeStringToUtf8(localName, outputStream);
                     outputStream.write('>');
 
-                    //We fineshed with this level, pop to the previous definitions.
+                    //We finished with this level, pop to the previous definitions.
                     outputStack.pop();
                     if (outputStack.size() == 0) {
                         documentLevel = NODE_AFTER_DOCUMENT_ELEMENT;

@@ -14,12 +14,12 @@
  */
 package org.swssf.test.utils;
 
-import com.ctc.wstx.evt.DefaultEventAllocator;
 import org.swssf.ext.ComparableAttribute;
 import org.swssf.ext.ComparableNamespace;
 import org.swssf.ext.XMLEventNS;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -39,21 +39,35 @@ import java.util.List;
  */
 public class XMLEventNSAllocator implements XMLEventAllocator {
 
-    private XMLEventAllocator xmlEventAllocator = DefaultEventAllocator.getDefaultInstance();
+    private XMLEventAllocator xmlEventAllocator;
 
-    private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
-    private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
+    private ArrayDeque<List<ComparableNamespace>> nsStack;
+    private ArrayDeque<List<ComparableAttribute>> attrStack;
 
-    public XMLEventNSAllocator() {
+    public XMLEventNSAllocator() throws Exception {
+        this(new ArrayDeque<List<ComparableNamespace>>(10), new ArrayDeque<List<ComparableAttribute>>(10));
     }
 
-    private XMLEventNSAllocator(ArrayDeque<List<ComparableNamespace>> nsStack, ArrayDeque<List<ComparableAttribute>> attrStack) {
+    private XMLEventNSAllocator(ArrayDeque<List<ComparableNamespace>> nsStack, ArrayDeque<List<ComparableAttribute>> attrStack) throws Exception {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        if (xmlInputFactory.getClass().getName().equals("com.sun.xml.internal.stream.XMLInputFactoryImpl")) {
+            xmlEventAllocator = (XMLEventAllocator) Class.forName("com.sun.xml.internal.stream.events.XMLEventAllocatorImpl").newInstance();
+        } else if (xmlInputFactory.getClass().getName().equals("com.ctc.wstx.stax.WstxInputFactory")) {
+            xmlEventAllocator = (XMLEventAllocator) Class.forName("com.ctc.wstx.evt.DefaultEventAllocator").getMethod("getDefaultInstance").invoke(null);
+        } else {
+            throw new Exception("Unknown XMLEventAllocator");
+        }
+
         this.nsStack = nsStack;
         this.attrStack = attrStack;
     }
 
     public XMLEventAllocator newInstance() {
-        return new XMLEventNSAllocator(nsStack.clone(), attrStack.clone());
+        try {
+            return new XMLEventNSAllocator(nsStack.clone(), attrStack.clone());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public XMLEvent allocate(XMLStreamReader reader) throws XMLStreamException {

@@ -324,6 +324,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
             try {
+                xmlEventWriter.add(XMLEventFactory.newFactory().createEndElement(new QName("a"), null));
                 //close the event writer to flush all outstanding events to the encrypt stream
                 xmlEventWriter.close();
                 //call close to force a cipher.doFinal()

@@ -19,7 +19,6 @@ import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
-import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -32,8 +31,6 @@ import javax.xml.rpc.handler.MessageContext;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
@@ -58,16 +55,20 @@ public class InteroperabilityTest extends AbstractTestBase {
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -87,16 +88,20 @@ public class InteroperabilityTest extends AbstractTestBase {
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -117,22 +122,20 @@ public class InteroperabilityTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://www.w3.org/2000/09/xmldsig#}Signature;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        /*{
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
-        }*/
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        //transformer.transform(new DOMSource(document), new StreamResult(System.out));
+        transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -154,18 +157,14 @@ public class InteroperabilityTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Content}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-
-        {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
-        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -188,16 +187,20 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -275,6 +278,10 @@ public class InteroperabilityTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedData");
         Element timeStamp = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
@@ -286,18 +293,15 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         securityHeaderNode.insertBefore(timeStamp, signature);
 
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        //transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
-
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
-        //Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
                     @Override
@@ -311,18 +315,21 @@ public class InteroperabilityTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionUseReqSigCert() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
@@ -340,7 +347,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 }
             };
 
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument), new ArrayList<SecurityEvent>(), securityEventListener);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new ArrayList<SecurityEvent>(), securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -351,7 +358,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         }
 
         //so we have a request generated, now do the response:
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos = new ByteArrayOutputStream();
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
@@ -438,7 +445,7 @@ public class InteroperabilityTest extends AbstractTestBase {
      *
      * @throws Exception
      */
-    @Test
+    @Test(invocationCount = 100) //retest 100 times to make sure we don't have a threading issue
     public void testSignatureC14NInclusivePartsInbound() throws Exception {
         Document securedDocument;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -477,7 +484,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

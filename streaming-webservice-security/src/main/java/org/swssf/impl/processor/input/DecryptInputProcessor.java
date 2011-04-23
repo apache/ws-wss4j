@@ -124,12 +124,10 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     } else {
                         xmlEvent = subInputProcessorChain.processEvent();
                     }
-                    //subInputProcessorChain.getDocumentContext().removePathElement();
                 }
                 while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(Constants.TAG_xenc_EncryptedData)));
 
                 tmpXmlEventList.push(xmlEvent);
-                //inputProcessorChain.getDocumentContext().removePathElement();
                 startElement = xmlEvent.asStartElement();
 
                 encryptedHeader = true;
@@ -229,12 +227,16 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = new DecryptedEventReaderInputProcessor(getSecurityProperties(),
                                     SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()), encryptedHeader, comparableNamespaceList, comparableAttributeList);
 
+                            //add the new created EventReader processor to the chain.
+                            inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
+
                             //when an exception in the decryption thread occurs, we want to forward them:
                             receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
 
-                            //we have to start the thread before we call decryptionThread.getDecryptedStreamInputProcessor().
+                            //we have to start the thread before we call decryptionThread.getPipedInputStream().
                             //Otherwise we will end in a deadlock, because the StAX reader expects already data.
-                            //@See some lines below: 
+                            //@See some lines below:
+                            logger.debug("Starting decryption thread");
                             receiverThread.start();
 
                             inputProcessorChain.getDocumentContext().removePathElement();
@@ -254,8 +256,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
                             decryptedEventReaderInputProcessor.setXmlEventReader(xmlEventReader);
 
-                            //add the new created EventReader processor to the chain.
-                            inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
                             if (isSecurityHeaderEvent) {
                                 return decryptedEventReaderInputProcessor.processNextHeaderEvent(inputProcessorChain);
                             } else {
@@ -309,7 +309,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
         private boolean rootElementProcessed;
 
-        DecryptedEventReaderInputProcessor(SecurityProperties securityProperties, SecurePart.Modifier encryptionModifier, boolean encryptedHeader, List<ComparableNamespace>[] namespaceList, List<ComparableAttribute>[] attributeList) {
+        DecryptedEventReaderInputProcessor(
+                SecurityProperties securityProperties, SecurePart.Modifier encryptionModifier,
+                boolean encryptedHeader, List<ComparableNamespace>[] namespaceList,
+                List<ComparableAttribute>[] attributeList
+        ) {
             super(securityProperties);
             getAfterProcessors().add(DecryptInputProcessor.class.getName());
             getAfterProcessors().add(DecryptedEventReaderInputProcessor.class.getName());
@@ -399,7 +403,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     }
                     while (!(endEvent.isEndElement() && endEvent.asEndElement().getName().equals(endElement)));
 
-                    inputProcessorChain.removeProcessor(this);
                     inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent();
 
                     //...fetch the next (unencrypted) event
@@ -408,6 +411,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     } else {
                         xmlEvent = inputProcessorChain.processEvent();
                     }
+
+                    inputProcessorChain.removeProcessor(this);
                 }
 
                 if (documentLevel > 0) {
@@ -646,6 +651,8 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                 tempBufferedWriter.write('>');
                 //real close of the stream
                 tempBufferedWriter.close();
+
+                logger.debug("Decryption thread finished");
 
             } catch (Exception e) {
                 throw new UncheckedWSSecurityException(e);

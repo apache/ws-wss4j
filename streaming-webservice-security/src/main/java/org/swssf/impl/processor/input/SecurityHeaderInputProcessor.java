@@ -96,7 +96,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 2
                         && endElement.getName().equals(Constants.TAG_wsse_Security)) {
 
-                    subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);
+                    //subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);
                     subInputProcessorChain.removeProcessor(internalSecurityHeaderBufferProcessor);
                     subInputProcessorChain.addProcessor(
                             new InternalSecurityHeaderReplayProcessor(getSecurityProperties(),
@@ -104,10 +104,12 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                                     //minus one because the first event will be deqeued when finished security header. @see below
                                     eventCount - 1));
 
-                    //since we are replaying the whole envelope strip the path:
-                    subInputProcessorChain.getDocumentContext().getPath().clear();
                     //remove this processor from chain now. the next events will go directly to the other processors
                     subInputProcessorChain.removeProcessor(this);
+                    //since we clone the inputProcessor list we have to add the processors from
+                    //the subChain to the main chain.
+                    inputProcessorChain.getProcessors().clear();
+                    inputProcessorChain.getProcessors().addAll(subInputProcessorChain.getProcessors());
 
                     countOfEventsToResponsibleSecurityHeader = 0;
 

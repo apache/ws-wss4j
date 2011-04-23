@@ -40,12 +40,12 @@ public class Canonicalizer20010315Test {
 
     private XMLInputFactory xmlInputFactory;
 
-    public Canonicalizer20010315Test() {
+    public Canonicalizer20010315Test() throws Exception {
         this.xmlInputFactory = XMLInputFactory.newFactory();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
         XMLResolver xmlResolver = new XMLResolver() {
             public Object resolveEntity(String publicID, String systemID, String baseURI, String namespace) throws XMLStreamException {
-                return this.getClass().getClassLoader().getResource("testdata/c14n/in/" + systemID);
+                return this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/in/" + systemID);
             }
         };
         this.xmlInputFactory.setXMLResolver(xmlResolver);

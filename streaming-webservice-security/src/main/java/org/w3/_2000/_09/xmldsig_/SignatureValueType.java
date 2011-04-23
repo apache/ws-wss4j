@@ -8,6 +8,7 @@
 
 package org.w3._2000._09.xmldsig_;
 
+import org.apache.commons.codec.binary.Base64;
 import org.swssf.ext.Constants;
 import org.swssf.ext.ParseException;
 import org.swssf.ext.Parseable;
@@ -46,7 +47,7 @@ import java.util.Iterator;
 public class SignatureValueType implements Parseable {
 
     @XmlValue
-    protected byte[] value;
+    protected StringBuffer value = new StringBuffer();
     @XmlAttribute(name = "Id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
@@ -88,7 +89,7 @@ public class SignatureValueType implements Parseable {
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
-                this.value = xmlEvent.asCharacters().getData().getBytes();
+                this.value.append(xmlEvent.asCharacters().getData());
                 break;
             default:
                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
@@ -109,7 +110,7 @@ public class SignatureValueType implements Parseable {
      *         byte[]
      */
     public byte[] getValue() {
-        return value;
+        return Base64.decodeBase64(this.value.toString());
     }
 
     /**
@@ -119,7 +120,7 @@ public class SignatureValueType implements Parseable {
      *              byte[]
      */
     public void setValue(byte[] value) {
-        this.value = ((byte[]) value);
+        this.value.append(value);
     }
 
     /**

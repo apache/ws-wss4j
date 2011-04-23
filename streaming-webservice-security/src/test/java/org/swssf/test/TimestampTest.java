@@ -18,7 +18,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -33,6 +32,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -90,22 +91,25 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampDefaultConfigurationInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -163,17 +167,20 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampExpiredInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         Thread.sleep(1000);
@@ -182,7 +189,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -198,18 +205,21 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampExpiredEncryptedInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
             outboundProperties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         Thread.sleep(1000);
@@ -220,7 +230,7 @@ public class TimestampTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -236,13 +246,13 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampInFutureInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
@@ -263,13 +273,16 @@ public class TimestampTest extends AbstractTestBase {
             XMLGregorianCalendar xmlGregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarExpires);
 
             expires.setTextContent(xmlGregorianCalendarExpires.toXMLFormat());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -285,17 +298,20 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampStrictOffInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         Thread.sleep(1000);
@@ -305,7 +321,7 @@ public class TimestampTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setStrictTimestampCheck(false);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
@@ -314,17 +330,20 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampTTLInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
             Properties outboundProperties = new Properties();
             outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "300");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         Thread.sleep(1000);
@@ -334,7 +353,7 @@ public class TimestampTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setTimestampTTL(1);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -350,11 +369,11 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampNoCreatedDateInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
@@ -365,13 +384,16 @@ public class TimestampTest extends AbstractTestBase {
                     node.getParentNode().removeChild(node);
                 }
             }
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -391,11 +413,11 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampNoExpiresDateInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
@@ -406,13 +428,16 @@ public class TimestampTest extends AbstractTestBase {
                     node.getParentNode().removeChild(node);
                 }
             }
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -426,11 +451,11 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testTimestampNoChildsInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
@@ -448,13 +473,16 @@ public class TimestampTest extends AbstractTestBase {
                 Node node = nodesToRemove.get(i);
                 node.getParentNode().removeChild(node);
             }
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -474,11 +502,11 @@ public class TimestampTest extends AbstractTestBase {
     @Test
     public void testDoubleTimestamp() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.TIMESTAMP;
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsu_Timestamp.getNamespaceURI(), Constants.TAG_wsu_Timestamp.getLocalPart());
@@ -488,13 +516,16 @@ public class TimestampTest extends AbstractTestBase {
             Node node = nodeList.item(0).cloneNode(true);
             securedDocument.adoptNode(node);
             parentNode.appendChild(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done timestamp; now test timestamp-verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);

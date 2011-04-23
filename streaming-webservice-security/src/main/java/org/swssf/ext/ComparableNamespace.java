@@ -45,7 +45,11 @@ public class ComparableNamespace implements Namespace, Comparable<ComparableName
         } else {
             this.prefix = "";
         }
-        this.uri = uri;
+        if (uri != null) {
+            this.uri = uri;
+        } else {
+            this.uri = "";
+        }
     }
 
     public int compareTo(ComparableNamespace o) {

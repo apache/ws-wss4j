@@ -12,7 +12,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -24,6 +23,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -38,12 +39,12 @@ public class UsernameTokenTest extends AbstractTestBase {
 
     @Test
     public void testDefaultConfigurationInbound() throws Exception {
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.USERNAME_TOKEN;
             Properties properties = new Properties();
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
@@ -51,7 +52,10 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done UsernameToken; now verification:
@@ -60,7 +64,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -73,16 +77,19 @@ public class UsernameTokenTest extends AbstractTestBase {
 
     @Test
     public void testWrongUsername() throws Exception {
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.USERNAME_TOKEN;
             Properties properties = new Properties();
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done UsernameToken; now verification:
@@ -91,7 +98,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl("wrongUsername"));
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -108,13 +115,13 @@ public class UsernameTokenTest extends AbstractTestBase {
     //Username can't be checked in swssf, it must be done via SecurityEvent
     @Test
     public void testInboundPW_TEXT() throws Exception {
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.USERNAME_TOKEN;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
@@ -122,7 +129,10 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done UsernameToken; now verification:
@@ -131,7 +141,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl("wrongUsername"));
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -158,16 +168,13 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
         }
 
-        javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
-
         //done UsernameToken; now verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -180,12 +187,12 @@ public class UsernameTokenTest extends AbstractTestBase {
 
     @Test
     public void testInboundUT_SIGN() throws Exception {
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGN_WITH_UT_KEY;
             Properties properties = new Properties();
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
@@ -193,7 +200,10 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done UsernameToken; now verification:
@@ -202,7 +212,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -237,7 +247,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
         }
 
         //done UsernameToken; now verification:
@@ -306,7 +316,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
         }
 
         //done UsernameToken; now verification:
@@ -343,7 +353,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -364,11 +374,10 @@ public class UsernameTokenTest extends AbstractTestBase {
 
     @Test
     public void testInboundOutboundPW_NONE() throws Exception {
-        Document securedDocument;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.USERNAMETOKEN};
             securityProperties.setOutAction(actions);
@@ -383,7 +392,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
-            securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            Document securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
@@ -396,7 +405,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument));
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

@@ -12,7 +12,6 @@ import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
-import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -26,6 +25,8 @@ import javax.xml.soap.SOAPConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -44,17 +45,20 @@ public class SignatureConfirmationTest extends AbstractTestBase {
     public void testDefaultConfigurationInbound() throws Exception {
 
         Vector sigv;
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, new Properties(), SOAPConstants.SOAP_1_1_PROTOCOL);
             sigv = (Vector) messageContext.getProperty(WSHandlerConstants.SEND_SIGV);
-            securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
@@ -70,7 +74,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
                 }
             };
 
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument), new ArrayList<SecurityEvent>(), securityEventListener);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new ArrayList<SecurityEvent>(), securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -81,7 +85,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         }
 
         //so we have a request generated, now do the response:
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos = new ByteArrayOutputStream();
         {
             SecurityProperties securityProperties = new SecurityProperties();
             Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE_CONFIRMATION};
@@ -171,14 +175,14 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         }
 
         //so we have a request generated, now do the response:
-        Document securedDocument;
+        baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION + " " + WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.RECV_RESULTS, wsHandlerResult);
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
@@ -195,6 +199,9 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
             Assert.assertTrue(idAttrValue.startsWith("id-"), "wsu:id Attribute doesn't start with id");
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //verify SigConf response:
@@ -204,7 +211,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument), securityEventList, null);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventList, null);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -257,13 +264,13 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         }
 
         //so we have a request generated, now do the response:
-        Document securedDocument;
+        baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
@@ -277,6 +284,9 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart());
             Assert.assertNotNull(idAttrValue);
             Assert.assertTrue(idAttrValue.startsWith("id-"), "wsu:id Attribute doesn't start with id");
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //verify SigConf response:
@@ -286,7 +296,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(new CustomW3CDOMStreamReader(securedDocument), securityEventList, null);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventList, null);
 
             try {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);

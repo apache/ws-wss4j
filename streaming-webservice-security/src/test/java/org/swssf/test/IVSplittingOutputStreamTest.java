@@ -82,6 +82,62 @@ public class IVSplittingOutputStreamTest {
     }
 
     @Test
+    public void testWriteBytesArrayIVLength() throws Exception {
+
+        int ivSize = 16;
+
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding");
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
+        ReplaceableOuputStream replaceableOuputStream = new ReplaceableOuputStream(ivSplittingOutputStream);
+        ivSplittingOutputStream.setParentOutputStream(replaceableOuputStream);
+
+        byte[] testBytes = testString.getBytes();
+        for (int i = 0; i < testBytes.length - ivSize; i += ivSize) {
+            replaceableOuputStream.write(testBytes, i, ivSize);
+        }
+        //write last part
+        replaceableOuputStream.write(testBytes, testBytes.length - testBytes.length % ivSize, testBytes.length % ivSize);
+        replaceableOuputStream.close();
+
+        Assert.assertEquals(new String(ivSplittingOutputStream.getIv()), testString.substring(0, ivSize));
+        Assert.assertEquals(new String(byteArrayOutputStream.toByteArray()), testString.substring(ivSize));
+        Assert.assertEquals(new String(ivSplittingOutputStream.getIv()) + new String(byteArrayOutputStream.toByteArray()), testString);
+        Assert.assertTrue(ivSplittingOutputStream.isIVComplete());
+    }
+
+    @Test
+    public void testWriteBytesArrayIVLength2() throws Exception {
+
+        int ivSize = 16;
+
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding");
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(byteArrayOutputStream, cipher, secretKey);
+        ReplaceableOuputStream replaceableOuputStream = new ReplaceableOuputStream(ivSplittingOutputStream);
+        ivSplittingOutputStream.setParentOutputStream(replaceableOuputStream);
+
+        byte[] testBytes = testString.getBytes();
+        replaceableOuputStream.write(testBytes, 0, testBytes.length - ivSize);
+        //write last part
+        replaceableOuputStream.write(testBytes, testBytes.length - ivSize, ivSize);
+        replaceableOuputStream.close();
+
+        Assert.assertEquals(new String(ivSplittingOutputStream.getIv()), testString.substring(0, ivSize));
+        Assert.assertEquals(new String(byteArrayOutputStream.toByteArray()), testString.substring(ivSize));
+        Assert.assertEquals(new String(ivSplittingOutputStream.getIv()) + new String(byteArrayOutputStream.toByteArray()), testString);
+        Assert.assertTrue(ivSplittingOutputStream.isIVComplete());
+    }
+
+    @Test
     public void testWriteBytesArrayWithOffset() throws Exception {
 
         int ivSize = 16;

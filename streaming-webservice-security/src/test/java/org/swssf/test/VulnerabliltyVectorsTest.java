@@ -23,7 +23,6 @@ import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyEnforcerFactory;
 import org.swssf.policy.PolicyInputProcessor;
 import org.swssf.policy.secpolicy.WSSPolicyException;
-import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Attr;
@@ -31,6 +30,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
@@ -84,13 +85,18 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element securityHeaderNode = (Element) encryptedKeyElement.getParentNode();
         securityHeaderNode.insertBefore(clonedEncryptedElement, encryptedKeyElement);
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
@@ -158,7 +164,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsu_Timestamp.getLocalPart(), Constants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
         outSecurityProperties.addSignaturePart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(Constants.TAG_soap_Body_LocalName, Constants.NS_SOAP11, SecurePart.Modifier.Content));
         Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -182,7 +188,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(), "SOAPAction does not match with the current Operation");
+            Assert.assertEquals(throwable.getMessage(), "SOAPAction (emptyPolicyOperation) does not match with the current Operation: {http://schemas.xmlsoap.org/wsdl/}definitions");
         }
     }
 
@@ -208,6 +214,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element headerElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         headerElement.appendChild(bodyElement);
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -218,7 +229,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new CustomW3CDOMStreamReader(securedDocument), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), policyEnforcer);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
@@ -249,7 +260,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Attr uri = (Attr) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         uri.setNodeValue("http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.23.tar.gz");
 
-        //doInboundSecurityWithWSS4J(securedDocument, WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         SecurityProperties inSecurityProperties = new SecurityProperties();
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -257,7 +271,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();

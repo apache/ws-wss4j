@@ -51,7 +51,7 @@ public class CipherDataType implements Parseable {
     private Parseable currentParseable;
 
     @XmlElement(name = "CipherValue")
-    protected byte[] cipherValue;
+    protected StringBuffer cipherValue = new StringBuffer();
     @XmlElement(name = "CipherReference")
     protected CipherReferenceType cipherReference;
 
@@ -91,7 +91,7 @@ public class CipherDataType implements Parseable {
                                     break;
                                 case XMLStreamConstants.CHARACTERS:
                                     //todo handle mutliple character events:
-                                    cipherValue = xmlEvent.asCharacters().getData().getBytes();
+                                    cipherValue.append(xmlEvent.asCharacters().getData());
                                     break;
                                 default:
                                     throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
@@ -145,7 +145,7 @@ public class CipherDataType implements Parseable {
      *         byte[]
      */
     public byte[] getCipherValue() {
-        return cipherValue;
+        return cipherValue.toString().getBytes();
     }
 
     /**
@@ -155,7 +155,7 @@ public class CipherDataType implements Parseable {
      *              byte[]
      */
     public void setCipherValue(byte[] value) {
-        this.cipherValue = ((byte[]) value);
+        this.cipherValue.append(value);
     }
 
     /**

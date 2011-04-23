@@ -11,7 +11,7 @@
     <developers>
         <developer>
             <name>Marc Giger</name>
-            <email>gigerstyle@gmx.ch</email>            
+            <email>gigerstyle@gmx.ch</email>
         </developer>
     </developers>
 
@@ -22,6 +22,11 @@
                 <artifactId>xercesImpl</artifactId>
                 <version>2.9.1</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.santuario</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>1.4.4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -31,6 +36,11 @@
             <artifactId>bcprov-jdk15</artifactId>
             <version>1.43</version>
         </dependency>
+        <!--<dependency>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+            <version>4.1.1</version>
+        </dependency>-->
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
@@ -50,6 +60,12 @@
             <groupId>org.apache.neethi</groupId>
             <artifactId>neethi</artifactId>
             <version>2.0.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -57,26 +73,14 @@
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>2.2.10</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.codehaus.staxmate</groupId>
-            <artifactId>staxmate</artifactId>
-            <version>2.0.0</version>
-            <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>stax2-api</artifactId>
+                    <artifactId>wstx-asl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        -->
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -101,13 +105,7 @@
             <version>1.1</version>
             <scope>test</scope>
         </dependency>
-        <!--        <dependency>
-                    <groupId>com.sun.xml.ws</groupId>
-                    <artifactId>jaxws-rt</artifactId>
-                    <version>2.1.4</version>
-                    <scope>test</scope>
-                </dependency>
-        -->
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -139,6 +137,13 @@
             <version>2.7.1</version>
             <scope>test</scope>
         </dependency>
+<!--
+        <dependency>
+            <groupId>ch.gigerstyle</groupId>
+            <artifactId>xmlGen</artifactId>
+            <version>0.1</version>
+        </dependency>
+-->
     </dependencies>
     <build>
         <plugins>
@@ -197,7 +202,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <groups>${test.groups}</groups>
-                    <argLine>-Xmx2000m</argLine>
+                    <argLine>-Xmx2000m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</argLine>
                     <excludes>
                         <exclude>**/ProfilingTest.java</exclude>
                         <exclude>**/PerformanceMemoryTest.java</exclude>
@@ -260,6 +265,17 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
+                    <targetJdk>1.5</targetJdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <linkXref>true</linkXref>
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <minimumTokens>100</minimumTokens>
                     <targetJdk>1.5</targetJdk>
                 </configuration>
             </plugin>

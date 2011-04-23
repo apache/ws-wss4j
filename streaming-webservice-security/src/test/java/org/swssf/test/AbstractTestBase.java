@@ -14,7 +14,6 @@
  */
 package org.swssf.test;
 
-import com.ctc.wstx.api.WstxInputProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -47,6 +46,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
@@ -68,6 +68,7 @@ public abstract class AbstractTestBase {
     //transformer.transform(new StreamSource(new ByteArrayInputStream(baos.toByteArray())), new StreamResult(System.out));
 
     protected static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    protected static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     protected DocumentBuilderFactory documentBuilderFactory;
 
     public AbstractTestBase() {
@@ -78,7 +79,7 @@ public abstract class AbstractTestBase {
         documentBuilderFactory.setIgnoringElementContentWhitespace(false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
+        //xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
     }
 
     public Document doInboundSecurity(SecurityProperties securityProperties, InputStream inputStream) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {

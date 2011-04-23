@@ -93,16 +93,16 @@ public class InputProcessorChainImpl implements InputProcessorChain {
 
         Constants.Phase targetPhase = newInputProcessor.getPhase();
 
-        for (int i = inputProcessors.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < inputProcessors.size(); i++) {
             InputProcessor inputProcessor = inputProcessors.get(i);
-            if (inputProcessor.getPhase().ordinal() < targetPhase.ordinal()) {
-                startPhaseIdx = i + 1;
+            if (inputProcessor.getPhase().ordinal() <= targetPhase.ordinal()) {
+                startPhaseIdx = i;
                 break;
             }
         }
-        for (int i = startPhaseIdx; i < inputProcessors.size(); i++) {
+        for (int i = inputProcessors.size() - 1; i >= startPhaseIdx; i--) {
             InputProcessor inputProcessor = inputProcessors.get(i);
-            if (inputProcessor.getPhase().ordinal() > targetPhase.ordinal()) {
+            if (inputProcessor.getPhase().ordinal() < targetPhase.ordinal()) {
                 endPhaseIdx = i;
                 break;
             }
@@ -111,37 +111,37 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         //just look for the correct phase and append as last
         if (newInputProcessor.getBeforeProcessors().isEmpty()
                 && newInputProcessor.getAfterProcessors().isEmpty()) {
-            inputProcessors.add(endPhaseIdx, newInputProcessor);
+            inputProcessors.add(startPhaseIdx, newInputProcessor);
         } else if (newInputProcessor.getBeforeProcessors().isEmpty()) {
-            int idxToInsert = endPhaseIdx;
+            int idxToInsert = startPhaseIdx;
 
             for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
                 InputProcessor inputProcessor = inputProcessors.get(i);
                 if (newInputProcessor.getAfterProcessors().contains(inputProcessor.getClass().getName())) {
-                    idxToInsert = i + 1;
+                    idxToInsert = i;
                     break;
                 }
             }
             inputProcessors.add(idxToInsert, newInputProcessor);
         } else if (newInputProcessor.getAfterProcessors().isEmpty()) {
-            int idxToInsert = startPhaseIdx;
+            int idxToInsert = endPhaseIdx;
 
             for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
                 InputProcessor inputProcessor = inputProcessors.get(i);
                 if (newInputProcessor.getBeforeProcessors().contains(inputProcessor.getClass().getName())) {
-                    idxToInsert = i;
+                    idxToInsert = i + 1;
                     break;
                 }
             }
             inputProcessors.add(idxToInsert, newInputProcessor);
         } else {
             boolean found = false;
-            int idxToInsert = endPhaseIdx;
+            int idxToInsert = startPhaseIdx;
 
-            for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
+            for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
                 InputProcessor inputProcessor = inputProcessors.get(i);
                 if (newInputProcessor.getBeforeProcessors().contains(inputProcessor.getClass().getName())) {
-                    idxToInsert = i;
+                    idxToInsert = i + 1;
                     found = true;
                     break;
                 }
@@ -149,10 +149,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
             if (found) {
                 inputProcessors.add(idxToInsert, newInputProcessor);
             } else {
-                for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
+                for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
                     InputProcessor inputProcessor = inputProcessors.get(i);
                     if (newInputProcessor.getAfterProcessors().contains(inputProcessor.getClass().getName())) {
-                        idxToInsert = i + 1;
+                        idxToInsert = i;
                         break;
                     }
                 }
@@ -176,23 +176,27 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         this.inputProcessors.remove(inputProcessor);
     }
 
+    public List<InputProcessor> getProcessors() {
+        return this.inputProcessors;
+    }
+
     public XMLEvent processHeaderEvent() throws XMLStreamException, WSSecurityException {
-        return inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).processNextHeaderEvent(this);
+        return inputProcessors.get(getPosAndIncrement()).processNextHeaderEvent(this);
     }
 
     public XMLEvent processEvent() throws XMLStreamException, WSSecurityException {
-        return inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).processNextEvent(this);
+        return inputProcessors.get(getPosAndIncrement()).processNextEvent(this);
     }
 
     public void doFinal() throws XMLStreamException, WSSecurityException {
-        inputProcessors.get(inputProcessors.size() - getPosAndIncrement() - 1).doFinal(this);
+        inputProcessors.get(getPosAndIncrement()).doFinal(this);
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, WSSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(),
-                inputProcessors.size() - inputProcessors.indexOf(inputProcessor));
-        inputProcessorChain.setInputProcessors(this.inputProcessors);
+                inputProcessors.indexOf(inputProcessor) + 1);
+        inputProcessorChain.setInputProcessors(new ArrayList<InputProcessor>(this.inputProcessors));
         return inputProcessorChain;
     }
 }

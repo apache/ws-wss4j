@@ -18,7 +18,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurePart;
 import org.swssf.ext.SecurityProperties;
-import org.swssf.test.utils.CustomW3CDOMStreamReader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -102,24 +101,27 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionDefaultConfigurationInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-1_5']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -184,25 +186,28 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionPartsContentInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Content}{http://www.w3.org/1999/XMLSchema}complexType;");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -296,18 +301,21 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionPartsElementInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             //wss4j just encrypts the first found element and not all!
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://www.w3.org/1999/XMLSchema}complexType;");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -315,7 +323,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -331,29 +339,29 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionPartsHeaderInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-encryptedHeader.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             //wss4j just encrypts the first found element and not all!
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Header}{http://www.example.com}testEncryptedHeader;");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
-        }
 
-        //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        //transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
 
         //done encryption; now test decryption:
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -468,18 +476,21 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierIssuerSerialInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "IssuerSerial");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/dsig:X509Data/dsig:X509IssuerSerial/dsig:X509SerialNumber");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -487,7 +498,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -541,18 +552,21 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenDirectReferenceInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/wsse:BinarySecurityToken");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -560,7 +574,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -576,13 +590,13 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenDirectReferenceAtTheEndOfTheSecurityHeaderInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/wsse:BinarySecurityToken");
@@ -591,6 +605,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             Element parentElement = (Element) node.getParentNode();
             parentElement.removeChild(node);
             parentElement.appendChild(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -598,7 +615,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -700,18 +717,21 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierX509KeyInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -719,7 +739,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -773,18 +793,21 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierSubjectKeyInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "SKIKeyIdentifier");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -792,7 +815,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -846,18 +869,21 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testEncDecryptionKeyIdentifierThumbprintInbound() throws Exception {
 
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENC_KEY_ID, "Thumbprint");
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done encryption; now test decryption:
@@ -865,7 +891,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, new CustomW3CDOMStreamReader(securedDocument));
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());

@@ -56,7 +56,7 @@ import java.util.Map;
 public class AttributedString implements Parseable {
 
     @XmlValue
-    protected String value;
+    protected StringBuffer value = new StringBuffer();
     @XmlAttribute(name = "Id", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
@@ -95,7 +95,7 @@ public class AttributedString implements Parseable {
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
-                this.value = xmlEvent.asCharacters().getData();
+                this.value.append(xmlEvent.asCharacters().getData());
                 break;
             default:
                 throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
@@ -113,7 +113,7 @@ public class AttributedString implements Parseable {
      *         {@link String }
      */
     public String getValue() {
-        return value;
+        return value.toString();
     }
 
     /**
@@ -123,7 +123,7 @@ public class AttributedString implements Parseable {
      *              {@link String }
      */
     public void setValue(String value) {
-        this.value = value;
+        this.value.append(value);
     }
 
     /**

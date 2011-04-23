@@ -55,6 +55,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
     public void doFinal(OutputProcessorChain outputProcessorChain) throws WSSecurityException {
         try {
             xmlEventWriter.flush();
+            xmlEventWriter.close();
         } catch (XMLStreamException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
         }

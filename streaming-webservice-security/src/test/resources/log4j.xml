@@ -36,6 +36,9 @@
     <logger name="org.apache.xml.security.utils.SignerOutputStream">
         <level value="INFO"/>
     </logger>
+    <logger name="org.apache.xml.security.encryption.XMLCipher">
+        <level value="INFO"/>
+    </logger>
     <logger name="org.apache.xml">
         <level value="INFO"/>
     </logger>
@@ -43,6 +46,9 @@
         <level value="INFO"/>
     </logger>
     <logger name="org.swssf.impl.OutputProcessorChainImpl">
+        <level value="INFO"/>
+    </logger>
+    <logger name="org.swssf.impl.processor.input">
         <level value="INFO"/>
     </logger>
 </log4j:configuration>
