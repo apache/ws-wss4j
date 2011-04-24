@@ -93,14 +93,14 @@ public class InputProcessorChainImpl implements InputProcessorChain {
 
         Constants.Phase targetPhase = newInputProcessor.getPhase();
 
-        for (int i = 0; i < inputProcessors.size(); i++) {
+        for (int i = inputProcessors.size() - 1; i >= 0; i--) {
             InputProcessor inputProcessor = inputProcessors.get(i);
-            if (inputProcessor.getPhase().ordinal() <= targetPhase.ordinal()) {
-                startPhaseIdx = i;
+            if (inputProcessor.getPhase().ordinal() > targetPhase.ordinal()) {
+                startPhaseIdx = i + 1;
                 break;
             }
         }
-        for (int i = inputProcessors.size() - 1; i >= startPhaseIdx; i--) {
+        for (int i = startPhaseIdx; i < inputProcessors.size(); i++) {
             InputProcessor inputProcessor = inputProcessors.get(i);
             if (inputProcessor.getPhase().ordinal() < targetPhase.ordinal()) {
                 endPhaseIdx = i;

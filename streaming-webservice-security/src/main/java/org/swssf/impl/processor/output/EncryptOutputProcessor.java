@@ -143,7 +143,6 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
         private EncryptionPartDef encryptionPartDef;
         private CharacterEventGeneratorOutputStream characterEventGeneratorOutputStream;
-        //private Writer streamWriter;
         private XMLEventWriter xmlEventWriter;
         private OutputStream cipherOutputStream;
 

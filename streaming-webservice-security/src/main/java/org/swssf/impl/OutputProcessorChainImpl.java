@@ -196,6 +196,10 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         this.outputProcessors.remove(outputProcessor);
     }
 
+    public List<OutputProcessor> getProcessors() {
+        return this.outputProcessors;
+    }
+
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException {
         if (this.curPos == this.startPos) {
             xmlEvent = Utils.createXMLEventNS(xmlEvent, nsStack, attrStack);

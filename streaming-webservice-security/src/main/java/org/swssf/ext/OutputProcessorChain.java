@@ -16,6 +16,7 @@ package org.swssf.ext;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.util.List;
 
 /**
  * The OutputProcessorChain manages the OutputProcessors and controls the XMLEvent flow
@@ -40,6 +41,13 @@ public interface OutputProcessorChain extends ProcessorChain {
      * @param outputProcessor to remove
      */
     public void removeProcessor(OutputProcessor outputProcessor);
+
+    /**
+     * Returns a list with the active processors.
+     *
+     * @return List<InputProcessor>
+     */
+    public List<OutputProcessor> getProcessors();
 
     /**
      * The actual processed document's security context
