@@ -224,8 +224,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                             Thread receiverThread = new Thread(decryptionThread);
                             receiverThread.setName("decrypting thread");
 
-                            DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = new DecryptedEventReaderInputProcessor(getSecurityProperties(),
-                                    SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()), encryptedHeader, comparableNamespaceList, comparableAttributeList);
+                            DecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor =
+                                    new DecryptedEventReaderInputProcessor(getSecurityProperties(),
+                                            SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()),
+                                            encryptedHeader, comparableNamespaceList, comparableAttributeList,
+                                            this);
 
                             //add the new created EventReader processor to the chain.
                             inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
@@ -312,11 +315,11 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         DecryptedEventReaderInputProcessor(
                 SecurityProperties securityProperties, SecurePart.Modifier encryptionModifier,
                 boolean encryptedHeader, List<ComparableNamespace>[] namespaceList,
-                List<ComparableAttribute>[] attributeList
+                List<ComparableAttribute>[] attributeList,
+                DecryptInputProcessor decryptInputProcessor
         ) {
             super(securityProperties);
-            getAfterProcessors().add(DecryptInputProcessor.class.getName());
-            getAfterProcessors().add(DecryptedEventReaderInputProcessor.class.getName());
+            getAfterProcessors().add(decryptInputProcessor);
             this.encryptionModifier = encryptionModifier;
             rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
             this.encryptedHeader = encryptedHeader;

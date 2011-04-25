@@ -31,14 +31,14 @@ public interface InputProcessor {
      *
      * @return The set with the named InputProcessors
      */
-    Set<String> getBeforeProcessors();
+    Set<Object> getBeforeProcessors();
 
     /**
      * This InputProcessor will be added after the processors in this set
      *
      * @return The set with the named InputProcessors
      */
-    Set<String> getAfterProcessors();
+    Set<Object> getAfterProcessors();
 
     /**
      * The Phase in which this InputProcessor should be applied

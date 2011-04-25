@@ -35,14 +35,14 @@ public class InputProcessorChainTest extends AbstractTestBase {
     abstract class AbstractInputProcessor implements InputProcessor {
 
         private Constants.Phase phase = Constants.Phase.PROCESSING;
-        private Set<String> beforeProcessors = new HashSet<String>();
-        private Set<String> afterProcessors = new HashSet<String>();
+        private Set<Object> beforeProcessors = new HashSet<Object>();
+        private Set<Object> afterProcessors = new HashSet<Object>();
 
-        public Set<String> getBeforeProcessors() {
+        public Set<Object> getBeforeProcessors() {
             return beforeProcessors;
         }
 
-        public Set<String> getAfterProcessors() {
+        public Set<Object> getAfterProcessors() {
             return afterProcessors;
         }
 

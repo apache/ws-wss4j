@@ -35,8 +35,8 @@ public abstract class AbstractInputProcessor implements InputProcessor {
     private SecurityProperties securityProperties;
 
     private Constants.Phase phase = Constants.Phase.PROCESSING;
-    private Set<String> beforeProcessors = new HashSet<String>();
-    private Set<String> afterProcessors = new HashSet<String>();
+    private Set<Object> beforeProcessors = new HashSet<Object>();
+    private Set<Object> afterProcessors = new HashSet<Object>();
 
     public AbstractInputProcessor(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
@@ -50,11 +50,11 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         this.phase = phase;
     }
 
-    public Set<String> getBeforeProcessors() {
+    public Set<Object> getBeforeProcessors() {
         return beforeProcessors;
     }
 
-    public Set<String> getAfterProcessors() {
+    public Set<Object> getAfterProcessors() {
         return afterProcessors;
     }
 

@@ -146,7 +146,8 @@ public class InteroperabilityTest extends AbstractTestBase {
         ));
     }
 
-    /* Not supported ATM: Timestamp encrypted and then Signed
+    //Not supported ATM: Timestamp encrypted and then Signed
+    /*
     @Test(invocationCount = 1)
     public void testInteroperabilitySignedEncryptedTimestampInbound() throws Exception {
 
@@ -159,6 +160,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -167,7 +171,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
         //read the whole stream:
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer = TRANSFORMER_FACTORY.newTransformer();
         //transformer.transform(new DOMSource(document), new StreamResult(System.out));
         transformer.transform(new DOMSource(document), new StreamResult(
                 new OutputStream() {
@@ -178,7 +182,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 }
         ));
     }
-    */
+*/
 
     @Test(invocationCount = 1)
     public void testInteroperabilityInboundReverseOrder() throws Exception {
