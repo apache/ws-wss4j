@@ -443,7 +443,7 @@ public abstract class WSHandler {
             reqData.setUseDerivedKey(useDerivedKey);
         }
         
-        String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
+        String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY_FOR_MAC, mc);
         boolean useDerivedKeyForMAC = Boolean.parseBoolean(derivedMAC);
         if (useDerivedKeyForMAC) {
             reqData.setUseDerivedKeyForMAC(useDerivedKeyForMAC);
