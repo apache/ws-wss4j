@@ -12,6 +12,8 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SecurityEventListener;
+import org.swssf.securityEvent.UsernameTokenSecurityEvent;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -111,7 +113,6 @@ public class UsernameTokenTest extends AbstractTestBase {
         }
     }
 
-    //todo wrongUserName is supplied and this test must fail.
     //Username can't be checked in swssf, it must be done via SecurityEvent
     @Test
     public void testInboundPW_TEXT() throws Exception {
@@ -138,17 +139,29 @@ public class UsernameTokenTest extends AbstractTestBase {
         //done UsernameToken; now verification:
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl("wrongUsername"));
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl("username"));
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            SecurityEventListener securityEventListener = new SecurityEventListener() {
+                public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+                    if (securityEvent instanceof UsernameTokenSecurityEvent) {
+                        UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
+                        if (!"username".equals(usernameTokenSecurityEvent.getUsername())) {
+                            throw new WSSecurityException("Wrong username");
+                        }
+                    }
+                }
+            };
 
-            //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new ArrayList<SecurityEvent>(), securityEventListener);
+
+            try {
+                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("Expected XMLStreamException");
+            } catch (XMLStreamException e) {
+                Assert.assertEquals(e.getMessage(), "org.swssf.ext.WSSecurityException: Wrong username");
+            }
         }
     }
 
