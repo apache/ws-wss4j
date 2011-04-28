@@ -191,7 +191,7 @@ public class Utils {
                         continue;
                     }
                 }
-                //add all attrs with xml - prefix (eg. xml:lang to attr list;
+                //add all attrs with xml - prefix (eg. xml:lang) to attr list:
                 comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
             }
 

@@ -202,7 +202,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <groups>${test.groups}</groups>
-                    <argLine>-Xmx2000m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</argLine>
+                    <argLine>-Xmx2000m</argLine>
                     <excludes>
                         <exclude>**/ProfilingTest.java</exclude>
                         <exclude>**/PerformanceMemoryTest.java</exclude>

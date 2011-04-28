@@ -28,7 +28,6 @@ import java.util.Iterator;
  */
 public abstract class AbstractBufferingOutputProcessor extends AbstractOutputProcessor {
 
-    //todo try to use a hint how much elements are expected from other processors?
     private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
 
     protected AbstractBufferingOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {

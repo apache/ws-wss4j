@@ -21,7 +21,7 @@ import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
+import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.swssf.impl.util.RFC2253Parser;
 import org.swssf.impl.util.SignerOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
@@ -348,7 +348,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
 
             Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             try {
-                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
                     Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
                     transformer = constructor.newInstance((String) null);
                 } else {

@@ -14,12 +14,13 @@
  */
 package org.swssf.test;
 
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_OmitCommentsTransformer;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_WithCommentsTransformer;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer11_OmitCommentsTransformer;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer11_WithCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.swssf.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLResolver;
@@ -36,11 +37,11 @@ import static org.testng.Assert.*;
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public class Canonicalizer20010315Test {
+public class Canonicalizer11Test {
 
     private XMLInputFactory xmlInputFactory;
 
-    public Canonicalizer20010315Test() throws Exception {
+    public Canonicalizer11Test() throws Exception {
         this.xmlInputFactory = XMLInputFactory.newFactory();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
         XMLResolver xmlResolver = new XMLResolver() {
@@ -63,9 +64,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n-comments.xml");
 
-        Canonicalizer20010315_WithCommentsTransformer canonicalizer20010315WithCommentsTransformer = new Canonicalizer20010315_WithCommentsTransformer(null);
+        Canonicalizer11_WithCommentsTransformer canonicalizer11_withCommentsTransformer = new Canonicalizer11_WithCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315WithCommentsTransformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_withCommentsTransformer);
     }
 
     /**
@@ -81,9 +82,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
     }
 
     /**
@@ -98,9 +99,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_c14n.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
     }
 
     /**
@@ -116,9 +117,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_c14n.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
     }
 
     /**
@@ -135,9 +136,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
     }
 
     /**
@@ -162,9 +163,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input_validatingParser.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n_validatingParser.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
     }
 
     /**
@@ -180,9 +181,9 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_c14n.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
     }
 
     /**
@@ -198,9 +199,53 @@ public class Canonicalizer20010315Test {
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_c14n.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
-        c14nAndCompare(fileIn, fileRef, canonicalizer20010315Transformer);
+        c14nAndCompare(fileIn, fileRef, canonicalizer11_omitCommentsTransformer);
+    }
+
+    /**
+     * 3.8 Document Subsets and XML Attributes (modified)
+     *
+     * @see <A HREF="http://www.w3.org/TR/2007/CR-xml-c14n11-20070621/#Example-DocSubsetsXMLAttrs">the example from the spec</A>
+     */
+    @Test
+    public void test38() throws Exception {
+        String descri = "3.6 UTF-8 Encoding. (uncommented)";
+
+        Canonicalizer11_OmitCommentsTransformer c = new Canonicalizer11_OmitCommentsTransformer(null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+                this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/in/38_input.xml")
+        );
+
+        XMLEvent xmlEvent = null;
+        while (xmlEventReader.hasNext()) {
+            xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://www.ietf.org", "e1"))) {
+                break;
+            }
+        }
+        while (xmlEventReader.hasNext()) {
+
+            c.transform(xmlEvent, baos);
+
+            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://www.ietf.org", "e1"))) {
+                break;
+            }
+            xmlEvent = xmlEventReader.nextEvent();
+        }
+
+        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/in/38_c14n.xml"));
+        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
+
+        if (equals == false) {
+            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
+            System.out.println("");
+            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
+        }
+
+        assertTrue(equals);
     }
 
 //   /**
@@ -267,10 +312,10 @@ public class Canonicalizer20010315Test {
 
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/relative-ns-behaviour.xml");
 
-        Canonicalizer20010315_OmitCommentsTransformer canonicalizer20010315Transformer = new Canonicalizer20010315_OmitCommentsTransformer(null);
+        Canonicalizer11_OmitCommentsTransformer canonicalizer11_omitCommentsTransformer = new Canonicalizer11_OmitCommentsTransformer(null);
 
         try {
-            c14nAndCompare(fileIn, fileIn, canonicalizer20010315Transformer);
+            c14nAndCompare(fileIn, fileIn, canonicalizer11_omitCommentsTransformer);
             fail();
         } catch (XMLStreamException cex) {
             assertTrue(cex != null);

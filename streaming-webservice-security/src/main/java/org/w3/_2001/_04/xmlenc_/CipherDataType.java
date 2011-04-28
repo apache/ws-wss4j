@@ -90,7 +90,6 @@ public class CipherDataType implements Parseable {
                                     }
                                     break;
                                 case XMLStreamConstants.CHARACTERS:
-                                    //todo handle mutliple character events:
                                     cipherValue.append(xmlEvent.asCharacters().getData());
                                     break;
                                 default:

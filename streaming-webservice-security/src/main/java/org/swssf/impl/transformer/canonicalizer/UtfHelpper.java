@@ -107,7 +107,6 @@ public class UtfHelpper {
             out.write(0x80 | ((c) & 0x3F));
 
         }
-
     }
 
     public final static byte[] getStringInUtf8(final String str) {
@@ -166,6 +165,4 @@ public class UtfHelpper {
         }
         return result;
     }
-
-
 }

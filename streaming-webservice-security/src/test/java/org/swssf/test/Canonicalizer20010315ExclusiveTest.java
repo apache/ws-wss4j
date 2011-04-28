@@ -15,8 +15,8 @@
 package org.swssf.test;
 
 import org.swssf.ext.Constants;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315ExclWithCommentsTransformer;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315WithCommentsTransformer;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_ExclWithCommentsTransformer;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_WithCommentsTransformer;
 import org.swssf.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -51,7 +51,7 @@ public class Canonicalizer20010315ExclusiveTest {
     @Test
     public void test221() throws Exception {
 
-        Canonicalizer20010315WithCommentsTransformer c = new Canonicalizer20010315WithCommentsTransformer(null);
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
@@ -89,7 +89,7 @@ public class Canonicalizer20010315ExclusiveTest {
     @Test
     public void test222() throws Exception {
 
-        Canonicalizer20010315WithCommentsTransformer c = new Canonicalizer20010315WithCommentsTransformer(null);
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
@@ -127,7 +127,7 @@ public class Canonicalizer20010315ExclusiveTest {
     @Test
     public void test221excl() throws Exception {
 
-        Canonicalizer20010315ExclWithCommentsTransformer c = new Canonicalizer20010315ExclWithCommentsTransformer(null);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
@@ -165,7 +165,7 @@ public class Canonicalizer20010315ExclusiveTest {
     @Test
     public void test222excl() throws Exception {
 
-        Canonicalizer20010315ExclWithCommentsTransformer c = new Canonicalizer20010315ExclWithCommentsTransformer(null);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
@@ -203,7 +203,7 @@ public class Canonicalizer20010315ExclusiveTest {
     @Test
     public void testComplexDocexcl() throws Exception {
 
-        Canonicalizer20010315ExclWithCommentsTransformer c = new Canonicalizer20010315ExclWithCommentsTransformer(null);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml")
@@ -282,7 +282,7 @@ public class Canonicalizer20010315ExclusiveTest {
         byte[] bytes = c14n.engineCanonicalize(input, "env ns0 xsi wsu");
 
 */
-        Canonicalizer20010315WithCommentsTransformer c = new Canonicalizer20010315WithCommentsTransformer("env ns0 xsi wsu");
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer("env ns0 xsi wsu");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(XML)

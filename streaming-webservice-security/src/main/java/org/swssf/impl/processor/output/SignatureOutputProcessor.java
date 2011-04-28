@@ -19,7 +19,7 @@ import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
+import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
@@ -143,7 +143,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
             Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             Transformer transformer = null;
             try {
-                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
                     Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
                     transformer = constructor.newInstance((String) null);
                 } else {

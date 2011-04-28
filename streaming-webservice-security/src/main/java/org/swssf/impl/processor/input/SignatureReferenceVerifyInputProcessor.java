@@ -18,7 +18,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315Transformer;
+import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.swssf.impl.util.DigestOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SignedElementSecurityEvent;
@@ -161,7 +161,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
                 Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(transformType.getAlgorithm());
                 Transformer transformer;
-                if (Canonicalizer20010315Transformer.class.isAssignableFrom(transformerClass)) {
+                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
                     Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
                     transformer = constructor.newInstance((String) null);
                 } else {
