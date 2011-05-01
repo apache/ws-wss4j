@@ -168,17 +168,20 @@ public class UsernameTokenTest extends AbstractTestBase {
     //wss4j bug. PWNONE throws an NPE...
     /*@Test
     public void testInboundPWNONE() throws Exception {
-        Document securedDocument;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.USERNAME_TOKEN;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
-            securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
         //done UsernameToken; now verification:
@@ -196,7 +199,8 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
         }
-    }*/
+    }
+    */
 
     @Test
     public void testInboundUT_SIGN() throws Exception {
@@ -210,10 +214,6 @@ public class UsernameTokenTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_UsernameToken.getNamespaceURI(), Constants.TAG_wsse_UsernameToken.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
-
-            nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_wsse_Password.getNamespaceURI(), Constants.TAG_wsse_Password.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Type.getLocalPart()), Constants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

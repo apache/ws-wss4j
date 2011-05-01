@@ -45,6 +45,11 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     @SuppressWarnings("unchecked")
+    public <T> T remove(String key) {
+        return (T) content.remove(key);
+    }
+
+    @SuppressWarnings("unchecked")
     public <T extends List> void putList(Class key, T value) {
         if (value == null) {
             return;

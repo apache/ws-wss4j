@@ -53,11 +53,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         // If the UsernameToken is to be used for key derivation, the (1.1)
         // spec says that it cannot contain a password, and it must contain
         // an Iteration element
-        if (usernameTokenType.getSalt() != null) {
-            if (usernameTokenType.getPassword() != null || usernameTokenType.getIteration() == null) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01");
-            }
-            return;
+        if (usernameTokenType.getSalt() != null && (usernameTokenType.getPassword() != null || usernameTokenType.getIteration() == null)) {
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
 
         Integer iteration = null;

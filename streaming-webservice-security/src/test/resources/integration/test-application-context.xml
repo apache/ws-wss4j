@@ -13,10 +13,7 @@
        http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
-    <import resource="classpath:META-INF/cxf/cxf-extension-http.xml"/>
-    <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml"/>
 
     <bean name="inSecurityProperties" class="org.swssf.ext.SecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>

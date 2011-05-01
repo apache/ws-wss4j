@@ -70,7 +70,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
                         securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
                                 keyInfoType,
-                                securityProperties.getDecryptionCrypto(),
+                                crypto,
                                 securityProperties.getCallbackHandler(),
                                 inputProcessorChain.getSecurityContext()
                         );

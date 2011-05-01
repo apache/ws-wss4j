@@ -20,10 +20,7 @@ import org.swssf.ext.WSSecurityException;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 import java.util.Iterator;
 
@@ -71,9 +68,6 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     }
 
     private XMLEvent getCurrentEvent() {
-        if (currentEvent == null) {
-            throw new IllegalStateException("Illegal state");
-        }
         return currentEvent;
     }
 
@@ -430,6 +424,9 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
 
     public int getEventType() {
         XMLEvent xmlEvent = getCurrentEvent();
+        if (xmlEvent == null) {
+            return XMLStreamConstants.START_DOCUMENT;
+        }
         return xmlEvent.getEventType();
     }
 

@@ -31,6 +31,7 @@
     </dependencyManagement>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <cxfVersion>2.4.0</cxfVersion>
     </properties>
 

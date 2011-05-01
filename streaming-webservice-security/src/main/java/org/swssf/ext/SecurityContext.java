@@ -31,6 +31,8 @@ public interface SecurityContext {
 
     public <T> T get(String key);
 
+    public <T> T remove(String key);
+
     public <T extends List> void putList(Class key, T value);
 
     public <T> void putAsList(Class key, T value);

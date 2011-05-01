@@ -42,64 +42,80 @@ public class
     }
 
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto, final CallbackHandler callbackHandler, SecurityContext securityContext) throws WSSecurityException {
-        if (keyInfoType != null) {
-            final SecurityTokenReferenceType securityTokenReferenceType = keyInfoType.getSecurityTokenReferenceType();
-            if (securityTokenReferenceType == null) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noSecTokRef");
-            }
-
-            if (securityTokenReferenceType.getX509DataType() != null) {
-                return new X509DataSecurityToken(crypto, callbackHandler, securityTokenReferenceType.getX509DataType());
-            } /*else if (securityToken instanceof X509IssuerSerialType) {
-                            X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType) securityToken;
-                            //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
-                        }*/ else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
-                KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
-
-                String valueType = keyIdentifierType.getValueType();
-                String encodingType = keyIdentifierType.getEncodingType();
-
-                byte[] binaryContent;
-                if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
-                    binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
-                } else {
-                    binaryContent = keyIdentifierType.getValue().getBytes();
+        try {
+            if (keyInfoType != null) {
+                final SecurityTokenReferenceType securityTokenReferenceType = keyInfoType.getSecurityTokenReferenceType();
+                if (securityTokenReferenceType == null) {
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noSecTokRef");
                 }
 
-                if (Constants.NS_X509_V3_TYPE.equals(valueType)) {
-                    return new X509_V3SecurityToken(crypto, callbackHandler, binaryContent);
-                } else if (Constants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
-                    return new X509SubjectKeyIdentifierSecurityToken(crypto, callbackHandler, binaryContent);
-                } else if (Constants.NS_THUMBPRINT.equals(valueType)) {
-                    return new ThumbprintSHA1SecurityToken(crypto, callbackHandler, binaryContent);
-                }
-            }//todo SAML Token, Custom-Token etc...
-            else if (securityTokenReferenceType.getReferenceType() != null) {
+                if (securityTokenReferenceType.getX509DataType() != null) {
+                    return new X509DataSecurityToken(crypto, callbackHandler, securityTokenReferenceType.getX509DataType());
+                } /*else if (securityToken instanceof X509IssuerSerialType) {
+                                X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType) securityToken;
+                                //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
+                            }*/ else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
+                    KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
 
-                String uri = securityTokenReferenceType.getReferenceType().getURI();
-                if (uri == null) {
-                    throw new WSSecurityException("badReferenceURI");
-                }
-                uri = Utils.dropReferenceMarker(uri);
-                //embedded BST:
-                if (securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType() != null
-                        && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
-                    BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
-                    return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler);
-                } else {//referenced BST:
-                    //we have to search BST somewhere in the doc. First we will check for a BST already processed and
-                    //stored in the context. Otherwise we will abort now.
-                    SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
-                    if (securityTokenProvider == null) {
-                        throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "noToken", new Object[]{uri});
+                    String valueType = keyIdentifierType.getValueType();
+                    String encodingType = keyIdentifierType.getEncodingType();
+
+                    byte[] binaryContent;
+                    if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
+                        binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
+                    } else {
+                        binaryContent = keyIdentifierType.getValue().getBytes();
                     }
-                    return securityTokenProvider.getSecurityToken(crypto);
+
+                    if (Constants.NS_X509_V3_TYPE.equals(valueType)) {
+                        return new X509_V3SecurityToken(crypto, callbackHandler, binaryContent);
+                    } else if (Constants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
+                        return new X509SubjectKeyIdentifierSecurityToken(crypto, callbackHandler, binaryContent);
+                    } else if (Constants.NS_THUMBPRINT.equals(valueType)) {
+                        return new ThumbprintSHA1SecurityToken(crypto, callbackHandler, binaryContent);
+                    }
+                }//todo SAML Token, Custom-Token etc...
+                else if (securityTokenReferenceType.getReferenceType() != null) {
+
+                    String uri = securityTokenReferenceType.getReferenceType().getURI();
+                    if (uri == null) {
+                        throw new WSSecurityException("badReferenceURI");
+                    }
+                    uri = Utils.dropReferenceMarker(uri);
+                    //embedded BST:
+                    if (securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType() != null
+                            && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
+                        BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
+                        return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler);
+                    } else {//referenced BST:
+                        //we have to search BST somewhere in the doc. First we will check for a BST already processed and
+                        //stored in the context. Otherwise we will abort now.
+
+                        //prevent recursive key reference DOS:
+                        Integer invokeCount = securityContext.<Integer>get("" + Thread.currentThread().hashCode());
+                        if (invokeCount == null) {
+                            invokeCount = 0;
+                        }
+                        invokeCount++;
+                        if (invokeCount == 10) {
+                            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN);
+                        }
+                        securityContext.put("" + Thread.currentThread().hashCode(), invokeCount);
+
+                        SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
+                        if (securityTokenProvider == null) {
+                            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "noToken", new Object[]{uri});
+                        }
+                        return securityTokenProvider.getSecurityToken(crypto);
+                    }
                 }
+            } else if (crypto.getDefaultX509Alias() != null) {
+                return new X509DefaultSecurityToken(crypto, callbackHandler, crypto.getDefaultX509Alias());
             }
-        } else if (crypto.getDefaultX509Alias() != null) {
-            return new X509DefaultSecurityToken(crypto, callbackHandler, crypto.getDefaultX509Alias());
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
+        } finally {
+            securityContext.remove("" + Thread.currentThread().hashCode());
         }
-        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
     }
 
     public SecurityToken getSecurityToken(BinarySecurityTokenType binarySecurityTokenType, Crypto crypto, CallbackHandler callbackHandler) throws WSSecurityException {
