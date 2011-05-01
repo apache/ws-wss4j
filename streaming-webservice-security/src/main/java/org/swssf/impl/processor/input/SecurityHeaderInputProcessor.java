@@ -65,6 +65,8 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         InternalSecurityHeaderBufferProcessor internalSecurityHeaderBufferProcessor = new InternalSecurityHeaderBufferProcessor(getSecurityProperties());
         subInputProcessorChain.addProcessor(internalSecurityHeaderBufferProcessor);
 
+        boolean responsibleSecurityHeaderFound = false;
+
         XMLEvent xmlEvent;
         do {
             subInputProcessorChain.reset();
@@ -83,6 +85,14 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                         && subInputProcessorChain.getDocumentContext().isInSOAPHeader()
                         && startElement.getName().equals(Constants.TAG_wsse_Security)) {
 
+                    if (!Utils.isResponsibleActorOrRole(startElement,
+                            subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace(),
+                            getSecurityProperties().getActor())) {
+                        continue;
+                    }
+
+                    responsibleSecurityHeaderFound = true;
+
                     subInputProcessorChain.getDocumentContext().setInSecurityHeader(true);
                     //minus one because the first event will be deqeued when finished security header. @see below
                     countOfEventsToResponsibleSecurityHeader = eventCount - 1;
@@ -93,7 +103,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 }
             } else if (xmlEvent.isEndElement()) {
                 EndElement endElement = xmlEvent.asEndElement();
-                if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 2
+                if (responsibleSecurityHeaderFound && subInputProcessorChain.getDocumentContext().getDocumentLevel() == 2
                         && endElement.getName().equals(Constants.TAG_wsse_Security)) {
 
                     //subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);

@@ -41,7 +41,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
+            if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {
                 try {
                     DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
                     XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());

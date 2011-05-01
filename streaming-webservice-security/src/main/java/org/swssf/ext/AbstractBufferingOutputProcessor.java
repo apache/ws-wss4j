@@ -15,6 +15,7 @@
 package org.swssf.ext;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
@@ -48,10 +49,29 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
             XMLEvent xmlEvent = xmlEventIterator.next();
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
-                if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
+                if (startElement.getName().equals(Constants.TAG_wsse_Security)
+                        && Utils.isResponsibleActorOrRole(
+                        startElement,
+                        subOutputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace(),
+                        getSecurityProperties().getActor())) {
+                    subOutputProcessorChain.getDocumentContext().setInSecurityHeader(true);
                     subOutputProcessorChain.reset();
                     subOutputProcessorChain.processEvent(xmlEvent);
                     processHeaderEvent(subOutputProcessorChain);
+                    break;
+                }
+            }
+            subOutputProcessorChain.reset();
+            subOutputProcessorChain.processEvent(xmlEvent);
+        }
+        while (xmlEventIterator.hasNext()) {
+            XMLEvent xmlEvent = xmlEventIterator.next();
+            if (xmlEvent.isEndElement()) {
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_wsse_Security)) {
+                    subOutputProcessorChain.getDocumentContext().setInSecurityHeader(false);
+                    subOutputProcessorChain.reset();
+                    subOutputProcessorChain.processEvent(xmlEvent);
                     break;
                 }
             }

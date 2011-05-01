@@ -234,6 +234,7 @@ public abstract class AbstractTestBase {
         } else {
             handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "receiver");
         }
+        handlerInfo.getHandlerConfig().putAll(properties);
         //handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTOR, "receiver");
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");

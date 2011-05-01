@@ -619,4 +619,14 @@ public class SecurityProperties {
     public void setUseReqSigCertForEncryption(boolean useReqSigCertForEncryption) {
         this.useReqSigCertForEncryption = useReqSigCertForEncryption;
     }
+
+    private String actor;
+
+    public String getActor() {
+        return actor;
+    }
+
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
 }

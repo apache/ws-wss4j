@@ -46,7 +46,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
+            if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 boolean aSignatureFound = false;

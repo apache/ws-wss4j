@@ -207,4 +207,34 @@ public class Utils {
         }
         return xmlEvent;
     }
+
+    public static boolean isResponsibleActorOrRole(StartElement startElement, String soapVersionNamespace, String responsibleActor) {
+        QName actorRole;
+        if (Constants.NS_SOAP11.equals(soapVersionNamespace)) {
+            actorRole = Constants.ATT_soap11_Actor;
+        } else {
+            actorRole = Constants.ATT_soap12_Role;
+        }
+
+        String actor = null;
+        Iterator<Attribute> attributeIterator = startElement.getAttributes();
+        while (attributeIterator.hasNext()) {
+            Attribute next = attributeIterator.next();
+            if (actorRole.equals(next.getName())) {
+                actor = next.getValue();
+            }
+        }
+
+        if (responsibleActor == null) {
+            if (actor == null) {
+                return true;
+            }
+            return false;
+        } else {
+            if (responsibleActor.equals(actor)) {
+                return true;
+            }
+            return false;
+        }
+    }
 }

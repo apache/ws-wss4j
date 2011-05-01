@@ -27,8 +27,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.rpc.JAXRPCException;
 import javax.xml.rpc.handler.MessageContext;
 import javax.xml.soap.SOAPConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -501,5 +503,253 @@ public class InteroperabilityTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
         }
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilitySOAPActionInbound() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("test");
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+        //read the whole stream:
+        transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilityInvalidSOAPActionInbound() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("anotherTest");
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        try {
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            //read the whole stream:
+            transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("XMLStreamException expected");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getMessage(), "org.swssf.ext.WSSecurityException: General security error (Security header is missing)");
+        }
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilitySOAPRoleInbound() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("test");
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+        //read the whole stream:
+        transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilityTwoSecurityHeadersSOAPRoleInbound() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        securedDocument = doOutboundSecurityWithWSS4J(new ByteArrayInputStream(baos.toByteArray()), action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+
+        transformer = TRANSFORMER_FACTORY.newTransformer();
+        baos.reset();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("test");
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+        //read the whole stream:
+        transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilitySOAPActionOutbound() throws Exception {
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("test");
+        securityProperties.setEncryptionUser("receiver");
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        securityProperties.setSignatureUser("transmitter");
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
+        securityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilityInvalidSOAPActionOutbound() throws Exception {
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("test");
+        securityProperties.setEncryptionUser("receiver");
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        securityProperties.setSignatureUser("transmitter");
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
+        securityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.ACTOR, "anotherTest");
+        try {
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+            Assert.fail("Expected JAXRPCException");
+        } catch (JAXRPCException e) {
+            Assert.assertEquals(e.getMessage(), "WSS4JHandler: security processing failed (actions mismatch)");
+        }
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilitySOAPRoleOutbound() throws Exception {
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setActor("test");
+        securityProperties.setEncryptionUser("receiver");
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        securityProperties.setSignatureUser("transmitter");
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
+        securityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
+
+        ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_2_PROTOCOL, properties, false);
+    }
+
+    @Test(invocationCount = 1)
+    public void testInteroperabilityTwoSecurityHeadersSOAPRoleOutbound() throws Exception {
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.setEncryptionUser("receiver");
+        securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        securityProperties.setSignatureUser("transmitter");
+        securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        Constants.Action[] actions = new Constants.Action[]{Constants.Action.TIMESTAMP, Constants.Action.SIGNATURE, Constants.Action.ENCRYPT};
+        securityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
+
+        ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+        securityProperties.setActor("test");
+        baos = doOutboundSecurity(securityProperties, new ByteArrayInputStream(baos.toByteArray()));
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.ACTOR, "test");
+        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_2_PROTOCOL, properties, false);
     }
 }

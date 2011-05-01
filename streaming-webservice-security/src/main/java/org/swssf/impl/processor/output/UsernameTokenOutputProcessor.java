@@ -117,7 +117,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
-                if (startElement.getName().equals(Constants.TAG_wsse_Security)) {
+                if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                     Map<QName, String> attributes = new HashMap<QName, String>();
