@@ -15,8 +15,8 @@
 package org.swssf.test;
 
 import org.swssf.ext.Constants;
+import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_ExclOmitCommentsTransformer;
 import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_ExclWithCommentsTransformer;
-import org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_WithCommentsTransformer;
 import org.swssf.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -46,82 +46,6 @@ public class Canonicalizer20010315ExclusiveTest {
     public void setUp() throws Exception {
         this.xmlInputFactory = XMLInputFactory.newFactory();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
-    }
-
-    @Test
-    public void test221() throws Exception {
-
-        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
-                this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
-        );
-
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
-                break;
-            }
-        }
-        while (xmlEventReader.hasNext()) {
-
-            c.transform(xmlEvent, baos);
-
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
-                break;
-            }
-            xmlEvent = xmlEventReader.nextEvent();
-        }
-
-        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_1_c14nized.xml"));
-        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
-
-        if (equals == false) {
-            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
-            System.out.println("");
-            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
-        }
-
-        assertTrue(equals);
-    }
-
-    @Test
-    public void test222() throws Exception {
-
-        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
-                this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
-        );
-
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
-                break;
-            }
-        }
-        while (xmlEventReader.hasNext()) {
-
-            c.transform(xmlEvent, baos);
-
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
-                break;
-            }
-            xmlEvent = xmlEventReader.nextEvent();
-        }
-
-        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_2_c14nized.xml"));
-        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
-
-        if (equals == false) {
-            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
-            System.out.println("");
-            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
-        }
-
-        assertTrue(equals);
     }
 
     @Test
@@ -282,7 +206,7 @@ public class Canonicalizer20010315ExclusiveTest {
         byte[] bytes = c14n.engineCanonicalize(input, "env ns0 xsi wsu");
 
 */
-        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer("env ns0 xsi wsu");
+        Canonicalizer20010315_ExclOmitCommentsTransformer c = new Canonicalizer20010315_ExclOmitCommentsTransformer("env ns0 xsi wsu");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(XML)

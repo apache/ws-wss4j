@@ -20,10 +20,13 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.action.SignatureAction;
-import org.apache.ws.security.handler.*;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.XMLUtils;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
 import org.swssf.securityEvent.SecurityEvent;
@@ -31,11 +34,14 @@ import org.swssf.securityEvent.SecurityEventListener;
 import org.swssf.test.utils.StAX2DOM;
 import org.swssf.test.utils.XmlReaderToWriter;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.rpc.Call;
 import javax.xml.rpc.JAXRPCException;
 import javax.xml.rpc.handler.HandlerInfo;
 import javax.xml.rpc.handler.MessageContext;
@@ -53,9 +59,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.security.cert.X509Certificate;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -70,6 +77,9 @@ public abstract class AbstractTestBase {
     protected static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     protected static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     protected DocumentBuilderFactory documentBuilderFactory;
+
+    protected static final String SECURED_DOCUMENT = "securedDocument";
+    protected static final String NO_SERIALIZATION = "noSerialization";
 
     public AbstractTestBase() {
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -117,15 +127,15 @@ public abstract class AbstractTestBase {
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
         MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, soapProtocol);
-        return (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+        return (Document) messageContext.getProperty(SECURED_DOCUMENT);
     }
 
     protected MessageContext doOutboundSecurityWithWSS4J_1(InputStream sourceDocument, String action, final Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
-        WSS4JHandler wss4JHandler = new WSS4JHandler();
+        CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
         wss4JHandler.init(handlerInfo);
-        MessageContext messageContext = getMessageContext(sourceDocument, soapProtocol);
-        handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, WSHandlerConstants.NO_SERIALIZATION + " " + action);
+        final MessageContext messageContext = getMessageContext(sourceDocument, soapProtocol);
+        handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTION, action);
         handlerInfo.getHandlerConfig().put(WSHandlerConstants.USER, "transmitter");
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
@@ -156,17 +166,14 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
+        requestData.setNoSerialization(true);
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setAction(new Integer(WSConstants.SIGN), new SignatureAction() {
             @Override
             public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData) throws org.apache.ws.security.WSSecurityException {
-                String password =
-                        handler.getPassword(
-                                reqData.getSignatureUser(),
-                                actionToDo,
-                                WSHandlerConstants.PW_CALLBACK_CLASS,
-                                WSHandlerConstants.PW_CALLBACK_REF, reqData
-                        ).getPassword();
+
+                CallbackHandler callbackHandler = handler.getPasswordCallbackHandler(reqData);
+                org.apache.ws.security.WSPasswordCallback passwordCallback = handler.getPasswordCB(reqData.getSignatureUser(), actionToDo, callbackHandler, reqData);
 
                 WSSecSignature wsSign = new WSSecSignature();
                 wsSign.setWsConfig(reqData.getWssConfig());
@@ -184,7 +191,7 @@ public abstract class AbstractTestBase {
                     wsSign.setSigCanonicalization(properties.getProperty("CanonicalizationAlgo"));
                 }
 
-                wsSign.setUserInfo(reqData.getSignatureUser(), password);
+                wsSign.setUserInfo(reqData.getSignatureUser(), passwordCallback.getPassword());
                 if (reqData.getSignatureParts().size() > 0) {
                     wsSign.setParts(reqData.getSignatureParts());
                 }
@@ -205,7 +212,7 @@ public abstract class AbstractTestBase {
 
     protected Document doInboundSecurityWithWSS4J(Document document, String action) throws Exception {
         MessageContext messageContext = doInboundSecurityWithWSS4J_1(document, action);
-        return ((Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY));
+        return ((Document) messageContext.getProperty(SECURED_DOCUMENT));
     }
 
     protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action) throws Exception {
@@ -309,7 +316,7 @@ public abstract class AbstractTestBase {
                     MessageFactory messageFactory = MessageFactory.newInstance(soapProtocol);
                     SOAPMessage soapMessage = messageFactory.createMessage();
                     soapMessage.getSOAPPart().setContent(inSource);
-                    setProperty(WSHandlerConstants.SND_SECURITY, soapMessage.getSOAPHeader().getOwnerDocument());
+                    setProperty(SECURED_DOCUMENT, soapMessage.getSOAPHeader().getOwnerDocument());
                     return soapMessage;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -372,20 +379,163 @@ public abstract class AbstractTestBase {
         return xPath.compile(expression);
     }
 
-    class CustomWSS4JHandler extends WSS4JHandler {
+    class CustomWSS4JHandler extends WSHandler {
 
         private final Log log = LogFactory.getLog(CustomWSS4JHandler.class.getName());
         private final boolean doDebug = log.isDebugEnabled();
+        private HandlerInfo handlerInfo;
 
-        @Override
+        /**
+         * Initializes the instance of the handler.
+         */
+        public void init(HandlerInfo hi) {
+            handlerInfo = hi;
+        }
+
+        /**
+         * Handles incoming web service requests and outgoing responses
+         */
+        public boolean doSender(MessageContext mc, RequestData reqData, boolean isRequest) throws org.apache.ws.security.WSSecurityException {
+
+            reqData.getSignatureParts().clear();
+            reqData.getEncryptParts().clear();
+            reqData.setNoSerialization(true);
+            /*
+            * Get the action first.
+            */
+            Vector actions = new Vector();
+            String action = (String) getOption(WSHandlerConstants.ACTION);
+            if (action == null) {
+                action = (String) mc.getProperty(WSHandlerConstants.ACTION);
+            }
+            if (action == null) {
+                throw new JAXRPCException("WSS4JHandler: No action defined");
+            }
+            int doAction = WSSecurityUtil.decodeAction(action, actions);
+            if (doAction == WSConstants.NO_SECURITY) {
+                return true;
+            }
+
+            /*
+            * For every action we need a username, so get this now. The username
+            * defined in the deployment descriptor takes precedence.
+            */
+            reqData.setUsername((String) getOption(WSHandlerConstants.USER));
+            if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
+                reqData.setUsername((String) mc.getProperty(WSHandlerConstants.USER));
+                mc.setProperty(WSHandlerConstants.USER, null);
+            }
+
+            /*
+            * Now we perform some set-up for UsernameToken and Signature
+            * functions. No need to do it for encryption only. Check if username
+            * is available and then get a password.
+            */
+            if (((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0)
+                    && (reqData.getUsername() == null || reqData.getUsername().equals(""))) {
+                /*
+                * We need a username - if none throw an JAXRPCException. For encryption
+                * there is a specific parameter to get a username.
+                */
+                throw new JAXRPCException("WSS4JHandler: Empty username for specified action");
+            }
+            if (doDebug) {
+                log.debug("Action: " + doAction);
+                log.debug("Actor: " + reqData.getActor());
+            }
+            /*
+            * Now get the SOAP part from the request message and convert it into a
+            * Document.
+            *
+            * This forces Axis to serialize the SOAP request into FORM_STRING.
+            * This string is converted into a document.
+            *
+            * During the FORM_STRING serialization Axis performs multi-ref of
+            * complex data types (if requested), generates and inserts references
+            * for attachments and so on. The resulting Document MUST be the
+            * complete and final SOAP request as Axis would send it over the wire.
+            * Therefore this must shall be the last (or only) handler in a chain.
+            *
+            * Now we can perform our security operations on this request.
+            */
+            Document doc = null;
+            SOAPMessage message = ((SOAPMessageContext) mc).getMessage();
+            Boolean propFormOptimization = (Boolean) mc.getProperty("axis.form.optimization");
+            log.debug("Form optimization: " + propFormOptimization);
+            /*
+            * If the message context property contains a document then this is a
+            * chained handler.
+            */
+            SOAPPart sPart = message.getSOAPPart();
+            if ((doc = (Document) mc.getProperty(SECURED_DOCUMENT)) == null) {
+                try {
+                    doc = messageToDocument(message);
+                } catch (Exception e) {
+                    if (doDebug) {
+                        log.debug(e.getMessage(), e);
+                    }
+                    throw new JAXRPCException("WSS4JHandler: cannot get SOAP envlope from message", e);
+                }
+            }
+            if (doDebug) {
+                log.debug("WSS4JHandler: orginal SOAP request: ");
+                log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
+            }
+            doSenderAction(doAction, doc, reqData, actions, isRequest);
+
+            /*
+            * If required convert the resulting document into a message first. The
+            * outputDOM() method performs the necessary c14n call. After that we
+            * extract it as a string for further processing.
+            *
+            * Set the resulting byte array as the new SOAP message.
+            *
+            * If noSerialization is false, this handler shall be the last (or only)
+            * one in a handler chain. If noSerialization is true, just set the
+            * processed Document in the transfer property. The next Axis WSS4J
+            * handler takes it and performs additional security processing steps.
+            *
+            */
+            if (reqData.isNoSerialization()) {
+                mc.setProperty(SECURED_DOCUMENT, doc);
+            } else {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                XMLUtils.outputDOM(doc, os, true);
+                if (doDebug) {
+                    String osStr = null;
+                    try {
+                        osStr = os.toString("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        if (doDebug) {
+                            log.debug(e.getMessage(), e);
+                        }
+                        osStr = os.toString();
+                    }
+                    log.debug("Send request:");
+                    log.debug(osStr);
+                }
+
+                try {
+                    sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
+                } catch (SOAPException se) {
+                    if (doDebug) {
+                        log.debug(se.getMessage(), se);
+                    }
+                    throw new JAXRPCException("Couldn't set content on SOAPPart" + se.getMessage(), se);
+                }
+                mc.setProperty(SECURED_DOCUMENT, null);
+            }
+            if (doDebug) {
+                log.debug("WSS4JHandler: exit invoke()");
+            }
+            return true;
+        }
+
         public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws org.apache.ws.security.WSSecurityException {
             Vector actions = new Vector();
-            String action = (String) getOption(WSHandlerConstants.RECEIVE + '.' + WSHandlerConstants.ACTION);
+            String action = (String) getOption(WSHandlerConstants.ACTION);
             if (action == null) {
-                action = (String) getOption(WSHandlerConstants.ACTION);
-                if (action == null) {
-                    action = (String) mc.getProperty(WSHandlerConstants.ACTION);
-                }
+                action = (String) mc.getProperty(WSHandlerConstants.ACTION);
             }
             if (action == null) {
                 throw new JAXRPCException("WSS4JHandler: No action defined");
@@ -404,19 +554,6 @@ public abstract class AbstractTestBase {
                 throw new JAXRPCException(e);
             }
 
-
-            /* hmmmmmmmmm????
-        Document doc = null;
-        try {
-            doc = messageToDocument(message);
-        } catch (Exception ex) {
-            if (doDebug) {
-                log.debug(ex.getMessage(), ex);
-            }
-            throw new JAXRPCException("WSS4JHandler: cannot convert into document",
-                    ex);
-        }
-        */
             /*
             * Check if it's a fault. Don't process faults.
             *
@@ -435,10 +572,12 @@ public abstract class AbstractTestBase {
             * To check a UsernameToken or to decrypt an encrypted message we need
             * a password.
             */
+
             CallbackHandler cbHandler = null;
             if ((doAction & (WSConstants.ENCR | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
-                cbHandler = getPasswordCB(reqData);
+                cbHandler = getPasswordCallbackHandler(reqData);
             }
+            reqData.setCallbackHandler(cbHandler);
 
             /*
             * Get and check the Signature specific parameters first because they
@@ -446,14 +585,12 @@ public abstract class AbstractTestBase {
             */
             doReceiverAction(doAction, reqData);
 
-            Vector wsResult = null;
+            Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
+
+            List wsResult = null;
             try {
                 wsResult =
-                        secEngine.processSecurityHeader(doc,
-                                actor,
-                                cbHandler,
-                                reqData.getSigCrypto(),
-                                reqData.getDecCrypto());
+                        secEngine.processSecurityHeader(elem, reqData);
             } catch (org.apache.ws.security.WSSecurityException ex) {
                 if (doDebug) {
                     log.debug(ex.getMessage(), ex);
@@ -471,28 +608,6 @@ public abstract class AbstractTestBase {
             if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
                 checkSignatureConfirmation(reqData, wsResult);
             }
-
-            /*
-            * If we had some security processing, get the original
-            * SOAP part of Axis' message and replace it with new SOAP
-            * part. This new part may contain decrypted elements.
-            */
-
-            /* hmmmmmmmmmmmm ?????
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XMLUtils.outputDOM(doc, os, true);
-        try {
-            sPart.setContent(new StreamSource(new ByteArrayInputStream(os.toByteArray())));
-        } catch (SOAPException se) {
-            if (doDebug) {
-                log.debug(se.getMessage(), se);
-            }
-            throw new JAXRPCException(
-                "Couldn't set content on SOAPPart" + se.getMessage(), se
-            );
-        }
-
-        */
 
             if (doDebug) {
                 log.debug("Processed received SOAP request");
@@ -519,21 +634,6 @@ public abstract class AbstractTestBase {
                 }
                 throw new JAXRPCException("WSS4JHandler: cannot get SOAP header after security processing", ex);
             }
-/*
-        Iterator headers = sHeader.examineHeaderElements(actor);
-
-        SOAPHeaderElement headerElement = null;
-        while (headers.hasNext()) {
-            SOAPHeaderElement hE = (SOAPHeaderElement) headers.next();
-            if (hE.getElementName().getLocalName().equals(WSConstants.WSSE_LN)
-                    && ((org.w3c.dom.Node) hE).getNamespaceURI().equals(WSConstants.WSSE_NS)) {
-                headerElement = hE;
-                break;
-            }
-        }
-  */
-            /* JAXRPC conversion changes */
-//        headerElement.setMustUnderstand(false); // is this sufficient?
 
             /*
             * Now we can check the certificate used to sign the message.
@@ -549,6 +649,7 @@ public abstract class AbstractTestBase {
 
             WSSecurityEngineResult actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.SIGN);
 
+/*
             if (actionResult != null) {
                 X509Certificate returnCert =
                         (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
@@ -557,6 +658,7 @@ public abstract class AbstractTestBase {
                     throw new JAXRPCException("WSS4JHandler: The certificate used for the signature is not trusted");
                 }
             }
+*/
 
             /*
             * Perform further checks on the timestamp that was transmitted in the header.
@@ -570,6 +672,7 @@ public abstract class AbstractTestBase {
             // Extract the timestamp action result from the action vector
             actionResult = WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
 
+/*
             if (actionResult != null) {
                 Timestamp timestamp =
                         (Timestamp) actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
@@ -579,11 +682,12 @@ public abstract class AbstractTestBase {
                     throw new JAXRPCException("WSS4JHandler: The timestamp could not be validated");
                 }
             }
+*/
 
             /*
             * now check the security actions: do they match, in right order?
             */
-            if (!checkReceiverResults(wsResult, actions)) {
+            if (!checkReceiverResultsAnyOrder(wsResult, actions)) {
                 throw new JAXRPCException("WSS4JHandler: security processing failed (actions mismatch)");
             }
 
@@ -607,6 +711,74 @@ public abstract class AbstractTestBase {
             }
 
             return true;
+        }
+
+        protected boolean checkReceiverResultsAnyOrder(
+                List<WSSecurityEngineResult> wsResult, List<Integer> actions
+        ) {
+            List<Integer> recordedActions = new ArrayList<Integer>(actions.size());
+            for (Integer action : actions) {
+                recordedActions.add(action);
+            }
+
+            for (WSSecurityEngineResult result : wsResult) {
+                final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+                int act = actInt.intValue();
+                if (act == WSConstants.SC || act == WSConstants.BST) {
+                    continue;
+                }
+
+                if (!recordedActions.remove(actInt)) {
+                    if (actInt == 8192) {
+                        if (!recordedActions.remove(new Integer(1))) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+            if (!recordedActions.isEmpty()) {
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Utility method to convert SOAPMessage to org.w3c.dom.Document
+         */
+        public Document messageToDocument(SOAPMessage message) {
+            try {
+                Source content = message.getSOAPPart().getContent();
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setNamespaceAware(true);
+                DocumentBuilder builder = dbf.newDocumentBuilder();
+                return builder.parse(org.apache.ws.security.util.XMLUtils.sourceToInputSource(content));
+            } catch (Exception ex) {
+                throw new JAXRPCException("messageToDocument: cannot convert SOAPMessage into Document", ex);
+            }
+        }
+
+        public Object getOption(String key) {
+            return handlerInfo.getHandlerConfig().get(key);
+        }
+
+        public Object getProperty(Object msgContext, String key) {
+            return ((MessageContext) msgContext).getProperty(key);
+        }
+
+        public void setProperty(Object msgContext, String key, Object value) {
+            ((MessageContext) msgContext).setProperty(key, value);
+        }
+
+        public String getPassword(Object msgContext) {
+            return (String) ((MessageContext) msgContext).getProperty(Call.PASSWORD_PROPERTY);
+        }
+
+        public void setPassword(Object msgContext, String password) {
+            ((MessageContext) msgContext).setProperty(Call.PASSWORD_PROPERTY, password);
         }
     }
 }

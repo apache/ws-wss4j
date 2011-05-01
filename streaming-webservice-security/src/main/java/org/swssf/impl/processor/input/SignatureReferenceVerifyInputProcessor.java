@@ -163,7 +163,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 Transformer transformer;
                 if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
                     Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
-                    transformer = constructor.newInstance((String) null);
+                    transformer = constructor.newInstance(transformType.getInclusiveNamespaces());
                 } else {
                     transformer = transformerClass.newInstance();
                 }

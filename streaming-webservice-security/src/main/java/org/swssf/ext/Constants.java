@@ -74,6 +74,7 @@ public class Constants {
     public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
 
     public static final String PREFIX_WSSE = "wsse";
+    public static final String PREFIX_WSSE11 = "wsse11";
     public static final QName TAG_wsse_Security = new QName(NS_WSSE10, "Security", PREFIX_WSSE);
 
     public static final String PREFIX_XENC = "xenc";
@@ -92,6 +93,7 @@ public class Constants {
     public static final QName TAG_wsse_SecurityTokenReference = new QName(NS_WSSE10, "SecurityTokenReference", PREFIX_WSSE);
     public static final QName TAG_wsse_Reference = new QName(NS_WSSE10, "Reference", PREFIX_WSSE);
     public static final QName ATT_wsse_Usage = new QName(NS_WSSE10, "Usage", PREFIX_WSSE);
+    public static final QName ATT_wsse11_TokenType = new QName(NS_WSSE11, "TokenType", PREFIX_WSSE11);
 
     public static final QName TAG_wsse_KeyIdentifier = new QName(NS_WSSE10, "KeyIdentifier", PREFIX_WSSE);
     public static final QName ATT_NULL_EncodingType = new QName(null, "EncodingType");
@@ -114,7 +116,6 @@ public class Constants {
 
     public static final QName TAG_xenc_EncryptedData = new QName(NS_XMLENC, "EncryptedData", PREFIX_XENC);
 
-    public static final String PREFIX_WSSE11 = "wsse11";
     public static final QName TAG_wsse11_EncryptedHeader = new QName(NS_WSSE11, "EncryptedHeader", PREFIX_WSSE11);
 
     public static final QName TAG_dsig_Signature = new QName(NS_DSIG, "Signature", PREFIX_DSIG);
@@ -172,6 +173,11 @@ public class Constants {
 
     public static final QName TAG_wsse11_SignatureConfirmation = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
     public static final QName ATT_NULL_Value = new QName(null, "Value");
+
+    public static final String NS_C14N_EXCL = "http://www.w3.org/2001/10/xml-exc-c14n#";
+    public static final String PREFIX_C14N_EXCL = "c14nEx";
+    public static final QName ATT_NULL_PrefixList = new QName(null, "PrefixList");
+    public static final QName TAG_c14nExcl_InclusiveNamespaces = new QName(NS_C14N_EXCL, "InclusiveNamespaces", PREFIX_C14N_EXCL);
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.

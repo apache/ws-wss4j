@@ -168,7 +168,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             try {
                 if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
                     Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
-                    transformer = constructor.newInstance((String) null);
+                    transformer = constructor.newInstance(signatureType.getSignedInfo().getCanonicalizationMethod().getInclusiveNamespaces());
                 } else {
                     transformer = transformerClass.newInstance();
                 }

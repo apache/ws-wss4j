@@ -58,6 +58,7 @@ public class TransformType implements Parseable {
     @XmlAttribute(name = "Algorithm", required = true)
     @XmlSchemaType(name = "anyURI")
     protected String algorithm;
+    protected String inclusiveNamespaces;
 
     private Parseable currentParseable;
 
@@ -84,7 +85,32 @@ public class TransformType implements Parseable {
         switch (xmlEvent.getEventType()) {
             case XMLStreamConstants.START_ELEMENT:
                 StartElement startElement = xmlEvent.asStartElement();
-                throw new ParseException("Unsupported Element: " + startElement.getName());
+                if (startElement.getName().equals(Constants.TAG_c14nExcl_InclusiveNamespaces)) {
+                    Attribute attribute = startElement.getAttributeByName(Constants.ATT_NULL_PrefixList);
+                    if (attribute != null) {
+                        inclusiveNamespaces = attribute.getValue();
+                    }
+                    currentParseable = new Parseable() {
+                        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+                            switch (xmlEvent.getEventType()) {
+                                case XMLStreamConstants.START_ELEMENT:
+                                    StartElement startElement = xmlEvent.asStartElement();
+                                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                                case XMLStreamConstants.END_ELEMENT:
+                                    return true;
+                                case XMLStreamConstants.CHARACTERS:
+                                    break;
+                            }
+                            return false;
+                        }
+
+                        public void validate() throws ParseException {
+                        }
+                    };
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
+                break;
             case XMLStreamConstants.END_ELEMENT:
                 currentParseable = null;
                 EndElement endElement = xmlEvent.asEndElement();
@@ -158,4 +184,11 @@ public class TransformType implements Parseable {
         this.algorithm = value;
     }
 
+    public String getInclusiveNamespaces() {
+        return inclusiveNamespaces;
+    }
+
+    public void setInclusiveNamespaces(String inclusiveNamespaces) {
+        this.inclusiveNamespaces = inclusiveNamespaces;
+    }
 }

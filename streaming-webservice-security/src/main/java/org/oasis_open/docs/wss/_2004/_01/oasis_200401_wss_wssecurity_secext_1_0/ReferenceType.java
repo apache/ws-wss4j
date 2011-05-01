@@ -61,6 +61,9 @@ public class ReferenceType implements Parseable {
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
+    public ReferenceType() {
+    }
+
     public ReferenceType(StartElement startElement) {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {

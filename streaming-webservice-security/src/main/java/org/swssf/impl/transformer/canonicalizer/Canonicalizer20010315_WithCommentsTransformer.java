@@ -14,37 +14,13 @@
  */
 package org.swssf.impl.transformer.canonicalizer;
 
-import org.swssf.ext.ComparableAttribute;
-import org.swssf.ext.ComparableNamespace;
-import org.swssf.ext.XMLEventNS;
-
-import javax.xml.stream.events.StartElement;
-import java.util.List;
-
 /**
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
-public class Canonicalizer20010315_WithCommentsTransformer extends CanonicalizerBase {
+public class Canonicalizer20010315_WithCommentsTransformer extends Canonicalizer20010315 {
 
     public Canonicalizer20010315_WithCommentsTransformer(String inclusiveNamespaces) {
         super(inclusiveNamespaces, true);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected List<ComparableNamespace>[] getInitialNamespaces(XMLEventNS xmlEventNS) {
-        return xmlEventNS.getNamespaceList();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected List<ComparableAttribute>[] getInitialAttributes(XMLEventNS xmlEventNS) {
-        return xmlEventNS.getAttributeList();
-    }
-
-    @Override
-    protected boolean namespaceIsVisibleUtilized(StartElement startElement, ComparableNamespace comparableNamespace) {
-        return true;
     }
 }

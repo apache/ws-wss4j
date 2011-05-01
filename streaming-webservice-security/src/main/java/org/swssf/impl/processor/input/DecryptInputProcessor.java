@@ -21,6 +21,7 @@ import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.util.IVSplittingOutputStream;
 import org.swssf.impl.util.ReplaceableOuputStream;
 import org.swssf.securityEvent.*;
+import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
 import org.w3._2001._04.xmlenc_.ReferenceList;
 import org.w3._2001._04.xmlenc_.ReferenceType;
@@ -52,6 +53,7 @@ import java.util.*;
 public class DecryptInputProcessor extends AbstractInputProcessor {
 
     private ReferenceList referenceList;
+    private KeyInfoType keyInfoType;
 
     //the prefix must start with a letter by spec!:
     private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
@@ -61,6 +63,12 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
     public DecryptInputProcessor(ReferenceList referenceList, SecurityProperties securityProperties) {
         super(securityProperties);
+        this.referenceList = referenceList;
+    }
+
+    public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList, SecurityProperties securityProperties) {
+        super(securityProperties);
+        this.keyInfoType = keyInfoType;
         this.referenceList = referenceList;
     }
 
@@ -217,9 +225,16 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
                             }
 
+                            KeyInfoType keyInfoType;
+                            if (this.keyInfoType != null) {
+                                keyInfoType = this.keyInfoType;
+                            } else {
+                                keyInfoType = currentEncryptedDataType.getKeyInfo();
+                            }
+
                             //create a new Thread for streaming decryption
                             DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent,
-                                    currentEncryptedDataType, xmlEventNS);
+                                    currentEncryptedDataType, keyInfoType, xmlEventNS);
 
                             Thread receiverThread = new Thread(decryptionThread);
                             receiverThread.setName("decrypting thread");
@@ -456,7 +471,6 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
 
         private InputProcessorChain inputProcessorChain;
         private boolean header;
-        private EncryptedDataType encryptedDataType;
         private XMLEventNS startXMLElement;
         private PipedOutputStream pipedOutputStream;
         private PipedInputStream pipedInputStream;
@@ -464,18 +478,17 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
         private Key secretKey;
 
         public DecryptionThread(InputProcessorChain inputProcessorChain, boolean header,
-                                EncryptedDataType encryptedDataType, XMLEventNS startXMLElement) throws XMLStreamException, WSSecurityException {
+                                EncryptedDataType encryptedDataType, KeyInfoType keyInfoType, XMLEventNS startXMLElement) throws XMLStreamException, WSSecurityException {
 
             this.inputProcessorChain = inputProcessorChain;
             this.header = header;
-            this.encryptedDataType = encryptedDataType;
             this.startXMLElement = startXMLElement;
 
             final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
 
             //retrieve the securityToken which must be used for decryption
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
-                    encryptedDataType.getKeyInfo(), getSecurityProperties().getDecryptionCrypto(),
+                    keyInfoType, getSecurityProperties().getDecryptionCrypto(),
                     getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
 
             //fire a RecipientSecurityTokenEvent

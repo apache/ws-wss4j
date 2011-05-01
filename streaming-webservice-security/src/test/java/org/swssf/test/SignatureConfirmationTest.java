@@ -44,14 +44,16 @@ public class SignatureConfirmationTest extends AbstractTestBase {
     @Test
     public void testDefaultConfigurationInbound() throws Exception {
 
-        Vector sigv;
+        List sigv;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE;
-            MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, new Properties(), SOAPConstants.SOAP_1_1_PROTOCOL);
-            sigv = (Vector) messageContext.getProperty(WSHandlerConstants.SEND_SIGV);
-            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+            MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
+            sigv = (List) messageContext.getProperty(WSHandlerConstants.SEND_SIGV);
+            Document securedDocument = (Document) messageContext.getProperty(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
@@ -171,7 +173,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             MessageContext messageContext = doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
             wsHandlerResult = (Vector) messageContext.getProperty(WSHandlerConstants.RECV_RESULTS);
 
-            Document document = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document document = (Document) messageContext.getProperty(SECURED_DOCUMENT);
         }
 
         //so we have a request generated, now do the response:
@@ -182,7 +184,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.RECV_RESULTS, wsHandlerResult);
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
@@ -192,7 +194,6 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertNotSame(((Element) nodeList.item(0)).getAttribute(Constants.ATT_NULL_Value.getLocalPart()), "");
             Assert.assertNotNull(((Element) nodeList.item(0)).getAttribute(Constants.ATT_wsu_Id.getLocalPart()), "");
-            Assert.assertTrue(((Element) nodeList.item(0)).getAttributeNS(Constants.ATT_wsu_Id.getNamespaceURI(), Constants.ATT_wsu_Id.getLocalPart()).startsWith("SigConf-"));
 
             nodeList = securedDocument.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -260,7 +261,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             MessageContext messageContext = doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
-            Document document = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document document = (Document) messageContext.getProperty(SECURED_DOCUMENT);
         }
 
         //so we have a request generated, now do the response:
@@ -270,7 +271,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());

@@ -144,10 +144,10 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                             || Arrays.binarySearch(getSecurityProperties().getOutAction(), Constants.Action.USERNAMETOKEN_SIGN) >= 0) {
                         attributes = new HashMap<QName, String>();
                         attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Nonce, null);
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Nonce, attributes);
 
 
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(this.nonceValue));
+                        createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Nonce);
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsu_Created, null);
 

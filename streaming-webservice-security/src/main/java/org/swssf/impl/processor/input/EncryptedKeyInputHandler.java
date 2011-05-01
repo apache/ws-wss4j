@@ -15,6 +15,8 @@
 package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
@@ -150,7 +152,13 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
         //and add it to the chain
         if (encryptedKeyType.getReferenceList() != null) {
-            inputProcessorChain.addProcessor(new DecryptInputProcessor(encryptedKeyType.getReferenceList(), securityProperties));
+            KeyInfoType keyInfoType = new KeyInfoType();
+            SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType();
+            ReferenceType referenceType = new ReferenceType();
+            referenceType.setURI("#" + encryptedKeyType.getId());
+            securityTokenReferenceType.setReferenceType(referenceType);
+            keyInfoType.setSecurityTokenReferenceType(securityTokenReferenceType);
+            inputProcessorChain.addProcessor(new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(), securityProperties));
         }
     }
 

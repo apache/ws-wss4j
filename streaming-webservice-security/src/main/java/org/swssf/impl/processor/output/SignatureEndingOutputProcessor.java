@@ -49,8 +49,6 @@ import java.util.*;
 public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProcessor {
 
     private List<SignaturePartDef> signaturePartDefList;
-    //todo implement or remove?:
-    private boolean useSingleCert = true;
 
     public SignatureEndingOutputProcessor(SecurityProperties securityProperties, SignatureOutputProcessor signatureOutputProcessor) throws WSSecurityException {
         super(securityProperties);
@@ -63,6 +61,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
+        boolean useSingleCert = getSecurityProperties().isUseSingleCert();
         String alias = getSecurityProperties().getSignatureUser();
         X509Certificate[] x509Certificates = null;
 
@@ -75,11 +74,18 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
 
         String certUri = "CertId-" + UUID.randomUUID().toString();
         BinarySecurityTokenType referencedBinarySecurityTokenType = null;
-        if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+
+        Constants.KeyIdentifierType signatureKeyIdentifierType = getSecurityProperties().getSignatureKeyIdentifierType();
+        if (signatureKeyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
             referencedBinarySecurityTokenType = new BinarySecurityTokenType();
             referencedBinarySecurityTokenType.setEncodingType(Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            referencedBinarySecurityTokenType.setValueType(Constants.NS_X509_V3_TYPE);
             referencedBinarySecurityTokenType.setId(certUri);
+
+            if (useSingleCert) {
+                referencedBinarySecurityTokenType.setValueType(Constants.NS_X509_V3_TYPE);
+            } else {
+                referencedBinarySecurityTokenType.setValueType(Constants.NS_X509PKIPathv1);
+            }
 
             Map<QName, String> attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, referencedBinarySecurityTokenType.getEncodingType());
@@ -87,7 +93,11 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             attributes.put(Constants.ATT_wsu_Id, referencedBinarySecurityTokenType.getId());
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
             try {
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
+                if (useSingleCert) {
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
+                } else {
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
+                }
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             }
@@ -175,7 +185,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue, null);
         final byte[] signatureValue = signedInfoProcessor.getSignatureValue();
-        createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(signatureValue));
+        createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValue));
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_SignatureValue);
 
         attributes = new HashMap<QName, String>();
@@ -184,9 +194,14 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
 
         attributes = new HashMap<QName, String>();
         attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+        if ((signatureKeyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
+                || signatureKeyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
+                && useSingleCert == false) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
+        }
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
 
-        if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.ISSUER_SERIAL) {
+        if (signatureKeyIdentifierType == Constants.KeyIdentifierType.ISSUER_SERIAL) {
 
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data, null);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial, null);
@@ -198,7 +213,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509SerialNumber);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509IssuerSerial);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_X509Data);
-        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+        } else if (signatureKeyIdentifierType == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
             // As per the 1.1 specification, SKI can only be used for a V3 certificate
             if (x509Certificates[0].getVersion() != 3) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "invalidCertForSKI");
@@ -209,21 +224,21 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509SubjectKeyIdentifier);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
             byte data[] = getSecurityProperties().getSignatureCrypto().getSKIBytesFromCert(x509Certificates[0]);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+        } else if (signatureKeyIdentifierType == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
             try {
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+        } else if (signatureKeyIdentifierType == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
@@ -236,59 +251,58 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
                 sha.update(x509Certificates[0].getEncoded());
                 byte[] data = sha.digest();
 
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             } catch (NoSuchAlgorithmException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
-        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_EMBEDDED) {
+        } else if (signatureKeyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED) {
+
+            String valueType;
+            if (useSingleCert) {
+                valueType = Constants.NS_X509_V3_TYPE;
+            } else {
+                valueType = Constants.NS_X509PKIPathv1;
+            }
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
-            if (useSingleCert) {
-                attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
-            } else {
-                attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509PKIPathv1);
-            }
+            attributes.put(Constants.ATT_NULL_ValueType, valueType);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            if (useSingleCert) {
-                attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
-            } else {
-                attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509PKIPathv1);
-            }
+            attributes.put(Constants.ATT_NULL_ValueType, valueType);
             attributes.put(Constants.ATT_wsu_Id, certUri);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
             try {
                 if (useSingleCert) {
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificates[0].getEncoded()));
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
                 } else {
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(getSecurityProperties().getSignatureCrypto().getCertificateData(false, x509Certificates)));
                 }
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
-        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+        } else if (signatureKeyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
 
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_URI, "#" + certUri);
             attributes.put(Constants.ATT_NULL_ValueType, referencedBinarySecurityTokenType.getValueType());
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
-        } else if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
+        } else if (signatureKeyIdentifierType == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
             attributes = new HashMap<QName, String>();
             attributes.put(Constants.ATT_NULL_URI, "#" + securityTokenProvider.getId());
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_USERNAMETOKEN_PROFILE_UsernameToken);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Reference);
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "unsupportedSecurityToken", new Object[]{getSecurityProperties().getSignatureKeyIdentifierType().name()});
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "unsupportedSecurityToken", new Object[]{signatureKeyIdentifierType.name()});
         }
 
         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);

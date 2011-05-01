@@ -18,30 +18,6 @@
     <import resource="classpath:META-INF/cxf/cxf-extension-http.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml"/>
 
-    <bean id="greeterServiceImpl" class="org.swssf.test.integration.GreeterServiceImpl">
-    </bean>
-
-    <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
-                    wsdlLocation="classpath:integration/helloWorld.wsdl"                    
-                    address="http://localhost:9001/GreeterService">
-        <jaxws:inInterceptors>
-            <ref bean="securityInInterceptor"/>
-        </jaxws:inInterceptors>
-        <jaxws:outInterceptors>
-            <ref bean="securityOutInterceptor"/>
-        </jaxws:outInterceptors>
-    </jaxws:endpoint>
-
-    <bean name="securityInInterceptor" class="org.swssf.interceptor.SecurityInInterceptor">
-        <constructor-arg index="0" value="post-stream"/>
-        <constructor-arg index="1" ref="inSecurityProperties"/>
-    </bean>
-
-    <bean name="securityOutInterceptor" class="org.swssf.interceptor.SecurityOutInterceptor">
-        <constructor-arg index="0" value="pre-stream"/>
-        <constructor-arg index="1" ref="outSecurityProperties"/>
-    </bean>
-
     <bean name="inSecurityProperties" class="org.swssf.ext.SecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
@@ -82,7 +58,7 @@
         </property>
     </bean>
 
-    <!-- set signature verfiication Keystore in securityProperties -->
+    <!-- set signature verification Keystore in securityProperties -->
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="targetObject" ref="inSecurityProperties"/>
         <property name="targetMethod" value="loadSignatureVerificationKeystore"/>
@@ -120,9 +96,32 @@
     </bean>
     -->
 
-    <bean name="callbackHandler" class="org.swssf.test.CallbackHandlerImpl">
+    <bean id="greeterServiceImpl" class="org.swssf.test.integration.GreeterServiceImpl">
     </bean>
 
+    <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
+                    wsdlLocation="classpath:integration/helloWorld.wsdl"
+                    address="http://localhost:9001/GreeterService">
+        <jaxws:inInterceptors>
+            <ref bean="securityInInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="securityOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:endpoint>
+
+    <bean name="securityInInterceptor" class="org.swssf.interceptor.SecurityInInterceptor">
+        <constructor-arg index="0" value="post-stream"/>
+        <constructor-arg index="1" ref="inSecurityProperties"/>
+    </bean>
+
+    <bean name="securityOutInterceptor" class="org.swssf.interceptor.SecurityOutInterceptor">
+        <constructor-arg index="0" value="pre-stream"/>
+        <constructor-arg index="1" ref="outSecurityProperties"/>
+    </bean>
+
+    <bean name="callbackHandler" class="org.swssf.test.CallbackHandlerImpl">
+    </bean>
 
     <jaxws:endpoint id="greeterServiceWSS4J" implementor="#greeterServiceImpl"
                     wsdlLocation="classpath:integration/helloWorld.wsdl"
@@ -134,7 +133,7 @@
             <ref bean="wss4jOutInterceptor"/>
         </jaxws:outInterceptors>
     </jaxws:endpoint>
-    
+
     <bean name="wss4jInInterceptor" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
         <property name="properties">
             <map>
@@ -173,7 +172,7 @@
                   </httpj:connector>
             -->
             <httpj:handlers>
-                <beans:bean class="org.mortbay.jetty.handler.DefaultHandler"/>
+                <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
             </httpj:handlers>
             <httpj:sessionSupport>false</httpj:sessionSupport>
         </httpj:engine>

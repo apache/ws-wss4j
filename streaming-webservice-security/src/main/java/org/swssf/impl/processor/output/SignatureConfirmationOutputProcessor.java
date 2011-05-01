@@ -60,7 +60,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
                         Map<QName, String> attributes = new HashMap<QName, String>();
                         attributes.put(Constants.ATT_wsu_Id, "SigConf-" + UUID.randomUUID().toString());
-                        attributes.put(Constants.ATT_NULL_Value, new String(Base64.encodeBase64(initiatorSignatureTokenSecurityEvent.getSignatureValue())));
+                        attributes.put(Constants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(initiatorSignatureTokenSecurityEvent.getSignatureValue()));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse11_SignatureConfirmation, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse11_SignatureConfirmation);
                     }

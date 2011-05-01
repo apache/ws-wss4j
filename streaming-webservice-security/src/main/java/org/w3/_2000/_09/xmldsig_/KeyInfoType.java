@@ -82,6 +82,10 @@ public class KeyInfoType implements Parseable {
     @XmlSchemaType(name = "ID")
     protected String id;
 
+    public KeyInfoType() {
+
+    }
+
     public KeyInfoType(StartElement startElement) {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {

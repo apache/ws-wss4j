@@ -326,7 +326,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
             MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            Document securedDocument = (Document) messageContext.getProperty(WSHandlerConstants.SND_SECURITY);
+            Document securedDocument = (Document) messageContext.getProperty(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
@@ -436,7 +436,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
         }
     }
 
@@ -478,7 +480,9 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-            doInboundSecurityWithWSS4J(securedDocument, action);
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
         }
 
         //done signature; now test sig-verification:

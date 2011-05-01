@@ -94,7 +94,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
             attributes.put(Constants.ATT_wsu_Id, referencedBinarySecurityTokenType.getId());
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
             try {
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
@@ -135,7 +135,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509SubjectKeyIdentifier);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
             byte data[] = getSecurityProperties().getEncryptionCrypto().getSKIBytesFromCert(x509Certificate);
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
         } else if (getSecurityProperties().getEncryptionKeyIdentifierType() == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
 
@@ -144,7 +144,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
             try {
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
@@ -162,7 +162,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
                 sha.update(x509Certificate.getEncoded());
                 byte[] data = sha.digest();
 
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(data));
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             } catch (NoSuchAlgorithmException e) {
@@ -181,7 +181,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
             attributes.put(Constants.ATT_wsu_Id, certUri);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
             try {
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(x509Certificate.getEncoded()));
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificate.getEncoded()));
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
             }
@@ -218,7 +218,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
             }
             byte[] encryptedEphemeralKey = cipher.doFinal(ephemeralKey);
 
-            createCharactersAndOutputAsEvent(subOutputProcessorChain, new String(org.bouncycastle.util.encoders.Base64.encode(encryptedEphemeralKey)));
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
         } catch (NoSuchPaddingException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);

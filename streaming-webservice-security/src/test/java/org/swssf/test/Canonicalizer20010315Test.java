@@ -20,6 +20,7 @@ import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.swssf.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLResolver;
@@ -49,6 +50,82 @@ public class Canonicalizer20010315Test {
             }
         };
         this.xmlInputFactory.setXMLResolver(xmlResolver);
+    }
+
+    @Test
+    public void test221() throws Exception {
+
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+                this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
+        );
+
+        XMLEvent xmlEvent = null;
+        while (xmlEventReader.hasNext()) {
+            xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+                break;
+            }
+        }
+        while (xmlEventReader.hasNext()) {
+
+            c.transform(xmlEvent, baos);
+
+            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+                break;
+            }
+            xmlEvent = xmlEventReader.nextEvent();
+        }
+
+        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_1_c14nized.xml"));
+        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
+
+        if (equals == false) {
+            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
+            System.out.println("");
+            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
+        }
+
+        assertTrue(equals);
+    }
+
+    @Test
+    public void test222() throws Exception {
+
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+                this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
+        );
+
+        XMLEvent xmlEvent = null;
+        while (xmlEventReader.hasNext()) {
+            xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+                break;
+            }
+        }
+        while (xmlEventReader.hasNext()) {
+
+            c.transform(xmlEvent, baos);
+
+            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+                break;
+            }
+            xmlEvent = xmlEventReader.nextEvent();
+        }
+
+        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_2_c14nized.xml"));
+        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
+
+        if (equals == false) {
+            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
+            System.out.println("");
+            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
+        }
+
+        assertTrue(equals);
     }
 
     /**

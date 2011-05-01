@@ -356,6 +356,7 @@ public class SecurityProperties {
     private KeyStore signatureKeyStore;
     private String signatureUser;
     private Constants.KeyIdentifierType signatureKeyIdentifierType;
+    private boolean useSingleCert = true;
 
     public void addSignaturePart(SecurePart securePart) {
         signatureParts.add(securePart);
@@ -450,6 +451,13 @@ public class SecurityProperties {
         this.signatureKeyIdentifierType = signatureKeyIdentifierType;
     }
 
+    public boolean isUseSingleCert() {
+        return useSingleCert;
+    }
+
+    public void setUseSingleCert(boolean useSingleCert) {
+        this.useSingleCert = useSingleCert;
+    }
 
     private Integer timestampTTL = 300;
 

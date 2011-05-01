@@ -75,6 +75,9 @@ public class SecurityTokenReferenceType implements Parseable {
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
+    public SecurityTokenReferenceType() {
+    }
+
     public SecurityTokenReferenceType(StartElement startElement) {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
