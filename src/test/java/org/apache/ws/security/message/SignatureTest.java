@@ -37,6 +37,8 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 /**
@@ -554,6 +556,35 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         verify(doc);
+    }
+    
+    /**
+     * This is a test for WSS-283 - "ClassCastException when signing message with existing 
+     * WSSE header containing Text as first child":
+     * 
+     * https://issues.apache.org/jira/browse/WSS-283
+     */
+    @org.junit.Test
+    public void testWSS283() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        Element secHeaderElement = secHeader.insertSecurityHeader(doc);
+        Node textNode = doc.createTextNode("This is a text node");
+        secHeaderElement.appendChild(textNode);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with text node:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
     }
 
     /**

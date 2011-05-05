@@ -39,6 +39,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -484,7 +485,11 @@ public class WSSecSignature extends WSSecSignatureBase {
             XMLSignContext signContext = null;
             if (prepend) {
                 if (siblingElement == null) {
-                    siblingElement = (Element)securityHeader.getFirstChild();
+                    Node child = securityHeader.getFirstChild();
+                    while (child != null && child.getNodeType() != Node.ELEMENT_NODE) {
+                        child = child.getNextSibling();
+                    } 
+                    siblingElement = (Element)child;
                 }
                 if (siblingElement == null) {
                     signContext = new DOMSignContext(key, securityHeader);
