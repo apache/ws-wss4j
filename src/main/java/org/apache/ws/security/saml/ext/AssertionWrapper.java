@@ -228,6 +228,9 @@ public class AssertionWrapper {
         }
 
         samlVersion = samlCallbacks[0].getSamlVersion();
+        if (samlVersion == null) {
+            samlVersion = parms.getSAMLVersion();
+        }
         String issuer = samlCallbacks[0].getIssuer();
         if (issuer == null && parms.getIssuer() != null) {
             issuer = parms.getIssuer();

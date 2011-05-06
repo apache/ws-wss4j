@@ -21,6 +21,8 @@ package org.apache.ws.security.saml.ext;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.opensaml.common.SAMLVersion;
+
 /**
  * Class SAMLParms is a parameter bean that is used to pass raw material from
  * the <code>AssertionWrapper</code> to the SAML builders during statement
@@ -30,6 +32,7 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class SAMLParms {
     private String issuer;
+    private SAMLVersion samlVersion;
     private CallbackHandler samlCallbackHandler;
 
     /**
@@ -48,6 +51,22 @@ public class SAMLParms {
      */
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+    
+    /**
+     * Get the SAML Version of the SAML Assertion to generate
+     * @return the SAML Version of the SAML Assertion to generate
+     */
+    public SAMLVersion getSAMLVersion() {
+        return samlVersion;
+    }
+    
+    /**
+     * Set the SAML Version of the SAML Assertion to generate
+     * @param samlVersion the SAML Version of the SAML Assertion to generate
+     */
+    public void setSAMLVersion(SAMLVersion samlVersion) {
+        this.samlVersion = samlVersion;
     }
     
     /**
