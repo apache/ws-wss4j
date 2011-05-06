@@ -44,7 +44,7 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
 
     public Key getSecretKey(String algorithmURI) throws WSSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
-        Utils.doCallback(getCallbackHandler(), pwCb);
+        Utils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }
 
@@ -62,8 +62,8 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
             X509Certificate x509Certificate = getX509Certificate();
             if (x509Certificate != null) {
                 x509Certificate.checkValidity();
+                getCrypto().validateCert(x509Certificate);
             }
-            getCrypto().validateCert(x509Certificate);
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
         } catch (CertificateNotYetValidException e) {

@@ -5,6 +5,7 @@ import org.swssf.ext.XMLEventNS;
 
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -30,8 +31,8 @@ import java.util.SortedSet;
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 public class Canonicalizer11 extends CanonicalizerBase {
-    public Canonicalizer11(String inclusiveNamespaces, boolean includeComments) {
-        super(inclusiveNamespaces, includeComments);
+    public Canonicalizer11(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+        super(inclusiveNamespaces, includeComments, outputStream);
     }
 
     @Override

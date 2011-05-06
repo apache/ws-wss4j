@@ -167,6 +167,7 @@ public abstract class AbstractTestBase {
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
         requestData.setNoSerialization(true);
+        requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setAction(new Integer(WSConstants.SIGN), new SignatureAction() {
             @Override

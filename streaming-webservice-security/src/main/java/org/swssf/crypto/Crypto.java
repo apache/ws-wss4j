@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -237,4 +238,21 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;
+
+    /**
+     * Evaluate whether a given certificate chain should be trusted.
+     *
+     * @param certs Certificate chain to validate
+     * @return true if the certificate chain is valid, false otherwise
+     * @throws WSSecurityException
+     */
+    public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException;
+
+    /**
+     * Evaluate whether a given public key should be trusted.
+     *
+     * @param publicKey The PublicKey to be evaluated
+     * @return whether the PublicKey parameter is trusted or not
+     */
+    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException;
 }

@@ -1,5 +1,7 @@
 package org.swssf.impl.transformer.canonicalizer;
 
+import java.io.OutputStream;
+
 /**
  * User: giger
  * Date: 5/1/11
@@ -22,7 +24,7 @@ package org.swssf.impl.transformer.canonicalizer;
  */
 public abstract class Canonicalizer20010315 extends CanonicalizerBase {
 
-    public Canonicalizer20010315(String inclusiveNamespaces, boolean includeComments) {
-        super(inclusiveNamespaces, includeComments);
+    public Canonicalizer20010315(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+        super(inclusiveNamespaces, includeComments, outputStream);
     }
 }

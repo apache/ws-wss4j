@@ -16,7 +16,6 @@ package org.swssf.ext;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.OutputStream;
 
 /**
  * @author $Author: giger $
@@ -24,5 +23,5 @@ import java.io.OutputStream;
  */
 public interface Transformer {
 
-    public void transform(XMLEvent xmlEvent, OutputStream outputStream) throws XMLStreamException;
+    public void transform(XMLEvent xmlEvent) throws XMLStreamException;
 }

@@ -49,15 +49,15 @@ public class CXFIntegrationTest {
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
             client.getOutInterceptors().add(wss4JOutInterceptor);
 
             WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
             wss4JInInterceptor.setProperty(WSHandlerConstants.ACTION, "Timestamp Signature Encrypt");
             wss4JInInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
-            wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
-            wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "transmitter-crypto.properties");
             client.getInInterceptors().add(wss4JInInterceptor);
 
             greeterStream.greetMe("Cold start");
@@ -73,15 +73,15 @@ public class CXFIntegrationTest {
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
-            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
             client.getOutInterceptors().add(wss4JOutInterceptor);
 
             WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
             wss4JInInterceptor.setProperty(WSHandlerConstants.ACTION, "Timestamp Signature Encrypt");
             wss4JInInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
-            wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "integration/transmitter-crypto.properties");
-            wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "integration/transmitter-crypto.properties");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
+            wss4JInInterceptor.setProperty(WSHandlerConstants.DEC_PROP_FILE, "transmitter-crypto.properties");
             client.getInInterceptors().add(wss4JInInterceptor);
 
             client.getRequestContext().put(Message.ENDPOINT_ADDRESS, "http://localhost:9001/GreeterServiceWSS4J");

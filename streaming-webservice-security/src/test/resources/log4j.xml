@@ -51,4 +51,7 @@
     <logger name="org.swssf.impl.processor.input">
         <level value="INFO"/>
     </logger>
+    <logger name="org.swssf.impl.saml.SAMLAssertionWrapper">
+        <level value="INFO"/>
+    </logger>
 </log4j:configuration>

@@ -136,8 +136,8 @@
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="passwordCallbackRef" value-ref="passwordCallbackHandlerWSS4J"/>
-                <entry key="decryptionPropFile" value="integration/receiver-crypto.properties"/>
-                <entry key="signaturePropFile" value="integration/receiver-crypto.properties"/>
+                <entry key="decryptionPropFile" value="receiver-crypto.properties"/>
+                <entry key="signaturePropFile" value="receiver-crypto.properties"/>
             </map>
         </property>
     </bean>
@@ -147,8 +147,8 @@
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="passwordCallbackRef" value-ref="passwordCallbackHandlerWSS4J"/>
-                <entry key="encryptionPropFile" value="integration/transmitter-crypto.properties"/>
-                <entry key="signaturePropFile" value="integration/receiver-crypto.properties"/>
+                <entry key="encryptionPropFile" value="transmitter-crypto.properties"/>
+                <entry key="signaturePropFile" value="receiver-crypto.properties"/>
                 <entry key="user" value="receiver"/>
                 <entry key="encryptionUser" value="transmitter"/>
             </map>

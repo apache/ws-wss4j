@@ -15,13 +15,14 @@
 package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.TransformationParametersType;
 import org.swssf.config.JCEAlgorithmMapper;
-import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
-import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
+import org.swssf.impl.securityToken.SecurityTokenReference;
 import org.swssf.impl.util.DigestOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SignedElementSecurityEvent;
+import org.w3._2000._09.xmldsig_.CanonicalizationMethodType;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 import org.w3._2000._09.xmldsig_.TransformType;
@@ -36,13 +37,11 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -83,9 +82,11 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "duplicateId");
                         }
                         InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
-                                new InternalSignatureReferenceVerifier(getSecurityProperties(), referenceType, startElement.getName());
-                        internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
-                        inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
+                                new InternalSignatureReferenceVerifier(getSecurityProperties(), inputProcessorChain, referenceType, startElement.getName());
+                        if (!internalSignatureReferenceVerifier.isFinished()) {
+                            internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
+                            inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
+                        }
                         referenceType.setProcessed(true);
                         inputProcessorChain.getDocumentContext().setIsInSignedContent();
 
@@ -127,21 +128,22 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
     class InternalSignatureReferenceVerifier extends AbstractInputProcessor {
         private ReferenceType referenceType;
 
-        private List<Transformer> transformers = new LinkedList<Transformer>();
+        private Transformer transformer;
         private DigestOutputStream digestOutputStream;
         private OutputStream bufferedDigestOutputStream;
         //todo: startElement still needed?? Is elementCounter not enough? Test overall code
         private QName startElement;
         private int elementCounter = 0;
+        private boolean finished = false;
 
-        public InternalSignatureReferenceVerifier(SecurityProperties securityProperties, ReferenceType referenceType, QName startElement) throws WSSecurityException {
+        public InternalSignatureReferenceVerifier(SecurityProperties securityProperties, InputProcessorChain inputProcessorChain, ReferenceType referenceType, QName startElement) throws WSSecurityException {
             super(securityProperties);
             this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
             this.startElement = startElement;
             this.referenceType = referenceType;
             try {
                 createMessageDigest();
-                buildTransformerChain(referenceType);
+                buildTransformerChain(referenceType, inputProcessorChain);
             } catch (Exception e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             }
@@ -154,20 +156,55 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             this.bufferedDigestOutputStream = new BufferedOutputStream(this.digestOutputStream);
         }
 
-        private void buildTransformerChain(ReferenceType referenceType) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        private void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain) throws WSSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
             List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
-            for (int i = 0; i < transformTypeList.size(); i++) {
+
+            String algorithm = null;
+            Transformer parentTransformer = null;
+            for (int i = transformTypeList.size() - 1; i >= 0; i--) {
                 TransformType transformType = transformTypeList.get(i);
 
-                Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(transformType.getAlgorithm());
-                Transformer transformer;
-                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
-                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
-                    transformer = constructor.newInstance(transformType.getInclusiveNamespaces());
-                } else {
-                    transformer = transformerClass.newInstance();
+                if (transformType.getTransformationParametersType() != null) {
+                    TransformationParametersType transformationParametersType = transformType.getTransformationParametersType();
+                    final CanonicalizationMethodType canonicalizationMethodType = transformationParametersType.getCanonicalizationMethodType();
+                    if (canonicalizationMethodType != null) {
+                        algorithm = canonicalizationMethodType.getAlgorithm();
+                        String inclusiveNamespaces = canonicalizationMethodType.getInclusiveNamespaces();
+                        if (Constants.SOAPMESSAGE_NS10_STRTransform.equals(transformType.getAlgorithm())) {
+                            if (inclusiveNamespaces == null) {
+                                inclusiveNamespaces = "#default";
+                            } else {
+                                inclusiveNamespaces = "#default " + inclusiveNamespaces;
+                            }
+                        }
+                        parentTransformer = Utils.getTransformer(inclusiveNamespaces, this.bufferedDigestOutputStream, algorithm);
+                    }
                 }
-                transformers.add(transformer);
+                algorithm = transformType.getAlgorithm();
+                if (parentTransformer != null) {
+                    parentTransformer = Utils.getTransformer(parentTransformer, transformType.getInclusiveNamespaces(), algorithm);
+                } else {
+                    parentTransformer = Utils.getTransformer(transformType.getInclusiveNamespaces(), this.bufferedDigestOutputStream, algorithm);
+                }
+            }
+
+            this.transformer = parentTransformer;
+
+            if (Constants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
+                SecurityTokenProvider securityTokenProvider = inputProcessorChain.getSecurityContext().getSecurityTokenProvider(referenceType.getURI());
+                if (securityTokenProvider == null) {
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "noReference");
+                }
+                SecurityToken securityToken = securityTokenProvider.getSecurityToken(getSecurityProperties().getSignatureVerificationCrypto());
+                if (!(securityToken instanceof SecurityTokenReference)) {
+                    throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN, null);
+                }
+                SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
+                this.startElement = securityTokenReference.getXmlEvents().getLast().asStartElement().getName();
+                Iterator<XMLEvent> xmlEventIterator = securityTokenReference.getXmlEvents().descendingIterator();
+                while (xmlEventIterator.hasNext()) {
+                    processEvent(xmlEventIterator.next(), inputProcessorChain);
+                }
             }
         }
 
@@ -184,11 +221,8 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         }
 
         protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
-            Iterator<Transformer> transformerIterator = transformers.iterator();
-            while (transformerIterator.hasNext()) {
-                Transformer transformer = transformerIterator.next();
-                transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
-            }
+
+            transformer.transform(xmlEvent);
 
             if (xmlEvent.isStartElement()) {
                 elementCounter++;
@@ -216,8 +250,13 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     }
                     inputProcessorChain.removeProcessor(this);
                     inputProcessorChain.getDocumentContext().unsetIsInSignedContent();
+                    finished = true;
                 }
             }
+        }
+
+        public boolean isFinished() {
+            return finished;
         }
     }
 }

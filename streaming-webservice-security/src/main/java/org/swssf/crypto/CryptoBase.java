@@ -890,4 +890,161 @@ public abstract class CryptoBase implements Crypto {
         }
         return aliases;
     }
+
+    /**
+     * Evaluate whether a given certificate chain should be trusted.
+     * Uses the CertPath API to validate a given certificate chain.
+     *
+     * @param certs Certificate chain to validate
+     * @return true if the certificate chain is valid, false otherwise
+     * @throws WSSecurityException
+     */
+    public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException {
+        try {
+            // Generate cert path
+            List<X509Certificate> certList = Arrays.asList(certs);
+            CertPath path = getCertificateFactory().generateCertPath(certList);
+
+            Set<TrustAnchor> set = new HashSet<TrustAnchor>();
+            if (cacerts != null) {
+                Enumeration<String> truststoreAliases = cacerts.aliases();
+                while (truststoreAliases.hasMoreElements()) {
+                    String alias = truststoreAliases.nextElement();
+                    X509Certificate cert =
+                            (X509Certificate) cacerts.getCertificate(alias);
+                    if (cert != null) {
+                        TrustAnchor anchor =
+                                new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                        set.add(anchor);
+                    }
+                }
+            }
+
+            // Add certificates from the keystore
+            if (keystore != null) {
+                Enumeration<String> aliases = keystore.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    X509Certificate cert =
+                            (X509Certificate) keystore.getCertificate(alias);
+                    if (cert != null) {
+                        TrustAnchor anchor =
+                                new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
+                        set.add(anchor);
+                    }
+                }
+            }
+
+            PKIXParameters param = new PKIXParameters(set);
+
+            // Do not check a revocation list
+            param.setRevocationEnabled(false);
+
+            // Verify the trust path using the above settings
+            String provider = getCryptoProvider();
+            CertPathValidator validator = null;
+            if (provider == null || provider.length() == 0) {
+                validator = CertPathValidator.getInstance("PKIX");
+            } else {
+                validator = CertPathValidator.getInstance("PKIX", provider);
+            }
+            validator.validate(path, param);
+            return true;
+        } catch (java.security.NoSuchProviderException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "certpath",
+                    new Object[]{e.getMessage()}, e
+            );
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE,
+                    "certpath", new Object[]{e.getMessage()},
+                    e
+            );
+        } catch (java.security.cert.CertificateException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "certpath",
+                    new Object[]{e.getMessage()}, e
+            );
+        } catch (java.security.InvalidAlgorithmParameterException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "certpath",
+                    new Object[]{e.getMessage()}, e
+            );
+        } catch (java.security.cert.CertPathValidatorException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "certpath",
+                    new Object[]{e.getMessage()}, e
+            );
+        } catch (java.security.KeyStoreException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "certpath",
+                    new Object[]{e.getMessage()}, e
+            );
+        }
+    }
+
+    /**
+     * Evaluate whether a given public key should be trusted.
+     *
+     * @param publicKey The PublicKey to be evaluated
+     * @return whether the PublicKey parameter is trusted or not
+     */
+    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException {
+        //
+        // If the public key is null, do not trust the signature
+        //
+        if (publicKey == null) {
+            return false;
+        }
+
+        //
+        // Search the keystore for the transmitted public key (direct trust)
+        //
+        boolean trust = findPublicKeyInKeyStore(publicKey, keystore);
+        if (trust) {
+            return true;
+        } else {
+            //
+            // Now search the truststore for the transmitted public key (direct trust)
+            //
+            trust = findPublicKeyInKeyStore(publicKey, cacerts);
+            if (trust) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Find the Public Key in a keystore.
+     */
+    private boolean findPublicKeyInKeyStore(PublicKey publicKey, KeyStore keyStoreToSearch) {
+        try {
+            for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                Certificate[] certs = keyStoreToSearch.getCertificateChain(alias);
+                Certificate cert;
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a result.
+                    cert = keyStoreToSearch.getCertificate(alias);
+                    if (cert == null) {
+                        continue;
+                    }
+                } else {
+                    cert = certs[0];
+                }
+                if (!(cert instanceof X509Certificate)) {
+                    continue;
+                }
+                X509Certificate x509cert = (X509Certificate) cert;
+                if (publicKey.equals(x509cert.getPublicKey())) {
+                    return true;
+                }
+            }
+        } catch (KeyStoreException e) {
+            return false;
+        }
+        return false;
+    }
 }

@@ -16,12 +16,10 @@ package org.swssf.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
-import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
-import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.swssf.impl.util.RFC2253Parser;
 import org.swssf.impl.util.SignerOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
@@ -33,7 +31,6 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -109,7 +106,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Signature, attributes);
 
         WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
-        Utils.doCallback(getSecurityProperties().getCallbackHandler(), pwCb);
+        Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
         String password = pwCb.getPassword();
         if (password == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noPassword", new Object[]{alias});
@@ -360,14 +357,8 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 
-            Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             try {
-                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
-                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
-                    transformer = constructor.newInstance((String) null);
-                } else {
-                    transformer = transformerClass.newInstance();
-                }
+                transformer = Utils.getTransformer((String) null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             } catch (InstantiationException e) {
@@ -390,7 +381,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
 
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-            transformer.transform(xmlEvent, bufferedSignerOutputStream);
+            transformer.transform(xmlEvent);
             outputProcessorChain.processEvent(xmlEvent);
         }
     }

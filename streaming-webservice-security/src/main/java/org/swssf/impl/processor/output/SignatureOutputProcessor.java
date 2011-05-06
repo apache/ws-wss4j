@@ -16,10 +16,8 @@ package org.swssf.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.config.JCEAlgorithmMapper;
-import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.SignaturePartDef;
-import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
@@ -31,7 +29,6 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -125,7 +122,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
         private OutputStream bufferedDigestOutputStream;
         private org.swssf.impl.util.DigestOutputStream digestOutputStream;
-        private List<Transformer> transformers = new LinkedList<Transformer>();
+        private Transformer transformer;
 
         InternalSignatureOutputProcessor(SecurityProperties securityProperties, SignaturePartDef signaturePartDef, QName startElement) throws WSSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super(securityProperties);
@@ -140,15 +137,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
             this.digestOutputStream = new org.swssf.impl.util.DigestOutputStream(messageDigest);
             this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
 
-            Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
-            Transformer transformer = null;
             try {
-                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
-                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
-                    transformer = constructor.newInstance((String) null);
-                } else {
-                    transformer = transformerClass.newInstance();
-                }
+                transformer = Utils.getTransformer((String) null, this.bufferedDigestOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             } catch (InstantiationException e) {
@@ -158,18 +148,12 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
             } catch (InvocationTargetException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             }
-
-            transformers.add(transformer);
         }
 
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
-            Iterator<Transformer> transformerIterator = transformers.iterator();
-            while (transformerIterator.hasNext()) {
-                Transformer transformer = transformerIterator.next();
-                transformer.transform(xmlEvent, this.bufferedDigestOutputStream);
-            }
+            transformer.transform(xmlEvent);
 
             if (xmlEvent.isStartElement()) {
                 elementCounter++;

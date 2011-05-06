@@ -70,6 +70,7 @@ import javax.security.auth.callback.Callback;
 
 public class WSPasswordCallback implements Callback {
 
+    //todo enum
     public static final int UNKNOWN = 0;
     public static final int DECRYPT = 1;
     public static final int USERNAME_TOKEN = 2;
@@ -79,6 +80,7 @@ public class WSPasswordCallback implements Callback {
     public final static int SECURITY_CONTEXT_TOKEN = 6;
     public final static int CUSTOM_TOKEN = 7;
     public final static int ENCRYPTED_KEY_TOKEN = 8;
+    public static final int SECRET_KEY = 9;
 
     private String identifier;
     private String password;

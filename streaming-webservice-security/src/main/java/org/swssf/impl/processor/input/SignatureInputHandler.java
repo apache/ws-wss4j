@@ -14,12 +14,10 @@
  */
 package org.swssf.impl.processor.input;
 
-import org.swssf.config.TransformerAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.impl.securityToken.SecurityTokenFactory;
-import org.swssf.impl.transformer.canonicalizer.CanonicalizerBase;
 import org.swssf.impl.util.SignerOutputStream;
 import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
 import org.swssf.securityEvent.SecurityEvent;
@@ -32,7 +30,6 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -164,14 +161,8 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 
-            Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
             try {
-                if (CanonicalizerBase.class.isAssignableFrom(transformerClass)) {
-                    Constructor<Transformer> constructor = transformerClass.getConstructor(String.class);
-                    transformer = constructor.newInstance(signatureType.getSignedInfo().getCanonicalizationMethod().getInclusiveNamespaces());
-                } else {
-                    transformer = transformerClass.newInstance();
-                }
+                transformer = Utils.getTransformer(signatureType.getSignedInfo().getCanonicalizationMethod().getInclusiveNamespaces(), this.bufferedSignerOutputStream, signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
             } catch (InstantiationException e) {
@@ -184,7 +175,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         public void processEvent(XMLEvent xmlEvent) throws XMLStreamException {
-            transformer.transform(xmlEvent, bufferedSignerOutputStream);
+            transformer.transform(xmlEvent);
         }
 
         public void doFinal() throws WSSecurityException {

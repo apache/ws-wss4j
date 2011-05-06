@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.ext.Transformer;
 import org.swssf.ext.Utils;
+import org.swssf.ext.WSSecurityException;
 import org.xmlsecurity.ns.configuration.TransformAlgorithmType;
 import org.xmlsecurity.ns.configuration.TransformAlgorithmsType;
 
@@ -53,11 +54,10 @@ public class TransformerAlgorithmMapper {
         }
     }
 
-    public static Class<Transformer> getTransformerClass(String algoURI) {
+    public static Class<Transformer> getTransformerClass(String algoURI) throws WSSecurityException {
         Class clazz = algorithmsClassMap.get(algoURI);
         if (clazz == null) {
-            logger.warn("No transformer for " + algoURI + " found");
-            return null;
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null);
         }
         return clazz;
     }

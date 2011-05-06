@@ -21,9 +21,12 @@ import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
+import org.swssf.impl.saml.SAMLKeyInfo;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.stream.events.XMLEvent;
+import java.util.Deque;
 
 /**
  * Factory to create SecurityToken Objects from keys in XML
@@ -60,11 +63,9 @@ public class
                     String valueType = keyIdentifierType.getValueType();
                     String encodingType = keyIdentifierType.getEncodingType();
 
-                    byte[] binaryContent;
+                    byte[] binaryContent = null;
                     if (Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
                         binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
-                    } else {
-                        binaryContent = keyIdentifierType.getValue().getBytes();
                     }
 
                     if (Constants.NS_X509_V3_TYPE.equals(valueType)) {
@@ -73,6 +74,12 @@ public class
                         return new X509SubjectKeyIdentifierSecurityToken(crypto, callbackHandler, binaryContent);
                     } else if (Constants.NS_THUMBPRINT.equals(valueType)) {
                         return new ThumbprintSHA1SecurityToken(crypto, callbackHandler, binaryContent);
+                    } else if (Constants.NS_SAML10_TYPE.equals(valueType) || Constants.NS_SAML20_TYPE.equals(valueType)) {
+                        SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
+                        if (securityTokenProvider == null) {
+                            throw new WSSecurityException(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "noToken", new Object[]{keyIdentifierType.getValue()});
+                        }
+                        return securityTokenProvider.getSecurityToken(crypto);
                     }
                 }//todo SAML Token, Custom-Token etc...
                 else if (securityTokenReferenceType.getReferenceType() != null) {
@@ -140,4 +147,11 @@ public class
         return new UsernameSecurityToken(usernameTokenType);
     }
 
+    public SecurityToken getSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler) throws WSSecurityException {
+        return new SAMLSecurityToken(samlKeyInfo, crypto, callbackHandler);
+    }
+
+    public SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, SecurityContext securityContext) throws WSSecurityException {
+        return new SecurityTokenReference(securityContext.getSecurityTokenProvider(referencedTokenId).getSecurityToken(crypto), xmlEvents, crypto, callbackHandler);
+    }
 }

@@ -28,6 +28,15 @@
         <Handler NAME="SignatureConfirmation"
                  URI="http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd"
                  JAVACLASS="org.swssf.impl.processor.input.SignatureConfirmationInputHandler"/>
+        <Handler NAME="SecurityTokenReference"
+                 URI="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                 JAVACLASS="org.swssf.impl.processor.input.SecurityTokenReferenceInputHandler"/>
+        <Handler NAME="Assertion"
+                 URI="urn:oasis:names:tc:SAML:1.0:assertion"
+                 JAVACLASS="org.swssf.impl.processor.input.SAMLTokenInputHandler"/>
+        <Handler NAME="Assertion"
+                 URI="urn:oasis:names:tc:SAML:2.0:assertion"
+                 JAVACLASS="org.swssf.impl.processor.input.SAMLTokenInputHandler"/>
     </SecurityHeaderHandlers>
    <TransformAlgorithms>
       <!-- c14n omitting comments -->
@@ -48,6 +57,10 @@
       <!-- exclusive c14n with comments -->
       <TransformAlgorithm URI="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"
                           JAVACLASS="org.swssf.impl.transformer.canonicalizer.Canonicalizer20010315_ExclWithCommentsTransformer" />
+
+       <!-- STR-Transformer -->
+       <TransformAlgorithm URI="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform"
+                          JAVACLASS="org.swssf.impl.transformer.STRTransformer" />
        
        <!-- Base64 -->
       <TransformAlgorithm URI="http://www.w3.org/2000/09/xmldsig#base64"

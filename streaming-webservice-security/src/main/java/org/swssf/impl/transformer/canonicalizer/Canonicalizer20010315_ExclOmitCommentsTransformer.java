@@ -14,13 +14,15 @@
  */
 package org.swssf.impl.transformer.canonicalizer;
 
+import java.io.OutputStream;
+
 /**
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
 public class Canonicalizer20010315_ExclOmitCommentsTransformer extends Canonicalizer20010315_Excl {
 
-    public Canonicalizer20010315_ExclOmitCommentsTransformer(String inclusiveNamespaces) {
-        super(inclusiveNamespaces, false);
+    public Canonicalizer20010315_ExclOmitCommentsTransformer(String inclusiveNamespaces, OutputStream outputStream) {
+        super(inclusiveNamespaces, false, outputStream);
     }
 }

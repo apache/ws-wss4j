@@ -58,7 +58,7 @@ public class UncategorizedTest extends AbstractTestBase {
 
          org.w3c.dom.Document w3cDoc = null;
 
-        Result streamResult = new StreamResult(new FileOutputStream("xml.out", true));
+        Result streamResult = new StreamResult(new FileOutputStream("xml.xml", true));
 
         SecurityProperties securityProperties = new SecurityProperties();
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());

@@ -8,10 +8,19 @@
 
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
+import org.swssf.ext.Constants;
+import org.swssf.ext.ParseException;
+import org.swssf.ext.Parseable;
+import org.swssf.ext.Utils;
+import org.w3._2000._09.xmldsig_.CanonicalizationMethodType;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,12 +51,61 @@ import java.util.Map;
 @XmlType(name = "TransformationParametersType", propOrder = {
         "any"
 })
-public class TransformationParametersType {
+public class TransformationParametersType implements Parseable {
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+
+    private CanonicalizationMethodType canonicalizationMethodType;
+
+    private Parseable currentParseable;
+
+    public TransformationParametersType(StartElement startElement) {
+    }
+
+    public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
+        if (currentParseable != null) {
+            boolean finished = currentParseable.parseXMLEvent(xmlEvent);
+            if (finished) {
+                currentParseable.validate();
+                currentParseable = null;
+            }
+            return false;
+        }
+
+        switch (xmlEvent.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
+                if (startElement.getName().equals(Constants.TAG_dsig_CanonicalizationMethod)) {
+                    currentParseable = canonicalizationMethodType = new CanonicalizationMethodType(startElement);
+                } else {
+                    throw new ParseException("Unsupported Element: " + startElement.getName());
+                }
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                currentParseable = null;
+                EndElement endElement = xmlEvent.asEndElement();
+                if (endElement.getName().equals(Constants.TAG_wsse_TransformationParameters)) {
+                    return true;
+                }
+                break;
+            //possible ignorable withespace and comments
+            case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.COMMENT:
+                break;
+            default:
+                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+        }
+        return false;
+    }
+
+    public void validate() throws ParseException {
+        if (canonicalizationMethodType == null) {
+            throw new ParseException("Element \"CanonicalizationMethodType\" is missing");
+        }
+    }
 
     /**
      * Gets the value of the any property.
@@ -93,4 +151,7 @@ public class TransformationParametersType {
         return otherAttributes;
     }
 
+    public CanonicalizationMethodType getCanonicalizationMethodType() {
+        return canonicalizationMethodType;
+    }
 }

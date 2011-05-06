@@ -14,6 +14,8 @@
  */
 package org.swssf.impl.transformer.canonicalizer;
 
+import java.io.OutputStream;
+
 /**
  * @author $Author: giger $
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
@@ -26,7 +28,7 @@ public class Canonicalizer11_OmitCommentsTransformer extends Canonicalizer11 {
      *
      * @param inclusiveNamespaces
      */
-    public Canonicalizer11_OmitCommentsTransformer(String inclusiveNamespaces) {
-        super(inclusiveNamespaces, false);
+    public Canonicalizer11_OmitCommentsTransformer(String inclusiveNamespaces, OutputStream outputStream) {
+        super(inclusiveNamespaces, false, outputStream);
     }
 }

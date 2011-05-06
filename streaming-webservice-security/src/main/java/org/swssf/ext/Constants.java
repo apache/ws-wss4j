@@ -52,6 +52,7 @@ public class Constants {
     public static final String XMLINPUTFACTORY = "XMLInputFactory";
     public static final String TIMESTAMP_PROCESSED = "TimestampProcessed";
 
+    public static final String NS_XML = "http://www.w3.org/2000/xmlns/";
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
     public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
     public static final String NS_WSSE10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
@@ -59,6 +60,12 @@ public class Constants {
     public static final String NS_WSU10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     public static final String NS_SOAP11 = "http://schemas.xmlsoap.org/soap/envelope/";
     public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
+
+    public static final String NS_WST = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    public static final String NS_WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
+
+    public static final String NS_SAML = "urn:oasis:names:tc:SAML:1.0:assertion";
+    public static final String NS_SAML2 = "urn:oasis:names:tc:SAML:2.0:assertion";
 
     public static final String PREFIX_SOAPENV = "env";
     public static final String TAG_soap_Envelope_LocalName = "Envelope";
@@ -134,6 +141,8 @@ public class Constants {
 
     public static final QName TAG_dsig_Transform = new QName(NS_DSIG, "Transform", PREFIX_DSIG);
 
+    public static final QName TAG_wsse_TransformationParameters = new QName(NS_WSSE10, "TransformationParameters", PREFIX_WSSE);
+
     public static final QName TAG_dsig_DigestMethod = new QName(NS_DSIG, "DigestMethod", PREFIX_DSIG);
 
     public static final QName TAG_dsig_DigestValue = new QName(NS_DSIG, "DigestValue", PREFIX_DSIG);
@@ -180,6 +189,22 @@ public class Constants {
     public static final String PREFIX_C14N_EXCL = "c14nEx";
     public static final QName ATT_NULL_PrefixList = new QName(null, "PrefixList");
     public static final QName TAG_c14nExcl_InclusiveNamespaces = new QName(NS_C14N_EXCL, "InclusiveNamespaces", PREFIX_C14N_EXCL);
+
+    public static final QName TAG_wst_BinarySecret = new QName(NS_WST, "BinarySecret");
+
+    public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
+
+    public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
+    public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");
+
+    public static final String NS_SAML10_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
+    public static final String NS_SAML11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
+    public static final String NS_SAML10_TYPE = NS_SAML10_TOKEN_PROFILE + "#SAMLAssertionID";
+    public static final String NS_SAML20_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLID";
+
+    public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
+    public static final QName ATT_NULL_ID = new QName(null, "ID");
+
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.

@@ -8,6 +8,7 @@
 
 package org.w3._2000._09.xmldsig_;
 
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.TransformationParametersType;
 import org.swssf.ext.Constants;
 import org.swssf.ext.ParseException;
 import org.swssf.ext.Parseable;
@@ -59,6 +60,7 @@ public class TransformType implements Parseable {
     @XmlSchemaType(name = "anyURI")
     protected String algorithm;
     protected String inclusiveNamespaces;
+    protected TransformationParametersType transformationParametersType;
 
     private Parseable currentParseable;
 
@@ -107,6 +109,8 @@ public class TransformType implements Parseable {
                         public void validate() throws ParseException {
                         }
                     };
+                } else if (startElement.getName().equals(Constants.TAG_wsse_TransformationParameters)) {
+                    currentParseable = transformationParametersType = new TransformationParametersType(startElement);
                 } else {
                     throw new ParseException("Unsupported Element: " + startElement.getName());
                 }
@@ -190,5 +194,9 @@ public class TransformType implements Parseable {
 
     public void setInclusiveNamespaces(String inclusiveNamespaces) {
         this.inclusiveNamespaces = inclusiveNamespaces;
+    }
+
+    public TransformationParametersType getTransformationParametersType() {
+        return transformationParametersType;
     }
 }

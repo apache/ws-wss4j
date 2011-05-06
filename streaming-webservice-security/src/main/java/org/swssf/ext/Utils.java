@@ -15,6 +15,7 @@
 package org.swssf.ext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.swssf.config.TransformerAlgorithmMapper;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -25,7 +26,10 @@ import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Deque;
@@ -97,17 +101,35 @@ public class Utils {
      * @param callback
      * @throws WSSecurityException if the callback couldn't be executed
      */
-    public static void doCallback(CallbackHandler callbackHandler, Callback callback) throws WSSecurityException {
+    public static void doPasswordCallback(CallbackHandler callbackHandler, Callback callback) throws WSSecurityException {
         if (callbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
         }
         try {
-            Callback[] callbacks = new Callback[]{callback};
-            callbackHandler.handle(callbacks);
+            callbackHandler.handle(new Callback[]{callback});
         } catch (IOException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+        }
+    }
+
+    /**
+     * Try to get the secret key from a CallbackHandler implementation
+     *
+     * @param cb a CallbackHandler implementation
+     * @return An array of bytes corresponding to the secret key (can be null)
+     * @throws WSSecurityException
+     */
+    public static void dotSecretKeyCallback(CallbackHandler callbackHandler, Callback callback, String id) throws WSSecurityException {
+        if (callbackHandler != null) {
+            try {
+                callbackHandler.handle(new Callback[]{callback});
+            } catch (IOException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+            }
         }
     }
 
@@ -236,5 +258,18 @@ public class Utils {
             }
             return false;
         }
+    }
+
+    public static Transformer getTransformer(Object methodParameter1, Object methodParameter2, String algorithm) throws WSSecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(algorithm);
+        Transformer childTransformer;
+        try {
+            Constructor<Transformer> constructor = transformerClass.getConstructor(Transformer.class);
+            childTransformer = constructor.newInstance(methodParameter1);
+        } catch (NoSuchMethodException e) {
+            Constructor<Transformer> constructor = transformerClass.getConstructor(String.class, OutputStream.class);
+            childTransformer = constructor.newInstance(methodParameter1, methodParameter2);
+        }
+        return childTransformer;
     }
 }

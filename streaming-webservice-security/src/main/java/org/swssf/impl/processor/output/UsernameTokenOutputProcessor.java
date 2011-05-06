@@ -47,7 +47,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         if (xmlEvent.isStartElement()) {
             try {
                 WSPasswordCallback pwCb = new WSPasswordCallback(getSecurityProperties().getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
-                Utils.doCallback(getSecurityProperties().getCallbackHandler(), pwCb);
+                Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
                 String password = pwCb.getPassword();
                 Constants.UsernameTokenPasswordType usernameTokenPasswordType = getSecurityProperties().getUsernameTokenPasswordType();
 

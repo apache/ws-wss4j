@@ -53,6 +53,8 @@ public abstract class CanonicalizerBase implements Transformer {
         NODE_AFTER_DOCUMENT_ELEMENT
     }
 
+    private OutputStream outputStream;
+
     private Map cache = new HashMap();
     private C14NStack<List<Comparable>> outputStack = new C14NStack<List<Comparable>>();
     private boolean includeComments = false;
@@ -60,9 +62,10 @@ public abstract class CanonicalizerBase implements Transformer {
     private boolean firstCall = true;
     private SortedSet<String> inclusiveNamespaces = null;
 
-    public CanonicalizerBase(String inclusiveNamespaces, boolean includeComments) {
+    public CanonicalizerBase(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
         this.includeComments = includeComments;
         this.inclusiveNamespaces = prefixStr2Set(inclusiveNamespaces);
+        this.outputStream = outputStream;
     }
 
     public static SortedSet<String> prefixStr2Set(String inclusiveNamespaces) {
@@ -158,7 +161,7 @@ public abstract class CanonicalizerBase implements Transformer {
         }
     }
 
-    public void transform(XMLEvent xmlEvent, OutputStream outputStream) throws XMLStreamException {
+    public void transform(XMLEvent xmlEvent) throws XMLStreamException {
         try {
             switch (xmlEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
@@ -184,7 +187,12 @@ public abstract class CanonicalizerBase implements Transformer {
                             while (iterator.hasNext()) {
                                 String next = iterator.next();
                                 String ns = startElement.getNamespaceURI(next);
-                                if (ns != null) {
+                                //add default ns:
+                                if (ns == null && "".equals(next)) {
+                                    ComparableNamespace comparableNamespace = new ComparableNamespace(next, "");
+                                    utilizedNamespaces.add(comparableNamespace);
+                                    outputStack.peek().add(comparableNamespace);
+                                } else if (ns != null) {
                                     ComparableNamespace comparableNamespace = new ComparableNamespace(next, ns);
                                     utilizedNamespaces.add(comparableNamespace);
                                     outputStack.peek().add(comparableNamespace);
@@ -259,21 +267,21 @@ public abstract class CanonicalizerBase implements Transformer {
 
                     break;
                 case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                    outputPItoWriter(((ProcessingInstruction) xmlEvent), outputStream, currentDocumentLevel);
+                    outputPItoWriter(((ProcessingInstruction) xmlEvent), this.outputStream, currentDocumentLevel);
                     break;
                 case XMLStreamConstants.CHARACTERS:
                     if (currentDocumentLevel == DocumentLevel.NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT) {
-                        outputTextToWriter(xmlEvent.asCharacters().getData(), outputStream);
+                        outputTextToWriter(xmlEvent.asCharacters().getData(), this.outputStream);
                     }
                     break;
                 case XMLStreamConstants.COMMENT:
                     if (includeComments) {
-                        outputCommentToWriter(((Comment) xmlEvent), outputStream, currentDocumentLevel);
+                        outputCommentToWriter(((Comment) xmlEvent), this.outputStream, currentDocumentLevel);
                     }
                     break;
                 case XMLStreamConstants.SPACE:
                     if (currentDocumentLevel == DocumentLevel.NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT) {
-                        outputTextToWriter(xmlEvent.asCharacters().getData(), outputStream);
+                        outputTextToWriter(xmlEvent.asCharacters().getData(), this.outputStream);
                     }
                     break;
                 case XMLStreamConstants.START_DOCUMENT:
@@ -288,7 +296,7 @@ public abstract class CanonicalizerBase implements Transformer {
                 case XMLStreamConstants.DTD:
                     break;
                 case XMLStreamConstants.CDATA:
-                    outputTextToWriter(xmlEvent.asCharacters().getData(), outputStream);
+                    outputTextToWriter(xmlEvent.asCharacters().getData(), this.outputStream);
                     break;
                 case XMLStreamConstants.NAMESPACE:
                     throw new XMLStreamException("illegal event :" + Utils.getXMLEventAsString(xmlEvent));
