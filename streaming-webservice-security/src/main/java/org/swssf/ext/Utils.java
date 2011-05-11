@@ -121,7 +121,7 @@ public class Utils {
      * @return An array of bytes corresponding to the secret key (can be null)
      * @throws WSSecurityException
      */
-    public static void dotSecretKeyCallback(CallbackHandler callbackHandler, Callback callback, String id) throws WSSecurityException {
+    public static void doSecretKeyCallback(CallbackHandler callbackHandler, Callback callback, String id) throws WSSecurityException {
         if (callbackHandler != null) {
             try {
                 callbackHandler.handle(new Callback[]{callback});
@@ -181,7 +181,7 @@ public class Utils {
                 Namespace namespace = namespaceIterator.next();
                 String prefix = namespace.getPrefix();
 
-                if (prefix != null && prefix.length() == 0 && namespace.getNamespaceURI().length() == 0) {
+                if ((prefix == null || prefix.length() == 0) && (namespace.getNamespaceURI() == null || namespace.getNamespaceURI().length() == 0)) {
                     continue;
                 }
 

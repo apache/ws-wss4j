@@ -28,6 +28,7 @@ import java.io.IOException;
 public class CallbackHandlerImpl implements CallbackHandler {
 
     private String username = "default";
+    private byte[] secret;
 
     public CallbackHandlerImpl() {
     }
@@ -36,6 +37,10 @@ public class CallbackHandlerImpl implements CallbackHandler {
         if (username != null) {
             this.username = username;
         }
+    }
+
+    public CallbackHandlerImpl(byte[] secret) {
+        this.secret = secret;
     }
 
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -47,6 +52,9 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 || pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
                 ) {
             pc.setPassword(username);
+        } else if (pc.getUsage() == WSPasswordCallback.SECRET_KEY
+                || pc.getUsage() == WSPasswordCallback.SECURITY_CONTEXT_TOKEN) {
+            pc.setKey(secret);
         } else {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
         }

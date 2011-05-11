@@ -205,6 +205,36 @@ public class Constants {
     public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
     public static final QName ATT_NULL_ID = new QName(null, "ID");
 
+    public static final String NS_WSC_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc";
+    public static final String NS_WSC_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
+    public static final String PREFIX_WSC = "wsc";
+
+    public static final QName TAG_wsc0502_SecurityContextToken = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
+    public static final QName TAG_wsc0512_SecurityContextToken = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Identifier = new QName(NS_WSC_05_02, "Identifier", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Identifier = new QName(NS_WSC_05_12, "Identifier", PREFIX_WSC);
+
+    public static final QName TAG_wsc0502_DerivedKeyToken = new QName(NS_WSC_05_02, "DerivedKeyToken", PREFIX_WSC);
+    public static final QName TAG_wsc0512_DerivedKeyToken = new QName(NS_WSC_05_12, "DerivedKeyToken", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+
+    public static final String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    public static final String P_SHA_1_2005_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
+    public static final String WS_SecureConversation_DEFAULT_LABEL = "WS-SecureConversation";
+
+    public static final String PROP_USE_THIS_TOKEN_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_FOR_SIGNATURE";
+
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.

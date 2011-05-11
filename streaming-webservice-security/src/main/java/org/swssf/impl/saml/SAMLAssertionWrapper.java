@@ -426,6 +426,25 @@ public class SAMLAssertionWrapper {
     }
 
     /**
+     * Parse a SAML Assertion to obtain a SAMLKeyInfo object from
+     * the Subject of the assertion
+     *
+     * @param assertion    The SAML Assertion
+     * @param data         The RequestData instance used to obtain configuration
+     * @param docInfo      A WSDocInfo instance
+     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
+     * @return a SAMLKeyInfo object
+     * @throws WSSecurityException
+     */
+    public SAMLKeyInfo getCredentialFromSubject(SecurityProperties securityProperties) throws WSSecurityException {
+        if (this.saml2 != null) {
+            return getCredentialFromSubject(this.saml2, securityProperties);
+        } else {
+            return getCredentialFromSubject(this.saml1, securityProperties);
+        }
+    }
+
+    /**
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a
      * SAML 1.1 assertion
      *
@@ -439,7 +458,7 @@ public class SAMLAssertionWrapper {
     public SAMLKeyInfo getCredentialFromSubject(org.opensaml.saml1.core.Assertion assertion, SecurityProperties securityProperties) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
         WSPasswordCallback passwordCallback = new WSPasswordCallback(assertion.getID(), WSPasswordCallback.SECRET_KEY);
-        Utils.dotSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, assertion.getID());
+        Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, assertion.getID());
         final byte[] key = passwordCallback.getKey();
         if (key != null && key.length > 0) {
             return new SAMLKeyInfo(key);
@@ -494,7 +513,7 @@ public class SAMLAssertionWrapper {
     public SAMLKeyInfo getCredentialFromSubject(org.opensaml.saml2.core.Assertion assertion, SecurityProperties securityProperties) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
         WSPasswordCallback passwordCallback = new WSPasswordCallback(assertion.getID(), WSPasswordCallback.SECRET_KEY);
-        Utils.dotSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, assertion.getID());
+        Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, assertion.getID());
         final byte[] key = passwordCallback.getKey();
         if (key != null && key.length > 0) {
             return new SAMLKeyInfo(key);

@@ -37,6 +37,18 @@
         <Handler NAME="Assertion"
                  URI="urn:oasis:names:tc:SAML:2.0:assertion"
                  JAVACLASS="org.swssf.impl.processor.input.SAMLTokenInputHandler"/>
+        <Handler NAME="SecurityContextToken"
+                 URI="http://schemas.xmlsoap.org/ws/2005/02/sc"
+                 JAVACLASS="org.swssf.impl.processor.input.SecurityContextTokenInputHandler"/>
+        <Handler NAME="SecurityContextToken"
+                 URI="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
+                 JAVACLASS="org.swssf.impl.processor.input.SecurityContextTokenInputHandler"/>
+        <Handler NAME="DerivedKeyToken"
+                 URI="http://schemas.xmlsoap.org/ws/2005/02/sc"
+                 JAVACLASS="org.swssf.impl.processor.input.DerivedKeyTokenInputHandler"/>
+        <Handler NAME="DerivedKeyToken"
+                 URI="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
+                 JAVACLASS="org.swssf.impl.processor.input.DerivedKeyTokenInputHandler"/>
     </SecurityHeaderHandlers>
    <TransformAlgorithms>
       <!-- c14n omitting comments -->

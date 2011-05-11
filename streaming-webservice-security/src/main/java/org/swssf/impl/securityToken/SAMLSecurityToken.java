@@ -96,4 +96,8 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         }
         return this.x509Certificate;
     }
+
+    public SAMLKeyInfo getSamlKeyInfo() {
+        return samlKeyInfo;
+    }
 }
