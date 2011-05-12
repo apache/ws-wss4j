@@ -17,21 +17,28 @@ package org.swssf.impl.saml;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opensaml.saml1.core.ConfirmationMethod;
-import org.opensaml.saml1.core.Subject;
-import org.opensaml.saml1.core.SubjectConfirmation;
-import org.opensaml.saml1.core.SubjectStatement;
+import org.opensaml.common.SAMLVersion;
+import org.opensaml.common.SignableSAMLObject;
+import org.opensaml.saml1.core.*;
+import org.opensaml.saml2.core.AuthnStatement;
+import org.opensaml.saml2.core.AuthzDecisionStatement;
+import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.SubjectConfirmationData;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
 import org.swssf.crypto.Crypto;
 import org.swssf.crypto.CryptoType;
 import org.swssf.ext.*;
+import org.swssf.impl.saml.builder.SAML1ComponentBuilder;
+import org.swssf.impl.saml.builder.SAML2ComponentBuilder;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -44,6 +51,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -81,6 +89,108 @@ public class SAMLAssertionWrapper {
         } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
             this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
         }
+    }
+
+    public SAMLAssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {
+        OpenSAMLUtil.initSamlEngine();
+
+        SAMLVersion samlVersion = samlCallback.getSamlVersion();
+        String issuer = samlCallback.getIssuer();
+
+        if (samlVersion.equals(SAMLVersion.VERSION_11)) {
+            // Build a SAML v1.1 assertion
+            saml1 = SAML1ComponentBuilder.createSamlv1Assertion(issuer);
+
+            try {
+                // Process the SAML authentication statement(s)
+                List<AuthenticationStatement> authenticationStatements =
+                        SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
+                                samlCallback.getAuthenticationStatementData()
+                        );
+                saml1.getAuthenticationStatements().addAll(authenticationStatements);
+
+                // Process the SAML attribute statement(s)
+                List<AttributeStatement> attributeStatements =
+                        SAML1ComponentBuilder.createSamlv1AttributeStatement(
+                                samlCallback.getAttributeStatementData()
+                        );
+                saml1.getAttributeStatements().addAll(attributeStatements);
+
+                // Process the SAML authorization decision statement(s)
+                List<AuthorizationDecisionStatement> authDecisionStatements =
+                        SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
+                                samlCallback.getAuthDecisionStatementData()
+                        );
+                saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
+
+                // Build the complete assertion
+                org.opensaml.saml1.core.Conditions conditions =
+                        SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
+                saml1.setConditions(conditions);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new WSSecurityException(
+                        "Error generating KeyInfo from signing credential", ex
+                );
+            }
+
+            // Set the OpenSaml2 XMLObject instance
+            xmlObject = saml1;
+
+        } else if (samlVersion.equals(SAMLVersion.VERSION_20)) {
+            // Build a SAML v2.0 assertion
+            saml2 = SAML2ComponentBuilder.createAssertion();
+            Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
+
+            // Authn Statement(s)
+            List<AuthnStatement> authnStatements =
+                    SAML2ComponentBuilder.createAuthnStatement(
+                            samlCallback.getAuthenticationStatementData()
+                    );
+            saml2.getAuthnStatements().addAll(authnStatements);
+
+            // Attribute statement(s)
+            List<org.opensaml.saml2.core.AttributeStatement> attributeStatements =
+                    SAML2ComponentBuilder.createAttributeStatement(
+                            samlCallback.getAttributeStatementData()
+                    );
+            saml2.getAttributeStatements().addAll(attributeStatements);
+
+            // AuthzDecisionStatement(s)
+            List<AuthzDecisionStatement> authDecisionStatements =
+                    SAML2ComponentBuilder.createAuthorizationDecisionStatement(
+                            samlCallback.getAuthDecisionStatementData()
+                    );
+            saml2.getAuthzDecisionStatements().addAll(authDecisionStatements);
+
+            // Build the SAML v2.0 assertion
+            saml2.setIssuer(samlIssuer);
+
+            try {
+                org.opensaml.saml2.core.Subject subject =
+                        SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
+                saml2.setSubject(subject);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new WSSecurityException(
+                        "Error generating KeyInfo from signing credential", ex
+                );
+            }
+
+            org.opensaml.saml2.core.Conditions conditions =
+                    SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
+            saml2.setConditions(conditions);
+
+            // Set the OpenSaml2 XMLObject instance
+            xmlObject = saml2;
+        }
+
+        if (samlCallback.isSignAssertion()) {
+            //todo throw Exception when params are null?
+            signAssertion(samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword(), samlCallback.getIssuerCrypto(), samlCallback.isSendKeyValue());
+        }
+    }
+
+    public Element toDOM(Document doc) throws WSSecurityException {
+        return OpenSAMLUtil.toDom(xmlObject, doc);
     }
 
     /**
@@ -122,6 +232,73 @@ public class SAMLAssertionWrapper {
                         + "object or issuer is null"
         );
         return null;
+    }
+
+    public void signAssertion(String issuerKeyName, String issuerKeyPassword, Crypto issuerCrypto, boolean sendKeyValue) throws WSSecurityException {
+        //
+        // Create the signature
+        //
+        Signature signature = OpenSAMLUtil.buildSignature();
+        signature.setCanonicalizationAlgorithm(
+                SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS
+        );
+
+        // prepare to sign the SAML token
+        X509Certificate[] issuerCerts = issuerCrypto.getCertificates(issuerKeyName);
+        if (issuerCerts == null) {
+            throw new WSSecurityException(
+                    "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                            + issuerKeyName
+            );
+        }
+
+        String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
+        String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
+        if (logger.isDebugEnabled()) {
+            logger.debug("automatic sig algo detection: " + pubKeyAlgo);
+        }
+        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+            sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
+        }
+        PrivateKey privateKey = null;
+        try {
+            privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
+        } catch (Exception ex) {
+            throw new WSSecurityException(ex.getMessage(), ex);
+        }
+
+        signature.setSignatureAlgorithm(sigAlgo);
+
+        BasicX509Credential signingCredential = new BasicX509Credential();
+        signingCredential.setEntityCertificate(issuerCerts[0]);
+        signingCredential.setPrivateKey(privateKey);
+
+        signature.setSigningCredential(signingCredential);
+
+        X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
+        if (sendKeyValue) {
+            kiFactory.setEmitPublicKeyValue(true);
+        } else {
+            kiFactory.setEmitEntityCertificate(true);
+        }
+        try {
+            KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
+            signature.setKeyInfo(keyInfo);
+        } catch (org.opensaml.xml.security.SecurityException ex) {
+            throw new WSSecurityException(
+                    "Error generating KeyInfo from signing credential", ex
+            );
+        }
+
+        // add the signature to the assertion
+        if (xmlObject instanceof SignableSAMLObject) {
+            SignableSAMLObject signableObject = (SignableSAMLObject) xmlObject;
+            signableObject.setSignature(signature);
+            signableObject.releaseDOM();
+            signableObject.releaseChildrenDOM(true);
+        } else {
+            logger.error("Attempt to sign an unsignable object " + xmlObject.getClass().getName());
+        }
     }
 
     /**
@@ -179,9 +356,6 @@ public class SAMLAssertionWrapper {
      * KeyInfo (DOM Element) argument.
      *
      * @param keyInfoElement The KeyInfo as a DOM Element
-     * @param data           The RequestData instance used to obtain configuration
-     * @param docInfo        A WSDocInfo instance
-     * @param bspCompliant   Whether to process tokens in compliance with the BSP spec or not
      * @return The credential (as a SAMLKeyInfo object)
      * @throws WSSecurityException
      */
@@ -312,8 +486,6 @@ public class SAMLAssertionWrapper {
      * Verify trust in the signature of a signed Assertion. This method is separate so that
      * the user can override if if they want.
      *
-     * @param assertion The signed Assertion
-     * @param data      The RequestData context
      * @return A Credential instance
      * @throws WSSecurityException
      */
@@ -328,8 +500,6 @@ public class SAMLAssertionWrapper {
      * This implementation first attempts to verify trust on the certificate (chain). If
      * this is not successful, then it will attempt to verify trust on the Public Key.
      *
-     * @param credential the Credential to be validated
-     * @param data       the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
      */
     protected void validate(X509Certificate[] certs, PublicKey publicKey, SecurityProperties securityProperties) throws WSSecurityException {
@@ -448,10 +618,7 @@ public class SAMLAssertionWrapper {
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a
      * SAML 1.1 assertion
      *
-     * @param assertion    The SAML 1.1 assertion
-     * @param data         The RequestData instance used to obtain configuration
-     * @param docInfo      A WSDocInfo instance
-     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
+     * @param assertion The SAML 1.1 assertion
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
@@ -503,10 +670,7 @@ public class SAMLAssertionWrapper {
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a
      * SAML 2 assertion
      *
-     * @param assertion    The SAML 2 assertion
-     * @param data         The RequestData instance used to obtain configuration
-     * @param docInfo      A WSDocInfo instance
-     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
+     * @param assertion The SAML 2 assertion
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */

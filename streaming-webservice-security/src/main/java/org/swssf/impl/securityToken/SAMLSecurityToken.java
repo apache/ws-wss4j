@@ -14,14 +14,12 @@
  */
 package org.swssf.impl.securityToken;
 
-import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurityToken;
 import org.swssf.ext.WSSecurityException;
 import org.swssf.impl.saml.SAMLKeyInfo;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
 import java.security.PublicKey;
@@ -36,7 +34,7 @@ import java.security.cert.X509Certificate;
 public class SAMLSecurityToken extends AbstractSecurityToken {
 
     private SAMLKeyInfo samlKeyInfo;
-    private X509Certificate x509Certificate;
+    private X509Certificate[] x509Certificate;
 
     public SAMLSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler) {
         super(crypto, callbackHandler);
@@ -48,24 +46,30 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
     }
 
     public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-        return new SecretKeySpec(samlKeyInfo.getSecret(), algoFamily);
+        return samlKeyInfo.getPrivateKey();
     }
 
     public PublicKey getPublicKey() throws WSSecurityException {
         PublicKey publicKey = samlKeyInfo.getPublicKey();
         if (publicKey == null) {
-            publicKey = getX509Certificate().getPublicKey();
+            publicKey = getX509Certificates()[0].getPublicKey();
         }
         return publicKey;
     }
 
+    public X509Certificate[] getX509Certificates() throws WSSecurityException {
+        if (this.x509Certificate == null) {
+            this.x509Certificate = samlKeyInfo.getCerts();
+        }
+        return this.x509Certificate;
+    }
+
     public void verify() throws WSSecurityException {
         try {
-            X509Certificate x509Certificate = getX509Certificate();
-            if (x509Certificate != null) {
-                x509Certificate.checkValidity();
-                getCrypto().validateCert(x509Certificate);
+            X509Certificate[] x509Certificates = getX509Certificates();
+            if (x509Certificates != null && x509Certificates.length > 0) {
+                x509Certificates[0].checkValidity();
+                getCrypto().validateCert(x509Certificates[0]);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
@@ -84,17 +88,6 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
 
     public Constants.KeyIdentifierType getKeyIdentifierType() {
         return null;
-    }
-
-    public X509Certificate getX509Certificate() throws WSSecurityException {
-        if (this.x509Certificate == null) {
-            X509Certificate[] x509Certificates = samlKeyInfo.getCerts();
-            if (x509Certificates == null || x509Certificates.length == 0) {
-                return null;
-            }
-            this.x509Certificate = x509Certificates[0];
-        }
-        return this.x509Certificate;
     }
 
     public SAMLKeyInfo getSamlKeyInfo() {

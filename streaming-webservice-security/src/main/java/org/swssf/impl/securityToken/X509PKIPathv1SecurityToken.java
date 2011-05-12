@@ -27,26 +27,26 @@ import java.security.cert.X509Certificate;
  */
 public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     private String alias = null;
-    private X509Certificate x509Certificate;
+    private X509Certificate[] x509Certificates;
 
     X509PKIPathv1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent) throws WSSecurityException {
         super(crypto, callbackHandler);
         X509Certificate[] x509Certificates = crypto.getX509Certificates(binaryContent, false);
         if (x509Certificates != null && x509Certificates.length > 0) {
-            this.x509Certificate = x509Certificates[0];
+            this.x509Certificates = x509Certificates;
         }
     }
 
     protected String getAlias() throws WSSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getAliasForX509Cert(this.x509Certificate);
+            this.alias = getCrypto().getAliasForX509Cert(this.x509Certificates[0]);
         }
         return this.alias;
     }
 
     @Override
-    public X509Certificate getX509Certificate() throws WSSecurityException {
-        return this.x509Certificate;
+    public X509Certificate[] getX509Certificates() throws WSSecurityException {
+        return this.x509Certificates;
     }
 
     public Constants.KeyIdentifierType getKeyIdentifierType() {

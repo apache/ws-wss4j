@@ -19,6 +19,7 @@
 
 package org.swssf.impl.saml;
 
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
@@ -42,12 +43,21 @@ public class SAMLKeyInfo {
      */
     private PublicKey publicKey;
 
+    /**
+     * The private key
+     */
+    private PrivateKey privateKey;
+
     public SAMLKeyInfo(X509Certificate[] certs) {
         this.certs = certs;
     }
 
     public SAMLKeyInfo(byte[] secret) {
         this.secret = secret;
+    }
+
+    public SAMLKeyInfo(PrivateKey privateKey) {
+        this.privateKey = privateKey;
     }
 
     public SAMLKeyInfo(PublicKey publicKey) {
@@ -78,4 +88,11 @@ public class SAMLKeyInfo {
         this.publicKey = publicKey;
     }
 
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey) {
+        this.privateKey = privateKey;
+    }
 }

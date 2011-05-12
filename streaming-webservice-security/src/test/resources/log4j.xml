@@ -54,4 +54,7 @@
     <logger name="org.swssf.impl.saml.SAMLAssertionWrapper">
         <level value="INFO"/>
     </logger>
+    <logger name="org.swssf.test.AbstractTestBase$CustomWSS4JHandler">
+        <level value="INFO"/>
+    </logger>
 </log4j:configuration>

@@ -33,6 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.util.Deque;
 import java.util.Hashtable;
 import java.util.Map;
@@ -121,6 +122,10 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         }
 
                         public PublicKey getPublicKey() throws WSSecurityException {
+                            return null;
+                        }
+
+                        public X509Certificate[] getX509Certificates() throws WSSecurityException {
                             return null;
                         }
 

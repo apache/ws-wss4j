@@ -54,6 +54,12 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
     }
 
+    @Override
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
+        setAppendAfterThisTokenId(outputProcessorChain.getSecurityContext().<String>get(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID));
+        super.doFinal(outputProcessorChain);
+    }
+
     protected void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
@@ -105,13 +111,6 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
         attributes.put(Constants.ATT_NULL_Id, "Signature-" + UUID.randomUUID().toString());
         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Signature, attributes);
 
-        WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
-        Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
-        String password = pwCb.getPassword();
-        if (password == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noPassword", new Object[]{alias});
-        }
-
         SignatureAlgorithm signatureAlgorithm;
 
         try {
@@ -123,10 +122,9 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
         }
 
         SecurityTokenProvider securityTokenProvider = null;
-        if (alias != null) {
-            signatureAlgorithm.engineInitSign(getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password));
-        } else if (getSecurityProperties().getTokenUser() != null) {
-            securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(getSecurityProperties().getTokenUser());
+        String tokenId = outputProcessorChain.getSecurityContext().get(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
+        if (tokenId != null) {
+            securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (securityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
             }
@@ -134,7 +132,16 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             if (securityToken == null) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
             }
+            x509Certificates = securityToken.getX509Certificates();
             signatureAlgorithm.engineInitSign(securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm()));
+        } else {
+            WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
+            Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
+            String password = pwCb.getPassword();
+            if (password == null) {
+                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noPassword", new Object[]{alias});
+            }
+            signatureAlgorithm.engineInitSign(getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password));
         }
 
         SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), signatureAlgorithm);
@@ -160,10 +167,23 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Reference, attributes);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transforms, null);
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(Constants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform, attributes);
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform);
+            if (signaturePartDef.getTransformAlgo() != null) {
+                attributes = new HashMap<QName, String>();
+                attributes.put(Constants.ATT_NULL_Algorithm, signaturePartDef.getTransformAlgo());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform, attributes);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_TransformationParameters, null);
+                attributes = new HashMap<QName, String>();
+                attributes.put(Constants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_CanonicalizationMethod, attributes);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_CanonicalizationMethod);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_TransformationParameters);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform);
+            } else {
+                attributes = new HashMap<QName, String>();
+                attributes.put(Constants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform, attributes);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transform);
+            }
 
             createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_dsig_Transforms);
 

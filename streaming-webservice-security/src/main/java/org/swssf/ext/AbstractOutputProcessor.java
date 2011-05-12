@@ -74,6 +74,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return securityProperties;
     }
 
+    //todo copy attributes
     protected XMLEventNS cloneStartElementEvent(XMLEvent xmlEvent, List<Attribute> attributeList) throws XMLStreamException {
         XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
         if (!xmlEvent.isStartElement()) {
@@ -87,6 +88,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         currentXmlEventNamespaces.add(new ComparableNamespace(xmlEvent.asStartElement().getName().getPrefix(), xmlEvent.asStartElement().getName().getNamespaceURI()));
 
         List<Namespace> namespaceList = new ArrayList<Namespace>();
+        @SuppressWarnings("unchecked")
         Iterator<Namespace> namespaceIterator = xmlEvent.asStartElement().getNamespaces();
         while (namespaceIterator.hasNext()) {
             Namespace namespace = namespaceIterator.next();
@@ -112,6 +114,28 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         StartElement startElement = xmlEventFactory.createStartElement(xmlEvent.asStartElement().getName(), attributeList.iterator(), namespaceList.iterator());
 
         return new XMLEventNS(startElement, xmlEventNSNamespaces, xmlEventNsAttributes);
+    }
+
+    protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> namespaces, Map<QName, String> attributes) throws XMLStreamException, WSSecurityException {
+        List<Attribute> attributeList = new LinkedList<Attribute>();
+        if (attributes != null) {
+            Iterator<Map.Entry<QName, String>> attributeIterator = attributes.entrySet().iterator();
+            while (attributeIterator.hasNext()) {
+                Map.Entry<QName, String> qNameStringEntry = attributeIterator.next();
+                Attribute attribute = xmlEventFactory.createAttribute(qNameStringEntry.getKey(), qNameStringEntry.getValue());
+                attributeList.add(attribute);
+            }
+        }
+        List<Namespace> namespaceList = new LinkedList<Namespace>();
+        if (namespaces != null) {
+            Iterator<Map.Entry<QName, String>> namespaceIterator = namespaces.entrySet().iterator();
+            while (namespaceIterator.hasNext()) {
+                Map.Entry<QName, String> qNameStringEntry = namespaceIterator.next();
+                namespaceList.add(xmlEventFactory.createNamespace(qNameStringEntry.getKey().getLocalPart(), qNameStringEntry.getValue()));
+            }
+        }
+        StartElement startElement = xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator());
+        outputAsEvent(outputProcessorChain, startElement);
     }
 
     protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, WSSecurityException {

@@ -25,6 +25,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -232,6 +233,10 @@ public class UsernameSecurityToken implements SecurityToken {
     }
 
     public PublicKey getPublicKey() throws WSSecurityException {
+        return null;
+    }
+
+    public X509Certificate[] getX509Certificates() throws WSSecurityException {
         return null;
     }
 

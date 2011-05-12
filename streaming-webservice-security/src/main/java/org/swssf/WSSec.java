@@ -213,6 +213,33 @@ public class WSSec {
                     break;
                 case SIGNATURE_CONFIRMATION:
                     securityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsse11_SignatureConfirmation.getLocalPart(), Constants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), SecurePart.Modifier.Element));
+                    break;
+                case SAML_TOKEN_SIGNED:
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                    }
+                    //signature namespace part will be set in SecurityHeaderOutputProcessor
+                    if (securityProperties.getSignatureSecureParts().isEmpty()) {
+                        securityProperties.addSignaturePart(new SecurePart("Body", "*", SecurePart.Modifier.Element));
+                    }
+                    if (securityProperties.getSignatureAlgorithm() == null) {
+                        securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+                    }
+                    if (securityProperties.getSignatureDigestAlgorithm() == null) {
+                        securityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
+                    }
+                    if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+                        securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+                    }
+                    if (securityProperties.getSignatureKeyIdentifierType() == null) {
+                        securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
+                    }
+                    break;
+                case SAML_TOKEN_UNSIGNED:
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                    }
+                    break;
             }
         }
         //todo clone securityProperties

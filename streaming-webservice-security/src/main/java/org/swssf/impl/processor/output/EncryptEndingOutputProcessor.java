@@ -60,6 +60,12 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
         this.encryptionPartDefList = encryptOutputProcessor.getEncryptionPartDefList();
     }
 
+    @Override
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
+        setAppendAfterThisTokenId(outputProcessorChain.getSecurityContext().<String>get(Constants.PROP_APPEND_ENCRYPTION_ON_THIS_ID));
+        super.doFinal(outputProcessorChain);
+    }
+
     protected void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
@@ -283,7 +289,7 @@ public class EncryptEndingOutputProcessor extends AbstractBufferingOutputProcess
                     SecurityToken securityToken = initiatorSignatureTokenSecurityEvent.getSecurityToken();
                     if (securityToken instanceof X509SecurityToken) {
                         X509SecurityToken x509SecurityToken = (X509SecurityToken) securityToken;
-                        return x509SecurityToken.getX509Certificate();
+                        return x509SecurityToken.getX509Certificates()[0];
                     }
                 }
             }

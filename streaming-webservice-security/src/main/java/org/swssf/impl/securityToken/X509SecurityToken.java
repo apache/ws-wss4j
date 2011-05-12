@@ -32,7 +32,7 @@ import java.security.cert.X509Certificate;
  * @version $Revision: $ $Date: $
  */
 public abstract class X509SecurityToken extends AbstractSecurityToken {
-    private X509Certificate x509Certificate = null;
+    private X509Certificate[] x509Certificates = null;
 
     X509SecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
         super(crypto, callbackHandler);
@@ -49,20 +49,27 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
     }
 
     public PublicKey getPublicKey() throws WSSecurityException {
-        X509Certificate x509Certificate = getX509Certificate();
-        if (x509Certificate == null) {
+        X509Certificate[] x509Certificates = getX509Certificates();
+        if (x509Certificates == null || x509Certificates.length == 0) {
             return null;
         }
-        return x509Certificate.getPublicKey();
+        return x509Certificates[0].getPublicKey();
     }
 
-    //todo testing:
+    public X509Certificate[] getX509Certificates() throws WSSecurityException {
+        if (this.x509Certificates == null) {
+            this.x509Certificates = getCrypto().getCertificates(getAlias());
+        }
+        return this.x509Certificates;
+    }
+
+    //todo testing: should the whole chain be verified?
     public void verify() throws WSSecurityException {
         try {
-            X509Certificate x509Certificate = getX509Certificate();
-            if (x509Certificate != null) {
-                x509Certificate.checkValidity();
-                getCrypto().validateCert(x509Certificate);
+            X509Certificate[] x509Certificates = getX509Certificates();
+            if (x509Certificates != null && x509Certificates.length > 0) {
+                x509Certificates[0].checkValidity();
+                getCrypto().validateCert(x509Certificates[0]);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
@@ -77,17 +84,6 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
 
     public String getKeyWrappingTokenAlgorithm() {
         return null;
-    }
-
-    public X509Certificate getX509Certificate() throws WSSecurityException {
-        if (this.x509Certificate == null) {
-            X509Certificate[] x509Certificates = getCrypto().getCertificates(getAlias());
-            if (x509Certificates.length == 0) {
-                return null;
-            }
-            this.x509Certificate = x509Certificates[0];
-        }
-        return this.x509Certificate;
     }
 
     protected abstract String getAlias() throws WSSecurityException;

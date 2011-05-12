@@ -25,6 +25,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Deque;
 
 /**
@@ -59,6 +60,10 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
             }
 
             public PublicKey getPublicKey() throws WSSecurityException {
+                return null;
+            }
+
+            public X509Certificate[] getX509Certificates() throws WSSecurityException {
                 return null;
             }
 

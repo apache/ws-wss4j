@@ -108,6 +108,18 @@ public class OutboundWSSec {
                     processorChain.addProcessor(signatureConfirmationOutputProcessor);
                     break;
                 }
+                case SAML_TOKEN_SIGNED: {
+                    SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor(securityProperties);
+                    processorChain.addProcessor(samlTokenOutputProcessor);
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
+                    processorChain.addProcessor(signatureOutputProcessor);
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
+                    break;
+                }
+                case SAML_TOKEN_UNSIGNED: {
+                    SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor(securityProperties);
+                    processorChain.addProcessor(samlTokenOutputProcessor);
+                }
             }
         }
 

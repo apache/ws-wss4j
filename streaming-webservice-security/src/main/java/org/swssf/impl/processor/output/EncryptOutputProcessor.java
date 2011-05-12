@@ -94,7 +94,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                 Iterator<SecurePart> securePartIterator = secureParts.iterator();
                 while (securePartIterator.hasNext()) {
                     SecurePart securePart = securePartIterator.next();
-                    if (securePart.getId() == null) {
+                    if (securePart.getIdToSign() == null) {
                         if (startElement.getName().getLocalPart().equals(securePart.getName())
                                 && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
 

@@ -400,6 +400,7 @@ public class SecurityProperties {
         this.signatureKeyStore = keyStore;
     }
 
+    //todo overall class generics <CryptoBase>
     public Class getSignatureCryptoClass() {
         return signatureCryptoClass;
     }

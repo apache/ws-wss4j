@@ -95,7 +95,7 @@ public class RecipientEncryptionTokenAssertionState extends AssertionState {
         setAsserted(true);
 
         try {
-            X509Certificate x509Certificate = x509SecurityToken.getX509Certificate();
+            X509Certificate x509Certificate = x509SecurityToken.getX509Certificates()[0];
             if (x509Token.getIssuerName() != null) {
                 final String certificateIssuerName = x509Certificate.getSubjectX500Principal().getName();
                 if (!x509Token.getIssuerName().equals(certificateIssuerName)) {

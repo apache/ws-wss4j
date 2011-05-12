@@ -38,60 +38,57 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         super(securityProperties);
     }
 
-    //todo derivedKey @see WSSecUsernameToken line 167
-
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.processEvent(xmlEvent);
 
-        if (xmlEvent.isStartElement()) {
-            try {
-                WSPasswordCallback pwCb = new WSPasswordCallback(getSecurityProperties().getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
-                Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
-                String password = pwCb.getPassword();
-                Constants.UsernameTokenPasswordType usernameTokenPasswordType = getSecurityProperties().getUsernameTokenPasswordType();
+        try {
+            WSPasswordCallback pwCb = new WSPasswordCallback(getSecurityProperties().getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
+            Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
+            String password = pwCb.getPassword();
+            Constants.UsernameTokenPasswordType usernameTokenPasswordType = getSecurityProperties().getUsernameTokenPasswordType();
 
-                if (password == null && usernameTokenPasswordType != null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE);
+            if (password == null && usernameTokenPasswordType != null) {
+                throw new WSSecurityException(WSSecurityException.FAILURE);
+            }
+
+            byte[] nonceValue = new byte[16];
+            Constants.secureRandom.nextBytes(nonceValue);
+
+            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+            XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
+
+            final String wsuId = "UsernameToken-" + UUID.randomUUID().toString();
+
+            final UsernameSecurityToken usernameSecurityToken =
+                    new UsernameSecurityToken(
+                            getSecurityProperties().getTokenUser(),
+                            password,
+                            created != null ? created.toXMLFormat() : null,
+                            nonceValue,
+                            null,
+                            null
+                    );
+
+            SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+                    return usernameSecurityToken;
                 }
 
-                byte[] nonceValue = new byte[16];
-                Constants.secureRandom.nextBytes(nonceValue);
+                public String getId() {
+                    return wsuId;
+                }
+            };
+            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
+            outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
+            outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);
+            outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(getSecurityProperties(), wsuId, nonceValue, password, created));
 
-                DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-                XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
-
-                final String wsuId = "UsernameToken-" + UUID.randomUUID().toString();
-
-                final UsernameSecurityToken usernameSecurityToken =
-                        new UsernameSecurityToken(
-                                getSecurityProperties().getTokenUser(),
-                                password,
-                                created != null ? created.toXMLFormat() : null,
-                                nonceValue,
-                                null,
-                                null
-                        );
-
-                SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
-                    public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                        return usernameSecurityToken;
-                    }
-
-                    public String getId() {
-                        return wsuId;
-                    }
-                };
-                outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(getSecurityProperties().getTokenUser(), securityTokenProvider);
-                outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(getSecurityProperties(), wsuId, nonceValue, password, created));
-
-            } catch (DatatypeConfigurationException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
-            } finally {
-                outputProcessorChain.removeProcessor(this);
-            }
+        } catch (DatatypeConfigurationException e) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+        } finally {
+            outputProcessorChain.removeProcessor(this);
         }
-
     }
 
     class FinalUsernameTokenOutputProcessor extends AbstractOutputProcessor {
@@ -105,6 +102,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                                           byte[] nonceValue, String password, XMLGregorianCalendar created)
                 throws WSSecurityException {
             super(securityProperties);
+            this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.wsuId = wsuId;
             this.nonceValue = nonceValue;
             this.password = password;

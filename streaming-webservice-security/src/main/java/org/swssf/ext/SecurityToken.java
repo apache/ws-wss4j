@@ -16,6 +16,7 @@ package org.swssf.ext;
 
 import java.security.Key;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 
 /**
  * This class represents the different token types which can occur in WS-Security
@@ -51,6 +52,14 @@ public interface SecurityToken {
      * @throws WSSecurityException if the key can't be loaded
      */
     public PublicKey getPublicKey() throws WSSecurityException;
+
+    /**
+     * Returns the certificate chain if one exists for this token type
+     *
+     * @return The certificate chain
+     * @throws WSSecurityException if the certificates can't be retrieved
+     */
+    public X509Certificate[] getX509Certificates() throws WSSecurityException;
 
     /**
      * Verifies the key if applicable

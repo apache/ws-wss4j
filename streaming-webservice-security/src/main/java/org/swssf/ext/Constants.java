@@ -201,13 +201,20 @@ public class Constants {
     public static final String NS_SAML11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
     public static final String NS_SAML10_TYPE = NS_SAML10_TOKEN_PROFILE + "#SAMLAssertionID";
     public static final String NS_SAML20_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLID";
+    public static final String NS_SAML11_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV1.1";
 
     public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
     public static final QName ATT_NULL_ID = new QName(null, "ID");
 
+
     public static final String NS_WSC_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc";
     public static final String NS_WSC_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
     public static final String PREFIX_WSC = "wsc";
+
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE";
+    public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
+    public static final String PROP_APPEND_ENCRYPTION_ON_THIS_ID = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
 
     public static final QName TAG_wsc0502_SecurityContextToken = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
     public static final QName TAG_wsc0512_SecurityContextToken = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
@@ -235,7 +242,6 @@ public class Constants {
 
     public static final String PROP_USE_THIS_TOKEN_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_FOR_SIGNATURE";
 
-
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.
      */
@@ -249,6 +255,8 @@ public class Constants {
         USERNAMETOKEN,
         USERNAMETOKEN_SIGN,
         SIGNATURE_CONFIRMATION,
+        SAML_TOKEN_SIGNED,
+        SAML_TOKEN_UNSIGNED,
     }
 
     public enum KeyIdentifierType {

@@ -62,56 +62,102 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
             //avoid double signature when child elements matches too
             if (activeInternalSignatureOutputProcessor == null) {
-                Iterator<SecurePart> securePartIterator = secureParts.iterator();
-                while (securePartIterator.hasNext()) {
-                    SecurePart securePart = securePartIterator.next();
-                    if (securePart.getId() == null) {
-                        if (startElement.getName().getLocalPart().equals(securePart.getName())
-                                && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
+                SecurePart securePart = securePartMatches(startElement, outputProcessorChain);
+                if (securePart != null) {
 
-                            logger.debug("Matched securePart for signature");
-                            InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
-                            try {
-                                SignaturePartDef signaturePartDef = new SignaturePartDef();
-                                signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
+                    logger.debug("Matched securePart for signature");
+                    InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
+                    try {
+                        SignaturePartDef signaturePartDef = new SignaturePartDef();
+                        if (securePart.getIdToSign() == null) {
+                            signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());
+                            signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
 
-                                signaturePartDefList.add(signaturePartDef);
-
-                                boolean found = false;
-                                List<Attribute> attributeList = new ArrayList<Attribute>();
-                                Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                                while (attributeIterator.hasNext()) {
-                                    Attribute attribute = attributeIterator.next();
-                                    if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
-                                        signaturePartDef.setSigRefId(attribute.getValue());
-                                        found = true;
-                                    }
+                            boolean found = false;
+                            List<Attribute> attributeList = new ArrayList<Attribute>();
+                            Iterator<Attribute> attributeIterator = startElement.getAttributes();
+                            while (attributeIterator.hasNext()) {
+                                Attribute attribute = attributeIterator.next();
+                                if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+                                    signaturePartDef.setSigRefId(attribute.getValue());
+                                    found = true;
                                 }
-                                if (!found) {
-                                    attributeList.add(createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
-                                    xmlEvent = cloneStartElementEvent(xmlEvent, attributeList);
-                                }
-
-                                internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
-
-                            } catch (NoSuchAlgorithmException e) {
-                                throw new WSSecurityException(
-                                        WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                                        new Object[]{"No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()}, e
-                                );
-                            } catch (NoSuchProviderException e) {
-                                throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
                             }
+                            if (!found) {
+                                attributeList.add(createAttribute(Constants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                                xmlEvent = cloneStartElementEvent(xmlEvent, attributeList);
+                            }
+                        } else {
+                            if (Constants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName())) {
+                                signaturePartDef.setSigRefId(securePart.getIdToReference());
+                                signaturePartDef.setTransformAlgo(Constants.SOAPMESSAGE_NS10_STRTransform);
+                                signaturePartDef.setC14nAlgo(Constants.NS_C14N_EXCL);
+                            } else {
+                                signaturePartDef.setSigRefId(securePart.getIdToSign());
+                                signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+                            }
+                        }
 
-                            activeInternalSignatureOutputProcessor = internalSignatureOutputProcessor;
-                            outputProcessorChain.addProcessor(internalSignatureOutputProcessor);
-                            break;
+                        signaturePartDefList.add(signaturePartDef);
+                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
+
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new WSSecurityException(
+                                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                new Object[]{"No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()}, e
+                        );
+                    } catch (NoSuchProviderException e) {
+                        throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
+                    }
+
+                    activeInternalSignatureOutputProcessor = internalSignatureOutputProcessor;
+                    outputProcessorChain.addProcessor(internalSignatureOutputProcessor);
+                }
+            }
+        }
+        outputProcessorChain.processEvent(xmlEvent);
+    }
+
+    private SecurePart securePartMatches(StartElement startElement, OutputProcessorChain outputProcessorChain) {
+        SecurePart securePart = securePartMatches(startElement, this.secureParts);
+        if (securePart != null) {
+            return securePart;
+        }
+        List<SecurePart> secureParts = outputProcessorChain.getSecurityContext().<SecurePart>getAsList(SecurePart.class);
+        if (secureParts == null) {
+            return null;
+        }
+        return securePartMatches(startElement, secureParts);
+    }
+
+    private SecurePart securePartMatches(StartElement startElement, List<SecurePart> secureParts) {
+        Iterator<SecurePart> securePartIterator = secureParts.iterator();
+        while (securePartIterator.hasNext()) {
+            SecurePart securePart = securePartIterator.next();
+            if (securePart.getIdToSign() == null) {
+                if (startElement.getName().getLocalPart().equals(securePart.getName())
+                        && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
+                    return securePart;
+                }
+            } else {
+                @SuppressWarnings("unchecked")
+                Iterator<Attribute> attributeIterator = startElement.getAttributes();
+                while (attributeIterator.hasNext()) {
+                    Attribute attribute = attributeIterator.next();
+                    if (attribute != null) {
+                        QName attributeName = attribute.getName();
+                        if ((attributeName.equals(Constants.ATT_wsu_Id)
+                                || attributeName.equals(Constants.ATT_NULL_Id)
+                                || attributeName.equals(Constants.ATT_NULL_ID)
+                                || attributeName.equals(Constants.ATT_NULL_AssertionID))
+                                && attribute.getValue().equals(securePart.getIdToSign())) {
+                            return securePart;
                         }
                     }
                 }
             }
         }
-        outputProcessorChain.processEvent(xmlEvent);
+        return null;
     }
 
     class InternalSignatureOutputProcessor extends AbstractOutputProcessor {
@@ -138,7 +184,12 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
             this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
 
             try {
-                transformer = Utils.getTransformer((String) null, this.bufferedDigestOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+                if (signaturePartDef.getTransformAlgo() != null) {
+                    Transformer transformer = Utils.getTransformer("#default", this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
+                    this.transformer = Utils.getTransformer(transformer, null, signaturePartDef.getTransformAlgo());
+                } else {
+                    transformer = Utils.getTransformer((String) null, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
+                }
             } catch (NoSuchMethodException e) {
                 throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
             } catch (InstantiationException e) {

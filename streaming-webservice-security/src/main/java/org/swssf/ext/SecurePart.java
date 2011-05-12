@@ -56,7 +56,8 @@ public class SecurePart {
     private String name;
     private String namespace;
     private Modifier modifier;
-    private String id;
+    private String idToSign;
+    private String idToReference;
 
     public SecurePart(String name, String namespace, Modifier modifier) {
         this.name = name;
@@ -64,11 +65,19 @@ public class SecurePart {
         this.modifier = modifier;
     }
 
-    public SecurePart(String name, String namespace, Modifier modifier, String id) {
+    public SecurePart(String name, String namespace, Modifier modifier, String idToSign) {
         this.name = name;
         this.namespace = namespace;
         this.modifier = modifier;
-        this.id = id;
+        this.idToSign = idToSign;
+    }
+
+    public SecurePart(String name, String namespace, Modifier modifier, String idToSign, String idToReference) {
+        this.name = name;
+        this.namespace = namespace;
+        this.modifier = modifier;
+        this.idToSign = idToSign;
+        this.idToReference = idToReference;
     }
 
     /**
@@ -115,11 +124,19 @@ public class SecurePart {
      *
      * @return The id
      */
-    public String getId() {
-        return id;
+    public String getIdToSign() {
+        return idToSign;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIdToSign(String idToSign) {
+        this.idToSign = idToSign;
+    }
+
+    public String getIdToReference() {
+        return idToReference;
+    }
+
+    public void setIdToReference(String idToReference) {
+        this.idToReference = idToReference;
     }
 }

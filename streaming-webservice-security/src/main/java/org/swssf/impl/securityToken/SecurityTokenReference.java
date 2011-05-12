@@ -23,6 +23,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Deque;
 
 /**
@@ -54,6 +55,10 @@ public class SecurityTokenReference extends AbstractSecurityToken {
 
     public PublicKey getPublicKey() throws WSSecurityException {
         return securityToken.getPublicKey();
+    }
+
+    public X509Certificate[] getX509Certificates() throws WSSecurityException {
+        return securityToken.getX509Certificates();
     }
 
     public void verify() throws WSSecurityException {
