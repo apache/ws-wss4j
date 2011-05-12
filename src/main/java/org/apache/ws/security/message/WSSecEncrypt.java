@@ -38,6 +38,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -297,7 +298,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         return doc;
     }
     
-    
     /**
      * Encrypt one or more parts or elements of the message.
      * 
@@ -319,8 +319,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
-    public Element encryptForRef(Element dataRef, List<WSEncryptionPart> references)
-        throws WSSecurityException {
+    public Element encryptForRef(
+        Element dataRef, 
+        List<WSEncryptionPart> references
+    ) throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
         List<String> encDataRefs = 
@@ -389,7 +391,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), dataRef);
     }
 
-
     /**
      * Perform encryption on the SOAP envelope.
      * @param doc The document containing the SOAP envelope as document element
@@ -443,7 +444,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             for (Element elementToEncrypt : elementsToEncrypt) {
                 String id = 
                     encryptElement(doc, elementToEncrypt, modifier, config, xmlCipher, 
-                                secretKey, keyInfo);
+                                   secretKey, keyInfo);
                 encPart.setEncId(id);
                 encDataRef.add("#" + id);
             }
@@ -481,6 +482,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         String xencEncryptedDataId = 
             config.getIdAllocator().createId("ED-", elementToEncrypt);
         try {
+            String headerId = "";
             if (modifier.equals("Header")) {
                 Element elem = 
                     doc.createElementNS(
@@ -489,22 +491,21 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
                 String wsuPrefix = 
                     WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                headerId = config.getIdAllocator().createId("EH-", elementToEncrypt);
                 elem.setAttributeNS(
-                    WSConstants.WSU_NS, wsuPrefix + ":Id", 
-                    config.getIdAllocator().createId("EH-", elementToEncrypt)
+                    WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
                 );
                 //
                 // Add the EncryptedHeader node to the element to be encrypted's parent
                 // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
                 // Header node as well
                 //
-                elementToEncrypt.getParentNode().appendChild(elem);
-                elementToEncrypt = 
-                    (Element)elementToEncrypt.getParentNode().removeChild(elementToEncrypt);
-                elementToEncrypt = (Element)elem.appendChild(elementToEncrypt);
+                Node parent = elementToEncrypt.getParentNode();
+                elementToEncrypt = (Element)parent.replaceChild(elem, elementToEncrypt);
+                elem.appendChild(elementToEncrypt);
                 
                 NamedNodeMap map = elementToEncrypt.getAttributes();
-                for (int i = 0 ; i < map.getLength() ; i++) {
+                for (int i = 0; i < map.getLength(); i++) {
                     Attr attr = (Attr)map.item(i);
                     if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
                         || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
@@ -556,16 +557,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            secToken.setKeyIdentifier(
-                WSConstants.WSS_SAML_KI_VALUE_TYPE, (encKeyIdDirectId ? "":"#") + encKeyId
-            );
+            secToken.setKeyIdentifier(WSConstants.WSS_SAML_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            secToken.setKeyIdentifier(
-                WSConstants.WSS_SAML2_KI_VALUE_TYPE, (encKeyIdDirectId ? "":"#") + encKeyId
-            );
+            secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();

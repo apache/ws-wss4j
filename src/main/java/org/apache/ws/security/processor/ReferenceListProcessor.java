@@ -243,6 +243,14 @@ public class ReferenceListProcessor implements Processor {
                 WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
             );
         }
+        if (encryptedDataElement.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
+            && encryptedDataElement.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
+            Node child = encryptedDataElement.getFirstChild();
+            while (child != null && child.getNodeType() != Node.ELEMENT_NODE) {
+                child = child.getNextSibling();
+            }
+            return (Element)child;
+        }
         return encryptedDataElement;
     }
 
@@ -297,11 +305,11 @@ public class ReferenceListProcessor implements Processor {
             && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
                 
             Node decryptedHeader = parent.getFirstChild();
-            Element decryptedHeaderClone = (Element)decryptedHeader.cloneNode(true);            
-            parent.getParentNode().appendChild(decryptedHeaderClone);
-            parent.getParentNode().removeChild(parent);
-            dataRef.setProtectedElement(decryptedHeaderClone);
-            dataRef.setXpath(getXPath(decryptedHeaderClone));
+            Node soapHeader = parent.getParentNode();
+            soapHeader.replaceChild(decryptedHeader, parent);
+
+            dataRef.setProtectedElement((Element)decryptedHeader);
+            dataRef.setXpath(getXPath(decryptedHeader));
         } else if (content) {
             dataRef.setProtectedElement(encData);
             dataRef.setXpath(getXPath(encData));

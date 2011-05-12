@@ -51,7 +51,9 @@ public class EncryptionPartsTest extends org.junit.Assert {
     private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Header>" +
+            "       <foo:bar1>baz1</foo:bar1>" + 
             "       <foo:foobar>baz</foo:foobar>" + 
+            "       <foo:bar2>baz2</foo:bar2>" +
             "   </soapenv:Header>" +
             "   <soapenv:Body>" +
             "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
