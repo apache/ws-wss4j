@@ -100,6 +100,12 @@ public class SAMLUtil {
                     strElement.getOwnerDocument(), wsDocInfo,
                     request.getCallbackHandler(), keyIdentifierValue, type
                 );
+            
+            if (token == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity"
+                );
+            }
             Processor proc = request.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
             List<WSSecurityEngineResult> samlResult =
                 proc.handleToken(token, request, wsDocInfo);
