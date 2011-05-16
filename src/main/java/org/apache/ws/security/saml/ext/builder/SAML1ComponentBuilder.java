@@ -233,7 +233,7 @@ public class SAML1ComponentBuilder {
                 builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
             
         }
-        Conditions conditions = conditionsV1Builder.buildObject(Conditions.TYPE_NAME);
+        Conditions conditions = conditionsV1Builder.buildObject();
         
         if (conditionsBean == null) {
             DateTime newNotBefore = new DateTime();
