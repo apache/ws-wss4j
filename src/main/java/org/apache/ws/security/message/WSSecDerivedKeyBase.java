@@ -222,23 +222,48 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         dkt.setID(dktId);
         
         if (strElem == null) {
-            //Create the SecurityTokenRef to the Encrypted Key
-            SecurityTokenReference strEncKey = new SecurityTokenReference(document);
-            Reference ref = new Reference(document);
+            SecurityTokenReference secRef = new SecurityTokenReference(document);
+            String strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
+            secRef.setID(strUri);
             
-            if (tokenIdDirectId) {
-                ref.setURI(tokenIdentifier);
-            } else {
-                ref.setURI("#" + tokenIdentifier);
+            switch (keyIdentifierType) {
+            case WSConstants.CUSTOM_KEY_IDENTIFIER:
+                secRef.setKeyIdentifier(customValueType, tokenIdentifier);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                }
+                break;
+            default:
+                Reference ref = new Reference(document);
+                
+                if (tokenIdDirectId) {
+                    ref.setURI(tokenIdentifier);
+                } else {
+                    ref.setURI("#" + tokenIdentifier);
+                }
+                if (customValueType != null && !"".equals(customValueType)) {
+                    ref.setValueType(customValueType);
+                } 
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    ref.setValueType(customValueType);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    ref.setValueType(customValueType);
+                } else if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(customValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                }
+
+                secRef.setReference(ref);
             }
-            if (customValueType != null && !"".equals(customValueType)) {
-                ref.setValueType(customValueType);
-            }
-            if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(customValueType)) {
-                strEncKey.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-            }
-            strEncKey.setReference(ref);
-            dkt.setSecurityTokenReference(strEncKey); 
+            
+            dkt.setSecurityTokenReference(secRef); 
         } else {
             dkt.setSecurityTokenReference(strElem);
         }
