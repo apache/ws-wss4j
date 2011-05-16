@@ -21,6 +21,7 @@ package org.apache.ws.security.str;
 
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
@@ -226,6 +227,7 @@ public class SignatureSTRParser implements STRParser {
                     byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                     secretKey = dkt.deriveKey(keyLength, secret); 
                     principal = dkt.createPrincipal();
+                    ((WSDerivedKeyTokenPrincipal)principal).setSecret(secret);
                 } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
                     AssertionWrapper assertion = 
                         (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);

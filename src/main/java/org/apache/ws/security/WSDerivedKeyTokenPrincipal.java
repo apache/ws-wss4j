@@ -37,6 +37,7 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
     private int length;
     private int offset;
     private String basetokenId;
+    private byte[] secret;
     
     public String getLabel() {
         return label;
@@ -44,6 +45,14 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+    
+    public byte[] getSecret() {
+        return secret;
+    }
+    
+    public void setSecret(byte[] secret) {
+        this.secret = secret;
     }
 
     public int getLength() {
