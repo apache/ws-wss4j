@@ -359,13 +359,13 @@ public class WSSConfig {
         if (!staticallyInitialized) {
             org.apache.xml.security.Init.init();
             if (addJceProviders) {
+                addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
                 addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
-                appendJceProvider("XMLDSig", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+                Security.removeProvider("STRTransform");
                 appendJceProvider(
                     "STRTransform", new org.apache.ws.security.transform.STRTransformProvider()
                 );
             }
-            
             staticallyInitialized = true;
         }
     }
@@ -739,7 +739,6 @@ public class WSSConfig {
         return null;
     }
 
-    
     /**
      * Add a new JCE security provider to use for WSS4J, of the specified name and class. Return
      * either the name of the previously loaded provider, the name of the new loaded provider, or
@@ -761,6 +760,35 @@ public class WSSConfig {
             try {
                 Class<? extends Provider> clazz = Loader.loadClass(className, false, Provider.class);
                 Provider provider = clazz.newInstance();
+                return addJceProvider(name, provider);
+            } catch (Throwable t) {
+                if (log.isDebugEnabled()) {
+                    log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
+                }
+                return null;
+            }
+        }
+        return currentProvider.getName();
+    }
+    
+    /**
+     * Add a new JCE security provider to use for WSS4J, of the specified name and class. Return
+     * either the name of the previously loaded provider, the name of the new loaded provider, or
+     * null if there's an exception in loading the provider. Add the provider either after the SUN
+     * provider (see WSS-99), or the IBMJCE provider. Otherwise fall back to the old behaviour of
+     * inserting the provider in position 2.
+     * 
+     * @param name
+     *            The name string of the provider (this may not be the real name of the provider)
+     * @param provider
+     *            A subclass of <code>java.security.Provider</code>
+     * 
+     * @return Returns the actual name of the provider that was loaded
+     */
+    public static String addJceProvider(String name, Provider provider) {
+        Provider currentProvider = Security.getProvider(name);
+        if (currentProvider == null) {
+            try {
                 //
                 // Install the provider after the SUN provider (see WSS-99)
                 // Otherwise fall back to the old behaviour of inserting
@@ -781,8 +809,8 @@ public class WSSConfig {
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(
-                        "The provider " + provider.getName() 
-                        + " was added at position: " + ret
+                        "The provider " + provider.getName() + " - "
+                         + provider.getVersion() + " was added at position: " + ret
                     );
                 }
                 return provider.getName();
