@@ -36,6 +36,8 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.message.token.Reference;
+import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -585,6 +587,34 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         verify(signedDoc);
+    }
+    
+    /**
+     * Create a signature that uses a custom SecurityTokenReference.
+     */
+    @org.junit.Test
+    public void testCustomSTR() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        SecurityTokenReference secRef = new SecurityTokenReference(doc);
+        Reference ref = new Reference(doc);
+        ref.setURI("custom-uri");
+        secRef.setReference(ref);
+        builder.setSecurityTokenReference(secRef);
+        
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
     }
 
     /**

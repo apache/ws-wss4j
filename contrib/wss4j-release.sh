@@ -46,7 +46,6 @@ mkdir -p ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/${WSS4J_VERSION}
 cd ${WSS4J_SRC_ROOT}
 mvn clean || exit 1
 mvn -Prelease,jdk15 install || exit 1
-mkdir -p ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j/
 cp -r ${M2_REPO}/org/apache/ws/security/wss4j/${WSS4J_VERSION} ${WSS4J_STAGE_ROOT}/maven/org/apache/ws/security/wss4j
 #
 # Build and stage the distribution using ant
