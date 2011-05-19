@@ -49,10 +49,20 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                 derivedKeyTokenType.getSecurityTokenReference(),
                 securityProperties.getDecryptionCrypto(),
                 securityProperties.getCallbackHandler(),
-                inputProcessorChain.getSecurityContext()
+                inputProcessorChain.getSecurityContext(),
+                this
         );
 
         final SecurityToken derivedKeySecurityToken = new SecurityToken() {
+
+            public String getId() {
+                return derivedKeyTokenType.getId();
+            }
+
+            public Object getProccesor() {
+                return null;
+            }
+
             public boolean isAsymmetric() {
                 return false;
             }

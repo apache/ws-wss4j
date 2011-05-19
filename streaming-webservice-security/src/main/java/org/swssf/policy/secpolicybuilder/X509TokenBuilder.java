@@ -68,7 +68,7 @@ public class X509TokenBuilder implements AssertionBuilder {
         policy = (Policy) policy.normalize(false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator
-                .hasNext();) {
+                .hasNext(); ) {
             processAlternative((List) iterator.next(), x509Token, spConstants);
 
             /*
@@ -84,7 +84,7 @@ public class X509TokenBuilder implements AssertionBuilder {
         Assertion assertion;
         QName name;
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
             assertion = (Assertion) iterator.next();
             name = assertion.getName();
 

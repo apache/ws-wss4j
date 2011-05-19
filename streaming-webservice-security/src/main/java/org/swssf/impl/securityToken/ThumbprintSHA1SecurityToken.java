@@ -28,8 +28,8 @@ public class ThumbprintSHA1SecurityToken extends X509SecurityToken {
     private String alias = null;
     private byte[] binaryContent;
 
-    ThumbprintSHA1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent) {
-        super(crypto, callbackHandler);
+    ThumbprintSHA1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) {
+        super(crypto, callbackHandler, id, processor);
         this.binaryContent = binaryContent;
     }
 

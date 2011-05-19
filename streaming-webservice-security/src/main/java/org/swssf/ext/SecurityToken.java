@@ -30,6 +30,20 @@ import java.security.cert.X509Certificate;
 public interface SecurityToken {
 
     /**
+     * Returns the token id aka wsu:Id
+     *
+     * @return The id
+     */
+    public String getId();
+
+    /**
+     * Returns the responsible processor for this token
+     *
+     * @return
+     */
+    public Object getProccesor();
+
+    /**
      * Returns the token type
      *
      * @return true if asymmetric token, false if symmetric token

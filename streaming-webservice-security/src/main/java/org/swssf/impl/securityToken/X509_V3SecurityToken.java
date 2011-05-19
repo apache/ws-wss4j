@@ -30,8 +30,8 @@ public class X509_V3SecurityToken extends X509SecurityToken {
     private String alias = null;
     private X509Certificate[] x509Certificates;
 
-    X509_V3SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent) throws WSSecurityException {
-        super(crypto, callbackHandler);
+    X509_V3SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) throws WSSecurityException {
+        super(crypto, callbackHandler, id, processor);
         this.x509Certificates = new X509Certificate[]{getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent))};
     }
 

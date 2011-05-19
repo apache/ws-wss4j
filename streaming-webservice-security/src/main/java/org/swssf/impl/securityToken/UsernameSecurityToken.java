@@ -37,6 +37,8 @@ public class UsernameSecurityToken implements SecurityToken {
 
     private static final int DEFAULT_ITERATION = 1000;
 
+    private String id;
+    private Object processor;
     private String username;
     private String password;
     private String created;
@@ -44,7 +46,9 @@ public class UsernameSecurityToken implements SecurityToken {
     private byte[] salt;
     private Integer iteration;
 
-    UsernameSecurityToken(UsernameTokenType usernameTokenType) {
+    UsernameSecurityToken(UsernameTokenType usernameTokenType, String id, Object processor) {
+        this.id = id;
+        this.processor = processor;
         this.username = usernameTokenType.getUsername();
         this.password = usernameTokenType.getPassword();
         this.created = usernameTokenType.getCreated();
@@ -53,13 +57,23 @@ public class UsernameSecurityToken implements SecurityToken {
         this.iteration = usernameTokenType.getIteration() != null ? Integer.parseInt(usernameTokenType.getIteration()) : null;
     }
 
-    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Integer iteration) {
+    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Integer iteration, String id, Object processor) {
+        this.id = id;
+        this.processor = processor;
         this.username = username;
         this.password = password;
         this.created = created;
         this.nonce = nonce;
         this.salt = salt;
         this.iteration = iteration;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Object getProccesor() {
+        return processor;
     }
 
     public String getUsername() {
@@ -90,10 +104,10 @@ public class UsernameSecurityToken implements SecurityToken {
      * This method generates a derived key as defined in WSS Username
      * Token Profile.
      *
-     * @param password  The password to include in the key generation
-     * @param salt      The Salt value
-     * @param iteration The Iteration value. If zero (0) is given the method uses the
-     *                  default value
+     * @param rawPassword The password to include in the key generation
+     * @param salt        The Salt value
+     * @param iteration   The Iteration value. If zero (0) is given the method uses the
+     *                    default value
      * @return Returns the derived key a byte array
      * @throws org.swssf.ext.WSSecurityException
      *

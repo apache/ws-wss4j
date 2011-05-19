@@ -34,15 +34,15 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @author Kohsuke Kawaguchi
  * @since 2.0
  */
-public class ZeroOneBooleanAdapter extends XmlAdapter<String,Boolean> {
+public class ZeroOneBooleanAdapter extends XmlAdapter<String, Boolean> {
     public Boolean unmarshal(String v) {
-        if(v==null)     return null;
+        if (v == null) return null;
         return DatatypeConverter.parseBoolean(v);
     }
 
     public String marshal(Boolean v) {
-        if(v==null)     return null;
-        if(v) {
+        if (v == null) return null;
+        if (v) {
             return "1";
         } else {
             return "0";

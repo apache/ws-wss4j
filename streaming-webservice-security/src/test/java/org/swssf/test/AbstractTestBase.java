@@ -64,6 +64,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  * @author $Author: giger $
@@ -79,7 +82,11 @@ public abstract class AbstractTestBase {
     protected DocumentBuilderFactory documentBuilderFactory;
 
     protected static final String SECURED_DOCUMENT = "securedDocument";
-    protected static final String NO_SERIALIZATION = "noSerialization";
+
+    static {
+        LogManager.getLogManager().addLogger(Logger.getLogger("org.jcp.xml.dsig.internal.dom"));
+        LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
+    }
 
     public AbstractTestBase() {
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -250,7 +257,11 @@ public abstract class AbstractTestBase {
         wss4JHandler.setPassword(messageContext, "default");
         messageContext.setProperty(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.setProperty("" + sigProperties.hashCode(), sigProperties);
-        messageContext.setProperty(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
+        if (properties.get(WSHandlerConstants.PW_CALLBACK_REF) != null) {
+            messageContext.setProperty(WSHandlerConstants.PW_CALLBACK_REF, properties.get(WSHandlerConstants.PW_CALLBACK_REF));
+        } else {
+            messageContext.setProperty(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
+        }
 
         Properties decProperties = new Properties();
         decProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
@@ -576,9 +587,9 @@ public abstract class AbstractTestBase {
             */
 
             CallbackHandler cbHandler = null;
-            if ((doAction & (WSConstants.ENCR | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
-                cbHandler = getPasswordCallbackHandler(reqData);
-            }
+            //if ((doAction & (WSConstants.ENCR | WSConstants.UT | WSConstants.UT_SIGN)) != 0) {
+            cbHandler = getPasswordCallbackHandler(reqData);
+            //}
             reqData.setCallbackHandler(cbHandler);
 
             /*
@@ -600,7 +611,7 @@ public abstract class AbstractTestBase {
                 throw new JAXRPCException("WSS4JHandler: security processing failed",
                         ex);
             }
-            if (wsResult == null) {         // no security header found
+            if (wsResult == null || wsResult.size() == 0) {         // no security header found
                 if (doAction == WSConstants.NO_SECURITY) {
                     return true;
                 } else {
@@ -689,7 +700,7 @@ public abstract class AbstractTestBase {
             /*
             * now check the security actions: do they match, in right order?
             */
-            if (!checkReceiverResultsAnyOrder(wsResult, actions)) {
+            if (!checkReceiverResults(wsResult, actions)) {
                 throw new JAXRPCException("WSS4JHandler: security processing failed (actions mismatch)");
             }
 
@@ -712,6 +723,43 @@ public abstract class AbstractTestBase {
                 log.debug("WSS4JHandler: exit invoke()");
             }
 
+            return true;
+        }
+
+        protected boolean checkReceiverResults(
+                List<WSSecurityEngineResult> wsResult, List<Integer> actions
+        ) {
+            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<WSSecurityEngineResult>();
+            for (WSSecurityEngineResult result : wsResult) {
+                boolean found = false;
+                for (WSSecurityEngineResult res : wsSecurityEngineResults) {
+                    if (((Integer) result.get(WSSecurityEngineResult.TAG_ACTION)).equals((Integer) res.get(WSSecurityEngineResult.TAG_ACTION))) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    wsSecurityEngineResults.add(result);
+                }
+            }
+            int size = actions.size();
+            int ai = 0;
+            for (WSSecurityEngineResult result : wsSecurityEngineResults) {
+                final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+                int act = actInt.intValue();
+                if (act == WSConstants.SC || act == WSConstants.BST || act == WSConstants.DKT || act == WSConstants.SCT || act == WSConstants.UT_NOPASSWORD) {
+                    continue;
+                }
+
+                if (ai >= size || actions.get(ai++).intValue() != act) {
+                    return false;
+                }
+            }
+/*
+        if (ai != size) {
+            return false;
+        }
+*/
             return true;
         }
 

@@ -51,7 +51,7 @@ public class ContentEncryptedElementsBuilder implements AssertionBuilder {
             contentEncryptedElements.setXPathVersion(attrXPathVersion.getAttributeValue());
         }
 
-        for (Iterator iterator = element.getChildElements(); iterator.hasNext();) {
+        for (Iterator iterator = element.getChildElements(); iterator.hasNext(); ) {
             processElement((OMElement) iterator.next(), contentEncryptedElements, spConstants);
         }
 

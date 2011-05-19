@@ -20,8 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.config.ConfigurationProperties;
 
-import java.io.IOException;
-
 /**
  * class lent from apache wss4j
  */
@@ -42,7 +40,8 @@ public class Merlin extends CryptoBase {
      *
      * @throws java.io.IOException
      */
-    public Merlin() throws IOException {
+    public Merlin() {
+        super();
     }
 
     protected String getCryptoProvider() {

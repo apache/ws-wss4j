@@ -92,7 +92,7 @@ public class SupportingTokensBuilder implements AssertionBuilder {
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
         policy = (Policy) policy.normalize(false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
             processAlternative((List) iterator.next(), supportingToken, spConstants);
             /*
              * for the moment we will say there should be only one alternative 
@@ -109,7 +109,7 @@ public class SupportingTokensBuilder implements AssertionBuilder {
 
     private void processAlternative(List assertions, SupportingToken supportingToken, SPConstants spConstants) {
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
 
             Assertion primitive = (Assertion) iterator.next();
             QName qname = primitive.getName();

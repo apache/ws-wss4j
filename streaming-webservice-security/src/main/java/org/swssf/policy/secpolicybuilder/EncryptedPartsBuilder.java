@@ -47,7 +47,7 @@ public class EncryptedPartsBuilder implements AssertionBuilder {
 
         Iterator iterator = element.getChildElements();
         if (iterator.hasNext()) {
-            for (; iterator.hasNext();) {
+            for (; iterator.hasNext(); ) {
                 processElement((OMElement) iterator.next(), signedEncryptedParts, spConstants);
             }
         } else {

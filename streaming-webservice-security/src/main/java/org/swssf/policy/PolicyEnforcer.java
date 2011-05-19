@@ -116,7 +116,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         Collection<AssertionState> assertionStates = assertionStateMap.get(securityEvent.getSecurityEventType());
         if (assertionStates != null && assertionStates.size() > 0) {
             int notAssertedCount = 0;
-            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext();) {
+            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext(); ) {
                 AssertionState assertionState = assertionStateIterator.next();
                 boolean asserted = assertionState.assertEvent(securityEvent);
                 if (!asserted) {
@@ -188,7 +188,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         while (entryIterator.hasNext()) {
             Map.Entry<SecurityEvent.Event, Collection<AssertionState>> eventCollectionEntry = entryIterator.next();
             Collection<AssertionState> assertionStates = eventCollectionEntry.getValue();
-            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext();) {
+            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext(); ) {
                 AssertionState assertionState = assertionStateIterator.next();
                 log.error(assertionState.getErrorMessage());
             }

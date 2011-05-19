@@ -27,8 +27,8 @@ import javax.security.auth.callback.CallbackHandler;
 public class X509DefaultSecurityToken extends X509SecurityToken {
     private String alias = null;
 
-    X509DefaultSecurityToken(Crypto crypto, CallbackHandler callbackHandler, String alias) {
-        super(crypto, callbackHandler);
+    X509DefaultSecurityToken(Crypto crypto, CallbackHandler callbackHandler, String alias, String id, Object processor) {
+        super(crypto, callbackHandler, id, processor);
         this.alias = alias;
     }
 

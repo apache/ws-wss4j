@@ -144,7 +144,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
         private void createSignatureAlgorithm() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, WSSecurityException {
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
-            SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext);
+            SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext, this);
             securityToken.verify();
 
             InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = new InitiatorSignatureTokenSecurityEvent(SecurityEvent.Event.InitiatorSignatureToken);

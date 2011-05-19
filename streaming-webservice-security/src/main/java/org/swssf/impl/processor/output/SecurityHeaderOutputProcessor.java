@@ -33,11 +33,12 @@ import java.util.Map;
  */
 public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
-    public SecurityHeaderOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public SecurityHeaderOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
         setPhase(Constants.Phase.PREPROCESSING);
     }
 
+    @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         boolean eventHandled = false;

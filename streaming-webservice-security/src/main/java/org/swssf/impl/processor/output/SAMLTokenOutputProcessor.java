@@ -40,13 +40,12 @@ import java.util.UUID;
  */
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public SAMLTokenOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public SAMLTokenOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
     }
 
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-        outputProcessorChain.processEvent(xmlEvent);
 
         try {
             SAMLCallback samlCallback = new SAMLCallback();
@@ -63,6 +62,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
             final String referenceId = "STRSAMLId-" + UUID.randomUUID().toString();
+            final String tokenId = samlAssertionWrapper.getId();
 
             if (senderVouches) {
 
@@ -82,31 +82,37 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     throw new WSSecurityException(ex.getMessage(), ex);
                 }
 
-                final String tokenId = samlAssertionWrapper.getId();
                 final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(issuerCerts);
                 samlKeyInfo.setPublicKey(issuerCerts[0].getPublicKey());
                 samlKeyInfo.setPrivateKey(privateKey);
 
+                final OutputProcessor outputProcessor = this;
                 SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
                     public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                        return new SAMLSecurityToken(samlKeyInfo, crypto, getSecurityProperties().getCallbackHandler());
+                        return new SAMLSecurityToken(samlKeyInfo, crypto, getSecurityProperties().getCallbackHandler(), tokenId, outputProcessor);
                     }
 
                     public String getId() {
                         return tokenId;
                     }
                 };
-
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(tokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);
                 outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, referenceId);
-                SecurePart securePart = new SecurePart(Constants.SOAPMESSAGE_NS10_STRTransform, null, SecurePart.Modifier.Element, tokenId, referenceId);
-                outputProcessorChain.getSecurityContext().putAsList(SecurePart.class, securePart);
             }
-            outputProcessorChain.addProcessor(new FinalSAMLTokenOutputProcessor(getSecurityProperties(), samlAssertionWrapper, referenceId));
+            switch (action) {
+                case SAML_TOKEN_SIGNED:
+                    SecurePart securePart = new SecurePart(Constants.SOAPMESSAGE_NS10_STRTransform, null, SecurePart.Modifier.Element, tokenId, referenceId);
+                    outputProcessorChain.getSecurityContext().putAsList(SecurePart.class, securePart);
+                    break;
+                case SAML_TOKEN_UNSIGNED:
+                    break;
+            }
+            outputProcessorChain.addProcessor(new FinalSAMLTokenOutputProcessor(getSecurityProperties(), getAction(), samlAssertionWrapper, referenceId));
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
+        outputProcessorChain.processEvent(xmlEvent);
     }
 
     class FinalSAMLTokenOutputProcessor extends AbstractOutputProcessor {
@@ -114,9 +120,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private SAMLAssertionWrapper samlAssertionWrapper;
         private String referenceId;
 
-        FinalSAMLTokenOutputProcessor(SecurityProperties securityProperties, SAMLAssertionWrapper samlAssertionWrapper, String referenceId)
+        FinalSAMLTokenOutputProcessor(SecurityProperties securityProperties, Constants.Action action, SAMLAssertionWrapper samlAssertionWrapper, String referenceId)
                 throws WSSecurityException {
-            super(securityProperties);
+            super(securityProperties, action);
+            this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.getAfterProcessors().add(SAMLTokenOutputProcessor.class.getName());
             this.samlAssertionWrapper = samlAssertionWrapper;
             this.referenceId = referenceId;
@@ -124,17 +131,18 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-            outputProcessorChain.processEvent(xmlEvent);
-
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {
+                    outputProcessorChain.processEvent(xmlEvent);
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
                     outputSecurityTokenReference(subOutputProcessorChain, referenceId, samlAssertionWrapper.getId());
                     outputProcessorChain.removeProcessor(this);
+                    return;
                 }
             }
+            outputProcessorChain.processEvent(xmlEvent);
         }
     }
 

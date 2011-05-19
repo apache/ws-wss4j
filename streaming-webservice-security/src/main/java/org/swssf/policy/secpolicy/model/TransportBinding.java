@@ -98,7 +98,7 @@ public class TransportBinding extends Binding {
         All wrapper;
         TransportBinding transportBinding;
 
-        for (Iterator iterator = configurations.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = configurations.iterator(); iterator.hasNext(); ) {
             wrapper = new All();
             transportBinding = new TransportBinding(spConstants);
 

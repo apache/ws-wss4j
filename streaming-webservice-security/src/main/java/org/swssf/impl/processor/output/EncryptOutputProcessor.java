@@ -22,7 +22,6 @@ import org.swssf.impl.util.TrimmerOutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
-import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
@@ -34,7 +33,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
@@ -47,42 +45,14 @@ import java.util.*;
 public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
     private List<SecurePart> secureParts;
-    private Key symmetricKey;
-    private String symmetricKeyId = "EncKeyId-" + UUID.randomUUID().toString();
-    private List<EncryptionPartDef> encryptionPartDefList = new LinkedList<EncryptionPartDef>();
-
     private InternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
 
-    public EncryptOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public EncryptOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
         secureParts = securityProperties.getEncryptionSecureParts();
-
-        //prepare the symmetric session key for all encryption parts
-        String keyAlgorithm = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(securityProperties.getEncryptionSymAlgorithm());
-        int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
-        KeyGenerator keyGen = null;
-        try {
-            keyGen = KeyGenerator.getInstance(keyAlgorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
-        }
-        keyGen.init(keyLength);
-
-        symmetricKey = keyGen.generateKey();
     }
 
-    public Key getSymmetricKey() {
-        return symmetricKey;
-    }
-
-    public String getSymmetricKeyId() {
-        return symmetricKeyId;
-    }
-
-    public List<EncryptionPartDef> getEncryptionPartDefList() {
-        return encryptionPartDefList;
-    }
-
+    @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         if (xmlEvent.isStartElement()) {
@@ -101,15 +71,18 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                             logger.debug("Matched securePart for encryption");
                             InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
                             try {
+                                String tokenId = outputProcessorChain.getSecurityContext().get(Constants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+                                SecurityTokenProvider securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
                                 EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
                                 encryptionPartDef.setModifier(securePart.getModifier());
-                                encryptionPartDef.setEncRefId("EncDataId-" + UUID.randomUUID().toString());//"EncDataId-1612925417"
-                                encryptionPartDef.setKeyId(symmetricKeyId);//EncKeyId-1483925398
-                                encryptionPartDef.setSymmetricKey(symmetricKey);
-                                encryptionPartDefList.add(encryptionPartDef);
+                                encryptionPartDef.setEncRefId("ED-" + UUID.randomUUID().toString());
+                                encryptionPartDef.setKeyId(securityTokenProvider.getId());
+                                encryptionPartDef.setSymmetricKey(securityTokenProvider.getSecurityToken(null).getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
+                                outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
                                 internalEncryptionOutputProcessor =
                                         new InternalEncryptionOutputProcessor(
                                                 getSecurityProperties(),
+                                                getAction(),
                                                 encryptionPartDef,
                                                 startElement,
                                                 outputProcessorChain.getDocumentContext().getEncoding()
@@ -151,11 +124,11 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
         private boolean doEncryptedHeader = false;
         private OutputProcessorChain subOutputProcessorChain;
 
-        InternalEncryptionOutputProcessor(SecurityProperties securityProperties, EncryptionPartDef encryptionPartDef,
+        InternalEncryptionOutputProcessor(SecurityProperties securityProperties, Constants.Action action, EncryptionPartDef encryptionPartDef,
                                           StartElement startElement, String encoding)
                 throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
-            super(securityProperties);
+            super(securityProperties, action);
             this.getBeforeProcessors().add(EncryptEndingOutputProcessor.class.getName());
             this.getBeforeProcessors().add(InternalEncryptionOutputProcessor.class.getName());
             this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
@@ -187,6 +160,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
             xmlEventWriter.add(XMLEventFactory.newFactory().createStartElement(new QName("a"), null, null));
         }
 
+        @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
             if (xmlEvent.isStartElement()) {

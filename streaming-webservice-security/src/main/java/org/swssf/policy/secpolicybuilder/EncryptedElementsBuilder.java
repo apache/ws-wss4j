@@ -49,7 +49,7 @@ public class EncryptedElementsBuilder implements AssertionBuilder {
             signedEncryptedElements.setXPathVersion(attribute.getAttributeValue());
         }
 
-        for (Iterator iterator = element.getChildElements(); iterator.hasNext();) {
+        for (Iterator iterator = element.getChildElements(); iterator.hasNext(); ) {
             processElement((OMElement) iterator.next(), signedEncryptedElements, spConstants);
         }
 

@@ -46,8 +46,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
-    public SignatureOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public SignatureOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
         secureParts = securityProperties.getSignatureSecureParts();
     }
 
@@ -99,7 +99,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                         }
 
                         signaturePartDefList.add(signaturePartDef);
-                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), signaturePartDef, startElement.getName());
+                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), getAction(), signaturePartDef, startElement.getName());
 
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(
@@ -170,8 +170,8 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         private org.swssf.impl.util.DigestOutputStream digestOutputStream;
         private Transformer transformer;
 
-        InternalSignatureOutputProcessor(SecurityProperties securityProperties, SignaturePartDef signaturePartDef, QName startElement) throws WSSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
-            super(securityProperties);
+        InternalSignatureOutputProcessor(SecurityProperties securityProperties, Constants.Action action, SignaturePartDef signaturePartDef, QName startElement) throws WSSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+            super(securityProperties, action);
             this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
             this.getBeforeProcessors().add(SignatureEndingOutputProcessor.class.getName());
             this.getBeforeProcessors().add(InternalSignatureOutputProcessor.class.getName());

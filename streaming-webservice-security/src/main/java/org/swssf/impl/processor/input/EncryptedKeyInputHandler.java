@@ -73,7 +73,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                                 keyInfoType,
                                 crypto,
                                 securityProperties.getCallbackHandler(),
-                                inputProcessorChain.getSecurityContext()
+                                inputProcessorChain.getSecurityContext(),
+                                this
                         );
                         cipher.init(Cipher.DECRYPT_MODE, securityToken.getSecretKey(algorithmURI));
 
@@ -105,6 +106,14 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     return new SecurityToken() {
 
                         private Map<String, Key> keyTable = new Hashtable<String, Key>();
+
+                        public String getId() {
+                            return encryptedKeyType.getId();
+                        }
+
+                        public Object getProccesor() {
+                            return null;
+                        }
 
                         public boolean isAsymmetric() {
                             return false;

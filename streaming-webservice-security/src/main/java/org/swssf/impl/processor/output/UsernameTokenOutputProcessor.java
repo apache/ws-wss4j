@@ -34,13 +34,12 @@ import java.util.*;
  */
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public UsernameTokenOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public UsernameTokenOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
     }
 
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
-        outputProcessorChain.processEvent(xmlEvent);
 
         try {
             WSPasswordCallback pwCb = new WSPasswordCallback(getSecurityProperties().getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
@@ -60,6 +59,8 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
             final String wsuId = "UsernameToken-" + UUID.randomUUID().toString();
 
+            final OutputProcessor outputProcessor = this;
+
             final UsernameSecurityToken usernameSecurityToken =
                     new UsernameSecurityToken(
                             getSecurityProperties().getTokenUser(),
@@ -67,7 +68,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                             created != null ? created.toXMLFormat() : null,
                             nonceValue,
                             null,
-                            null
+                            null,
+                            wsuId,
+                            outputProcessor
                     );
 
             SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
@@ -82,13 +85,14 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
             outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
             outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);
-            outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(getSecurityProperties(), wsuId, nonceValue, password, created));
+            outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(getSecurityProperties(), getAction(), wsuId, nonceValue, password, created));
 
         } catch (DatatypeConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
+        outputProcessorChain.processEvent(xmlEvent);
     }
 
     class FinalUsernameTokenOutputProcessor extends AbstractOutputProcessor {
@@ -98,10 +102,11 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         private String password = null;
         private XMLGregorianCalendar created = null;
 
-        FinalUsernameTokenOutputProcessor(SecurityProperties securityProperties, String wsuId,
+        FinalUsernameTokenOutputProcessor(SecurityProperties securityProperties, Constants.Action action, String wsuId,
                                           byte[] nonceValue, String password, XMLGregorianCalendar created)
                 throws WSSecurityException {
-            super(securityProperties);
+            super(securityProperties, action);
+            this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.wsuId = wsuId;
             this.nonceValue = nonceValue;
@@ -112,7 +117,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         @Override
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
             outputProcessorChain.processEvent(xmlEvent);
-
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {

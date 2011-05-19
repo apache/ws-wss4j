@@ -48,7 +48,7 @@ public class TransportBindingBuilder implements AssertionBuilder {
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
         policy = (Policy) policy.normalize(false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
             processAlternative((List) iterator.next(), transportBinding, factory, spConstants);
 
             /*
@@ -66,7 +66,7 @@ public class TransportBindingBuilder implements AssertionBuilder {
 
     private void processAlternative(List assertionList, TransportBinding parent, AssertionBuilderFactory factory, SPConstants spConstants) {
 
-        for (Iterator iterator = assertionList.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertionList.iterator(); iterator.hasNext(); ) {
 
             Assertion primitive = (Assertion) iterator.next();
             QName name = primitive.getName();

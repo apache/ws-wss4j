@@ -38,8 +38,8 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
     }
 
-    public FinalOutputProcessor(OutputStream outputStream, String encoding, SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public FinalOutputProcessor(OutputStream outputStream, String encoding, SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
         setPhase(Constants.Phase.POSTPROCESSING);
         try {
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, encoding);
@@ -48,10 +48,12 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         }
     }
 
+    @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         xmlEventWriter.add(xmlEvent);
     }
 
+    @Override
     public void doFinal(OutputProcessorChain outputProcessorChain) throws WSSecurityException {
         try {
             xmlEventWriter.flush();

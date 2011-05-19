@@ -34,8 +34,7 @@ import java.util.Deque;
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
-public class
-        SecurityTokenFactory {
+public class SecurityTokenFactory {
 
     private SecurityTokenFactory() {
     }
@@ -44,23 +43,23 @@ public class
         return new SecurityTokenFactory();
     }
 
-    public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto, final CallbackHandler callbackHandler, SecurityContext securityContext) throws WSSecurityException {
+    public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto, final CallbackHandler callbackHandler, SecurityContext securityContext, Object processor) throws WSSecurityException {
         if (keyInfoType != null) {
-            return getSecurityToken(keyInfoType.getSecurityTokenReferenceType(), crypto, callbackHandler, securityContext);
+            return getSecurityToken(keyInfoType.getSecurityTokenReferenceType(), crypto, callbackHandler, securityContext, processor);
         } else if (crypto.getDefaultX509Alias() != null) {
-            return new X509DefaultSecurityToken(crypto, callbackHandler, crypto.getDefaultX509Alias());
+            return new X509DefaultSecurityToken(crypto, callbackHandler, crypto.getDefaultX509Alias(), crypto.getDefaultX509Alias(), processor);
         }
         throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
     }
 
-    public SecurityToken getSecurityToken(SecurityTokenReferenceType securityTokenReferenceType, Crypto crypto, final CallbackHandler callbackHandler, SecurityContext securityContext) throws WSSecurityException {
+    public SecurityToken getSecurityToken(SecurityTokenReferenceType securityTokenReferenceType, Crypto crypto, final CallbackHandler callbackHandler, SecurityContext securityContext, Object processor) throws WSSecurityException {
         try {
             if (securityTokenReferenceType == null) {
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noSecTokRef");
             }
 
             if (securityTokenReferenceType.getX509DataType() != null) {
-                return new X509DataSecurityToken(crypto, callbackHandler, securityTokenReferenceType.getX509DataType());
+                return new X509DataSecurityToken(crypto, callbackHandler, securityTokenReferenceType.getX509DataType(), securityTokenReferenceType.getId(), processor);
             } /*else if (securityToken instanceof X509IssuerSerialType) {
                                 X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType) securityToken;
                                 //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
@@ -76,11 +75,11 @@ public class
                 }
 
                 if (Constants.NS_X509_V3_TYPE.equals(valueType)) {
-                    return new X509_V3SecurityToken(crypto, callbackHandler, binaryContent);
+                    return new X509_V3SecurityToken(crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
                 } else if (Constants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
-                    return new X509SubjectKeyIdentifierSecurityToken(crypto, callbackHandler, binaryContent);
+                    return new X509SubjectKeyIdentifierSecurityToken(crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
                 } else if (Constants.NS_THUMBPRINT.equals(valueType)) {
-                    return new ThumbprintSHA1SecurityToken(crypto, callbackHandler, binaryContent);
+                    return new ThumbprintSHA1SecurityToken(crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
                 } else if (Constants.NS_SAML10_TYPE.equals(valueType) || Constants.NS_SAML20_TYPE.equals(valueType)) {
                     SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider == null) {
@@ -99,7 +98,7 @@ public class
                 if (securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType() != null
                         && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
                     BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
-                    return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler);
+                    return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler, processor);
                 } else {//referenced BST:
                     //we have to search BST somewhere in the doc. First we will check for a BST already processed and
                     //stored in the context. Otherwise we will abort now.
@@ -128,7 +127,7 @@ public class
         }
     }
 
-    public SecurityToken getSecurityToken(BinarySecurityTokenType binarySecurityTokenType, Crypto crypto, CallbackHandler callbackHandler) throws WSSecurityException {
+    public SecurityToken getSecurityToken(BinarySecurityTokenType binarySecurityTokenType, Crypto crypto, CallbackHandler callbackHandler, Object processor) throws WSSecurityException {
 
         //only Base64Encoding is supported
         if (!Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
@@ -138,23 +137,23 @@ public class
         byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
 
         if (Constants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
-            return new X509_V3SecurityToken(crypto, callbackHandler, securityTokenData);
+            return new X509_V3SecurityToken(crypto, callbackHandler, securityTokenData, binarySecurityTokenType.getId(), processor);
         } else if (Constants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
-            return new X509PKIPathv1SecurityToken(crypto, callbackHandler, securityTokenData);
+            return new X509PKIPathv1SecurityToken(crypto, callbackHandler, securityTokenData, binarySecurityTokenType.getId(), processor);
         } else {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "invalidValueType", new Object[]{binarySecurityTokenType.getValueType()});
         }
     }
 
-    public SecurityToken getSecurityToken(UsernameTokenType usernameTokenType) throws WSSecurityException {
-        return new UsernameSecurityToken(usernameTokenType);
+    public SecurityToken getSecurityToken(UsernameTokenType usernameTokenType, Object processor) throws WSSecurityException {
+        return new UsernameSecurityToken(usernameTokenType, usernameTokenType.getId(), processor);
     }
 
-    public SecurityToken getSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler) throws WSSecurityException {
-        return new SAMLSecurityToken(samlKeyInfo, crypto, callbackHandler);
+    public SecurityToken getSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) throws WSSecurityException {
+        return new SAMLSecurityToken(samlKeyInfo, crypto, callbackHandler, id, processor);
     }
 
-    public SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, SecurityContext securityContext) throws WSSecurityException {
-        return new SecurityTokenReference(securityContext.getSecurityTokenProvider(referencedTokenId).getSecurityToken(crypto), xmlEvents, crypto, callbackHandler);
+    public SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, SecurityContext securityContext, String id, Object processor) throws WSSecurityException {
+        return new SecurityTokenReference(securityContext.getSecurityTokenProvider(referencedTokenId).getSecurityToken(crypto), xmlEvents, crypto, callbackHandler, id, processor);
     }
 }

@@ -35,8 +35,8 @@ public class SecurityTokenReference extends AbstractSecurityToken {
     private SecurityToken securityToken;
     private Deque<XMLEvent> xmlEvents;
 
-    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler) {
-        super(crypto, callbackHandler);
+    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+        super(crypto, callbackHandler, id, processor);
         this.securityToken = securityToken;
         this.xmlEvents = xmlEvents;
     }

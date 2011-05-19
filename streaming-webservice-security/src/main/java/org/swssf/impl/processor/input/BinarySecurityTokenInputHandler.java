@@ -39,7 +39,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
             SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
                 public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                    return SecurityTokenFactory.newInstance().getSecurityToken(binarySecurityTokenType, crypto, securityProperties.getCallbackHandler());
+                    return SecurityTokenFactory.newInstance().getSecurityToken(binarySecurityTokenType, crypto, securityProperties.getCallbackHandler(), null);
                 }
 
                 public String getId() {

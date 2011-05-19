@@ -31,14 +31,25 @@ import java.util.GregorianCalendar;
  */
 public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
-    public TimestampOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public TimestampOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
     }
+
+    /*
+                <wsu:Timestamp wsu:Id="Timestamp-1247751600"
+                    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+                        <wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+                            2009-08-31T05:37:57.391Z
+                        </wsu:Created>
+                        <wsu:Expires xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+                            2009-08-31T05:52:57.391Z
+                        </wsu:Expires>
+                    </wsu:Timestamp>
+                 */
 
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.processEvent(xmlEvent);
-
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {
@@ -65,18 +76,6 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 outputProcessorChain.removeProcessor(this);
-
-                /*
-                <wsu:Timestamp wsu:Id="Timestamp-1247751600"
-                    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-                        <wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-                            2009-08-31T05:37:57.391Z
-                        </wsu:Created>
-                        <wsu:Expires xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-                            2009-08-31T05:52:57.391Z
-                        </wsu:Expires>
-                    </wsu:Timestamp>
-                 */
             }
         }
     }

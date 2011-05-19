@@ -132,7 +132,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
         }
 
         Header header;
-        for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = headers.iterator(); iterator.hasNext(); ) {
             header = (Header) iterator.next();
             // <sp:Header Name=".." Namespace=".." />
             writer.writeStartElement(prefix, SPConstants.HEADER, namespaceURI);

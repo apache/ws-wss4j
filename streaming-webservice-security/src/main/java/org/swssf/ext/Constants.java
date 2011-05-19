@@ -211,11 +211,6 @@ public class Constants {
     public static final String NS_WSC_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
     public static final String PREFIX_WSC = "wsc";
 
-    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE";
-    public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
-    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
-    public static final String PROP_APPEND_ENCRYPTION_ON_THIS_ID = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
-
     public static final QName TAG_wsc0502_SecurityContextToken = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
     public static final QName TAG_wsc0512_SecurityContextToken = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
     public static final QName TAG_wsc0502_Identifier = new QName(NS_WSC_05_02, "Identifier", PREFIX_WSC);
@@ -240,7 +235,15 @@ public class Constants {
     public static final String P_SHA_1_2005_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
     public static final String WS_SecureConversation_DEFAULT_LABEL = "WS-SecureConversation";
 
-    public static final String PROP_USE_THIS_TOKEN_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_FOR_SIGNATURE";
+    public static final String NS_WSS_ENC_KEY_VALUE_TYPE = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKey";
+
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
+
+    public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.
@@ -255,6 +258,8 @@ public class Constants {
         USERNAMETOKEN,
         USERNAMETOKEN_SIGN,
         SIGNATURE_CONFIRMATION,
+        SIGNATURE_WITH_DERIVED_KEY,
+        ENCRYPT_WITH_DERIVED_KEY,
         SAML_TOKEN_SIGNED,
         SAML_TOKEN_UNSIGNED,
     }
@@ -269,7 +274,14 @@ public class Constants {
         THUMBPRINT_IDENTIFIER,
         EMBEDDED_KEYNAME,
         USERNAMETOKEN_SIGNED,
-        //EMBED_SECURITY_TOKEN_REF,
+        EMBEDDED_SECURITY_TOKEN_REF,
+        SECURITY_CONTEXT_TOKEN,
+    }
+
+    public enum DerivedKeyTokenReference {
+        DirectReference,
+        EncryptedKey,
+        SecurityContextToken,
     }
 
     public enum UsernameTokenPasswordType {

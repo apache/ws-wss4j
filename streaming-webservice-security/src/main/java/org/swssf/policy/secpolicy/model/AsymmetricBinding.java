@@ -95,7 +95,7 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         All wrapper;
         AsymmetricBinding asymmetricBinding;
 
-        for (Iterator iterator = configs.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = configs.iterator(); iterator.hasNext(); ) {
             wrapper = new All();
             asymmetricBinding = new AsymmetricBinding(spConstants);
 

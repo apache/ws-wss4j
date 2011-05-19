@@ -48,7 +48,7 @@ public class AsymmetricBindingBuilder implements AssertionBuilder {
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
         policy = (Policy) policy.normalize(false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
             processAlternative((List) iterator.next(), asymmetricBinding, spConstants);
 
             /*
@@ -65,7 +65,7 @@ public class AsymmetricBindingBuilder implements AssertionBuilder {
         Assertion assertion;
         QName name;
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
             assertion = (Assertion) iterator.next();
             name = assertion.getName();
 

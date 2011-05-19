@@ -44,7 +44,7 @@ public class SignedPartsBuilder implements AssertionBuilder {
 
         SignedEncryptedParts signedEncryptedParts = new SignedEncryptedParts(true, spConstants);
 
-        for (Iterator iterator = element.getChildElements(); iterator.hasNext();) {
+        for (Iterator iterator = element.getChildElements(); iterator.hasNext(); ) {
             processElement((OMElement) iterator.next(), signedEncryptedParts, spConstants);
         }
 

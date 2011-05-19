@@ -31,14 +31,14 @@ public interface OutputProcessor {
      *
      * @return The set with the named OutputProcessor
      */
-    Set<String> getBeforeProcessors();
+    Set<Object> getBeforeProcessors();
 
     /**
      * This OutputProcessor will be added after the processors in this set
      *
      * @return The set with the named OutputProcessor
      */
-    Set<String> getAfterProcessors();
+    Set<Object> getAfterProcessors();
 
     /**
      * The Phase in which this OutputProcessor should be applied

@@ -49,7 +49,7 @@ public class RequiredElementsBuilder implements AssertionBuilder {
             requiredElements.setXPathVersion(attrXPathVersion.getAttributeValue());
         }
 
-        for (Iterator iterator = element.getChildElements(); iterator.hasNext();) {
+        for (Iterator iterator = element.getChildElements(); iterator.hasNext(); ) {
             processElement((OMElement) iterator.next(), requiredElements, spConstants);
         }
 

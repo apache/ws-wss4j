@@ -8,24 +8,19 @@
 
 package org.oasis_open.docs.wss.oasis_wss_wssecurity_secext_1_1;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0.runtime.ZeroOneBooleanAdapter;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
+
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
  * <p>Java class for EncryptedHeaderType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="EncryptedHeaderType">
  *   &lt;complexContent>
@@ -42,12 +37,10 @@ import org.w3._2001._04.xmlenc_.EncryptedDataType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EncryptedHeaderType", namespace = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", propOrder = {
-    "encryptedData"
+        "encryptedData"
 })
 public class EncryptedHeaderType {
 
@@ -72,11 +65,9 @@ public class EncryptedHeaderType {
 
     /**
      * Gets the value of the encryptedData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EncryptedDataType }
-     *     
+     *
+     * @return possible object is
+     *         {@link EncryptedDataType }
      */
     public EncryptedDataType getEncryptedData() {
         return encryptedData;
@@ -84,11 +75,9 @@ public class EncryptedHeaderType {
 
     /**
      * Sets the value of the encryptedData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EncryptedDataType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link EncryptedDataType }
      */
     public void setEncryptedData(EncryptedDataType value) {
         this.encryptedData = value;
@@ -96,11 +85,9 @@ public class EncryptedHeaderType {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -108,11 +95,9 @@ public class EncryptedHeaderType {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -120,11 +105,9 @@ public class EncryptedHeaderType {
 
     /**
      * Gets the value of the mustUnderstand property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public Boolean isMustUnderstand() {
         return mustUnderstand;
@@ -132,11 +115,9 @@ public class EncryptedHeaderType {
 
     /**
      * Sets the value of the mustUnderstand property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setMustUnderstand(Boolean value) {
         this.mustUnderstand = value;
@@ -144,11 +125,9 @@ public class EncryptedHeaderType {
 
     /**
      * Gets the value of the actor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getActor() {
         return actor;
@@ -156,11 +135,9 @@ public class EncryptedHeaderType {
 
     /**
      * Sets the value of the actor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setActor(String value) {
         this.actor = value;
@@ -168,11 +145,9 @@ public class EncryptedHeaderType {
 
     /**
      * Gets the value of the role property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getRole() {
         return role;
@@ -180,11 +155,9 @@ public class EncryptedHeaderType {
 
     /**
      * Sets the value of the role property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setRole(String value) {
         this.role = value;
@@ -192,11 +165,9 @@ public class EncryptedHeaderType {
 
     /**
      * Gets the value of the relay property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public boolean isRelay() {
         if (relay == null) {
@@ -208,11 +179,9 @@ public class EncryptedHeaderType {
 
     /**
      * Sets the value of the relay property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setRelay(Boolean value) {
         this.relay = value;

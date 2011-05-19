@@ -189,7 +189,6 @@ public class WSSec {
                     if (securityProperties.getTokenUser() == null) {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noTokenUser");
                     }
-                    securityProperties.setSignatureUser(null);
                     if (securityProperties.getCallbackHandler() == null) {
                         throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
                     }
@@ -213,6 +212,86 @@ public class WSSec {
                     break;
                 case SIGNATURE_CONFIRMATION:
                     securityProperties.addSignaturePart(new SecurePart(Constants.TAG_wsse11_SignatureConfirmation.getLocalPart(), Constants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), SecurePart.Modifier.Element));
+                    break;
+                case SIGNATURE_WITH_DERIVED_KEY:
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                    }
+                    //signature namespace part will be set in SecurityHeaderOutputProcessor
+                    if (securityProperties.getSignatureSecureParts().isEmpty()) {
+                        securityProperties.addSignaturePart(new SecurePart("Body", "*", SecurePart.Modifier.Element));
+                    }
+                    if (securityProperties.getSignatureAlgorithm() == null) {
+                        securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+                    }
+                    if (securityProperties.getSignatureDigestAlgorithm() == null) {
+                        securityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
+                    }
+                    if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+                        securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+                    }
+                    securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF);
+                    if (securityProperties.getEncryptionSymAlgorithm() == null) {
+                        securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+                    }
+                    if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+                        //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
+                        //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
+                        //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
+                        securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+                    }
+                    if (securityProperties.getEncryptionKeyIdentifierType() == null) {
+                        securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    }
+                    if (securityProperties.getDerivedKeyKeyIdentifierType() == null) {
+                        securityProperties.setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    }
+                    if (securityProperties.getDerivedKeyTokenReference() == null) {
+                        securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.DirectReference);
+                    }
+                    if (securityProperties.getDerivedKeyTokenReference() != Constants.DerivedKeyTokenReference.DirectReference) {
+                        securityProperties.setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF);
+                    }
+                    break;
+                case ENCRYPT_WITH_DERIVED_KEY:
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                    }
+                    if (securityProperties.getEncryptionUseThisCertificate() == null
+                            && securityProperties.getEncryptionKeyStore() == null
+                            && !securityProperties.isUseReqSigCertForEncryption()) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
+                    }
+                    if (securityProperties.getEncryptionUser() == null
+                            && securityProperties.getEncryptionUseThisCertificate() == null
+                            && !securityProperties.isUseReqSigCertForEncryption()) {
+                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noEncryptionUser");
+                    }
+                    //encryption namespace part will be set in SecurityHeaderOutputProcessor
+                    if (securityProperties.getEncryptionSecureParts().isEmpty()) {
+                        securityProperties.addEncryptionPart(new SecurePart("Body", "*", SecurePart.Modifier.Content));
+                    }
+                    if (securityProperties.getEncryptionSymAlgorithm() == null) {
+                        securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+                    }
+                    if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+                        //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
+                        //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
+                        //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
+                        securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+                    }
+                    if (securityProperties.getEncryptionKeyIdentifierType() == null) {
+                        securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    }
+                    if (securityProperties.getDerivedKeyKeyIdentifierType() == null) {
+                        securityProperties.setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    }
+                    if (securityProperties.getDerivedKeyTokenReference() == null) {
+                        securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.EncryptedKey);
+                    }
+                    if (securityProperties.getDerivedKeyTokenReference() != Constants.DerivedKeyTokenReference.DirectReference) {
+                        securityProperties.setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF);
+                    }
                     break;
                 case SAML_TOKEN_SIGNED:
                     if (securityProperties.getCallbackHandler() == null) {

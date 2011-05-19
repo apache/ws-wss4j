@@ -138,7 +138,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
             public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                return SecurityTokenFactory.newInstance().getSecurityToken(usernameTokenType);
+                return SecurityTokenFactory.newInstance().getSecurityToken(usernameTokenType, null);
             }
 
             public String getId() {

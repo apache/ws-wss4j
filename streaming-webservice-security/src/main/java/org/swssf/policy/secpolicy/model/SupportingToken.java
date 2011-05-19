@@ -260,7 +260,7 @@ public class SupportingToken extends AbstractSecurityAssertion implements
                 SPConstants.POLICY.getNamespaceURI());
 
         Token token;
-        for (Iterator iterator = getTokens().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = getTokens().iterator(); iterator.hasNext(); ) {
             // [Token Assertion] +
             token = (Token) iterator.next();
             token.serialize(writer);

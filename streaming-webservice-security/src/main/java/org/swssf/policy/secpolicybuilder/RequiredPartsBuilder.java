@@ -46,7 +46,7 @@ public class RequiredPartsBuilder implements AssertionBuilder {
 
         RequiredParts requiredParts = new RequiredParts(spConstants);
 
-        for (Iterator iterator = element.getChildElements(); iterator.hasNext();) {
+        for (Iterator iterator = element.getChildElements(); iterator.hasNext(); ) {
             processElement((OMElement) iterator.next(), requiredParts, spConstants);
         }
 

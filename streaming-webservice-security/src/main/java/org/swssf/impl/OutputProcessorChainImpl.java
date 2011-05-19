@@ -110,7 +110,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     public void addProcessor(OutputProcessor newOutputProcessor) {
         int startPhaseIdx = 0;
         int endPhaseIdx = outputProcessors.size();
-
+        int idxToInsert = endPhaseIdx;
         Constants.Phase targetPhase = newOutputProcessor.getPhase();
 
         for (int i = outputProcessors.size() - 1; i >= 0; i--) {
@@ -133,22 +133,24 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
                 && newOutputProcessor.getAfterProcessors().isEmpty()) {
             outputProcessors.add(endPhaseIdx, newOutputProcessor);
         } else if (newOutputProcessor.getBeforeProcessors().isEmpty()) {
-            int idxToInsert = endPhaseIdx;
+            idxToInsert = endPhaseIdx;
 
             for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
                 OutputProcessor outputProcessor = outputProcessors.get(i);
-                if (newOutputProcessor.getAfterProcessors().contains(outputProcessor.getClass().getName())) {
+                if (newOutputProcessor.getAfterProcessors().contains(outputProcessor)
+                        || newOutputProcessor.getAfterProcessors().contains(outputProcessor.getClass().getName())) {
                     idxToInsert = i + 1;
                     break;
                 }
             }
             outputProcessors.add(idxToInsert, newOutputProcessor);
         } else if (newOutputProcessor.getAfterProcessors().isEmpty()) {
-            int idxToInsert = startPhaseIdx;
+            idxToInsert = startPhaseIdx;
 
             for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
                 OutputProcessor outputProcessor = outputProcessors.get(i);
-                if (newOutputProcessor.getBeforeProcessors().contains(outputProcessor.getClass().getName())) {
+                if (newOutputProcessor.getBeforeProcessors().contains(outputProcessor)
+                        || newOutputProcessor.getBeforeProcessors().contains(outputProcessor.getClass().getName())) {
                     idxToInsert = i;
                     break;
                 }
@@ -156,11 +158,12 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             outputProcessors.add(idxToInsert, newOutputProcessor);
         } else {
             boolean found = false;
-            int idxToInsert = endPhaseIdx;
+            idxToInsert = endPhaseIdx;
 
             for (int i = startPhaseIdx; i < endPhaseIdx; i++) {
                 OutputProcessor outputProcessor = outputProcessors.get(i);
-                if (newOutputProcessor.getBeforeProcessors().contains(outputProcessor.getClass().getName())) {
+                if (newOutputProcessor.getBeforeProcessors().contains(outputProcessor)
+                        || newOutputProcessor.getBeforeProcessors().contains(outputProcessor.getClass().getName())) {
                     idxToInsert = i;
                     found = true;
                     break;
@@ -171,13 +174,17 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             } else {
                 for (int i = endPhaseIdx - 1; i >= startPhaseIdx; i--) {
                     OutputProcessor outputProcessor = outputProcessors.get(i);
-                    if (newOutputProcessor.getAfterProcessors().contains(outputProcessor.getClass().getName())) {
+                    if (newOutputProcessor.getAfterProcessors().contains(outputProcessor)
+                            || newOutputProcessor.getAfterProcessors().contains(outputProcessor.getClass().getName())) {
                         idxToInsert = i + 1;
                         break;
                     }
                 }
                 outputProcessors.add(idxToInsert, newOutputProcessor);
             }
+        }
+        if (idxToInsert < this.curPos) {
+            this.curPos++;
         }
         if (log.isDebugEnabled()) {
             log.debug("Added " + newOutputProcessor.getClass().getName() + " to output chain: ");

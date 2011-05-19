@@ -107,7 +107,9 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
                     SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
                         public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                            return SecurityTokenFactory.newInstance().getSecurityToken(attributeValue, xmlEventList, crypto, getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
+                            return SecurityTokenFactory.newInstance().getSecurityToken(
+                                    attributeValue, xmlEventList, crypto, getSecurityProperties().getCallbackHandler(),
+                                    inputProcessorChain.getSecurityContext(), securityTokenReferenceId, this);
                         }
 
                         public String getId() {

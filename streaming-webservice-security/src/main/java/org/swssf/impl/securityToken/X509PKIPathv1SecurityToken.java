@@ -29,8 +29,8 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     private String alias = null;
     private X509Certificate[] x509Certificates;
 
-    X509PKIPathv1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent) throws WSSecurityException {
-        super(crypto, callbackHandler);
+    X509PKIPathv1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) throws WSSecurityException {
+        super(crypto, callbackHandler, id, processor);
         X509Certificate[] x509Certificates = crypto.getX509Certificates(binaryContent, false);
         if (x509Certificates != null && x509Certificates.length > 0) {
             this.x509Certificates = x509Certificates;

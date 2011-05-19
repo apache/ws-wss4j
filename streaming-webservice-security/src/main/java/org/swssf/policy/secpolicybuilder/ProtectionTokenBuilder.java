@@ -49,7 +49,7 @@ public class ProtectionTokenBuilder implements AssertionBuilder {
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
         policy = (Policy) policy.normalize(false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
             processAlternative((List) iterator.next(), protectionToken);
             break; // since there should be only one alternative ..
         }

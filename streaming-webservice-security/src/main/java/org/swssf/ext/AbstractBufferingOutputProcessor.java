@@ -34,8 +34,8 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
     private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
     private String appendAfterThisTokenId;
 
-    protected AbstractBufferingOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    protected AbstractBufferingOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
     }
 
     protected String getAppendAfterThisTokenId() {
@@ -95,13 +95,14 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
 
                     @SuppressWarnings("unchecked")
                     Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                    while (attributeIterator.hasNext()  && !found) {
+                    while (attributeIterator.hasNext() && !found) {
                         Attribute attribute = attributeIterator.next();
-                        if (Constants.ATT_wsu_Id.equals(attribute.getName()) && getAppendAfterThisTokenId().equals(attribute.getValue())) {
+                        if ((Constants.ATT_wsu_Id.equals(attribute.getName()) && getAppendAfterThisTokenId().equals(attribute.getValue()))
+                                || (Constants.ATT_NULL_Id.equals(attribute.getName()) && getAppendAfterThisTokenId().equals(attribute.getValue()))) {
                             matchingElementName = startElement.getName();
                             //we found the token and...
                             int level = 0;
-                            while (xmlEventIterator.hasNext()  && !found) {
+                            while (xmlEventIterator.hasNext() && !found) {
                                 xmlEvent = xmlEventIterator.next();
 
                                 subOutputProcessorChain.reset();

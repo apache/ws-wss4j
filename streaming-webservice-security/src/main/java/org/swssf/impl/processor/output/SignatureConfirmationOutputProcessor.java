@@ -34,8 +34,8 @@ import java.util.UUID;
  */
 public class SignatureConfirmationOutputProcessor extends AbstractOutputProcessor {
 
-    public SignatureConfirmationOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
-        super(securityProperties);
+    public SignatureConfirmationOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
+        super(securityProperties, action);
         getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
         getBeforeProcessors().add(EncryptOutputProcessor.class.getName());
     }
@@ -43,7 +43,6 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.processEvent(xmlEvent);
-
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (outputProcessorChain.getDocumentContext().isInSecurityHeader() && startElement.getName().equals(Constants.TAG_wsse_Security)) {

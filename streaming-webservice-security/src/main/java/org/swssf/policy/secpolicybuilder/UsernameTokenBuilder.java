@@ -60,7 +60,7 @@ public class UsernameTokenBuilder implements AssertionBuilder {
             Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
             policy = (Policy) policy.normalize(false);
 
-            for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+            for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
                 processAlternative((List) iterator.next(), usernameToken, spConstants);
 
                 /*
@@ -79,7 +79,7 @@ public class UsernameTokenBuilder implements AssertionBuilder {
 
     private void processAlternative(List assertions, UsernameToken parent, SPConstants spConstants) {
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
             Assertion assertion = (Assertion) iterator.next();
             QName qname = assertion.getName();
 

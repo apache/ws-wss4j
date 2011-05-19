@@ -50,7 +50,7 @@ public class InitiatorTokenBuilder implements AssertionBuilder {
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
         policy = (Policy) policy.normalize(false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
             processAlternative((List) iterator.next(), initiatorToken);
             break; // TODO process all the token that must be set ..
         }
@@ -62,7 +62,7 @@ public class InitiatorTokenBuilder implements AssertionBuilder {
 
         Object token;
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
             token = iterator.next();
 
             if (token instanceof Token) {

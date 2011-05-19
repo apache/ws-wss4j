@@ -50,7 +50,7 @@ public class TransportTokenBuilder implements AssertionBuilder {
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
         policy = (Policy) policy.normalize(false);
 
-        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
             processAlternative((List) iterator.next(), transportToken, spConstants);
             break; // since there should be only one alternative
         }
@@ -64,7 +64,7 @@ public class TransportTokenBuilder implements AssertionBuilder {
 
     private void processAlternative(List assertions, TransportToken parent, SPConstants spConstants) {
 
-        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
             XmlPrimtiveAssertion primtive = (XmlPrimtiveAssertion) iterator.next();
             QName qname = primtive.getName();
 

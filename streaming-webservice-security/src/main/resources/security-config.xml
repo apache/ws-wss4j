@@ -102,6 +102,7 @@
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="128"
                     JCEProvider="BC"
                     JCEName="MD5"/>
 
@@ -109,6 +110,7 @@
                     Description="RIPEMD-160 message digest"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="OPTIONAL"
+                    KeyLength="160"
                     JCEProvider="BC"
                     JCEName="RIPEMD160"/>
 
@@ -116,6 +118,7 @@
                     Description="SHA-1 message digest"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="REQUIRED"
+                    KeyLength="160"
                     JCEProvider="BC"
                     JCEName="SHA-1"/>
 
@@ -123,6 +126,7 @@
                     Description="SHA-1 message digest with 256 bit"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="RECOMMENDED"
+                    KeyLength="256"
                     JCEProvider="BC"
                     JCEName="SHA-256"/>
 
@@ -131,6 +135,7 @@
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="384"
                     JCEProvider="BC"
                     JCEName="SHA-384"/>
 
@@ -138,6 +143,7 @@
                     Description="SHA-1 message digest with 512 bit"
                     AlgorithmClass="MessageDigest"
                     RequirementLevel="OPTIONAL"
+                    KeyLength="512"
                     JCEProvider="BC"
                     JCEName="SHA-512"/>
 
@@ -146,6 +152,7 @@
                     Description="Digital Signature Algorithm with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="REQUIRED"
+                    KeyLength="160"
                     RequiredKey="SHA1withDSA"
                     JCEProvider="BC"
                     JCEName="SHA1withDSA"/>
@@ -155,6 +162,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="128"
                     RequiredKey="MD5withRSA"
                     JCEProvider="BC"
                     JCEName="MD5withRSA"/>
@@ -164,6 +172,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="160"
                     RequiredKey="RIPEMD160withRSA"
                     JCEProvider="BC"
                     JCEName="RIPEMD160withRSA"/>
@@ -172,6 +181,7 @@
                     Description="RSA Signature with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="RECOMMENDED"
+                    KeyLength="160"
                     RequiredKey="SHA1withRSA"
                     JCEProvider="BC"
                     JCEName="SHA1withRSA"/>
@@ -181,6 +191,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="256"
                     RequiredKey="SHA256withRSA"
                     JCEProvider="BC"
                     JCEName="SHA256withRSA"/>
@@ -190,6 +201,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="384"
                     RequiredKey="SHA384withRSA"
                     JCEProvider="BC"
                     JCEName="SHA384withRSA"/>
@@ -199,6 +211,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="512"
                     RequiredKey="SHA512withRSA"
                     JCEProvider="BC"
                     JCEName="SHA512withRSA"/>
@@ -208,6 +221,7 @@
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="160"
                     RequiredKey="ECDSAwithSHA1"
                     JCEProvider="BC"
                     JCEName="ECDSAwithSHA1"/>
@@ -218,6 +232,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="NOT RECOMMENDED"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="128"
                     RequiredKey="HmacMD5"
                     JCEProvider="BC"
                     JCEName="HmacMD5"/>
@@ -227,6 +242,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="160"
                     RequiredKey="HMACRIPEMD160"
                     JCEProvider="BC"
                     JCEName="HMACRIPEMD160"/>
@@ -235,6 +251,7 @@
                     Description="Message Authentication code using SHA1"
                     AlgorithmClass="Mac"
                     RequirementLevel="REQUIRED"
+                    KeyLength="160"
                     RequiredKey="HmacSHA1"
                     JCEProvider="BC"
                     JCEName="HmacSHA1"/>
@@ -244,6 +261,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="256"
                     RequiredKey="HmacSHA256"
                     JCEProvider="BC"
                     JCEName="HmacSHA256"/>
@@ -253,6 +271,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="384"
                     RequiredKey="HmacSHA384"
                     JCEProvider="BC"
                     JCEName="HmacSHA384"/>
@@ -262,6 +281,7 @@
                     AlgorithmClass="Mac"
                     RequirementLevel="OPTIONAL"
                     SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
+                    KeyLength="512"
                     RequiredKey="HmacSHA512"
                     JCEProvider="BC"
                     JCEName="HmacSHA512"/>

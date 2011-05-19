@@ -701,7 +701,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
             Assert.fail("Expected JAXRPCException");
         } catch (JAXRPCException e) {
-            Assert.assertEquals(e.getMessage(), "WSS4JHandler: security processing failed (actions mismatch)");
+            Assert.assertEquals(e.getMessage(), "WSS4JHandler: Request does not contain required Security header");
         }
     }
 

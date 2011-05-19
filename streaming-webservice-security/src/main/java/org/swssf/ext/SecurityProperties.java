@@ -630,4 +630,24 @@ public class SecurityProperties {
     public void setActor(String actor) {
         this.actor = actor;
     }
+
+
+    private Constants.KeyIdentifierType derivedKeyKeyIdentifierType;
+    private Constants.DerivedKeyTokenReference derivedKeyTokenReference;
+
+    public Constants.KeyIdentifierType getDerivedKeyKeyIdentifierType() {
+        return derivedKeyKeyIdentifierType;
+    }
+
+    public void setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType derivedKeyKeyIdentifierType) {
+        this.derivedKeyKeyIdentifierType = derivedKeyKeyIdentifierType;
+    }
+
+    public Constants.DerivedKeyTokenReference getDerivedKeyTokenReference() {
+        return derivedKeyTokenReference;
+    }
+
+    public void setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference derivedKeyTokenReference) {
+        this.derivedKeyTokenReference = derivedKeyTokenReference;
+    }
 }

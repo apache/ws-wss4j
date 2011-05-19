@@ -90,7 +90,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
             SecurityEvent.Event securityEvent = secEvents[i];
 
             Collection<AssertionState> assertionStates = assertionStateMap.get(securityEvent);
-            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext();) {
+            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext(); ) {
                 AssertionState assertionState = assertionStateIterator.next();
                 if (assertionState.getAssertion() == this) {
                     asserted &= assertionState.isAsserted();

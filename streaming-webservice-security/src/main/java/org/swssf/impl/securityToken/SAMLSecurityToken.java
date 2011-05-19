@@ -36,8 +36,8 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
     private SAMLKeyInfo samlKeyInfo;
     private X509Certificate[] x509Certificate;
 
-    public SAMLSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler) {
-        super(crypto, callbackHandler);
+    public SAMLSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+        super(crypto, callbackHandler, id, processor);
         this.samlKeyInfo = samlKeyInfo;
     }
 

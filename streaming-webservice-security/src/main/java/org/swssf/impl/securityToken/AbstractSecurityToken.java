@@ -27,10 +27,22 @@ public abstract class AbstractSecurityToken implements SecurityToken {
 
     private Crypto crypto;
     private CallbackHandler callbackHandler;
+    private String id;
+    private Object processor;
 
-    AbstractSecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
+    AbstractSecurityToken(Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
         this.crypto = crypto;
         this.callbackHandler = callbackHandler;
+        this.id = id;
+        this.processor = processor;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public Object getProccesor() {
+        return processor;
     }
 
     public Crypto getCrypto() {

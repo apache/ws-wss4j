@@ -117,7 +117,7 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         All wrapper;
         SymmetricBinding symmetricBinding;
 
-        for (Iterator iterator = configurations.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = configurations.iterator(); iterator.hasNext(); ) {
             wrapper = new All();
             symmetricBinding = new SymmetricBinding(spConstants);
 

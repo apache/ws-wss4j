@@ -34,8 +34,8 @@ import java.security.cert.X509Certificate;
 public abstract class X509SecurityToken extends AbstractSecurityToken {
     private X509Certificate[] x509Certificates = null;
 
-    X509SecurityToken(Crypto crypto, CallbackHandler callbackHandler) {
-        super(crypto, callbackHandler);
+    X509SecurityToken(Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+        super(crypto, callbackHandler, id, processor);
     }
 
     public boolean isAsymmetric() {

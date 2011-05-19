@@ -33,6 +33,9 @@
     <logger name="org.apache.xml.security.utils.DigesterOutputStream">
         <level value="INFO"/>
     </logger>
+    <logger name="org.jcp.xml.dsig.internal">
+        <level value="INFO"/>
+    </logger>
     <logger name="org.apache.xml.security.utils.SignerOutputStream">
         <level value="INFO"/>
     </logger>

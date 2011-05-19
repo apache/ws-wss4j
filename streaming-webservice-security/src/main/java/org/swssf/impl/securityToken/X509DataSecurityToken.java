@@ -29,8 +29,8 @@ public class X509DataSecurityToken extends X509SecurityToken {
     private String alias = null;
     protected X509DataType x509DataType;
 
-    X509DataSecurityToken(Crypto crypto, CallbackHandler callbackHandler, X509DataType x509DataType) {
-        super(crypto, callbackHandler);
+    X509DataSecurityToken(Crypto crypto, CallbackHandler callbackHandler, X509DataType x509DataType, String id, Object processor) {
+        super(crypto, callbackHandler, id, processor);
         this.x509DataType = x509DataType;
     }
 

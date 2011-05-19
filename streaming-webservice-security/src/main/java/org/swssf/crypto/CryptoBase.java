@@ -342,7 +342,7 @@ public abstract class CryptoBase implements Crypto {
         }
 
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements(); ) {
                 String alias = (String) e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
@@ -388,7 +388,7 @@ public abstract class CryptoBase implements Crypto {
         Certificate cert = null;
 
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements(); ) {
                 String alias = (String) e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
@@ -524,7 +524,7 @@ public abstract class CryptoBase implements Crypto {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", e);
         }
         try {
-            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements(); ) {
                 String alias = (String) e.nextElement();
                 Certificate[] certs = keystore.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
@@ -863,7 +863,7 @@ public abstract class CryptoBase implements Crypto {
         Certificate cert = null;
 
         try {
-            for (Enumeration e = store.aliases(); e.hasMoreElements();) {
+            for (Enumeration e = store.aliases(); e.hasMoreElements(); ) {
                 String alias = (String) e.nextElement();
 
                 Certificate[] certs = store.getCertificateChain(alias);
@@ -1021,7 +1021,7 @@ public abstract class CryptoBase implements Crypto {
      */
     private boolean findPublicKeyInKeyStore(PublicKey publicKey, KeyStore keyStoreToSearch) {
         try {
-            for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
+            for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements(); ) {
                 String alias = e.nextElement();
                 Certificate[] certs = keyStoreToSearch.getCertificateChain(alias);
                 Certificate cert;

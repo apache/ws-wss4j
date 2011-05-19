@@ -20,7 +20,6 @@ import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
@@ -41,19 +40,24 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final SecurityContextTokenType securityContextTokenType = (SecurityContextTokenType) parseStructure(eventQueue, index);
 
         final SecurityToken securityContextToken = new SecurityToken() {
+
+            public String getId() {
+                return securityContextTokenType.getId();
+            }
+
+            public Object getProccesor() {
+                return null;
+            }
+
             public boolean isAsymmetric() {
                 return false;
             }
 
             public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-                CallbackHandler callbackHandler = securityProperties.getCallbackHandler();
-                WSPasswordCallback passwordCallback = new WSPasswordCallback(securityContextTokenType.getId(), WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
-                Utils.doSecretKeyCallback(callbackHandler, passwordCallback, securityContextTokenType.getId());
                 String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-
-                WSPasswordCallback pwCb = new WSPasswordCallback(securityContextTokenType.getIdentifier(), WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
-                Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), pwCb, null);
-                if (pwCb.getKey() == null) {
+                WSPasswordCallback passwordCallback = new WSPasswordCallback(securityContextTokenType.getIdentifier(), WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
+                Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, null);
+                if (passwordCallback.getKey() == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE, "noKey", new Object[]{securityContextTokenType.getId()});
                 }
                 return new SecretKeySpec(passwordCallback.getKey(), algo);

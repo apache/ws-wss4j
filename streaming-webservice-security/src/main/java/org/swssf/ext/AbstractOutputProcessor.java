@@ -14,13 +14,24 @@
  */
 package org.swssf.ext;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.crypto.Merlin;
+import org.swssf.impl.EncryptionPartDef;
+import org.swssf.impl.util.RFC2253Parser;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -35,13 +46,15 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
     protected static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
     protected SecurityProperties securityProperties;
+    protected Constants.Action action;
 
     private Constants.Phase phase = Constants.Phase.PROCESSING;
-    private Set<String> beforeProcessors = new HashSet<String>();
-    private Set<String> afterProcessors = new HashSet<String>();
+    private Set<Object> beforeProcessors = new HashSet<Object>();
+    private Set<Object> afterProcessors = new HashSet<Object>();
 
-    protected AbstractOutputProcessor(SecurityProperties securityProperties) throws WSSecurityException {
+    protected AbstractOutputProcessor(SecurityProperties securityProperties, Constants.Action action) throws WSSecurityException {
         this.securityProperties = securityProperties;
+        this.action = action;
     }
 
     public Constants.Phase getPhase() {
@@ -52,12 +65,20 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         this.phase = phase;
     }
 
-    public Set<String> getBeforeProcessors() {
+    public Set<Object> getBeforeProcessors() {
         return beforeProcessors;
     }
 
-    public Set<String> getAfterProcessors() {
+    public Set<Object> getAfterProcessors() {
         return afterProcessors;
+    }
+
+    public SecurityProperties getSecurityProperties() {
+        return securityProperties;
+    }
+
+    public Constants.Action getAction() {
+        return action;
     }
 
     public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException;
@@ -68,10 +89,6 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
     public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.doFinal();
-    }
-
-    public SecurityProperties getSecurityProperties() {
-        return securityProperties;
     }
 
     //todo copy attributes
@@ -201,5 +218,267 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     protected void outputAsEvent(OutputProcessorChain outputProcessorChain, XMLEvent xmlEvent) throws XMLStreamException, WSSecurityException {
         outputProcessorChain.reset();
         outputProcessorChain.processEvent(xmlEvent);
+    }
+
+    protected void createSecurityTokenReferenceStructureForSignature(
+            OutputProcessorChain outputProcessorChain,
+            SecurityToken securityToken,
+            Constants.KeyIdentifierType keyIdentifierType,
+            boolean useSingleCertificate)
+            throws XMLStreamException, WSSecurityException {
+
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+        if ((keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
+                || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
+                && useSingleCertificate == false) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
+        }
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
+
+        X509Certificate[] x509Certificates = securityToken.getX509Certificates();
+        String tokenId = securityToken.getId();
+
+        if (keyIdentifierType == Constants.KeyIdentifierType.ISSUER_SERIAL) {
+            createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+            createX509SubjectKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            createX509KeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            createThumbprintKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED) {
+            createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, true);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+            createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
+            createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
+            createUsernameTokenReferenceStructure(outputProcessorChain, tokenId);
+        } else {
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "unsupportedSecurityToken", new Object[]{keyIdentifierType.name()});
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
+    }
+
+    protected void createSecurityTokenReferenceStructureForEncryptedKey(
+            OutputProcessorChain outputProcessorChain,
+            SecurityToken securityToken,
+            Constants.KeyIdentifierType keyIdentifierType,
+            boolean useSingleCertificate)
+            throws XMLStreamException, WSSecurityException {
+
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+        if ((keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
+                || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
+                && useSingleCertificate == false) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
+        }
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
+
+        X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
+        String tokenId = securityToken.getKeyWrappingToken().getId();
+
+        if (keyIdentifierType == Constants.KeyIdentifierType.ISSUER_SERIAL) {
+            createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+            createX509SubjectKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            createX509KeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            createThumbprintKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED) {
+            createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, true);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+            createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
+            createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
+        } else {
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "unsupportedSecurityToken", new Object[]{keyIdentifierType.name()});
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
+    }
+
+    protected void createSecurityTokenReferenceStructureForDerivedKey(
+            OutputProcessorChain outputProcessorChain,
+            SecurityToken securityToken,
+            Constants.KeyIdentifierType keyIdentifierType,
+            Constants.DerivedKeyTokenReference derivedKeyTokenReference,
+            boolean useSingleCertificate)
+            throws XMLStreamException, WSSecurityException {
+
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+        if ((keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
+                || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
+                && useSingleCertificate == false) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
+        } else if (derivedKeyTokenReference == Constants.DerivedKeyTokenReference.EncryptedKey) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_WSS_ENC_KEY_VALUE_TYPE);
+        }
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
+
+        X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
+        String tokenId = securityToken.getKeyWrappingToken().getId();
+
+        if (keyIdentifierType == Constants.KeyIdentifierType.ISSUER_SERIAL) {
+            createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+            createX509SubjectKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            createX509KeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            createThumbprintKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED) {
+            createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, true);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+            createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
+            createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
+        } else {
+            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "unsupportedSecurityToken", new Object[]{keyIdentifierType.name()});
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
+    }
+
+    protected void createUsernameTokenReferenceStructure(OutputProcessorChain outputProcessorChain, String tokenId) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_NULL_URI, "#" + tokenId);
+        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_USERNAMETOKEN_PROFILE_UsernameToken);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
+    }
+
+    protected void createEmbeddedSecurityTokenReferenceStructure(OutputProcessorChain outputProcessorChain, String referenceId) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_NULL_URI, "#" + referenceId);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
+    }
+
+    protected void createBSTReferenceStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate, boolean embed) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        String valueType;
+        if (useSingleCertificate) {
+            valueType = Constants.NS_X509_V3_TYPE;
+        } else {
+            valueType = Constants.NS_X509PKIPathv1;
+        }
+        attributes.put(Constants.ATT_NULL_URI, "#" + referenceId);
+        attributes.put(Constants.ATT_NULL_ValueType, valueType);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference, attributes);
+        if (embed) {
+            createBinarySecurityTokenStructure(outputProcessorChain, referenceId, x509Certificates, useSingleCertificate, valueType);
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
+    }
+
+    protected void createBinarySecurityTokenStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate, String valueType) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+        attributes.put(Constants.ATT_NULL_ValueType, valueType);
+        attributes.put(Constants.ATT_wsu_Id, referenceId);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_BinarySecurityToken, attributes);
+        try {
+            if (useSingleCertificate) {
+                createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
+            } else {
+                try {
+                    CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
+                    List<X509Certificate> certificates = Arrays.asList(x509Certificates);
+                    createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
+                } catch (CertificateException e) {
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, null, e);
+                } catch (NoSuchProviderException e) {
+                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, null, e);
+                }
+            }
+        } catch (CertificateEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
+    }
+
+    protected void createThumbprintKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_THUMBPRINT);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+        try {
+            MessageDigest sha;
+            sha = MessageDigest.getInstance("SHA-1");
+            sha.reset();
+            sha.update(x509Certificates[0].getEncoded());
+            byte[] data = sha.digest();
+
+            createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
+        } catch (CertificateEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+    }
+
+    protected void createX509KeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509_V3_TYPE);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+        try {
+            createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
+        } catch (CertificateEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+    }
+
+    protected void createX509SubjectKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws WSSecurityException, XMLStreamException {
+        // As per the 1.1 specification, SKI can only be used for a V3 certificate
+        if (x509Certificates[0].getVersion() != 3) {
+            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "invalidCertForSKI");
+        }
+
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+        attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_X509SubjectKeyIdentifier);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+        byte data[] = new Merlin().getSKIBytesFromCert(x509Certificates[0]);
+        createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+    }
+
+    protected void createX509IssuerSerialStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, WSSecurityException {
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509Data, null);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509IssuerSerial, null);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509IssuerName, null);
+        createCharactersAndOutputAsEvent(outputProcessorChain, RFC2253Parser.normalize(x509Certificates[0].getIssuerDN().getName(), true));
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509IssuerName);
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509SerialNumber, null);
+        createCharactersAndOutputAsEvent(outputProcessorChain, x509Certificates[0].getSerialNumber().toString());
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509SerialNumber);
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509IssuerSerial);
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_dsig_X509Data);
+    }
+
+    protected void createReferenceListStructure(OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
+        List<EncryptionPartDef> encryptionPartDefs = outputProcessorChain.getSecurityContext().getAsList(EncryptionPartDef.class);
+        if (encryptionPartDefs == null) {
+            return;
+        }
+        Map<QName, String> attributes;
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_ReferenceList, null);
+        //output the references to the encrypted data:
+        Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefs.iterator();
+        while (encryptionPartDefIterator.hasNext()) {
+            EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
+
+            attributes = new HashMap<QName, String>();
+            attributes.put(Constants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId());
+            createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_DataReference, attributes);
+            createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_DataReference);
+        }
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_xenc_ReferenceList);
     }
 }

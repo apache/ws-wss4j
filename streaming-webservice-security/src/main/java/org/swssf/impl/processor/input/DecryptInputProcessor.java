@@ -489,7 +489,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             //retrieve the securityToken which must be used for decryption
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
                     keyInfoType, getSecurityProperties().getDecryptionCrypto(),
-                    getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
+                    getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext(), this);
 
             //fire a RecipientSecurityTokenEvent
             RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent =

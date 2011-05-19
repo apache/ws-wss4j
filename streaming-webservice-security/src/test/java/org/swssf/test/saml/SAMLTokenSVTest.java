@@ -61,6 +61,8 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -143,6 +145,8 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
             securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -172,7 +176,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -231,6 +235,8 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
             securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -315,6 +321,8 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
             securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -339,7 +347,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -400,6 +408,8 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -423,7 +433,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

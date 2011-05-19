@@ -12,26 +12,33 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.*;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.swssf.WSSec;
 import org.swssf.ext.Constants;
 import org.swssf.ext.InboundWSSec;
+import org.swssf.ext.OutboundWSSec;
 import org.swssf.ext.SecurityProperties;
+import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.test.utils.SOAPUtil;
 import org.swssf.test.utils.StAX2DOM;
+import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 /**
  * @author $Author: $
@@ -45,7 +52,39 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testEncryptionDecryptionTRIPLEDES() throws Exception {
+    public void testEncryptionDecryptionTRIPLEDESOutbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            byte[] secret = new byte[128 / 8];
+            Constants.secureRandom.nextBytes(secret);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+            securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_soap11_Body.getLocalPart());
+        }
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testEncryptionDecryptionTRIPLEDESInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -98,7 +137,39 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testEncryptionDecryptionAES128() throws Exception {
+    public void testEncryptionDecryptionAES128Outbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            byte[] secret = new byte[128 / 8];
+            Constants.secureRandom.nextBytes(secret);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
+            securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_soap11_Body.getLocalPart());
+        }
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testEncryptionDecryptionAES128Inbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -151,7 +222,40 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignature() throws Exception {
+    public void testSignatureOutbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.EncryptedKey);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("receiver");
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+        }
+        {
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -161,7 +265,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //EncryptedKey
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-            encrKeyBuilder.setUserInfo("transmitter");
+            encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             encrKeyBuilder.prepare(doc, crypto);
@@ -189,7 +293,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             SecurityProperties securityProperties = new SecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -202,7 +306,51 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureThumbprintSHA1() throws Exception {
+    public void testSignatureThumbprintSHA1Outbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("receiver");
+            securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.DirectReference);
+            securityProperties.setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_SecurityContextToken.getNamespaceURI(), Constants.TAG_wsc0502_SecurityContextToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_DerivedKeyToken.getNamespaceURI(), Constants.TAG_wsc0502_DerivedKeyToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_KeyIdentifier.getNamespaceURI(), Constants.TAG_wsse_KeyIdentifier.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(Constants.ATT_NULL_ValueType.getLocalPart());
+            Assert.assertEquals(attr.getValue(), Constants.NS_THUMBPRINT);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+        }
+        {
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureThumbprintSHA1Inbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -248,7 +396,51 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureSKI() throws Exception {
+    public void testSignatureSKIOutbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("receiver");
+            securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.DirectReference);
+            securityProperties.setDerivedKeyKeyIdentifierType(Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_SecurityContextToken.getNamespaceURI(), Constants.TAG_wsc0502_SecurityContextToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_DerivedKeyToken.getNamespaceURI(), Constants.TAG_wsc0502_DerivedKeyToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_KeyIdentifier.getNamespaceURI(), Constants.TAG_wsse_KeyIdentifier.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(Constants.ATT_NULL_ValueType.getLocalPart());
+            Assert.assertEquals(attr.getValue(), Constants.NS_X509SubjectKeyIdentifier);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+        }
+        {
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureSKIInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -294,7 +486,55 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testSignatureEncrypt() throws Exception {
+    public void testSignatureEncryptOutbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.SIGNATURE_WITH_DERIVED_KEY, Constants.Action.ENCRYPT_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("receiver");
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.EncryptedKey);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_SecurityContextToken.getNamespaceURI(), Constants.TAG_wsc0502_SecurityContextToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_DerivedKeyToken.getNamespaceURI(), Constants.TAG_wsc0502_DerivedKeyToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_KeyIdentifier.getNamespaceURI(), Constants.TAG_wsse_KeyIdentifier.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(Constants.ATT_NULL_ValueType.getLocalPart());
+            Assert.assertEquals(attr.getValue(), Constants.NS_THUMBPRINT);
+            attr = (Attr) nodeList.item(1).getAttributes().getNamedItem(Constants.ATT_NULL_ValueType.getLocalPart());
+            Assert.assertEquals(attr.getValue(), Constants.NS_THUMBPRINT);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+        }
+        {
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testSignatureEncryptInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -358,7 +598,55 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     }
 
     @Test
-    public void testEncryptSignature() throws Exception {
+    public void testEncryptSignatureOutbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SecurityProperties securityProperties = new SecurityProperties();
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.ENCRYPT_WITH_DERIVED_KEY, Constants.Action.SIGNATURE_WITH_DERIVED_KEY};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("receiver");
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionKeyIdentifierType(Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setDerivedKeyTokenReference(Constants.DerivedKeyTokenReference.EncryptedKey);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_SecurityContextToken.getNamespaceURI(), Constants.TAG_wsc0502_SecurityContextToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedKey.getNamespaceURI(), Constants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsc0502_DerivedKeyToken.getNamespaceURI(), Constants.TAG_wsc0502_DerivedKeyToken.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_wsse_KeyIdentifier.getNamespaceURI(), Constants.TAG_wsse_KeyIdentifier.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(Constants.ATT_NULL_ValueType.getLocalPart());
+            Assert.assertEquals(attr.getValue(), Constants.NS_THUMBPRINT);
+            attr = (Attr) nodeList.item(1).getAttributes().getNamedItem(Constants.ATT_NULL_ValueType.getLocalPart());
+            Assert.assertEquals(attr.getValue(), Constants.NS_THUMBPRINT);
+            nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+        }
+        {
+            String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testEncryptSignatureInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

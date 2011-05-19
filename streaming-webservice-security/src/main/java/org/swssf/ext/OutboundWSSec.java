@@ -69,61 +69,86 @@ public class OutboundWSSec {
         documentContext.setEncoding(encoding);
 
         OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
-        processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties));
+        processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties, null));
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
             Constants.Action action = securityProperties.getOutAction()[i];
             switch (action) {
                 case TIMESTAMP: {
-                    processorChain.addProcessor(new TimestampOutputProcessor(securityProperties));
+                    processorChain.addProcessor(new TimestampOutputProcessor(securityProperties, action));
                     break;
                 }
                 case SIGNATURE: {
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
+                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(signatureOutputProcessor);
-                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor));
                     break;
                 }
                 case ENCRYPT: {
-                    EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor(securityProperties);
-                    processorChain.addProcessor(encryptOutputProcessor);
-                    processorChain.addProcessor(new EncryptEndingOutputProcessor(securityProperties, encryptOutputProcessor));
+                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    processorChain.addProcessor(new EncryptedKeyOutputProcessor(securityProperties, action));
+                    processorChain.addProcessor(new EncryptOutputProcessor(securityProperties, action));
+                    processorChain.addProcessor(new EncryptEndingOutputProcessor(securityProperties, action));
                     break;
                 }
                 case USERNAMETOKEN: {
-                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor(securityProperties);
+                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(usernameTokenOutputProcessor);
                     break;
                 }
                 case USERNAMETOKEN_SIGN: {
-                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor(securityProperties);
-                    processorChain.addProcessor(usernameTokenOutputProcessor);
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
+                    processorChain.addProcessor(new UsernameTokenOutputProcessor(securityProperties, action));
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(signatureOutputProcessor);
-                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor));
                     break;
                 }
                 case SIGNATURE_CONFIRMATION: {
-                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor = new SignatureConfirmationOutputProcessor(securityProperties);
+                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor = new SignatureConfirmationOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(signatureConfirmationOutputProcessor);
                     break;
                 }
-                case SAML_TOKEN_SIGNED: {
-                    SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor(securityProperties);
-                    processorChain.addProcessor(samlTokenOutputProcessor);
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties);
+                case SIGNATURE_WITH_DERIVED_KEY: {
+                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    if (securityProperties.getDerivedKeyTokenReference() == Constants.DerivedKeyTokenReference.EncryptedKey) {
+                        processorChain.addProcessor(new EncryptedKeyOutputProcessor(securityProperties, action));
+                    } else if (securityProperties.getDerivedKeyTokenReference() == Constants.DerivedKeyTokenReference.SecurityContextToken) {
+                        processorChain.addProcessor(new SecurityContextTokenOutputProcessor(securityProperties, action));
+                    }
+                    processorChain.addProcessor(new DerivedKeyTokenOutputProcessor(securityProperties, action));
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(signatureOutputProcessor);
-                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, signatureOutputProcessor));
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor));
+                    break;
+                }
+                case ENCRYPT_WITH_DERIVED_KEY: {
+                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    if (securityProperties.getDerivedKeyTokenReference() == Constants.DerivedKeyTokenReference.EncryptedKey) {
+                        processorChain.addProcessor(new EncryptedKeyOutputProcessor(securityProperties, action));
+                    } else if (securityProperties.getDerivedKeyTokenReference() == Constants.DerivedKeyTokenReference.SecurityContextToken) {
+                        processorChain.addProcessor(new SecurityContextTokenOutputProcessor(securityProperties, action));
+                    }
+                    processorChain.addProcessor(new DerivedKeyTokenOutputProcessor(securityProperties, action));
+                    processorChain.addProcessor(new EncryptOutputProcessor(securityProperties, action));
+                    processorChain.addProcessor(new EncryptEndingOutputProcessor(securityProperties, action));
+                    break;
+                }
+                case SAML_TOKEN_SIGNED: {
+                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    processorChain.addProcessor(new SAMLTokenOutputProcessor(securityProperties, action));
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
+                    processorChain.addProcessor(signatureOutputProcessor);
+                    processorChain.addProcessor(new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor));
                     break;
                 }
                 case SAML_TOKEN_UNSIGNED: {
-                    SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor(securityProperties);
-                    processorChain.addProcessor(samlTokenOutputProcessor);
+                    processorChain.addProcessor(new SAMLTokenOutputProcessor(securityProperties, action));
                 }
             }
         }
 
-        processorChain.addProcessor(new FinalOutputProcessor(outputStream, encoding, securityProperties));
+        processorChain.addProcessor(new FinalOutputProcessor(outputStream, encoding, securityProperties, null));
         return new XMLSecurityStreamWriter(processorChain);
     }
 }

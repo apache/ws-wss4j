@@ -14,6 +14,8 @@
  */
 package org.swssf.test;
 
+import org.apache.ws.security.WSPasswordCallback;
+
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
@@ -23,6 +25,16 @@ import java.io.IOException;
  * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
  */
 public class WSS4JCallbackHandlerImpl implements CallbackHandler {
+
+    private byte[] secret;
+
+    public WSS4JCallbackHandlerImpl() {
+    }
+
+    public WSS4JCallbackHandlerImpl(byte[] secret) {
+        this.secret = secret;
+    }
+
     public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         org.apache.ws.security.WSPasswordCallback pc = (org.apache.ws.security.WSPasswordCallback) callbacks[0];
 
@@ -32,5 +44,8 @@ public class WSS4JCallbackHandlerImpl implements CallbackHandler {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
         }
 */
+        if (pc.getUsage() == WSPasswordCallback.SECURITY_CONTEXT_TOKEN) {
+            pc.setKey(secret);
+        }
     }
 }
