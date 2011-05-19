@@ -106,143 +106,74 @@ public class SignatureSTRParser implements STRParser {
         // processed, in particular the crypto implementation, and already
         // detected BST that may be used later during dereferencing.
         //
+        String uri = null;
         if (secRef.containsReference()) {
-            org.apache.ws.security.message.token.Reference ref = secRef.getReference();
-
-            String uri = ref.getURI();
+            uri = secRef.getReference().getURI();
             if (uri.charAt(0) == '#') {
                 uri = uri.substring(1);
             }
-            WSSecurityEngineResult result = wsDocInfo.getResult(uri);
-            if (result == null) {
-                Element token = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
-                QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                    certs = getCertificatesTokenReference(secRef, token, crypto, bspCompliant);
-                } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
-                    || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
-                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
-                    //
-                    // Just check to see whether the token was processed or not
-                    //
-                    Element processedToken = 
-                        secRef.findProcessedTokenElement(
-                            strElement.getOwnerDocument(), wsDocInfo, 
-                            data.getCallbackHandler(), uri, ref.getValueType()
-                        );
-                    AssertionWrapper assertion = null;
-                    if (processedToken == null) {
-                        List<WSSecurityEngineResult> samlResult =
-                            proc.handleToken(token, data, wsDocInfo);
-                        assertion = 
-                            (AssertionWrapper)samlResult.get(0).get(
-                                WSSecurityEngineResult.TAG_SAML_ASSERTION
-                            );
-                    } else {
-                        assertion = new AssertionWrapper(processedToken);
-                        assertion.parseHOKSubject(data, wsDocInfo);
-                    }
-                    if (bspCompliant) {
-                        BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                    }
-                    SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
-                    X509Certificate[] foundCerts = keyInfo.getCerts();
-                    if (foundCerts != null) {
-                        certs = new X509Certificate[]{foundCerts[0]};
-                    }
-                    secretKey = keyInfo.getSecret();
-                    principal = createPrincipalFromSAML(assertion);
-                } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
-                    if (bspCompliant) {
-                        BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
-                    }
-                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
-                    List<WSSecurityEngineResult> encrResult =
+        } else if (secRef.containsKeyIdentifier()) {
+            uri = secRef.getKeyIdentifierValue();
+        }
+        
+        WSSecurityEngineResult result = wsDocInfo.getResult(uri);
+        if (result != null) {
+            processPreviousResult(result, secRef, data, parameters, bspCompliant);
+        } else if (secRef.containsReference()) {
+            Element token = 
+                secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+            QName el = new QName(token.getNamespaceURI(), token.getLocalName());
+            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+                certs = getCertificatesTokenReference(secRef, token, crypto, bspCompliant);
+            } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
+                || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
+                Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
+                //
+                // Just check to see whether the token was processed or not
+                //
+                Element processedToken = 
+                    secRef.findProcessedTokenElement(
+                        strElement.getOwnerDocument(), wsDocInfo, 
+                        data.getCallbackHandler(), uri, secRef.getReference().getValueType()
+                    );
+                AssertionWrapper assertion = null;
+                if (processedToken == null) {
+                    List<WSSecurityEngineResult> samlResult =
                         proc.handleToken(token, data, wsDocInfo);
-                    secretKey = 
-                        (byte[])encrResult.get(0).get(
-                            WSSecurityEngineResult.TAG_SECRET
+                    assertion = 
+                        (AssertionWrapper)samlResult.get(0).get(
+                            WSSecurityEngineResult.TAG_SAML_ASSERTION
                         );
-                    principal = new CustomTokenPrincipal(token.getAttribute("Id"));
                 } else {
-                    String id = secRef.getReference().getURI();
-                    secretKey = getSecretKeyFromToken(id, null, data);
-                    principal = new CustomTokenPrincipal(id);
+                    assertion = new AssertionWrapper(processedToken);
+                    assertion.parseHOKSubject(data, wsDocInfo);
                 }
+                if (bspCompliant) {
+                    BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+                }
+                SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+                X509Certificate[] foundCerts = keyInfo.getCerts();
+                if (foundCerts != null) {
+                    certs = new X509Certificate[]{foundCerts[0]};
+                }
+                secretKey = keyInfo.getSecret();
+                principal = createPrincipalFromSAML(assertion);
+            } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                if (bspCompliant) {
+                    BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
+                }
+                Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
+                List<WSSecurityEngineResult> encrResult =
+                    proc.handleToken(token, data, wsDocInfo);
+                secretKey = 
+                    (byte[])encrResult.get(0).get(
+                                                  WSSecurityEngineResult.TAG_SECRET
+                    );
+                principal = new CustomTokenPrincipal(token.getAttribute("Id"));
             } else {
-                int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
-                    if (bspCompliant) {
-                        BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
-                    }
-                    UsernameToken usernameToken = 
-                        (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-
-                    usernameToken.setRawPassword(data);
-                    if (usernameToken.isDerivedKey()) {
-                        secretKey = usernameToken.getDerivedKey();
-                    } else {
-                        int keyLength = ((Integer)parameters.get(SECRET_KEY_LENGTH)).intValue();
-                        secretKey = usernameToken.getSecretKey(keyLength);
-                    }
-                    principal = usernameToken.createPrincipal();
-                } else if (WSConstants.BST == action) {
-                    if (bspCompliant) {
-                        BinarySecurity token = 
-                            (BinarySecurity)result.get(
-                                WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
-                            );
-                        BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
-                    }
-                    certs = 
-                        (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-                    Boolean validatedToken = 
-                        (Boolean)result.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
-                    if (validatedToken.booleanValue()) {
-                        trustedCredential = true;
-                    }
-                } else if (WSConstants.ENCR == action) {
-                    if (bspCompliant) {
-                        BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
-                    }
-                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                    String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                    principal = new CustomTokenPrincipal(id);
-                } else if (WSConstants.SCT == action) {
-                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                    SecurityContextToken sct = 
-                        (SecurityContextToken)result.get(
-                                WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN
-                        );
-                    principal = new CustomTokenPrincipal(sct.getIdentifier());
-                } else if (WSConstants.DKT == action) {
-                    DerivedKeyToken dkt = 
-                        (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
-                    int keyLength = dkt.getLength();
-                    if (keyLength <= 0) {
-                        String algorithm = (String)parameters.get(SIGNATURE_METHOD);
-                        keyLength = WSSecurityUtil.getKeyLength(algorithm);
-                    }
-                    byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                    secretKey = dkt.deriveKey(keyLength, secret); 
-                    principal = dkt.createPrincipal();
-                    ((WSDerivedKeyTokenPrincipal)principal).setSecret(secret);
-                } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-                    AssertionWrapper assertion = 
-                        (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                    if (bspCompliant) {
-                        BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                    }
-                    SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
-                    X509Certificate[] foundCerts = keyInfo.getCerts();
-                    if (foundCerts != null) {
-                        certs = new X509Certificate[]{foundCerts[0]};
-                    }
-                    secretKey = keyInfo.getSecret();
-                    publicKey = keyInfo.getPublicKey();
-                    principal = createPrincipalFromSAML(assertion);
-                }
+                String id = secRef.getReference().getURI();
+                secretKey = getSecretKeyFromToken(id, null, data);
+                principal = new CustomTokenPrincipal(id);
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
             X509Certificate[] foundCerts = secRef.getX509IssuerSerial(crypto);
@@ -342,8 +273,6 @@ public class SignatureSTRParser implements STRParser {
     public boolean isTrustedCredential() {
         return trustedCredential;
     }
-    
-    
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
      *
@@ -452,6 +381,90 @@ public class SignatureSTRParser implements STRParser {
         }
 
         return pwcb.getKey();
+    }
+    
+    /**
+     * Process a previous security result
+     */
+    private void processPreviousResult(
+        WSSecurityEngineResult result,
+        SecurityTokenReference secRef,
+        RequestData data,
+        Map<String, Object> parameters,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+            if (bspCompliant) {
+                BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
+            }
+            UsernameToken usernameToken = 
+                (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+
+            usernameToken.setRawPassword(data);
+            if (usernameToken.isDerivedKey()) {
+                secretKey = usernameToken.getDerivedKey();
+            } else {
+                int keyLength = ((Integer)parameters.get(SECRET_KEY_LENGTH)).intValue();
+                secretKey = usernameToken.getSecretKey(keyLength);
+            }
+            principal = usernameToken.createPrincipal();
+        } else if (WSConstants.BST == action) {
+            if (bspCompliant) {
+                BinarySecurity token = 
+                    (BinarySecurity)result.get(
+                        WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
+                    );
+                BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
+            }
+            certs = 
+                (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+            Boolean validatedToken = 
+                (Boolean)result.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
+            if (validatedToken.booleanValue()) {
+                trustedCredential = true;
+            }
+        } else if (WSConstants.ENCR == action) {
+            if (bspCompliant) {
+                BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
+            }
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
+            principal = new CustomTokenPrincipal(id);
+        } else if (WSConstants.SCT == action) {
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            SecurityContextToken sct = 
+                (SecurityContextToken)result.get(
+                        WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN
+                );
+            principal = new CustomTokenPrincipal(sct.getIdentifier());
+        } else if (WSConstants.DKT == action) {
+            DerivedKeyToken dkt = 
+                (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
+            int keyLength = dkt.getLength();
+            if (keyLength <= 0) {
+                String algorithm = (String)parameters.get(SIGNATURE_METHOD);
+                keyLength = WSSecurityUtil.getKeyLength(algorithm);
+            }
+            byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            secretKey = dkt.deriveKey(keyLength, secret); 
+            principal = dkt.createPrincipal();
+            ((WSDerivedKeyTokenPrincipal)principal).setSecret(secret);
+        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+            AssertionWrapper assertion = 
+                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            if (bspCompliant) {
+                BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+            }
+            SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+            X509Certificate[] foundCerts = keyInfo.getCerts();
+            if (foundCerts != null) {
+                certs = new X509Certificate[]{foundCerts[0]};
+            }
+            secretKey = keyInfo.getSecret();
+            publicKey = keyInfo.getPublicKey();
+            principal = createPrincipalFromSAML(assertion);
+        }
     }
     
     

@@ -76,21 +76,21 @@ public class EncryptedKeySTRParser implements STRParser {
         }
         
         SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
-        //
-        // Handle X509IssuerSerial here. First check if all elements are available,
-        // get the appropriate data, check if all data is available.
-        // Then look up the certificate alias according to issuer name and serial number.
-        //
-        if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
-            certs = secRef.getX509IssuerSerial(crypto);
+        
+        String uri = null;
+        if (secRef.containsReference()) {
+            uri = secRef.getReference().getURI();
+            if (uri.charAt(0) == '#') {
+                uri = uri.substring(1);
+            }
+        } else if (secRef.containsKeyIdentifier()) {
+            uri = secRef.getKeyIdentifierValue();
         }
-        //
-        // If wsse:KeyIdentifier found, then the public key of the attached cert was used to
-        // encrypt the session (symmetric) key that encrypts the data. Extract the certificate
-        // using the BinarySecurity token (was enhanced to handle KeyIdentifier too).
-        // This method is _not_ recommended by OASIS WS-S specification, X509 profile
-        //
-        else if (secRef.containsKeyIdentifier()) {
+        
+        WSSecurityEngineResult result = wsDocInfo.getResult(uri);
+        if (result != null) {
+            processPreviousResult(result, secRef, data, wsDocInfo, bspCompliant);
+        } else if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 AssertionWrapper assertion = 
@@ -110,70 +110,28 @@ public class EncryptedKeySTRParser implements STRParser {
                 }
                 certs = secRef.getKeyIdentifier(crypto);
             }
+        } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
+            certs = secRef.getX509IssuerSerial(crypto);
         } else if (secRef.containsReference()) {
-            if (wsDocInfo != null) {
-                String uri = secRef.getReference().getURI();
-                WSSecurityEngineResult result = wsDocInfo.getResult(uri);
-                
-                if (result != null) {
-                    int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                    if (WSConstants.BST == action) {
-                        if (bspCompliant) {
-                            BinarySecurity token = 
-                                (BinarySecurity)result.get(
-                                    WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
-                                );
-                            BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
-                        }
-                        certs = 
-                            (X509Certificate[])result.get(
-                                WSSecurityEngineResult.TAG_X509_CERTIFICATES
-                            );
-                    } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-                        AssertionWrapper assertion = 
-                            (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                        if (bspCompliant) {
-                            BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                        }
-                        SAMLKeyInfo keyInfo = 
-                            SAMLUtil.getCredentialFromSubject(assertion, 
-                                                              data,
-                                                              wsDocInfo, bspCompliant);
-                        certs = keyInfo.getCerts();
-                    } else {
-                        throw new WSSecurityException(
-                            WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                            "unsupportedBinaryTokenType",
-                            null
-                        );
-                    }
+            Element bstElement = 
+                secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+
+            // at this point ... check token type: Binary
+            QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
+            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+                X509Security token = new X509Security(bstElement);
+                if (bspCompliant) {
+                    BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
                 }
+                certs = new X509Certificate[]{token.getX509Certificate(crypto)};
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                    "unsupportedBinaryTokenType",
+                    null
+                );
             }
-            if (certs == null) {
-                Element bstElement = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
-    
-                // at this point ... check token type: Binary
-                QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
-                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                    X509Security token = new X509Security(bstElement);
-                    if (bspCompliant) {
-                        BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
-                    }
-                    certs = new X509Certificate[]{token.getX509Certificate(crypto)};
-                } else {
-                    throw new WSSecurityException(
-                        WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                        "unsupportedBinaryTokenType",
-                        null
-                    );
-                }
-            }
-        } else {
-            throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "unsupportedKeyId"
-            );
-        }
+        } 
         
         if (LOG.isDebugEnabled() && certs != null && certs[0] != null) {
             LOG.debug("cert: " + certs[0]);
@@ -221,6 +179,49 @@ public class EncryptedKeySTRParser implements STRParser {
      */
     public boolean isTrustedCredential() {
         return false;
+    }
+    
+    /**
+     * Process a previous security result
+     */
+    private void processPreviousResult(
+        WSSecurityEngineResult result,
+        SecurityTokenReference secRef,
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        if (WSConstants.BST == action) {
+            if (bspCompliant) {
+                BinarySecurity token = 
+                    (BinarySecurity)result.get(
+                        WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
+                    );
+                BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
+            }
+            certs = 
+                (X509Certificate[])result.get(
+                    WSSecurityEngineResult.TAG_X509_CERTIFICATES
+                );
+        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+            AssertionWrapper assertion = 
+                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            if (bspCompliant) {
+                BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+            }
+            SAMLKeyInfo keyInfo = 
+                SAMLUtil.getCredentialFromSubject(assertion, 
+                                                  data,
+                                                  wsDocInfo, bspCompliant);
+            certs = keyInfo.getCerts();
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                "unsupportedBinaryTokenType",
+                null
+            );
+        }
     }
     
 }

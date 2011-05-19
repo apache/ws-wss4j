@@ -77,54 +77,30 @@ public class SecurityTokenRefSTRParser implements STRParser {
         }
         
         SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
-
+        
+        String uri = null;
         if (secRef.containsReference()) {
+            uri = secRef.getReference().getURI();
+            if (uri.charAt(0) == '#') {
+                uri = uri.substring(1);
+            }
+        } else if (secRef.containsKeyIdentifier()) {
+            uri = secRef.getKeyIdentifierValue();
+        }
+        
+        WSSecurityEngineResult result = wsDocInfo.getResult(uri);
+        if (result != null) {
+            processPreviousResult(result, secRef, data, parameters, wsDocInfo, bspCompliant);
+        } else if (secRef.containsReference()) {
             Reference reference = secRef.getReference();
-            String uri = reference.getURI();
-            String id = uri;
-            if (id.charAt(0) == '#') {
-                id = id.substring(1);
+            // Try asking the CallbackHandler for the secret key
+            secretKey = getSecretKeyFromToken(uri, reference.getValueType(), data);
+            if (secretKey == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                );
             }
-            WSSecurityEngineResult result = wsDocInfo.getResult(id);
-            if (result != null) {
-                int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                if (WSConstants.ENCR == action) {
-                    if (bspCompliant) {
-                        BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
-                    }
-                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                } else if (WSConstants.DKT == action) {
-                    DerivedKeyToken dkt = 
-                        (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
-                    byte[] secret = 
-                        (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                    String algorithm = (String)parameters.get(SIGNATURE_METHOD);
-                    secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
-                } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-                    AssertionWrapper assertion = 
-                        (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                    if (bspCompliant) {
-                        BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                    }
-                    SAMLKeyInfo keyInfo = 
-                        SAMLUtil.getCredentialFromSubject(assertion, 
-                                                          data, wsDocInfo, bspCompliant);
-                    // TODO Handle malformed SAML tokens where they don't have the 
-                    // secret in them
-                    secretKey = keyInfo.getSecret();
-                } else if (WSConstants.SCT == action) {
-                    secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-                }
-            } else {
-                // Try asking the CallbackHandler for the secret key
-                secretKey = getSecretKeyFromToken(id, reference.getValueType(), data);
-                if (secretKey == null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[]{id}
-                    );
-                }
-            }
-        } else if (secRef.containsKeyIdentifier()){
+        } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) { 
@@ -133,24 +109,16 @@ public class SecurityTokenRefSTRParser implements STRParser {
                         secRef, strElement, 
                         data, wsDocInfo
                     );
-                if (bspCompliant) {
-                    BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                }
-                SAMLKeyInfo samlKi = 
-                    SAMLUtil.getCredentialFromSubject(assertion,
-                                                      data,
-                                                      wsDocInfo, bspCompliant);
-                // TODO Handle malformed SAML tokens where they don't have the 
-                // secret in them
-                secretKey = samlKi.getSecret();
+                secretKey = 
+                    getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
             } else {
                 if (bspCompliant && SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
                     BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
                 } 
                 secretKey = 
                     getSecretKeyFromToken(
-                        secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(), 
-                        data);
+                        secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(), data
+                    );
             }
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
@@ -231,6 +199,60 @@ public class SecurityTokenRefSTRParser implements STRParser {
         }
 
         return pwcb.getKey();
+    }
+    
+    /**
+     * Get a SecretKey from a SAML Assertion
+     */
+    private byte[] getSecretKeyFromAssertion(
+        AssertionWrapper assertion, 
+        SecurityTokenReference secRef,
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        if (bspCompliant) {
+            BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+        }
+        SAMLKeyInfo samlKi = 
+            SAMLUtil.getCredentialFromSubject(assertion, data, wsDocInfo, bspCompliant);
+        // TODO Handle malformed SAML tokens where they don't have the 
+        // secret in them
+        return samlKi.getSecret();
+    }
+    
+    /**
+     * Process a previous security result
+     */
+    private void processPreviousResult(
+        WSSecurityEngineResult result,
+        SecurityTokenReference secRef,
+        RequestData data,
+        Map<String, Object> parameters,
+        WSDocInfo wsDocInfo,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        if (WSConstants.ENCR == action) {
+            if (bspCompliant) {
+                BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
+            }
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        } else if (WSConstants.DKT == action) {
+            DerivedKeyToken dkt = 
+                (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
+            byte[] secret = 
+                (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+            String algorithm = (String)parameters.get(SIGNATURE_METHOD);
+            secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
+        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+            AssertionWrapper assertion = 
+                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            secretKey = 
+                getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
+        } else if (WSConstants.SCT == action) {
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        }
     }
     
     

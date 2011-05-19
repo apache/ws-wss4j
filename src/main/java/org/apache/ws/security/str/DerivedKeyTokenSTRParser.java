@@ -27,7 +27,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -76,64 +75,24 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
         
         String uri = null;
-        String keyIdentifierValueType = null;
-        String keyIdentifierValue = null;
-        
-        WSSecurityEngineResult result = null;
         if (secRef.containsReference()) {
-            Reference ref = secRef.getReference();
-            uri = ref.getURI();
+            uri = secRef.getReference().getURI();
             if (uri.charAt(0) == '#') {
                 uri = uri.substring(1);
             }
-            result = wsDocInfo.getResult(uri);
-        } else {
-            // Contains key identifier
-            keyIdentifierValue = secRef.getKeyIdentifierValue();
-            keyIdentifierValueType = secRef.getKeyIdentifierValueType();
-            result = wsDocInfo.getResult(keyIdentifierValue);
+        } else if (secRef.containsKeyIdentifier()) {
+            uri = secRef.getKeyIdentifierValue();
         }
         
+        WSSecurityEngineResult result = wsDocInfo.getResult(uri);
         if (result != null) {
-            int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-            if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
-                if (bspCompliant) {
-                    BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
-                }
-                UsernameToken usernameToken = 
-                    (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-                usernameToken.setRawPassword(data);
-                secretKey = usernameToken.getDerivedKey();
-            } else if (WSConstants.ENCR == action) {
-                if (bspCompliant) {
-                    BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
-                }
-                secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-            } else if (WSConstants.SCT == action) {
-                secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-            } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-                AssertionWrapper assertion = 
-                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                if (bspCompliant) {
-                    BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                }
-                SAMLKeyInfo keyInfo = 
-                    SAMLUtil.getCredentialFromSubject(assertion, 
-                                                      data, wsDocInfo, bspCompliant);
-                // TODO Handle malformed SAML tokens where they don't have the 
-                // secret in them
-                secretKey = keyInfo.getSecret();
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
-                );
-            }
-        } else if (result == null && uri != null) {
+            processPreviousResult(result, secRef, data, wsDocInfo, bspCompliant);
+        } else if (secRef.containsReference()) { 
             // Now use the callback and get it
             secretKey = 
-                getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, 
-                                      data);
-        } else if (keyIdentifierValue != null && keyIdentifierValueType != null) {
+                getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, data);
+        } else if (secRef.containsKeyIdentifier()) {
+            String keyIdentifierValueType = secRef.getKeyIdentifierValueType();
             if (bspCompliant 
                 && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
                 BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
@@ -142,7 +101,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 secretKey = 
                     this.getSecretKeyFromToken(
-                        keyIdentifierValue, keyIdentifierValueType, 
+                        secRef.getKeyIdentifierValue(), keyIdentifierValueType, 
                         WSPasswordCallback.SECRET_KEY, data
                    ); 
             } else {
@@ -232,4 +191,48 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         return pwcb.getKey();
     }
     
+    /**
+     * Process a previous security result
+     */
+    private void processPreviousResult(
+        WSSecurityEngineResult result,
+        SecurityTokenReference secRef,
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+            if (bspCompliant) {
+                BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
+            }
+            UsernameToken usernameToken = 
+                (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+            usernameToken.setRawPassword(data);
+            secretKey = usernameToken.getDerivedKey();
+        } else if (WSConstants.ENCR == action) {
+            if (bspCompliant) {
+                BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
+            }
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        } else if (WSConstants.SCT == action) {
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+            AssertionWrapper assertion = 
+                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            if (bspCompliant) {
+                BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+            }
+            SAMLKeyInfo keyInfo = 
+                SAMLUtil.getCredentialFromSubject(assertion, 
+                                                  data, wsDocInfo, bspCompliant);
+            // TODO Handle malformed SAML tokens where they don't have the 
+            // secret in them
+            secretKey = keyInfo.getSecret();
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+            );
+        }
+    }
 }
