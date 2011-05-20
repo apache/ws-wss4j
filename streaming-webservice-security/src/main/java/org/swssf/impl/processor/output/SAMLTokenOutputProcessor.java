@@ -99,7 +99,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             if (alias == null) {
                                 throw new WSSecurityException(WSSecurityException.FAILURE, "aliasIsNull");
                             }
-                            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
+                            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                             Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), wsPasswordCallback);
                             certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
                             privateKey = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());

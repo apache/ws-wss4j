@@ -43,7 +43,7 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
     }
 
     public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-        WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
+        WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         Utils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }

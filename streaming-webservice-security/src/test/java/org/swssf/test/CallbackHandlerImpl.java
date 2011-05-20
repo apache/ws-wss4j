@@ -79,14 +79,14 @@ public class CallbackHandlerImpl implements CallbackHandler {
         if (callbacks[0] instanceof WSPasswordCallback) {
             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 
-            if (pc.getUsage() == WSPasswordCallback.DECRYPT
-                    || pc.getUsage() == WSPasswordCallback.SIGNATURE
-                    || pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
-                    || pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN
+            if (pc.getUsage() == WSPasswordCallback.Usage.DECRYPT
+                    || pc.getUsage() == WSPasswordCallback.Usage.SIGNATURE
+                    || pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN
+                    || pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN_UNKNOWN
                     ) {
                 pc.setPassword(username);
-            } else if (pc.getUsage() == WSPasswordCallback.SECRET_KEY
-                    || pc.getUsage() == WSPasswordCallback.SECURITY_CONTEXT_TOKEN) {
+            } else if (pc.getUsage() == WSPasswordCallback.Usage.SECRET_KEY
+                    || pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN) {
                 pc.setKey(secret);
             } else {
                 throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");

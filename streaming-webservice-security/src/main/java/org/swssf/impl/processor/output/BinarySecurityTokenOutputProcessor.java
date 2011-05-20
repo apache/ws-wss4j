@@ -52,7 +52,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 case SAML_TOKEN_SIGNED:
                 case SIGNATURE_WITH_DERIVED_KEY:
                     String alias = getSecurityProperties().getSignatureUser();
-                    WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
+                    WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                     Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
                     String password = pwCb.getPassword();
                     if (password == null) {

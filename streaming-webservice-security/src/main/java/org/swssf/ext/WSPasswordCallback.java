@@ -70,22 +70,23 @@ import javax.security.auth.callback.Callback;
 
 public class WSPasswordCallback implements Callback {
 
-    //todo enum
-    public static final int UNKNOWN = 0;
-    public static final int DECRYPT = 1;
-    public static final int USERNAME_TOKEN = 2;
-    public static final int SIGNATURE = 3;
-    public static final int KEY_NAME = 4;
-    public static final int USERNAME_TOKEN_UNKNOWN = 5;
-    public final static int SECURITY_CONTEXT_TOKEN = 6;
-    public final static int CUSTOM_TOKEN = 7;
-    public final static int ENCRYPTED_KEY_TOKEN = 8;
-    public static final int SECRET_KEY = 9;
+    public enum Usage {
+        UNKNOWN,
+        DECRYPT,
+        USERNAME_TOKEN,
+        SIGNATURE,
+        KEY_NAME,
+        USERNAME_TOKEN_UNKNOWN,
+        SECURITY_CONTEXT_TOKEN,
+        CUSTOM_TOKEN,
+        ENCRYPTED_KEY_TOKEN,
+        SECRET_KEY,
+    }
 
     private String identifier;
     private String password;
     private byte[] key;
-    private int usage;
+    private Usage usage;
     private String type;
     private Element customToken;
 
@@ -95,7 +96,7 @@ public class WSPasswordCallback implements Callback {
      * @param id The application called back must supply the password for
      *           this identifier.
      */
-    public WSPasswordCallback(String id, int usage) {
+    public WSPasswordCallback(String id, Usage usage) {
         this(id, null, null, usage);
     }
 
@@ -105,7 +106,7 @@ public class WSPasswordCallback implements Callback {
      * @param id The application called back must supply the password for
      *           this identifier.
      */
-    public WSPasswordCallback(String id, String pw, String type, int usage) {
+    public WSPasswordCallback(String id, String pw, String type, Usage usage) {
         identifier = id;
         password = pw;
         this.type = type;
@@ -192,7 +193,7 @@ public class WSPasswordCallback implements Callback {
      *
      * @return The usage for this callback
      */
-    public int getUsage() {
+    public Usage getUsage() {
         return usage;
     }
 

@@ -102,7 +102,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             try {
                 byte[] secret;
                 if (wrappingSecurityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SECURITY_CONTEXT_TOKEN) {
-                    WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
+                    WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.Usage.SECRET_KEY);
                     Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, wsuIdDKT);
                     if (passwordCallback.getKey() == null) {
                         throw new WSSecurityException(WSSecurityException.FAILURE, "noKey", new Object[]{wsuIdDKT});

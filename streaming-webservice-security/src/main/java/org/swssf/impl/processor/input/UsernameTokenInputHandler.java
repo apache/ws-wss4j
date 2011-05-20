@@ -95,7 +95,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(),
                     null,
                     usernameTokenType.getPasswordType(),
-                    WSPasswordCallback.USERNAME_TOKEN);
+                    WSPasswordCallback.Usage.USERNAME_TOKEN);
             try {
                 Utils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
@@ -117,7 +117,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(),
                     usernameTokenType.getPassword(),
                     usernameTokenType.getPasswordType(),
-                    WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
+                    WSPasswordCallback.Usage.USERNAME_TOKEN_UNKNOWN);
             try {
                 Utils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {

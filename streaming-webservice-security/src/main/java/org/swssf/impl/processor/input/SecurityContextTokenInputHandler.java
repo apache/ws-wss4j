@@ -55,7 +55,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
 
             public Key getSecretKey(String algorithmURI) throws WSSecurityException {
                 String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-                WSPasswordCallback passwordCallback = new WSPasswordCallback(securityContextTokenType.getIdentifier(), WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
+                WSPasswordCallback passwordCallback = new WSPasswordCallback(securityContextTokenType.getIdentifier(), WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
                 Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, null);
                 if (passwordCallback.getKey() == null) {
                     throw new WSSecurityException(WSSecurityException.FAILURE, "noKey", new Object[]{securityContextTokenType.getId()});

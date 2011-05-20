@@ -42,7 +42,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         try {
-            WSPasswordCallback pwCb = new WSPasswordCallback(getSecurityProperties().getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
+            WSPasswordCallback pwCb = new WSPasswordCallback(getSecurityProperties().getTokenUser(), WSPasswordCallback.Usage.USERNAME_TOKEN);
             Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
             String password = pwCb.getPassword();
             Constants.UsernameTokenPasswordType usernameTokenPasswordType = getSecurityProperties().getUsernameTokenPasswordType();

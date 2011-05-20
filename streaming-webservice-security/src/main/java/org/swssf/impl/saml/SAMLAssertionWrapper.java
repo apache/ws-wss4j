@@ -627,7 +627,7 @@ public class SAMLAssertionWrapper {
      */
     public SAMLKeyInfo getCredentialFromSubject(org.opensaml.saml1.core.Assertion assertion, SecurityProperties securityProperties) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
-        WSPasswordCallback passwordCallback = new WSPasswordCallback(assertion.getID(), WSPasswordCallback.SECRET_KEY);
+        WSPasswordCallback passwordCallback = new WSPasswordCallback(assertion.getID(), WSPasswordCallback.Usage.SECRET_KEY);
         Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, assertion.getID());
         final byte[] key = passwordCallback.getKey();
         if (key != null && key.length > 0) {
@@ -679,7 +679,7 @@ public class SAMLAssertionWrapper {
      */
     public SAMLKeyInfo getCredentialFromSubject(org.opensaml.saml2.core.Assertion assertion, SecurityProperties securityProperties) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
-        WSPasswordCallback passwordCallback = new WSPasswordCallback(assertion.getID(), WSPasswordCallback.SECRET_KEY);
+        WSPasswordCallback passwordCallback = new WSPasswordCallback(assertion.getID(), WSPasswordCallback.Usage.SECRET_KEY);
         Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, assertion.getID());
         final byte[] key = passwordCallback.getKey();
         if (key != null && key.length > 0) {
