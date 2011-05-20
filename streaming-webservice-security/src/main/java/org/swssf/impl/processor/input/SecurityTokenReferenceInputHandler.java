@@ -52,7 +52,6 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                         = new InternalSecurityTokenReferenceInputHandler(securityTokenReferenceType.getId(), Constants.ATT_NULL_ID, keyIdentifierType.getValue().trim(), securityProperties);
                 inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
             }
-            //todo other referenceTypes...@see line 57ff STRTransformUtil.java in WSS4J
         }
     }
 

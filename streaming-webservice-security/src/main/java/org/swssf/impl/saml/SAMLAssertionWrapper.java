@@ -184,7 +184,6 @@ public class SAMLAssertionWrapper {
         }
 
         if (samlCallback.isSignAssertion()) {
-            //todo throw Exception when params are null?
             signAssertion(samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword(), samlCallback.getIssuerCrypto(), samlCallback.isSendKeyValue());
         }
     }
