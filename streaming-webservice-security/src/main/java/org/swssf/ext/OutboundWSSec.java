@@ -135,7 +135,6 @@ public class OutboundWSSec {
                     break;
                 }
                 case SAML_TOKEN_SIGNED: {
-                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
                     processorChain.addProcessor(new SAMLTokenOutputProcessor(securityProperties, action));
                     SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(signatureOutputProcessor);

@@ -233,6 +233,10 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
                 || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
                 && useSingleCertificate == false) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
+        } else if (securityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SAML_10) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_SAML11_TOKEN_PROFILE_TYPE);
+        } else if (securityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SAML_20) {
+            attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_SAML20_TOKEN_PROFILE_TYPE);
         }
         createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
 
@@ -253,6 +257,8 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
             createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
         } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
             createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.EMEDDED_KEYIDENTIFIER_REF) {
+            createEmbeddedKeyIdentifierStructure(outputProcessorChain, securityToken.getKeyIdentifierType(), tokenId);
         } else if (keyIdentifierType == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
             createUsernameTokenReferenceStructure(outputProcessorChain, tokenId);
         } else {
@@ -357,6 +363,18 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
     }
 
+    protected void createEmbeddedKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, Constants.KeyIdentifierType keyIdentifierType, String referenceId) throws XMLStreamException, WSSecurityException {
+        Map<QName, String> attributes = new HashMap<QName, String>();
+        if (keyIdentifierType == Constants.KeyIdentifierType.SAML_10) {
+            attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_SAML10_TYPE);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.SAML_20) {
+            attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_SAML20_TYPE);
+        }
+        createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);
+        createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
+        createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
+    }
+
     protected void createBSTReferenceStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate, boolean embed) throws XMLStreamException, WSSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         String valueType;
@@ -369,13 +387,19 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         attributes.put(Constants.ATT_NULL_ValueType, valueType);
         createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference, attributes);
         if (embed) {
-            createBinarySecurityTokenStructure(outputProcessorChain, referenceId, x509Certificates, useSingleCertificate, valueType);
+            createBinarySecurityTokenStructure(outputProcessorChain, referenceId, x509Certificates, useSingleCertificate);
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
     }
 
-    protected void createBinarySecurityTokenStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate, String valueType) throws XMLStreamException, WSSecurityException {
+    protected void createBinarySecurityTokenStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate) throws XMLStreamException, WSSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
+        String valueType;
+        if (useSingleCertificate) {
+            valueType = Constants.NS_X509_V3_TYPE;
+        } else {
+            valueType = Constants.NS_X509PKIPathv1;
+        }
         attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
         attributes.put(Constants.ATT_NULL_ValueType, valueType);
         attributes.put(Constants.ATT_wsu_Id, referenceId);

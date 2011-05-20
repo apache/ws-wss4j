@@ -189,6 +189,13 @@ public class SAMLAssertionWrapper {
         }
     }
 
+    public SAMLVersion getSAMLVersion() {
+        if (saml1 != null) {
+            return SAMLVersion.VERSION_11;
+        }
+        return SAMLVersion.VERSION_20;
+    }
+
     public Element toDOM(Document doc) throws WSSecurityException {
         return OpenSAMLUtil.toDom(xmlObject, doc);
     }
@@ -599,10 +606,6 @@ public class SAMLAssertionWrapper {
      * Parse a SAML Assertion to obtain a SAMLKeyInfo object from
      * the Subject of the assertion
      *
-     * @param assertion    The SAML Assertion
-     * @param data         The RequestData instance used to obtain configuration
-     * @param docInfo      A WSDocInfo instance
-     * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return a SAMLKeyInfo object
      * @throws WSSecurityException
      */

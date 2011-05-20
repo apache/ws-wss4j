@@ -63,7 +63,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
             public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                return SecurityTokenFactory.newInstance().getSecurityToken(samlSubjectKeyInfo, crypto, securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
+                return SecurityTokenFactory.newInstance().getSecurityToken(samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo, crypto, securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
             }
 
             public String getId() {

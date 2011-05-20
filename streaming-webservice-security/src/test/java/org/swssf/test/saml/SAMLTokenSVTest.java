@@ -31,6 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.soap.SOAPConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -63,6 +64,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -147,6 +149,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -177,7 +180,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
-            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
         }
     }
 
@@ -234,9 +239,11 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -246,11 +253,10 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_saml_Assertion.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 3);
+            Assert.assertEquals(nodeList.getLength(), 2);
 
             nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -261,7 +267,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
@@ -320,9 +326,11 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -332,11 +340,10 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_saml_Assertion.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Reference.getNamespaceURI(), Constants.TAG_dsig_Reference.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 3);
+            Assert.assertEquals(nodeList.getLength(), 2);
 
             nodeList = document.getElementsByTagNameNS(Constants.NS_SOAP11, Constants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -347,8 +354,10 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
-            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
         }
     }
 
@@ -410,6 +419,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -434,7 +444,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
-            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
         }
     }
 

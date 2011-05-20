@@ -165,8 +165,6 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
-            System.out.println(new String(baos.toByteArray()));
-
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -218,7 +216,6 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
-            System.out.println(new String(baos.toByteArray()));
         }
 
         {
@@ -263,8 +260,6 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
-
-            System.out.println(new String(baos.toByteArray()));
         }
 
         {

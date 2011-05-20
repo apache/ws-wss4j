@@ -14,6 +14,7 @@
  */
 package org.swssf.impl.securityToken;
 
+import org.opensaml.common.SAMLVersion;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
 import org.swssf.ext.SecurityToken;
@@ -33,11 +34,13 @@ import java.security.cert.X509Certificate;
  */
 public class SAMLSecurityToken extends AbstractSecurityToken {
 
+    private SAMLVersion samlVersion;
     private SAMLKeyInfo samlKeyInfo;
     private X509Certificate[] x509Certificate;
 
-    public SAMLSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
         super(crypto, callbackHandler, id, processor);
+        this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
     }
 
@@ -87,7 +90,10 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
     }
 
     public Constants.KeyIdentifierType getKeyIdentifierType() {
-        return null;
+        if (samlVersion == SAMLVersion.VERSION_10 || samlVersion == SAMLVersion.VERSION_11) {
+            return Constants.KeyIdentifierType.SAML_10;
+        }
+        return Constants.KeyIdentifierType.SAML_20;
     }
 
     public SAMLKeyInfo getSamlKeyInfo() {

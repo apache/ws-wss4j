@@ -19,6 +19,7 @@ import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
+import org.opensaml.common.SAMLVersion;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
 import org.swssf.impl.saml.SAMLKeyInfo;
@@ -149,8 +150,8 @@ public class SecurityTokenFactory {
         return new UsernameSecurityToken(usernameTokenType, usernameTokenType.getId(), processor);
     }
 
-    public SecurityToken getSecurityToken(SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) throws WSSecurityException {
-        return new SAMLSecurityToken(samlKeyInfo, crypto, callbackHandler, id, processor);
+    public SecurityToken getSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) throws WSSecurityException {
+        return new SAMLSecurityToken(samlVersion, samlKeyInfo, crypto, callbackHandler, id, processor);
     }
 
     public SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, SecurityContext securityContext, String id, Object processor) throws WSSecurityException {

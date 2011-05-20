@@ -119,6 +119,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
                             throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
                         }
                     }
+                    samlCallback.setSubject(subjectBean);
                     createAndSetStatement(subjectBean, samlCallback);
                 } else {
                     samlCallback.setSamlVersion(SAMLVersion.VERSION_20);

@@ -153,6 +153,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     if (getSecurityProperties().getSignatureKeyIdentifierType() == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
                         outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, bstId);
                         FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
+                        finalBinarySecurityTokenOutputProcessor.getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
                         outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
                         binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                     }
@@ -237,13 +238,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                     boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();
-                    String valueType;
-                    if (useSingleCertificate) {
-                        valueType = Constants.NS_X509_V3_TYPE;
-                    } else {
-                        valueType = Constants.NS_X509PKIPathv1;
-                    }
-                    createBinarySecurityTokenStructure(subOutputProcessorChain, securityToken.getId(), securityToken.getX509Certificates(), useSingleCertificate, valueType);
+                    createBinarySecurityTokenStructure(subOutputProcessorChain, securityToken.getId(), securityToken.getX509Certificates(), useSingleCertificate);
 
                     outputProcessorChain.removeProcessor(this);
                 }

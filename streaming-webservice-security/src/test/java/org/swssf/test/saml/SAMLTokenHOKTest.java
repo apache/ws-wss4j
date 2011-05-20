@@ -86,7 +86,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
@@ -218,7 +218,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);

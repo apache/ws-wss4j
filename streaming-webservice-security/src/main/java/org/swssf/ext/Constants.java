@@ -202,6 +202,7 @@ public class Constants {
     public static final String NS_SAML10_TYPE = NS_SAML10_TOKEN_PROFILE + "#SAMLAssertionID";
     public static final String NS_SAML20_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLID";
     public static final String NS_SAML11_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV1.1";
+    public static final String NS_SAML20_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV2.0";
 
     public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
     public static final QName ATT_NULL_ID = new QName(null, "ID");
@@ -242,6 +243,7 @@ public class Constants {
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
+    //public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
 
     public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
 
@@ -264,6 +266,7 @@ public class Constants {
         SAML_TOKEN_UNSIGNED,
     }
 
+    //todo differentiate between keyIdentifier and tokentypes eg SAMLToken, BST and ISSUER_SERIAL,etc
     public enum KeyIdentifierType {
         NO_TOKEN,
         ISSUER_SERIAL,
@@ -275,7 +278,14 @@ public class Constants {
         EMBEDDED_KEYNAME,
         USERNAMETOKEN_SIGNED,
         EMBEDDED_SECURITY_TOKEN_REF,
+        EMEDDED_KEYIDENTIFIER_REF,
         SECURITY_CONTEXT_TOKEN,
+        SAML_20,
+        SAML_10,
+    }
+
+    public enum TokenType {
+
     }
 
     public enum DerivedKeyTokenReference {

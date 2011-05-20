@@ -97,8 +97,12 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
                     Iterator<Attribute> attributeIterator = startElement.getAttributes();
                     while (attributeIterator.hasNext() && !found) {
                         Attribute attribute = attributeIterator.next();
-                        if ((Constants.ATT_wsu_Id.equals(attribute.getName()) && getAppendAfterThisTokenId().equals(attribute.getValue()))
-                                || (Constants.ATT_NULL_Id.equals(attribute.getName()) && getAppendAfterThisTokenId().equals(attribute.getValue()))) {
+                        final QName attributeName = attribute.getName();
+                        final String attributeValue = attribute.getValue();
+                        if ((Constants.ATT_wsu_Id.equals(attributeName) && getAppendAfterThisTokenId().equals(attributeValue))
+                                || (Constants.ATT_NULL_Id.equals(attributeName) && getAppendAfterThisTokenId().equals(attributeValue))
+                                || (Constants.ATT_NULL_AssertionID.equals(attributeName) && getAppendAfterThisTokenId().equals(attributeValue))
+                                || (Constants.ATT_NULL_ID.equals(attributeName) && getAppendAfterThisTokenId().endsWith(attributeValue))) {
                             matchingElementName = startElement.getName();
                             //we found the token and...
                             int level = 0;

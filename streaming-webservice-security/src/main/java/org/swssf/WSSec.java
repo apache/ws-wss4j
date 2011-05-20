@@ -311,7 +311,7 @@ public class WSSec {
                         securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                     }
                     if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                        securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.ISSUER_SERIAL);
+                        securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF);
                     }
                     break;
                 case SAML_TOKEN_UNSIGNED:

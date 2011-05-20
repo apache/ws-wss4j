@@ -53,7 +53,7 @@ import java.util.Properties;
 public class SAMLTokenReferenceTest extends AbstractTestBase {
 
     @Test
-    public void testSAML1AuthnAssertionOutbound() throws Exception {
+    public void estSAML1SVKeyIdentifierOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -165,7 +165,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "true");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
@@ -361,6 +361,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -379,12 +380,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(Constants.TAG_dsig_Signature.getNamespaceURI(), Constants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.getLength(), 1);
         }
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
@@ -451,7 +452,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             crypto.setKeyStore(keyStore);
             callbackHandler.setCerts(crypto.getCertificates("transmitter"));
             securityProperties.setCallbackHandler(callbackHandler);
-            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.EMEDDED_KEYIDENTIFIER_REF);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
 
@@ -468,7 +469,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
         //done signature; now test sig-verification:
         {
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
@@ -515,6 +516,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         }
     }
 
+    /* not implemented!
     @Test
     public void testSAML2HOKDirectReferenceOutbound() throws Exception {
 
@@ -557,6 +559,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
         }
     }
+    */
 
     @Test
     public void testSAML2HOKDirectReferenceInbound() throws Exception {
