@@ -34,7 +34,6 @@ import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
 import org.swssf.crypto.Crypto;
-import org.swssf.crypto.CryptoType;
 import org.swssf.ext.*;
 import org.swssf.impl.saml.builder.SAML1ComponentBuilder;
 import org.swssf.impl.saml.builder.SAML2ComponentBuilder;
@@ -422,19 +421,7 @@ public class SAMLAssertionWrapper {
                                         WSSecurityException.FAILURE, "noSigCryptoFile"
                                 );
                             }
-                            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
-                            cryptoType.setIssuerSerial(
-                                    ((X509IssuerSerial) x509obj).getIssuerName(),
-                                    ((X509IssuerSerial) x509obj).getSerialNumber()
-                            );
-                            String alias = securityProperties.getSignatureVerificationCrypto().getAliasForX509Cert(((X509IssuerSerial) x509obj).getIssuerName(), ((X509IssuerSerial) x509obj).getSerialNumber());
-                            if (alias == null) {
-                                throw new WSSecurityException(
-                                        WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                                        new Object[]{"cannot get certificate or key"}
-                                );
-                            }
-                            certs = securityProperties.getSignatureVerificationCrypto().getCertificates(alias);
+                            certs = securityProperties.getSignatureVerificationCrypto().getCertificates(((X509IssuerSerial) x509obj).getIssuerName(), ((X509IssuerSerial) x509obj).getSerialNumber());
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
                                         WSSecurityException.FAILURE, "invalidSAMLsecurity",
@@ -540,7 +527,6 @@ public class SAMLAssertionWrapper {
      *
      * @throws WSSecurityException
      */
-    //todo check if this method is already there in the framework
     protected void validateCertificates(X509Certificate[] certificates)
             throws WSSecurityException {
         try {
@@ -720,11 +706,7 @@ public class SAMLAssertionWrapper {
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
 
-        String alias = crypto.getAliasForX509Cert(issuerString, issuerSerial);
-        if (alias == null) {
-            return false;
-        }
-        X509Certificate[] foundCerts = crypto.getCertificates(alias);
+        X509Certificate[] foundCerts = crypto.getCertificates(issuerString, issuerSerial);
 
         //
         // If a certificate has been found, the certificates must be compared
@@ -762,8 +744,6 @@ public class SAMLAssertionWrapper {
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
      */
-    //todo check if this method is already there in the framework
-    //todo check also if this is the better implementation
     protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto)
             throws WSSecurityException {
         String subjectString = cert.getSubjectX500Principal().getName();
@@ -789,11 +769,7 @@ public class SAMLAssertionWrapper {
         // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the
         // keystore or the truststore
         //
-        String alias = crypto.getAliasForX509Cert(issuerString);
-        if (alias == null) {
-            return false;
-        }
-        X509Certificate[] foundCerts = crypto.getCertificates(alias);
+        X509Certificate[] foundCerts = crypto.getCertificates(issuerString);
 
         // If the certs have not been found, the issuer is not in the keystore/truststore
         // As a direct result, do not trust the transmitted certificate
@@ -823,7 +799,7 @@ public class SAMLAssertionWrapper {
         X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
         x509certs[0] = cert;
         for (int j = 0; j < foundCerts.length; j++) {
-            x509certs[j + 1] = (X509Certificate) foundCerts[j];
+            x509certs[j + 1] = foundCerts[j];
         }
 
         //
@@ -858,29 +834,14 @@ public class SAMLAssertionWrapper {
      */
     protected boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto)
             throws WSSecurityException {
-        String subjectString = certificates[0].getSubjectX500Principal().getName();
         //
         // Use the validation method from the crypto to check whether the subjects'
         // certificate was really signed by the issuer stated in the certificate
         //
-        if (certificates != null && certificates.length > 1
+        if (certificates != null && certificates.length > 0
                 && crypto.verifyTrust(certificates)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                        "Certificate path has been verified for certificate with subject "
-                                + subjectString
-                );
-            }
             return true;
         }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "Certificate path could not be verified for certificate with subject "
-                            + subjectString
-            );
-        }
-
         return false;
     }
 

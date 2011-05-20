@@ -21,7 +21,6 @@ import org.swssf.ext.WSSecurityException;
 
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -61,19 +60,6 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     X509Certificate[] getX509Certificates(byte[] data, boolean reverse) throws WSSecurityException;
-
-    /**
-     * get a byte array given an array of X509 certificates.
-     * <p/>
-     *
-     * @param reverse If set the first certificate in the array data will
-     *                the last in the byte array
-     * @param certs   The certificates to convert
-     * @return The byte array for the certificates ordered according
-     *         to the reverse flag
-     * @throws WSSecurityException
-     */
-    byte[] getCertificateData(boolean reverse, X509Certificate[] certs) throws WSSecurityException;
 
     /**
      * Gets the private key identified by <code>alias</> and <code>password</code>.
@@ -116,18 +102,19 @@ public interface Crypto {
     public String getAliasForX509Cert(Certificate cert) throws WSSecurityException;
 
     /**
-     * Lookup a X509 Certificate in the keystore according to a given
+     * Search a X509 Certificate in the keystore according to a given serial number and
      * the issuer of a Certificate.
      * <p/>
      * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the Issuer of each certificate of the chain
+     * for each alias. Then the SerialNumber and Issuer of each certificate of the chain
      * is compared with the parameters.
      *
-     * @param issuer The issuer's name for the certificate
-     * @return alias name of the certificate that matches the issuer name
+     * @param issuer       The issuer's name for the certificate
+     * @param serialNumber The serial number of the certificate from the named issuer
+     * @return alias name of the certificate that matches serialNumber and issuer name
      *         or null if no such certificate was found.
      */
-    public String getAliasForX509Cert(String issuer) throws WSSecurityException;
+    public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws WSSecurityException;
 
     /**
      * Search a X509 Certificate in the keystore according to a given serial number and
@@ -142,7 +129,7 @@ public interface Crypto {
      * @return alias name of the certificate that matches serialNumber and issuer name
      *         or null if no such certificate was found.
      */
-    public String getAliasForX509Cert(String issuer, BigInteger serialNumber) throws WSSecurityException;
+    public X509Certificate[] getCertificates(String issuer, BigInteger serialNumber) throws WSSecurityException;
 
     /**
      * Lookup a X509 Certificate in the keystore according to a given
@@ -195,49 +182,12 @@ public interface Crypto {
     public String getAliasForX509CertThumb(byte[] thumb) throws WSSecurityException;
 
     /**
-     * Gets the Keystore that was loaded by the underlying implementation
-     *
-     * @return the Keystore
-     */
-    public KeyStore getKeyStore();
-
-    /**
      * Gets the CertificateFactory instantiated by the underlying implementation
      *
      * @return the CertificateFactory
      * @throws WSSecurityException
      */
     public CertificateFactory getCertificateFactory() throws WSSecurityException;
-
-    /**
-     * Uses the CertPath API to validate a given certificate
-     * <p/>
-     *
-     * @param cert Certificate to validate
-     * @return true if the certificate is valid, false otherwise
-     * @throws WSSecurityException
-     */
-    public void validateCert(X509Certificate cert) throws WSSecurityException;
-
-    /**
-     * Uses the CertPath API to validate a given certificate chain
-     * <p/>
-     *
-     * @param certs Certificate chain to validate
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
-     */
-    public boolean validateCertPath(X509Certificate[] certs) throws WSSecurityException;
-
-    /**
-     * Lookup X509 Certificates in the keystore according to a given DN of the subject of the certificate
-     * <p/>
-     *
-     * @param subjectDN The DN of subject to look for in the keystore
-     * @return Vector with all alias of certificates with the same DN as given in the parameters
-     * @throws WSSecurityException
-     */
-    public String[] getAliasesForDN(String subjectDN) throws WSSecurityException;
 
     /**
      * Evaluate whether a given certificate chain should be trusted.

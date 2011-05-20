@@ -63,13 +63,12 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
         return this.x509Certificates;
     }
 
-    //todo testing: should the whole chain be verified?
     public void verify() throws WSSecurityException {
         try {
             X509Certificate[] x509Certificates = getX509Certificates();
             if (x509Certificates != null && x509Certificates.length > 0) {
                 x509Certificates[0].checkValidity();
-                getCrypto().validateCert(x509Certificates[0]);
+                getCrypto().verifyTrust(x509Certificates);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);

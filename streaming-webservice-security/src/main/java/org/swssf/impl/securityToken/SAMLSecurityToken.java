@@ -72,7 +72,7 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
             X509Certificate[] x509Certificates = getX509Certificates();
             if (x509Certificates != null && x509Certificates.length > 0) {
                 x509Certificates[0].checkValidity();
-                getCrypto().validateCert(x509Certificates[0]);
+                getCrypto().verifyTrust(x509Certificates);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);

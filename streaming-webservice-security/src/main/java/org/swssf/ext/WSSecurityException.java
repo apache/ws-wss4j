@@ -137,6 +137,7 @@ public class WSSecurityException extends RemoteException {
      * @param msgId
      * @param args
      */
+    //todo vararg
     public WSSecurityException(int errorCode, String msgId, Object[] args) {
         super(getMessage(errorCode, msgId, args));
         this.errorCode = errorCode;
