@@ -46,6 +46,7 @@ import org.opensaml.saml1.core.AuthorizationDecisionStatement;
 import org.opensaml.saml1.core.Conditions;
 import org.opensaml.saml1.core.ConfirmationMethod;
 import org.opensaml.saml1.core.DecisionTypeEnumeration;
+import org.opensaml.saml1.core.Evidence;
 import org.opensaml.saml1.core.NameIdentifier;
 import org.opensaml.saml1.core.Subject;
 import org.opensaml.saml1.core.SubjectConfirmation;
@@ -438,6 +439,11 @@ public class SAML1ComponentBuilder {
                     Action actionElement = createSamlv1Action(actionBean);
                     authDecision.getActions().add(actionElement);
                 }
+                
+                if (decisionStatementBean.getEvidence() instanceof Evidence) {                                    
+                    authDecision.setEvidence((Evidence)decisionStatementBean.getEvidence());
+                }
+                
                 authDecisionStatements.add(authDecision);
             }
         }

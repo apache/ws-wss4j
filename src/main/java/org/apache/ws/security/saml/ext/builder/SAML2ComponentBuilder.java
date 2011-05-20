@@ -48,6 +48,7 @@ import org.opensaml.saml2.core.AuthnStatement;
 import org.opensaml.saml2.core.AuthzDecisionStatement;
 import org.opensaml.saml2.core.Conditions;
 import org.opensaml.saml2.core.DecisionTypeEnumeration;
+import org.opensaml.saml2.core.Evidence;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.KeyInfoConfirmationDataType;
 import org.opensaml.saml2.core.NameID;
@@ -541,6 +542,11 @@ public class SAML2ComponentBuilder {
                     Action actionElement = createSamlAction(actionBean);
                     authDecision.getActions().add(actionElement);
                 }
+
+                if (decisionStatementBean.getEvidence() instanceof Evidence) {                                    
+                    authDecision.setEvidence((Evidence)decisionStatementBean.getEvidence());
+                }
+                
                 authDecisionStatements.add(authDecision);
             }
         }
