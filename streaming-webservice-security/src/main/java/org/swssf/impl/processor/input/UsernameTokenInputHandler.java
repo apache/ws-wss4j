@@ -62,7 +62,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         // spec says that it cannot contain a password, and it must contain
         // an Iteration element
         if (usernameTokenType.getSalt() != null && (usernameTokenType.getPassword() != null || usernameTokenType.getIteration() == null)) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
 
         Integer iteration = null;
@@ -82,7 +82,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         if (usernameTokenPasswordType == Constants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
             final String nonce = usernameTokenType.getNonce();
             if (nonce == null || usernameTokenType.getCreated() == null) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
             }
 
             /*
@@ -92,31 +92,31 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             */
             final String cacheKey = nonce;
             if (cache.get(cacheKey) != null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             ElementAttributes elementAttributes = new ElementAttributes();
             elementAttributes.setMaxLifeSeconds(300);
             try {
                 cache.put(cacheKey, usernameTokenType.getCreated(), elementAttributes);
             } catch (CacheException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
 
             DatatypeFactory datatypeFactory = null;
             try {
                 datatypeFactory = DatatypeFactory.newInstance();
             } catch (DatatypeConfigurationException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
             XMLGregorianCalendar xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar(usernameTokenType.getCreated());
             createdCal = xmlGregorianCalendar.toGregorianCalendar();
             GregorianCalendar now = new GregorianCalendar();
             if (createdCal.after(now)) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             now.add(Calendar.MINUTE, 5);
             if (createdCal.after(now)) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
 
             WSPasswordCallback pwCb = new WSPasswordCallback(username,
@@ -126,18 +126,18 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             try {
                 Utils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
             }
 
             if (pwCb.getPassword() == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
 
             nonceVal = Base64.decodeBase64(nonce);
 
             String passDigest = Utils.doPasswordDigest(nonceVal, usernameTokenType.getCreated(), pwCb.getPassword());
             if (!usernameTokenType.getPassword().equals(passDigest)) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             usernameTokenType.setPassword(pwCb.getPassword());
         } else {
@@ -148,7 +148,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             try {
                 Utils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
             }
             usernameTokenType.setPassword(pwCb.getPassword());
         }

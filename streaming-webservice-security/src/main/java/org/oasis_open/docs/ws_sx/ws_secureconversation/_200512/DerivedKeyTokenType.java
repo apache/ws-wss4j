@@ -98,6 +98,7 @@ public class DerivedKeyTokenType implements Parseable {
 
     public DerivedKeyTokenType(StartElement startElement) {
         this.startElement = startElement;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

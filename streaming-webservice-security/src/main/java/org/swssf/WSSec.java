@@ -56,7 +56,7 @@ public class WSSec {
      */
     public static OutboundWSSec getOutboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, WSSConfigurationException {
         if (securityProperties == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "missingSecurityProperties");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
 
         Init.init(null);
@@ -77,7 +77,7 @@ public class WSSec {
      */
     public static InboundWSSec getInboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, WSSConfigurationException {
         if (securityProperties == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "missingSecurityProperties");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
 
         Init.init(null);
@@ -96,7 +96,7 @@ public class WSSec {
      */
     public static SecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(SecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getOutAction() == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "noOutputAction");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noOutputAction");
         }
 
         //todo encrypt sigconf when original signature was encrypted
@@ -120,13 +120,13 @@ public class WSSec {
                     break;
                 case SIGNATURE:
                     if (securityProperties.getSignatureKeyStore() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureKeyStoreNotSet");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
                     }
                     if (securityProperties.getSignatureUser() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noSignatureUser");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noSignatureUser");
                     }
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     //signature namespace part will be set in SecurityHeaderOutputProcessor
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
@@ -150,12 +150,12 @@ public class WSSec {
                     if (securityProperties.getEncryptionUseThisCertificate() == null
                             && securityProperties.getEncryptionKeyStore() == null
                             && !securityProperties.isUseReqSigCertForEncryption()) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                     }
                     if (securityProperties.getEncryptionUser() == null
                             && securityProperties.getEncryptionUseThisCertificate() == null
                             && !securityProperties.isUseReqSigCertForEncryption()) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noEncryptionUser");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noEncryptionUser");
                     }
                     //encryption namespace part will be set in SecurityHeaderOutputProcessor
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {
@@ -176,10 +176,10 @@ public class WSSec {
                     break;
                 case USERNAMETOKEN:
                     if (securityProperties.getTokenUser() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noTokenUser");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noTokenUser");
                     }
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     if (securityProperties.getUsernameTokenPasswordType() == null) {
                         securityProperties.setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType.PASSWORD_DIGEST);
@@ -187,10 +187,10 @@ public class WSSec {
                     break;
                 case USERNAMETOKEN_SIGN:
                     if (securityProperties.getTokenUser() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noTokenUser");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noTokenUser");
                     }
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     //signature namespace part will be set in SecurityHeaderOutputProcessor
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
@@ -215,7 +215,7 @@ public class WSSec {
                     break;
                 case SIGNATURE_WITH_DERIVED_KEY:
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     //signature namespace part will be set in SecurityHeaderOutputProcessor
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
@@ -255,17 +255,17 @@ public class WSSec {
                     break;
                 case ENCRYPT_WITH_DERIVED_KEY:
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     if (securityProperties.getEncryptionUseThisCertificate() == null
                             && securityProperties.getEncryptionKeyStore() == null
                             && !securityProperties.isUseReqSigCertForEncryption()) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                     }
                     if (securityProperties.getEncryptionUser() == null
                             && securityProperties.getEncryptionUseThisCertificate() == null
                             && !securityProperties.isUseReqSigCertForEncryption()) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noEncryptionUser");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noEncryptionUser");
                     }
                     //encryption namespace part will be set in SecurityHeaderOutputProcessor
                     if (securityProperties.getEncryptionSecureParts().isEmpty()) {
@@ -295,7 +295,7 @@ public class WSSec {
                     break;
                 case SAML_TOKEN_SIGNED:
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     //signature namespace part will be set in SecurityHeaderOutputProcessor
                     if (securityProperties.getSignatureSecureParts().isEmpty()) {
@@ -316,7 +316,7 @@ public class WSSec {
                     break;
                 case SAML_TOKEN_UNSIGNED:
                     if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSecurityException.FAILURE, "noCallback");
+                        throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                     }
                     break;
             }

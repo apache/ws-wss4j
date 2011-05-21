@@ -92,7 +92,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                 Attribute attribute = startElement.getAttributeByName(this.attribute);
                 if (attribute != null && this.attributeValue.equals(attribute.getValue())) {
                     if (refFound) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "duplicateId");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
                     }
                     refFound = true;
                     startElementName = startElement.getName();

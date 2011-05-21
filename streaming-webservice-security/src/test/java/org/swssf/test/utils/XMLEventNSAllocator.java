@@ -70,6 +70,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public XMLEvent allocate(XMLStreamReader reader) throws XMLStreamException {
         if (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
 
@@ -118,7 +119,6 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
 
             attrStack.push(comparableAttributeList);
             nsStack.push(comparableNamespaceList);
-
             return new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
         } else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT) {
             XMLEventNS xmlEventNS = new XMLEventNS(xmlEventAllocator.allocate(reader), nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));

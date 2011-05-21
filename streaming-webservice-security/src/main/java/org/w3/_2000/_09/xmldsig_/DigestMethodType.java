@@ -59,6 +59,7 @@ public class DigestMethodType implements Parseable {
     private Parseable currentParseable;
 
     public DigestMethodType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

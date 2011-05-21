@@ -229,6 +229,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             attributeIterator.next();
@@ -243,6 +244,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -260,6 +262,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -277,6 +280,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -294,6 +298,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -311,6 +316,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -328,6 +334,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -345,6 +352,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = xmlEvent.asStartElement().getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
@@ -356,6 +364,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
+    @SuppressWarnings("unchecked")
     public int getNamespaceCount() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
@@ -375,6 +384,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
         return count;
     }
 
+    @SuppressWarnings("unchecked")
     public String getNamespacePrefix(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
@@ -403,6 +413,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
             throw new IllegalStateException(ERR_STATE_NOT_STELEM);
         }
         int count = 0;
+        @SuppressWarnings("unchecked")
         Iterator<Namespace> namespaceIterator = xmlEvent.asStartElement().getNamespaces();
         while (namespaceIterator.hasNext()) {
             Namespace namespace = namespaceIterator.next();

@@ -44,15 +44,15 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         try {
             String tokenId = outputProcessorChain.getSecurityContext().get(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN);
             if (tokenId == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
             SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
             final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
             if (wrappingSecurityToken == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
 
             final String wsuId = "SCT-" + UUID.randomUUID().toString();

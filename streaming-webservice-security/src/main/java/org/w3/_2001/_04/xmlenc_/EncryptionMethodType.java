@@ -66,6 +66,7 @@ public class EncryptionMethodType implements Parseable {
     protected String algorithm;
 
     public EncryptionMethodType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

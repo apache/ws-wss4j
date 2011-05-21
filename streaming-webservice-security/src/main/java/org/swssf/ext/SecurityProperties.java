@@ -111,7 +111,7 @@ public class SecurityProperties {
     public Crypto getDecryptionCrypto() throws WSSecurityException {
 
         if (this.getDecryptionKeyStore() == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "decryptionKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "decryptionKeyStoreNotSet");
         }
 
         if (this.getDecryptionCryptoClass() == cachedDecryptionCryptoClass
@@ -132,7 +132,7 @@ public class SecurityProperties {
             cachedDecryptionKeyStore = this.getDecryptionKeyStore();
             return decryptionCrypto;
         } catch (Exception e) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "decryptionCryptoFailure", e);
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "decryptionCryptoFailure", e);
         }
     }
 
@@ -218,7 +218,7 @@ public class SecurityProperties {
     public Crypto getEncryptionCrypto() throws WSSecurityException {
 
         if (this.getEncryptionKeyStore() == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
         }
 
         if (this.getEncryptionCryptoClass() == cachedEncryptionCryptoClass
@@ -239,7 +239,7 @@ public class SecurityProperties {
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;
         } catch (Exception e) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "encryptionCryptoFailure", e);
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionCryptoFailure", e);
         }
     }
 
@@ -346,7 +346,7 @@ public class SecurityProperties {
     private String signatureAlgorithm;
     private String signatureDigestAlgorithm;
     private String signatureCanonicalizationAlgorithm;
-    private Class signatureCryptoClass;
+    private Class<? extends CryptoBase> signatureCryptoClass;
     private KeyStore signatureKeyStore;
     private String signatureUser;
     private Constants.KeyIdentifierType signatureKeyIdentifierType;
@@ -394,22 +394,22 @@ public class SecurityProperties {
         this.signatureKeyStore = keyStore;
     }
 
-    public Class getSignatureCryptoClass() {
+    public Class<? extends CryptoBase> getSignatureCryptoClass() {
         return signatureCryptoClass;
     }
 
-    public void setSignatureCryptoClass(Class signatureCryptoClass) {
+    public void setSignatureCryptoClass(Class<? extends CryptoBase> signatureCryptoClass) {
         this.signatureCryptoClass = signatureCryptoClass;
     }
 
     private Crypto cachedSignatureCrypto;
-    private Class cachedSignatureCryptoClass;
+    private Class<? extends CryptoBase> cachedSignatureCryptoClass;
     private KeyStore cachedSignatureKeyStore;
 
     public Crypto getSignatureCrypto() throws WSSecurityException {
 
         if (this.getSignatureKeyStore() == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
         }
 
         if (this.getSignatureCryptoClass() == cachedSignatureCryptoClass
@@ -430,7 +430,7 @@ public class SecurityProperties {
             cachedSignatureKeyStore = this.getSignatureKeyStore();
             return signatureCrypto;
         } catch (Exception e) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureCryptoFailure", e);
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
         }
     }
 
@@ -517,7 +517,7 @@ public class SecurityProperties {
     public Crypto getSignatureVerificationCrypto() throws WSSecurityException {
 
         if (this.getSignatureVerificationKeyStore() == null) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureVerificationKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
         }
 
         if (this.getSignatureVerificationCryptoClass() == cachedSignatureVerificationCryptoClass
@@ -535,7 +535,7 @@ public class SecurityProperties {
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
         } catch (Exception e) {
-            throw new WSSConfigurationException(WSSecurityException.FAILURE, "signatureVerificationCryptoFailure", e);
+            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureVerificationCryptoFailure", e);
         }
     }
 

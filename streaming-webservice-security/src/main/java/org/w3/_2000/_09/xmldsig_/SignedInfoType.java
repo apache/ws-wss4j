@@ -69,6 +69,7 @@ public class SignedInfoType implements Parseable {
     private Parseable currentParseable;
 
     public SignedInfoType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

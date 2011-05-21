@@ -88,13 +88,13 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                                 outputProcessorChain.getDocumentContext().getEncoding()
                                         );
                             } catch (NoSuchAlgorithmException e) {
-                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                             } catch (NoSuchPaddingException e) {
-                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                             } catch (InvalidKeyException e) {
-                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                             } catch (IOException e) {
-                                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, null, e);
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                             }
 
                             activeInternalEncryptionOutputProcessor = internalEncryptionOutputProcessor;
@@ -240,6 +240,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
 
                 attributes = new HashMap<QName, String>();
 
+                @SuppressWarnings("unchecked")
                 Iterator<Attribute> attributeIterator = this.startElement.getAttributes();
                 while (attributeIterator.hasNext()) {
                     Attribute attribute = attributeIterator.next();

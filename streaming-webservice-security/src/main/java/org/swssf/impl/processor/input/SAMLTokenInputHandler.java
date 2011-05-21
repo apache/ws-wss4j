@@ -104,11 +104,13 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         element.setPrefix(startElement.getName().getPrefix());
                     }
                     currentNode = currentNode.appendChild(element);
+                    @SuppressWarnings("unchecked")
                     Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
                     while (namespaceIterator.hasNext()) {
                         Namespace next = namespaceIterator.next();
                         parseXMLEvent(next);
                     }
+                    @SuppressWarnings("unchecked")
                     Iterator<Attribute> attributesIterator = startElement.getAttributes();
                     while (attributesIterator.hasNext()) {
                         Attribute next = attributesIterator.next();

@@ -101,22 +101,22 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
         try {
             signatureAlgorithm = SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(getSecurityProperties().getSignatureAlgorithm());
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         } catch (NoSuchProviderException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
         }
 
         String tokenId = outputProcessorChain.getSecurityContext().get(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
         if (tokenId == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
         SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
         if (wrappingSecurityTokenProvider == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
         final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
         if (wrappingSecurityToken == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
 
         signatureAlgorithm.engineInitSign(wrappingSecurityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm()));
@@ -210,13 +210,13 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             try {
                 transformer = Utils.getTransformer((String) null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             } catch (NoSuchMethodException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InstantiationException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (IllegalAccessException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InvocationTargetException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             }
         }
 
@@ -225,7 +225,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
                 bufferedSignerOutputStream.close();
                 return signerOutputStream.sign();
             } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             }
         }
 

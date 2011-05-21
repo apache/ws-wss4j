@@ -87,6 +87,7 @@ public class KeyInfoType implements Parseable {
     }
 
     public KeyInfoType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

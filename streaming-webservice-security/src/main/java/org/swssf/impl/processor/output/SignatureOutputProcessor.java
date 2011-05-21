@@ -75,6 +75,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
                             boolean found = false;
                             List<Attribute> attributeList = new ArrayList<Attribute>();
+                            @SuppressWarnings("unchecked")
                             Iterator<Attribute> attributeIterator = startElement.getAttributes();
                             while (attributeIterator.hasNext()) {
                                 Attribute attribute = attributeIterator.next();
@@ -103,11 +104,11 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
 
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(
-                                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                                new Object[]{"No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()}, e
+                                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                e, "No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()
                         );
                     } catch (NoSuchProviderException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
                     }
 
                     activeInternalSignatureOutputProcessor = internalSignatureOutputProcessor;
@@ -191,13 +192,13 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     transformer = Utils.getTransformer((String) null, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
                 }
             } catch (NoSuchMethodException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InstantiationException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (IllegalAccessException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InvocationTargetException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             }
         }
 
@@ -217,7 +218,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
                     }
                     String calculatedDigest = new String(Base64.encodeBase64(this.digestOutputStream.getDigestValue()));
                     logger.debug("Calculated Digest: " + calculatedDigest);

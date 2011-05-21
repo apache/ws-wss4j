@@ -34,9 +34,9 @@ import java.util.*;
  */
 public class ContentEncryptedElements extends AbstractSecurityAssertion {
 
-    private ArrayList xPathExpressions = new ArrayList();
+    private List<String> xPathExpressions = new ArrayList<String>();
 
-    private HashMap declaredNamespaces = new HashMap();
+    private Map<String, String> declaredNamespaces = new HashMap<String, String>();
 
     private String xPathVersion;
 
@@ -47,7 +47,7 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
     /**
      * @return Returns the xPathExpressions.
      */
-    public ArrayList getXPathExpressions() {
+    public List<String> getXPathExpressions() {
         return xPathExpressions;
     }
 
@@ -69,7 +69,7 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
         xPathVersion = pathVersion;
     }
 
-    public HashMap getDeclaredNamespaces() {
+    public Map<String, String> getDeclaredNamespaces() {
         return declaredNamespaces;
     }
 
@@ -109,9 +109,9 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
 
         String xpathExpression;
 
-        for (Iterator iterator = xPathExpressions.iterator(); iterator
+        for (Iterator<String> iterator = xPathExpressions.iterator(); iterator
                 .hasNext(); ) {
-            xpathExpression = (String) iterator.next();
+            xpathExpression = iterator.next();
             // <sp:XPath ..>
             writer.writeStartElement(prefix, SPConstants.XPATH_EXPR, namespaceURI);
             writer.writeCharacters(xpathExpression);
@@ -144,7 +144,7 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
     private List<QName> getQNamesFromXPath() {
         List<QName> qNames = new ArrayList<QName>(xPathExpressions.size());
         for (int i = 0; i < xPathExpressions.size(); i++) {
-            String s = (String) xPathExpressions.get(i);
+            String s = xPathExpressions.get(i);
             String prefix;
             String localName;
             if (s.contains(":")) {
@@ -155,7 +155,7 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
                 prefix = "";
                 localName = s;
             }
-            qNames.add(new QName((String) declaredNamespaces.get(prefix), localName));
+            qNames.add(new QName(declaredNamespaces.get(prefix), localName));
         }
         return qNames;
     }

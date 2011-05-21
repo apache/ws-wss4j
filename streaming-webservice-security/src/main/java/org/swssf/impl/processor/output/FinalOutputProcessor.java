@@ -44,7 +44,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         try {
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(outputStream, encoding);
         } catch (XMLStreamException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 
@@ -59,7 +59,7 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
             xmlEventWriter.flush();
             xmlEventWriter.close();
         } catch (XMLStreamException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 }

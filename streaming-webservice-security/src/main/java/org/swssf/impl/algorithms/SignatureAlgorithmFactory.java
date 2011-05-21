@@ -35,7 +35,7 @@ public class SignatureAlgorithmFactory {
     public SignatureAlgorithm getSignatureAlgorithm(String algoURI) throws WSSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
         AlgorithmType algorithmType = JCEAlgorithmMapper.getAlgorithmMapping(algoURI);
         if (algorithmType == null) {
-            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, "unknownSignatureAlgorithm", new Object[]{algoURI});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unknownSignatureAlgorithm", algoURI);
         }
         String algorithmClass = algorithmType.getAlgorithmClass();
         if ("MAC".equalsIgnoreCase(algorithmClass)) {

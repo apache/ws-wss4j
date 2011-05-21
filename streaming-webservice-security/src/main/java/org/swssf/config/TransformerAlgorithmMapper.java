@@ -37,15 +37,16 @@ public class TransformerAlgorithmMapper {
     private static final transient Log logger = LogFactory.getLog(TransformerAlgorithmMapper.class);
 
     private static Map<String, TransformAlgorithmType> algorithmsMap;
-    private static Map<String, Class> algorithmsClassMap;
+    private static Map<String, Class<Transformer>> algorithmsClassMap;
 
     private TransformerAlgorithmMapper() {
     }
 
+    @SuppressWarnings("unchecked")
     protected static void init(TransformAlgorithmsType transformAlgorithms) throws Exception {
         List<TransformAlgorithmType> algorithms = transformAlgorithms.getTransformAlgorithm();
         algorithmsMap = new HashMap<String, TransformAlgorithmType>(algorithms.size());
-        algorithmsClassMap = new HashMap<String, Class>();
+        algorithmsClassMap = new HashMap<String, Class<Transformer>>();
 
         for (int i = 0; i < algorithms.size(); i++) {
             TransformAlgorithmType algorithmType = algorithms.get(i);
@@ -55,9 +56,9 @@ public class TransformerAlgorithmMapper {
     }
 
     public static Class<Transformer> getTransformerClass(String algoURI) throws WSSecurityException {
-        Class clazz = algorithmsClassMap.get(algoURI);
+        Class<Transformer> clazz = algorithmsClassMap.get(algoURI);
         if (clazz == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
         return clazz;
     }

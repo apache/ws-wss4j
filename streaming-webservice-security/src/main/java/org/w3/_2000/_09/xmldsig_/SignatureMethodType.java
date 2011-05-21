@@ -62,6 +62,7 @@ public class SignatureMethodType implements Parseable {
     private Parseable currentParseable;
 
     public SignatureMethodType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

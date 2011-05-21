@@ -37,7 +37,7 @@ public class TransportBinding extends Binding {
 
     private TransportToken transportToken;
 
-    private List transportBindings;
+    private List<TransportBinding> transportBindings;
 
     public TransportBinding(SPConstants spConstants) {
         super(spConstants);
@@ -63,14 +63,14 @@ public class TransportBinding extends Binding {
 
     public TransportBinding getDefaultConfiguration() {
         if (transportBindings != null) {
-            return (TransportBinding) transportBindings.get(0);
+            return transportBindings.get(0);
         }
         return null;
     }
 
     public void addConfiguration(TransportBinding transportBinding) {
         if (transportBindings == null) {
-            transportBindings = new ArrayList();
+            transportBindings = new ArrayList<TransportBinding>();
         }
         transportBindings.add(transportBinding);
     }

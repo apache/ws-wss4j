@@ -79,7 +79,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     if (refId.getValue().equals(referenceType.getURI())) {
                         logger.debug("Found signature reference: " + refId.getValue() + " on element" + startElement.getName());
                         if (referenceType.isProcessed()) {
-                            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "duplicateId");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
                         }
                         InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
                                 new InternalSignatureReferenceVerifier(getSecurityProperties(), inputProcessorChain, referenceType, startElement.getName());
@@ -119,7 +119,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);
             if (!referenceType.isProcessed()) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "unprocessedSignatureReferences");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unprocessedSignatureReferences");
             }
         }
         inputProcessorChain.doFinal();
@@ -145,7 +145,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                 createMessageDigest();
                 buildTransformerChain(referenceType, inputProcessorChain);
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
 
@@ -193,11 +193,11 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             if (Constants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
                 SecurityTokenProvider securityTokenProvider = inputProcessorChain.getSecurityContext().getSecurityTokenProvider(referenceType.getURI());
                 if (securityTokenProvider == null) {
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "noReference");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noReference");
                 }
                 SecurityToken securityToken = securityTokenProvider.getSecurityToken(getSecurityProperties().getSignatureVerificationCrypto());
                 if (!(securityToken instanceof SecurityTokenReference)) {
-                    throw new WSSecurityException(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN, null);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
                 }
                 SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
                 this.startElement = securityTokenReference.getXmlEvents().getLast().asStartElement().getName();
@@ -234,7 +234,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
                     }
 
                     byte[] calculatedDigest = this.digestOutputStream.getDigestValue();
@@ -246,7 +246,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     }
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "digestVerificationFailed");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "digestVerificationFailed");
                     }
                     inputProcessorChain.removeProcessor(this);
                     inputProcessorChain.getDocumentContext().unsetIsInSignedContent();

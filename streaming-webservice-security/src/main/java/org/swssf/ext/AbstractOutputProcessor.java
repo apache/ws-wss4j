@@ -262,7 +262,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         } else if (keyIdentifierType == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
             createUsernameTokenReferenceStructure(outputProcessorChain, tokenId);
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "unsupportedSecurityToken", new Object[]{keyIdentifierType.name()});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken", keyIdentifierType.name());
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
     }
@@ -301,7 +301,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
             createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "unsupportedSecurityToken", new Object[]{keyIdentifierType.name()});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken", keyIdentifierType.name());
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
     }
@@ -343,7 +343,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
             createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "unsupportedSecurityToken", new Object[]{keyIdentifierType.name()});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken", keyIdentifierType.name());
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference);
     }
@@ -413,13 +413,13 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
                     List<X509Certificate> certificates = Arrays.asList(x509Certificates);
                     createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
                 } catch (CertificateException e) {
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, null, e);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
                 } catch (NoSuchProviderException e) {
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, null, e);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
                 }
             }
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_BinarySecurityToken);
     }
@@ -438,9 +438,9 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
             createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
     }
@@ -453,7 +453,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         try {
             createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
         } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier);
     }
@@ -461,7 +461,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     protected void createX509SubjectKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws WSSecurityException, XMLStreamException {
         // As per the 1.1 specification, SKI can only be used for a V3 certificate
         if (x509Certificates[0].getVersion() != 3) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "invalidCertForSKI");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "invalidCertForSKI");
         }
 
         Map<QName, String> attributes = new HashMap<QName, String>();

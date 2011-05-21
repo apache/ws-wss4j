@@ -56,6 +56,7 @@ public class SignatureConfirmationType implements Parseable {
     public SignatureConfirmationType(StartElement startElement) {
         super();
         this.startElement = startElement;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

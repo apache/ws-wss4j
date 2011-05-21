@@ -55,6 +55,7 @@ public abstract class Canonicalizer20010315_Excl extends CanonicalizerBase {
             }
 
             if (!visibleUtilized) {
+                @SuppressWarnings("unchecked")
                 Iterator<Attribute> attributesIterator = startElement.getAttributes();
                 while (attributesIterator.hasNext()) {
                     Attribute attribute = attributesIterator.next();

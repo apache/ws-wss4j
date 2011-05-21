@@ -57,6 +57,7 @@ public class SignatureValueType implements Parseable {
     private Parseable currentParseable;
 
     public SignatureValueType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

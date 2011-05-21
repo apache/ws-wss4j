@@ -32,9 +32,9 @@ import java.util.*;
  */
 public class RequiredElements extends AbstractSecurityAssertion {
 
-    private ArrayList xPathExpressions = new ArrayList();
+    private List<String> xPathExpressions = new ArrayList<String>();
 
-    private HashMap declaredNamespaces = new HashMap();
+    private Map<String, String> declaredNamespaces = new HashMap<String, String>();
 
     private String xPathVersion;
 
@@ -45,7 +45,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
     /**
      * @return Returns the xPathExpressions.
      */
-    public ArrayList getXPathExpressions() {
+    public List<String> getXPathExpressions() {
         return xPathExpressions;
     }
 
@@ -67,7 +67,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
         xPathVersion = pathVersion;
     }
 
-    public HashMap getDeclaredNamespaces() {
+    public Map<String, String> getDeclaredNamespaces() {
         return declaredNamespaces;
     }
 
@@ -107,9 +107,9 @@ public class RequiredElements extends AbstractSecurityAssertion {
 
         String xpathExpression;
 
-        for (Iterator iterator = xPathExpressions.iterator(); iterator
+        for (Iterator<String> iterator = xPathExpressions.iterator(); iterator
                 .hasNext(); ) {
-            xpathExpression = (String) iterator.next();
+            xpathExpression = iterator.next();
             // <sp:XPath ..>
             writer.writeStartElement(prefix, SPConstants.XPATH_EXPR, namespaceURI);
             writer.writeCharacters(xpathExpression);

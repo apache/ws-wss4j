@@ -59,6 +59,7 @@ public class CanonicalizationMethodType implements Parseable {
     private Parseable currentParseable;
 
     public CanonicalizationMethodType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

@@ -97,7 +97,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         if (x509Certificate != null) {
                             String alias = getSecurityProperties().getSignatureCrypto().getAliasForX509Cert(x509Certificate);
                             if (alias == null) {
-                                throw new WSSecurityException(WSSecurityException.FAILURE, "aliasIsNull");
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
                             WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                             Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), wsPasswordCallback);

@@ -137,6 +137,7 @@ public abstract class AbstractTestBase {
         return (Document) messageContext.getProperty(SECURED_DOCUMENT);
     }
 
+    @SuppressWarnings("unchecked")
     protected MessageContext doOutboundSecurityWithWSS4J_1(InputStream sourceDocument, String action, final Properties properties, String soapProtocol) throws org.apache.ws.security.WSSecurityException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
@@ -231,6 +232,7 @@ public abstract class AbstractTestBase {
         return doInboundSecurityWithWSS4J_1(document, action, SOAPConstants.SOAP_1_1_PROTOCOL, new Properties(), false);
     }
 
+    @SuppressWarnings("unchecked")
     protected MessageContext doInboundSecurityWithWSS4J_1(Document document, String action, String soapProtocol, Properties properties, boolean client) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         HandlerInfo handlerInfo = new HandlerInfo();
@@ -298,6 +300,7 @@ public abstract class AbstractTestBase {
         return getMessageContext(new DOMSource(document), soapProtocol);
     }
 
+    @SuppressWarnings("unchecked")
     private MessageContext getMessageContext(final Source inSource, final String soapProtocol) {
         MessageContext messageContext = new SOAPMessageContext() {
 
@@ -392,6 +395,7 @@ public abstract class AbstractTestBase {
         return xPath.compile(expression);
     }
 
+    @SuppressWarnings("unchecked")
     class CustomWSS4JHandler extends WSHandler {
 
         private final Log log = LogFactory.getLog(CustomWSS4JHandler.class.getName());
@@ -544,6 +548,7 @@ public abstract class AbstractTestBase {
             return true;
         }
 
+        @SuppressWarnings("unchecked")
         public boolean doReceiver(MessageContext mc, RequestData reqData, boolean isRequest) throws org.apache.ws.security.WSSecurityException {
             Vector actions = new Vector();
             String action = (String) getOption(WSHandlerConstants.ACTION);

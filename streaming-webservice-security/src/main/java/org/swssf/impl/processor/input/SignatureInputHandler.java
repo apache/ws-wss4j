@@ -138,7 +138,7 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             try {
                 createSignatureAlgorithm();
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
 
@@ -164,13 +164,13 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             try {
                 transformer = Utils.getTransformer(signatureType.getSignedInfo().getCanonicalizationMethod().getInclusiveNamespaces(), this.bufferedSignerOutputStream, signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
             } catch (NoSuchMethodException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             } catch (InstantiationException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             } catch (IllegalAccessException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             } catch (InvocationTargetException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
 
@@ -182,10 +182,10 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             try {
                 bufferedSignerOutputStream.close();
                 if (!signerOutputStream.verify(signatureType.getSignatureValue().getValue())) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                 }
             } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
     }

@@ -37,17 +37,20 @@ import java.util.ResourceBundle;
  */
 public class WSSecurityException extends RemoteException {
 
-    public static final int FAILURE = 0;
-    public static final int UNSUPPORTED_SECURITY_TOKEN = 1;
-    public static final int UNSUPPORTED_ALGORITHM = 2;
-    public static final int INVALID_SECURITY = 3;
-    public static final int INVALID_SECURITY_TOKEN = 4;
-    public static final int FAILED_AUTHENTICATION = 5;
-    public static final int FAILED_CHECK = 6;
-    public static final int SECURITY_TOKEN_UNAVAILABLE = 7;
-    public static final int MESSAGE_EXPIRED = 8;
-    public static final int FAILED_ENCRYPTION = 9;
-    public static final int FAILED_SIGNATURE = 10;
+    public enum ErrorCode {
+        FAILURE,
+        UNSUPPORTED_SECURITY_TOKEN,
+        UNSUPPORTED_ALGORITHM,
+        INVALID_SECURITY,
+        INVALID_SECURITY_TOKEN,
+        FAILED_AUTHENTICATION,
+        FAILED_CHECK,
+        SECURITY_TOKEN_UNAVAILABLE,
+        MESSAGE_EXPIRED,
+        FAILED_ENCRYPTION,
+        FAILED_SIGNATURE,
+    }
+
     private static ResourceBundle resources;
     /*
      * This is an Integer -> QName map. Its function is to map the integer error codes
@@ -56,7 +59,7 @@ public class WSSecurityException extends RemoteException {
      * any parsing of the error code. Note that there are no mappings for "FAILURE",
      * "FAILED_ENCRYPTION" and "FAILED_SIGNATURE" as these are not standard error messages.
      */
-    private static final Map<Integer, QName> FAULT_CODE_MAP = new HashMap<Integer, QName>();
+    private static final Map<ErrorCode, QName> FAULT_CODE_MAP = new HashMap<ErrorCode, QName>();
 
     static {
         try {
@@ -66,40 +69,48 @@ public class WSSecurityException extends RemoteException {
         }
 
         FAULT_CODE_MAP.put(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                 Constants.UNSUPPORTED_SECURITY_TOKEN
         );
         FAULT_CODE_MAP.put(
-                UNSUPPORTED_ALGORITHM,
+                ErrorCode.UNSUPPORTED_ALGORITHM,
                 Constants.UNSUPPORTED_ALGORITHM
         );
         FAULT_CODE_MAP.put(
-                INVALID_SECURITY,
+                ErrorCode.INVALID_SECURITY,
                 Constants.INVALID_SECURITY
         );
         FAULT_CODE_MAP.put(
-                INVALID_SECURITY_TOKEN,
+                ErrorCode.INVALID_SECURITY_TOKEN,
                 Constants.INVALID_SECURITY_TOKEN
         );
         FAULT_CODE_MAP.put(
-                FAILED_AUTHENTICATION,
+                ErrorCode.FAILED_AUTHENTICATION,
                 Constants.FAILED_AUTHENTICATION
         );
         FAULT_CODE_MAP.put(
-                FAILED_CHECK,
+                ErrorCode.FAILED_CHECK,
                 Constants.FAILED_CHECK
         );
         FAULT_CODE_MAP.put(
-                SECURITY_TOKEN_UNAVAILABLE,
+                ErrorCode.FAILED_SIGNATURE,
+                Constants.FAILED_CHECK
+        );
+        FAULT_CODE_MAP.put(
+                ErrorCode.FAILED_ENCRYPTION,
+                Constants.FAILED_CHECK
+        );
+        FAULT_CODE_MAP.put(
+                ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
                 Constants.SECURITY_TOKEN_UNAVAILABLE
         );
         FAULT_CODE_MAP.put(
-                MESSAGE_EXPIRED,
+                ErrorCode.MESSAGE_EXPIRED,
                 Constants.MESSAGE_EXPIRED
         );
     }
 
-    private int errorCode;
+    private ErrorCode errorCode;
 
     /**
      * Constructor.
@@ -107,11 +118,29 @@ public class WSSecurityException extends RemoteException {
      *
      * @param errorCode
      * @param msgId
-     * @param args
+     * @param exception
+     * @param arguments
+     */
+    public WSSecurityException(ErrorCode errorCode, String msgId, Throwable exception, Object... arguments) {
+        super(getMessage(errorCode, msgId, arguments), exception);
+        this.errorCode = errorCode;
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     *
+     * @param errorCode
+     * @param msgId
      * @param exception
      */
-    public WSSecurityException(int errorCode, String msgId, Object[] args, Throwable exception) {
-        super(getMessage(errorCode, msgId, args), exception);
+    public WSSecurityException(ErrorCode errorCode, String msgId, Throwable exception) {
+        super(getMessage(errorCode, msgId), exception);
+        this.errorCode = errorCode;
+    }
+
+    public WSSecurityException(ErrorCode errorCode, Throwable exception) {
+        super(getMessage(errorCode, null), exception);
         this.errorCode = errorCode;
     }
 
@@ -121,25 +150,10 @@ public class WSSecurityException extends RemoteException {
      *
      * @param errorCode
      * @param msgId
-     * @param args
-     * @param exception
+     * @param arguments
      */
-    public WSSecurityException(int errorCode, String msgId, Throwable exception) {
-        super(getMessage(errorCode, msgId, null), exception);
-        this.errorCode = errorCode;
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorCode
-     * @param msgId
-     * @param args
-     */
-    //todo vararg
-    public WSSecurityException(int errorCode, String msgId, Object[] args) {
-        super(getMessage(errorCode, msgId, args));
+    public WSSecurityException(ErrorCode errorCode, String msgId, Object... arguments) {
+        super(getMessage(errorCode, msgId, arguments));
         this.errorCode = errorCode;
     }
 
@@ -150,7 +164,7 @@ public class WSSecurityException extends RemoteException {
      * @param errorCode
      * @param msgId
      */
-    public WSSecurityException(int errorCode, String msgId) {
+    public WSSecurityException(ErrorCode errorCode, String msgId) {
         this(errorCode, msgId, (Object[]) null);
     }
 
@@ -160,7 +174,7 @@ public class WSSecurityException extends RemoteException {
      *
      * @param errorCode
      */
-    public WSSecurityException(int errorCode) {
+    public WSSecurityException(ErrorCode errorCode) {
         this(errorCode, null, (Object[]) null);
     }
 
@@ -190,7 +204,7 @@ public class WSSecurityException extends RemoteException {
      *
      * @return error code of this exception See values above.
      */
-    public int getErrorCode() {
+    public ErrorCode getErrorCode() {
         return this.errorCode;
     }
 
@@ -214,15 +228,15 @@ public class WSSecurityException extends RemoteException {
      *
      * @param errorCode
      * @param msgId
-     * @param args
+     * @param arguments
      * @return the message translated from the property (message) file.
      */
-    private static String getMessage(int errorCode, String msgId, Object[] args) {
+    private static String getMessage(ErrorCode errorCode, String msgId, Object... arguments) {
         String msg = null;
         try {
-            msg = resources.getString(String.valueOf(errorCode));
+            msg = resources.getString(String.valueOf(errorCode.ordinal()));
             if (msgId != null) {
-                return msg += (" (" + MessageFormat.format(resources.getString(msgId), args) + ")");
+                return msg += (" (" + MessageFormat.format(resources.getString(msgId), arguments) + ")");
             }
         } catch (MissingResourceException e) {
             throw new RuntimeException("Undefined '" + msgId + "' resource property", e);

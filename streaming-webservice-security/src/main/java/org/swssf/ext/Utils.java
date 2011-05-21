@@ -103,14 +103,14 @@ public class Utils {
      */
     public static void doPasswordCallback(CallbackHandler callbackHandler, Callback callback) throws WSSecurityException {
         if (callbackHandler == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
         }
         try {
             callbackHandler.handle(new Callback[]{callback});
         } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
         } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
         }
     }
 
@@ -126,9 +126,9 @@ public class Utils {
             try {
                 callbackHandler.handle(new Callback[]{callback});
             } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             } catch (UnsupportedCallbackException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             }
         }
     }
@@ -157,12 +157,13 @@ public class Utils {
             sha.update(b4);
             return new String(Base64.encodeBase64(sha.digest()));
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e);
         } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static XMLEvent createXMLEventNS(XMLEvent xmlEvent, Deque<List<ComparableNamespace>> nsStack, Deque<List<ComparableAttribute>> attrStack) {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
@@ -176,6 +177,7 @@ public class Utils {
             ComparableNamespace curElementNamespace = new ComparableNamespace(startElementName.getPrefix(), startElementName.getNamespaceURI());
             comparableNamespaceList.add(curElementNamespace);
 
+            @SuppressWarnings("unchecked")
             Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
             while (namespaceIterator.hasNext()) {
                 Namespace namespace = namespaceIterator.next();
@@ -194,6 +196,7 @@ public class Utils {
 
             List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
 
+            @SuppressWarnings("unchecked")
             Iterator<Attribute> attributeIterator = startElement.getAttributes();
             while (attributeIterator.hasNext()) {
                 Attribute attribute = attributeIterator.next();
@@ -239,6 +242,7 @@ public class Utils {
         }
 
         String actor = null;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute next = attributeIterator.next();

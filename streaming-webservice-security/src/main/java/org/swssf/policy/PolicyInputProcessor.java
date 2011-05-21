@@ -65,7 +65,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             try {
                 policyEnforcer.doFinal();
             } catch (PolicyViolationException e) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
         }
 

@@ -39,7 +39,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
 
     private boolean attachments;
 
-    private ArrayList headers = new ArrayList();
+    private List<Header> headers = new ArrayList<Header>();
 
     private boolean signedParts;
 
@@ -79,7 +79,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
     /**
      * @return Returns the headers.
      */
-    public ArrayList getHeaders() {
+    public List<Header> getHeaders() {
         return this.headers;
     }
 

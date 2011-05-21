@@ -26,10 +26,7 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * class lent from apache rampart
@@ -49,7 +46,7 @@ public class SupportingToken extends AbstractSecurityAssertion implements
 
     private AlgorithmSuite algorithmSuite;
 
-    private ArrayList tokens = new ArrayList();
+    private List<Token> tokens = new ArrayList<Token>();
 
     private SignedEncryptedElements signedElements;
 
@@ -81,7 +78,7 @@ public class SupportingToken extends AbstractSecurityAssertion implements
     /**
      * @return Returns the token.
      */
-    public ArrayList getTokens() {
+    public List<Token> getTokens() {
         return tokens;
     }
 

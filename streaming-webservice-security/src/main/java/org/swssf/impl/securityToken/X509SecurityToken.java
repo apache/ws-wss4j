@@ -71,9 +71,9 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
                 getCrypto().verifyTrust(x509Certificates);
             }
         } catch (CertificateExpiredException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         } catch (CertificateNotYetValidException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }
 

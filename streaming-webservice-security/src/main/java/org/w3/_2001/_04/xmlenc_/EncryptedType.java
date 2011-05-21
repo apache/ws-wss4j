@@ -92,6 +92,7 @@ public abstract class EncryptedType implements Parseable {
     protected EncryptedType(StartElement startElement) {
         this.startElementName = startElement.getName();
 
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

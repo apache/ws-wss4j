@@ -48,7 +48,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             Constants.UsernameTokenPasswordType usernameTokenPasswordType = getSecurityProperties().getUsernameTokenPasswordType();
 
             if (password == null && usernameTokenPasswordType != null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
 
             byte[] nonceValue = new byte[16];
@@ -88,7 +88,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(getSecurityProperties(), getAction(), wsuId, nonceValue, password, created));
 
         } catch (DatatypeConfigurationException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } finally {
             outputProcessorChain.removeProcessor(this);
         }

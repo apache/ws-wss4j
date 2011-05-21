@@ -77,6 +77,7 @@ public class TimestampType implements Parseable {
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
     public TimestampType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

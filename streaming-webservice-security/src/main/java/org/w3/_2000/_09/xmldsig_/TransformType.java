@@ -65,6 +65,7 @@ public class TransformType implements Parseable {
     private Parseable currentParseable;
 
     public TransformType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

@@ -50,7 +50,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
             StartElement startElement = xmlEvent.asStartElement();
 
             if (level == 1 && soapMessageVersion == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "notASOAPMessage");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "notASOAPMessage");
             } else if (level == 1 && soapMessageVersion != null) {
                 //set correct namespace on secure parts
                 List<SecurePart> securePartList = securityProperties.getEncryptionSecureParts();

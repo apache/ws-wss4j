@@ -79,7 +79,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                 if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 1) {
                     if (subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace() == null) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE, "notASOAPMessage");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "notASOAPMessage");
                     }
                 } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                         && subInputProcessorChain.getDocumentContext().isInSOAPHeader()
@@ -138,9 +138,10 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 && xmlEvent.asStartElement().getName().getNamespaceURI().equals(subInputProcessorChain.getDocumentContext().getSOAPMessageVersionNamespace())
         ));
         //if we reach this state we didn't find a security header
-        throw new WSSecurityException(WSSecurityException.FAILURE, "missingSecurityHeader");
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityHeader");
     }
 
+    @SuppressWarnings("unchecked")
     private static void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain,
                                                     SecurityProperties securityProperties,
                                                     Deque eventQueue,

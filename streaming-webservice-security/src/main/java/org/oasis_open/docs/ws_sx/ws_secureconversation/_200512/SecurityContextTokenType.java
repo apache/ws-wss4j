@@ -75,6 +75,7 @@ public class SecurityContextTokenType implements Parseable {
     public SecurityContextTokenType(StartElement startElement) {
         super();
         this.startElement = startElement;
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

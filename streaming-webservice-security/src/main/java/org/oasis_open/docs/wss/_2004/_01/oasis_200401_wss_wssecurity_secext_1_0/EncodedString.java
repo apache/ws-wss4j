@@ -63,6 +63,7 @@ public class EncodedString
     public EncodedString(StartElement startElement) {
         super(startElement);
         this.startElementName = startElement.getName();
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

@@ -56,6 +56,7 @@ public class BinarySecurityTokenType
 
     public BinarySecurityTokenType(StartElement startElement) {
         super(startElement);
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

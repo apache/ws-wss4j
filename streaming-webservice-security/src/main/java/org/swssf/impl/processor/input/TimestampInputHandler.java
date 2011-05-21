@@ -42,8 +42,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
         Boolean alreadyProcessed = inputProcessorChain.getSecurityContext().<Boolean>get(Constants.TIMESTAMP_PROCESSED);
         if (Boolean.TRUE.equals(alreadyProcessed)) {
-            throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED, "invalidTimestamp",
-                    new Object[]{"Message contains two or more timestamps"});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
+                    "Message contains two or more timestamps");
         }
         inputProcessorChain.getSecurityContext().put(Constants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
@@ -74,20 +74,20 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
             if (exp != null && securityProperties.isStrictTimestampCheck() && exp.before(rightNow)) {
                 logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
-                throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED, "invalidTimestamp",
-                        new Object[]{"The security semantics of the message have expired"});
+                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
+                        "The security semantics of the message have expired");
             }
 
             if (crea != null && securityProperties.isStrictTimestampCheck() && crea.before(ttl)) {
                 logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
-                throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED, "invalidTimestamp",
-                        new Object[]{"The security semantics of the message have expired"});
+                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
+                        "The security semantics of the message have expired");
             }
 
             if (crea != null && crea.after(rightNow)) {
                 logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
-                throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED, "invalidTimestamp",
-                        new Object[]{"The security semantics of the message is invalid"});
+                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
+                        "The security semantics of the message is invalid");
             }
 
             TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
@@ -96,9 +96,9 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             inputProcessorChain.getSecurityContext().registerSecurityEvent(timestampSecurityEvent);
 
         } catch (DatatypeConfigurationException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (IllegalArgumentException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 

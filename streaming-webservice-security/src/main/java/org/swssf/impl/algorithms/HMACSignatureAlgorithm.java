@@ -51,7 +51,7 @@ public class HMACSignatureAlgorithm implements SignatureAlgorithm {
         try {
             mac.init(signingKey);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -59,7 +59,7 @@ public class HMACSignatureAlgorithm implements SignatureAlgorithm {
         try {
             mac.init(signingKey);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -67,9 +67,9 @@ public class HMACSignatureAlgorithm implements SignatureAlgorithm {
         try {
             mac.init(signingKey, algorithmParameterSpec);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         } catch (InvalidAlgorithmParameterException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -81,7 +81,7 @@ public class HMACSignatureAlgorithm implements SignatureAlgorithm {
         try {
             mac.init(verificationKey);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }
 

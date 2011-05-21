@@ -58,7 +58,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                 WSPasswordCallback passwordCallback = new WSPasswordCallback(securityContextTokenType.getIdentifier(), WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
                 Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, null);
                 if (passwordCallback.getKey() == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE, "noKey", new Object[]{securityContextTokenType.getId()});
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", securityContextTokenType.getId());
                 }
                 return new SecretKeySpec(passwordCallback.getKey(), algo);
             }

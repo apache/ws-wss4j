@@ -22,23 +22,23 @@ package org.swssf.ext;
  */
 public class WSSConfigurationException extends WSSecurityException {
 
-    public WSSConfigurationException(int errorCode, String msgId, Object[] args, Throwable exception) {
-        super(errorCode, msgId, args, exception);
+    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object[] args, Throwable exception) {
+        super(errorCode, msgId, exception, args);
     }
 
-    public WSSConfigurationException(int errorCode, String msgId, Throwable exception) {
+    public WSSConfigurationException(ErrorCode errorCode, String msgId, Throwable exception) {
         super(errorCode, msgId, exception);
     }
 
-    public WSSConfigurationException(int errorCode, String msgId, Object[] args) {
+    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object[] args) {
         super(errorCode, msgId, args);
     }
 
-    public WSSConfigurationException(int errorCode, String msgId) {
+    public WSSConfigurationException(ErrorCode errorCode, String msgId) {
         super(errorCode, msgId);
     }
 
-    public WSSConfigurationException(int errorCode) {
+    public WSSConfigurationException(ErrorCode errorCode) {
         super(errorCode);
     }
 

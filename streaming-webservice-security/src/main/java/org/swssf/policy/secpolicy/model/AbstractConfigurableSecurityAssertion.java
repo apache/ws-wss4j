@@ -25,11 +25,11 @@ import java.util.List;
  */
 public abstract class AbstractConfigurableSecurityAssertion extends AbstractSecurityAssertion {
 
-    protected ArrayList configurations = null;
+    protected List<Assertion> configurations = null;
 
     public void addConfiguration(Assertion assertion) {
         if (configurations == null) {
-            configurations = new ArrayList();
+            configurations = new ArrayList<Assertion>();
         }
         configurations.add(assertion);
     }
@@ -40,7 +40,7 @@ public abstract class AbstractConfigurableSecurityAssertion extends AbstractSecu
 
     public Assertion getDefaultAssertion() {
         if (configurations != null) {
-            return (Assertion) configurations.get(0);
+            return configurations.get(0);
         }
         return null;
     }

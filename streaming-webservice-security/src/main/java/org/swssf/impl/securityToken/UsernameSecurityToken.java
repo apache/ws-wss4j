@@ -120,7 +120,7 @@ public class UsernameSecurityToken implements SecurityToken {
         try {
             pwBytes = rawPassword.getBytes("UTF-8");
         } catch (final java.io.UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
 
         byte[] pwSalt = new byte[salt.length + pwBytes.length];
@@ -131,7 +131,7 @@ public class UsernameSecurityToken implements SecurityToken {
         try {
             sha = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSHA1availabe", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e);
         }
         sha.reset();
 
@@ -175,9 +175,9 @@ public class UsernameSecurityToken implements SecurityToken {
             key = P_hash(password, seed, mac, keylen);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noHMACSHA1available", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noHMACSHA1available", e);
         } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         return key;
     }
@@ -215,7 +215,7 @@ public class UsernameSecurityToken implements SecurityToken {
                 required -= toCopy;
             }
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         return out;
     }

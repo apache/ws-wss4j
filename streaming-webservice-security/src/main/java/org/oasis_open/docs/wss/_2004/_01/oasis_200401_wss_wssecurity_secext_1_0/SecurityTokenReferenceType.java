@@ -79,6 +79,7 @@ public class SecurityTokenReferenceType implements Parseable {
     }
 
     public SecurityTokenReferenceType(StartElement startElement) {
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

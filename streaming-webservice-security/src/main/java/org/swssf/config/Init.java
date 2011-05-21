@@ -59,7 +59,7 @@ public class Init {
                 TransformerAlgorithmMapper.init(configurationTypeJAXBElement.getValue().getTransformAlgorithms());
 
             } catch (Exception e) {
-                throw new WSSConfigurationException(WSSecurityException.FAILURE, null, e);
+                throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, null, e);
             }
             initialized = "security-config.xml";
         }

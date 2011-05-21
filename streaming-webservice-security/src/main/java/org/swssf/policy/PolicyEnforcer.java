@@ -92,6 +92,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     private void buildAssertionStateMap(PolicyComponent policyComponent, Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) throws WSSPolicyException {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
+            @SuppressWarnings("unchecked")
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
             for (int i = 0; i < policyComponents.size(); i++) {
                 PolicyComponent curPolicyComponent = policyComponents.get(i);
@@ -158,6 +159,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
             boolean isExactlyOne = policyOperator instanceof ExactlyOne;
+            @SuppressWarnings("unchecked")
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
 
             boolean isAsserted = false;

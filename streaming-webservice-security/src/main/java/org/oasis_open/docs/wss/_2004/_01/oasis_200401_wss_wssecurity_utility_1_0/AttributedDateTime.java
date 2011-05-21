@@ -66,6 +66,7 @@ public class AttributedDateTime implements Parseable {
 
     public AttributedDateTime(StartElement startElement) {
         this.startElementName = startElement.getName();
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();

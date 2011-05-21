@@ -55,7 +55,7 @@ public abstract class CanonicalizerBase implements Transformer {
 
     private OutputStream outputStream;
 
-    private Map cache = new HashMap();
+    private Map<String, byte[]> cache = new HashMap<String, byte[]>();
     private C14NStack<List<Comparable>> outputStack = new C14NStack<List<Comparable>>();
     private boolean includeComments = false;
     private DocumentLevel currentDocumentLevel = DocumentLevel.NODE_BEFORE_DOCUMENT_ELEMENT;
@@ -311,7 +311,7 @@ public abstract class CanonicalizerBase implements Transformer {
     }
 
     private static final void outputAttrToWriter(final String name, final String value, final OutputStream writer,
-                                                 final Map cache) throws IOException {
+                                                 final Map<String, byte[]> cache) throws IOException {
         writer.write(' ');
         UtfHelpper.writeByte(name, writer, cache);
         writer.write(EQUAL_STRING);

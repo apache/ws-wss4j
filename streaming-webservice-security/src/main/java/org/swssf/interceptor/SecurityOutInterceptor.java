@@ -72,7 +72,9 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
 
         XMLStreamWriter newXMLStreamWriter;
         try {
-            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".in"), securityEventListener);
+            @SuppressWarnings("unchecked")
+            final List<SecurityEvent> requestSecurityEvents = (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".in");
+            newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, requestSecurityEvents, securityEventListener);
             soapMessage.setContent(XMLStreamWriter.class, newXMLStreamWriter);
         } catch (WSSecurityException e) {
             throw new Fault(e);

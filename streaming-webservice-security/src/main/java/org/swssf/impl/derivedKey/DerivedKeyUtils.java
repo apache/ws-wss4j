@@ -49,9 +49,7 @@ public class DerivedKeyUtils {
             return algo.createKey(secret, seed, offset, length);
 
         } catch (Exception e) {
-            throw new WSSecurityException(
-                    WSSecurityException.FAILURE, null, null, e
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 }

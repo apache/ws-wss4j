@@ -63,7 +63,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     try {
                         algorithmURI = encryptedKeyType.getEncryptionMethod().getAlgorithm();
                         if (algorithmURI == null) {
-                            throw new WSSecurityException(WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
                         }
                         AlgorithmType asyncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
                         Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
@@ -83,22 +83,22 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
                     } catch (NoSuchPaddingException e) {
                         throw new WSSecurityException(
-                                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                                new Object[]{"No such padding: " + algorithmURI}, e
+                                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                e, "No such padding: " + algorithmURI
                         );
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(
-                                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                                new Object[]{"No such algorithm: " + algorithmURI}, e
+                                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                e, "No such algorithm: " + algorithmURI
                         );
                     } catch (BadPaddingException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
                     } catch (IllegalBlockSizeException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
                     } catch (InvalidKeyException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
                     } catch (NoSuchProviderException e) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE, "noSecProvider", e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
                     }
 
                     final String algorithm = algorithmURI;

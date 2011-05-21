@@ -324,8 +324,8 @@ public class SAMLAssertionWrapper {
 
         if (samlKeyInfo == null) {
             throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate or key"}
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
+                    "cannot get certificate or key"
             );
         }
 
@@ -343,8 +343,8 @@ public class SAMLAssertionWrapper {
             credential.setPublicKey(samlKeyInfo.getPublicKey());
         } else {
             throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate or key"}
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
+                    "cannot get certificate or key"
             );
         }
         SignatureValidator sigValidator = new SignatureValidator(credential);
@@ -418,14 +418,14 @@ public class SAMLAssertionWrapper {
                         } else if (x509obj instanceof X509IssuerSerial) {
                             if (securityProperties.getSignatureVerificationCrypto() == null) {
                                 throw new WSSecurityException(
-                                        WSSecurityException.FAILURE, "noSigCryptoFile"
+                                        WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile"
                                 );
                             }
                             certs = securityProperties.getSignatureVerificationCrypto().getCertificates(((X509IssuerSerial) x509obj).getIssuerName(), ((X509IssuerSerial) x509obj).getSerialNumber());
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
-                                        WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                                        new Object[]{"cannot get certificate or key"}
+                                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
+                                        "cannot get certificate or key"
                                 );
                             }
                             return new SAMLKeyInfo(certs);
@@ -435,8 +435,8 @@ public class SAMLAssertionWrapper {
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate or key"}, ex
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
+                    ex, "cannot get certificate or key"
             );
         }
         return null;
@@ -465,11 +465,11 @@ public class SAMLAssertionWrapper {
             }
 
             if (samlKeyInfo == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeyInSAMLToken");
             }
             // The assertion must have been signed for HOK
             if (!isSigned()) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
         return samlKeyInfo;
@@ -498,7 +498,7 @@ public class SAMLAssertionWrapper {
     protected void validate(X509Certificate[] certs, PublicKey publicKey, SecurityProperties securityProperties) throws WSSecurityException {
         Crypto crypto = securityProperties.getSignatureVerificationCrypto();
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
         }
 
         if (certs != null && certs.length > 0) {
@@ -519,7 +519,7 @@ public class SAMLAssertionWrapper {
                 return;
             }
         }
-        throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
     }
 
     /**
@@ -535,11 +535,11 @@ public class SAMLAssertionWrapper {
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
             );
         } catch (CertificateNotYetValidException e) {
             throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
             );
         }
     }
@@ -637,8 +637,8 @@ public class SAMLAssertionWrapper {
 
             if (samlSubject == null) {
                 throw new WSSecurityException(
-                        WSSecurityException.FAILURE, "invalidSAMLToken",
-                        new Object[]{"for Signature (no Subject)"}
+                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken",
+                        "for Signature (no Subject)"
                 );
             }
 
@@ -674,8 +674,8 @@ public class SAMLAssertionWrapper {
         org.opensaml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject == null) {
             throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLToken",
-                    new Object[]{"for Signature (no Subject)"}
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken",
+                    "for Signature (no Subject)"
             );
         }
         List<org.opensaml.saml2.core.SubjectConfirmation> subjectConfList =

@@ -53,15 +53,15 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             String tokenId = outputProcessorChain.getSecurityContext().get(Constants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY);
             if (tokenId == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
             SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
             final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
             if (wrappingSecurityToken == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
 
             final String wsuIdDKT = "DK-" + UUID.randomUUID().toString();
@@ -105,7 +105,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.Usage.SECRET_KEY);
                     Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, wsuIdDKT);
                     if (passwordCallback.getKey() == null) {
-                        throw new WSSecurityException(WSSecurityException.FAILURE, "noKey", new Object[]{wsuIdDKT});
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", wsuIdDKT);
                     }
                     secret = passwordCallback.getKey();
                 } else {

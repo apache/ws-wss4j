@@ -43,7 +43,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         final DerivedKeyTokenType derivedKeyTokenType = (DerivedKeyTokenType) parseStructure(eventQueue, index);
         if (derivedKeyTokenType.getSecurityTokenReference() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
         final SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
                 derivedKeyTokenType.getSecurityTokenReference(),
@@ -84,7 +84,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         secret = securityToken.getSecretKey(algorithmURI).getEncoded();
                     }
                 } else {
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "unsupportedKeyId");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId");
                 }
                 byte[] nonce = derivedKeyTokenType.getNonce();
                 if (nonce == null || nonce.length == 0) {

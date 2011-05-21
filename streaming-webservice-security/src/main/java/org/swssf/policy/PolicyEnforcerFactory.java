@@ -130,18 +130,21 @@ public class PolicyEnforcerFactory {
     private List<OperationPolicy> findPoliciesByOperation(Definition wsdlDefinition) throws WSSPolicyException {
 
         List<OperationPolicy> operationPolicyList = new ArrayList<OperationPolicy>();
-
+        @SuppressWarnings("unchecked")
         Iterator<Map.Entry> services = wsdlDefinition.getAllServices().entrySet().iterator();
         while (services.hasNext()) {
+            @SuppressWarnings("unchecked")
             Map.Entry<QName, Service> serviceEntry = services.next();
             Service service = serviceEntry.getValue();
-
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry> ports = service.getPorts().entrySet().iterator();
             while (ports.hasNext()) {
+                @SuppressWarnings("unchecked")
                 Map.Entry<QName, Port> portEntry = ports.next();
                 Port port = portEntry.getValue();
                 Binding binding = port.getBinding();
 
+                @SuppressWarnings("unchecked")
                 List<BindingOperation> bindingOperations = binding.getBindingOperations();
                 for (int i = 0; i < bindingOperations.size(); i++) {
                     BindingOperation bindingOperation = bindingOperations.get(i);
@@ -151,6 +154,7 @@ public class PolicyEnforcerFactory {
                     OperationPolicy operationPolicy = new OperationPolicy(operation.getName());
                     operationPolicyList.add(operationPolicy);
 
+                    @SuppressWarnings("unchecked")
                     List<ExtensibilityElement> extensibilityElements = bindingOperation.getExtensibilityElements();
                     for (int j = 0; j < extensibilityElements.size(); j++) {
                         ExtensibilityElement extensibilityElement = extensibilityElements.get(j);
@@ -228,6 +232,7 @@ public class PolicyEnforcerFactory {
             policies.add(portTypePolicy);
         }
 
+        @SuppressWarnings("unchecked")
         List<Operation> operations = portType.getOperations();
         for (int i = 0; i < operations.size(); i++) {
             Operation portTypeOperation = operations.get(i);
@@ -268,6 +273,7 @@ public class PolicyEnforcerFactory {
 
         List<Policy> policies = new ArrayList<Policy>();
 
+        @SuppressWarnings("unchecked")
         List<ExtensibilityElement> extensibilityElements = wsdlElement.getExtensibilityElements();
         for (int i = 0; i < extensibilityElements.size(); i++) {
             ExtensibilityElement extensibilityElement = extensibilityElements.get(i);

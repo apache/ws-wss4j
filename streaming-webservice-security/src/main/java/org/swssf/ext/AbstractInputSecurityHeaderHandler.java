@@ -44,11 +44,11 @@ public abstract class AbstractInputSecurityHeaderHandler {
         }
 
         if (!iterator.hasNext()) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "unexpectedEndOfXML");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unexpectedEndOfXML");
         }
         XMLEvent xmlEvent = iterator.next();
         if (!xmlEvent.isStartElement()) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "notAStartElement");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "notAStartElement");
         }
         Parseable parseable = getParseable(xmlEvent.asStartElement());
 
@@ -59,7 +59,7 @@ public abstract class AbstractInputSecurityHeaderHandler {
             }
             parseable.validate();
         } catch (ParseException e) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
         return parseable;
     }

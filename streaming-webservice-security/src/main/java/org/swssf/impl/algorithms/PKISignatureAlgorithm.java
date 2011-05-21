@@ -62,7 +62,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
         try {
             signature.initSign((PrivateKey) signingKey);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -70,7 +70,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
         try {
             signature.initSign((PrivateKey) signingKey, secureRandom);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -78,7 +78,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
         try {
             signature.initSign((PrivateKey) signingKey);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -86,7 +86,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
         try {
             return signature.sign();
         } catch (SignatureException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
 
@@ -94,7 +94,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
         try {
             signature.initVerify((PublicKey) verificationKey);
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }
 
@@ -102,7 +102,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
         try {
             return this.signature.verify(signature);
         } catch (SignatureException e) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }
 

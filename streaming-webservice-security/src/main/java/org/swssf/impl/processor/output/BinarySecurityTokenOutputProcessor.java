@@ -56,12 +56,12 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     Utils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
                     String password = pwCb.getPassword();
                     if (password == null) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noPassword", new Object[]{alias});
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
                     }
                     key = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password);
                     x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(getSecurityProperties().getSignatureUser());
                     if (x509Certificates == null || x509Certificates.length == 0) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_SIGNATURE, "noUserCertsFound", new Object[]{alias});
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
                     }
                     break;
                 case ENCRYPT:
@@ -77,7 +77,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     } else {
                         x509Certificates = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
                         if (x509Certificates == null || x509Certificates.length == 0) {
-                            throw new WSSecurityException(WSSecurityException.FAILED_ENCRYPTION, "noUserCertsFound", new Object[]{getSecurityProperties().getEncryptionUser()});
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound", getSecurityProperties().getEncryptionUser());
                         }
                     }
                     key = null;

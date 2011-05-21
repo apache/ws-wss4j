@@ -49,14 +49,14 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
                 //when no signature was sent, we expect an empty SignatureConfirmation in the response
                 if (signatureValueSecurityEventList == null || signatureValueSecurityEventList.size() == 0) {
                     if (signatureConfirmationTypeList == null || signatureConfirmationTypeList.size() != 1) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                     } else if (signatureConfirmationTypeList.get(0).getValue() != null) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                     }
                 }
 
                 if (signatureConfirmationTypeList == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                 }
 
                 for (int i = 0; i < signatureValueSecurityEventList.size(); i++) {
@@ -74,7 +74,7 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
                     }
 
                     if (!found) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                     }
                 }
             }

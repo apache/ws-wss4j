@@ -26,17 +26,14 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * class lent from apache rampart
  */
 public class RequiredParts extends AbstractSecurityAssertion {
 
-    private ArrayList headers = new ArrayList();
+    private List<Header> headers = new ArrayList<Header>();
 
     public RequiredParts(SPConstants spConstants) {
         setVersion(spConstants);
@@ -45,12 +42,12 @@ public class RequiredParts extends AbstractSecurityAssertion {
     /**
      * @return Returns the headers.
      */
-    public ArrayList getHeaders() {
+    public List<Header> getHeaders() {
         return this.headers;
     }
 
     /**
-     * @param headers The headers to set.
+     * @param header The headers to set.
      */
     public void addHeader(Header header) {
         this.headers.add(header);

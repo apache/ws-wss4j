@@ -85,6 +85,7 @@ public class UsernameTokenType implements Parseable {
 
     public UsernameTokenType(StartElement startElement) {
         this.startElementName = startElement.getName();
+        @SuppressWarnings("unchecked")
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
