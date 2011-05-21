@@ -61,10 +61,9 @@ public class SecurityTokenFactory {
 
             if (securityTokenReferenceType.getX509DataType() != null) {
                 return new X509DataSecurityToken(crypto, callbackHandler, securityTokenReferenceType.getX509DataType(), securityTokenReferenceType.getId(), processor);
-            } /*else if (securityToken instanceof X509IssuerSerialType) {
-                                X509IssuerSerialType x509IssuerSerialType = (X509IssuerSerialType) securityToken;
-                                //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
-                            }*/ else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
+            }
+            //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
+            else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
                 KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
 
                 String valueType = keyIdentifierType.getValueType();

@@ -15,6 +15,9 @@
 package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.jcs.JCS;
+import org.apache.jcs.access.exception.CacheException;
+import org.apache.jcs.engine.ElementAttributes;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
@@ -39,14 +42,19 @@ import java.util.GregorianCalendar;
  */
 public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public UsernameTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+    private static final String cacheRegionName = "usernameToken";
 
-        //todo:
-        /*
-        It is RECOMMENDED that used nonces be cached for a period at least as long as
-        the timestamp freshness limitation period, above, and that UsernameToken with
-        nonces that have already been used (and are thus in the cache) be rejected
-        */
+    private static JCS cache;
+
+    static {
+        try {
+            cache = JCS.getInstance(cacheRegionName);
+        } catch (CacheException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public UsernameTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final UsernameTokenType usernameTokenType = (UsernameTokenType) parseStructure(eventQueue, index);
 
@@ -70,9 +78,28 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             usernameTokenPasswordType = Constants.UsernameTokenPasswordType.getUsernameTokenPasswordType(usernameTokenType.getPasswordType());
         }
 
+        final String username = usernameTokenType.getUsername();
         if (usernameTokenPasswordType == Constants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
-            if (usernameTokenType.getNonce() == null || usernameTokenType.getCreated() == null) {
+            final String nonce = usernameTokenType.getNonce();
+            if (nonce == null || usernameTokenType.getCreated() == null) {
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN, "badTokenType01");
+            }
+
+            /*
+                It is RECOMMENDED that used nonces be cached for a period at least as long as
+                the timestamp freshness limitation period, above, and that UsernameToken with
+                nonces that have already been used (and are thus in the cache) be rejected
+            */
+            final String cacheKey = nonce;
+            if (cache.get(cacheKey) != null) {
+                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            }
+            ElementAttributes elementAttributes = new ElementAttributes();
+            elementAttributes.setMaxLifeSeconds(300);
+            try {
+                cache.put(cacheKey, usernameTokenType.getCreated(), elementAttributes);
+            } catch (CacheException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, null, e);
             }
 
             DatatypeFactory datatypeFactory = null;
@@ -92,7 +119,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
 
-            WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(),
+            WSPasswordCallback pwCb = new WSPasswordCallback(username,
                     null,
                     usernameTokenType.getPasswordType(),
                     WSPasswordCallback.Usage.USERNAME_TOKEN);
@@ -106,7 +133,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
             }
 
-            nonceVal = Base64.decodeBase64(usernameTokenType.getNonce());
+            nonceVal = Base64.decodeBase64(nonce);
 
             String passDigest = Utils.doPasswordDigest(nonceVal, usernameTokenType.getCreated(), pwCb.getPassword());
             if (!usernameTokenType.getPassword().equals(passDigest)) {
@@ -114,7 +141,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
             usernameTokenType.setPassword(pwCb.getPassword());
         } else {
-            WSPasswordCallback pwCb = new WSPasswordCallback(usernameTokenType.getUsername(),
+            WSPasswordCallback pwCb = new WSPasswordCallback(username,
                     usernameTokenType.getPassword(),
                     usernameTokenType.getPasswordType(),
                     WSPasswordCallback.Usage.USERNAME_TOKEN_UNKNOWN);
@@ -127,7 +154,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
-        usernameTokenSecurityEvent.setUsername(usernameTokenType.getUsername());
+        usernameTokenSecurityEvent.setUsername(username);
         usernameTokenSecurityEvent.setPassword(usernameTokenType.getPassword());
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
         usernameTokenSecurityEvent.setNonce(nonceVal);

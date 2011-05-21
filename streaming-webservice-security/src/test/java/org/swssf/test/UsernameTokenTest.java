@@ -244,6 +244,39 @@ public class UsernameTokenTest extends AbstractTestBase {
     }
 
     @Test
+    public void testReusedNonce() throws Exception {
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "    <env:Header>" +
+                "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
+                "           <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">" +
+                "               <wsse:Username>transmitter</wsse:Username>" +
+                "               <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">HJuU+E+LKyZyC7k1BX7GF7kyACY=</wsse:Password>" +
+                "               <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">Ex2YESUvsa1qne1m6TM8XA==</wsse:Nonce>" +
+                "               <wsu:Created>2011-05-21T17:14:42.545Z</wsu:Created>" +
+                "           </wsse:UsernameToken>" +
+                "       </wsse:Security>\n" +
+                "    </env:Header>\n" +
+                "    <env:Body>\n" +
+                "    </env:Body>\n" +
+                "</env:Envelope>";
+
+        SecurityProperties securityProperties = new SecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
+        StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+        try {
+            xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getMessage(), "org.swssf.ext.WSSecurityException: The security token could not be authenticated or authorized");
+        }
+    }
+
+    @Test
     public void testDefaultConfigurationOutbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
