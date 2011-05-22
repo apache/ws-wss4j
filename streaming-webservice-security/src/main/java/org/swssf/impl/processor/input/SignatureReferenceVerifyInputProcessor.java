@@ -15,6 +15,9 @@
 package org.swssf.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.jcs.JCS;
+import org.apache.jcs.access.exception.CacheException;
+import org.apache.jcs.engine.ElementAttributes;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.TransformationParametersType;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
@@ -22,6 +25,7 @@ import org.swssf.impl.securityToken.SecurityTokenReference;
 import org.swssf.impl.util.DigestOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SignedElementSecurityEvent;
+import org.swssf.securityEvent.TimestampSecurityEvent;
 import org.w3._2000._09.xmldsig_.CanonicalizationMethodType;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
@@ -41,6 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -50,7 +55,20 @@ import java.util.List;
  */
 public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcessor {
 
+    private static final String cacheRegionName = "timestamp";
+
+    private static JCS cache;
+
+    static {
+        try {
+            cache = JCS.getInstance(cacheRegionName);
+        } catch (CacheException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private SignatureType signatureType;
+    private boolean replayChecked = false;
 
     public SignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityProperties securityProperties) {
         super(securityProperties);
@@ -66,6 +84,32 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
 
     @Override
     public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
+
+        //this is the earliest possible point to check for an replay attack
+        if (!replayChecked) {
+            replayChecked = true;
+
+            TimestampSecurityEvent timestampSecurityEvent = inputProcessorChain.getSecurityContext().get(Constants.PROP_TIMESTAMP_SECURITYEVENT);
+            if (timestampSecurityEvent != null) {
+                final String cacheKey = String.valueOf(timestampSecurityEvent.getCreated().getTimeInMillis()) + new String(signatureType.getSignatureValue().getValue());
+                if (cache.get(cacheKey) != null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+                }
+                ElementAttributes elementAttributes = new ElementAttributes();
+                if (timestampSecurityEvent.getExpires() != null) {
+                    long lifeTime = timestampSecurityEvent.getExpires().getTime().getTime() - new Date().getTime();
+                    elementAttributes.setMaxLifeSeconds(lifeTime / 1000);
+                } else {
+                    elementAttributes.setMaxLifeSeconds(300);
+                }
+                try {
+                    cache.put(cacheKey, timestampSecurityEvent.getCreated(), elementAttributes);
+                } catch (CacheException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                }
+            }
+        }
+
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
 
         if (xmlEvent.isStartElement()) {

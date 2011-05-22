@@ -94,6 +94,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             timestampSecurityEvent.setCreated(crea);
             timestampSecurityEvent.setExpires(exp);
             inputProcessorChain.getSecurityContext().registerSecurityEvent(timestampSecurityEvent);
+            inputProcessorChain.getSecurityContext().put(Constants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
 
         } catch (DatatypeConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
