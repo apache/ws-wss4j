@@ -54,7 +54,7 @@ public class WSSec {
      * @throws org.swssf.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
-    public static OutboundWSSec getOutboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, WSSConfigurationException {
+    public static OutboundWSSec getOutboundWSSec(SecurityProperties securityProperties) throws WSSecurityException {
         if (securityProperties == null) {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
@@ -75,7 +75,7 @@ public class WSSec {
      * @throws org.swssf.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
-    public static InboundWSSec getInboundWSSec(SecurityProperties securityProperties) throws WSSecurityException, WSSConfigurationException {
+    public static InboundWSSec getInboundWSSec(SecurityProperties securityProperties) throws WSSecurityException {
         if (securityProperties == null) {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
         }

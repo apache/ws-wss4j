@@ -48,7 +48,7 @@ public class ConversationException extends Exception {
         }
     }
 
-    public ConversationException(String faultCode, Object[] args) {
+    public ConversationException(String faultCode, Object... args) {
         super(getMessage(faultCode, args));
         this.faultCode = getFaultCode(faultCode);
         this.faultString = getMessage(faultCode, args);
@@ -57,7 +57,6 @@ public class ConversationException extends Exception {
     /**
      * Construct the fault properly code for the standard faults
      *
-     * @param faultCode2
      * @return
      */
     private String getFaultCode(String code) {
@@ -76,14 +75,14 @@ public class ConversationException extends Exception {
         this(faultCode, (Object[]) null);
     }
 
-    public ConversationException(String faultCode, Object[] args, Throwable e) {
-        super(getMessage(faultCode, args), e);
+    public ConversationException(String faultCode, Throwable e, Object... arguments) {
+        super(getMessage(faultCode, arguments), e);
         this.faultCode = faultCode;
-        this.faultString = getMessage(faultCode, args);
+        this.faultString = getMessage(faultCode, arguments);
     }
 
     public ConversationException(String faultCode, Throwable e) {
-        this(faultCode, null, e);
+        this(faultCode, e, null);
     }
 
     /**
@@ -92,7 +91,7 @@ public class ConversationException extends Exception {
      *
      * @return the message translated from the property (message) file.
      */
-    protected static String getMessage(String faultCode, Object[] args) {
+    protected static String getMessage(String faultCode, Object... args) {
         String msg = null;
         try {
             msg = MessageFormat.format(resources.getString(faultCode), args);

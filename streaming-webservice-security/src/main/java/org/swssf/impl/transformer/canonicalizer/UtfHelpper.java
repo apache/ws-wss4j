@@ -22,8 +22,8 @@ import java.util.Map;
 
 public class UtfHelpper {
 
-    final static void writeByte(final String str, final OutputStream out, Map<String, byte[]> cache) throws IOException {
-        byte[] result = (byte[]) cache.get(str);
+    static void writeByte(final String str, final OutputStream out, Map<String, byte[]> cache) throws IOException {
+        byte[] result = cache.get(str);
         if (result == null) {
             result = getStringInUtf8(str);
             cache.put(str, result);
@@ -33,7 +33,7 @@ public class UtfHelpper {
 
     }
 
-    final static void writeCharToUtf8(final char c, final OutputStream out) throws IOException {
+    static void writeCharToUtf8(final char c, final OutputStream out) throws IOException {
         if (c < 0x80) {
             out.write(c);
             return;
@@ -68,7 +68,7 @@ public class UtfHelpper {
 
     }
 
-    final static void writeStringToUtf8(final String str, final OutputStream out) throws IOException {
+    static void writeStringToUtf8(final String str, final OutputStream out) throws IOException {
         final int length = str.length();
         int i = 0;
         char c;
@@ -109,7 +109,7 @@ public class UtfHelpper {
         }
     }
 
-    public final static byte[] getStringInUtf8(final String str) {
+    public static byte[] getStringInUtf8(final String str) {
         final int length = str.length();
         boolean expanded = false;
         byte[] result = new byte[length];

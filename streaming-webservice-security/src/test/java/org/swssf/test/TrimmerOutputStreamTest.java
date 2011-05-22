@@ -48,7 +48,7 @@ public class TrimmerOutputStreamTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         TrimmerOutputStream trimmerOutputStream = new TrimmerOutputStream(baos, 32, 3, 4);
 
-        StringBuffer stringBuffer = new StringBuffer("<a>");
+        StringBuilder stringBuffer = new StringBuilder("<a>");
         for (int i = 0; i < 100; i++) {
             stringBuffer.append(testString);
         }

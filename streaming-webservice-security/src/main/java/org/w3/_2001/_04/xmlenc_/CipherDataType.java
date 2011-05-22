@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Arrays;
 
 
 /**
@@ -154,7 +155,7 @@ public class CipherDataType implements Parseable {
      *              byte[]
      */
     public void setCipherValue(byte[] value) {
-        this.cipherValue.append(value);
+        this.cipherValue.append(Arrays.toString(value));
     }
 
     /**

@@ -14,6 +14,7 @@
  */
 package org.swssf.ext;
 
+import com.sun.istack.Nullable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.impl.DocumentContextImpl;
@@ -90,7 +91,7 @@ public class InboundWSSec {
      * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, @Nullable SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);

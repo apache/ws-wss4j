@@ -55,8 +55,7 @@ public class ComparableNamespace implements Namespace, Comparable<ComparableName
     public int compareTo(ComparableNamespace o) {
         //An element's namespace nodes are sorted lexicographically by local name
         //(the default namespace node, if one exists, has no local name and is therefore lexicographically least).
-        int prefixCompare = this.getPrefix().compareTo(o.getPrefix());
-        return prefixCompare;
+        return this.getPrefix().compareTo(o.getPrefix());
     }
 
     @Override

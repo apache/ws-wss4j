@@ -14,6 +14,7 @@
  */
 package org.swssf.ext;
 
+import com.sun.istack.Nullable;
 import org.swssf.impl.DocumentContextImpl;
 import org.swssf.impl.OutputProcessorChainImpl;
 import org.swssf.impl.XMLSecurityStreamWriter;
@@ -60,7 +61,7 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents, @Nullable SecurityEventListener securityEventListener) throws WSSecurityException {
 
         final SecurityContextImpl securityContextImpl = new SecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);

@@ -72,7 +72,7 @@ public class RFC2253Parser {
 
         try {
             String _DN = semicolonToComma(dn);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             int i = 0;
             int l = 0;
             int k;
@@ -82,7 +82,7 @@ public class RFC2253Parser {
                 l += countQuotes(_DN, j, k);
 
                 if ((k > 0) && (_DN.charAt(k - 1) != '\\') && (l % 2) != 1) {
-                    sb.append(parseRDN(_DN.substring(i, k).trim(), toXML) + ",");
+                    sb.append(parseRDN(_DN.substring(i, k).trim(), toXML)).append(",");
 
                     i = k + 1;
                     l = 0;
@@ -106,7 +106,7 @@ public class RFC2253Parser {
      */
     static String parseRDN(String str, boolean toXML) throws IOException {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
         int l = 0;
         int k;
@@ -115,7 +115,7 @@ public class RFC2253Parser {
             l += countQuotes(str, j, k);
 
             if ((k > 0) && (str.charAt(k - 1) != '\\') && (l % 2) != 1) {
-                sb.append(parseATAV(trim(str.substring(i, k)), toXML) + "+");
+                sb.append(parseATAV(trim(str.substring(i, k)), toXML)).append("+");
 
                 i = k + 1;
                 l = 0;
@@ -183,7 +183,7 @@ public class RFC2253Parser {
         String value = trim(str);
 
         if (value.startsWith("\"")) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             StringReader sr = new StringReader(value.substring(1,
                     value.length() - 1));
             int i = 0;
@@ -260,7 +260,7 @@ public class RFC2253Parser {
      */
     static String changeLess32toRFC(String string) throws IOException {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringReader sr = new StringReader(string);
         int i = 0;
         char c;
@@ -303,7 +303,7 @@ public class RFC2253Parser {
      */
     static String changeLess32toXML(String string) throws IOException {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringReader sr = new StringReader(string);
         int i = 0;
 
@@ -328,7 +328,7 @@ public class RFC2253Parser {
      */
     static String changeWStoXML(String string) throws IOException {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringReader sr = new StringReader(string);
         int i = 0;
         char c;
@@ -365,12 +365,12 @@ public class RFC2253Parser {
      */
     static String changeWStoRFC(String string) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
         int k;
 
         for (int j = 0; (k = string.indexOf("\\20", j)) >= 0; j = k + 3) {
-            sb.append(trim(string.substring(i, k)) + "\\ ");
+            sb.append(trim(string.substring(i, k))).append("\\ ");
 
             i = k + 3;
         }
@@ -411,7 +411,7 @@ public class RFC2253Parser {
      */
     static String removeWSandReplace(String str, String symbol, String replace) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
         int l = 0;
         int k;
@@ -420,7 +420,7 @@ public class RFC2253Parser {
             l += countQuotes(str, j, k);
 
             if ((k > 0) && (str.charAt(k - 1) != '\\') && (l % 2) != 1) {
-                sb.append(trim(str.substring(i, k)) + replace);
+                sb.append(trim(str.substring(i, k))).append(replace);
 
                 i = k + 1;
                 l = 0;

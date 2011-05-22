@@ -214,7 +214,7 @@ public class ReferenceType implements Parseable {
      *              byte[]
      */
     public void setDigestValue(byte[] value) {
-        this.digestValue = ((byte[]) value);
+        this.digestValue = value;
     }
 
     /**

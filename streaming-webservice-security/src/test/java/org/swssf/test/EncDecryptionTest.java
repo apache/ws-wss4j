@@ -161,8 +161,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 25);
 
             for (int i = 0; i < nodeList.getLength(); i++) {
-                Assert.assertEquals(((Element) nodeList.item(i).getParentNode()).getLocalName(), "complexType");
-                Assert.assertEquals(((Element) nodeList.item(i).getParentNode()).getNamespaceURI(), "http://www.w3.org/1999/XMLSchema");
+                Assert.assertEquals(nodeList.item(i).getParentNode().getLocalName(), "complexType");
+                Assert.assertEquals(nodeList.item(i).getParentNode().getNamespaceURI(), "http://www.w3.org/1999/XMLSchema");
                 NodeList childNodes = nodeList.item(i).getParentNode().getChildNodes();
                 for (int j = 0; j < childNodes.getLength(); j++) {
                     Node child = childNodes.item(j);
@@ -399,7 +399,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
 
-            Assert.assertEquals(((Element) nodeList.item(0).getParentNode()).getLocalName(), "Body");
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), "Body");
             NodeList childNodes = nodeList.item(0).getParentNode().getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);

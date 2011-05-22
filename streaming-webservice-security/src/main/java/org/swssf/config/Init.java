@@ -14,6 +14,7 @@
  */
 package org.swssf.config;
 
+import com.sun.istack.Nullable;
 import org.swssf.ext.WSSConfigurationException;
 import org.swssf.ext.WSSecurityException;
 import org.xmlsecurity.ns.configuration.ConfigurationType;
@@ -38,7 +39,7 @@ public class Init {
     private static String initialized = null;
 
     @SuppressWarnings("unchecked")
-    public synchronized static void init(URL url) throws WSSecurityException {
+    public synchronized static void init(@Nullable URL url) throws WSSecurityException {
         if (initialized == null || (url != null && !url.toExternalForm().equals(initialized))) {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance("org.xmlsecurity.ns.configuration");

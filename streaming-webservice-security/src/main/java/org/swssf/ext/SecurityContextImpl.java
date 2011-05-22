@@ -14,6 +14,7 @@
  */
 package org.swssf.ext;
 
+import com.sun.istack.Nullable;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
 
@@ -88,7 +89,7 @@ public class SecurityContextImpl implements SecurityContext {
         return secretTokenProviders.get(id);
     }
 
-    public void setSecurityEventListener(SecurityEventListener securityEventListener) {
+    public void setSecurityEventListener(@Nullable SecurityEventListener securityEventListener) {
         this.securityEventListener = securityEventListener;
     }
 

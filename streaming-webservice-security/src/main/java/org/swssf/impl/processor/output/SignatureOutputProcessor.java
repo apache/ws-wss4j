@@ -124,7 +124,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
         if (securePart != null) {
             return securePart;
         }
-        List<SecurePart> secureParts = outputProcessorChain.getSecurityContext().<SecurePart>getAsList(SecurePart.class);
+        List<SecurePart> secureParts = outputProcessorChain.getSecurityContext().getAsList(SecurePart.class);
         if (secureParts == null) {
             return null;
         }
@@ -189,7 +189,7 @@ public class SignatureOutputProcessor extends AbstractOutputProcessor {
                     Transformer transformer = Utils.getTransformer("#default", this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
                     this.transformer = Utils.getTransformer(transformer, null, signaturePartDef.getTransformAlgo());
                 } else {
-                    transformer = Utils.getTransformer((String) null, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
+                    transformer = Utils.getTransformer(null, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
                 }
             } catch (NoSuchMethodException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);

@@ -22,6 +22,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Arrays;
 import java.util.Iterator;
 
 
@@ -121,7 +122,7 @@ public class SignatureValueType implements Parseable {
      *              byte[]
      */
     public void setValue(byte[] value) {
-        this.value.append(value);
+        this.value.append(Arrays.toString(value));
     }
 
     /**

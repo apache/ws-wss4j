@@ -252,15 +252,9 @@ public class Utils {
         }
 
         if (responsibleActor == null) {
-            if (actor == null) {
-                return true;
-            }
-            return false;
+            return actor == null;
         } else {
-            if (responsibleActor.equals(actor)) {
-                return true;
-            }
-            return false;
+            return responsibleActor.equals(actor);
         }
     }
 

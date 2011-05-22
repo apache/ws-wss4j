@@ -380,7 +380,7 @@ public class TimestampTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE && ((Element) node).getLocalName().equals("Created")) {
+                if (node.getNodeType() == Node.ELEMENT_NODE && node.getLocalName().equals("Created")) {
                     node.getParentNode().removeChild(node);
                 }
             }
@@ -424,7 +424,7 @@ public class TimestampTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), Constants.TAG_wsse_Security.getLocalPart());
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE && ((Element) node).getLocalName().equals("Expires")) {
+                if (node.getNodeType() == Node.ELEMENT_NODE && node.getLocalName().equals("Expires")) {
                     node.getParentNode().removeChild(node);
                 }
             }
@@ -465,7 +465,7 @@ public class TimestampTest extends AbstractTestBase {
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE
-                        && (((Element) node).getLocalName().equals("Created")) || ((Element) node).getLocalName().equals("Expires")) {
+                        && (node.getLocalName().equals("Created")) || node.getLocalName().equals("Expires")) {
                     nodesToRemove.add(node);
                 }
             }

@@ -61,7 +61,7 @@ public class RFC2253ParserTest {
 
     @Test
     public void testToXML8() throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append('L');
         sb.append('u');
         sb.append('\uc48d');
@@ -107,7 +107,7 @@ public class RFC2253ParserTest {
 
     @Test
     public void testToRFC8() throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append('L');
         sb.append('u');
         sb.append('\uc48d');

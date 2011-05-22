@@ -208,7 +208,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 
             try {
-                transformer = Utils.getTransformer((String) null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+                transformer = Utils.getTransformer(null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InstantiationException e) {

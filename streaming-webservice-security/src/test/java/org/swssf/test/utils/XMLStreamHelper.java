@@ -138,7 +138,7 @@ public class XMLStreamHelper implements XMLStreamConstants {
         int count = in.getNamespaceCount();
         for (int i = 0; i < count; i++) {
             String aPrefix = in.getNamespacePrefix(i);
-            if (prefix == aPrefix || (prefix != null && prefix.equals(aPrefix))) {
+            if (prefix.equals(aPrefix) || (prefix != null && prefix.equals(aPrefix))) {
                 continue;
             }
             String uri = in.getNamespaceURI(i);
@@ -225,8 +225,7 @@ public class XMLStreamHelper implements XMLStreamConstants {
             return false;
         }
         String mappedUri = context.getPrefix(prefix);
-        boolean map = (mappedUri == null || !mappedUri.equals(uri));
-        return map;
+        return (mappedUri == null || !mappedUri.equals(uri));
     }
 
     static class QNameHelper {

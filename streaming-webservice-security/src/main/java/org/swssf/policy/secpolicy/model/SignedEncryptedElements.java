@@ -124,8 +124,8 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
             Iterator<String> namespaces = declaredNamespaces.keySet().iterator();
 
             while (namespaces.hasNext()) {
-                prefix = (String) namespaces.next();
-                namespaceURI = (String) declaredNamespaces.get(prefix);
+                prefix = namespaces.next();
+                namespaceURI = declaredNamespaces.get(prefix);
                 writer.writeNamespace(prefix, namespaceURI);
             }
 
@@ -171,7 +171,7 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     private List<QName> getQNamesFromXPath() {
         List<QName> qNames = new ArrayList<QName>(xPathExpressions.size());
         for (int i = 0; i < xPathExpressions.size(); i++) {
-            String s = (String) xPathExpressions.get(i);
+            String s = xPathExpressions.get(i);
             String prefix;
             String localName;
             if (s.contains(":")) {
@@ -182,7 +182,7 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
                 prefix = "";
                 localName = s;
             }
-            qNames.add(new QName((String) declaredNamespaces.get(prefix), localName));
+            qNames.add(new QName(declaredNamespaces.get(prefix), localName));
         }
         return qNames;
     }

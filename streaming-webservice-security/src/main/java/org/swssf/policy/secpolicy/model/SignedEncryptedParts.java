@@ -189,7 +189,7 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
     private List<QName> getQNamesFromHeaders() {
         List<QName> qNames = new ArrayList<QName>(headers.size());
         for (int i = 0; i < headers.size(); i++) {
-            Header header = (Header) headers.get(i);
+            Header header = headers.get(i);
             String localName = header.getName();
             if (localName == null) {
                 localName = "*";

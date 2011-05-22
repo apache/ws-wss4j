@@ -115,7 +115,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
         if (xmlEvent.getEventType() != START_ELEMENT) {
             throw new XMLStreamException("Not positioned on a start element");
         }
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
 
         /**
          * Need to loop to get rid of PIs, comments

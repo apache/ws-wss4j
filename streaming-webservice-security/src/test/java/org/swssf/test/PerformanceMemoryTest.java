@@ -292,9 +292,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         long totalMemory = Runtime.getRuntime().totalMemory();
         gc();
         long freeMemory = Runtime.getRuntime().freeMemory();
-        long usedMemory = totalMemory - freeMemory;
-        return usedMemory;
-
+        return totalMemory - freeMemory;
     }
 
     @Test(groups = "dom")

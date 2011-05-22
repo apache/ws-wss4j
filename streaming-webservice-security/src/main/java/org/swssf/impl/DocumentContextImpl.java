@@ -28,7 +28,7 @@ import java.util.List;
  * @author $Author: giger $
  * @version $Revision: 281 $ $Date: 2011-01-04 21:15:27 +0100 (Tue, 04 Jan 2011) $
  */
-public class DocumentContextImpl implements DocumentContext {
+public class DocumentContextImpl implements DocumentContext, Cloneable {
 
     private static final QName nullElement = new QName("", "");
     private List<QName> path = new ArrayList<QName>(10);
@@ -138,7 +138,8 @@ public class DocumentContextImpl implements DocumentContext {
     }
 
     @Override
-    protected DocumentContextImpl clone() {
+    protected DocumentContextImpl clone() throws CloneNotSupportedException {
+        super.clone();
         DocumentContextImpl documentContext = new DocumentContextImpl();
         List<QName> subPath = new ArrayList<QName>();
         subPath.addAll(this.path);

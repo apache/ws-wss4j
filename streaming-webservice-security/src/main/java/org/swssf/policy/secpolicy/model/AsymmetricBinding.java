@@ -186,7 +186,7 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
             // </sp:IncludeTimestamp>
         }
 
-        if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(getProtectionOrder())) {
+        if (SPConstants.ProtectionOrder.EncryptBeforeSigning.equals(getProtectionOrder())) {
             // <sp:EncryptBeforeSign />
             writer.writeStartElement(prefix, SPConstants.ENCRYPT_BEFORE_SIGNING,
                     namespaceURI);

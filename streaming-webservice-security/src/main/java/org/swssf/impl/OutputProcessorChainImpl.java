@@ -225,8 +225,13 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, WSSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
-        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContext, documentContext.clone(),
-                outputProcessors.indexOf(outputProcessor) + 1);
+        OutputProcessorChainImpl outputProcessorChain = null;
+        try {
+            outputProcessorChain = new OutputProcessorChainImpl(securityContext, documentContext.clone(),
+                    outputProcessors.indexOf(outputProcessor) + 1);
+        } catch (CloneNotSupportedException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
         outputProcessorChain.setOutputProcessors(this.outputProcessors);
         outputProcessorChain.setNsStack(getNsStack());
         outputProcessorChain.setAttrStack(getAttrStack());

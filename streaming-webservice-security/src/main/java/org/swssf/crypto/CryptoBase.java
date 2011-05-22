@@ -264,7 +264,7 @@ public abstract class CryptoBase implements Crypto {
 
     protected static String createKeyStoreErrorMessage(KeyStore keystore) throws KeyStoreException {
         Enumeration<String> aliases = keystore.aliases();
-        StringBuffer sb = new StringBuffer(keystore.size() * 7);
+        StringBuilder sb = new StringBuilder(keystore.size() * 7);
         boolean firstAlias = true;
         while (aliases.hasMoreElements()) {
             if (!firstAlias) {
@@ -273,11 +273,10 @@ public abstract class CryptoBase implements Crypto {
             sb.append(aliases.nextElement());
             firstAlias = false;
         }
-        String msg = " in keystore of type [" + keystore.getType()
+        return " in keystore of type [" + keystore.getType()
                 + "] from provider [" + keystore.getProvider()
                 + "] with size [" + keystore.size() + "] and aliases: {"
                 + sb.toString() + "}";
-        return msg;
     }
 
     private Object createBCX509Name(String s) {

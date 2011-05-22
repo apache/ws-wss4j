@@ -23,7 +23,6 @@ import org.swssf.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -61,7 +60,7 @@ public class OutputChainTest extends AbstractTestBase {
         nodeList = document.getElementsByTagNameNS(Constants.TAG_xenc_EncryptedData.getNamespaceURI(), Constants.TAG_xenc_EncryptedData.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 1);
 
-        Assert.assertEquals(((Element) nodeList.item(0).getParentNode()).getLocalName(), "Body");
+        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), "Body");
         NodeList childNodes = nodeList.item(0).getParentNode().getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node child = childNodes.item(i);

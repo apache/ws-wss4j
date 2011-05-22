@@ -59,6 +59,7 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
     /**
      * @return Returns the protectionOrder.
      */
+
     public SPConstants.ProtectionOrder getProtectionOrder() {
         return protectionOrder;
     }
@@ -67,12 +68,9 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
      * @param protectionOrder The protectionOrder to set.
      */
     public void setProtectionOrder(SPConstants.ProtectionOrder protectionOrder) {
-        if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(protectionOrder) ||
-                SPConstants.SIGN_BEFORE_ENCRYPTING.equals(protectionOrder)) {
+        if (SPConstants.ProtectionOrder.EncryptBeforeSigning.equals(protectionOrder) ||
+                SPConstants.ProtectionOrder.SignBeforeEncrypting.equals(protectionOrder)) {
             this.protectionOrder = protectionOrder;
-        } else {
-//            throw new WSSPolicyException("Incorrect protection order value : "
-//                    + protectionOrder);
         }
     }
 

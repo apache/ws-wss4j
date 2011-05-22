@@ -198,8 +198,13 @@ public class InputProcessorChainImpl implements InputProcessorChain {
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, WSSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
-        InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(),
-                inputProcessors.indexOf(inputProcessor) + 1);
+        InputProcessorChainImpl inputProcessorChain = null;
+        try {
+            inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(),
+                    inputProcessors.indexOf(inputProcessor) + 1);
+        } catch (CloneNotSupportedException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
         inputProcessorChain.setInputProcessors(new ArrayList<InputProcessor>(this.inputProcessors));
         return inputProcessorChain;
     }

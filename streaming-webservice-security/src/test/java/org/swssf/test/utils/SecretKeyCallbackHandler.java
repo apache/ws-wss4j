@@ -47,7 +47,7 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
                 switch (pc.getUsage()) {
                     case WSPasswordCallback.SECRET_KEY:
                     case WSPasswordCallback.SECURITY_CONTEXT_TOKEN: {
-                        byte[] secret = (byte[]) this.secrets.get(pc.getIdentifier());
+                        byte[] secret = this.secrets.get(pc.getIdentifier());
                         if (secret == null) {
                             secret = outboundSecret;
                         }

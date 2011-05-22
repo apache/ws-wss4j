@@ -43,8 +43,6 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         AUTHN, ATTR, AUTHZ
     }
 
-    ;
-
     protected String subjectName = null;
     protected String subjectQualifier = null;
     protected String confirmationMethod = null;

@@ -81,7 +81,7 @@ public class Canonicalizer20010315Test {
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_1_c14nized.xml"));
         boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
 
-        if (equals == false) {
+        if (!equals) {
             System.out.println("Expected:\n" + new String(reference, "UTF-8"));
             System.out.println("");
             System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
@@ -119,7 +119,7 @@ public class Canonicalizer20010315Test {
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_2_c14nized.xml"));
         boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
 
-        if (equals == false) {
+        if (!equals) {
             System.out.println("Expected:\n" + new String(reference, "UTF-8"));
             System.out.println("");
             System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));

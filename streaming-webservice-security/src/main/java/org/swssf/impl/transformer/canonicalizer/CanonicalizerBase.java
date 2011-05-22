@@ -310,8 +310,8 @@ public abstract class CanonicalizerBase implements Transformer {
         }
     }
 
-    private static final void outputAttrToWriter(final String name, final String value, final OutputStream writer,
-                                                 final Map<String, byte[]> cache) throws IOException {
+    protected static void outputAttrToWriter(final String name, final String value, final OutputStream writer,
+                                             final Map<String, byte[]> cache) throws IOException {
         writer.write(' ');
         UtfHelpper.writeByte(name, writer, cache);
         writer.write(EQUAL_STRING);
@@ -368,7 +368,7 @@ public abstract class CanonicalizerBase implements Transformer {
      * @param writer writer where to write the things
      * @throws IOException
      */
-    static final void outputTextToWriter(final String text, final OutputStream writer) throws IOException {
+    protected static void outputTextToWriter(final String text, final OutputStream writer) throws IOException {
         final int length = text.length();
         byte[] toWrite;
         for (int i = 0; i < length; i++) {
@@ -411,7 +411,7 @@ public abstract class CanonicalizerBase implements Transformer {
      * @param writer    where to write the things
      * @throws IOException
      */
-    static final void outputPItoWriter(ProcessingInstruction currentPI, OutputStream writer, DocumentLevel position) throws IOException {
+    protected static void outputPItoWriter(ProcessingInstruction currentPI, OutputStream writer, DocumentLevel position) throws IOException {
         if (position == DocumentLevel.NODE_AFTER_DOCUMENT_ELEMENT) {
             writer.write(NEWLINE);
         }
@@ -463,7 +463,7 @@ public abstract class CanonicalizerBase implements Transformer {
      * @param writer         writer where to write the things
      * @throws IOException
      */
-    static final void outputCommentToWriter(Comment currentComment, OutputStream writer, DocumentLevel position) throws IOException {
+    protected static void outputCommentToWriter(Comment currentComment, OutputStream writer, DocumentLevel position) throws IOException {
         if (position == DocumentLevel.NODE_AFTER_DOCUMENT_ELEMENT) {
             writer.write(NEWLINE);
         }

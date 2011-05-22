@@ -37,8 +37,6 @@ public abstract class SPConstants {
         SP_V13,
     }
 
-    ;
-
     public enum Layout {
         Lax,
         Strict,
@@ -46,14 +44,10 @@ public abstract class SPConstants {
         LaxTimestampLast
     }
 
-    ;
-
     public enum ProtectionOrder {
         EncryptBeforeSigning,
         SignBeforeEncrypting
     }
-
-    ;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -358,9 +352,6 @@ public abstract class SPConstants {
         INCLUDE_TOKEN_ALWAYS_TO_INITIATOR,
         INCLUDE_TOKEN_ALWAYS
     }
-
-    ;
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

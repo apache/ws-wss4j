@@ -96,7 +96,7 @@ public class PolicyEnforcerFactory {
         addAssertionBuilder(new X509TokenBuilder());
     }
 
-    private static final void addAssertionBuilder(AssertionBuilder assertionBuilder) {
+    private static void addAssertionBuilder(AssertionBuilder assertionBuilder) {
         QName[] knownElements = assertionBuilder.getKnownElements();
         for (int i = 0; i < knownElements.length; i++) {
             QName knownElement = knownElements[i];

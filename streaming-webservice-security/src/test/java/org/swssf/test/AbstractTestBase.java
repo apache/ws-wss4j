@@ -14,6 +14,7 @@
  */
 package org.swssf.test;
 
+import com.sun.istack.Nullable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
@@ -111,11 +112,10 @@ public abstract class AbstractTestBase {
         return doInboundSecurity(securityProperties, xmlStreamReader, null);
     }
 
-    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(SecurityProperties securityProperties, XMLStreamReader xmlStreamReader, @Nullable SecurityEventListener securityEventListener) throws WSSecurityException, XMLStreamException, ParserConfigurationException {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
         XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
-        Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
-        return document;
+        return StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
     }
 
     protected ByteArrayOutputStream doOutboundSecurity(SecurityProperties securityProperties, InputStream sourceDocument) throws Exception {
@@ -794,11 +794,7 @@ public abstract class AbstractTestBase {
                 }
             }
 
-            if (!recordedActions.isEmpty()) {
-                return false;
-            }
-
-            return true;
+            return recordedActions.isEmpty();
         }
 
         /**

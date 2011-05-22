@@ -14,6 +14,7 @@
  */
 package org.swssf.test;
 
+import com.sun.istack.Nullable;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -148,7 +149,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
     /**
      * Note that the SubjectBean parameter should be null for SAML2.0
      */
-    protected void createAndSetStatement(SubjectBean subjectBean, SAMLCallback callback) {
+    protected void createAndSetStatement(@Nullable SubjectBean subjectBean, SAMLCallback callback) {
         if (statement == Statement.AUTHN) {
             AuthenticationStatementBean authBean = new AuthenticationStatementBean();
             if (subjectBean != null) {

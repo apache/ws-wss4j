@@ -14,6 +14,7 @@
  */
 package org.swssf.ext;
 
+import com.sun.istack.Nullable;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -155,7 +156,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         outputAsEvent(outputProcessorChain, startElement);
     }
 
-    protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, WSSecurityException {
+    protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, @Nullable Map<QName, String> attributes) throws XMLStreamException, WSSecurityException {
         List<Namespace> namespaceList = new LinkedList<Namespace>();
         namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
 
@@ -231,7 +232,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
         if ((keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
                 || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
-                && useSingleCertificate == false) {
+                && !useSingleCertificate) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
         } else if (securityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SAML_10) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_SAML11_TOKEN_PROFILE_TYPE);
@@ -278,7 +279,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
         if ((keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
                 || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
-                && useSingleCertificate == false) {
+                && !useSingleCertificate) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
         }
         createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
@@ -318,7 +319,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         attributes.put(Constants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
         if ((keyIdentifierType == Constants.KeyIdentifierType.BST_DIRECT_REFERENCE
                 || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
-                && useSingleCertificate == false) {
+                && !useSingleCertificate) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
         } else if (derivedKeyTokenReference == Constants.DerivedKeyTokenReference.EncryptedKey) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_WSS_ENC_KEY_VALUE_TYPE);
