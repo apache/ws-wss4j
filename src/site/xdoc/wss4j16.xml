@@ -3,7 +3,7 @@
 <body>
 <section name="Apache WSS4J 1.6">
 <p>
-This page describes the new features of WSS4J 1.6, and how the things to be aware of when upgrading
+This page describes the new features of WSS4J 1.6, and the things to be aware of when upgrading
 from WSS4J 1.5.x. 
 </p>
 <subsection name="New features">
