@@ -25,6 +25,7 @@ import org.swssf.impl.securityToken.SecurityTokenReference;
 import org.swssf.impl.util.DigestOutputStream;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SignedElementSecurityEvent;
+import org.swssf.securityEvent.SignedPartSecurityEvent;
 import org.swssf.securityEvent.TimestampSecurityEvent;
 import org.w3._2000._09.xmldsig_.CanonicalizationMethodType;
 import org.w3._2000._09.xmldsig_.ReferenceType;
@@ -88,26 +89,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         //this is the earliest possible point to check for an replay attack
         if (!replayChecked) {
             replayChecked = true;
-
-            TimestampSecurityEvent timestampSecurityEvent = inputProcessorChain.getSecurityContext().get(Constants.PROP_TIMESTAMP_SECURITYEVENT);
-            if (timestampSecurityEvent != null) {
-                final String cacheKey = String.valueOf(timestampSecurityEvent.getCreated().getTimeInMillis()) + new String(signatureType.getSignatureValue().getValue());
-                if (cache.get(cacheKey) != null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
-                }
-                ElementAttributes elementAttributes = new ElementAttributes();
-                if (timestampSecurityEvent.getExpires() != null) {
-                    long lifeTime = timestampSecurityEvent.getExpires().getTime().getTime() - new Date().getTime();
-                    elementAttributes.setMaxLifeSeconds(lifeTime / 1000);
-                } else {
-                    elementAttributes.setMaxLifeSeconds(300);
-                }
-                try {
-                    cache.put(cacheKey, timestampSecurityEvent.getCreated(), elementAttributes);
-                } catch (CacheException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                }
-            }
+            detectReplayAttack(inputProcessorChain);
         }
 
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
@@ -135,26 +117,44 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                         inputProcessorChain.getDocumentContext().setIsInSignedContent();
 
                         //fire a SecurityEvent:
-                        //if (level == 2 && isInSoapHeader) {//todo this is not correct. It is only a header event when we are at top level in the soap header
-                        //todo an encrypted top-level soap-header element counts as EncryptedPartSecurityEvent
-                        //todo these if-else statements here must be designed with care
-                        //todo we need the infrastructure to detect where we are in the document.
-                        //todo This can be useful below to handle encrypted header elements like timestamps
-                        //todo and also for policy verification elsewhere
-                        //SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart);
-                        //signedPartSecurityEvent.setElement(startElement.getName());
-                        //securityContext.registerSecurityEvent(signedPartSecurityEvent);
-                        //} else {                            
-                        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, false);
-                        signedElementSecurityEvent.setElement(startElement.getName());
-                        inputProcessorChain.getSecurityContext().registerSecurityEvent(signedElementSecurityEvent);
-                        //}
+                        if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
+                                && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                            SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+                            signedPartSecurityEvent.setElement(startElement.getName());
+                            inputProcessorChain.getSecurityContext().registerSecurityEvent(signedPartSecurityEvent);
+                        } else {
+                            SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, false);
+                            signedElementSecurityEvent.setElement(startElement.getName());
+                            inputProcessorChain.getSecurityContext().registerSecurityEvent(signedElementSecurityEvent);
+                        }
                     }
                 }
             }
         }
 
         return xmlEvent;
+    }
+
+    private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
+        TimestampSecurityEvent timestampSecurityEvent = inputProcessorChain.getSecurityContext().get(Constants.PROP_TIMESTAMP_SECURITYEVENT);
+        if (timestampSecurityEvent != null) {
+            final String cacheKey = String.valueOf(timestampSecurityEvent.getCreated().getTimeInMillis()) + signatureType.getSignatureValue().getRawValue();
+            if (cache.get(cacheKey) != null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+            }
+            ElementAttributes elementAttributes = new ElementAttributes();
+            if (timestampSecurityEvent.getExpires() != null) {
+                long lifeTime = timestampSecurityEvent.getExpires().getTime().getTime() - new Date().getTime();
+                elementAttributes.setMaxLifeSeconds(lifeTime / 1000);
+            } else {
+                elementAttributes.setMaxLifeSeconds(300);
+            }
+            try {
+                cache.put(cacheKey, timestampSecurityEvent.getCreated(), elementAttributes);
+            } catch (CacheException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+        }
     }
 
     @Override
@@ -175,7 +175,6 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
         private Transformer transformer;
         private DigestOutputStream digestOutputStream;
         private OutputStream bufferedDigestOutputStream;
-        //todo: startElement still needed?? Is elementCounter not enough? Test overall code
         private QName startElement;
         private int elementCounter = 0;
         private boolean finished = false;
