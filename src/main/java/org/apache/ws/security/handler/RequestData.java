@@ -74,6 +74,7 @@ public class RequestData {
     private boolean useDerivedKeyForMAC = true;
     private boolean useSingleCert = true;
     private CallbackHandler callback = null;
+    private boolean enableRevocation = false;
 
     public void clear() {
         soapConstants = null;
@@ -94,6 +95,7 @@ public class RequestData {
         useDerivedKeyForMAC = true;
         useSingleCert = true;
         callback = null;
+        enableRevocation = false;
     }
 
     public Object getMsgContext() {
@@ -380,7 +382,22 @@ public class RequestData {
     public boolean isUseSingleCert() {
         return useSingleCert;
     }
+
+    /**
+     * Set whether to enable CRL checking or not when verifying trust in a certificate.
+     * @param enableRevocation whether to enable CRL checking 
+     */
+    public void setEnableRevocation(boolean enableRevocation) {
+        this.enableRevocation = enableRevocation;
+    }
     
+    /**
+     * Get whether to enable CRL checking or not when verifying trust in a certificate.
+     * @return whether to enable CRL checking
+     */
+    public boolean isRevocationEnabled() {
+        return enableRevocation;
+    }
     
     /**
      * Sets the CallbackHandler used for this request

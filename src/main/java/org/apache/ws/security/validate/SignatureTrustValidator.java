@@ -64,10 +64,11 @@ public class SignatureTrustValidator implements Validator {
         if (certs != null && certs.length > 0) {
             validateCertificates(certs);
             boolean trust = false;
+            boolean enableRevocation = data.isRevocationEnabled();
             if (certs.length == 1) {
-                trust = verifyTrustInCert(certs[0], crypto);
+                trust = verifyTrustInCert(certs[0], crypto, enableRevocation);
             } else {
-                trust = verifyTrustInCerts(certs, crypto);
+                trust = verifyTrustInCerts(certs, crypto, enableRevocation);
             }
             if (trust) {
                 return credential;
@@ -124,8 +125,33 @@ public class SignatureTrustValidator implements Validator {
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
      */
+    @Deprecated
     protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto) 
         throws WSSecurityException {
+        return verifyTrustInCert(cert, crypto, false);
+    }
+    
+    /**
+     * Evaluate whether a given certificate should be trusted.
+     * 
+     * Policy used in this implementation:
+     * 1. Search the keystore for the transmitted certificate
+     * 2. Search the keystore for a connection to the transmitted certificate
+     * (that is, search for certificate(s) of the issuer of the transmitted certificate
+     * 3. Verify the trust path for those certificates found because the search for the issuer 
+     * might be fooled by a phony DN (String!)
+     *
+     * @param cert the certificate that should be validated against the keystore
+     * @param crypto A crypto instance to use for trust validation
+     * @param enableRevocation Whether revocation is enabled or not
+     * @return true if the certificate is trusted, false if not
+     * @throws WSSecurityException
+     */
+    protected boolean verifyTrustInCert(
+        X509Certificate cert, 
+        Crypto crypto,
+        boolean enableRevocation
+    ) throws WSSecurityException {
         String subjectString = cert.getSubjectX500Principal().getName();
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
@@ -188,7 +214,7 @@ public class SignatureTrustValidator implements Validator {
         // Use the validation method from the crypto to check whether the subjects' 
         // certificate was really signed by the issuer stated in the certificate
         //
-        if (crypto.verifyTrust(x509certs)) {
+        if (crypto.verifyTrust(x509certs, enableRevocation)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "Certificate path has been verified for certificate with subject " 
@@ -209,7 +235,7 @@ public class SignatureTrustValidator implements Validator {
     
     /**
      * Check to see if the certificate argument is in the keystore
-     * @param crypto The Crypto instance to use
+     * @param crypto A Crypto instance to use for trust validation
      * @param cert The certificate to check
      * @return true if cert is in the keystore
      * @throws WSSecurityException
@@ -250,18 +276,39 @@ public class SignatureTrustValidator implements Validator {
      * Evaluate whether the given certificate chain should be trusted.
      * 
      * @param certificates the certificate chain that should be validated against the keystore
+     * @param crypto  A Crypto instance to use for trust validation
      * @return true if the certificate chain is trusted, false if not
      * @throws WSSecurityException
      */
-    protected boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto)
-        throws WSSecurityException {
+    @Deprecated
+    protected boolean verifyTrustInCerts(
+        X509Certificate[] certificates, 
+        Crypto crypto
+    ) throws WSSecurityException {
+        return verifyTrustInCerts(certificates, crypto, false);
+    }
+    
+    /**
+     * Evaluate whether the given certificate chain should be trusted.
+     * 
+     * @param certificates the certificate chain that should be validated against the keystore
+     * @param crypto A Crypto instance
+     * @param enableRevocation Whether revocation is enabled or not
+     * @return true if the certificate chain is trusted, false if not
+     * @throws WSSecurityException
+     */
+    protected boolean verifyTrustInCerts(
+        X509Certificate[] certificates, 
+        Crypto crypto,
+        boolean enableRevocation
+    ) throws WSSecurityException {
         String subjectString = certificates[0].getSubjectX500Principal().getName();
         //
         // Use the validation method from the crypto to check whether the subjects' 
         // certificate was really signed by the issuer stated in the certificate
         //
         if (certificates != null && certificates.length > 1
-            && crypto.verifyTrust(certificates)) {
+            && crypto.verifyTrust(certificates, enableRevocation)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "Certificate path has been verified for certificate with subject " 

@@ -1088,6 +1088,11 @@ public abstract class WSHandler {
         if (reqData.getSigCrypto() == null) {
             reqData.setSigCrypto(loadSignatureCrypto(reqData));
         }
+        boolean enableRevocation = 
+            decodeBooleanConfigValue(
+                reqData, WSHandlerConstants.ENABLE_REVOCATION, false
+            );
+        reqData.setEnableRevocation(enableRevocation);
     }
 
     /*

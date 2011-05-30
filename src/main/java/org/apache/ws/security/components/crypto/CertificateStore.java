@@ -139,7 +139,23 @@ public class CertificateStore extends CryptoBase {
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
+    @Deprecated
     public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException {
+        return verifyTrust(certs, false);
+    }
+    
+    /**
+     * Evaluate whether a given certificate chain should be trusted.
+     *
+     * @param certs Certificate chain to validate
+     * @param enableRevocation whether to enable CRL verification or not
+     * @return true if the certificate chain is valid, false otherwise
+     * @throws WSSecurityException
+     */
+    public boolean verifyTrust(
+        X509Certificate[] certs, 
+        boolean enableRevocation
+    ) throws WSSecurityException {
         try {
             // Generate cert path
             List<X509Certificate> certList = Arrays.asList(certs);
@@ -155,9 +171,7 @@ public class CertificateStore extends CryptoBase {
             }
 
             PKIXParameters param = new PKIXParameters(set);
-            
-            // Do not check a revocation list
-            param.setRevocationEnabled(false);
+            param.setRevocationEnabled(enableRevocation);
 
             // Verify the trust path using the above settings
             String provider = getCryptoProvider();

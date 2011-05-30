@@ -372,6 +372,12 @@ public class WSHandlerConstants {
         = "allowNamespaceQualifiedPasswordTypes";
     
     /**
+     * This variable controls whether to enable Certificate Revocation List (CRL) checking
+     * or not when verifying trust in a certificate. The default value is "false".
+     */
+    public static final String ENABLE_REVOCATION = "enableRevocation";
+    
+    /**
      * Set the value of this parameter to true to treat passwords as binary values
      * for Username Tokens. The default value is "false".
      * 

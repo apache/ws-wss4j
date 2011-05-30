@@ -39,14 +39,18 @@ import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
+import java.security.cert.CertStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -102,6 +106,12 @@ public class Merlin extends CryptoBase {
     public static final String TRUSTSTORE_TYPE =
         "org.apache.ws.security.crypto.merlin.truststore.type";
     
+    /*
+     * CRL configuration
+     */
+    public static final String X509_CRL_FILE = 
+        "org.apache.ws.security.crypto.merlin.x509crl.file";
+    
     private static final org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(Merlin.class);
     private static final boolean doDebug = log.isDebugEnabled();
@@ -110,6 +120,7 @@ public class Merlin extends CryptoBase {
     protected Properties properties = null;
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;
+    protected CertStore crlCertStore = null;
     
     public Merlin() {
         // default constructor
@@ -246,7 +257,48 @@ public class Merlin extends CryptoBase {
                 }
             }
         }
-        
+        //
+        // Load the CRL file
+        //
+        String crlLocation = properties.getProperty(X509_CRL_FILE);
+        if (crlLocation != null) {
+            crlLocation = crlLocation.trim();
+            InputStream is = loadInputStream(loader, crlLocation);
+
+            try {
+                CertificateFactory cf = getCertificateFactory();
+                X509CRL crl = (X509CRL)cf.generateCRL(is);
+                
+                if (provider == null || provider.length() == 0) {
+                    crlCertStore = 
+                        CertStore.getInstance(
+                            "Collection",
+                            new CollectionCertStoreParameters(Collections.singletonList(crl))
+                        );
+                } else {
+                    crlCertStore = 
+                        CertStore.getInstance(
+                            "Collection",
+                            new CollectionCertStoreParameters(Collections.singletonList(crl)),
+                            provider
+                        );
+                }
+                if (doDebug) {
+                    log.debug(
+                        "The CRL " + crlLocation + " has been loaded"
+                    );
+                }
+            } catch (Exception e) {
+                if (doDebug) {
+                    log.debug(e.getMessage(), e);
+                }
+                throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        }
     }
 
     
@@ -359,6 +411,26 @@ public class Merlin extends CryptoBase {
      */
     public void setTrustStore(KeyStore trustStore) {
         truststore = trustStore;
+    }
+    
+    /**
+     * Set the CertStore from which to obtain a list of CRLs for Certificate Revocation
+     * checking.
+     * @param crlCertStore the CertStore from which to obtain a list of CRLs for Certificate 
+     * Revocation checking.
+     */
+    public void setCRLCertStore(CertStore crlCertStore) {
+        this.crlCertStore = crlCertStore;
+    }
+    
+    /**
+     * Get the CertStore from which to obtain a list of CRLs for Certificate Revocation
+     * checking.
+     * @return the CertStore from which to obtain a list of CRLs for Certificate 
+     * Revocation checking.
+     */
+    public CertStore getCRLCertStore() {
+        return crlCertStore;
     }
     
     /**
@@ -646,7 +718,24 @@ public class Merlin extends CryptoBase {
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
+    @Deprecated
     public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException {
+        return verifyTrust(certs, false);
+    }
+    
+    /**
+     * Evaluate whether a given certificate chain should be trusted.
+     * Uses the CertPath API to validate a given certificate chain.
+     *
+     * @param certs Certificate chain to validate
+     * @param enableRevocation whether to enable CRL verification or not
+     * @return true if the certificate chain is valid, false otherwise
+     * @throws WSSecurityException
+     */
+    public boolean verifyTrust(
+        X509Certificate[] certs, 
+        boolean enableRevocation
+    ) throws WSSecurityException {
         try {
             // Generate cert path
             List<X509Certificate> certList = Arrays.asList(certs);
@@ -683,9 +772,10 @@ public class Merlin extends CryptoBase {
             }
 
             PKIXParameters param = new PKIXParameters(set);
-            
-            // Do not check a revocation list
-            param.setRevocationEnabled(false);
+            param.setRevocationEnabled(enableRevocation);
+            if (enableRevocation && crlCertStore != null) {
+                param.addCertStore(crlCertStore);
+            }
 
             // Verify the trust path using the above settings
             String provider = getCryptoProvider();
