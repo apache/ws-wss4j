@@ -4,8 +4,8 @@
 <section name="Using Apache WSS4J">
 <p>
 This page describes how to use Apache WSS4J, either in a standalone manner, or in conjunction with
-other software packages. For information about how to configure WSS4J 1.6, see 
-<a href="config.html">here</a>
+other software packages. For information about how to configure WSS4J 1.6, see the 
+<a href="config.html">configuration page</a>.
 </p>
 <subsection name="Standalone">
 <p>

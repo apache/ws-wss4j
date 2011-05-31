@@ -9,8 +9,9 @@ from WSS4J 1.5.x.
 <subsection name="New features">
 <p>
 This section describes the main new features that have been implemented in WSS4J 1.6. For more 
-information on the changes, please click on the links. The list of JIRAs that have been fixed in WSS4J
-1.6 is available <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12313718">here</a>.
+information on the changes, please click on the links. You can also review the 
+<a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12313718">list of JIRAs</a>
+that have been fixed in WSS4J 1.6.
 </p>
 <ul>
 <li>
@@ -83,8 +84,8 @@ directly.
 <li>
 If the WSEncryptionPart used to point to an element for signature or encryption does not either store
 the element directly, or store the wsu:Id, <b>all</b> DOM Elements that match the stored 
-localname/namespace will be processed. See 
-<a href="http://coheigea.blogspot.com/2011/02/wss4j-16-specifying-elements-to-sign-or.html">here</a>
+localname/namespace will be processed. See the 
+<a href="http://ws.apache.org/wss4j/topics.html#Specifying_elements_to_sign_or_encrypt">Special Topics page</a>
 for more information.
 </li>
 <li>

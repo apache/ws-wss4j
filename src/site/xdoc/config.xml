@@ -8,18 +8,16 @@ properties have changed since WSS4J 1.5.x.
 </p>
 <subsection name="Crypto properties">
 <p>
-Apache WSS4J uses the Crypto interface to get keys and certificates for encryption/decryption, or for
-signature creation/verification. WSS4J ships with two implementations, a standard "Merlin" implementation,
+Apache WSS4J uses the Crypto interface to get keys and certificates for encryption/decryption and for
+signature creation/verification. WSS4J ships with two implementations, the standard "Merlin" implementation,
 which is based around two JDK keystores for key retrieval and trust verification, as well as a 
-CertificateStore, which is based around a set of X509Certificates, for encryption/signature verification
-only. For more information on the Crypto implementations, go
-<a href="http://coheigea.blogspot.com/2011/02/wss4j-16-changes-to-crypto-interface.html">here</a>. 
+CertificateStore, which is based around a set of X509Certificates (presently supporting encryption/signature verification
+only). For more information on the Crypto implementations see the
+<a href="http://ws.apache.org/wss4j/topics.html#Crypto_Interface">Special Topics page</a>. 
 </p>
 <p>
 It is possible to instantiate a Crypto implementation directly, but it can also be loaded via a 
-properties file. For more information on the Merlin property values, go 
-<a href="http://coheigea.blogspot.com/2011/01/wss4j-16-crypto-property-change.html">here</a>. The 
-property values are summarised here:
+properties file. The property values are as follows:
 </p>
 <p>
 General properties:
@@ -31,7 +29,7 @@ General properties:
 </tr>
 <tr>
 <td>org.apache.ws.security.crypto.provider</td>
-<td>WSS4J specific provider used to create Crypto instances. Defaults to: 
+<td>WSS4J specific provider used to create Crypto instances. Defaults to 
 "org.apache.ws.security.components.crypto.Merlin".</td>
 </tr>
 <tr>
@@ -57,7 +55,7 @@ Keystore properties:
 </tr>
 <tr>
 <td>org.apache.ws.security.crypto.merlin.keystore.password</td>
-<td>The password used to load the keystore. Falls back to: "security".</td>
+<td>The password used to load the keystore. Default value is "security".</td>
 </tr>
 <tr>
 <td>org.apache.ws.security.crypto.merlin.keystore.type</td>
@@ -78,7 +76,7 @@ TrustStore properties:
 </tr>
 <tr>
 <td>org.apache.ws.security.crypto.merlin.load.cacerts</td>
-<td>whether to load the CA certs in ${java.home}/lib/security/cacerts or not (default is false)</td>
+<td>Whether or not to load the CA certs in ${java.home}/lib/security/cacerts (default is false)</td>
 </tr>
 <tr>
 <td>org.apache.ws.security.crypto.merlin.truststore.file</td>
@@ -100,9 +98,7 @@ TrustStore properties:
 Apache WSS4J uses the SAMLIssuer interface to configure the creation and signing of a SAML 
 Assertion. WSS4J ships with a default "SAMLIssuerImpl" implementation. It is possible to 
 instantiate a SAMLIssuer implementation directly, but it can also be loaded via a properties file.
-For more information on the SAMLIssuer property values, go 
-<a href="http://coheigea.blogspot.com/2011/03/wss4j-16-saml-property-changes.html">here</a>. The 
-property values are summarised here:
+The property values are as follows:
 </p>
 <table name="SAMLIssuer properties">
 <tr>
@@ -132,11 +128,11 @@ be signed.</td>
 </tr>
 <tr>
 <td>org.apache.ws.security.saml.issuer.sendKeyValue</td>
-<td>Whether to send the key value or the X509Certificate. Defaults to: "false".</td>
+<td>Whether to send the key value or the X509Certificate. Default is "false".</td>
 </tr>
 <tr>
 <td>org.apache.ws.security.saml.issuer.signAssertion</td>
-<td>Whether the SAMLIssuer implementation will sign the assertion or not. Defaults to: 
+<td>Whether the SAMLIssuer implementation will sign the assertion or not. Defaults is 
 "false".</td>
 </tr>
 <tr>
@@ -148,11 +144,11 @@ be signed.</td>
 <subsection name="WSHandler configuration tags">
 <p>
 Apache WSS4J provides a set of configuration tags for the WSHandler object used for the creation
-and processing of WS-Security enabled messages. For more information see the javadoc
-<a href="apidocs/org/apache/ws/security/handler/WSHandlerConstants.html">here</a>.
+and processing of WS-Security enabled messages. For more information see the 
+<a href="apidocs/org/apache/ws/security/handler/WSHandlerConstants.html">WSHandlerConstants Javadoc</a>.
 </p>
 <p>
-The configuration tags for WSHandler Actions are summarised here:
+The configuration tags for WSHandler Actions are as follows:
 </p>
 <table name="WSHandler Action configuration tags">
 <tr>
@@ -207,7 +203,7 @@ The configuration tags for WSHandler Actions are summarised here:
 </tr>
 </table>
 <p>
-The configuration tags for WSHandler user properties are summarised here:
+The configuration tags for WSHandler user properties are as follows:
 </p>
 <table name="WSHandler User configuration tags">
 <tr>
@@ -323,7 +319,7 @@ encryption.</td>
 </table>
 <p>
 The configuration tags for WSHandler properties that are configured via a boolean parameter 
-(i.e. "true" or "false") are summarised here:
+(i.e. "true" or "false") are as follows:
 </p>
 <table name="WSHandler boolean configuration tags">
 <tr>
@@ -334,74 +330,74 @@ The configuration tags for WSHandler properties that are configured via a boolea
 <tr>
 <td>ENABLE_SIGNATURE_CONFIRMATION</td>
 <td>enableSignatureConfirmation</td>
-<td>Whether to enable signature confirmation or not. Default is: "false".</td>
+<td>Whether to enable signature confirmation or not. Default is "false".</td>
 </tr>
 <tr>
 <td>MUST_UNDERSTAND</td>
 <td>mustUnderstand</td>
-<td>Set the outbound MustUnderstand flag or not. Default is: "true".</td>
+<td>Set the outbound MustUnderstand flag or not. Default is "true".</td>
 </tr>
 <tr>
 <td>IS_BSP_COMPLIANT</td>
 <td>isBSPCompliant</td>
-<td>Whether to ensure compliance with the BSP 1.1 spec or not. Default is: "true".</td>
+<td>Whether or not to ensure compliance with the BSP 1.1 spec. Default is "true".</td>
 </tr>
 <tr>
 <td>HANDLE_CUSTOM_PASSWORD_TYPES</td>
 <td>handleCustomPasswordTypes</td>
-<td>Whether to allow non-standard password types in a UsernameToken. Default is: "false".</td>
+<td>Whether to allow non-standard password types in a UsernameToken. Default is "false".</td>
 </tr>
 <tr>
 <td>PASSWORD_TYPE_STRICT</td>
 <td>passwordTypeStrict</td>
-<td>Whether to enable strict Username Token password type handling. Default is: "false".</td>
+<td>Whether to enable strict Username Token password type handling. Default is "false".</td>
 </tr>
 <tr>
 <td>ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES</td>
 <td>allowNamespaceQualifiedPasswordTypes</td>
 <td>Whether (wsse) namespace qualified password types are accepted when processing UsernameTokens. 
-Default is: "false".</td>
+Default is "false".</td>
 </tr>
 <tr>
 <td>USE_ENCODED_PASSWORDS</td>
 <td>useEncodedPasswords</td>
-<td>Set whether to treat passwords as binary values for Username Tokens. Default is: "false".</td>
+<td>Set whether to treat passwords as binary values for Username Tokens. Default is "false".</td>
 </tr>
 <tr>
 <td>USE_SINGLE_CERTIFICATE</td>
 <td>useSingleCertificate</td>
 <td>Whether to use a single certificate or a whole certificate chain to construct a 
-BinarySecurityToken. Default is: "true".</td>
+BinarySecurityToken. Default is "true".</td>
 </tr>
 <tr>
 <td>USE_DERIVED_KEY</td>
 <td>useDerivedKey</td>
-<td>Whether to use the standard UsernameToken Key Derivation algorithm. Default is: "true".</td>
+<td>Whether to use the standard UsernameToken Key Derivation algorithm. Default is "true".</td>
 </tr>
 <tr>
 <td>USE_DERIVED_KEY_FOR_MAC</td>
 <td>useDerivedKeyForMAC</td>
-<td>Whether to use the Username Token derived key for a MAC. Default is: "true".</td>
+<td>Whether to use the Username Token derived key for a MAC. Default is "true".</td>
 </tr>
 <tr>
 <td>TIMESTAMP_PRECISION</td>
 <td>precisionInMilliseconds</td>
-<td>Set whether outbound timestamps have precision in milliseconds. Default is: "true".</td>
+<td>Set whether outbound timestamps have precision in milliseconds. Default is "true".</td>
 </tr>
 <tr>
 <td>TIMESTAMP_STRICT</td>
 <td>timestampStrict</td>
-<td>Set whether to enable strict Timestamp handling. Default is: "true".</td>
+<td>Set whether to enable strict Timestamp handling. Default is "true".</td>
 </tr>
 <tr>
 <td>ENC_SYM_ENC_KEY</td>
 <td>encryptSymmetricEncryptionKey</td>
-<td>Set whether to encrypt the symmetric encryption key or not. Default is: "true".</td>
+<td>Set whether to encrypt the symmetric encryption key or not. Default is "true".</td>
 </tr>
 </table>
 <p>
 The configuration tags for WSHandler properties that are configured via a non-boolean parameter 
-are summarised here:
+are as follows:
 </p>
 <table name="WSHandler non-boolean configuration tags">
 <tr>
@@ -493,7 +489,8 @@ valid. The default is "0".</td>
 </table>
 <p>
 The configuration values for setting the KeyIdentifiers for signature or encryption 
-are summarised here. See the Javadoc for SIG_KEY_ID and ENC_KEY_ID for more details:
+are shown below. See the <a href="http://ws.apache.org/wss4j/apidocs/org/apache/ws/security/handler/WSHandlerConstants.html">Javadoc</a> 
+for SIG_KEY_ID and ENC_KEY_ID for more details:
 </p>
 <table name="WSHandler KeyIdentifier values">
 <tr>
