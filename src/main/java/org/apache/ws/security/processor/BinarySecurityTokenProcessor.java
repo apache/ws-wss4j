@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.processor;
 
+import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -75,14 +76,19 @@ public class BinarySecurityTokenProcessor implements Processor {
             credential.setCertificates(certs);
             
             Credential returnedCredential = validator.validate(credential, data);
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             
             if (returnedCredential.getTransformedToken() != null) {
                 result.put(
                     WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
                     returnedCredential.getTransformedToken()
                 );
+                SAMLTokenPrincipal samlPrincipal = 
+                    new SAMLTokenPrincipal(credential.getTransformedToken());
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+            } else if (certs != null && certs[0] != null) {
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, certs[0].getSubjectX500Principal());
             }
-            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }
         
         wsDocInfo.addResult(result);

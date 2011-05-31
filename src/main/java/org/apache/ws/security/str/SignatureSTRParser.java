@@ -20,6 +20,7 @@
 package org.apache.ws.security.str;
 
 import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
@@ -337,8 +338,7 @@ public class SignatureSTRParser implements STRParser {
     private Principal createPrincipalFromSAML(
         AssertionWrapper assertion
     ) {
-        Principal principal = new CustomTokenPrincipal(assertion.getId());
-        ((CustomTokenPrincipal)principal).setTokenObject(assertion);
+        SAMLTokenPrincipal principal = new SAMLTokenPrincipal(assertion);
         String confirmMethod = null;
         List<String> methods = assertion.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {

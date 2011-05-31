@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.processor;
 
+import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -63,15 +64,21 @@ public class SAMLTokenProcessor implements Processor {
         } else {
             result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
         }
-        String id = assertion.getId();
-        result.put(WSSecurityEngineResult.TAG_ID, id);
-        if (credential.getTransformedToken() != null) {
-            result.put(
-                WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
-            );
-        }
+        
+        result.put(WSSecurityEngineResult.TAG_ID, assertion.getId());
+
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+            if (credential.getTransformedToken() != null) {
+                result.put(
+                    WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
+                );
+                SAMLTokenPrincipal samlPrincipal = 
+                    new SAMLTokenPrincipal(credential.getTransformedToken());
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+            } else {
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipal(assertion));
+            }
         }
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);

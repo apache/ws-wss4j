@@ -174,7 +174,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      * The value under this tag is of type java.security.Principal.
      */
     public static final String TAG_PRINCIPAL = "principal";
-
+    
     /**
      * Tag denoting references to a List of Data ref URIs.
      *
@@ -298,6 +298,10 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SIGNATURE_CONFIRMATION, sc);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+    }
+    
+    public WSSecurityEngineResult(int act, UsernameToken usernameToken) {
+        this(act, usernameToken, null);
     }
     
     public WSSecurityEngineResult(int act, UsernameToken usernameToken, Principal principal) {

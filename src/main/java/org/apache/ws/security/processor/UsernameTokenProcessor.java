@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.processor;
 
+import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -51,29 +52,33 @@ public class UsernameTokenProcessor implements Processor {
         Credential credential = handleUsernameToken(elem, validator, data);
         UsernameToken token = credential.getUsernametoken();
         
-        WSUsernameTokenPrincipal principal = 
-            new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
-        principal.setNonce(token.getNonce());
-        principal.setPassword(token.getPassword());
-        principal.setCreatedTime(token.getCreated());
-        principal.setPasswordType(token.getPasswordType());
-        
         int action = WSConstants.UT;
         if (token.getPassword() == null) { 
             action = WSConstants.UT_NOPASSWORD;
         }
-        WSSecurityEngineResult result = 
-            new WSSecurityEngineResult(action, token, principal);
+        WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);
         result.put(WSSecurityEngineResult.TAG_ID, token.getID());
-        if (credential.getTransformedToken() != null) {
-            result.put(
-                WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
-            );
-        }
         
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+            if (credential.getTransformedToken() != null) {
+                result.put(
+                    WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
+                );
+                SAMLTokenPrincipal samlPrincipal = 
+                    new SAMLTokenPrincipal(credential.getTransformedToken());
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+            } else {
+                WSUsernameTokenPrincipal principal = 
+                    new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
+                principal.setNonce(token.getNonce());
+                principal.setPassword(token.getPassword());
+                principal.setCreatedTime(token.getCreated());
+                principal.setPasswordType(token.getPasswordType());
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, principal);
+            }
         }
+        
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
