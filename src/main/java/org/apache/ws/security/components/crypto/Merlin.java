@@ -121,6 +121,7 @@ public class Merlin extends CryptoBase {
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;
     protected CertStore crlCertStore = null;
+    private boolean loadCACerts = false;
     
     public Merlin() {
         // default constructor
@@ -225,6 +226,7 @@ public class Merlin extends CryptoBase {
                         + " has been loaded"
                     );
                 }
+                loadCACerts = false;
             } finally {
                 if (is != null) {
                     is.close();
@@ -250,6 +252,7 @@ public class Merlin extends CryptoBase {
                     if (doDebug) {
                         log.debug("CA certs have been loaded");
                     }
+                    loadCACerts = true;
                 } finally {
                     if (is != null) {
                         is.close();
@@ -756,8 +759,12 @@ public class Merlin extends CryptoBase {
                 }
             }
 
-            // Add certificates from the keystore
-            if (keystore != null) {
+            //
+            // Add certificates from the keystore - only if there is no TrustStore, apart from
+            // the case that the truststore is the JDK CA certs. This behaviour is preserved
+            // for backwards compatibility reasons
+            //
+            if (keystore != null && (truststore == null || loadCACerts)) {
                 Enumeration<String> aliases = keystore.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
