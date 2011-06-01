@@ -175,12 +175,12 @@ public class TimestampTest extends org.junit.Assert {
     
     
     /**
-     * This is a test for processing an Timestamp where the "Created" element is in the future.
-     * This Timestamp should be rejected by default, and then accepted once the future 
-     * time-to-live configuration is enabled.
+     * This is a test for processing an Timestamp where the "Created" element is in the (near)
+     * future. It should be accepted by default when it is created 30 seconds in the future, 
+     * and then rejected once we configure "0 seconds" for future-time-to-live.
      */
     @org.junit.Test
-    public void testFutureCreated() throws Exception {
+    public void testNearFutureCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -213,14 +213,60 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         WSSConfig config = WSSConfig.getNewInstance();
+        verify(doc, config);
+        try {
+            config.setTimeStampFutureTTL(0);
+            verify(doc, config);
+            fail("The timestamp validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }
+    }
+    
+    /**
+     * This is a test for processing an Timestamp where the "Created" element is in the future.
+     * A Timestamp that is 120 seconds in the future should be rejected by default.
+     */
+    @org.junit.Test
+    public void testFutureCreated() throws Exception {
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element timestampElement = 
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
+            );
+
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 120000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(timestampElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        //
+        // Do some processing
+        //
+        WSSConfig config = WSSConfig.getNewInstance();
         try {
             verify(doc, config);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
         }
-        config.setTimeStampFutureTTL(60);
-        verify(doc, config);
     }
     
     

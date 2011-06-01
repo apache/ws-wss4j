@@ -649,11 +649,9 @@ public class WSHandlerConstants {
     
     /**
      * This configuration tag specifies the time in seconds in the future within which
-     * the Created time of an incoming Timestamp is valid. WSS4J rejects by default any
-     * timestamp which is "Created" in the future, and so there could potentially be
-     * problems in a scenario where a client's clock is slightly askew. The default
-     * value for this parameter is "0", meaning that no future-created Timestamps are
-     * allowed.
+     * the Created time of an incoming Timestamp is valid. The default value is "60",
+     * to avoid problems where clocks are slightly askew. To reject all future-created
+     * Timestamps, set this value to "0". 
      */
     public static final String TTL_FUTURE_TIMESTAMP = "futureTimeToLive";
     

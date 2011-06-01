@@ -594,18 +594,19 @@ public abstract class WSHandler {
     protected int decodeFutureTimeToLive(RequestData reqData) {
         String ttl = 
             getString(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, reqData.getMsgContext());
+        int defaultFutureTimeToLive = 60;
         if (ttl != null) {
             try {
                 int ttlI = Integer.parseInt(ttl);
                 if (ttlI < 0) {
-                    return 0;
+                    return defaultFutureTimeToLive;
                 }
                 return ttlI;
             } catch (NumberFormatException e) {
-                return 0;
+                return defaultFutureTimeToLive;
             }
         }
-        return 0;
+        return defaultFutureTimeToLive;
     }
     
     protected boolean decodeBSPCompliance(RequestData reqData)

@@ -105,7 +105,15 @@ public class Timestamp {
                     }
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                    if (strExpires == null) {
+                    if (strExpires != null || (bspCompliant && strCreated == null)) {
+                        //
+                        // Created must appear before Expires and we can't have multiple Expires 
+                        // elements
+                        //
+                        throw new WSSecurityException(
+                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                        ); 
+                    } else {
                         String valueType = currentChildElement.getAttribute("ValueType");
                         if (bspCompliant && valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
@@ -114,14 +122,6 @@ public class Timestamp {
                             );
                         }
                         strExpires = ((Text)currentChildElement.getFirstChild()).getData();
-                    } else if (strExpires != null || (bspCompliant && strCreated == null)) {
-                        //
-                        // Created must appear before Expires, and we can't have multiple
-                        // Expires elements
-                        //
-                        throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
-                        );                        
                     }
                 } else {
                     if (bspCompliant) {

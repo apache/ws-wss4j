@@ -48,7 +48,7 @@ public class TimestampValidator implements Validator {
         WSSConfig wssConfig = data.getWssConfig();
         boolean timeStampStrict = true;
         int timeStampTTL = 300;
-        int futureTimeToLive = 0;
+        int futureTimeToLive = 60;
         if (wssConfig != null) {
             timeStampStrict = wssConfig.isTimeStampStrict();
             timeStampTTL = wssConfig.getTimeStampTTL();

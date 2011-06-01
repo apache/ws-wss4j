@@ -236,10 +236,9 @@ public class WSSConfig {
     
     /**
      * The time in seconds in the future within which the Created time of an incoming 
-     * Timestamp is valid. The default is 0 seconds, meaning that no future-dated
-     * timestamps are allowed.
+     * Timestamp is valid. The default is 60 seconds.
      */
-    protected int timeStampFutureTTL = 0;
+    protected int timeStampFutureTTL = 60;
     
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
