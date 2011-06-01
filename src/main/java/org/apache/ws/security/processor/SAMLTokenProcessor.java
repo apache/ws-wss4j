@@ -76,6 +76,8 @@ public class SAMLTokenProcessor implements Processor {
                 SAMLTokenPrincipal samlPrincipal = 
                     new SAMLTokenPrincipal(credential.getTransformedToken());
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+            } else if (credential.getPrincipal() != null) {
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
             } else {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipal(assertion));
             }
