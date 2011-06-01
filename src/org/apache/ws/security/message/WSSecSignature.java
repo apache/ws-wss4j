@@ -375,8 +375,7 @@ public class WSSecSignature extends WSSecBase {
             }
         }
 
-        EnvelopeIdResolver resolver = (EnvelopeIdResolver)EnvelopeIdResolver.getInstance();
-        resolver.setWsDocInfo(wsDocInfo);
+        EnvelopeIdResolver resolver = new EnvelopeIdResolver(wsDocInfo);
         sig.addResourceResolver(resolver);
         sig.setId(wssConfig.getIdAllocator().createId("Signature-", sig));
 

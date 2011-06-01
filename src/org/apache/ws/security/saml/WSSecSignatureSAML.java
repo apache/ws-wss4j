@@ -352,8 +352,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         }
 
-        EnvelopeIdResolver resolver = (EnvelopeIdResolver)EnvelopeIdResolver.getInstance();
-        resolver.setWsDocInfo(wsDocInfo);
+        EnvelopeIdResolver resolver = new EnvelopeIdResolver(wsDocInfo);
         sig.addResourceResolver(resolver);
         String sigUri = wssConfig.getIdAllocator().createId("Signature-", sig);
         sig.setId(sigUri);

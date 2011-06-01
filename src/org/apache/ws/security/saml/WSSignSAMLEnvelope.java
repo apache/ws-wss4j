@@ -346,7 +346,7 @@ public class WSSignSAMLEnvelope extends WSSignEnvelope {
                     "noXMLSig", null, e1);
         }
 
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+        sig.addResourceResolver(new EnvelopeIdResolver(wsDocInfo));
 
         /*
          * The order to prepend is: - signature - BinarySecurityToken (depends

@@ -151,7 +151,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             }
         }
         
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+        sig.addResourceResolver(new EnvelopeIdResolver(wsDocInfo));
         String sigUri = wssConfig.getIdAllocator().createId("Signature-", sig);
         sig.setId(sigUri);
         

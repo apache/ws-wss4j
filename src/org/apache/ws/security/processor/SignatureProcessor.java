@@ -227,7 +227,7 @@ public class SignatureProcessor implements Processor {
             );
         }
 
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+        sig.addResourceResolver(new EnvelopeIdResolver(wsDocInfo));
 
         KeyInfo info = sig.getKeyInfo();
         UsernameToken ut = null;

@@ -475,7 +475,7 @@ public class WSSignEnvelope extends WSBaseMessage {
             }
         }
 
-        sig.addResourceResolver(EnvelopeIdResolver.getInstance());
+        sig.addResourceResolver(new EnvelopeIdResolver(wsDocInfo));
 
         WSSecurityUtil.prependChildElement(securityHeader, sig.getElement());
         if (tlog.isDebugEnabled()) {

@@ -55,15 +55,17 @@ public class EnvelopeIdResolver extends ResourceResolverSpi {
      * <p/>
      *
      * @return TODO
+     * @deprecated
      */
     public synchronized static ResourceResolverSpi getInstance() {
         if (resolver == null) {
-            resolver = new EnvelopeIdResolver();
+            resolver = new EnvelopeIdResolver(null);
         }
         return resolver;
     }
 
-    private EnvelopeIdResolver() {
+    public EnvelopeIdResolver(WSDocInfo wsDocInfo) {
+        this.wsDocInfo = wsDocInfo;
     }
     
     /**
