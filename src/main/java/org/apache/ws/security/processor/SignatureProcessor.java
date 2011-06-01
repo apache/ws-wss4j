@@ -350,35 +350,33 @@ public class SignatureProcessor implements Processor {
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
                 return xmlSignature;
-            } else {
-                //
-                // Log the exact signature error
-                //
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("XML Signature verification has failed");
-                    boolean signatureValidationCheck = 
-                        xmlSignature.getSignatureValue().validate(context);
-                    LOG.debug("Signature Validation check: " + signatureValidationCheck);
-                    java.util.Iterator<?> referenceIterator = 
-                        xmlSignature.getSignedInfo().getReferences().iterator();
-                    while (referenceIterator.hasNext()) {
-                        Reference reference = (Reference)referenceIterator.next();
-                        boolean referenceValidationCheck = reference.validate(context);
-                        String id = reference.getId();
-                        if (id == null) {
-                            id = reference.getURI();
-                        }
-                        LOG.debug("Reference " + id + " check: " + referenceValidationCheck);
+            }
+            //
+            // Log the exact signature error
+            //
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("XML Signature verification has failed");
+                boolean signatureValidationCheck = 
+                    xmlSignature.getSignatureValue().validate(context);
+                LOG.debug("Signature Validation check: " + signatureValidationCheck);
+                java.util.Iterator<?> referenceIterator = 
+                    xmlSignature.getSignedInfo().getReferences().iterator();
+                while (referenceIterator.hasNext()) {
+                    Reference reference = (Reference)referenceIterator.next();
+                    boolean referenceValidationCheck = reference.validate(context);
+                    String id = reference.getId();
+                    if (id == null) {
+                        id = reference.getURI();
                     }
+                    LOG.debug("Reference " + id + " check: " + referenceValidationCheck);
                 }
-                
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, null, null, ex
             );
         }
+        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
     }
     
     
