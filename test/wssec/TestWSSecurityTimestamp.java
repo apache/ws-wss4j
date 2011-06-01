@@ -262,11 +262,11 @@ public class TestWSSecurityTimestamp extends TestCase {
     }
     
     /**
-     * This is a test for processing an Timestamp where the "Created" element is in the future.
-     * This Timestamp should be rejected by default, and then accepted once the future 
-     * time-to-live configuration is enabled.
+     * This is a test for processing an Timestamp where the "Created" element is in the (near)
+     * future. It should be accepted by default when it is created 30 seconds in the future, 
+     * and then rejected once we configure "0 seconds" for future-time-to-live.
      */
-    public void testFutureCreated() throws Exception {
+    public void testNearFutureCreated() throws Exception {
         
         Document doc = unsignedEnvelope.getAsDocument();
         WSSecHeader secHeader = new WSSecHeader();
@@ -309,7 +309,7 @@ public class TestWSSecurityTimestamp extends TestCase {
         assertTrue(receivedTimestamp != null);
         
         MyHandler myHandler = new MyHandler();
-        if (myHandler.publicVerifyTimestamp(receivedTimestamp, 300)) {
+        if (myHandler.publicVerifyTimestamp(receivedTimestamp, 300, 0)) {
             fail("The timestamp validation should have failed");
         }
         assertTrue(myHandler.publicVerifyTimestamp(receivedTimestamp, 300, 60));

@@ -1406,7 +1406,7 @@ public abstract class WSHandler {
      * @throws WSSecurityException
      */
     protected boolean verifyTimestamp(Timestamp timestamp, int timeToLive) throws WSSecurityException {
-        return verifyTimestamp(timestamp, timeToLive, 0);
+        return verifyTimestamp(timestamp, timeToLive, 60);
     }
     
     /**
