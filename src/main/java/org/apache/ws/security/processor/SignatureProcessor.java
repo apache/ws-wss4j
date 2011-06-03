@@ -207,6 +207,7 @@ public class SignatureProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }
         wsDocInfo.addResult(result);
+        wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
     }
     

@@ -137,6 +137,7 @@ public class EncryptedKeyProcessor implements Processor {
         );
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
         wsDocInfo.addResult(result);
+        wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
     }
     

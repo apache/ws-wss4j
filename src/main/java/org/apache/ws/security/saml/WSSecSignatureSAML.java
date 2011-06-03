@@ -373,7 +373,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     Element elem = secRefSaml.getElement();
                     elem.appendChild(keyId);
                 }
-                wsDocInfo.addTokenElement(secRefSaml.getElement());
+                wsDocInfo.addTokenElement(secRefSaml.getElement(), false);
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
@@ -389,7 +389,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 bstToken = new X509Security(doc);
                 ((X509Security) bstToken).setX509Certificate(certs[0]);
                 bstToken.setID(certUri);
-                wsDocInfo.addTokenElement(bstToken.getElement());
+                wsDocInfo.addTokenElement(bstToken.getElement(), false);
                 ref.setValueType(bstToken.getValueType());
                 secRef.setReference(ref);
                 break;
@@ -429,14 +429,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
             elem.appendChild(keyId);
         }
         XMLStructure structure = new DOMStructure(secRef.getElement());
-        wsDocInfo.addTokenElement(secRef.getElement());
+        wsDocInfo.addTokenElement(secRef.getElement(), false);
 
         keyInfo = 
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri
             );
 
-        wsDocInfo.addTokenElement(samlToken);
+        wsDocInfo.addTokenElement(samlToken, false);
     }
 
     /**

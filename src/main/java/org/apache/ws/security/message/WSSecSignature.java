@@ -192,7 +192,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 ref.setValueType(bstToken.getValueType());
                 secRef.setReference(ref);
                 bstToken.setID(certUri);
-                wsDocInfo.addTokenElement(bstToken.getElement());
+                wsDocInfo.addTokenElement(bstToken.getElement(), false);
                 break;
     
             case WSConstants.ISSUER_SERIAL:
@@ -296,7 +296,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
             XMLStructure structure = new DOMStructure(secRef.getElement());
-            wsDocInfo.addTokenElement(secRef.getElement());
+            wsDocInfo.addTokenElement(secRef.getElement(), false);
             keyInfo = 
                 keyInfoFactory.newKeyInfo(
                     java.util.Collections.singletonList(structure), keyInfoUri

@@ -45,7 +45,6 @@ public class WSDocInfo {
     private Document doc = null;
     private Crypto crypto = null;
     private List<Element> tokenList = null;
-    private List<Element> elementList = null;
     private List<WSSecurityEngineResult> resultsList = null;
     private CallbackLookup callbackLookup = null;
 
@@ -66,40 +65,77 @@ public class WSDocInfo {
         if (tokenList != null && tokenList.size() > 0) {
             tokenList.clear();
         }
-        if (elementList != null && elementList.size() > 0) {
-            elementList.clear();
-        }
         if (resultsList != null && resultsList.size() > 0) {
             resultsList.clear();
         }
         
         tokenList = null;
-        elementList = null;
         resultsList = null;
     }
     
     /**
-     * Store a token element for later retrieval. The token element is one of:
-     *  - SecurityTokenReference element
-     *  - BinarySecurityToken element
-     *  - SAML Assertion element
-     *  - SecurityContextToken element
-     *  - UsernameToken element
-     *  - DerivedKeyToken element
-     *  - Timestamp element
-     * @param elem is the token element to store
+     * Store a token element for later retrieval. Before storing the token, we check for a 
+     * previously processed token with the same (wsu/SAML) Id.
+     * @param element is the token element to store
+     * @deprecated
      */
-    public void addTokenElement(Element elem) {
+    public void addTokenElement(Element element) throws WSSecurityException {
+        addTokenElement(element, true);
+    }
+    
+    /**
+     * Store a token element for later retrieval. Before storing the token, we check for a 
+     * previously processed token with the same (wsu/SAML) Id.
+     * @param element is the token element to store
+     * @param checkMultipleElements check for a previously stored element with the same Id.
+     */
+    public void addTokenElement(Element element, boolean checkMultipleElements) throws WSSecurityException {
         if (tokenList == null) {
             tokenList = new ArrayList<Element>();
         }
-        tokenList.add(elem);
+        
+        if (checkMultipleElements) {
+            for (Element elem : tokenList) {
+                if (compareElementsById(element, elem)) {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+                    );
+                }
+            }
+        }
+        tokenList.add(element);
+    }
+    
+    private boolean compareElementsById(Element firstElement, Element secondElement) {
+        if (firstElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
+            && secondElement.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
+            String id = firstElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+            String id2 = secondElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+            if (id.equals(id2)) {
+                return true;
+            }
+        }
+        if (firstElement.hasAttribute("AssertionID")
+            && secondElement.hasAttribute("AssertionID")) {
+            String id = firstElement.getAttribute("AssertionID");
+            String id2 = secondElement.getAttribute("AssertionID");
+            if (id.equals(id2)) {
+                return true;
+            }
+        }
+        if (firstElement.hasAttribute("ID") && secondElement.hasAttribute("ID")) {
+            String id = firstElement.getAttribute("ID");
+            String id2 = secondElement.getAttribute("ID");
+            if (id.equals(id2)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
      * Get a token Element for the given Id. The Id can be either a wsu:Id or a 
-     * SAML AssertionID/ID.
-     * TODO think about if it is better to restrict the default Id to wsu:Id?
+     * SAML AssertionID/ID. 
      * @param uri is the (relative) uri of the id
      * @return the token element or null if nothing found
      */
@@ -115,7 +151,9 @@ public class WSDocInfo {
                 String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
                 String samlId = elem.getAttribute("AssertionID");
                 String samlId2 = elem.getAttribute("ID");
-                if (id.equals(cId) || id.equals(samlId) || id.equals(samlId2)) {
+                if ((elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)) 
+                    || (elem.hasAttribute("AssertionID") && id.equals(samlId))
+                    || (elem.hasAttribute("ID") && id.equals(samlId2))) {
                     return elem;
                 }
             }
@@ -124,39 +162,26 @@ public class WSDocInfo {
     }
     
     /**
-     * Store a protection element for later retrieval. 
+     * Store a protection element for later retrieval. This is only used for the 
+     * creation/outbound case.
      * @param element is the protection element to store
+     * @deprecated
      */
     public void addProtectionElement(Element element) {
-        if (elementList == null) {
-            elementList = new ArrayList<Element>();
+        if (tokenList == null) {
+            tokenList = new ArrayList<Element>();
         }
-        elementList.add(element);
+        tokenList.add(element);
     }
     
     /**
-     * Get a protection element for the given (wsu) Id.
+     * Get a protection element for the given (wsu/SAML) Id.
      * @param uri is the (relative) uri of the id
      * @return the protection element or null if nothing found
+     * @deprecated
      */
     public Element getProtectionElement(String uri) {
-        String id = uri;
-        if (id == null) {
-            return null;
-        } else if (id.charAt(0) == '#') {
-            id = id.substring(1);
-        }
-        if (elementList != null) {
-            for (Element element : elementList) {
-                if (element != null) {
-                    String cId = element.getAttributeNS(WSConstants.WSU_NS, "Id");
-                    if (id.equals(cId)) {
-                        return element;
-                    }
-                }
-            }
-        }
-        return null;
+        return getTokenElement(uri); 
     }
     
     /**

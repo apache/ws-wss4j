@@ -101,6 +101,7 @@ public class EncryptedDataProcessor implements Processor {
             );
         }
         
+        wsDocInfo.addTokenElement(elem);
         WSSConfig wssConfig = request.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
