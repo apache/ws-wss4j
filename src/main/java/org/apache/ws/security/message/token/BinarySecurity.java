@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.message.token;
 
+import java.util.Arrays;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -236,5 +238,40 @@ public class BinarySecurity {
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node)element);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        byte[] token = getToken();
+        if (token != null) {
+            result = 31 * result + Arrays.hashCode(token);
+        }
+        result = 31 * result + getValueType().hashCode();
+        result = 31 * result + getEncodingType().hashCode();
+        
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof BinarySecurity)) {
+            return false;
+        }
+        BinarySecurity binarySecurity = (BinarySecurity)object;
+        
+        byte[] token = binarySecurity.getToken();
+        if (!Arrays.equals(token, getToken())) {
+            return false;
+        }
+        String valueType = binarySecurity.getValueType();
+        if (!valueType.equals(getValueType())) {
+            return false;
+        }
+        String encodingType = binarySecurity.getEncodingType();
+        if (!encodingType.equals(getEncodingType())) {
+            return false;
+        }
+        return true;
     }
 }

@@ -125,7 +125,17 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");
-        verify(signedDoc);
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT);
+        UsernameToken receivedToken = 
+            (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+        assertTrue(receivedToken != null);
+        
+        UsernameToken clone = new UsernameToken(receivedToken.getElement());
+        assertTrue(clone.equals(receivedToken));
+        assertTrue(clone.hashCode() == receivedToken.hashCode());
     }
     
     /**
@@ -252,7 +262,17 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Text....");
-        verify(signedDoc);
+
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.UT);
+        UsernameToken receivedToken = 
+            (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+        assertTrue(receivedToken != null);
+        
+        UsernameToken clone = new UsernameToken(receivedToken.getElement());
+        assertTrue(clone.equals(receivedToken));
+        assertTrue(clone.hashCode() == receivedToken.hashCode());
     }
     
     /**

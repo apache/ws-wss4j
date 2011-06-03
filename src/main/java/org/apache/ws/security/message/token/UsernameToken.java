@@ -44,6 +44,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.text.DateFormat;
@@ -410,7 +411,7 @@ public class UsernameToken {
     public byte[] getSalt() throws WSSecurityException {
         String salt = nodeString(elementSalt);
         if (salt != null) {
-            return Base64.decode(nodeString(elementSalt));
+            return Base64.decode(salt);
         }
         return null;
     }
@@ -855,6 +856,91 @@ public class UsernameToken {
         return saltValue;
     }
 
+    @Override
+    public int hashCode() {
+        int result = 17;
+        String username = getName();
+        if (username != null) {
+            result = 31 * result + username.hashCode();
+        }
+        String password = getPassword();
+        if (password != null) {
+            result = 31 * result + password.hashCode();
+        }
+        String passwordType = getPasswordType();
+        if (passwordType != null) {
+            result = 31 * result + passwordType.hashCode();
+        }
+        String nonce = getNonce();
+        if (nonce != null) {
+            result = 31 * result + nonce.hashCode();
+        }
+        String created = getCreated();
+        if (created != null) {
+            result = 31 * result + created.hashCode();
+        }
+        try {
+            byte[] salt = getSalt();
+            if (salt != null) {
+                result = 31 * result + Arrays.hashCode(salt);
+            }
+        } catch (WSSecurityException ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
+            }
+        }
+        result = 31 * result + Integer.valueOf(getIteration()).hashCode();
+        
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof UsernameToken)) {
+            return false;
+        }
+        UsernameToken usernameToken = (UsernameToken)object;
+        if (!compare(usernameToken.getName(), getName())) {
+            return false;
+        }
+        if (!compare(usernameToken.getPassword(), getPassword())) {
+            return false;
+        }
+        if (!compare(usernameToken.getPasswordType(), getPasswordType())) {
+            return false;
+        }
+        if (!compare(usernameToken.getNonce(), getNonce())) {
+            return false;
+        }
+        if (!compare(usernameToken.getCreated(), getCreated())) {
+            return false;
+        }
+        try {
+            byte[] salt = usernameToken.getSalt();
+            if (!Arrays.equals(salt, getSalt())) {
+                return false;
+            }
+        } catch (WSSecurityException ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
+            }
+        }
+        int iteration = usernameToken.getIteration();
+        if (iteration != getIteration()) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(String item1, String item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
+    }
+    
     /**
      * P_hash as defined in RFC 2246 for TLS.
      * 

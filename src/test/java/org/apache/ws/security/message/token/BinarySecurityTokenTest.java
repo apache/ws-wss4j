@@ -84,6 +84,10 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assert token != null;
+        
+        BinarySecurity clone = new BinarySecurity(token.getElement());
+        assertTrue(clone.equals(token));
+        assertTrue(clone.hashCode() == token.hashCode());
     }
     
     /**
