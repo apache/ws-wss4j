@@ -5,6 +5,29 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.1
+=============
+
+Bug
+
+    * [WSS-273] - org.apache.ws.security.transform.STRTransform causes ClassCastException when wss4j is running on IBM 1.6 JVM
+    * [WSS-276] - Support signing a SAML Assertion using a derived key
+    * [WSS-280] - USE_DERIVED_KEY instead of USE_DERIVED_KEY_FOR_MAC in WSHandler
+    * [WSS-283] - ClassCastException when signing message with existing WSSE header containing Text as first child
+    * [WSS-285] - Error in SAML1.1 Conditions support
+    * [WSS-286] - Evidence element not present in SAML AuthzDecisionStatement
+    * [WSS-291] - Default to allowing Timestamps Created up to 60 seconds in the future to avoid clock skew problems
+
+Improvement
+
+    * [WSS-275] - Use SLF4J for logging framework for 1.6
+    * [WSS-278] - verifyTrust in Crypto should use CRLs as well
+    * [WSS-284] - Improvements to wsse11:EncryptedHeader support
+    * [WSS-287] - No longer use keystore for truststore purposes if the latter is explicitly specified.
+    * [WSS-288] - Incorporating Colm's Blog entries into WSS4J documentation
+    * [WSS-289] - Text improvements to website pages
+    * [WSS-290] - Create Principals when processing SAML and BinarySecurityTokens
+
 Release 1.6.0
 =============
 
