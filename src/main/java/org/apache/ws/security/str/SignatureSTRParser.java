@@ -457,6 +457,11 @@ public class SignatureSTRParser implements STRParser {
                 BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
             }
             SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+            if (keyInfo == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity"
+                );
+            }
             X509Certificate[] foundCerts = keyInfo.getCerts();
             if (foundCerts != null) {
                 certs = new X509Certificate[]{foundCerts[0]};
