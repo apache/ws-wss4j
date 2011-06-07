@@ -123,7 +123,7 @@ public class WSSecSignatureBase extends WSSecBase {
                                     callbackLookup = new DOMCallbackLookup(doc);
                                 }
                                 toSignById = callbackLookup.getElement(idToSign, null, false);
-                                wsDocInfo.addProtectionElement(toSignById);
+                                wsDocInfo.addTokenElement(toSignById, false);
                             }
                             List<String> prefixes = getInclusivePrefixes(toSignById);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
@@ -135,7 +135,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             );
                     }
                     if (element != null) {
-                        wsDocInfo.addProtectionElement(element);
+                        wsDocInfo.addTokenElement(element, false);
                     }
                     javax.xml.crypto.dsig.Reference reference = 
                         signatureFactory.newReference(
@@ -166,7 +166,7 @@ public class WSSecSignatureBase extends WSSecBase {
                         );
                     }
                     for (Element elementToSign : elementsToSign) {
-                        wsDocInfo.addProtectionElement(elementToSign);
+                        wsDocInfo.addTokenElement(elementToSign, false);
                         TransformParameterSpec transformSpec = null;
                         if (wssConfig.isWsiBSPCompliant()) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);

@@ -77,7 +77,6 @@ public class WSDocInfo {
      * Store a token element for later retrieval. Before storing the token, we check for a 
      * previously processed token with the same (wsu/SAML) Id.
      * @param element is the token element to store
-     * @deprecated
      */
     public void addTokenElement(Element element) throws WSSecurityException {
         addTokenElement(element, true);
