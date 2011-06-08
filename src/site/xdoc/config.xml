@@ -40,6 +40,10 @@ General properties:
 <td>org.apache.ws.security.crypto.merlin.cert.provider</td>
 <td>The provider used to load certificates. Defaults to keystore provider.</td>
 </tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.x509crl.file</td>
+<td>The location of an (X509) CRL file to use.</td>
+</tr>
 </table>
 <p>
 Keystore properties:
@@ -359,6 +363,12 @@ The configuration tags for WSHandler properties that are configured via a boolea
 Default is "false".</td>
 </tr>
 <tr>
+<td>ENABLE_REVOCATION</td>
+<td>enableRevocation</td>
+<td>Whether to enable Certificate Revocation List (CRL) checking when verifying trust in a 
+certificate. Default is "false".</td>
+</tr>
+<tr>
 <td>USE_ENCODED_PASSWORDS</td>
 <td>useEncodedPasswords</td>
 <td>Set whether to treat passwords as binary values for Username Tokens. Default is "false".</td>
@@ -484,7 +494,7 @@ default is "300".</td>
 <td>TTL_FUTURE_TIMESTAMP</td>
 <td>futureTimeToLive</td>
 <td>The time in seconds in the future within which the Created time of an incoming Timestamp is 
-valid. The default is "0".</td>
+valid. The default is "60".</td>
 </tr>
 </table>
 <p>
