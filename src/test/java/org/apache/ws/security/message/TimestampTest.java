@@ -74,6 +74,10 @@ public class TimestampTest extends org.junit.Assert {
         Timestamp receivedTimestamp = 
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
+        
+        Timestamp clone = new Timestamp(receivedTimestamp.getElement());
+        assertTrue(clone.equals(receivedTimestamp));
+        assertTrue(clone.hashCode() == receivedTimestamp.hashCode());
     }
     
     

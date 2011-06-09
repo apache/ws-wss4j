@@ -345,4 +345,40 @@ public class Timestamp {
     }
 
     
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (createdDate != null) {
+            result = 31 * result + createdDate.hashCode();
+        }
+        if (expiresDate != null) {
+            result = 31 * result + expiresDate.hashCode();
+        }
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Timestamp)) {
+            return false;
+        }
+        Timestamp timestamp = (Timestamp)object;
+        if (!compare(timestamp.getCreated(), getCreated())) {
+            return false;
+        }
+        if (!compare(timestamp.getExpires(), getExpires())) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(Date item1, Date item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
+    }
+    
 }

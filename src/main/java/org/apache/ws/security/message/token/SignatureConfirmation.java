@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.message.token;
 
+import java.util.Arrays;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -124,6 +126,28 @@ public class SignatureConfirmation {
      */
     public byte[] getSignatureValue() {
         return signatureValue;
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (signatureValue != null) {
+            result = 31 * result + Arrays.hashCode(signatureValue);
+        }
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof SignatureConfirmation)) {
+            return false;
+        }
+        SignatureConfirmation signatureConfirmation = (SignatureConfirmation)object;
+        byte[] sigValue = signatureConfirmation.getSignatureValue();
+        if (!Arrays.equals(sigValue, getSignatureValue())) {
+            return false;
+        }
+        return true;
     }
     
 }
