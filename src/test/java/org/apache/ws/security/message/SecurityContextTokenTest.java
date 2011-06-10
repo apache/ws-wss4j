@@ -19,15 +19,19 @@
 
 package org.apache.ws.security.message;
 
+import java.util.List;
+
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -115,7 +119,18 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 LOG.debug(out);
             }
 
-            verify(doc);
+            List<WSSecurityEngineResult> results = verify(doc);
+            
+            WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SCT);
+            SecurityContextToken receivedToken = 
+                (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
+            assertTrue(receivedToken != null);
+            
+            SecurityContextToken clone = new SecurityContextToken(receivedToken.getElement());
+            assertTrue(clone.equals(receivedToken));
+            assertTrue(clone.hashCode() == receivedToken.hashCode());
+            
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -340,11 +355,13 @@ public class SecurityContextTokenTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
+        return results;
     }
 
 

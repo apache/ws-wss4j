@@ -225,5 +225,36 @@ public class SecurityContextToken {
     public void setID(String id) {
         element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        String identifier = getIdentifier();
+        if (identifier != null) {
+            result = 31 * result + identifier.hashCode();
+        }
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof SecurityContextToken)) {
+            return false;
+        }
+        SecurityContextToken securityToken = (SecurityContextToken)object;
+        if (!compare(getIdentifier(), securityToken.getIdentifier())) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(String item1, String item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
+    }
 
 }
