@@ -195,6 +195,13 @@ public class SAML2ComponentBuilder {
             conditions.setNotBefore(newNotBefore);
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(tokenPeriodMinutes));
         }
+        
+        if (conditionsBean.getAudienceURI() != null) {
+            AudienceRestriction audienceRestriction = 
+                createAudienceRestriction(conditionsBean.getAudienceURI());
+            conditions.getAudienceRestrictions().add(audienceRestriction);
+        }
+        
         return conditions;
     }
 
@@ -294,12 +301,28 @@ public class SAML2ComponentBuilder {
      * @param name         of type String
      * @param values       of type ArrayList
      * @return a SAML2 Attribute
+     * @deprecated
      */
     public static Attribute createAttribute(String friendlyName, String name, List<String> values) {
+        return createAttribute(friendlyName, name, null, values);
+    }
+    
+    /**
+     * Create a SAML2 Attribute
+     *
+     * @param friendlyName of type String
+     * @param name         of type String
+     * @param nameFormat   of type String
+     * @param values       of type ArrayList
+     * @return a SAML2 Attribute
+     */
+    public static Attribute createAttribute(
+        String friendlyName, String name, String nameFormat, List<String> values
+    ) {
         if (stringBuilder == null) {
             stringBuilder = (XSStringBuilder)builderFactory.getBuilder(XSString.TYPE_NAME);
         }
-        Attribute attribute = createAttribute(friendlyName, name);
+        Attribute attribute = createAttribute(friendlyName, name, nameFormat);
         for (String value : values) {
             XSString attributeValue = 
                 stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -328,13 +351,16 @@ public class SAML2ComponentBuilder {
         NameID nameID = SAML2ComponentBuilder.createNameID(subjectBean);
         subject.setNameID(nameID);
         
-        SubjectConfirmationData subjectConfData = 
-            SAML2ComponentBuilder.createSubjectConfirmationData(
-                null, 
-                null, 
-                null, 
-                subjectBean.getKeyInfo() 
-            );
+        SubjectConfirmationData subjectConfData = null;
+        if (subjectBean.getKeyInfo() != null) {
+            subjectConfData = 
+                SAML2ComponentBuilder.createSubjectConfirmationData(
+                    null, 
+                    null, 
+                    null, 
+                    subjectBean.getKeyInfo() 
+                );
+        }
         
         String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
         if (confirmationMethodStr == null) {
@@ -476,6 +502,7 @@ public class SAML2ComponentBuilder {
                         createAttribute(
                             values.getSimpleName(), 
                             values.getQualifiedName(),
+                            values.getNameFormat(),
                             values.getAttributeValues()
                         );
                     attributeStatement.getAttributes().add(samlAttribute);
@@ -497,9 +524,22 @@ public class SAML2ComponentBuilder {
      * @param friendlyName of type String
      * @param name of type String
      * @return an Attribute object
+     * @deprecated
+     */
+    public static Attribute createAttribute(String friendlyName, String name) {
+        return createAttribute(friendlyName, name, (String)null);
+    }
+    
+    /**
+     * Create an Attribute object.
+     *
+     * @param friendlyName of type String
+     * @param name of type String
+     * @param nameFormat of type String
+     * @return an Attribute object
      */
     @SuppressWarnings("unchecked")
-    public static Attribute createAttribute(String friendlyName, String name) {
+    public static Attribute createAttribute(String friendlyName, String name, String nameFormat) {
         if (attributeBuilder == null) {
             attributeBuilder = (SAMLObjectBuilder<Attribute>)
                 builderFactory.getBuilder(Attribute.DEFAULT_ELEMENT_NAME);
@@ -507,7 +547,11 @@ public class SAML2ComponentBuilder {
         
         Attribute attribute = attributeBuilder.buildObject();
         attribute.setFriendlyName(friendlyName);
-        attribute.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_URI);
+        if (nameFormat == null) {
+            attribute.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_URI);
+        } else {
+            attribute.setNameFormat(nameFormat);
+        }
         attribute.setName(name);
         return attribute;
     }

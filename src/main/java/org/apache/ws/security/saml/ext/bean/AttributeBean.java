@@ -31,6 +31,7 @@ import java.util.ArrayList;
 public class AttributeBean {
     private String simpleName;
     private String qualifiedName;
+    private String nameFormat;
     private List<String> attributeValues;
 
     /**
@@ -69,6 +70,24 @@ public class AttributeBean {
      */
     public void setSimpleName(String simpleName) {
         this.simpleName = simpleName;
+    }
+    
+    /**
+     * Method getNameFormat returns the nameFormat of this SamlAttribute object
+     * 
+     * @return he nameFormat of this SamlAttribute object
+     */
+    public String getNameFormat() {
+        return nameFormat;
+    }
+    
+    /**
+     * Method setNameFormat sets the nameFormat of this SamlAttribute object.
+     *
+     * @param nameFormat the nameFormat of this SamlAttribute object.
+     */
+    public void setNameFormat(String nameFormat) {
+        this.nameFormat = nameFormat;
     }
 
     /**
@@ -126,6 +145,12 @@ public class AttributeBean {
             return false;
         }
         
+        if (nameFormat == null && that.nameFormat != null) {
+            return false;
+        } else if (nameFormat != null && !nameFormat.equals(that.nameFormat)) {
+            return false;
+        }
+        
         if (simpleName == null && that.simpleName != null) {
             return false;
         } else if (simpleName != null && !simpleName.equals(that.simpleName)) {
@@ -143,6 +168,9 @@ public class AttributeBean {
         }
         if (qualifiedName != null) {
             result = 31 * result + qualifiedName.hashCode();
+        }
+        if (nameFormat != null) {
+            result = 31 * result + nameFormat.hashCode();
         }
         if (attributeValues != null) {
             result = 31 * result + attributeValues.hashCode();

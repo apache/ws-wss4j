@@ -32,6 +32,7 @@ public class ConditionsBean {
     private DateTime notBefore;
     private DateTime notAfter;
     private int tokenPeriodMinutes;
+    private String audienceURI;
 
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
@@ -117,6 +118,24 @@ public class ConditionsBean {
     public void setTokenPeriodMinutes(int tokenPeriodMinutes) {
         this.tokenPeriodMinutes = tokenPeriodMinutes;
     }
+    
+    /**
+     * Get the audienceURI instance
+     *
+     * @return the audienceURI instance
+     */
+    public String getAudienceURI() {
+        return audienceURI;
+    }
+
+    /**
+     * Set the audienceURI instance
+     *
+     * @param audienceURI the audienceURI instance to set
+     */
+    public void setAudienceURI(String audienceURI) {
+        this.audienceURI = audienceURI;
+    }
 
     /**
      * Method equals ...
@@ -144,6 +163,12 @@ public class ConditionsBean {
         } else if (notAfter != null && !notAfter.equals(that.notAfter)) {
             return false; 
         }
+        
+        if (audienceURI == null && that.audienceURI != null) {
+            return false;
+        } else if (audienceURI != null && !audienceURI.equals(that.audienceURI)) {
+            return false; 
+        }
 
         return true;
     }
@@ -159,6 +184,9 @@ public class ConditionsBean {
         }
         if (notAfter != null) {
             result = 31 * result + notAfter.hashCode();
+        }
+        if (audienceURI != null) {
+            result = 31 * result + audienceURI.hashCode();
         }
         return result;
     }
