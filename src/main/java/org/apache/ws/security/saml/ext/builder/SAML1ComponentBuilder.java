@@ -41,6 +41,8 @@ import org.opensaml.saml1.core.Assertion;
 import org.opensaml.saml1.core.Attribute;
 import org.opensaml.saml1.core.AttributeStatement;
 import org.opensaml.saml1.core.AttributeValue;
+import org.opensaml.saml1.core.Audience;
+import org.opensaml.saml1.core.AudienceRestrictionCondition;
 import org.opensaml.saml1.core.AuthenticationStatement;
 import org.opensaml.saml1.core.AuthorizationDecisionStatement;
 import org.opensaml.saml1.core.Conditions;
@@ -72,6 +74,10 @@ public class SAML1ComponentBuilder {
     private static SAMLObjectBuilder<Assertion> assertionV1Builder;
     
     private static SAMLObjectBuilder<Conditions> conditionsV1Builder;
+    
+    private static SAMLObjectBuilder<AudienceRestrictionCondition> audienceRestrictionV1Builder;
+    
+    private static SAMLObjectBuilder<Audience> audienceV1Builder;
     
     private static SAMLObjectBuilder<AuthenticationStatement> authenticationStatementV1Builder;
     
@@ -260,7 +266,40 @@ public class SAML1ComponentBuilder {
             conditions.setNotBefore(newNotBefore);
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(tokenPeriodMinutes));
         }
+        
+        if (conditionsBean.getAudienceURI() != null) {
+            AudienceRestrictionCondition audienceRestriction = 
+                createSamlv1AudienceRestriction(conditionsBean.getAudienceURI());
+            conditions.getAudienceRestrictionConditions().add(audienceRestriction);
+        }
+        
         return conditions;
+    }
+    
+    /**
+     * Create an AudienceRestrictionCondition object
+     *
+     * @param audienceURI of type String
+     * @return an AudienceRestrictionCondition object
+     */
+    @SuppressWarnings("unchecked")
+    public static AudienceRestrictionCondition 
+    createSamlv1AudienceRestriction(String audienceURI) {
+        if (audienceRestrictionV1Builder == null) {
+            audienceRestrictionV1Builder = (SAMLObjectBuilder<AudienceRestrictionCondition>) 
+                builderFactory.getBuilder(AudienceRestrictionCondition.DEFAULT_ELEMENT_NAME);
+        }
+        if (audienceV1Builder == null) {
+            audienceV1Builder = (SAMLObjectBuilder<Audience>) 
+                builderFactory.getBuilder(Audience.DEFAULT_ELEMENT_NAME);
+        }
+       
+        AudienceRestrictionCondition audienceRestriction = 
+            audienceRestrictionV1Builder.buildObject();
+        Audience audience = audienceV1Builder.buildObject();
+        audience.setUri(audienceURI);
+        audienceRestriction.getAudiences().add(audience);
+        return audienceRestriction;
     }
 
     /**
