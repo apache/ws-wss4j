@@ -475,7 +475,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         KeyInfo keyInfo
     ) throws WSSecurityException {
 
-        boolean content = modifier.equals("Content") ? true : false;
+        boolean content = "Content".equals(modifier) ? true : false;
         //
         // Encrypt data, and set necessary attributes in xenc:EncryptedData
         //
