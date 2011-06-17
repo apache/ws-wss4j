@@ -565,6 +565,41 @@ public class EncryptionTest extends org.junit.Assert {
             assert ex.getMessage().contains("bad attribute");
         }
     }
+    
+    /**
+     * In this test an EncryptedKey structure is embedded in the EncryptedData structure.
+     * The EncryptedKey structure refers to a certificate via the SKI_KEY_IDENTIFIER.
+     */
+    @org.junit.Test
+    public void testEmbeddedEncryptedKey() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        builder.prepare(doc, crypto);
+        builder.setEmbedEncryptedKey(true);
+
+        SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
+                .getDocumentElement());
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP = new WSEncryptionPart(soapConstants
+                .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
+                "Content");
+        parts.add(encP);
+
+        builder.encryptForRef(null, parts);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        System.out.println(outputString);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(doc, crypto, keystoreCallbackHandler);
+    }
 
     
     /**

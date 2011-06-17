@@ -90,6 +90,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * True if the encKeyId is a direct reference to a key identifier instead of a URI to a key
      */
     private boolean encKeyIdDirectId;
+    
+    private boolean embedEncryptedKey;
  
     public WSSecEncrypt() {
         super();
@@ -541,7 +543,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private KeyInfo createKeyInfo() throws WSSecurityException {
 
         KeyInfo keyInfo = new KeyInfo(document);
-        if (keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
+        if (embedEncryptedKey) {
+            keyInfo.addUnknownElement(getEncryptedKeyElement());
+        } else if (keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
             if (customReferenceValue != null) {
@@ -685,5 +689,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     public void setEncKeyIdDirectId(boolean b) {
         encKeyIdDirectId = b;
+    }
+    
+    public void setEmbedEncryptedKey(boolean embedEncryptedKey) {
+        this.embedEncryptedKey = embedEncryptedKey;
+    }
+    
+    public boolean isEmbedEncryptedKey() {
+        return embedEncryptedKey;
     }
 }
