@@ -136,6 +136,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         
         try {
             verify(encryptedDoc);
+            fail("Failure expected with a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 6);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
@@ -151,6 +152,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
     public void testUnsupportedAlgorithm() throws Exception {
         try {
             WSSecurityUtil.getCipherInstance("Bad Algorithm");
+            fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 2);
             assertTrue(ex.getMessage().startsWith(
@@ -168,6 +170,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
     public void testSecurityTokenUnavailable() throws Exception {
         try {
             crypto.loadCertificate(new java.io.ByteArrayInputStream(new byte[]{}));
+            fail("A Security Token is unavailable");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 7);
             assertTrue(ex.getMessage().startsWith(
@@ -192,6 +195,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         
         try {
             verify(timestampedDoc);
+            fail("Failure expected on an expired message");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 8);
             assertTrue(ex.getMessage().startsWith(
@@ -218,6 +222,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         
         try {
             verify(timestampedDoc);
+            fail("Failure expected on a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 5);
             assertTrue(ex.getMessage().startsWith(
@@ -244,6 +249,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
         
         try {
             new UsernameToken(doc.getDocumentElement());
+            fail("Failure expected on an invalid security token");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 4);
             assertTrue(ex.getMessage().startsWith(
@@ -259,6 +265,7 @@ public class TestWSSecurityFaultCodes extends TestCase implements CallbackHandle
     public void testInvalidSecurity() throws Exception {
         try {
             new Reference((org.w3c.dom.Element)null);
+            fail("Failure expected on processing the security header");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 3);
             assertTrue(ex.getMessage().startsWith(
