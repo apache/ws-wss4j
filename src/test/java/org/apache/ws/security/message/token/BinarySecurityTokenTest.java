@@ -83,7 +83,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertNotNull(token);
         
         BinarySecurity clone = new BinarySecurity(token.getElement());
         assertTrue(clone.equals(token));
@@ -126,7 +126,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         PKIPathSecurity token =
             (PKIPathSecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertNotNull(token);
     }
     
     /**
@@ -177,7 +177,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertNotNull(token);
     }
     
 }

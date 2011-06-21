@@ -292,7 +292,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
             fail("Failure expected on a request with no wsu:Id");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("wsu:Id");
+            assertTrue(ex.getMessage().contains("wsu:Id"));
         }
     }
     

@@ -257,7 +257,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         try {
             verify(encryptedDoc);
-            throw new Exception("Failure expected on a bad derived encryption");
+            fail("Failure expected on a bad derived encryption");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
             // expected
@@ -308,7 +308,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         try {
             verify(encryptedDoc);
-            throw new Exception("Failure expected on a bad derived encryption");
+            fail("Failure expected on a bad derived encryption");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -459,7 +459,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
 
         try {
             verify(signedDoc);
-            throw new Exception("Failure expected on a bad derived signature");
+            fail("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
             // expected
@@ -505,7 +505,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
 
         try {
             verify(signedDoc);
-            throw new Exception("Failure expected on a bad derived signature");
+            fail("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected

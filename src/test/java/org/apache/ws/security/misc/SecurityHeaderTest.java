@@ -90,6 +90,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(DUPLICATE_NULL_ACTOR_MSG);
         try {
             secEngine.processSecurityHeader(doc, null, null, null);
+            fail("Failure expected on a null actor");
         } catch (WSSecurityException ex) {
             // expected
         }
@@ -103,12 +104,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(DUPLICATE_ACTOR_MSG);
         try {
             secEngine.processSecurityHeader(doc, "user", null, null);
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        
-        try {
-            secEngine.processSecurityHeader(doc, "otheruser", null, null);
+            fail("Failure expected on a duplicate actor");
         } catch (WSSecurityException ex) {
             // expected
         }

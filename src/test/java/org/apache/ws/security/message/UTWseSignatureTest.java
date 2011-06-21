@@ -129,7 +129,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         //
         try {
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
-            fail ("An error was expected on verifying the signature");
+            fail("An error was expected on verifying the signature");
         } catch (Exception ex) {
             // expected
         }
@@ -177,7 +177,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         //
         try {
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
-            fail ("An error was expected on verifying the signature");
+            fail("An error was expected on verifying the signature");
         } catch (Exception ex) {
             // expected
         }

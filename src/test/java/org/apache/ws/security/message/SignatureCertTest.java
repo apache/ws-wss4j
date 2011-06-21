@@ -213,7 +213,7 @@ public class SignatureCertTest extends org.junit.Assert {
         
         try {
             verify(signedDoc, cryptoCA);
-            throw new Exception("Failure expected on issuer serial");
+            fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
             // expected

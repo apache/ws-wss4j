@@ -120,8 +120,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML message Key Identifier (sender vouches):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
@@ -184,8 +184,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML message Direct Reference (sender vouches):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
@@ -248,8 +248,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
@@ -257,7 +257,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -312,8 +312,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
@@ -321,7 +321,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -381,8 +381,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         verify(encryptedDoc, crypto, crypto);
     }
@@ -439,8 +439,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted SAML 1.1 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -448,7 +448,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -515,8 +515,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted SAML 1.1 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -524,7 +524,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -537,7 +537,6 @@ public class SamlReferenceTest extends org.junit.Assert {
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
-        
     }
     
     /**
@@ -575,8 +574,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML2 message Key Identifier (sender vouches):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
@@ -638,8 +637,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML2 message Direct Reference (sender vouches):");
             LOG.debug(outputString);
         }
-        assert !outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        assertTrue(!outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
@@ -702,8 +701,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML2 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
@@ -711,7 +710,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -766,8 +765,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML2 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert !outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        assertTrue(!outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
@@ -775,7 +774,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -841,8 +840,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted SAML 2 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -850,7 +849,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -917,8 +916,8 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted SAML 2 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert !outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        assert outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        assertTrue(!outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -926,7 +925,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);

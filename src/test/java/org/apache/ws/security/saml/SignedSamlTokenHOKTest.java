@@ -127,7 +127,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -188,7 +188,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -250,7 +250,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -313,7 +313,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -366,7 +366,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug("SAML 1.1 Authn Assertion Issuer Serial (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains("X509IssuerSerial");
+        assertTrue(outputString.contains("X509IssuerSerial"));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -374,7 +374,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -426,7 +426,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug("SAML 1.1 Authn Assertion Key Value (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains("KeyValue");
+        assertTrue(outputString.contains("KeyValue"));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -486,7 +486,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug("SAML 2 Authn Assertion Key Value (holder-of-key):");
             LOG.debug(outputString);
         }
-        assert outputString.contains("KeyValue");
+        assertTrue(outputString.contains("KeyValue"));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
@@ -494,7 +494,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -560,7 +560,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);

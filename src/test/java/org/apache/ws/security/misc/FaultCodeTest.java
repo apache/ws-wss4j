@@ -70,6 +70,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         
         try {
             verify(encryptedDoc);
+            fail("Failure expected with a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 6);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
@@ -87,30 +88,12 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         try {
             secEngine.getWssConfig();
             WSSecurityUtil.getCipherInstance("Bad Algorithm");
+            fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 2);
             assertTrue(ex.getMessage().startsWith(
                 "An unsupported signature or encryption algorithm was used"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "UnsupportedAlgorithm");
-            assertTrue(ex.getFaultCode().equals(faultCode));
-        }
-    }
-    
-    
-    /**
-     * Test for the wsse:SecurityTokenUnavailable faultcode. This will fail due to the 
-     * argument to loadCertificate.
-     */
-    @org.junit.Test
-    public void testSecurityTokenUnavailable() throws Exception {
-        try {
-            secEngine.getWssConfig();
-            crypto.loadCertificate(new java.io.ByteArrayInputStream(new byte[]{}));
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 7);
-            assertTrue(ex.getMessage().startsWith(
-                "Referenced security token could not be retrieved"));
-            QName faultCode = new QName(WSConstants.WSSE_NS, "SecurityTokenUnavailable");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
@@ -131,6 +114,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         
         try {
             verify(timestampedDoc);
+            fail("Failure expected on an expired message");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 8);
             assertTrue(ex.getMessage().startsWith(
@@ -158,6 +142,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         
         try {
             verify(timestampedDoc);
+            fail("Failure expected on a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 5);
             assertTrue(ex.getMessage().startsWith(
@@ -185,6 +170,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         
         try {
             new UsernameToken(doc.getDocumentElement());
+            fail("Failure expected on an invalid security token");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 4);
             assertTrue(ex.getMessage().startsWith(
@@ -201,6 +187,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     public void testInvalidSecurity() throws Exception {
         try {
             new Reference((org.w3c.dom.Element)null);
+            fail("Failure expected on processing the security header");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == 3);
             assertTrue(ex.getMessage().startsWith(

@@ -92,7 +92,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
     }
     
     /**
@@ -125,7 +125,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
     }
     
     /**
@@ -172,7 +172,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         */
     }
     
@@ -190,7 +190,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         samlParms.setCallbackHandler(callbackHandler);
         AssertionWrapper assertion = new AssertionWrapper(samlParms);
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
-
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -213,7 +212,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
     }
     
     /**

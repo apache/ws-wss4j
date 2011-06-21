@@ -136,8 +136,8 @@ public class SignatureCRLTest extends org.junit.Assert {
         } catch (Exception ex) {
             String errorMessage = ex.getMessage();
             // Different errors using different JDKs...
-            assert errorMessage.contains("Certificate has been revoked")
-                || errorMessage.contains("Certificate revocation");
+            assertTrue(errorMessage.contains("Certificate has been revoked")
+                || errorMessage.contains("Certificate revocation"));
         }
     }
     

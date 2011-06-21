@@ -82,14 +82,14 @@ public class PrincipalTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, null);
         
         Principal principal = (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assert principal instanceof WSUsernameTokenPrincipal;
-        assert "wernerd".equals(principal.getName());
+        assertTrue(principal instanceof WSUsernameTokenPrincipal);
+        assertTrue("wernerd".equals(principal.getName()));
         WSUsernameTokenPrincipal userPrincipal = (WSUsernameTokenPrincipal)principal;
-        assert userPrincipal.getCreatedTime() != null;
-        assert userPrincipal.getNonce() != null;
-        assert userPrincipal.getPassword() != null;
-        assert userPrincipal.isPasswordDigest();
-        assert WSConstants.PASSWORD_DIGEST.equals(userPrincipal.getPasswordType());
+        assertTrue(userPrincipal.getCreatedTime() != null);
+        assertTrue(userPrincipal.getNonce() != null);
+        assertTrue(userPrincipal.getPassword() != null);
+        assertTrue(userPrincipal.isPasswordDigest());
+        assertTrue(WSConstants.PASSWORD_DIGEST.equals(userPrincipal.getPasswordType()));
     }
     
     /**
@@ -114,9 +114,9 @@ public class PrincipalTest extends org.junit.Assert {
             verify(signedDoc, new DummyValidator(), WSSecurityEngine.USERNAME_TOKEN, null);
         
         Principal principal = (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assert principal instanceof SAMLTokenPrincipal;
-        assert principal.getName().contains("uid=joe");
-        assert ((SAMLTokenPrincipal)principal).getToken() != null;
+        assertTrue(principal instanceof SAMLTokenPrincipal);
+        assertTrue(principal.getName().contains("uid=joe"));
+        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
     }
     
     /**
@@ -155,9 +155,9 @@ public class PrincipalTest extends org.junit.Assert {
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assert principal instanceof SAMLTokenPrincipal;
-        assert principal.getName().contains("uid=joe");
-        assert ((SAMLTokenPrincipal)principal).getToken() != null;
+        assertTrue(principal instanceof SAMLTokenPrincipal);
+        assertTrue(principal.getName().contains("uid=joe"));
+        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
     }
     
     /**
@@ -196,9 +196,9 @@ public class PrincipalTest extends org.junit.Assert {
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assert principal instanceof SAMLTokenPrincipal;
-        assert principal.getName().contains("uid=joe");
-        assert ((SAMLTokenPrincipal)principal).getToken() != null;
+        assertTrue(principal instanceof SAMLTokenPrincipal);
+        assertTrue(principal.getName().contains("uid=joe"));
+        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
     }
     
     /**
@@ -239,9 +239,9 @@ public class PrincipalTest extends org.junit.Assert {
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assert principal instanceof SAMLTokenPrincipal;
-        assert principal.getName().contains("uid=joe");
-        assert ((SAMLTokenPrincipal)principal).getToken() != null;
+        assertTrue(principal instanceof SAMLTokenPrincipal);
+        assertTrue(principal.getName().contains("uid=joe"));
+        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
     }
     
     /**
@@ -276,13 +276,13 @@ public class PrincipalTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertNotNull(token);
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assert principal instanceof SAMLTokenPrincipal;
-        assert principal.getName().contains("uid=joe");
-        assert ((SAMLTokenPrincipal)principal).getToken() != null;
+        assertTrue(principal instanceof SAMLTokenPrincipal);
+        assertTrue(principal.getName().contains("uid=joe"));
+        assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
     }
     
     /**

@@ -92,7 +92,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
@@ -125,7 +125,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
@@ -162,7 +162,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
@@ -199,7 +199,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
@@ -236,7 +236,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
@@ -273,7 +273,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
@@ -310,7 +310,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
 
     /**
@@ -352,7 +352,7 @@ public class SamlTokenTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert !receivedAssertion.isSigned();
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**

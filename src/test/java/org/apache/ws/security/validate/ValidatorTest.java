@@ -121,7 +121,7 @@ public class ValidatorTest extends org.junit.Assert {
         newEngine.setWssConfig(config);
         try {
             newEngine.processSecurityHeader(signedDoc, null, null, cryptoCA);
-            throw new Exception("Failure expected on issuer serial");
+            fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
             // expected
@@ -206,11 +206,11 @@ public class ValidatorTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertTrue(token != null);
         
         AssertionWrapper assertion = 
             (AssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
-        assert assertion != null;
+        assertTrue(assertion != null);
     }
     
     /**
@@ -254,7 +254,7 @@ public class ValidatorTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertTrue(token != null);
     }
 
 

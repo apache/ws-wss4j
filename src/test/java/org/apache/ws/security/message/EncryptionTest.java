@@ -562,7 +562,7 @@ public class EncryptionTest extends org.junit.Assert {
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
             fail("Failure expected on a bad attribute type");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("bad attribute");
+            assertTrue(ex.getMessage().contains("bad attribute"));
         }
     }
     
@@ -593,7 +593,6 @@ public class EncryptionTest extends org.junit.Assert {
 
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        System.out.println(outputString);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

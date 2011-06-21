@@ -58,7 +58,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on a reference with no URI");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("Reference URI is null");
+            assertTrue(ex.getMessage().contains("Reference URI is null"));
         }
     }
 
@@ -89,7 +89,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on multiple data references");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("Cannot handle multiple data references");
+            assertTrue(ex.getMessage().contains("Cannot handle multiple data references"));
         }
         
         new SecurityTokenReference(strElement, false);
@@ -117,7 +117,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on a Key Identifier with no ValueType");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("Bad ValueType");
+            assertTrue(ex.getMessage().contains("Bad ValueType"));
         }
         
         new SecurityTokenReference(strElement, false);
@@ -150,7 +150,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on a Key Identifier with a Bad EncodingType");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("bad EncodingType");
+            assertTrue(ex.getMessage().contains("bad EncodingType"));
         }
         
         new SecurityTokenReference(strElement, false);
@@ -183,7 +183,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on a Key Identifier with no EncodingType");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("No EncodingType");
+            assertTrue(ex.getMessage().contains("No EncodingType"));
         }
         
         new SecurityTokenReference(strElement, false);
@@ -244,7 +244,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on an Embedded Child with a SecurityTokenReference child");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("embedded Reference is invalid");
+            assertTrue(ex.getMessage().contains("embedded Reference is invalid"));
         }
         
         new SecurityTokenReference(strElement, false);
@@ -280,7 +280,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement);
             fail("Failure expected on an Embedded Child with multiple children");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("embedded Reference is invalid");
+            assertTrue(ex.getMessage().contains("embedded Reference is invalid"));
         }
         
         new SecurityTokenReference(strElement, false);

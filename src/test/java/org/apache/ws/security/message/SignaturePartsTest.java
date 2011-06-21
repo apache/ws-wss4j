@@ -225,7 +225,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
         
         WSSecurityEngineResult signActionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -404,7 +404,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "Incorrect N/S",
                 "");
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
-        assert bodyElement != null && "Body".equals(bodyElement.getLocalName());
+        assertTrue(bodyElement != null && "Body".equals(bodyElement.getLocalName()));
         encP.setElement(bodyElement);
         parts.add(encP);
         sign.setParts(parts);

@@ -172,7 +172,7 @@ public class SignatureTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Failure expected on a bad c14n algorithm");
         } catch (WSSecurityException ex) {
-            assert ex.getMessage().contains("bad canonicalization algorithm");
+            assertTrue(ex.getMessage().contains("bad canonicalization algorithm"));
         }
     }
     

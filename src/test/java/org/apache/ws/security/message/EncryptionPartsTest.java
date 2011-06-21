@@ -361,7 +361,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "Incorrect N/S",
                 "");
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
-        assert bodyElement != null && "Body".equals(bodyElement.getLocalName());
+        assertTrue(bodyElement != null && "Body".equals(bodyElement.getLocalName()));
         encP.setElement(bodyElement);
         parts.add(encP);
         encrypt.setParts(parts);
@@ -409,14 +409,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assert !outputString.contains("testMethod");
+        assertTrue(!outputString.contains("testMethod"));
         
         verify(encryptedDoc);
         
         outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assert outputString.contains("asf1");
-        assert outputString.contains("asf2");
+        assertTrue(outputString.contains("asf1"));
+        assertTrue(outputString.contains("asf2"));
     }
     
 
