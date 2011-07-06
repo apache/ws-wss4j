@@ -61,7 +61,11 @@ public class WSDocInfo {
         // WSDocInfoStore.lookup(transformObject.getDocument())
         // will not work. 
         //
-        this.doc = doc.getDocumentElement().getOwnerDocument();
+        if (doc != null && doc.getDocumentElement() != null) {
+            this.doc = doc.getDocumentElement().getOwnerDocument();
+        } else {
+            this.doc = doc;
+        }
     }
     
     /**
