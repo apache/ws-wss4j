@@ -54,7 +54,11 @@ public class WSDocInfo {
         // be that the "owner" document of any child elements is an internal Document, rather
         // than the SOAPPart. This is the case for the SUN SAAJ implementation.
         //
-        this.doc = doc.getDocumentElement().getOwnerDocument();
+        if (doc != null && doc.getDocumentElement() != null) {
+            this.doc = doc.getDocumentElement().getOwnerDocument();
+        } else {
+            this.doc = doc;
+        }
     }
     
     /**
