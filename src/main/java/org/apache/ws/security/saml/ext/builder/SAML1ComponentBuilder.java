@@ -169,7 +169,7 @@ public class SAML1ComponentBuilder {
         
         nameIdentifier.setNameQualifier(subjectBean.getSubjectNameQualifier());
         nameIdentifier.setNameIdentifier(subjectBean.getSubjectName());
-        nameIdentifier.setFormat(SAML1Constants.NAMEID_FORMAT_UNSPECIFIED);
+        nameIdentifier.setFormat(subjectBean.getSubjectNameIDFormat());
         String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
         
         if (confirmationMethodStr == null) {

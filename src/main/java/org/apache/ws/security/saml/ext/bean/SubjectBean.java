@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.saml.ext.bean;
 
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+
 /**
  * Class SubjectBean represents a SAML subject (can be used to create
  * both SAML v1.1 and v2.0 statements)
@@ -27,6 +29,7 @@ package org.apache.ws.security.saml.ext.bean;
  */
 public class SubjectBean {
     private String subjectName;
+    private String subjectNameIDFormat = SAML1Constants.NAMEID_FORMAT_UNSPECIFIED;
     private String subjectNameQualifier;
     private String subjectConfirmationMethod;
     private KeyInfoBean keyInfo;
@@ -52,6 +55,24 @@ public class SubjectBean {
         this.subjectName = subjectName;
         this.subjectNameQualifier = subjectNameQualifier;
         this.subjectConfirmationMethod = subjectConfirmationMethod;
+    }
+    
+    /**
+     * Constructor SubjectBean creates a new SubjectBean instance.
+     *
+     * @param subjectName of type String
+     * @param subjectNameQualifier of type String
+     * @param subjectConfirmationMethod of type String
+     * @param subjectNameIDFormat of type String
+     */
+    public SubjectBean(
+        String subjectName, 
+        String subjectNameQualifier, 
+        String subjectConfirmationMethod,
+        String subjectNameIDFormat
+    ) {
+        this(subjectName, subjectNameQualifier, subjectConfirmationMethod);
+        this.subjectNameIDFormat = subjectNameIDFormat;
     }
 
     /**
@@ -112,6 +133,26 @@ public class SubjectBean {
     }
     
     /**
+     * Method getSubjectNameIDFormat returns the subjectNameIDFormat of this SubjectBean 
+     * object.
+     *
+     * @return the subjectNameIDFormat (type String) of this SubjectBean object.
+     */
+    public String getSubjectNameIDFormat() {
+        return subjectNameIDFormat;
+    }
+
+    /**
+     * Method setSubjectNameIDFormat sets the subjectNameIDFormat of this SubjectBean 
+     * object.
+     *
+     * @param subjectNameIDFormat the subjectNameIDFormat of this SubjectBean object.
+     */
+    public void setSubjectNameIDFormat(String subjectNameIDFormat) {
+        this.subjectNameIDFormat = subjectNameIDFormat;
+    }
+    
+    /**
      * Method getKeyInfo returns the keyInfo of this SubjectBean object.
      *
      * @return the keyInfo (type KeyInfoBean) of this SubjectBean object.
@@ -162,6 +203,13 @@ public class SubjectBean {
             return false;
         }
         
+        if (subjectNameIDFormat == null && that.subjectNameIDFormat != null) {
+            return false;
+        } else if (subjectNameIDFormat != null 
+            && !subjectNameIDFormat.equals(that.subjectNameIDFormat)) {
+            return false;
+        }
+        
         if (keyInfo == null && that.keyInfo != null) {
             return false;
         } else if (keyInfo != null && !keyInfo.equals(that.keyInfo)) {
@@ -185,6 +233,9 @@ public class SubjectBean {
         }
         if (subjectConfirmationMethod != null) {
             result = 31 * result + subjectConfirmationMethod.hashCode();
+        }
+        if (subjectNameIDFormat != null) {
+            result = 31 * result + subjectNameIDFormat.hashCode();
         }
         if (keyInfo != null) {
             result = 31 * result + keyInfo.hashCode();

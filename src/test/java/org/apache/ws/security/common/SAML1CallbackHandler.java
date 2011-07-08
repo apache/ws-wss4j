@@ -63,6 +63,9 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
+                if (subjectNameIDFormat != null) {
+                    subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
+                }
                 if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
                     try {
                         KeyInfoBean keyInfo = createKeyInfo();

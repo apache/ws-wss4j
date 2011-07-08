@@ -472,7 +472,7 @@ public class SAML2ComponentBuilder {
         }
         NameID nameID = nameIdBuilder.buildObject();
         nameID.setNameQualifier(subject.getSubjectNameQualifier());
-        nameID.setFormat(NameID.UNSPECIFIED);
+        nameID.setFormat(subject.getSubjectNameIDFormat());
         nameID.setValue(subject.getSubjectName());
         return nameID;
     }

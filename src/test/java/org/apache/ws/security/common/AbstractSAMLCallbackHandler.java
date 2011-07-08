@@ -58,6 +58,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
     protected byte[] ephemeralKey = null;
     protected String issuer = null;
+    protected String subjectNameIDFormat = null;
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
@@ -81,6 +82,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+    
+    public void setSubjectNameIDFormat(String subjectNameIDFormat) {
+        this.subjectNameIDFormat = subjectNameIDFormat;
     }
     
     /**

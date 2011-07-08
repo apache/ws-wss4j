@@ -35,6 +35,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
@@ -429,6 +430,86 @@ public class SamlTokenTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             // expected
         }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
+     * a user-specified SubjectNameIDFormat.
+     */
+    @org.junit.Test
+    public void testSAML1SubjectNameIDFormat() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS));
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assertTrue(!receivedAssertion.isSigned());
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
+     * a user-specified SubjectNameIDFormat.
+     */
+    @org.junit.Test
+    public void testSAML2SubjectNameIDFormat() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS));
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assertTrue(!receivedAssertion.isSigned());
     }
     
     /**
