@@ -51,7 +51,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     private Crypto crypto = null;
     
     public FaultCodeTest() throws Exception {
-        crypto = CryptoFactory.getInstance();
+        crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
     /**
@@ -61,7 +61,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     @org.junit.Test
     public void testFailedCheck() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt(secEngine.getWssConfig());
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
