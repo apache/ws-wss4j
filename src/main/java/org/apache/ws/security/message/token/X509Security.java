@@ -96,6 +96,9 @@ public class X509Security extends BinarySecurity {
         if (cachedCert != null) {
             return cachedCert;
         }
+        if (crypto == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+        }
         byte[] data = getToken();
         if (data == null) {
             throw new WSSecurityException(

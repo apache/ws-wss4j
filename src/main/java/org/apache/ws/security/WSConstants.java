@@ -233,6 +233,18 @@ public class WSConstants {
         new QName (WSSE_NS, "MessageExpired");
 
     //
+    // Kerberos ValueTypes
+    //
+    public static final String WSS_KRB_V5_AP_REQ = KERBEROS_NS11 + "#Kerberosv5_AP_REQ";
+    public static final String WSS_GSS_KRB_V5_AP_REQ = KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ";
+    public static final String WSS_KRB_V5_AP_REQ1510 = KERBEROS_NS11 + "#Kerberosv5_AP_REQ1510";
+    public static final String WSS_GSS_KRB_V5_AP_REQ1510 = 
+        KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ1510";
+    public static final String WSS_KRB_V5_AP_REQ4120 = KERBEROS_NS11 + "#Kerberosv5_AP_REQ4120";
+    public static final String WSS_GSS_KRB_V5_AP_REQ4120 = 
+        KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ4120";
+    
+    //
     // Misc
     //
     public static final String WSS_SAML_KI_VALUE_TYPE = SAMLTOKEN_NS + "#" + SAML_ASSERTION_ID;

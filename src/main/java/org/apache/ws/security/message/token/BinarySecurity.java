@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.message.token;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.ws.security.WSConstants;
@@ -31,6 +32,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 /**
@@ -102,6 +105,36 @@ public class BinarySecurity {
         element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:BinarySecurityToken");
         setEncodingType(BASE64_ENCODING);
         element.appendChild(doc.createTextNode(""));
+    }
+    
+    /**
+     * Create a BinarySecurityToken via a CallbackHandler
+     * @param callbackHandler
+     * @throws WSSecurityException
+     */
+    public BinarySecurity(CallbackHandler callbackHandler) throws WSSecurityException {
+        if (callbackHandler == null) {
+            LOG.debug("Trying to create a BinarySecurityToken via a null CallbackHandler");
+            throw new WSSecurityException(WSSecurityException.FAILURE);
+        }
+        TokenElementCallback[] callback = new TokenElementCallback[] { new TokenElementCallback() };
+
+        try {
+            callbackHandler.handle(callback);
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                "IOException while creating a token element", e
+            );
+        } catch (UnsupportedCallbackException e) {
+            throw new IllegalStateException(
+                "UnsupportedCallbackException while creating a token element", e
+            );
+        }
+        element = callback[0].getTokenElement();
+        if (element == null) {
+            LOG.debug("CallbackHandler did not return a token element");
+            throw new WSSecurityException(WSSecurityException.FAILURE);
+        }
     }
     
     /**

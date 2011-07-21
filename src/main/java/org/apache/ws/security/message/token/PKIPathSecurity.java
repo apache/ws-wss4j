@@ -84,6 +84,9 @@ public class PKIPathSecurity extends BinarySecurity {
         if (data == null) {
             return null;
         }
+        if (crypto == null) {
+            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+        }
         return crypto.getCertificatesFromBytes(data);
     }
 

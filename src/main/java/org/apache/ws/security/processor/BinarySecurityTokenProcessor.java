@@ -28,6 +28,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.validate.Credential;
@@ -86,6 +87,8 @@ public class BinarySecurityTokenProcessor implements Processor {
                 SAMLTokenPrincipal samlPrincipal = 
                     new SAMLTokenPrincipal(credential.getTransformedToken());
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+            } else if (credential.getPrincipal() != null) {
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
             } else if (certs != null && certs[0] != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, certs[0].getSubjectX500Principal());
             }
@@ -105,9 +108,6 @@ public class BinarySecurityTokenProcessor implements Processor {
      */
     private X509Certificate[] getCertificatesTokenReference(BinarySecurity token, Crypto crypto)
         throws WSSecurityException {
-        if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
-        }
         if (token instanceof PKIPathSecurity) {
             return ((PKIPathSecurity) token).getX509Certificates(crypto);
         } else if (token instanceof X509Security) {
@@ -136,10 +136,29 @@ public class BinarySecurityTokenProcessor implements Processor {
             token = new X509Security(element, config.isWsiBSPCompliant());
         } else if (PKIPathSecurity.getType().equals(type)) {
             token = new PKIPathSecurity(element, config.isWsiBSPCompliant());
+        } else if (isKerberosToken(type)) {
+            token = new KerberosSecurity(element, config.isWsiBSPCompliant());
         } else {
             token = new BinarySecurity(element, config.isWsiBSPCompliant());
         }
         return token;
+    }
+    
+    /**
+     * Return true if the valueType represents a Kerberos Token
+     * @param valueType the valueType of the token
+     * @return true if the valueType represents a Kerberos Token
+     */
+    private boolean isKerberosToken(String valueType) {
+        if (WSConstants.WSS_KRB_V5_AP_REQ.equals(valueType)
+            || WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)
+            || WSConstants.WSS_KRB_V5_AP_REQ1510.equals(valueType)
+            || WSConstants.WSS_GSS_KRB_V5_AP_REQ1510.equals(valueType)
+            || WSConstants.WSS_KRB_V5_AP_REQ4120.equals(valueType)
+            || WSConstants.WSS_GSS_KRB_V5_AP_REQ4120.equals(valueType)) {
+            return true;
+        }
+        return false;
     }
 
 }
