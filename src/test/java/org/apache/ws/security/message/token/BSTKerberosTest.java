@@ -196,7 +196,7 @@ public class BSTKerberosTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assert token != null;
+        assertTrue(token != null);
         
         assertTrue(AP_REQ.equals(token.getValueType()));
         assertTrue(BASE64_NS.equals(token.getEncodingType()));

@@ -19,6 +19,14 @@
 
 package org.apache.ws.security.message.token;
 
+import java.security.Principal;
+import java.util.Set;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.w3c.dom.Document;
@@ -28,6 +36,9 @@ import org.w3c.dom.Element;
  * Kerberos Security Token.
  */
 public class KerberosSecurity extends BinarySecurity {
+    
+    private static org.apache.commons.logging.Log log =
+        org.apache.commons.logging.LogFactory.getLog(KerberosSecurity.class);
     
     /**
      * This constructor creates a new Kerberos token object and initializes
@@ -87,4 +98,71 @@ public class KerberosSecurity extends BinarySecurity {
         return false;
     }
 
+    /**
+     * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
+     * BinarySecurityToken.
+     * @param jaasLoginModuleName the JAAS Login Module name to use
+     * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
+     * @param serviceName the desired Kerberized service
+     * @throws WSSecurityException
+     */
+    public void retrieveServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName
+    ) throws WSSecurityException {
+        // Get a TGT from the KDC using JAAS
+        LoginContext loginContext = null;
+        try {
+            if (callbackHandler == null) {
+                loginContext = new LoginContext(jaasLoginModuleName);
+            } else {
+                loginContext = new LoginContext(jaasLoginModuleName, callbackHandler);
+            }
+            loginContext.login();
+        } catch (LoginException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug(ex.getMessage(), ex);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "kerberosLoginError", 
+                new Object[] {ex.getMessage()}
+            );
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully authenticated to the TGT");
+        }
+        
+        Subject clientSubject = loginContext.getSubject();
+        Set<Principal> clientPrincipals = clientSubject.getPrincipals();
+        if (clientPrincipals.isEmpty()) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, 
+                "kerberosLoginError", 
+                new Object[] {"No Client principals found after login"}
+            );
+        }
+        
+        // Get the service ticket
+        KerberosClientAction action = 
+            new KerberosClientAction(clientPrincipals.iterator().next(), serviceName);
+        byte[] ticket = Subject.doAs(clientSubject, action);
+        if (ticket == null) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "kerberosServiceTicketError"
+            );
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully retrieved a service ticket");
+        }
+        
+        setToken(ticket);
+        
+        if ("".equals(getValueType())) {
+            setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
+        }
+    }
+    
+    
 }
