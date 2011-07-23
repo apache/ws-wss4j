@@ -292,7 +292,8 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         builder.prepare(doc);
         
         byte[] derivedKey = builder.getDerivedKey();
-        derivedKey[5] = 12;
+        derivedKey[5] = 'z';
+        derivedKey[6] = 'a';
         assertTrue(derivedKey.length == 20);
         
         String tokenIdentifier = builder.getId();
