@@ -29,6 +29,7 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,6 +60,8 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected byte[] ephemeralKey = null;
     protected String issuer = null;
     protected String subjectNameIDFormat = null;
+    protected String subjectLocalityIpAddress = null;
+    protected String subjectLocalityDnsAddress = null;
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
@@ -88,6 +91,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.subjectNameIDFormat = subjectNameIDFormat;
     }
     
+    public void setSubjectLocality(String ipAddress, String dnsAddress) {
+        this.subjectLocalityIpAddress = ipAddress;
+        this.subjectLocalityDnsAddress = dnsAddress;
+    }
+    
     /**
      * Note that the SubjectBean parameter should be null for SAML2.0
      */
@@ -96,6 +104,12 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             AuthenticationStatementBean authBean = new AuthenticationStatementBean();
             if (subjectBean != null) {
                 authBean.setSubject(subjectBean);
+            }
+            if (subjectLocalityIpAddress != null || subjectLocalityDnsAddress != null) {
+                SubjectLocalityBean subjectLocality = new SubjectLocalityBean();
+                subjectLocality.setIpAddress(subjectLocalityIpAddress);
+                subjectLocality.setDnsAddress(subjectLocalityDnsAddress);
+                authBean.setSubjectLocality(subjectLocality);
             }
             authBean.setAuthenticationMethod("Password");
             callback.setAuthenticationStatementData(Collections.singletonList(authBean));

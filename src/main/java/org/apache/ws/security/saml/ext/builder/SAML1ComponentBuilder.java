@@ -29,6 +29,7 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 import org.apache.ws.security.util.UUIDGenerator;
 
 import org.joda.time.DateTime;
@@ -52,6 +53,7 @@ import org.opensaml.saml1.core.Evidence;
 import org.opensaml.saml1.core.NameIdentifier;
 import org.opensaml.saml1.core.Subject;
 import org.opensaml.saml1.core.SubjectConfirmation;
+import org.opensaml.saml1.core.SubjectLocality;
 
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
@@ -103,6 +105,8 @@ public class SAML1ComponentBuilder {
     private static SAMLObjectBuilder<Action> actionElementV1Builder;
     
     private static XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    
+    private static SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
     /**
      * Create a new SAML 1.1 assertion
@@ -319,6 +323,10 @@ public class SAML1ComponentBuilder {
             authenticationStatementV1Builder = (SAMLObjectBuilder<AuthenticationStatement>) 
                 builderFactory.getBuilder(AuthenticationStatement.DEFAULT_ELEMENT_NAME);
         }
+        if (subjectLocalityBuilder == null) {
+            subjectLocalityBuilder = (SAMLObjectBuilder<SubjectLocality>) 
+                builderFactory.getBuilder(SubjectLocality.DEFAULT_ELEMENT_NAME);
+        }
 
         if (authBeans != null && authBeans.size() > 0) {
             for (AuthenticationStatementBean statementBean : authBeans) {
@@ -342,6 +350,16 @@ public class SAML1ComponentBuilder {
                 authenticationStatement.setAuthenticationMethod(
                     transformAuthenticationMethod(statementBean.getAuthenticationMethod())
                 );
+                
+                SubjectLocalityBean subjectLocalityBean = statementBean.getSubjectLocality();
+                if (subjectLocalityBean != null) {
+                    SubjectLocality subjectLocality = subjectLocalityBuilder.buildObject();
+                    subjectLocality.setDNSAddress(subjectLocalityBean.getDnsAddress());
+                    subjectLocality.setIPAddress(subjectLocalityBean.getIpAddress());
+
+                    authenticationStatement.setSubjectLocality(subjectLocality);
+                }
+                
                 authenticationStatements.add(authenticationStatement);
             }
         }

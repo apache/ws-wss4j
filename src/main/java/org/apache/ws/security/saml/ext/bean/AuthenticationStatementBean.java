@@ -32,6 +32,8 @@ public class AuthenticationStatementBean {
     private SubjectBean subject;
     DateTime authenticationInstant;
     private String authenticationMethod;
+    private SubjectLocalityBean subjectLocality;
+    private String sessionIndex;
 
     /**
      * Default constructor
@@ -103,6 +105,42 @@ public class AuthenticationStatementBean {
     public void setAuthenticationInstant(DateTime authenticationInstant) {
         this.authenticationInstant = authenticationInstant;
     }
+    
+    /**
+     * Get Subject Locality.
+     * 
+     * @return the subjectLocality
+     */
+    public final SubjectLocalityBean getSubjectLocality() {
+        return subjectLocality;
+    }
+
+    /**
+     * Set Subject Locality.
+     * 
+     * @param subjectLocality the subjectLocality to set
+     */
+    public final void setSubjectLocality(final SubjectLocalityBean subjectLocality) {
+        this.subjectLocality = subjectLocality;
+    }
+    
+    /**
+     * Get the session index.
+     * 
+     * @return the sessionIndex
+     */
+    public final String getSessionIndex() {
+        return sessionIndex;
+    }
+
+    /**
+     * Set the session index.
+     * 
+     * @param sessionIndex the sessionIndex to set
+     */
+    public final void setSessionIndex(final String sessionIndex) {
+        this.sessionIndex = sessionIndex;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -131,6 +169,18 @@ public class AuthenticationStatementBean {
             && !subject.equals(that.subject)) {
             return false;
         }
+        
+        if (subjectLocality == null && that.subjectLocality != null) {
+            return false;
+        } else if (subjectLocality != null && !subjectLocality.equals(that.subjectLocality)) {
+            return false;
+        }
+
+        if (sessionIndex == null && that.sessionIndex != null) {
+            return false;
+        } else if (sessionIndex != null && !sessionIndex.equals(that.sessionIndex)) {
+            return false;
+        }
 
         return true;
     }
@@ -140,6 +190,8 @@ public class AuthenticationStatementBean {
         int result = subject != null ? subject.hashCode() : 0;
         result = 31 * result + (authenticationInstant != null ? authenticationInstant.hashCode() : 0);
         result = 31 * result + (authenticationMethod != null ? authenticationMethod.hashCode() : 0);
+        result = 31 * result + (subjectLocality != null ? subjectLocality.hashCode() : 0);
+        result = 31 * result + (sessionIndex != null ? sessionIndex.hashCode() : 0);
         return result;
     }
 }

@@ -28,6 +28,7 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 import org.apache.ws.security.util.UUIDGenerator;
 
 import org.joda.time.DateTime;
@@ -55,6 +56,7 @@ import org.opensaml.saml2.core.NameID;
 import org.opensaml.saml2.core.Subject;
 import org.opensaml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml2.core.SubjectLocality;
 
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
@@ -109,6 +111,8 @@ public class SAML2ComponentBuilder {
     private static SAMLObjectBuilder<Action> actionElementBuilder;
     
     private static XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    
+    private static SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
     /**
      * Create a SAML 2 assertion
@@ -253,13 +257,19 @@ public class SAML2ComponentBuilder {
             authnContextClassRefBuilder = (SAMLObjectBuilder<AuthnContextClassRef>) 
                 builderFactory.getBuilder(AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
         }
+        if (subjectLocalityBuilder == null) {
+            subjectLocalityBuilder = (SAMLObjectBuilder<SubjectLocality>) 
+            builderFactory.getBuilder(SubjectLocality.DEFAULT_ELEMENT_NAME);
+        }
         
-
         if (authBeans != null && authBeans.size() > 0) {
             for (AuthenticationStatementBean statementBean : authBeans) {
                 AuthnStatement authnStatement = authnStatementBuilder.buildObject();
                 authnStatement.setAuthnInstant(statementBean.getAuthenticationInstant());
-                //authnStatement.setSessionIndex("b07b804c-7c29-ea16-7300-4f3d6f7928ac");
+                
+                if (statementBean.getSessionIndex() != null) {
+                    authnStatement.setSessionIndex(statementBean.getSessionIndex());
+                }
                 
                 AuthnContextClassRef authnContextClassRef = authnContextClassRefBuilder.buildObject();
                 authnContextClassRef.setAuthnContextClassRef(
@@ -269,6 +279,15 @@ public class SAML2ComponentBuilder {
                 authnContext.setAuthnContextClassRef(authnContextClassRef);
                 authnStatement.setAuthnContext(authnContext);
 
+                SubjectLocalityBean subjectLocalityBean = statementBean.getSubjectLocality();
+                if (subjectLocalityBean != null) {
+                    SubjectLocality subjectLocality = subjectLocalityBuilder.buildObject();
+                    subjectLocality.setDNSName(subjectLocalityBean.getDnsAddress());
+                    subjectLocality.setAddress(subjectLocalityBean.getIpAddress());
+
+                    authnStatement.setSubjectLocality(subjectLocality);
+                }
+                
                 authnStatements.add(authnStatement);
             }
         }
