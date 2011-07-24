@@ -595,6 +595,45 @@ public class SamlTokenTest extends org.junit.Assert {
     }
     
     /**
+     * Test that creates, sends and processes an unsigned SAML 1.1 authorization assertion
+     * with a Resource URI.
+     */
+    @org.junit.Test
+    public void testSAML1Resource() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setResource("http://resource.org");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 1.1 Authz Assertion (sender vouches):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assertTrue(!receivedAssertion.isSigned());
+    }
+    
+    /**
      * Verifies the soap envelope
      * <p/>
      * 

@@ -62,6 +62,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectNameIDFormat = null;
     protected String subjectLocalityIpAddress = null;
     protected String subjectLocalityDnsAddress = null;
+    protected String resource = null;
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
@@ -94,6 +95,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     public void setSubjectLocality(String ipAddress, String dnsAddress) {
         this.subjectLocalityIpAddress = ipAddress;
         this.subjectLocalityDnsAddress = dnsAddress;
+    }
+    
+    public void setResource(String resource) {
+        this.resource = resource;
     }
     
     /**
@@ -133,6 +138,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             authzBean.setActions(Collections.singletonList(actionBean));
             authzBean.setResource("endpoint");
             authzBean.setDecision(AuthDecisionStatementBean.Decision.PERMIT);
+            authzBean.setResource(resource);
             callback.setAuthDecisionStatementData(Collections.singletonList(authzBean));
         }
     }
