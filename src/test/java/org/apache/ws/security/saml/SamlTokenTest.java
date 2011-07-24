@@ -617,12 +617,13 @@ public class SamlTokenTest extends org.junit.Assert {
         
         Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
 
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authz Assertion (sender vouches):");
-            String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
+        assertTrue(outputString.contains("http://resource.org"));
         
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
