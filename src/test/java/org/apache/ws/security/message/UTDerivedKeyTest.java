@@ -49,7 +49,6 @@ import java.util.List;
 public class UTDerivedKeyTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(UTDerivedKeyTest.class);
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;
     
@@ -795,6 +794,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
