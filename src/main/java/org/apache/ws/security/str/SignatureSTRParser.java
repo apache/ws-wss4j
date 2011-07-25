@@ -291,7 +291,7 @@ public class SignatureSTRParser implements STRParser {
         if (crypto == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
         }
-        BinarySecurity token = createSecurityToken(elem);
+        BinarySecurity token = createSecurityToken(elem, bspCompliant);
         if (bspCompliant) {
             BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
         }
@@ -309,18 +309,21 @@ public class SignatureSTRParser implements STRParser {
      * @param element The XML element that contains either a <code>BinarySecurityToken
      *                </code> or a <code>PKIPath</code> element. Other element types a not
      *                supported
+     * @param bspCompliant Whether BSP compliance is enforced or not
      * @return the BinarySecurity object, either a <code>X509Security</code> or a
      *         <code>PKIPathSecurity</code> object.
      * @throws WSSecurityException
      */
-    private static BinarySecurity createSecurityToken(Element element) throws WSSecurityException {
-
+    private static BinarySecurity createSecurityToken(
+        Element element, 
+        boolean bspCompliant
+    ) throws WSSecurityException {
         String type = element.getAttribute("ValueType");
         if (X509Security.X509_V3_TYPE.equals(type)) {
-            X509Security x509 = new X509Security(element);
+            X509Security x509 = new X509Security(element, bspCompliant);
             return (BinarySecurity) x509;
         } else if (PKIPathSecurity.getType().equals(type)) {
-            PKIPathSecurity pkiPath = new PKIPathSecurity(element);
+            PKIPathSecurity pkiPath = new PKIPathSecurity(element, bspCompliant);
             return (BinarySecurity) pkiPath;
         }
         throw new WSSecurityException(

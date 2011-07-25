@@ -61,6 +61,14 @@ public class KerberosSecurity extends BinarySecurity {
      */
     public KerberosSecurity(Element elem, boolean bspCompliant) throws WSSecurityException {
         super(elem, bspCompliant);
+        String valueType = getValueType();
+        if (bspCompliant && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                "invalidValueType", 
+                new Object[]{valueType}
+            );
+        }
     }
 
     /**
@@ -164,5 +172,21 @@ public class KerberosSecurity extends BinarySecurity {
         }
     }
     
+    /**
+     * Return true if the valueType represents a Kerberos Token
+     * @param valueType the valueType of the token
+     * @return true if the valueType represents a Kerberos Token
+     */
+    public static boolean isKerberosToken(String valueType) {
+        if (WSConstants.WSS_KRB_V5_AP_REQ.equals(valueType)
+            || WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)
+            || WSConstants.WSS_KRB_V5_AP_REQ1510.equals(valueType)
+            || WSConstants.WSS_GSS_KRB_V5_AP_REQ1510.equals(valueType)
+            || WSConstants.WSS_KRB_V5_AP_REQ4120.equals(valueType)
+            || WSConstants.WSS_GSS_KRB_V5_AP_REQ4120.equals(valueType)) {
+            return true;
+        }
+        return false;
+    }
     
 }

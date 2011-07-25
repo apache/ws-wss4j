@@ -29,6 +29,7 @@ import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DOMX509Data;
 import org.apache.ws.security.message.token.DOMX509IssuerSerial;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -236,6 +237,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                 } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customTokenValueType)) {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                     refCust.setValueType(customTokenValueType);
+                } else if (KerberosSecurity.isKerberosToken(customTokenValueType)) {
+                    secRef.addTokenType(customTokenValueType);
+                    refCust.setValueType(customTokenValueType);
                 } else {
                     refCust.setValueType(customTokenValueType);
                 }
@@ -252,6 +256,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                     secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
                 } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customTokenValueType)) {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    refCustd.setValueType(customTokenValueType);
+                } else if (KerberosSecurity.isKerberosToken(customTokenValueType)) {
+                    secRef.addTokenType(customTokenValueType);
                     refCustd.setValueType(customTokenValueType);
                 } else {
                     refCustd.setValueType(customTokenValueType);

@@ -243,6 +243,7 @@ public class WSConstants {
     public static final String WSS_KRB_V5_AP_REQ4120 = KERBEROS_NS11 + "#Kerberosv5_AP_REQ4120";
     public static final String WSS_GSS_KRB_V5_AP_REQ4120 = 
         KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ4120";
+    public static final String WSS_KRB_KI_VALUE_TYPE = KERBEROS_NS11 + "#Kerberosv5APREQSHA1";
     
     //
     // Misc

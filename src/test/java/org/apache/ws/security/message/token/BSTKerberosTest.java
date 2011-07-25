@@ -38,7 +38,11 @@ import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Document;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.crypto.dsig.SignatureMethod;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,8 +53,7 @@ import java.util.List;
 public class BSTKerberosTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(BSTKerberosTest.class);
-    private static final String AP_REQ = 
-        "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#Kerberosv5_AP_REQ";
+    private static final String AP_REQ = WSConstants.WSS_GSS_KRB_V5_AP_REQ;
     private static final String BASE64_NS = 
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -240,6 +243,45 @@ public class BSTKerberosTest extends org.junit.Assert {
         }
     }
     
+    /**
+     * A test for signing using a direct reference to a Kerberos token
+     */
+    @org.junit.Test
+    public void testKerberosSignatureDRCreation() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        BinarySecurity bst = new BinarySecurity(doc);
+        bst.setValueType(AP_REQ);
+        bst.setEncodingType(BASE64_NS);
+        
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);
+        SecretKey key = keyGen.generateKey();
+        byte[] keyData = key.getEncoded();
+        
+        bst.setToken(keyData);
+        bst.setID("Id-" + bst.hashCode());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        sign.setCustomTokenValueType(AP_REQ);
+        sign.setCustomTokenId(bst.getID());
+        sign.setSecretKey(keyData);
+        
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+    }
+
     
     /**
      * Verifies the soap envelope

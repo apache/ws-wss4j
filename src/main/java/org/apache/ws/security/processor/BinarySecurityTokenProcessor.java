@@ -136,7 +136,7 @@ public class BinarySecurityTokenProcessor implements Processor {
             token = new X509Security(element, config.isWsiBSPCompliant());
         } else if (PKIPathSecurity.getType().equals(type)) {
             token = new PKIPathSecurity(element, config.isWsiBSPCompliant());
-        } else if (isKerberosToken(type)) {
+        } else if (KerberosSecurity.isKerberosToken(type)) {
             token = new KerberosSecurity(element, config.isWsiBSPCompliant());
         } else {
             token = new BinarySecurity(element, config.isWsiBSPCompliant());
@@ -144,21 +144,4 @@ public class BinarySecurityTokenProcessor implements Processor {
         return token;
     }
     
-    /**
-     * Return true if the valueType represents a Kerberos Token
-     * @param valueType the valueType of the token
-     * @return true if the valueType represents a Kerberos Token
-     */
-    private boolean isKerberosToken(String valueType) {
-        if (WSConstants.WSS_KRB_V5_AP_REQ.equals(valueType)
-            || WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)
-            || WSConstants.WSS_KRB_V5_AP_REQ1510.equals(valueType)
-            || WSConstants.WSS_GSS_KRB_V5_AP_REQ1510.equals(valueType)
-            || WSConstants.WSS_KRB_V5_AP_REQ4120.equals(valueType)
-            || WSConstants.WSS_GSS_KRB_V5_AP_REQ4120.equals(valueType)) {
-            return true;
-        }
-        return false;
-    }
-
 }
