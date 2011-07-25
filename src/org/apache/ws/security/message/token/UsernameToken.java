@@ -803,9 +803,9 @@ public class UsernameToken {
         byte[] saltValue = new byte[16];
         random.nextBytes(saltValue);
         if (useForMac) {
-            saltValue[15] = 0x01;
+            saltValue[0] = 0x01;
         } else {
-            saltValue[15] = 0x02;
+            saltValue[0] = 0x02;
         }
         return saltValue;
     }
