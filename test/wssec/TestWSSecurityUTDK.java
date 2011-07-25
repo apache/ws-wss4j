@@ -78,7 +78,6 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";
 
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = CryptoFactory.getInstance();
     private MessageContext msgContext;
     private SOAPEnvelope unsignedEnvelope;
@@ -575,6 +574,7 @@ public class TestWSSecurityUTDK extends TestCase implements CallbackHandler {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private Vector verify(Document doc) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         return secEngine.processSecurityHeader(doc, null, this, crypto);
     }
     
