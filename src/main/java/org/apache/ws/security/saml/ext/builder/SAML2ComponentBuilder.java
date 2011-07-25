@@ -58,6 +58,7 @@ import org.opensaml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml2.core.SubjectLocality;
 
+import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
@@ -336,17 +337,22 @@ public class SAML2ComponentBuilder {
      * @return a SAML2 Attribute
      */
     public static Attribute createAttribute(
-        String friendlyName, String name, String nameFormat, List<String> values
+        String friendlyName, String name, String nameFormat, List<?> values
     ) {
         if (stringBuilder == null) {
             stringBuilder = (XSStringBuilder)builderFactory.getBuilder(XSString.TYPE_NAME);
         }
         Attribute attribute = createAttribute(friendlyName, name, nameFormat);
-        for (String value : values) {
-            XSString attributeValue = 
-                stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
-            attributeValue.setValue(value);
-            attribute.getAttributeValues().add(attributeValue);
+        
+        for (Object value : values) {
+            if (value instanceof String) {
+                XSString attributeValue = 
+                    stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+                attributeValue.setValue((String)value);
+                attribute.getAttributeValues().add(attributeValue);
+            } else if (value instanceof XMLObject) {
+                attribute.getAttributeValues().add((XMLObject)value);
+            }
         }
 
         return attribute;
@@ -517,12 +523,16 @@ public class SAML2ComponentBuilder {
             for (AttributeStatementBean statementBean : attributeData) {
                 AttributeStatement attributeStatement = attributeStatementBuilder.buildObject();
                 for (AttributeBean values : statementBean.getSamlAttributes()) {
+                    List<?> attributeValues = values.getAttributeValues();
+                    if (attributeValues == null || attributeValues.isEmpty()) {
+                        attributeValues = values.getCustomAttributeValues();
+                    }
                     Attribute samlAttribute = 
                         createAttribute(
                             values.getSimpleName(), 
                             values.getQualifiedName(),
                             values.getNameFormat(),
-                            values.getAttributeValues()
+                            attributeValues
                         );
                     attributeStatement.getAttributes().add(samlAttribute);
                 }
@@ -585,7 +595,8 @@ public class SAML2ComponentBuilder {
     public static List<AuthzDecisionStatement> createAuthorizationDecisionStatement(
         List<AuthDecisionStatementBean> decisionData
     ) {
-        List<AuthzDecisionStatement> authDecisionStatements = new ArrayList();
+        List<AuthzDecisionStatement> authDecisionStatements = 
+                new ArrayList<AuthzDecisionStatement>();
         if (authorizationDecisionStatementBuilder == null) {
             authorizationDecisionStatementBuilder = 
                 (SAMLObjectBuilder<AuthzDecisionStatement>)

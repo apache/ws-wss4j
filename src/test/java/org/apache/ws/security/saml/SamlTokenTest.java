@@ -38,8 +38,17 @@ import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 
+import org.joda.time.DateTime;
+import org.opensaml.Configuration;
+import org.opensaml.common.SAMLObjectBuilder;
+import org.opensaml.saml2.core.AttributeValue;
+import org.opensaml.saml2.core.Conditions;
+import org.opensaml.xml.XMLObjectBuilder;
+import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.schema.XSAny;
 import org.w3c.dom.Document;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -624,6 +633,61 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("http://resource.org"));
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assertTrue(!receivedAssertion.isSigned());
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 attribute assertion. The attributeValue
+     * has a custom XMLObject (not a String) value.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2AttrAssertionCustomAttribute() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
+        callbackHandler.setIssuer("www.example.com");
+        
+        // Create and add a custom Attribute (conditions Object)
+        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        
+        SAMLObjectBuilder<Conditions> conditionsV2Builder = 
+                (SAMLObjectBuilder<Conditions>)builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
+        Conditions conditions = conditionsV2Builder.buildObject();
+        DateTime newNotBefore = new DateTime();
+        conditions.setNotBefore(newNotBefore);
+        conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
+        
+        XMLObjectBuilder<XSAny> xsAnyBuilder = builderFactory.getBuilder(XSAny.TYPE_NAME);
+        XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+        attributeValue.getUnknownXMLObjects().add(conditions);
+        
+        callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
+
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Attr Assertion (sender vouches):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
         
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =

@@ -40,6 +40,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * A base implementation of a Callback Handler for a SAML assertion. By default it creates an
@@ -63,6 +64,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectLocalityIpAddress = null;
     protected String subjectLocalityDnsAddress = null;
     protected String resource = null;
+    protected List<?> customAttributeValues = null;
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
@@ -101,6 +103,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.resource = resource;
     }
     
+    public void setCustomAttributeValues(List<?> customAttributeValues) {
+        this.customAttributeValues = customAttributeValues;
+    }
+    
     /**
      * Note that the SubjectBean parameter should be null for SAML2.0
      */
@@ -125,7 +131,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             }
             AttributeBean attributeBean = new AttributeBean();
             attributeBean.setSimpleName("role");
-            attributeBean.setAttributeValues(Collections.singletonList("user"));
+            if (customAttributeValues != null) {
+                attributeBean.setCustomAttributeValues(customAttributeValues);   
+            } else {
+                attributeBean.setAttributeValues(Collections.singletonList("user"));
+            }
             attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             callback.setAttributeStatementData(Collections.singletonList(attrBean));
         } else {

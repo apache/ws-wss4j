@@ -22,7 +22,6 @@ package org.apache.ws.security.saml.ext.bean;
 import java.util.List;
 import java.util.ArrayList;
 
-
 /**
  * Class SamlAttribute represents an instance of a SAML attribute.
  * <p/>
@@ -33,6 +32,7 @@ public class AttributeBean {
     private String qualifiedName;
     private String nameFormat;
     private List<String> attributeValues;
+    private List<?> customAttributeValues;
 
     /**
      * Constructor SamlAttribute creates a new SamlAttribute instance.
@@ -111,7 +111,7 @@ public class AttributeBean {
     /**
      * Method getAttributeValues returns the attributeValues of this SamlAttribute object.
      *
-     * @return the attributeValues (type Map) of this SamlAttribute object.
+     * @return the attributeValues (type List) of this SamlAttribute object.
      */
     public List<String> getAttributeValues() {
         return attributeValues;
@@ -125,6 +125,25 @@ public class AttributeBean {
     public void setAttributeValues(List<String> attributeValues) {
         this.attributeValues = attributeValues;
     }
+    
+    /**
+     * Method setCustomAttributeValues sets the attributeValues of this SamlAttribute object.
+     * This method allows the user to specify OpenSAML XMLObject attributes.
+     *
+     * @param customAttributeValues the attributeValues of this SamlAttribute object.
+     */
+    public void setCustomAttributeValues(List<?> customAttributeValues) {
+        this.customAttributeValues = customAttributeValues;
+    }
+    
+    /**
+     * Method getCustomAttributeValues returns the attributeValues of this SamlAttribute object.
+     *
+     * @return the attributeValues (type List) of this SamlAttribute object.
+     */
+    public List<?> getCustomAttributeValues() {
+        return customAttributeValues;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -136,6 +155,13 @@ public class AttributeBean {
         if (attributeValues == null && that.attributeValues != null) {
             return false;
         } else if (attributeValues != null && !attributeValues.equals(that.attributeValues)) {
+            return false;
+        }
+        
+        if (customAttributeValues == null && that.customAttributeValues != null) {
+            return false;
+        } else if (customAttributeValues != null 
+                && !customAttributeValues.equals(that.customAttributeValues)) {
             return false;
         }
         
@@ -174,6 +200,9 @@ public class AttributeBean {
         }
         if (attributeValues != null) {
             result = 31 * result + attributeValues.hashCode();
+        }
+        if (customAttributeValues != null) {
+            result = 31 * result + customAttributeValues.hashCode();
         }
         return result;
     }

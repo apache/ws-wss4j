@@ -55,6 +55,7 @@ import org.opensaml.saml1.core.Subject;
 import org.opensaml.saml1.core.SubjectConfirmation;
 import org.opensaml.saml1.core.SubjectLocality;
 
+import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
@@ -411,11 +412,16 @@ public class SAML1ComponentBuilder {
                 attributeStatement.setSubject(attributeSubject);
                 // Add the individual attributes
                 for (AttributeBean values : statementBean.getSamlAttributes()) {
+                    List<?> attributeValues = values.getAttributeValues();
+                    if (attributeValues == null || attributeValues.isEmpty()) {
+                        attributeValues = values.getCustomAttributeValues();
+                    }
+                    
                     Attribute samlAttribute = 
                         createSamlv1Attribute(
                             values.getSimpleName(),
                             values.getQualifiedName(), 
-                            values.getAttributeValues()
+                            attributeValues
                         );
                     attributeStatement.getAttributes().add(samlAttribute);
                 }
@@ -439,7 +445,7 @@ public class SAML1ComponentBuilder {
     public static Attribute createSamlv1Attribute(
         String attributeName, 
         String attributeUrn,
-        List<String> values
+        List<?> values
     ) {
         if (attributeV1Builder == null) {
             attributeV1Builder = (SAMLObjectBuilder<Attribute>) 
@@ -453,11 +459,15 @@ public class SAML1ComponentBuilder {
         attribute.setAttributeName(attributeName);
         attribute.setAttributeNamespace(attributeUrn);
         
-        for (String value : values) {
-            XSString attribute1 = 
-                stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
-            attribute1.setValue(value);
-            attribute.getAttributeValues().add(attribute1);
+        for (Object value : values) {
+            if (value instanceof String) {
+                XSString attribute1 = 
+                    stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+                attribute1.setValue((String)value);
+                attribute.getAttributeValues().add(attribute1);
+            } else if (value instanceof XMLObject) {
+                attribute.getAttributeValues().add((XMLObject)value);
+            }
         }
 
         return attribute;
@@ -473,7 +483,8 @@ public class SAML1ComponentBuilder {
     public static List<AuthorizationDecisionStatement> createSamlv1AuthorizationDecisionStatement(
             List<AuthDecisionStatementBean> decisionData) 
         throws org.opensaml.xml.security.SecurityException, WSSecurityException {
-        List<AuthorizationDecisionStatement> authDecisionStatements = new ArrayList();
+        List<AuthorizationDecisionStatement> authDecisionStatements = 
+                new ArrayList<AuthorizationDecisionStatement>();
         if (authorizationDecisionStatementV1Builder == null) {
             authorizationDecisionStatementV1Builder = 
                 (SAMLObjectBuilder<AuthorizationDecisionStatement>) 
