@@ -71,7 +71,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         byte[] salt = usernameToken.addSalt(doc, null, false);
         assertTrue(salt.length == 16);
-        assertTrue(salt[15] == 0x02);
+        assertTrue(salt[0] == 0x02);
         byte[] utSalt = usernameToken.getSalt();
         assertTrue(salt.length == utSalt.length);
         for (int i = 0; i < salt.length; i++) {
