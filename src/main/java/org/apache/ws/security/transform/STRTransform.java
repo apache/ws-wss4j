@@ -29,20 +29,19 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignatureInput;
 
-import org.jcp.xml.dsig.internal.dom.ApacheData;
-import org.jcp.xml.dsig.internal.dom.DOMSubTreeData;
-import org.jcp.xml.dsig.internal.dom.DOMUtils;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Iterator;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
@@ -98,7 +97,7 @@ public class STRTransform extends TransformService {
         }
         Element transformElement2 = (Element) 
             ((javax.xml.crypto.dom.DOMStructure) parent).getNode();
-        DOMUtils.appendChild(transformElement2, transformElement);
+        appendChild(transformElement2, transformElement);
         transformElement = transformElement2;
     }
 
@@ -143,33 +142,31 @@ public class STRTransform extends TransformService {
         }
         try {
             //
-            // Get the input (node) to transform. Currently we support only an
-            // Element as input format. If other formats are required we must
-            // get it as bytes and probably reparse it into a DOM tree (How to
-            // work with nodesets? how to select the right node from a nodeset?)
+            // Get the input (node) to transform. 
             //
-            XMLSignatureInput xmlSignatureInput = null;
-            if (data instanceof ApacheData) {
-                xmlSignatureInput = ((ApacheData) data).getXMLSignatureInput();
-            } else if (data instanceof DOMSubTreeData) {
-                DOMSubTreeData subTree = (DOMSubTreeData) data;
-                xmlSignatureInput = new XMLSignatureInput(subTree.getRoot());
-                xmlSignatureInput.setExcludeComments(subTree.excludeComments());
+            Element str = null;
+            if (data instanceof NodeSetData) {
+                NodeSetData nodeSetData = (NodeSetData)data;
+                Iterator<?> iterator = nodeSetData.iterator();
+                while (iterator.hasNext()) {
+                    Node node = (Node)iterator.next();
+                    if (node instanceof Element && "SecurityTokenReference".equals(node.getLocalName())) {
+                        str = (Element)node;
+                        break;
+                    }
+                }
             } else {
                 try {
-                    xmlSignatureInput = 
+                    XMLSignatureInput xmlSignatureInput = 
                         new XMLSignatureInput(((OctetStreamData)data).getOctetStream());
+                    str = (Element)xmlSignatureInput.getSubNode();
                 } catch (Exception ex) {
                     throw new TransformException(ex);
                 }
             }
-            
-            if (!xmlSignatureInput.isElement()) {
-                throw new TransformException(
-                    "Wrong input format - only element input supported"
-                );
+            if (str == null) {
+                throw new TransformException("No SecurityTokenReference found");
             }
-            Element str = (Element)xmlSignatureInput.getSubNode();
             //
             // The element to transform MUST be a SecurityTokenReference
             // element.
@@ -274,6 +271,20 @@ public class STRTransform extends TransformService {
             throw new NullPointerException();
         } else {
             return false;
+        }
+    }
+    
+    private static void appendChild(Node parent, Node child) {
+        Document ownerDoc = null;
+        if (parent.getNodeType() == Node.DOCUMENT_NODE) {
+            ownerDoc = (Document)parent;
+        } else {
+            ownerDoc = parent.getOwnerDocument();
+        }
+        if (child.getOwnerDocument() != ownerDoc) {
+            parent.appendChild(ownerDoc.importNode(child, true));
+        } else {
+            parent.appendChild(child);
         }
     }
 

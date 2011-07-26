@@ -34,12 +34,15 @@ package org.apache.ws.security;
 
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.CallbackLookup;
+import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.crypto.dom.DOMCryptoContext;
 
 public class WSDocInfo {
     private Document doc = null;
@@ -162,6 +165,18 @@ public class WSDocInfo {
             }
         }
         return null;
+    }
+
+    /**
+     * Set all stored tokens on the DOMCryptoContext argument
+     * @param context
+     */
+    public void setTokensOnContext(DOMCryptoContext context) {
+        if (tokenList != null) {
+            for (Element elem : tokenList) {
+                WSSecurityUtil.storeElementInContext(context, elem);
+            }
+        }
     }
     
     /**

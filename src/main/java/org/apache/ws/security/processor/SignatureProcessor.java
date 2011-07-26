@@ -32,7 +32,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.DOMCallbackLookup;
-import org.apache.ws.security.message.DOMURIDereferencer;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.STRParser;
@@ -50,7 +49,6 @@ import org.w3c.dom.Node;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
-import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.Reference;
@@ -342,12 +340,11 @@ public class SignatureProcessor implements Processor {
         
         XMLValidateContext context = new DOMValidateContext(key, elem);
         context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
-        URIDereferencer dereferencer = new DOMURIDereferencer();
-        ((DOMURIDereferencer)dereferencer).setWsDocInfo(wsDocInfo);
-        context.setURIDereferencer(dereferencer);
         context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
+        
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
+            setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo, elem.getOwnerDocument());
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
                 return xmlSignature;
@@ -380,6 +377,38 @@ public class SignatureProcessor implements Processor {
         throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
     }
     
+    /**
+     * Retrieve the Reference elements and set them on the ValidateContext
+     * @param xmlSignature the XMLSignature object to get the references from
+     * @param context the ValidateContext
+     * @param wsDocInfo the WSDocInfo object where tokens are stored
+     * @param doc the owner document from which to find elements
+     * @throws WSSecurityException
+     */
+    private void setElementsOnContext(
+        XMLSignature xmlSignature, 
+        DOMValidateContext context,
+        WSDocInfo wsDocInfo,
+        Document doc
+    ) throws WSSecurityException {
+        java.util.Iterator<?> referenceIterator = 
+            xmlSignature.getSignedInfo().getReferences().iterator();
+        CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
+        while (referenceIterator.hasNext()) {
+            Reference reference = (Reference)referenceIterator.next();
+            String uri = reference.getURI();
+            Element element = callbackLookup.getElement(uri, null, true);
+            if (element == null) {
+                element = wsDocInfo.getTokenElement(uri);
+            }
+            if (element != null) {
+                WSSecurityUtil.storeElementInContext(((DOMValidateContext)context), element);
+            }
+        }
+    }
     
     /**
      * Get the signature method algorithm URI from the associated signature element.

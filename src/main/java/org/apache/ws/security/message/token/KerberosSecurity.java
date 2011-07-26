@@ -155,7 +155,7 @@ public class KerberosSecurity extends BinarySecurity {
         // Get the service ticket
         KerberosClientAction action = 
             new KerberosClientAction(clientPrincipals.iterator().next(), serviceName);
-        byte[] ticket = Subject.doAs(clientSubject, action);
+        byte[] ticket = (byte[])Subject.doAs(clientSubject, action);
         if (ticket == null) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "kerberosServiceTicketError"

@@ -148,7 +148,7 @@ public class KerberosTokenValidator implements Validator {
         
         // Validate the ticket
         KerberosServiceAction action = new KerberosServiceAction(token, service);
-        Principal principal = Subject.doAs(subject, action);
+        Principal principal = (Principal)Subject.doAs(subject, action);
         if (principal == null) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "kerberosTicketValidationError"

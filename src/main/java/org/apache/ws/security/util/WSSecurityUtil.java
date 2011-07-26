@@ -42,6 +42,7 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.namespace.QName;
 
 import java.security.MessageDigest;
@@ -1203,6 +1204,25 @@ public class WSSecurityUtil {
             }
         }
         return ret;
+    }
+    
+    /**
+     * Store the element argument in the DOM Crypto Context if it has one of the standard
+     * "Id" attributes.
+     */
+    public static void storeElementInContext(DOMCryptoContext context, Element element) {
+        if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
+            context.setIdAttributeNS(element, WSConstants.WSU_NS, "Id");
+        }
+        if (element.hasAttributeNS(null, "Id")) {
+    	    context.setIdAttributeNS(element, null, "Id");
+        }
+        if (element.hasAttributeNS(null, "ID")) {
+            context.setIdAttributeNS(element, null, "ID");
+        }
+        if (element.hasAttributeNS(null, "AssertionID")) {
+            context.setIdAttributeNS(element, null, "AssertionID");
+        }
     }
     
 }
