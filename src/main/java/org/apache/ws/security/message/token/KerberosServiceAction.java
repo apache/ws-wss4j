@@ -22,7 +22,8 @@ package org.apache.ws.security.message.token;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 
-import org.apache.ws.security.KerberosTokenPrincipal;
+import javax.security.auth.kerberos.KerberosPrincipal;
+
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -61,9 +62,8 @@ public class KerberosServiceAction implements PrivilegedAction<Principal> {
             secContext.acceptSecContext(ticket, 0, ticket.length);
  
             GSSName clientName = secContext.getSrcName();
-            Principal principal = new KerberosTokenPrincipal(clientName.toString());
             secContext.dispose();
-            return principal;
+            return new KerberosPrincipal(clientName.toString());
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error in validating a Kerberos token", e);
