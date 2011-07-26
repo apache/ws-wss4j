@@ -116,16 +116,14 @@ public class WSSecSignatureBase extends WSSecBase {
                             );
                     } else {
                         TransformParameterSpec transformSpec = null;
-                        if (wssConfig.isWsiBSPCompliant()) {
-                            Element toSignById = element;
-                            if (toSignById == null) {
-                                if (callbackLookup == null) {
-                                    callbackLookup = new DOMCallbackLookup(doc);
-                                }
-                                toSignById = callbackLookup.getElement(idToSign, null, false);
-                                wsDocInfo.addTokenElement(toSignById, false);
+                        if (element == null) {
+                            if (callbackLookup == null) {
+                                callbackLookup = new DOMCallbackLookup(doc);
                             }
-                            List<String> prefixes = getInclusivePrefixes(toSignById);
+                            element = callbackLookup.getElement(idToSign, null, false);
+                        }
+                        if (wssConfig.isWsiBSPCompliant()) {
+                            List<String> prefixes = getInclusivePrefixes(element);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
                         transform =
@@ -166,7 +164,6 @@ public class WSSecSignatureBase extends WSSecBase {
                         );
                     }
                     for (Element elementToSign : elementsToSign) {
-                        wsDocInfo.addTokenElement(elementToSign, false);
                         TransformParameterSpec transformSpec = null;
                         if (wssConfig.isWsiBSPCompliant()) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);
@@ -186,6 +183,7 @@ public class WSSecSignatureBase extends WSSecBase {
                                 null
                             );
                         referenceList.add(reference);
+                        wsDocInfo.addTokenElement(elementToSign, false);
                     }
                 }
             } catch (Exception ex) {
