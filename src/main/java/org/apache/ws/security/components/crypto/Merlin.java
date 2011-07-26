@@ -121,7 +121,7 @@ public class Merlin extends CryptoBase {
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;
     protected CertStore crlCertStore = null;
-    private boolean loadCACerts = false;
+    protected boolean loadCACerts = false;
     
     public Merlin() {
         // default constructor
