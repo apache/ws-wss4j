@@ -30,6 +30,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.KerberosServiceAction;
 
 /**
@@ -105,6 +106,11 @@ public class KerberosTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
         
+        BinarySecurity binarySecurity = credential.getBinarySecurityToken();
+        if (!(binarySecurity instanceof KerberosSecurity)) {
+            return credential;
+        }
+        
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -128,7 +134,6 @@ public class KerberosTokenValidator implements Validator {
             log.debug("Successfully authenticated to the TGT");
         }
         
-        BinarySecurity binarySecurity = credential.getBinarySecurityToken();
         byte[] token = binarySecurity.getToken();
         
         // Get the service name to use - fall back on the principal
