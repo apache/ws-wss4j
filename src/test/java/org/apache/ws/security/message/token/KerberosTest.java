@@ -39,7 +39,8 @@ import javax.security.auth.kerberos.KerberosPrincipal;
  * This is a test for a WSS4J client retrieving a service ticket from a KDC, and inserting
  * it into the security header of a request, to be processed by WSS4J. The tests are @Ignored by
  * default, as a KDC is needed. To replicate the test scenario, set up a KDC with user principal
- * "alice" (keytab in "/etc/alice.keytab"), and host service "bob@service" (keytab in "/etc/bob.keytab").
+ * "alice" (keytab in "/etc/alice.keytab"), and host service "bob@service.ws.apache.org" 
+ * (keytab in "/etc/bob.keytab").
  * The test can be run with:
  * 
  * mvn -Djava.security.auth.login.config=src/test/resources/kerberos.jaas test -Dtest=KerberosTest
@@ -67,7 +68,7 @@ public class KerberosTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service");
+        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
         if (LOG.isDebugEnabled()) {
@@ -80,7 +81,7 @@ public class KerberosTest extends org.junit.Assert {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setJaasLoginModuleName("bob");
-        validator.setServiceName("bob@service");
+        validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
