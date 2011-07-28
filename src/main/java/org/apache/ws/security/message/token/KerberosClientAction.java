@@ -62,6 +62,7 @@ public class KerberosClientAction implements PrivilegedAction<byte[]> {
                     gssService, kerberos5Oid, credentials, GSSContext.DEFAULT_LIFETIME
                 );
  
+            secContext.requestMutualAuth(false);
             byte[] token = new byte[0];
             byte[] returnedToken = secContext.initSecContext(token, 0, token.length);
             secContext.dispose();
