@@ -597,17 +597,8 @@ public abstract class CryptoBase implements Crypto {
         byte[] derEncodedValue = cert.getExtensionValue(SKI_OID);
 
         if (cert.getVersion() < 3 || derEncodedValue == null) {
-            PublicKey key = cert.getPublicKey();
-            if (!(key instanceof RSAPublicKey)) {
-                throw new WSSecurityException(
-                        1,
-                        "noSKIHandling",
-                        new Object[]{"Support for RSA key only"});
-            }
-            byte[] encoded = key.getEncoded();
-            // remove 22-byte algorithm ID and header
-            byte[] value = new byte[encoded.length - 22];
-            System.arraycopy(encoded, 22, value, 0, value.length);
+            X509SubjectPublicKeyInfo spki = new X509SubjectPublicKeyInfo(cert.getPublicKey());
+            byte[] value = spki.getSubjectPublicKey();
             MessageDigest sha;
             try {
                 sha = MessageDigest.getInstance("SHA-1");
@@ -624,13 +615,15 @@ public abstract class CryptoBase implements Crypto {
         }
 
         //
-        // Strip away first four bytes from the DerValue (tag and length of
+        // Strip away first (four) bytes from the DerValue (tag and length of
         // ExtensionValue OCTET STRING and KeyIdentifier OCTET STRING)
         //
-        byte abyte0[] = new byte[derEncodedValue.length - 4];
-
-        System.arraycopy(derEncodedValue, 4, abyte0, 0, abyte0.length);
-        return abyte0;
+        DERDecoder extVal = new DERDecoder(derEncodedValue);
+        extVal.expect(DERDecoder.TYPE_OCTET_STRING);  // ExtensionValue OCTET STRING
+        extVal.getLength();
+        extVal.expect(DERDecoder.TYPE_OCTET_STRING);  // KeyIdentifier OCTET STRING
+        int keyIDLen = extVal.getLength();
+        return extVal.getBytes(keyIDLen);
     }
 
     public KeyStore getKeyStore() {
