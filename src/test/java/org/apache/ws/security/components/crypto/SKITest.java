@@ -67,16 +67,16 @@ public class SKITest extends org.junit.Assert {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CryptoTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/rsa2048.jks");
-        keyStore.load(input, "security".toCharArray());
+        keyStore.load(input, "password".toCharArray());
         ((Merlin)crypto).setKeyStore(keyStore);
         
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("rsa2048");
+        cryptoType.setAlias("test");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
         
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
-        String knownBase64Encoding = "39rBJRcGsSn7u07V+a5hhs4+4V0=";
+        String knownBase64Encoding = "tgkZUMZ461ZSA1nZkBu6E5GDxLM=";
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
 }
