@@ -29,7 +29,6 @@ import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Class OpenSAMLUtil provides static helper methods for the OpenSaml library
