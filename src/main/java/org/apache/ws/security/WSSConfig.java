@@ -19,6 +19,7 @@
 
 package org.apache.ws.security;
 
+import java.lang.reflect.Field;
 import java.security.Provider;
 import java.security.Security;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
+import org.apache.ws.security.util.XMLUtils;
 import org.apache.ws.security.validate.Validator;
 
 /**
@@ -354,9 +356,35 @@ public class WSSConfig {
         addJceProviders = value;
     }
     
+    private static void setXmlSecIgnoreLineBreak() {
+        //really need to make sure ignoreLineBreaks is set to
+        boolean wasSet = false;
+        try {
+            // Don't override if it was set explicitly
+            String lineBreakPropName = "org.apache.xml.security.ignoreLineBreaks";
+            if (System.getProperty(lineBreakPropName) == null) {
+                System.setProperty(lineBreakPropName, "true");
+            } else {
+                wasSet = true;
+            }
+        } catch (Throwable t) { //NOPMD
+            //ignore
+        }
+        org.apache.xml.security.Init.init();
+        if (!wasSet) {
+            try {
+                Field f = XMLUtils.class.getDeclaredField("ignoreLineBreaks");
+                f.setAccessible(true);
+                f.set(null, Boolean.TRUE);
+            } catch (Throwable t) { //NOPMD
+                //ignore
+            }
+        }
+    }
+    
     public static synchronized void init() {
         if (!staticallyInitialized) {
-            org.apache.xml.security.Init.init();
+            setXmlSecIgnoreLineBreak();
             if (addJceProviders) {
                 addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
                 addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
