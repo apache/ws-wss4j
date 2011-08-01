@@ -102,54 +102,57 @@ public class OpenSAMLUtil {
     ) throws WSSecurityException {
         Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
         Element element = null;
+        Element orig = doc.getDocumentElement();
         try {
-            element = marshaller.marshall(xmlObject);
-        } catch (MarshallingException ex) {
-            throw new WSSecurityException("Error marshalling a SAML assertion", ex);
-        }
-
-        // Sign the assertion if the signature element is present.
-        if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
-            org.opensaml.saml2.core.Assertion saml2 = 
-                (org.opensaml.saml2.core.Assertion) xmlObject;
-            // if there is a signature, but it hasn't already been signed
-            if (saml2.getSignature() != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Signing SAML v2.0 assertion...");
+            if (orig != null) {
+                doc.removeChild(orig);
+            }
+            try {
+                element = marshaller.marshall(xmlObject, doc);
+            } catch (MarshallingException ex) {
+                throw new WSSecurityException("Error marshalling a SAML assertion", ex);
+            }
+    
+            // Sign the assertion if the signature element is present.
+            if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+                org.opensaml.saml2.core.Assertion saml2 = 
+                    (org.opensaml.saml2.core.Assertion) xmlObject;
+                // if there is a signature, but it hasn't already been signed
+                if (saml2.getSignature() != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Signing SAML v2.0 assertion...");
+                    }
+                    try {
+                        Signer.signObject(saml2.getSignature());
+                    } catch (SignatureException ex) {
+                        throw new WSSecurityException("Error signing a SAML assertion", ex);
+                    }
                 }
-                try {
-                    Signer.signObject(saml2.getSignature());
-                } catch (SignatureException ex) {
-                    throw new WSSecurityException("Error signing a SAML assertion", ex);
+            } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+                org.opensaml.saml1.core.Assertion saml1 = 
+                    (org.opensaml.saml1.core.Assertion) xmlObject;
+                // if there is a signature, but it hasn't already been signed
+                if (saml1.getSignature() != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Signing SAML v1.1 assertion...");
+                    }
+                    try {
+                        Signer.signObject(saml1.getSignature());
+                    } catch (SignatureException ex) {
+                        throw new WSSecurityException("Error signing a SAML assertion", ex);
+                    }
                 }
             }
-        } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
-            org.opensaml.saml1.core.Assertion saml1 = 
-                (org.opensaml.saml1.core.Assertion) xmlObject;
-            // if there is a signature, but it hasn't already been signed
-            if (saml1.getSignature() != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Signing SAML v1.1 assertion...");
+        } finally {
+            if (doc.getDocumentElement() != orig) {
+                if (doc.getDocumentElement() != null) {
+                    doc.removeChild(doc.getDocumentElement());
                 }
-                try {
-                    Signer.signObject(saml1.getSignature());
-                } catch (SignatureException ex) {
-                    throw new WSSecurityException("Error signing a SAML assertion", ex);
+                if (orig != null) {
+                    doc.appendChild(orig);
                 }
             }
         }
-
-        // Reparent the document. This makes sure that the resulting element will be compatible
-        // with the user-supplied document in the future (for example, when we want to add this
-        // element that dom).
-        if (doc != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Reparenting the SAML token dom to type: " + doc.getClass().getName());
-            }
-            Node importedNode = doc.importNode(element, true);
-            element = (Element) importedNode;
-        }
-
         return element;
     }
     
