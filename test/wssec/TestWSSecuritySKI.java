@@ -23,7 +23,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.io.InputStream;
 import java.security.cert.X509Certificate;
 
 import org.apache.ws.security.components.crypto.Crypto;
@@ -63,11 +62,11 @@ public class TestWSSecuritySKI extends TestCase {
     public void testRSA2048() throws Exception {
         // Load the keystore
         Crypto crypto = CryptoFactory.getInstance("rsa2048.properties");
-        X509Certificate[] certs = crypto.getCertificates("rsa2048");
+        X509Certificate[] certs = crypto.getCertificates("test");
         assertTrue(certs != null && certs.length > 0);
         
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
-        String knownBase64Encoding = "39rBJRcGsSn7u07V+a5hhs4+4V0=";
+        String knownBase64Encoding = "tgkZUMZ461ZSA1nZkBu6E5GDxLM=";
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
     
