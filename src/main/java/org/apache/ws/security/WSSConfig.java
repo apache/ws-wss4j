@@ -31,8 +31,8 @@ import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
-import org.apache.ws.security.util.XMLUtils;
 import org.apache.ws.security.validate.Validator;
+import org.apache.xml.security.utils.XMLUtils;
 
 /**
  * WSSConfig <p/> Carries configuration data so the WSS4J spec compliance can be
