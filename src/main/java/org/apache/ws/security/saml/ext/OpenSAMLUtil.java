@@ -101,13 +101,17 @@ public class OpenSAMLUtil {
     ) throws WSSecurityException {
         Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
         Element element = null;
-        Element orig = doc.getDocumentElement();
+        Element orig = doc == null ? null : doc.getDocumentElement();
         try {
             if (orig != null) {
                 doc.removeChild(orig);
             }
             try {
-                element = marshaller.marshall(xmlObject, doc);
+                if (doc == null) {
+                    element = marshaller.marshall(xmlObject);
+                } else {
+                    element = marshaller.marshall(xmlObject, doc);
+                } 
             } catch (MarshallingException ex) {
                 throw new WSSecurityException("Error marshalling a SAML assertion", ex);
             }
@@ -143,7 +147,7 @@ public class OpenSAMLUtil {
                 }
             }
         } finally {
-            if (doc.getDocumentElement() != orig) {
+            if (doc != null && doc.getDocumentElement() != orig) {
                 if (doc.getDocumentElement() != null) {
                     doc.removeChild(doc.getDocumentElement());
                 }
