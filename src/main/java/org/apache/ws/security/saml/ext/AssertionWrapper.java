@@ -31,6 +31,9 @@ import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
 
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.UUIDGenerator;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureException;
 
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.SignableSAMLObject;
@@ -708,6 +711,34 @@ public class AssertionWrapper {
      */
     public SAMLKeyInfo getSubjectKeyInfo() {
         return subjectKeyInfo;
+    }
+    
+    /**
+     * Get the SignatureValue bytes of the signed SAML Assertion 
+     * @return the SignatureValue bytes of the signed SAML Assertion 
+     * @throws WSSecurityException
+     */
+    public byte[] getSignatureValue() throws WSSecurityException {
+        Signature sig = null;
+        if (saml2 != null && saml2.getSignature() != null) {
+            sig = saml2.getSignature();
+        } else if (saml1 != null && saml1.getSignature() != null) {
+            sig = saml1.getSignature();
+        }
+        if (sig != null) {
+            Element signatureElement = sig.getDOM();
+            
+            try {
+                // Use XML-Security class to obtain SignatureValue
+                XMLSignature xmlSignature = new XMLSignature(signatureElement, "");
+                return xmlSignature.getSignatureValue();
+            } catch (XMLSignatureException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        }
+        return null;
     }
 
 }

@@ -128,6 +128,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
         assertTrue(receivedAssertion.isSigned());
+        assertTrue(receivedAssertion.getSignatureValue() != null);
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
