@@ -964,10 +964,6 @@ public class Merlin extends CryptoBase {
     private X509Certificate[] getX509Certificates(byte[] thumbprint) throws WSSecurityException {
         MessageDigest sha = null;
         
-        if (keystore == null) {
-            return null;
-        }
-
         try {
             sha = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {

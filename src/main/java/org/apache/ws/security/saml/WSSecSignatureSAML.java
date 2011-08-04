@@ -29,6 +29,8 @@ import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.message.token.DOMX509Data;
+import org.apache.ws.security.message.token.DOMX509IssuerSerial;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
@@ -395,9 +397,28 @@ public class WSSecSignatureSAML extends WSSecSignature {
             case WSConstants.X509_KEY_IDENTIFIER :
                 secRef.setKeyIdentifier(certs[0]);
                 break;
+                
+            case WSConstants.SKI_KEY_IDENTIFIER:
+                secRef.setKeyIdentifierSKI(certs[0], iCrypto != null ? iCrypto : uCrypto);
+                break;
+
+            case WSConstants.THUMBPRINT_IDENTIFIER:
+                secRef.setKeyIdentifierThumb(certs[0]);
+                break;
+
+            case WSConstants.ISSUER_SERIAL:
+                final String issuer = certs[0].getIssuerDN().getName();
+                final java.math.BigInteger serialNumber = certs[0].getSerialNumber();
+                final DOMX509IssuerSerial domIssuerSerial =
+                        new DOMX509IssuerSerial(document, issuer, serialNumber);
+                final DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
+                secRef.setX509Data(domX509Data);
+                break;
 
             default:
-                throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "unsupportedKeyId", new Object[]{}
+                );
             }
         } else if (useDirectReferenceToAssertion) {
             Reference ref = new Reference(doc);
