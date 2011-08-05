@@ -19,7 +19,6 @@
 
 package org.apache.ws.security;
 
-import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -31,7 +30,7 @@ import javax.xml.namespace.QName;
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
-public class WSSecurityException extends RemoteException {
+public class WSSecurityException extends Exception {
     /**
      * 
      */

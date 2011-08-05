@@ -32,19 +32,20 @@ import org.apache.ws.security.str.EncryptedKeySTRParser;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class EncryptedKeyProcessor implements Processor {
@@ -96,10 +97,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
         
         X509Certificate[] certs = 
-            getCertificatesFromEncryptedKey(elem,
-                                            data,
-                                            data.getDecCrypto(), 
-                                            wsDocInfo);
+            getCertificatesFromEncryptedKey(elem, data, data.getDecCrypto(), wsDocInfo);
 
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
@@ -108,6 +106,8 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
         }
         
+        List<String> dataRefURIs = getDataRefURIs(elem);
+        
         byte[] encryptedEphemeralKey = null;
         byte[] decryptedBytes = null;
         try {
@@ -115,14 +115,12 @@ public class EncryptedKeyProcessor implements Processor {
             decryptedBytes = cipher.doFinal(encryptedEphemeralKey);
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
-        } catch (IllegalBlockSizeException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
-        } catch (BadPaddingException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+        } catch (Exception ex) {
+            decryptedBytes = getRandomKey(dataRefURIs, elem.getOwnerDocument(), wsDocInfo);
         }
 
         List<WSDataRef> dataRefs = 
-            decryptDataRefs(elem.getOwnerDocument(), elem, wsDocInfo, decryptedBytes);
+            decryptDataRefs(dataRefURIs, elem.getOwnerDocument(), wsDocInfo, decryptedBytes);
         
         WSSecurityEngineResult result = new WSSecurityEngineResult(
                 WSConstants.ENCR, 
@@ -139,6 +137,36 @@ public class EncryptedKeyProcessor implements Processor {
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
+    }
+    
+    /**
+     * Generates a random secret key using the algorithm specified in the
+     * first DataReference URI
+     * 
+     * @param dataRefURIs
+     * @param doc
+     * @param wsDocInfo
+     * @return
+     * @throws WSSecurityException
+     */
+    private static byte[] getRandomKey(List<String> dataRefURIs, Document doc, WSDocInfo wsDocInfo) throws WSSecurityException {
+        try {
+            String alg = "AES";
+            int size = 128;
+            if (!dataRefURIs.isEmpty()) {
+                String uri = dataRefURIs.iterator().next();
+                Element ee = ReferenceListProcessor.findEncryptedDataElement(doc, wsDocInfo, uri);
+                String algorithmURI = X509Util.getEncAlgo(ee);
+                alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                size = JCEMapper.getKeyLengthFromURI(algorithmURI);
+            }
+            KeyGenerator kgen = KeyGenerator.getInstance(alg);
+            kgen.init(size);
+            SecretKey k = kgen.generateKey();
+            return k.getEncoded();
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+        }
     }
     
     /**
@@ -237,27 +265,17 @@ public class EncryptedKeyProcessor implements Processor {
     }
     
     /**
-     * Decrypt all data references
+     * Find the list of all URIs that this encrypted Key references
      */
-    private List<WSDataRef> decryptDataRefs(
-        Document doc, Element xencEncryptedKey, WSDocInfo docInfo, byte[] decryptedBytes
-    ) throws WSSecurityException {
-        //
-        // At this point we have the decrypted session (symmetric) key. According
-        // to W3C XML-Enc this key is used to decrypt _any_ references contained in
-        // the reference list
-        // Now lookup the references that are encrypted with this key
-        //
+    private List<String> getDataRefURIs(Element xencEncryptedKey) {
+        // Lookup the references that are encrypted with this key
         Element refList = 
             WSSecurityUtil.getDirectChildElement(
-                    xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
+                xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
             );
-        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
+        List<String> dataRefURIs = new LinkedList<String>();
         if (refList != null) {
-            for (Node node = refList.getFirstChild();
-            node != null; 
-            node = node.getNextSibling()
-            ) {
+            for (Node node = refList.getFirstChild(); node != null; node = node.getNextSibling()) {
                 if (Node.ELEMENT_NODE == node.getNodeType()
                         && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                         && "DataReference".equals(node.getLocalName())) {
@@ -265,14 +283,32 @@ public class EncryptedKeyProcessor implements Processor {
                     if (dataRefURI.charAt(0) == '#') {
                         dataRefURI = dataRefURI.substring(1);
                     }
-                    WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes);
-                    dataRefs.add(dataRef);
+                    dataRefURIs.add(dataRefURI);
                 }
             }
-            return dataRefs;
         }
-
-        return null;
+        return dataRefURIs;
+    }
+    
+    /**
+     * Decrypt all data references
+     */
+    private List<WSDataRef> decryptDataRefs(
+        List<String> dataRefURIs, Document doc, WSDocInfo docInfo, byte[] decryptedBytes
+    ) throws WSSecurityException {
+        //
+        // At this point we have the decrypted session (symmetric) key. According
+        // to W3C XML-Enc this key is used to decrypt _any_ references contained in
+        // the reference list
+        if (dataRefURIs == null || dataRefURIs.isEmpty()) {
+            return null;
+        }
+        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
+        for (String dataRefURI : dataRefURIs) {
+            WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes);
+            dataRefs.add(dataRef);
+        }
+        return dataRefs;
     }
 
     /**
