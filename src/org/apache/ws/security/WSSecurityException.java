@@ -93,6 +93,7 @@ public class WSSecurityException extends RemoteException {
     }
 
     private int errorCode;
+    private Throwable cause;
 
     /**
      * Constructor.
@@ -104,7 +105,8 @@ public class WSSecurityException extends RemoteException {
      * @param exception
      */
     public WSSecurityException(int errorCode, String msgId, Object[] args, Throwable exception) {
-        super(getMessage(errorCode, msgId, args), exception);
+        super(getMessage(errorCode, msgId, args));
+        this.cause = exception;
         this.errorCode = errorCode;
     }
 
@@ -159,7 +161,8 @@ public class WSSecurityException extends RemoteException {
      * @param errorMessage
      */
     public WSSecurityException(String errorMessage, Throwable t) {
-        super(errorMessage, t);
+        super(errorMessage);
+        this.cause = t;
     }
 
     /**
@@ -184,6 +187,25 @@ public class WSSecurityException extends RemoteException {
             return (javax.xml.namespace.QName)ret;
         }
         return null;
+    }
+    
+    public Throwable getCause() {
+        return this.cause != null ? this.cause : super.getCause();
+    }
+            
+    /**
+     * Get message allowing for having cause's message included if verbose mode is on
+     * <p/>
+     * 
+     * @param verbose
+     * @return the message
+     */
+    public String getMessage(boolean verbose) {
+        if (verbose) {
+            return super.getMessage() + "; nested exception is: \n\t" + this.cause.toString();
+        } else {
+            return super.getMessage();
+        }
     }
 
     /**
