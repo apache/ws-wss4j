@@ -5,6 +5,25 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.2
+=============
+
+Bug
+
+    * [WSS-294] - Merlin doesn't support physical providers with no keystore file
+    * [WSS-295] - org.apache.ws.security.saml.ext.bean.AttributeBean attributeValues is not correct
+    * [WSS-296] - SubjectLocality is missing from AuthenticationStatementBean
+    * [WSS-297] - Subject Bean is missing NameID Format variable
+    * [WSS-299] - UsernameToken Salt Mac/Encryption Flag on Wrong End of Array
+    * [WSS-300] - SubjectKeyIidentifier (SKI) incorrectly calculated for 2048-bit RSA key
+    * [WSS-301] - WSS4J 1.6 incorrectly using XML-Security ResourceResolvers
+    * [WSS-302] - Unable to load keystore/truststore when it cannot be loaded from an InputStream
+    * [WSS-303] - Support SKI_KEY_IDENTIFIER, THUMBPRINT_IDENTIFIER, ISSUER_SERIAL when signing "sender vouches" assertions
+
+New Feature
+
+    * [WSS-251] - Support WSS Kerberos Token Profile
+
 Release 1.6.1
 =============
 

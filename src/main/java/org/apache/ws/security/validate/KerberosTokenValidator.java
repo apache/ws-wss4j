@@ -111,6 +111,17 @@ public class KerberosTokenValidator implements Validator {
             return credential;
         }
         
+        if (log.isDebugEnabled()) {
+            try {
+                String jaasAuth = System.getProperty("java.security.auth.login.config");
+                String krbConf = System.getProperty("java.security.krb5.conf");
+                log.debug("KerberosTokenValidator - Using JAAS auth login file: " + jaasAuth);
+                log.debug("KerberosTokenValidator - Using KRB conf file: " + krbConf);
+            } catch (SecurityException ex) {
+                log.debug(ex.getMessage(), ex);
+            }
+        }
+        
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {

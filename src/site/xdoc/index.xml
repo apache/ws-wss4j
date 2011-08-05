@@ -39,12 +39,11 @@ Foundation.
 <subsection name="News">
 <ul>
 <li>
-<p> <b>April 2011</b> - 
-The Apache WSS4J team are pleased to announce the release of version 1.6.0. This release is a major
-update to the 1.5.x releases.
+<p> <b>August 2011</b> - 
+The Apache WSS4J team are pleased to announce the release of version 1.6.2. 
 </p>
 <p>
-Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12313718">
+Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12316475">
 release notes</a> for more information.
 </p>
 </li>
