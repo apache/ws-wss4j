@@ -5,6 +5,22 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.12
+=============
+
+Bug
+
+    [WSS-267] - WSDoAllReceiver.invoke not setting proper WSSConfig on security engine
+    [WSS-270] - No need to ensure Crypto object is non-null for SAML signature verification using a secret key
+    [WSS-291] - Default to allowing Timestamps Created up to 60 seconds in the future to avoid clock skew problems
+    [WSS-292] - EnvelopIdResolver is used as singleton, but has message specific state.
+    [WSS-299] - UsernameToken Salt Mac/Encryption Flag on Wrong End of Array
+    [WSS-300] - SubjectKeyIidentifier (SKI) incorrectly calculated for 2048-bit RSA key
+
+Improvement
+
+    [WSS-274] - Add support for allowing future-dated Timestamps
+
 Release 1.5.11
 =============
 
