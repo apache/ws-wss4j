@@ -81,7 +81,7 @@ public class BinarySecurity {
             // The EncodingType attribute must be specified, and must be equal to Base64Binary
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY_TOKEN,
-                "badEncoding", 
+                "badEncodingType", 
                 new Object[] {encoding}
             );
         }
