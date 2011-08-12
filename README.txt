@@ -149,7 +149,7 @@ axis-saaj-1.4.jar
     
     See: http://ws.apache.org/axis/
 
-bcprov-jdk14-1.45.jar
+bcprov-jdk14-1.46.jar
     This is the BouncyCastle library that implements all necessary
     encryption, hashing, certificate, and keystore functions. Without
     this fantastic library WSS4J wouldn't work at all.
@@ -201,7 +201,7 @@ xalan-2.7.1.jar
    
     See: http://xml.apache.org/xalan-j/
    
-xmlsec-1.4.3.jar
+xmlsec-1.4.5.jar
     This library implements the XML-Signature Syntax and Processing and
     the XML Encryption Syntax and Processing specifications of the W3C. Thus
     they form one of the base foundations of WSS4J.  
