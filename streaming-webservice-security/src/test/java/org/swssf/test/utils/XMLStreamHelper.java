@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
  * Utility methods for working with an XMLStreamWriter. Maybe push this back into
  * stax-utils project.
  *
- * @version $Revision: 272 $
+ * @version $Revision$
  */
 public class XMLStreamHelper implements XMLStreamConstants {
     private static Attributes emptyAttributes = new AttributesImpl();

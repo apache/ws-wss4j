@@ -25,7 +25,7 @@ import java.io.StringReader;
  */
 
 /**
- * @author $Author: giger $
+ * @author $Author$
  */
 public class RFC2253Parser {
 
