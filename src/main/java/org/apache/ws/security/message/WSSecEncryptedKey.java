@@ -395,6 +395,9 @@ public class WSSecEncryptedKey extends WSSecBase {
             // Assume AES as default, so initialize it
             //
             String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+            if (keyAlgorithm == null || "".equals(keyAlgorithm)) {
+                keyAlgorithm = JCEMapper.translateURItoJCEID(symEncAlgo);
+            }
             KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
             if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
                 keyGen.init(128);
