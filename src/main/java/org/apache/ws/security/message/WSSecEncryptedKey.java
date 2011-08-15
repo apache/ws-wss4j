@@ -127,12 +127,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     
     protected X509Certificate useThisCert = null;
     
-    /**
-     * Key size in bits
-     * Defaults to 128
-     */
-    protected int keySize = 128;
-    
     public WSSecEncryptedKey() {
         super();
     }
@@ -405,8 +399,6 @@ public class WSSecEncryptedKey extends WSSecBase {
                 keyGen.init(192);
             } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
                 keyGen.init(256);
-            } else {
-                keyGen.init(keySize);
             }
             return keyGen;
         } catch (NoSuchAlgorithmException e) {
@@ -554,14 +546,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         return null;
     }
     
-    public void setKeySize(int keySize) throws WSSecurityException {
-        if (keySize < 64) {
-            // Minimum size has to be 64 bits - E.g. A DES key
-            throw new WSSecurityException("invalidKeySize");
-        }
-        this.keySize = keySize;
-    }
-
     public void setKeyEncAlgo(String keyEncAlgo) {
         this.keyEncAlgo = keyEncAlgo;
     }
