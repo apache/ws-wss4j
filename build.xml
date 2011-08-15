@@ -351,7 +351,7 @@ org.apache.ws.security.util
          <zip destfile=
            "${dir.dist}/${product.shortname}-bin-${product.version}.zip">
             <zipfileset prefix="wss4j-${product.version}" dir="."
-                includes="legal/** lib/** LICENSE.txt NOTICE "/>
+                includes="legal/** lib/** LICENSE.txt README.txt NOTICE "/>
             <zipfileset prefix="wss4j-${product.version}/lib" dir="target/"
                 includes="wss4j-${product.version}.jar" />
             <zipfileset prefix="wss4j-${product.version}/doc" dir="target/"
@@ -367,7 +367,7 @@ org.apache.ws.security.util
         <zip destfile=
                  "${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j-${product.version}" dir="."
-                includes="src/** legal/** lib/** endorsed/** ChangeLog.txt LICENSE.txt NOTICE build.xml pom.xml"/>
+                includes="src/** legal/** lib/** endorsed/** ChangeLog.txt LICENSE.txt README.txt NOTICE build.xml pom.xml"/>
         </zip>
     </target>
 
