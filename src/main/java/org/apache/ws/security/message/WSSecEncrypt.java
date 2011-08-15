@@ -29,7 +29,6 @@ import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -43,7 +42,6 @@ import org.w3c.dom.Node;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,16 +57,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecEncrypt.class);
     
-    protected String symEncAlgo = WSConstants.AES_128;
-
     protected byte[] embeddedKey = null;
 
     protected String embeddedKeyName = null;
-
-    /**
-     * Symmetric key used in the EncrytpedKey.
-     */
-    protected SecretKey symmetricKey = null;
 
     /**
      * SecurityTokenReference to be inserted into EncryptedData/keyInfo element.
@@ -96,6 +87,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public WSSecEncrypt() {
         super();
     }
+    
     public WSSecEncrypt(WSSConfig config) {
         super(config);
     }
@@ -132,40 +124,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         this.embeddedKeyName = embeddedKeyName;
     }
     
-    
-    /**
-     * Set the name of the symmetric encryption algorithm to use.
-     * 
-     * This encryption algorithm is used to encrypt the data. If the algorithm
-     * is not set then AES128 is used. Refer to WSConstants which algorithms are
-     * supported.
-     * 
-     * @param algo Is the name of the encryption algorithm
-     * @see WSConstants#TRIPLE_DES
-     * @see WSConstants#AES_128
-     * @see WSConstants#AES_192
-     * @see WSConstants#AES_256
-     */
-    public void setSymmetricEncAlgorithm(String algo) {
-        symEncAlgo = algo;
-    }
-
-    
-    /**
-     * Get the name of symmetric encryption algorithm to use.
-     * 
-     * The name of the encryption algorithm to encrypt the data, i.e. the SOAP
-     * Body. Refer to WSConstants which algorithms are supported.
-     * 
-     * @return the name of the currently selected symmetric encryption algorithm
-     * @see WSConstants#TRIPLE_DES
-     * @see WSConstants#AES_128
-     * @see WSConstants#AES_192
-     * @see WSConstants#AES_256
-     */
-    public String getSymmetricEncAlgorithm() {
-        return symEncAlgo;
-    }
     
     /**
      * Initialize a WSSec Encrypt.
@@ -220,7 +178,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 }
                 remoteCert = certs[0];
             }
-            prepareInternal(ephemeralKey, remoteCert, crypto);
+            prepareInternal(symmetricKey, remoteCert, crypto);
         } else {
             encryptedEphemeralKey = ephemeralKey;
         }
@@ -598,29 +556,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         return keyInfo;
     }
 
-
-    private KeyGenerator getKeyGenerator() throws WSSecurityException {
-        try {
-            //
-            // Assume AES as default, so initialize it
-            //
-            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
-            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
-                keyGen.init(128);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
-                keyGen.init(192);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
-                keyGen.init(256);
-            }
-            return keyGen;
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
-            );
-        }
-    }
-
     /**
      * Create DOM subtree for <code>xenc:EncryptedKey</code>
      * 
@@ -643,22 +578,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             referenceList.appendChild(dataReference);
         }
         return referenceList;
-    }
-
-    /**
-     * @return The symmetric key
-     */
-    public SecretKey getSymmetricKey() {
-        return symmetricKey;
-    }
-
-    /**
-     * Set the symmetric key to be used for encryption
-     * 
-     * @param key
-     */
-    public void setSymmetricKey(SecretKey key) {
-        this.symmetricKey = key;
     }
 
     /**

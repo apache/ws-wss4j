@@ -20,11 +20,13 @@
 package org.apache.ws.security.message;
 
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -39,6 +41,7 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.JCEMapper;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,6 +72,11 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Session key used as the secret in key derivation
      */
     protected byte[] ephemeralKey;
+    
+    /**
+     * Symmetric key used in the EncryptedKey.
+     */
+    protected SecretKey symmetricKey = null;
 
     /**
      * Encrypted bytes of the ephemeral key
@@ -84,6 +92,11 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Algorithm used to encrypt the ephemeral key
      */
     protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSA15;
+    
+    /**
+     * Algorithm to be used with the ephemeral key
+     */
+    protected String symEncAlgo = WSConstants.AES_128;
 
     /**
      * xenc:EncryptedKey element
@@ -123,6 +136,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     public WSSecEncryptedKey() {
         super();
     }
+    
     public WSSecEncryptedKey(WSSConfig config) {
         super(config);
     }
@@ -167,7 +181,15 @@ public class WSSecEncryptedKey extends WSSecBase {
         // Set up the ephemeral key
         //
         if (ephemeralKey == null) {
-            ephemeralKey = generateEphemeralKey();
+            if (symmetricKey == null) {
+                KeyGenerator keyGen = getKeyGenerator();
+                symmetricKey = keyGen.generateKey();
+            } 
+            ephemeralKey = symmetricKey.getEncoded();
+        }
+        
+        if (symmetricKey == null) {
+            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, ephemeralKey);
         }
 
         //
@@ -189,7 +211,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             remoteCert = certs[0];
         }
         
-        prepareInternal(ephemeralKey, remoteCert, crypto);
+        prepareInternal(symmetricKey, remoteCert, crypto);
     }
 
     /**
@@ -198,20 +220,20 @@ public class WSSecEncryptedKey extends WSSecBase {
      * This method does the most work for to prepare the EncryptedKey element.
      * It is also used by the WSSecEncrypt sub-class.
      * 
-     * @param keyBytes The bytes that represent the symmetric key
+     * @param secretKey The symmetric key
      * @param remoteCert The certificate that contains the public key to encrypt the
      *                   symmetric key data
      * @param crypto An instance of the Crypto API to handle keystore and certificates
      * @throws WSSecurityException
      */
     protected void prepareInternal(
-        byte[] keyBytes, 
+        SecretKey secretKey, 
         X509Certificate remoteCert,
         Crypto crypto
     ) throws WSSecurityException {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, remoteCert);
+            cipher.init(Cipher.WRAP_MODE, remoteCert);
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, e
@@ -220,20 +242,12 @@ public class WSSecEncryptedKey extends WSSecBase {
         int blockSize = cipher.getBlockSize();
         if (doDebug) {
             log.debug(
-                "cipher blksize: " + blockSize
-                + ", symm key length: " + keyBytes.length
-            );
-        }
-        if (blockSize > 0 && blockSize < keyBytes.length) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE,
-                "unsupportedKeyTransp",
-                new Object[] {"public key algorithm too weak to encrypt symmetric key"}
+                "cipher blksize: " + blockSize + ", symm key: " + secretKey.toString()
             );
         }
         
         try {
-            encryptedEphemeralKey = cipher.doFinal(keyBytes);
+            encryptedEphemeralKey = cipher.wrap(secretKey);
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, ex
@@ -242,7 +256,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, ex
             );
-        } catch (BadPaddingException ex) {
+        } catch (InvalidKeyException ex) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, ex
             );
@@ -375,17 +389,27 @@ public class WSSecEncryptedKey extends WSSecBase {
         envelope = document.getDocumentElement();
     }
 
-    /**
-     * Create an ephemeral key
-     * 
-     * @return an ephemeral key
-     * @throws WSSecurityException
-     */
-    protected byte[] generateEphemeralKey() throws WSSecurityException {
+    protected KeyGenerator getKeyGenerator() throws WSSecurityException {
         try {
-            return WSSecurityUtil.generateNonce(this.keySize / 8);
-        } catch (Exception e) {
-            throw new WSSecurityException("Error in creating the ephemeral key", e);
+            //
+            // Assume AES as default, so initialize it
+            //
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+                keyGen.init(128);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
+                keyGen.init(192);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
+                keyGen.init(256);
+            } else {
+                keyGen.init(keySize);
+            }
+            return keyGen;
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
+            );
         }
     }
 
@@ -526,7 +550,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         return null;
     }
-
+    
     public void setKeySize(int keySize) throws WSSecurityException {
         if (keySize < 64) {
             // Minimum size has to be 64 bits - E.g. A DES key
@@ -589,4 +613,56 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setCustomEKTokenId(String customEKTokenId) {
         this.customEKTokenId = customEKTokenId;
     }
+    
+    /**
+     * Set the name of the symmetric encryption algorithm to use.
+     * 
+     * This encryption algorithm is used to encrypt the data. If the algorithm
+     * is not set then AES128 is used. Refer to WSConstants which algorithms are
+     * supported.
+     * 
+     * @param algo Is the name of the encryption algorithm
+     * @see WSConstants#TRIPLE_DES
+     * @see WSConstants#AES_128
+     * @see WSConstants#AES_192
+     * @see WSConstants#AES_256
+     */
+    public void setSymmetricEncAlgorithm(String algo) {
+        symEncAlgo = algo;
+    }
+
+    
+    /**
+     * Get the name of symmetric encryption algorithm to use.
+     * 
+     * The name of the encryption algorithm to encrypt the data, i.e. the SOAP
+     * Body. Refer to WSConstants which algorithms are supported.
+     * 
+     * @return the name of the currently selected symmetric encryption algorithm
+     * @see WSConstants#TRIPLE_DES
+     * @see WSConstants#AES_128
+     * @see WSConstants#AES_192
+     * @see WSConstants#AES_256
+     */
+    public String getSymmetricEncAlgorithm() {
+        return symEncAlgo;
+    }
+    
+    /**
+     * @return The symmetric key
+     */
+    public SecretKey getSymmetricKey() {
+        return symmetricKey;
+    }
+
+    /**
+     * Set the symmetric key to be used for encryption
+     * 
+     * @param key
+     */
+    public void setSymmetricKey(SecretKey key) {
+        this.symmetricKey = key;
+    }
+
+
 }
