@@ -115,6 +115,10 @@ public class SignatureValueType implements Parseable {
         return Base64.decodeBase64(this.value.toString());
     }
 
+    public String getRawValue() {
+        return this.value.toString();
+    }
+
     /**
      * Sets the value of the value property.
      *
