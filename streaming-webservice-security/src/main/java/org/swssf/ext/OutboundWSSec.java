@@ -75,7 +75,8 @@ public class OutboundWSSec {
 
         OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
         processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties, null));
-
+        //todo some combinations are not possible atm: eg Action.SIGNATURE and Action.USERNAMETOKEN_SIGNED
+        //todo they use the same signaure parts
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
             Constants.Action action = securityProperties.getOutAction()[i];
             switch (action) {
@@ -102,7 +103,7 @@ public class OutboundWSSec {
                     processorChain.addProcessor(usernameTokenOutputProcessor);
                     break;
                 }
-                case USERNAMETOKEN_SIGN: {
+                case USERNAMETOKEN_SIGNED: {
                     processorChain.addProcessor(new UsernameTokenOutputProcessor(securityProperties, action));
                     SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
                     processorChain.addProcessor(signatureOutputProcessor);

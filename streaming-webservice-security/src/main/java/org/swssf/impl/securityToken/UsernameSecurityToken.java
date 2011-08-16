@@ -22,6 +22,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.Constants;
+import org.swssf.ext.SecurityContext;
 import org.swssf.ext.SecurityToken;
 import org.swssf.ext.WSSecurityException;
 
@@ -29,7 +30,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
-import java.security.cert.X509Certificate;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -37,12 +37,10 @@ import java.util.Map;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class UsernameSecurityToken implements SecurityToken {
+public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
 
     private static final int DEFAULT_ITERATION = 1000;
 
-    private String id;
-    private Object processor;
     private String username;
     private String password;
     private String created;
@@ -50,9 +48,8 @@ public class UsernameSecurityToken implements SecurityToken {
     private byte[] salt;
     private Integer iteration;
 
-    UsernameSecurityToken(UsernameTokenType usernameTokenType, String id, Object processor) {
-        this.id = id;
-        this.processor = processor;
+    UsernameSecurityToken(UsernameTokenType usernameTokenType, SecurityContext securityContext, String id, Object processor) {
+        super(securityContext, id, processor);
         this.username = usernameTokenType.getUsername();
         this.password = usernameTokenType.getPassword();
         this.created = usernameTokenType.getCreated();
@@ -61,23 +58,14 @@ public class UsernameSecurityToken implements SecurityToken {
         this.iteration = usernameTokenType.getIteration() != null ? Integer.parseInt(usernameTokenType.getIteration()) : null;
     }
 
-    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Integer iteration, String id, Object processor) {
-        this.id = id;
-        this.processor = processor;
+    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Integer iteration, SecurityContext securityContext, String id, Object processor) {
+        super(securityContext, id, processor);
         this.username = username;
         this.password = password;
         this.created = created;
         this.nonce = nonce;
         this.salt = salt;
         this.iteration = iteration;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public Object getProccesor() {
-        return processor;
     }
 
     public String getUsername() {
@@ -230,7 +218,8 @@ public class UsernameSecurityToken implements SecurityToken {
 
     private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
-    public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
+        super.getSecretKey(algorithmURI, keyUsage);
         byte[] secretToken = null;
         if (getSalt() != null && getIteration() != null) {
             int iteration = getIteration();
@@ -243,22 +232,16 @@ public class UsernameSecurityToken implements SecurityToken {
         if (keyTable.containsKey(algorithmURI)) {
             return keyTable.get(algorithmURI);
         } else {
-            String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+            String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
             Key key = new SecretKeySpec(secretToken, algoFamily);
             keyTable.put(algorithmURI, key);
             return key;
         }
     }
 
-    public PublicKey getPublicKey() throws WSSecurityException {
+    public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
+        super.getPublicKey(keyUsage);
         return null;
-    }
-
-    public X509Certificate[] getX509Certificates() throws WSSecurityException {
-        return null;
-    }
-
-    public void verify() throws WSSecurityException {
     }
 
     public SecurityToken getKeyWrappingToken() {
@@ -269,7 +252,7 @@ public class UsernameSecurityToken implements SecurityToken {
         return null;
     }
 
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
+    public Constants.TokenType getTokenType() {
         return null;
     }
 }

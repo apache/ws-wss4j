@@ -16,16 +16,18 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
+import org.swssf.policy.assertionStates.TokenAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -118,13 +120,13 @@ public class HttpsToken extends Token {
                 * a http user/pwd authentication. Nevertheless stick to the specification.
                 */
                 if (isHttpBasicAuthentication()) {
-                    writer.writeStartElement(prefix, SPConstants.HTTP_BASIC_AUTHENTICATION.getLocalPart(), namespaceURI);
+                    writer.writeStartElement(prefix, spConstants.getHttpBasicAuthentication().getLocalPart(), namespaceURI);
                     writer.writeEndElement();
                 } else if (isHttpDigestAuthentication()) {
-                    writer.writeStartElement(prefix, SPConstants.HTTP_DIGEST_AUTHENTICATION.getLocalPart(), namespaceURI);
+                    writer.writeStartElement(prefix, spConstants.getHttpDigestAuthentication().getLocalPart(), namespaceURI);
                     writer.writeEndElement();
                 } else if (isRequireClientCertificate()) {
-                    writer.writeStartElement(prefix, SPConstants.REQUIRE_CLIENT_CERTIFICATE.getLocalPart(), namespaceURI);
+                    writer.writeStartElement(prefix, spConstants.getRequireClientCertificate().getLocalPart(), namespaceURI);
                     writer.writeEndElement();
                 }
                 // </wsp:Policy>
@@ -132,7 +134,7 @@ public class HttpsToken extends Token {
             }
         } else {
             // RequireClientCertificate=".."
-            writer.writeAttribute(SPConstants.REQUIRE_CLIENT_CERTIFICATE.getLocalPart(), Boolean
+            writer.writeAttribute(spConstants.getRequireClientCertificate().getLocalPart(), Boolean
                     .toString(isRequireClientCertificate()));
         }
 
@@ -141,6 +143,18 @@ public class HttpsToken extends Token {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public QName getXmlName() {
+        return null;
+    }
+
+    @Override
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        SecurityEvent.Event[] responsibleAssertionEvents = getResponsibleAssertionEvents();
+        for (int i = 0; i < responsibleAssertionEvents.length; i++) {
+            SecurityEvent.Event responsibleAssertionEvent = responsibleAssertionEvents[i];
+            TokenAssertionState tokenAssertionState = new TokenAssertionState(this, false);
+            Map<Assertion, List<AssertionState>> assertionStates = assertionStateMap.get(responsibleAssertionEvent);
+            addAssertionState(assertionStates, this, tokenAssertionState);
+        }
     }
 }

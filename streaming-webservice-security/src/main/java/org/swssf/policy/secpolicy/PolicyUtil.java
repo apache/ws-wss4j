@@ -18,6 +18,13 @@
  */
 package org.swssf.policy.secpolicy;
 
+import org.apache.neethi.Assertion;
+import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyOperator;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -33,5 +40,72 @@ public class PolicyUtil {
             return SP11Constants.INSTANCE;
         }
         return null;
+    }
+
+    public static List<Assertion> getPolicyAssertionsInSameAlternative(PolicyComponent policy, Assertion policyAssertion, Class<? extends Assertion> policyAssertionToSearchFor, Object... initArgs) {
+        List<Assertion> policyAssertions = new ArrayList<Assertion>();
+        PolicyOperator foundPolicyOperator = (PolicyOperator) getPolicyAssertionParentOperator(policy, policyAssertion, null);
+        getPolicyAssertion(policyAssertions, foundPolicyOperator, policyAssertionToSearchFor);
+        if (policyAssertions.size() == 0) {
+            //ok no matching Assertion found, so append one
+            //atm we append it directly on the operator. this is probably not the correct place
+            Class[] params = new Class[initArgs.length];
+            for (int i = 0; i < initArgs.length; i++) {
+                Object initArg = initArgs[i];
+                //todo better solution:
+                if (i == initArgs.length - 1) {
+                    params[i] = initArg.getClass().getSuperclass();
+                } else {
+                    params[i] = initArg.getClass();
+                }
+            }
+            try {
+                Assertion assertion = policyAssertionToSearchFor.getConstructor(params).newInstance(initArgs);
+                policyAssertions.add(assertion);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        return policyAssertions;
+    }
+
+    public static PolicyComponent getPolicyAssertionParentOperator(PolicyComponent policy, Assertion policyAssertion, PolicyComponent parent) {
+        if (policy instanceof PolicyOperator) {
+            PolicyOperator policyOperator = (PolicyOperator) policy;
+            @SuppressWarnings("unchecked")
+            List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
+            for (int i = 0; i < policyComponents.size(); i++) {
+                PolicyComponent policyComponent = policyComponents.get(i);
+                PolicyComponent foundPolicyComponent = getPolicyAssertionParentOperator(policyComponent, policyAssertion, policyOperator);
+                if (foundPolicyComponent != null) {
+                    return foundPolicyComponent;
+                }
+            }
+        } else {
+            Assertion foundPolicyAssertion = (Assertion) policy;
+            if (foundPolicyAssertion == policyAssertion) {
+                return parent;
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static void getPolicyAssertion(List<Assertion> foundPolicies, PolicyComponent policyComponent, Class<? extends Assertion> policyAssertionClass) {
+        if (policyComponent instanceof PolicyOperator) {
+            PolicyOperator policyOperator = (PolicyOperator) policyComponent;
+            @SuppressWarnings("unchecked")
+            List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
+            for (int i = 0; i < policyComponents.size(); i++) {
+                PolicyComponent curpolicyComponent = policyComponents.get(i);
+                getPolicyAssertion(foundPolicies, curpolicyComponent, policyAssertionClass);
+            }
+        } else {
+            Assertion foundPolicyAssertion = (Assertion) policyComponent;
+            if (foundPolicyAssertion.getClass() == policyAssertionClass) {
+                foundPolicies.add(foundPolicyAssertion);
+            }
+        }
     }
 }

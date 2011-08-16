@@ -16,10 +16,9 @@
 
 package org.swssf.policy.secpolicy.model;
 
-import org.apache.neethi.All;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.*;
+import org.swssf.policy.OperationPolicy;
+import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
@@ -27,8 +26,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * class lent from apache rampart
@@ -85,38 +84,24 @@ public class TransportBinding extends Binding {
         }
 
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configurations = algorithmSuite.getConfigurations();
-
-        if (configurations != null && configurations.size() == 1) {
-            setNormalized(true);
-            return this;
-        }
 
         Policy policy = new Policy();
         ExactlyOne exactlyOne = new ExactlyOne();
-
-        All wrapper;
-        TransportBinding transportBinding;
-
-        for (Iterator iterator = configurations.iterator(); iterator.hasNext(); ) {
-            wrapper = new All();
-            transportBinding = new TransportBinding(spConstants);
-
-            algorithmSuite = (AlgorithmSuite) iterator.next();
-            transportBinding.setAlgorithmSuite(algorithmSuite);
-            transportBinding.setIncludeTimestamp(isIncludeTimestamp());
-            transportBinding.setLayout(getLayout());
-            transportBinding
-                    .setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            transportBinding
-                    .setSignedSupportingToken(getSignedSupportingToken());
-            transportBinding.setTransportToken(getTransportToken());
-
-            wrapper.addPolicyComponent(transportBinding);
-            exactlyOne.addPolicyComponent(wrapper);
-        }
-
         policy.addPolicyComponent(exactlyOne);
+        All all = new All();
+        exactlyOne.addPolicyComponent(all);
+
+        TransportBinding transportBinding = new TransportBinding(spConstants);
+        transportBinding.setAlgorithmSuite(algorithmSuite);
+        transportBinding.setIncludeTimestamp(isIncludeTimestamp());
+        transportBinding.setLayout(getLayout());
+        transportBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
+        transportBinding.setSignedSupportingToken(getSignedSupportingToken());
+        transportBinding.setTransportToken(getTransportToken());
+
+        transportBinding.setNormalized(true);
+        all.addPolicyComponent(transportBinding);
+
         return policy;
     }
 
@@ -187,13 +172,27 @@ public class TransportBinding extends Binding {
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        SecurityEvent.Event[] parentEvents = super.getResponsibleAssertionEvents();
+        SecurityEvent.Event[] collectedSecurityEvents = new SecurityEvent.Event[parentEvents.length];
+        System.arraycopy(parentEvents, 0, collectedSecurityEvents, 0, parentEvents.length);
+        return collectedSecurityEvents;
     }
 
-    /*
     @Override
-    public void assertPolicy(SecurityEvent securityEvent) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        super.getAssertions(assertionStateMap, operationPolicy);
+        if (transportToken != null) {
+            transportToken.getAssertions(assertionStateMap, operationPolicy);
+        }
     }
-    */
+
+    @Override
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
+        boolean isAsserted = true;
+        if (transportToken != null) {
+            isAsserted &= transportToken.isAsserted(assertionStateMap);
+        }
+        isAsserted &= super.isAsserted(assertionStateMap);
+        return isAsserted;
+    }
 }

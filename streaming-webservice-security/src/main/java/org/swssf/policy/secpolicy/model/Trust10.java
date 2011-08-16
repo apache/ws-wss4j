@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
@@ -25,7 +26,7 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -215,18 +216,7 @@ public class Trust10 extends AbstractSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         //todo
     }
-
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
-    }
-
-    @Override
-    public boolean isAsserted() {
-        return true;
-    }
-    */
 }

@@ -16,16 +16,19 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
+import org.swssf.ext.Constants;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
+import org.swssf.policy.assertionStates.TokenAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +43,10 @@ public class UsernameToken extends Token {
     private boolean noPassword;
 
     private boolean hashPassword;
+
+    private boolean createdTimestamp;
+
+    private boolean nonce;
 
     public UsernameToken(SPConstants spConstants) {
         setVersion(spConstants);
@@ -81,6 +88,22 @@ public class UsernameToken extends Token {
 
     public void setUseUTProfile10(boolean useUTProfile10) {
         this.useUTProfile10 = useUTProfile10;
+    }
+
+    public boolean isCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(boolean createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    public boolean isNonce() {
+        return nonce;
+    }
+
+    public void setNonce(boolean nonce) {
+        this.nonce = nonce;
     }
 
     public QName getName() {
@@ -167,7 +190,23 @@ public class UsernameToken extends Token {
 
     }
 
+    public QName getXmlName() {
+        return Constants.TAG_wsse_UsernameToken;
+    }
+
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public SecurityEvent.Event[] getResponsibleAssertionEvents() {
+        return new SecurityEvent.Event[]{SecurityEvent.Event.UsernameToken};
+    }
+
+    @Override
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        SecurityEvent.Event[] responsibleAssertionEvents = getResponsibleAssertionEvents();
+        for (int i = 0; i < responsibleAssertionEvents.length; i++) {
+            SecurityEvent.Event responsibleAssertionEvent = responsibleAssertionEvents[i];
+            Map<Assertion, List<AssertionState>> assertionStates = assertionStateMap.get(responsibleAssertionEvent);
+            TokenAssertionState tokenAssertionState = new TokenAssertionState(this, false);
+            addAssertionState(assertionStates, this, tokenAssertionState);
+        }
     }
 }

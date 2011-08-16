@@ -20,6 +20,7 @@ package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
+import org.swssf.ext.SecurityContext;
 import org.swssf.ext.WSSecurityException;
 import org.w3._2000._09.xmldsig_.X509DataType;
 
@@ -33,8 +34,8 @@ public class X509DataSecurityToken extends X509SecurityToken {
     private String alias = null;
     protected X509DataType x509DataType;
 
-    X509DataSecurityToken(Crypto crypto, CallbackHandler callbackHandler, X509DataType x509DataType, String id, Object processor) {
-        super(crypto, callbackHandler, id, processor);
+    X509DataSecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, X509DataType x509DataType, String id, Object processor) {
+        super(Constants.TokenType.X509V3Token, securityContext, crypto, callbackHandler, id, processor);
         this.x509DataType = x509DataType;
     }
 
@@ -43,9 +44,5 @@ public class X509DataSecurityToken extends X509SecurityToken {
             this.alias = getCrypto().getAliasForX509Cert(x509DataType.getX509IssuerSerialType().getX509IssuerName(), x509DataType.getX509IssuerSerialType().getX509SerialNumber());
         }
         return this.alias;
-    }
-
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
-        return Constants.KeyIdentifierType.ISSUER_SERIAL;
     }
 }

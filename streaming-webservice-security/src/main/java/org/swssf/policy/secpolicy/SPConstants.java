@@ -151,6 +151,14 @@ public abstract class SPConstants {
 
     public final static String USERNAME_TOKEN11 = "WssUsernameToken11";
 
+    public static final String SAML_TOKEN = "SamlToken";
+
+    public static final String SAML_11_TOKEN_10 = "WssSamlV11Token10";
+
+    public static final String SAML_11_TOKEN_11 = "WssSamlV11Token11";
+
+    public static final String SAML_20_TOKEN_11 = "WssSamlV20Token11";
+
 
     public static final String KEYVALUE_TOKEN = "KeyValueToken";
 
@@ -159,11 +167,11 @@ public abstract class SPConstants {
 
     public final static String HTTPS_TOKEN = "HttpsToken";
 
-    public final static QName REQUIRE_CLIENT_CERTIFICATE = new QName("RequireClientCertificate");
+    public final static String REQUIRE_CLIENT_CERTIFICATE = "RequireClientCertificate";
 
-    public final static QName HTTP_BASIC_AUTHENTICATION = new QName("HttpBasicAuthentication");
+    public final static String HTTP_BASIC_AUTHENTICATION = "HttpBasicAuthentication";
 
-    public final static QName HTTP_DIGEST_AUTHENTICATION = new QName("HttpDigestAuthentication");
+    public final static String HTTP_DIGEST_AUTHENTICATION = "HttpDigestAuthentication";
 
     public final static String SECURITY_CONTEXT_TOKEN = "SecurityContextToken";
 
@@ -199,21 +207,16 @@ public abstract class SPConstants {
 
     public final static String SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS = "SignedEndorsingEncryptedSupportingTokens";
 
-    public final static int SUPPORTING_TOKEN_SUPPORTING = 1;
-
-    public final static int SUPPORTING_TOKEN_ENDORSING = 2;
-
-    public final static int SUPPORTING_TOKEN_SIGNED = 3;
-
-    public final static int SUPPORTING_TOKEN_SIGNED_ENDORSING = 4;
-
-    public final static int SUPPORTING_TOKEN_SIGNED_ENCRYPTED = 5;
-
-    public final static int SUPPORTING_TOKEN_ENCRYPTED = 6;
-
-    public final static int SUPPORTING_TOKEN_ENDORSING_ENCRYPTED = 7;
-
-    public final static int SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED = 8;
+    public enum SupportingTokenType {
+        SUPPORTING,
+        ENDORSING,
+        SIGNED,
+        SIGNED_ENDORSING,
+        SIGNED_ENCRYPTED,
+        ENCRYPTED,
+        ENDORSING_ENCRYPTED,
+        SIGNED_ENDORSING_ENCRYPTED,
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -335,16 +338,6 @@ public abstract class SPConstants {
 
     public static final String INCLUDE_TOEKN_ALWAYS_SUFFIX = "/IncludeToken/Always";
 
-    public static final int INCLUDE_TOKEN_NEVER = 1;
-
-    public static final int INCLUDE_TOKEN_ONCE = 2;
-
-    public static final int INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT = 3;
-
-    public static final int INCLUDE_TOEKN_ALWAYS_TO_INITIATOR = 4;
-
-    public static final int INCLUDE_TOEKN_ALWAYS = 5;
-
     public enum IncludeTokenType {
         INCLUDE_TOKEN_NEVER,
         INCLUDE_TOKEN_ONCE,
@@ -452,6 +445,10 @@ public abstract class SPConstants {
     public static final String NO_PASSWORD = "NoPassword";
 
     public static final String HASH_PASSWORD = "HashPassword";
+
+    public static final String CREATED = "Created";
+
+    public static final String NONCE = "Nonce";
 
     public abstract Version getVersion();
 
@@ -569,6 +566,8 @@ public abstract class SPConstants {
 
     public abstract QName getX509Token();
 
+    public abstract QName getSamlToken();
+
     public abstract QName getSupportingTokens();
 
     public abstract QName getSignedSupportingTokens();
@@ -606,6 +605,10 @@ public abstract class SPConstants {
     public abstract QName getNoPassword();
 
     public abstract QName getHashPassword();
+
+    public abstract QName getCreated();
+
+    public abstract QName getNonce();
 
     public abstract QName getMustSupportRefKeyIdentifier();
 

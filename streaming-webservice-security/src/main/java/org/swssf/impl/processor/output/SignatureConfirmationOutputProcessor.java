@@ -20,8 +20,8 @@ package org.swssf.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.ext.*;
-import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
 import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SignatureTokenSecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -57,13 +57,13 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                 List<SecurityEvent> requestSecurityEvents = outputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
                 for (int i = 0; i < requestSecurityEvents.size(); i++) {
                     SecurityEvent securityEvent = requestSecurityEvents.get(i);
-                    if (securityEvent.getSecurityEventType() == SecurityEvent.Event.InitiatorSignatureToken) {
+                    if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureToken) {
                         aSignatureFound = true;
-                        InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = (InitiatorSignatureTokenSecurityEvent) securityEvent;
+                        SignatureTokenSecurityEvent signatureTokenSecurityEvent = (SignatureTokenSecurityEvent) securityEvent;
 
                         Map<QName, String> attributes = new HashMap<QName, String>();
                         attributes.put(Constants.ATT_wsu_Id, "SigConf-" + UUID.randomUUID().toString());
-                        attributes.put(Constants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(initiatorSignatureTokenSecurityEvent.getSignatureValue()));
+                        attributes.put(Constants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureTokenSecurityEvent.getSignatureValue()));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse11_SignatureConfirmation, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse11_SignatureConfirmation);
                     }

@@ -16,17 +16,18 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.swssf.ext.Constants;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.IncludeTimeStampAssertionState;
 import org.swssf.policy.assertionStates.SignedElementAssertionState;
+import org.swssf.policy.secpolicy.PolicyUtil;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
     private AlgorithmSuite algorithmSuite;
     private boolean includeTimestamp;
     private Layout layout;
+    //todo are these defined in an old ws-securityPolicy schema? if not, remove them
     private SupportingToken signedSupportingToken;
     private SupportingToken signedEndorsingSupportingTokens;
 
@@ -114,7 +116,7 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         if (algorithmSuite != null) {
             algorithmSuite.getAssertions(assertionStateMap, operationPolicy);
         }
@@ -128,22 +130,32 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
             signedEndorsingSupportingTokens.getAssertions(assertionStateMap, operationPolicy);
         }
 
-        Collection<AssertionState> timestampAssertionStates = assertionStateMap.get(SecurityEvent.Event.Timestamp);
+        Map<Assertion, List<AssertionState>> timestampAssertionStates = assertionStateMap.get(SecurityEvent.Event.Timestamp);
         //ws-securitypolicy-1.3-spec: 6.2 [Timestamp] Property
         if (isIncludeTimestamp()) {
-            timestampAssertionStates.add(new IncludeTimeStampAssertionState(this, false));
+            addAssertionState(timestampAssertionStates, this, new IncludeTimeStampAssertionState(this, false));
 
-            Collection<AssertionState> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
+            Map<Assertion, List<AssertionState>> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
             List<QName> qNames = new ArrayList<QName>();
             qNames.add(Constants.TAG_wsu_Timestamp);
-            signedElementAssertionStates.add(new SignedElementAssertionState(this, false, qNames));
+
+            SignedEncryptedElements signedEncryptedElements = null;
+            List<Assertion> assertions = PolicyUtil.getPolicyAssertionsInSameAlternative(operationPolicy.getPolicy(), this, SignedEncryptedElements.class, Boolean.TRUE, spConstants);
+            for (int i = 0; i < assertions.size(); i++) {
+                signedEncryptedElements = (SignedEncryptedElements) assertions.get(i);
+                if (signedEncryptedElements.isSignedElements()) {
+                    break;
+                }
+            }
+
+            addAssertionState(signedElementAssertionStates, signedEncryptedElements, new SignedElementAssertionState(signedEncryptedElements, true, qNames));
         } else {
-            timestampAssertionStates.add(new IncludeTimeStampAssertionState(this, true));
+            addAssertionState(timestampAssertionStates, this, new IncludeTimeStampAssertionState(this, true));
         }
     }
 
     @Override
-    public boolean isAsserted(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
         boolean isAsserted = super.isAsserted(assertionStateMap);
         //todo early returns?
         if (algorithmSuite != null) {

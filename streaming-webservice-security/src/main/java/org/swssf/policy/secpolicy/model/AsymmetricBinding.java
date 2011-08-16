@@ -16,10 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
-import org.apache.neethi.All;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.*;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
@@ -28,8 +25,6 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -85,37 +80,29 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
         }
 
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configs = algorithmSuite.getConfigurations();
 
         Policy policy = new Policy();
         ExactlyOne exactlyOne = new ExactlyOne();
-
         policy.addPolicyComponent(exactlyOne);
+        All all = new All();
+        exactlyOne.addPolicyComponent(all);
 
-        All wrapper;
-        AsymmetricBinding asymmetricBinding;
+        AsymmetricBinding asymmetricBinding = new AsymmetricBinding(spConstants);
 
-        for (Iterator iterator = configs.iterator(); iterator.hasNext(); ) {
-            wrapper = new All();
-            asymmetricBinding = new AsymmetricBinding(spConstants);
+        asymmetricBinding.setAlgorithmSuite(algorithmSuite);
+        asymmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
+        asymmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
+        asymmetricBinding.setInitiatorToken(getInitiatorToken());
+        asymmetricBinding.setLayout(getLayout());
+        asymmetricBinding.setProtectionOrder(getProtectionOrder());
+        asymmetricBinding.setRecipientToken(getRecipientToken());
+        asymmetricBinding.setSignatureProtection(isSignatureProtection());
+        asymmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
+        asymmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
+        asymmetricBinding.setTokenProtection(isTokenProtection());
 
-            asymmetricBinding.setAlgorithmSuite((AlgorithmSuite) iterator
-                    .next());
-            asymmetricBinding
-                    .setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-            asymmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-            asymmetricBinding.setInitiatorToken(getInitiatorToken());
-            asymmetricBinding.setLayout(getLayout());
-            asymmetricBinding.setProtectionOrder(getProtectionOrder());
-            asymmetricBinding.setRecipientToken(getRecipientToken());
-            asymmetricBinding.setSignatureProtection(isSignatureProtection());
-            asymmetricBinding
-                    .setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            asymmetricBinding.setTokenProtection(isTokenProtection());
-
-            asymmetricBinding.setNormalized(true);
-            wrapper.addPolicyComponent(wrapper);
-        }
+        asymmetricBinding.setNormalized(true);
+        all.addPolicyComponent(asymmetricBinding);
 
         return policy;
 
@@ -231,7 +218,7 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         super.getAssertions(assertionStateMap, operationPolicy);
         if (initiatorToken != null) {
             initiatorToken.getAssertions(assertionStateMap, operationPolicy);
@@ -242,7 +229,7 @@ public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
     }
 
     @Override
-    public boolean isAsserted(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
         boolean isAsserted = true;
         if (initiatorToken != null) {
             isAsserted &= initiatorToken.isAsserted(assertionStateMap);

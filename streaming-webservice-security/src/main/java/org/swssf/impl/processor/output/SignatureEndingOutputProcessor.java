@@ -123,7 +123,7 @@ public class SignatureEndingOutputProcessor extends AbstractBufferingOutputProce
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
 
-        signatureAlgorithm.engineInitSign(wrappingSecurityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm()));
+        signatureAlgorithm.engineInitSign(wrappingSecurityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm(), null));
 
         SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), getAction(), signatureAlgorithm);
         subOutputProcessorChain.addProcessor(signedInfoProcessor);

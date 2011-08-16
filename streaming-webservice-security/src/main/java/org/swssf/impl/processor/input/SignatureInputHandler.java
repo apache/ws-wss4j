@@ -23,8 +23,9 @@ import org.swssf.impl.algorithms.SignatureAlgorithm;
 import org.swssf.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.util.SignerOutputStream;
-import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
+import org.swssf.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SignatureTokenSecurityEvent;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2000._09.xmldsig_.SignatureType;
 
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
@@ -151,17 +153,32 @@ public class SignatureInputHandler extends AbstractInputSecurityHeaderHandler {
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType, securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(), securityContext, this);
             securityToken.verify();
 
-            InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = new InitiatorSignatureTokenSecurityEvent(SecurityEvent.Event.InitiatorSignatureToken);
-            initiatorSignatureTokenSecurityEvent.setSecurityToken(securityToken);
-            initiatorSignatureTokenSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
-            securityContext.registerSecurityEvent(initiatorSignatureTokenSecurityEvent);
+            SignatureTokenSecurityEvent signatureTokenSecurityEvent = new SignatureTokenSecurityEvent(SecurityEvent.Event.SignatureToken);
+            signatureTokenSecurityEvent.setSecurityToken(securityToken);
+            signatureTokenSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
+            securityContext.registerSecurityEvent(signatureTokenSecurityEvent);
+
+            /*AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+            algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
+            algorithmSuiteSecurityEvent.setKeyUsage();
+            securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+            */
+
+            AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+            algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
+            algorithmSuiteSecurityEvent.setKeyUsage(Constants.KeyUsage.C14n);
+            securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+
+            Key verifyKey;
+            if (securityToken.isAsymmetric()) {
+                verifyKey = securityToken.getPublicKey(Constants.KeyUsage.Asym_Sig);
+            } else {
+                verifyKey = securityToken.getSecretKey(
+                        signatureType.getSignedInfo().getSignatureMethod().getAlgorithm(), Constants.KeyUsage.Sym_Sig);
+            }
 
             SignatureAlgorithm signatureAlgorithm = SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
-            if (securityToken.isAsymmetric()) {
-                signatureAlgorithm.engineInitVerify(securityToken.getPublicKey());
-            } else {
-                signatureAlgorithm.engineInitVerify(securityToken.getSecretKey(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm()));
-            }
+            signatureAlgorithm.engineInitVerify(verifyKey);
             signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 

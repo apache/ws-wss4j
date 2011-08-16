@@ -55,7 +55,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
+    public void processEvent(XMLEvent xmlEvent, final OutputProcessorChain outputProcessorChain) throws XMLStreamException, WSSecurityException {
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
@@ -140,7 +140,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return binarySecurityTokenId;
                     }
 
-                    public Object getProccesor() {
+                    public Object getProcessor() {
                         return outputProcessor;
                     }
 
@@ -148,11 +148,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return true;
                     }
 
-                    public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+                    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
                         return secretKey;
                     }
 
-                    public PublicKey getPublicKey() throws WSSecurityException {
+                    public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
                         return x509Certificates[0].getPublicKey();
                     }
 
@@ -171,8 +171,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return null;
                     }
 
-                    public Constants.KeyIdentifierType getKeyIdentifierType() {
-                        return Constants.KeyIdentifierType.BST_DIRECT_REFERENCE;
+                    public Constants.TokenType getTokenType() {
+                        //todo pkiPathToken etc?
+                        return Constants.TokenType.X509V3Token;
                     }
                 };
             } else {
@@ -199,7 +200,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             } else {
                 securityTokenProvider = new SecurityTokenProvider() {
                     public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                        return new SAMLSecurityToken(samlCallback.getSamlVersion(), samlKeyInfo, crypto, getSecurityProperties().getCallbackHandler(), tokenId, finalSAMLTokenOutputProcessor);
+                        return new SAMLSecurityToken(samlCallback.getSamlVersion(), samlKeyInfo, outputProcessorChain.getSecurityContext(), crypto, getSecurityProperties().getCallbackHandler(), tokenId, finalSAMLTokenOutputProcessor);
                     }
 
                     public String getId() {
@@ -213,7 +214,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
 
-            switch (action) {
+            switch (getAction()) {
                 case SAML_TOKEN_SIGNED:
                     if (senderVouches) {
                         SecurePart securePart = new SecurePart(Constants.SOAPMESSAGE_NS10_STRTransform, null, SecurePart.Modifier.Element, tokenId, securityTokenReferenceId);

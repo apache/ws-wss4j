@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.ext.Constants;
 import org.swssf.policy.OperationPolicy;
@@ -28,7 +29,10 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * class lent from apache rampart
@@ -165,24 +169,24 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         //here we add just one AssertionState for all Parts to get a fail-fast behavior
         //when we add multiple AssertionStates some of them return true, becauce they don't match
         //as a result the policy is temporary satisfied for the current event and can only be falsified at last 
         if (isSignedParts()) {
-            Collection<AssertionState> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
+            Map<Assertion, List<AssertionState>> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
             List<QName> qNames = getQNamesFromHeaders();
             if (isBody()) {
                 qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), Constants.TAG_soap_Body_LocalName));
             }
-            signedPartsAssertionStates.add(new SignedPartAssertionState(this, true, qNames));
+            addAssertionState(signedPartsAssertionStates, this, new SignedPartAssertionState(this, true, qNames));
         } else {
-            Collection<AssertionState> encryptedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedPart);
+            Map<Assertion, List<AssertionState>> encryptedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedPart);
             List<QName> qNames = getQNamesFromHeaders();
             if (isBody()) {
                 qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), Constants.TAG_soap_Body_LocalName));
             }
-            encryptedPartsAssertionStates.add(new EncryptedPartAssertionState(this, true, qNames));
+            addAssertionState(encryptedPartsAssertionStates, this, new EncryptedPartAssertionState(this, true, qNames));
         }
     }
 

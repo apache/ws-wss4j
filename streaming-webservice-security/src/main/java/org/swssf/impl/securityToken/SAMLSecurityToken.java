@@ -21,6 +21,7 @@ package org.swssf.impl.securityToken;
 import org.opensaml.common.SAMLVersion;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
+import org.swssf.ext.SecurityContext;
 import org.swssf.ext.SecurityToken;
 import org.swssf.ext.WSSecurityException;
 import org.swssf.impl.saml.SAMLKeyInfo;
@@ -36,14 +37,14 @@ import java.security.cert.X509Certificate;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SAMLSecurityToken extends AbstractSecurityToken {
+public class SAMLSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
 
     private SAMLVersion samlVersion;
     private SAMLKeyInfo samlKeyInfo;
     private X509Certificate[] x509Certificate;
 
-    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(crypto, callbackHandler, id, processor);
+    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+        super(securityContext, crypto, callbackHandler, id, processor);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
     }
@@ -52,11 +53,13 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         return true;
     }
 
-    public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
+        super.getSecretKey(algorithmURI, keyUsage);
         return samlKeyInfo.getPrivateKey();
     }
 
-    public PublicKey getPublicKey() throws WSSecurityException {
+    public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
+        super.getPublicKey(keyUsage);
         PublicKey publicKey = samlKeyInfo.getPublicKey();
         if (publicKey == null) {
             publicKey = getX509Certificates()[0].getPublicKey();
@@ -93,14 +96,17 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         return null;
     }
 
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
-        if (samlVersion == SAMLVersion.VERSION_10 || samlVersion == SAMLVersion.VERSION_11) {
-            return Constants.KeyIdentifierType.SAML_10;
+    public Constants.TokenType getTokenType() {
+        if (samlVersion == SAMLVersion.VERSION_10) {
+            return Constants.TokenType.Saml10Token;
+        } else if (samlVersion == SAMLVersion.VERSION_11) {
+            return Constants.TokenType.Saml11Token;
         }
-        return Constants.KeyIdentifierType.SAML_20;
+        return Constants.TokenType.Saml20Token;
     }
 
     public SAMLKeyInfo getSamlKeyInfo() {
+        //todo AlgoSecEvent?
         return samlKeyInfo;
     }
 }

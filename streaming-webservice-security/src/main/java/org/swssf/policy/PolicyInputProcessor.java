@@ -34,6 +34,8 @@ import javax.xml.stream.events.XMLEvent;
 public class PolicyInputProcessor extends AbstractInputProcessor {
 
     private PolicyEnforcer policyEnforcer;
+    private boolean firstHeaderCall = true;
+    private boolean firstBodyCall = true;
 
     public PolicyInputProcessor(PolicyEnforcer policyEnforcer, SecurityProperties securityProperties) {
         super(securityProperties);
@@ -44,16 +46,38 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
 
     @Override
     public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
+        if (firstHeaderCall) {
+            firstHeaderCall = false;
+            if (policyEnforcer.isTransportSecurityActive()) {
+                inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
+                inputProcessorChain.getDocumentContext().setIsInSignedContent();
+            }
+        }
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
-        //test if non encrypted element not have to be encrypted per policy
+        //test if non encrypted element have to be encrypted per policy
         if (!inputProcessorChain.getDocumentContext().isInEncryptedContent() && inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
+        }
+        if (xmlEvent.isStartElement() && inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+            RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent(SecurityEvent.Event.RequiredPart);
+            requiredPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+            policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
+            RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent(SecurityEvent.Event.RequiredElement);
+            requiredElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+            policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
         }
         return xmlEvent;
     }
 
     @Override
     public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
+        if (firstBodyCall) {
+            firstBodyCall = false;
+            if (policyEnforcer.isTransportSecurityActive()) {
+                inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
+                inputProcessorChain.getDocumentContext().setIsInSignedContent();
+            }
+        }
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
 
         if (xmlEvent.isStartElement()) {
@@ -62,42 +86,42 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             }
-        } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 1
+        } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 0
                 && xmlEvent.isEndElement()
                 //ns mismatch should be detected by the xml parser so a local-name equality check should be enough
                 && xmlEvent.asEndElement().getName().getLocalPart().equals(Constants.TAG_soap_Envelope_LocalName)) {
-            try {
-                policyEnforcer.doFinal();
-            } catch (PolicyViolationException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-            }
+            policyEnforcer.doFinal();
         }
 
-        //test if non encrypted element not have to be encrypted per policy
+        //test if non encrypted element have to be encrypted per policy
         if (!inputProcessorChain.getDocumentContext().isInEncryptedContent() && !inputProcessorChain.getDocumentContext().isInSecurityHeader()) {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
         }
 
-        //test if non signed element not have to be signed per policy
+        //test if non signed element have to be signed per policy
         if (!inputProcessorChain.getDocumentContext().isInSignedContent()) {
-            if (xmlEvent.isStartElement()) {
-
-                if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
-                    SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
-                    signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
-                    policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-                } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 2 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
-                    SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
-                    signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
-                    policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-                } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
-                    SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, true);
-                    signedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
-                    policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
-                }
-            }
+            testSignaturePolicy(inputProcessorChain, xmlEvent);
         }
         return xmlEvent;
+    }
+
+    private void testSignaturePolicy(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent) throws WSSecurityException {
+        if (xmlEvent.isStartElement()) {
+
+            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && inputProcessorChain.getDocumentContext().isInSOAPHeader()) {
+                SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+                signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+            } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 2 && inputProcessorChain.getDocumentContext().isInSOAPBody()) {
+                SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+                signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+            } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
+                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, true);
+                signedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
+            }
+        }
     }
 
     private void testEncryptionPolicy(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws WSSecurityException {

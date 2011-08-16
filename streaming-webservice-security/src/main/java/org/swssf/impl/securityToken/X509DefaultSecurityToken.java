@@ -20,6 +20,7 @@ package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
+import org.swssf.ext.SecurityContext;
 import org.swssf.ext.WSSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -31,16 +32,12 @@ import javax.security.auth.callback.CallbackHandler;
 public class X509DefaultSecurityToken extends X509SecurityToken {
     private String alias = null;
 
-    X509DefaultSecurityToken(Crypto crypto, CallbackHandler callbackHandler, String alias, String id, Object processor) {
-        super(crypto, callbackHandler, id, processor);
+    X509DefaultSecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String alias, String id, Object processor) {
+        super(Constants.TokenType.X509V3Token, securityContext, crypto, callbackHandler, id, processor);
         this.alias = alias;
     }
 
     protected String getAlias() throws WSSecurityException {
         return this.alias;
-    }
-
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
-        return Constants.KeyIdentifierType.NO_TOKEN;
     }
 }

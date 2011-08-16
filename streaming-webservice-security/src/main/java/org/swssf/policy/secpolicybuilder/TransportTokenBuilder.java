@@ -21,7 +21,6 @@ import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.neethi.builders.xml.XmlPrimtiveAssertion;
 import org.swssf.policy.secpolicy.*;
 import org.swssf.policy.secpolicy.model.HttpsToken;
 import org.swssf.policy.secpolicy.model.TransportToken;
@@ -64,29 +63,13 @@ public class TransportTokenBuilder implements AssertionBuilder {
 
     private void processAlternative(List assertions, TransportToken parent, SPConstants spConstants) {
 
+        Object token;
+
         for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
-            XmlPrimtiveAssertion primtive = (XmlPrimtiveAssertion) iterator.next();
-            QName qname = primtive.getName();
+            token = iterator.next();
 
-            if (spConstants.getHttpsToken().equals(qname)) {
-                HttpsToken httpsToken = new HttpsToken(spConstants);
-
-                OMElement element = primtive.getValue().getFirstChildWithName(SPConstants.POLICY);
-
-                if (element != null) {
-                    OMElement child = element.getFirstElement();
-                    if (child != null) {
-                        if (spConstants.getHttpBasicAuthentication().equals(child.getQName())) {
-                            httpsToken.setHttpBasicAuthentication(true);
-                        } else if (spConstants.getHttpDigestAuthentication().equals(child.getQName())) {
-                            httpsToken.setHttpDigestAuthentication(true);
-                        } else if (spConstants.getRequireClientCertificate().equals(child.getQName())) {
-                            httpsToken.setRequireClientCertificate(true);
-                        }
-                    }
-                }
-
-                parent.setToken(httpsToken);
+            if (token instanceof HttpsToken) {
+                parent.setToken((HttpsToken) token);
             }
         }
     }

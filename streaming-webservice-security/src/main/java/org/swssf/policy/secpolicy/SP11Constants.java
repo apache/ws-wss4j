@@ -32,8 +32,8 @@ public final class SP11Constants extends SPConstants {
 
     public final static String SP_PREFIX = "sp";
 
-    public static final QName INCLUDE_TOKEN = new QName(SP_NS, SPConstants.ATTR_INCLUDE_TOKEN,
-            SP11Constants.SP_PREFIX);
+    //all attributes are unqualified!!
+    public static final QName INCLUDE_TOKEN = new QName(SPConstants.ATTR_INCLUDE_TOKEN);
 
     public final static String INCLUDE_NEVER = SP11Constants.SP_NS +
             SPConstants.INCLUDE_TOKEN_NEVER_SUFFIX;
@@ -112,6 +112,9 @@ public final class SP11Constants extends SPConstants {
 
     public static final QName USERNAME_TOKEN = new QName(SP11Constants.SP_NS,
             SPConstants.USERNAME_TOKEN, SP11Constants.SP_PREFIX);
+
+    public static final QName SAML_TOKEN = new QName(SP11Constants.SP_NS,
+            SPConstants.SAML_TOKEN, SP11Constants.SP_PREFIX);
 
     public static final QName WSS_USERNAME_TOKEN10 = new QName(SP11Constants.SP_NS,
             SPConstants.USERNAME_TOKEN10, SP11Constants.SP_PREFIX);
@@ -265,6 +268,15 @@ public final class SP11Constants extends SPConstants {
 
     public static final QName REQUIRE_INTERNAL_REFERNCE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERNCE, SP11Constants.SP_PREFIX);
+
+    public static final QName REQUIRE_CLIENT_CERTIFICATE = new QName(
+            SP11Constants.SP_NS, SPConstants.REQUIRE_CLIENT_CERTIFICATE, SP11Constants.SP_PREFIX);
+
+    public static final QName HTTP_BASIC_AUTHENTICATION = new QName(
+            SP11Constants.SP_NS, SPConstants.HTTP_BASIC_AUTHENTICATION, SP11Constants.SP_PREFIX);
+
+    public static final QName HTTP_DIGEST_AUTHENTICATION = new QName(
+            SP11Constants.SP_NS, SPConstants.HTTP_DIGEST_AUTHENTICATION, SP11Constants.SP_PREFIX);
 
     public static final QName REQUEST_SECURITY_TOKEN_TEMPLATE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE,
@@ -526,6 +538,10 @@ public final class SP11Constants extends SPConstants {
         return X509_TOKEN;
     }
 
+    public QName getSamlToken() {
+        return SAML_TOKEN;
+    }
+
     public QName getSupportingTokens() {
         return SUPPORTING_TOKENS;
     }
@@ -603,6 +619,14 @@ public final class SP11Constants extends SPConstants {
     }
 
     public QName getHashPassword() {
+        return EMPTY;
+    }
+
+    public QName getCreated() {
+        return EMPTY;
+    }
+
+    public QName getNonce() {
         return EMPTY;
     }
 

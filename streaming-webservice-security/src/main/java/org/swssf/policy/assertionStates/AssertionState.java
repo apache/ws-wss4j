@@ -29,7 +29,7 @@ public class AssertionState {
 
     private AbstractSecurityAssertion assertion;
     private boolean asserted;
-    private String errorMessage;
+    private StringBuilder errorMessage = new StringBuilder();
 
     public AssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         this.assertion = assertion;
@@ -56,14 +56,14 @@ public class AssertionState {
     }
 
     public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+        this.errorMessage.append("\n").append(errorMessage);
     }
 
     public String getErrorMessage() {
-        if (errorMessage == null) {
+        if (errorMessage.length() == 0) {
             return "Assertion " + assertion.getName() + " not satisfied";
         } else {
-            return errorMessage;
+            return errorMessage.toString();
         }
     }
 }

@@ -34,9 +34,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.Calendar;
-import java.util.Deque;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 /**
  * Processor for the UsernameToken XML Structure
@@ -58,9 +56,12 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
     }
 
-    public UsernameTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+    public UsernameTokenInputHandler(final InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final UsernameTokenType usernameTokenType = (UsernameTokenType) parseStructure(eventQueue, index);
+        if (usernameTokenType.getId() == null) {
+            usernameTokenType.setId(UUID.randomUUID().toString());
+        }
 
         // If the UsernameToken is to be used for key derivation, the (1.1)
         // spec says that it cannot contain a password, and it must contain
@@ -157,19 +158,19 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             usernameTokenType.setPassword(pwCb.getPassword());
         }
 
-        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
-        usernameTokenSecurityEvent.setUsername(username);
-        usernameTokenSecurityEvent.setPassword(usernameTokenType.getPassword());
-        usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
-        usernameTokenSecurityEvent.setNonce(nonceVal);
-        usernameTokenSecurityEvent.setCreated(createdCal);
-        usernameTokenSecurityEvent.setSalt(usernameTokenType.getSalt());
-        usernameTokenSecurityEvent.setIteration(iteration);
-        inputProcessorChain.getSecurityContext().registerSecurityEvent(usernameTokenSecurityEvent);
-
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+
             public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                return SecurityTokenFactory.newInstance().getSecurityToken(usernameTokenType, null);
+                SecurityToken securityToken = securityTokens.get(crypto);
+                if (securityToken != null) {
+                    return securityToken;
+                }
+                securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                        usernameTokenType, inputProcessorChain.getSecurityContext(), null);
+                securityTokens.put(crypto, securityToken);
+                return securityToken;
             }
 
             public String getId() {
@@ -177,6 +178,12 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(usernameTokenType.getId(), securityTokenProvider);
+
+        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
+        usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
+        usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken(null));
+        usernameTokenSecurityEvent.setUsernameTokenProfile(Constants.NS_USERNAMETOKEN_PROFILE11);
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(usernameTokenSecurityEvent);
     }
 
     @Override

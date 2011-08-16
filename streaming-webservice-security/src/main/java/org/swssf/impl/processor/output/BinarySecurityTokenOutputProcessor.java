@@ -20,10 +20,11 @@ package org.swssf.impl.processor.output;
 
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
+import org.swssf.impl.securityToken.DelegatingSecurityToken;
 import org.swssf.impl.securityToken.ProcessorInfoSecurityToken;
 import org.swssf.impl.securityToken.X509SecurityToken;
-import org.swssf.securityEvent.InitiatorSignatureTokenSecurityEvent;
 import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.securityEvent.SignatureTokenSecurityEvent;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -51,7 +52,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             final X509Certificate[] x509Certificates;
             final Key key;
 
-            switch (action) {
+            switch (getAction()) {
                 case SIGNATURE:
                 case SAML_TOKEN_SIGNED:
                 case SIGNATURE_WITH_DERIVED_KEY:
@@ -104,7 +105,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     this.outputProcessor = outputProcessor;
                 }
 
-                public Object getProccesor() {
+                public Object getProcessor() {
                     return outputProcessor;
                 }
 
@@ -112,11 +113,11 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     return true;
                 }
 
-                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+                public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
                     return key;
                 }
 
-                public PublicKey getPublicKey() throws WSSecurityException {
+                public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
                     return x509Certificates[0].getPublicKey();
                 }
 
@@ -135,7 +136,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     return null;
                 }
 
-                public Constants.KeyIdentifierType getKeyIdentifierType() {
+                public Constants.TokenType getTokenType() {
                     return null;
                 }
             };
@@ -150,7 +151,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 }
             };
 
-            switch (action) {
+            switch (getAction()) {
                 case SIGNATURE:
                 case SAML_TOKEN_SIGNED:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
@@ -210,9 +211,13 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         if (securityEventList != null) {
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.InitiatorSignatureToken) {
-                    InitiatorSignatureTokenSecurityEvent initiatorSignatureTokenSecurityEvent = (InitiatorSignatureTokenSecurityEvent) securityEvent;
-                    SecurityToken securityToken = initiatorSignatureTokenSecurityEvent.getSecurityToken();
+                //todo find correct message signature token...however...
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureToken) {
+                    SignatureTokenSecurityEvent signatureTokenSecurityEvent = (SignatureTokenSecurityEvent) securityEvent;
+                    SecurityToken securityToken = signatureTokenSecurityEvent.getSecurityToken();
+                    if (securityToken instanceof DelegatingSecurityToken) {
+                        securityToken = ((DelegatingSecurityToken) securityToken).getDelegatedSecurityToken();
+                    }
                     if (securityToken instanceof X509SecurityToken) {
                         X509SecurityToken x509SecurityToken = (X509SecurityToken) securityToken;
                         return x509SecurityToken.getX509Certificates()[0];

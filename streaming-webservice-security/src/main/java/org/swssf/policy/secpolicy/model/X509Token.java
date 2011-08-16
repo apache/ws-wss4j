@@ -16,18 +16,18 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
-import org.swssf.policy.assertionStates.InitiatorEncryptionTokenAssertionState;
-import org.swssf.policy.assertionStates.RecipientEncryptionTokenAssertionState;
+import org.swssf.policy.assertionStates.TokenAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -203,22 +203,18 @@ public class X509Token extends Token {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public QName getXmlName() {
+        return null;
+    }
 
+    @Override
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         SecurityEvent.Event[] responsibleAssertionEvents = getResponsibleAssertionEvents();
         for (int i = 0; i < responsibleAssertionEvents.length; i++) {
             SecurityEvent.Event responsibleAssertionEvent = responsibleAssertionEvents[i];
-            Collection<AssertionState> assertionStates = assertionStateMap.get(responsibleAssertionEvent);
-            switch (responsibleAssertionEvent) {
-                case InitiatorEncryptionToken:
-                    InitiatorEncryptionTokenAssertionState initiatorEncryptionTokenAssertionState = new InitiatorEncryptionTokenAssertionState(this, false);
-                    assertionStates.add(initiatorEncryptionTokenAssertionState);
-                    break;
-                case RecipientEncryptionToken:
-                    RecipientEncryptionTokenAssertionState recipientEncryptionTokenAssertionState = new RecipientEncryptionTokenAssertionState(this, false);
-                    assertionStates.add(recipientEncryptionTokenAssertionState);
-                    break;
-            }
+            TokenAssertionState tokenAssertionState = new TokenAssertionState(this, false);
+            Map<Assertion, List<AssertionState>> assertionStates = assertionStateMap.get(responsibleAssertionEvent);
+            addAssertionState(assertionStates, this, tokenAssertionState);
         }
     }
 }

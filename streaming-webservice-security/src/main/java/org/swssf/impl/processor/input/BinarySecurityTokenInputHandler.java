@@ -26,6 +26,9 @@ import org.swssf.impl.securityToken.SecurityTokenFactory;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Processor for the BinarySecurityToken XML Structure
@@ -35,24 +38,35 @@ import java.util.Deque;
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public BinarySecurityTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+    public BinarySecurityTokenInputHandler(final InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final BinarySecurityTokenType binarySecurityTokenType = (BinarySecurityTokenType) parseStructure(eventQueue, index);
 
-        if (binarySecurityTokenType.getId() != null) {
-
-            SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
-                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                    return SecurityTokenFactory.newInstance().getSecurityToken(binarySecurityTokenType, crypto, securityProperties.getCallbackHandler(), null);
-                }
-
-                public String getId() {
-                    return binarySecurityTokenType.getId();
-                }
-            };
-
-            inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
+        if (binarySecurityTokenType.getId() == null) {
+            binarySecurityTokenType.setId(UUID.randomUUID().toString());
         }
+
+        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+
+            public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+                SecurityToken securityToken = securityTokens.get(crypto);
+                if (securityToken != null) {
+                    return securityToken;
+                }
+                securityToken = SecurityTokenFactory.newInstance().getSecurityToken(binarySecurityTokenType, inputProcessorChain.getSecurityContext(), crypto, securityProperties.getCallbackHandler(), null);
+                securityTokens.put(crypto, securityToken);
+                return securityToken;
+            }
+
+            public String getId() {
+                return binarySecurityTokenType.getId();
+            }
+        };
+
+        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
+
     }
 
     @Override

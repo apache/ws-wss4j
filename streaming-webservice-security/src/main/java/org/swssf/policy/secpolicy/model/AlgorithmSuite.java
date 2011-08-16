@@ -15,6 +15,7 @@
  */
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AlgorithmSuiteAssertionState;
@@ -26,13 +27,13 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
  * class lent from apache rampart
  */
-public class AlgorithmSuite extends AbstractConfigurableSecurityAssertion {
+public class AlgorithmSuite extends AbstractSecurityAssertion {
 
     private String algoSuiteString;
 
@@ -527,9 +528,9 @@ public class AlgorithmSuite extends AbstractConfigurableSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
-        Collection<AssertionState> assertionStates = assertionStateMap.get(SecurityEvent.Event.AlgorithmSuite);
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        Map<Assertion, List<AssertionState>> assertionStates = assertionStateMap.get(SecurityEvent.Event.AlgorithmSuite);
         AlgorithmSuiteAssertionState algorithmSuiteAssertionState = new AlgorithmSuiteAssertionState(this, true);
-        assertionStates.add(algorithmSuiteAssertionState);
+        addAssertionState(assertionStates, this, algorithmSuiteAssertionState);
     }
 }

@@ -22,8 +22,9 @@ import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,7 +59,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
     }
 
     public boolean isNormalized() {
-        return true;
+        return this.normalized;
     }
 
     public PolicyComponent normalize() {
@@ -79,9 +80,9 @@ public abstract class AbstractSecurityAssertion implements Assertion {
 
     public abstract SecurityEvent.Event[] getResponsibleAssertionEvents();
 
-    public abstract void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy);
+    public abstract void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy);
 
-    public boolean isAsserted(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
 
         boolean asserted = true;
 
@@ -89,14 +90,27 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         for (int i = 0; i < secEvents.length; i++) {
             SecurityEvent.Event securityEvent = secEvents[i];
 
-            Collection<AssertionState> assertionStates = assertionStateMap.get(securityEvent);
-            for (Iterator<AssertionState> assertionStateIterator = assertionStates.iterator(); assertionStateIterator.hasNext(); ) {
-                AssertionState assertionState = assertionStateIterator.next();
-                if (assertionState.getAssertion() == this) {
-                    asserted &= assertionState.isAsserted();
+            Map<Assertion, List<AssertionState>> assertionStates = assertionStateMap.get(securityEvent);
+            for (Iterator<Map.Entry<Assertion, List<AssertionState>>> assertionStateIterator = assertionStates.entrySet().iterator(); assertionStateIterator.hasNext(); ) {
+                Map.Entry<Assertion, List<AssertionState>> entry = assertionStateIterator.next();
+                if (entry.getKey() == this) {
+                    List<AssertionState> assertionState = entry.getValue();
+                    for (int j = 0; j < assertionState.size(); j++) {
+                        AssertionState state = assertionState.get(j);
+                        asserted &= state.isAsserted();
+                    }
                 }
             }
         }
         return asserted;
+    }
+
+    protected void addAssertionState(Map<Assertion, List<AssertionState>> assertionStates, Assertion keyAssertion, AssertionState assertionState) {
+        List<AssertionState> assertionStateList = assertionStates.get(keyAssertion);
+        if (assertionStateList == null) {
+            assertionStateList = new ArrayList<AssertionState>();
+        }
+        assertionStateList.add(assertionState);
+        assertionStates.put(keyAssertion, assertionStateList);
     }
 }

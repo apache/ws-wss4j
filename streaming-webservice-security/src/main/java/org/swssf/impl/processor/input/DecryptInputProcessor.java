@@ -24,7 +24,10 @@ import org.swssf.ext.*;
 import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.util.IVSplittingOutputStream;
 import org.swssf.impl.util.ReplaceableOuputStream;
-import org.swssf.securityEvent.*;
+import org.swssf.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.securityEvent.EncryptedElementSecurityEvent;
+import org.swssf.securityEvent.EncryptedPartSecurityEvent;
+import org.swssf.securityEvent.SecurityEvent;
 import org.w3._2000._09.xmldsig_.KeyInfoType;
 import org.w3._2001._04.xmlenc_.EncryptedDataType;
 import org.w3._2001._04.xmlenc_.ReferenceList;
@@ -495,23 +498,7 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
                     keyInfoType, getSecurityProperties().getDecryptionCrypto(),
                     getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext(), this);
 
-            //fire a RecipientSecurityTokenEvent
-            RecipientEncryptionTokenSecurityEvent recipientEncryptionTokenSecurityEvent =
-                    new RecipientEncryptionTokenSecurityEvent(SecurityEvent.Event.RecipientEncryptionToken);
-            recipientEncryptionTokenSecurityEvent.setSecurityToken(securityToken);
-            inputProcessorChain.getSecurityContext().registerSecurityEvent(recipientEncryptionTokenSecurityEvent);
-
-            if (securityToken.getKeyWrappingToken() != null) {
-                AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
-                algorithmSuiteSecurityEvent.setAlgorithmURI(securityToken.getKeyWrappingTokenAlgorithm());
-                algorithmSuiteSecurityEvent.setUsage(
-                        securityToken.getKeyWrappingToken().isAsymmetric()
-                                ? AlgorithmSuiteSecurityEvent.Usage.Asym_Key_Wrap
-                                : AlgorithmSuiteSecurityEvent.Usage.Sym_Key_Wrap);
-                inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
-            }
-
-            secretKey = securityToken.getSecretKey(algorithmURI);
+            secretKey = securityToken.getSecretKey(algorithmURI, Constants.KeyUsage.Enc);
 
             try {
                 AlgorithmType syncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
@@ -532,10 +519,10 @@ public class DecryptInputProcessor extends AbstractInputProcessor {
             }
 
             //fire an AlgorithmSuiteSecurityEvent
-            AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+            /*AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
             algorithmSuiteSecurityEvent.setAlgorithmURI(algorithmURI);
-            algorithmSuiteSecurityEvent.setUsage(AlgorithmSuiteSecurityEvent.Usage.Enc);
-            inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
+            algorithmSuiteSecurityEvent.setKeyUsage(Constants.KeyUsage.Enc);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);*/
 
             //prepare the piped streams and connect them:
             //5 * 8192 seems to be a fine value

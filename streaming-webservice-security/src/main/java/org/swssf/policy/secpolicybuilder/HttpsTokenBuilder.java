@@ -21,7 +21,6 @@ import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.neethi.builders.xml.XmlPrimtiveAssertion;
 import org.swssf.policy.secpolicy.*;
 import org.swssf.policy.secpolicy.model.HttpsToken;
 
@@ -62,7 +61,17 @@ public class HttpsTokenBuilder implements AssertionBuilder {
 
         HttpsToken httpsToken = new HttpsToken(spConstants);
 
-        Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
+        OMElement issuer = element.getFirstChildWithName(spConstants.getIssuer());
+        if (issuer != null) {
+            httpsToken.setIssuer(issuer.getText());
+        }
+
+        OMElement issuerName = element.getFirstChildWithName(spConstants.getIssuerName());
+        if (issuerName != null) {
+            httpsToken.setIssuerName(issuerName.getText());
+        }
+
+        Policy policy = PolicyEngine.getPolicy(element.getFirstChildWithName(SPConstants.POLICY));
         policy = (Policy) policy.normalize(false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext(); ) {
@@ -96,15 +105,15 @@ public class HttpsTokenBuilder implements AssertionBuilder {
     private void processAlternative(List assertions, HttpsToken parent, SPConstants spConstants) {
 
         for (Iterator iterator = assertions.iterator(); iterator.hasNext(); ) {
-            XmlPrimtiveAssertion primtive = (XmlPrimtiveAssertion) iterator.next();
-            QName qname = primtive.getName();
+            Assertion assertion = (Assertion) iterator.next();
+            QName qname = assertion.getName();
 
             if (qname != null) {
-                if (SPConstants.HTTP_BASIC_AUTHENTICATION.equals(qname)) {
+                if (spConstants.getHttpBasicAuthentication().equals(qname)) {
                     parent.setHttpBasicAuthentication(true);
-                } else if (SPConstants.HTTP_DIGEST_AUTHENTICATION.equals(qname)) {
+                } else if (spConstants.getHttpDigestAuthentication().equals(qname)) {
                     parent.setHttpDigestAuthentication(true);
-                } else if (SPConstants.REQUIRE_CLIENT_CERTIFICATE.equals(qname)) {
+                } else if (spConstants.getRequireClientCertificate().equals(qname)) {
                     parent.setRequireClientCertificate(true);
                 }
             }

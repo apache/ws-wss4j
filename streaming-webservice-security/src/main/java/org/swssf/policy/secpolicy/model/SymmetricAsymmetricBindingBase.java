@@ -16,12 +16,14 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
+import org.swssf.policy.assertionStates.ProtectionOrderAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -111,13 +113,17 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         super.getAssertions(assertionStateMap, operationPolicy);
-        //todo
+        ProtectionOrderAssertionState protectionOrderAssertionState = new ProtectionOrderAssertionState(this, true);
+        Map<Assertion, List<AssertionState>> assertionStates = assertionStateMap.get(SecurityEvent.Event.SignatureToken);
+        addAssertionState(assertionStates, this, protectionOrderAssertionState);
+        assertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptionToken);
+        addAssertionState(assertionStates, this, protectionOrderAssertionState);
     }
 
     @Override
-    public boolean isAsserted(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
         boolean isAsserted = super.isAsserted(assertionStateMap);
         return isAsserted;
     }

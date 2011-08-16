@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
@@ -136,9 +137,9 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
-        Collection<AssertionState> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.ContentEncrypted);
-        encryptedElementAssertionStates.add(new ContentEncryptedElementAssertionState(this, true, getQNamesFromXPath()));
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        Map<Assertion, List<AssertionState>> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.ContentEncrypted);
+        addAssertionState(encryptedElementAssertionStates, this, new ContentEncryptedElementAssertionState(this, true, getQNamesFromXPath()));
     }
 
     private List<QName> getQNamesFromXPath() {

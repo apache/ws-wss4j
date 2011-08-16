@@ -26,8 +26,6 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * class lent from apache rampart
@@ -109,39 +107,32 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         }
 
         AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configurations = algorithmSuite.getConfigurations();
 
         Policy policy = new Policy();
         ExactlyOne exactlyOne = new ExactlyOne();
-
-        All wrapper;
-        SymmetricBinding symmetricBinding;
-
-        for (Iterator iterator = configurations.iterator(); iterator.hasNext(); ) {
-            wrapper = new All();
-            symmetricBinding = new SymmetricBinding(spConstants);
-
-            algorithmSuite = (AlgorithmSuite) iterator.next();
-            symmetricBinding.setAlgorithmSuite(algorithmSuite);
-
-            symmetricBinding.setEncryptionToken(getEncryptionToken());
-            symmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-            symmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-            symmetricBinding.setLayout(getLayout());
-            symmetricBinding.setProtectionOrder(getProtectionOrder());
-            symmetricBinding.setProtectionToken(getProtectionToken());
-            symmetricBinding.setSignatureProtection(isSignatureProtection());
-            symmetricBinding.setSignatureToken(getSignatureToken());
-            symmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            symmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
-            symmetricBinding.setTokenProtection(isTokenProtection());
-
-            symmetricBinding.setNormalized(true);
-            wrapper.addPolicyComponent(symmetricBinding);
-            exactlyOne.addPolicyComponent(wrapper);
-        }
-
         policy.addPolicyComponent(exactlyOne);
+        All all = new All();
+        exactlyOne.addPolicyComponent(all);
+
+        SymmetricBinding symmetricBinding = new SymmetricBinding(spConstants);
+
+        symmetricBinding.setAlgorithmSuite(algorithmSuite);
+
+        symmetricBinding.setEncryptionToken(getEncryptionToken());
+        symmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
+        symmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
+        symmetricBinding.setLayout(getLayout());
+        symmetricBinding.setProtectionOrder(getProtectionOrder());
+        symmetricBinding.setProtectionToken(getProtectionToken());
+        symmetricBinding.setSignatureProtection(isSignatureProtection());
+        symmetricBinding.setSignatureToken(getSignatureToken());
+        symmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
+        symmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
+        symmetricBinding.setTokenProtection(isTokenProtection());
+
+        symmetricBinding.setNormalized(true);
+        all.addPolicyComponent(symmetricBinding);
+
         return policy;
     }
 
@@ -240,25 +231,4 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         //todo
         return new SecurityEvent.Event[0];
     }
-
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
-        super.assertPolicy(securityEvent);
-        if (securityEvent.getSecurityEventType() == SecurityEvent.Event.InitiatorEncryptionToken
-                || securityEvent.getSecurityEventType() == SecurityEvent.Event.RecipientEncryptionToken) {
-            if (getEncryptionToken() != null) {
-                getEncryptionToken().assertPolicy(securityEvent);
-            }
-            if (getProtectionToken() != null) {
-                getProtectionToken().assertPolicy(securityEvent);
-            }
-        }
-    }
-
-    @Override
-    public boolean isAsserted() {
-        return super.isAsserted();
-    }
-    */
 }

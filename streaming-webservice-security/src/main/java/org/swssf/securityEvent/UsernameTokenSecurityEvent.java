@@ -20,40 +20,17 @@ package org.swssf.securityEvent;
 
 import org.swssf.ext.Constants;
 
-import java.util.Calendar;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class UsernameTokenSecurityEvent extends SecurityEvent {
+public class UsernameTokenSecurityEvent extends TokenSecurityEvent {
 
-    private String username;
-    private String password;
     private Constants.UsernameTokenPasswordType usernameTokenPasswordType;
-    private byte[] nonce;
-    private Calendar created;
-    private String salt;
-    private Integer iteration;
+    private String usernameTokenProfile;
 
     public UsernameTokenSecurityEvent(Event securityEventType) {
         super(securityEventType);
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Constants.UsernameTokenPasswordType getUsernameTokenPasswordType() {
@@ -64,35 +41,11 @@ public class UsernameTokenSecurityEvent extends SecurityEvent {
         this.usernameTokenPasswordType = usernameTokenPasswordType;
     }
 
-    public byte[] getNonce() {
-        return nonce;
+    public String getUsernameTokenProfile() {
+        return usernameTokenProfile;
     }
 
-    public void setNonce(byte[] nonce) {
-        this.nonce = nonce;
-    }
-
-    public Calendar getCreated() {
-        return created;
-    }
-
-    public void setCreated(Calendar created) {
-        this.created = created;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public Integer getIteration() {
-        return iteration;
-    }
-
-    public void setIteration(Integer iteration) {
-        this.iteration = iteration;
+    public void setUsernameTokenProfile(String usernameTokenProfile) {
+        this.usernameTokenProfile = usernameTokenProfile;
     }
 }

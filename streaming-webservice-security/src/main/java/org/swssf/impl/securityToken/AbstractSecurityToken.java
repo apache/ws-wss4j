@@ -20,8 +20,10 @@ package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.SecurityToken;
+import org.swssf.ext.WSSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
+import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
@@ -41,11 +43,15 @@ public abstract class AbstractSecurityToken implements SecurityToken {
         this.processor = processor;
     }
 
+    AbstractSecurityToken(String id) {
+        this.id = id;
+    }
+
     public String getId() {
         return this.id;
     }
 
-    public Object getProccesor() {
+    public Object getProcessor() {
         return processor;
     }
 
@@ -55,5 +61,12 @@ public abstract class AbstractSecurityToken implements SecurityToken {
 
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
+    }
+
+    public X509Certificate[] getX509Certificates() throws WSSecurityException {
+        return null;
+    }
+
+    public void verify() throws WSSecurityException {
     }
 }

@@ -57,7 +57,7 @@ import java.util.Properties;
 public class SAMLTokenReferenceTest extends AbstractTestBase {
 
     @Test
-    public void estSAML1SVKeyIdentifierOutbound() throws Exception {
+    public void testSAML1SVKeyIdentifierOutbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

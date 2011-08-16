@@ -91,6 +91,10 @@ public class UsernameTokenBuilder implements AssertionBuilder {
                 parent.setNoPassword(true);
             } else if (spConstants.getHashPassword().equals(qname)) {
                 parent.setHashPassword(true);
+            } else if (spConstants.getCreated().equals(qname)) {
+                parent.setCreatedTimestamp(true);
+            } else if (spConstants.getNonce().equals(qname)) {
+                parent.setNonce(true);
             } else if (spConstants.getRequireDerivedKeys().equals(qname)) {
                 parent.setDerivedKeys(true);
             } else if (spConstants.getRequireExplicitDerivedKeys().equals(qname)) {

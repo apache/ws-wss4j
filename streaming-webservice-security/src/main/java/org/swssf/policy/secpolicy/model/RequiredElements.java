@@ -16,9 +16,11 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
+import org.swssf.policy.assertionStates.RequiredElementAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
@@ -130,23 +132,35 @@ public class RequiredElements extends AbstractSecurityAssertion {
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        return new SecurityEvent.Event[]{SecurityEvent.Event.RequiredElement};
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
-        //todo
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        Map<Assertion, List<AssertionState>> requiredElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.RequiredElement);
+        List<QName> qNames = getQNamesFromXPath();
+        for (int i = 0; i < qNames.size(); i++) {
+            QName qName = qNames.get(i);
+            addAssertionState(requiredElementAssertionStates, this, new RequiredElementAssertionState(this, false, qName));
+        }
     }
 
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
+    private List<QName> getQNamesFromXPath() {
+        List<QName> qNames = new ArrayList<QName>(xPathExpressions.size());
+        for (int i = 0; i < xPathExpressions.size(); i++) {
+            String s = xPathExpressions.get(i);
+            String prefix;
+            String localName;
+            if (s.contains(":")) {
+                int idx = s.indexOf(":");
+                prefix = s.substring(0, idx);
+                localName = s.substring(idx + 1);
+            } else {
+                prefix = "";
+                localName = s;
+            }
+            qNames.add(new QName(declaredNamespaces.get(prefix), localName));
+        }
+        return qNames;
     }
-
-    @Override
-    public boolean isAsserted() {
-        return true;
-    }
-    */
 }

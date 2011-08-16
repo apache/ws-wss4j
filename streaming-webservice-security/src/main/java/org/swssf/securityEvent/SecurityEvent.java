@@ -27,18 +27,22 @@ public abstract class SecurityEvent {
     public enum Event {
         Operation,
         Timestamp,
+        SignatureValue,
         SignedPart,
         SignedElement,
-        InitiatorEncryptionToken,
-        RecipientEncryptionToken,
-        AlgorithmSuite,
         EncryptedPart,
         EncryptedElement,
         ContentEncrypted,
+        RequiredElement,
+        RequiredPart,
+        AlgorithmSuite,
+        SignatureToken,
+        EncryptionToken,
+        SamlToken,
+        SecurityContextToken,
         UsernameToken,
-        InitiatorSignatureToken,
-        RecipientSignatureToken,
-        SignatureValue,
+        SupportingToken,
+        TransportToken,
     }
 
     private Event securityEventType;

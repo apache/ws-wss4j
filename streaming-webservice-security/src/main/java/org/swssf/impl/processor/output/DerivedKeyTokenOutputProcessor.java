@@ -105,7 +105,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             final byte[] derivedKeyBytes;
             try {
                 byte[] secret;
-                if (wrappingSecurityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SECURITY_CONTEXT_TOKEN) {
+                if (wrappingSecurityToken.getTokenType() == Constants.TokenType.SecurityContextToken) {
                     WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.Usage.SECRET_KEY);
                     Utils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, wsuIdDKT);
                     if (passwordCallback.getKey() == null) {
@@ -113,7 +113,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                     secret = passwordCallback.getKey();
                 } else {
-                    secret = wrappingSecurityToken.getSecretKey(null).getEncoded();
+                    secret = wrappingSecurityToken.getSecretKey(null, null).getEncoded();
                 }
 
                 derivedKeyBytes = derivationAlgorithm.createKey(secret, seed, offset, length);
@@ -134,7 +134,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     this.outputProcessor = outputProcessor;
                 }
 
-                public Object getProccesor() {
+                public Object getProcessor() {
                     return outputProcessor;
                 }
 
@@ -142,18 +142,18 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     return false;
                 }
 
-                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+                public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
                     if (keyTable.containsKey(algorithmURI)) {
                         return keyTable.get(algorithmURI);
                     } else {
-                        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
                         Key key = new SecretKeySpec(derivedKeyBytes, algoFamily);
                         keyTable.put(algorithmURI, key);
                         return key;
                     }
                 }
 
-                public PublicKey getPublicKey() throws WSSecurityException {
+                public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
                     return null;
                 }
 
@@ -172,7 +172,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     return null;
                 }
 
-                public Constants.KeyIdentifierType getKeyIdentifierType() {
+                public Constants.TokenType getTokenType() {
                     return null;
                 }
             };
@@ -187,7 +187,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 }
             };
 
-            switch (action) {
+            switch (getAction()) {
                 case SIGNATURE_WITH_DERIVED_KEY:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuIdDKT);
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuIdDKT);
@@ -198,7 +198,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             }
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);
             FinalDerivedKeyTokenOutputProcessor finalDerivedKeyTokenOutputProcessor = new FinalDerivedKeyTokenOutputProcessor(getSecurityProperties(), getAction(), derivedKeySecurityToken, offset, length, new String(Base64.encodeBase64(nonce)));
-            finalDerivedKeyTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProccesor());
+            finalDerivedKeyTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
             derivedKeySecurityToken.setProcessor(finalDerivedKeyTokenOutputProcessor);
             outputProcessorChain.addProcessor(finalDerivedKeyTokenOutputProcessor);
         } finally {

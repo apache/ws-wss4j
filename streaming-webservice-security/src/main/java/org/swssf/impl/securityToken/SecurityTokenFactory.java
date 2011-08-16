@@ -52,7 +52,7 @@ public class SecurityTokenFactory {
         if (keyInfoType != null) {
             return getSecurityToken(keyInfoType.getSecurityTokenReferenceType(), crypto, callbackHandler, securityContext, processor);
         } else if (crypto.getDefaultX509Alias() != null) {
-            return new X509DefaultSecurityToken(crypto, callbackHandler, crypto.getDefaultX509Alias(), crypto.getDefaultX509Alias(), processor);
+            return new X509DefaultSecurityToken(securityContext, crypto, callbackHandler, crypto.getDefaultX509Alias(), crypto.getDefaultX509Alias(), processor);
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
     }
@@ -64,7 +64,7 @@ public class SecurityTokenFactory {
             }
 
             if (securityTokenReferenceType.getX509DataType() != null) {
-                return new X509DataSecurityToken(crypto, callbackHandler, securityTokenReferenceType.getX509DataType(), securityTokenReferenceType.getId(), processor);
+                return new DelegatingSecurityToken(Constants.KeyIdentifierType.ISSUER_SERIAL, new X509DataSecurityToken(securityContext, crypto, callbackHandler, securityTokenReferenceType.getX509DataType(), securityTokenReferenceType.getId(), processor));
             }
             //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
             else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
@@ -79,11 +79,11 @@ public class SecurityTokenFactory {
                 }
 
                 if (Constants.NS_X509_V3_TYPE.equals(valueType)) {
-                    return new X509_V3SecurityToken(crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
+                    return new X509_V3SecurityToken(securityContext, crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
                 } else if (Constants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
-                    return new X509SubjectKeyIdentifierSecurityToken(crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
+                    return new X509SubjectKeyIdentifierSecurityToken(securityContext, crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
                 } else if (Constants.NS_THUMBPRINT.equals(valueType)) {
-                    return new ThumbprintSHA1SecurityToken(crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
+                    return new ThumbprintSHA1SecurityToken(securityContext, crypto, callbackHandler, binaryContent, securityTokenReferenceType.getId(), processor);
                 } else if (Constants.NS_SAML10_TYPE.equals(valueType) || Constants.NS_SAML20_TYPE.equals(valueType)) {
                     SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider == null) {
@@ -102,7 +102,7 @@ public class SecurityTokenFactory {
                 if (securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType() != null
                         && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
                     BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
-                    return getSecurityToken(binarySecurityTokenType, crypto, callbackHandler, processor);
+                    return new DelegatingSecurityToken(Constants.KeyIdentifierType.BST_EMBEDDED, getSecurityToken(binarySecurityTokenType, securityContext, crypto, callbackHandler, processor));
                 } else {//referenced BST:
                     //we have to search BST somewhere in the doc. First we will check for a BST already processed and
                     //stored in the context. Otherwise we will abort now.
@@ -122,7 +122,7 @@ public class SecurityTokenFactory {
                     if (securityTokenProvider == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
                     }
-                    return securityTokenProvider.getSecurityToken(crypto);
+                    return new DelegatingSecurityToken(Constants.KeyIdentifierType.BST_DIRECT_REFERENCE, securityTokenProvider.getSecurityToken(crypto));
                 }
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
@@ -131,7 +131,7 @@ public class SecurityTokenFactory {
         }
     }
 
-    public SecurityToken getSecurityToken(BinarySecurityTokenType binarySecurityTokenType, Crypto crypto, CallbackHandler callbackHandler, Object processor) throws WSSecurityException {
+    public SecurityToken getSecurityToken(BinarySecurityTokenType binarySecurityTokenType, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, Object processor) throws WSSecurityException {
 
         //only Base64Encoding is supported
         if (!Constants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
@@ -141,20 +141,20 @@ public class SecurityTokenFactory {
         byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
 
         if (Constants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
-            return new X509_V3SecurityToken(crypto, callbackHandler, securityTokenData, binarySecurityTokenType.getId(), processor);
+            return new X509_V3SecurityToken(securityContext, crypto, callbackHandler, securityTokenData, binarySecurityTokenType.getId(), processor);
         } else if (Constants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
-            return new X509PKIPathv1SecurityToken(crypto, callbackHandler, securityTokenData, binarySecurityTokenType.getId(), processor);
+            return new X509PKIPathv1SecurityToken(securityContext, crypto, callbackHandler, securityTokenData, binarySecurityTokenType.getId(), processor);
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType", binarySecurityTokenType.getValueType());
         }
     }
 
-    public SecurityToken getSecurityToken(UsernameTokenType usernameTokenType, Object processor) throws WSSecurityException {
-        return new UsernameSecurityToken(usernameTokenType, usernameTokenType.getId(), processor);
+    public SecurityToken getSecurityToken(UsernameTokenType usernameTokenType, SecurityContext securityContext, Object processor) throws WSSecurityException {
+        return new UsernameSecurityToken(usernameTokenType, securityContext, usernameTokenType.getId(), processor);
     }
 
-    public SecurityToken getSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) throws WSSecurityException {
-        return new SAMLSecurityToken(samlVersion, samlKeyInfo, crypto, callbackHandler, id, processor);
+    public SecurityToken getSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) throws WSSecurityException {
+        return new SAMLSecurityToken(samlVersion, samlKeyInfo, securityContext, crypto, callbackHandler, id, processor);
     }
 
     public SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, SecurityContext securityContext, String id, Object processor) throws WSSecurityException {

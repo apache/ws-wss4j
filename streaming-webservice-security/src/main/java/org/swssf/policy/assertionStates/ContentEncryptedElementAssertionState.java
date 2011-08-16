@@ -40,9 +40,6 @@ public class ContentEncryptedElementAssertionState extends AssertionState {
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) {
-        //here we add just one AssertionState for all Parts to get a fail-fast behavior
-        //when we add multiple AssertionStates some of them return true, becauce they don't match
-        //as a result the policy is temporary satisfied for the current event and can only be falsified at last
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
         for (int i = 0; i < elements.size(); i++) {
             QName qName = elements.get(i);

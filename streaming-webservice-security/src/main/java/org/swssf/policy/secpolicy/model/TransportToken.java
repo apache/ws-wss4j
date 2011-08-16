@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
@@ -25,7 +26,7 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -111,23 +112,23 @@ public class TransportToken extends AbstractSecurityAssertion implements TokenWr
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        return new SecurityEvent.Event[]{SecurityEvent.Event.TransportToken};
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
-        //todo
-    }
-
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        if (transportToken != null) {
+            transportToken.setResponsibleAssertionEvents(getResponsibleAssertionEvents());
+            transportToken.getAssertions(assertionStateMap, operationPolicy);
+        }
     }
 
     @Override
-    public boolean isAsserted() {
-        return true;
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
+        boolean isAsserted = super.isAsserted(assertionStateMap);
+        if (transportToken != null) {
+            isAsserted &= transportToken.isAsserted(assertionStateMap);
+        }
+        return isAsserted;
     }
-    */
 }

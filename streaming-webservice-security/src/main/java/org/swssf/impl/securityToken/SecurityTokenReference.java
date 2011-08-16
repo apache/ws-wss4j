@@ -53,12 +53,12 @@ public class SecurityTokenReference extends AbstractSecurityToken {
         return securityToken.isAsymmetric();
     }
 
-    public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-        return securityToken.getSecretKey(algorithmURI);
+    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
+        return securityToken.getSecretKey(algorithmURI, keyUsage);
     }
 
-    public PublicKey getPublicKey() throws WSSecurityException {
-        return securityToken.getPublicKey();
+    public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
+        return securityToken.getPublicKey(keyUsage);
     }
 
     public X509Certificate[] getX509Certificates() throws WSSecurityException {
@@ -77,7 +77,7 @@ public class SecurityTokenReference extends AbstractSecurityToken {
         return securityToken.getKeyWrappingTokenAlgorithm();
     }
 
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
-        return securityToken.getKeyIdentifierType();
+    public Constants.TokenType getTokenType() {
+        return securityToken.getTokenType();
     }
 }

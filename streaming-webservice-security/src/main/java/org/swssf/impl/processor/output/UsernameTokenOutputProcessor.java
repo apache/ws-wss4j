@@ -73,6 +73,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                             nonceValue,
                             null,
                             null,
+                            outputProcessorChain.getSecurityContext(),
                             wsuId,
                             outputProcessor
                     );
@@ -86,9 +87,11 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     return wsuId;
                 }
             };
-            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
-            outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
-            outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);
+            if (getAction() == Constants.Action.USERNAMETOKEN_SIGNED) {
+                outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
+                outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
+                outputProcessorChain.getSecurityContext().put(Constants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);
+            }
             outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(getSecurityProperties(), getAction(), wsuId, nonceValue, password, created));
 
         } catch (DatatypeConfigurationException e) {
@@ -147,7 +150,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     }
 
                     if (getSecurityProperties().getUsernameTokenPasswordType() == Constants.UsernameTokenPasswordType.PASSWORD_DIGEST
-                            || Arrays.binarySearch(getSecurityProperties().getOutAction(), Constants.Action.USERNAMETOKEN_SIGN) >= 0) {
+                            || Arrays.binarySearch(getSecurityProperties().getOutAction(), Constants.Action.USERNAMETOKEN_SIGNED) >= 0) {
                         attributes = new HashMap<QName, String>();
                         attributes.put(Constants.ATT_NULL_EncodingType, Constants.SOAPMESSAGE_NS10_BASE64_ENCODING);
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, Constants.TAG_wsse_Nonce, attributes);

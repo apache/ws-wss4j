@@ -18,22 +18,17 @@
  */
 package org.swssf.policy;
 
+import org.swssf.policy.secpolicy.WSSPolicyException;
+
 /**
  * Exception for PolicyViolation
  *
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class PolicyViolationException extends Exception {
+public class PolicyViolationException extends WSSPolicyException {
+
     public PolicyViolationException(String message) {
         super(message);
-    }
-
-    public PolicyViolationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public PolicyViolationException(Throwable cause) {
-        super(cause);
     }
 }

@@ -181,10 +181,10 @@ public class Constants {
     public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
     public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
 
-    public static final String NS_USERNAMETOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
-    public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE + "#PasswordDigest";
-    public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE + "#PasswordText";
-    public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE + "#UsernameToken";
+    public static final String NS_USERNAMETOKEN_PROFILE11 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE11 + "#PasswordDigest";
+    public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE11 + "#PasswordText";
+    public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE11 + "#UsernameToken";
 
     public static final QName TAG_wsse11_SignatureConfirmation = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
     public static final QName ATT_NULL_Value = new QName(null, "Value");
@@ -263,7 +263,7 @@ public class Constants {
         SIGNATURE,
         ENCRYPT,
         USERNAMETOKEN,
-        USERNAMETOKEN_SIGN,
+        USERNAMETOKEN_SIGNED,
         SIGNATURE_CONFIRMATION,
         SIGNATURE_WITH_DERIVED_KEY,
         ENCRYPT_WITH_DERIVED_KEY,
@@ -271,24 +271,33 @@ public class Constants {
         SAML_TOKEN_UNSIGNED,
     }
 
-    //todo differentiate between keyIdentifier and tokentypes eg SAMLToken, BST and ISSUER_SERIAL,etc
     public enum KeyIdentifierType {
-        NO_TOKEN,
+        DEFAULT_TOKEN,
         ISSUER_SERIAL,
         BST_DIRECT_REFERENCE,
         BST_EMBEDDED,
         X509_KEY_IDENTIFIER,
         SKI_KEY_IDENTIFIER,
         THUMBPRINT_IDENTIFIER,
-        USERNAMETOKEN_SIGNED,
         EMBEDDED_SECURITY_TOKEN_REF,
         EMEDDED_KEYIDENTIFIER_REF,
-        SECURITY_CONTEXT_TOKEN,
-        SAML_20,
-        SAML_10,
+        USERNAMETOKEN_REFERENCE,
     }
 
     public enum TokenType {
+        EncryptedKeyToken,
+        X509V3Token,
+        X509V1Token,
+        X509Pkcs7Token,
+        X509PkiPathV1Token,
+        UsernameToken,
+        SecurityContextToken,
+        Saml10Token,
+        Saml11Token,
+        Saml20Token,
+        IssuedToken,
+        SecureConversationToken,
+        HttpsToken,
 
     }
 
@@ -368,4 +377,20 @@ public class Constants {
      * The message has expired
      */
     public static final QName MESSAGE_EXPIRED = new QName(NS_WSSE10, "MessageExpired");
+
+    public enum KeyUsage {
+        Sym_Sig,
+        Asym_Sig,
+        Dig,
+        Enc,
+        Sym_Key_Wrap,
+        Asym_Key_Wrap,
+        Comp_Key,
+        Enc_KD,
+        Sig_KD,
+        C14n,
+        Soap_Norm,
+        STR_Trans,
+        XPath,
+    }
 }

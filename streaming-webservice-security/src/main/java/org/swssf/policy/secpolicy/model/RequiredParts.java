@@ -16,9 +16,11 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
+import org.swssf.policy.assertionStates.RequiredPartAssertionState;
 import org.swssf.policy.secpolicy.SP12Constants;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
@@ -26,7 +28,10 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * class lent from apache rampart
@@ -99,23 +104,29 @@ public class RequiredParts extends AbstractSecurityAssertion {
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        return new SecurityEvent.Event[]{SecurityEvent.Event.RequiredPart};
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
-        //todo
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        Map<Assertion, List<AssertionState>> requiredPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.RequiredPart);
+        List<QName> qNames = getQNamesFromHeaders();
+        for (int i = 0; i < qNames.size(); i++) {
+            QName qName = qNames.get(i);
+            addAssertionState(requiredPartsAssertionStates, this, new RequiredPartAssertionState(this, false, qName));
+        }
     }
 
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
+    private List<QName> getQNamesFromHeaders() {
+        List<QName> qNames = new ArrayList<QName>(headers.size());
+        for (int i = 0; i < headers.size(); i++) {
+            Header header = headers.get(i);
+            String localName = header.getName();
+            if (localName == null) {
+                localName = "*";
+            }
+            qNames.add(new QName(header.getNamespace(), localName));
+        }
+        return qNames;
     }
-
-    @Override
-    public boolean isAsserted() {
-        return true;
-    }
-    */
 }

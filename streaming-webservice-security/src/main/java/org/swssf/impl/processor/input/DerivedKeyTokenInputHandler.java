@@ -23,6 +23,7 @@ import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.*;
 import org.swssf.impl.derivedKey.DerivedKeyUtils;
+import org.swssf.impl.securityToken.AbstractAlgorithmSuiteSecurityEventFiringSecurityToken;
 import org.swssf.impl.securityToken.SAMLSecurityToken;
 import org.swssf.impl.securityToken.SecurityTokenFactory;
 import org.swssf.impl.securityToken.UsernameSecurityToken;
@@ -31,9 +32,10 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Processor for the SecurityContextToken XML Structure
@@ -43,95 +45,95 @@ import java.util.Deque;
  */
 public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public DerivedKeyTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+    public DerivedKeyTokenInputHandler(final InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final DerivedKeyTokenType derivedKeyTokenType = (DerivedKeyTokenType) parseStructure(eventQueue, index);
+        if (derivedKeyTokenType.getId() == null) {
+            derivedKeyTokenType.setId(UUID.randomUUID().toString());
+        }
         if (derivedKeyTokenType.getSecurityTokenReference() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
-        final SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
-                derivedKeyTokenType.getSecurityTokenReference(),
-                securityProperties.getDecryptionCrypto(),
-                securityProperties.getCallbackHandler(),
-                inputProcessorChain.getSecurityContext(),
-                this
-        );
 
-        final SecurityToken derivedKeySecurityToken = new SecurityToken() {
-
-            public String getId() {
-                return derivedKeyTokenType.getId();
-            }
-
-            public Object getProccesor() {
-                return null;
-            }
-
-            public boolean isAsymmetric() {
-                return false;
-            }
-
-            public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-                byte[] secret;
-                if (securityToken != null) {
-                    if (securityToken instanceof UsernameSecurityToken) {
-                        UsernameSecurityToken usernameSecurityToken = (UsernameSecurityToken) securityToken;
-                        secret = usernameSecurityToken.generateDerivedKey(
-                                usernameSecurityToken.getPassword(),
-                                usernameSecurityToken.getSalt(),
-                                usernameSecurityToken.getIteration()
-                        );
-                    } else if (securityToken instanceof SAMLSecurityToken) {
-                        SAMLSecurityToken samlSecurityToken = (SAMLSecurityToken) securityToken;
-                        secret = samlSecurityToken.getSamlKeyInfo().getSecret();
-                    } else {
-                        secret = securityToken.getSecretKey(algorithmURI).getEncoded();
-                    }
-                } else {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId");
-                }
-                byte[] nonce = derivedKeyTokenType.getNonce();
-                if (nonce == null || nonce.length == 0) {
-                    throw new WSSecurityException("Missing wsc:Nonce value");
-                }
-                byte[] keyBytes = DerivedKeyUtils.deriveKey(
-                        derivedKeyTokenType.getAlgorithm(),
-                        derivedKeyTokenType.getLabel(),
-                        derivedKeyTokenType.getLength(),
-                        secret,
-                        nonce,
-                        derivedKeyTokenType.getOffset()
-                );
-                String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-                return new SecretKeySpec(keyBytes, algo);
-            }
-
-            public PublicKey getPublicKey() throws WSSecurityException {
-                return null;
-            }
-
-            public X509Certificate[] getX509Certificates() throws WSSecurityException {
-                return null;
-            }
-
-            public void verify() throws WSSecurityException {
-            }
-
-            public SecurityToken getKeyWrappingToken() {
-                return null;
-            }
-
-            public String getKeyWrappingTokenAlgorithm() {
-                return null;
-            }
-
-            public Constants.KeyIdentifierType getKeyIdentifierType() {
-                return null;
-            }
-        };
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+
             public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                return derivedKeySecurityToken;
+
+                SecurityToken securityToken = securityTokens.get(crypto);
+                if (securityToken != null) {
+                    return securityToken;
+                }
+
+                final SecurityToken referencedSecurityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                        derivedKeyTokenType.getSecurityTokenReference(),
+                        securityProperties.getDecryptionCrypto(),
+                        securityProperties.getCallbackHandler(),
+                        inputProcessorChain.getSecurityContext(),
+                        null
+                );
+
+                securityToken = new AbstractAlgorithmSuiteSecurityEventFiringSecurityToken(inputProcessorChain.getSecurityContext(), derivedKeyTokenType.getId()) {
+
+                    public boolean isAsymmetric() {
+                        return false;
+                    }
+
+                    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
+                        super.getSecretKey(algorithmURI, keyUsage);
+                        byte[] secret;
+                        if (referencedSecurityToken != null) {
+                            if (referencedSecurityToken instanceof UsernameSecurityToken) {
+                                UsernameSecurityToken usernameSecurityToken = (UsernameSecurityToken) referencedSecurityToken;
+                                secret = usernameSecurityToken.generateDerivedKey(
+                                        usernameSecurityToken.getPassword(),
+                                        usernameSecurityToken.getSalt(),
+                                        usernameSecurityToken.getIteration()
+                                );
+                            } else if (referencedSecurityToken instanceof SAMLSecurityToken) {
+                                SAMLSecurityToken samlSecurityToken = (SAMLSecurityToken) referencedSecurityToken;
+                                secret = samlSecurityToken.getSamlKeyInfo().getSecret();
+                            } else {
+                                //todo is this the correct algo and KeyUsage?
+                                secret = referencedSecurityToken.getSecretKey(algorithmURI, Constants.KeyUsage.Sig_KD).getEncoded();
+                            }
+                        } else {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId");
+                        }
+                        byte[] nonce = derivedKeyTokenType.getNonce();
+                        if (nonce == null || nonce.length == 0) {
+                            throw new WSSecurityException("Missing wsc:Nonce value");
+                        }
+                        byte[] keyBytes = DerivedKeyUtils.deriveKey(
+                                derivedKeyTokenType.getAlgorithm(),
+                                derivedKeyTokenType.getLabel(),
+                                derivedKeyTokenType.getLength(),
+                                secret,
+                                nonce,
+                                derivedKeyTokenType.getOffset()
+                        );
+                        String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
+                        return new SecretKeySpec(keyBytes, algo);
+                    }
+
+                    public SecurityToken getKeyWrappingToken() {
+                        //todo?
+                        return null;
+                    }
+
+                    public String getKeyWrappingTokenAlgorithm() {
+                        //todo?
+                        return null;
+                    }
+
+                    public Constants.TokenType getTokenType() {
+                        //todo?
+                        return null;
+                    }
+                };
+                securityTokens.put(crypto, securityToken);
+                return securityToken;
             }
 
             public String getId() {

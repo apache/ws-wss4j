@@ -32,6 +32,8 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Processor for the SecurityTokenReference XML Structure
@@ -109,10 +111,19 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                     xmlEventList.push(xmlEvent);
 
                     SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+                        private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+
                         public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                            return SecurityTokenFactory.newInstance().getSecurityToken(
+                            SecurityToken securityToken = securityTokens.get(crypto);
+                            if (securityToken != null) {
+                                return securityToken;
+                            }
+                            securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
                                     attributeValue, xmlEventList, crypto, getSecurityProperties().getCallbackHandler(),
                                     inputProcessorChain.getSecurityContext(), securityTokenReferenceId, this);
+                            securityTokens.put(crypto, securityToken);
+                            return securityToken;
                         }
 
                         public String getId() {

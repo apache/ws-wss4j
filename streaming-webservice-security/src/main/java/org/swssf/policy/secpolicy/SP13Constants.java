@@ -28,8 +28,8 @@ public final class SP13Constants extends SPConstants {
 
     public final static String SP_PREFIX = "sp";
 
-    public static final QName INCLUDE_TOKEN = new QName(SP_NS, SPConstants.ATTR_INCLUDE_TOKEN,
-            SP13Constants.SP_PREFIX);
+    //all attributes are unqualified!!
+    public static final QName INCLUDE_TOKEN = new QName(SPConstants.ATTR_INCLUDE_TOKEN);
 
     public final static String INCLUDE_NEVER = SP12Constants.SP_NS +
             SPConstants.INCLUDE_TOKEN_NEVER_SUFFIX;
@@ -138,6 +138,9 @@ public final class SP13Constants extends SPConstants {
 
     public static final QName USERNAME_TOKEN = new QName(SP13Constants.SP_NS,
             SPConstants.USERNAME_TOKEN, SP13Constants.SP_PREFIX);
+
+    public static final QName SAML_TOKEN = new QName(SP13Constants.SP_NS,
+            SPConstants.SAML_TOKEN, SP13Constants.SP_PREFIX);
 
     public static final QName KEYVALUE_TOKEN = new QName(SP13Constants.SP_NS,
             SPConstants.KEYVALUE_TOKEN, SP13Constants.SP_PREFIX);
@@ -334,6 +337,12 @@ public final class SP13Constants extends SPConstants {
             SP13Constants.SP_PREFIX);
 
     public static final QName HASH_PASSWORD = new QName(SP13Constants.SP_NS, SPConstants.HASH_PASSWORD,
+            SP13Constants.SP_PREFIX);
+
+    public static final QName CREATED = new QName(SP13Constants.SP_NS, SPConstants.CREATED,
+            SP13Constants.SP_PREFIX);
+
+    public static final QName NONCE = new QName(SP13Constants.SP_NS, SPConstants.NONCE,
             SP13Constants.SP_PREFIX);
 
     // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -593,6 +602,10 @@ public final class SP13Constants extends SPConstants {
         return X509_TOKEN;
     }
 
+    public QName getSamlToken() {
+        return SAML_TOKEN;
+    }
+
     public QName getSupportingTokens() {
         return SUPPORTING_TOKENS;
     }
@@ -671,6 +684,14 @@ public final class SP13Constants extends SPConstants {
 
     public QName getHashPassword() {
         return HASH_PASSWORD;
+    }
+
+    public QName getCreated() {
+        return CREATED;
+    }
+
+    public QName getNonce() {
+        return NONCE;
     }
 
     public QName getMustSupportRefKeyIdentifier() {

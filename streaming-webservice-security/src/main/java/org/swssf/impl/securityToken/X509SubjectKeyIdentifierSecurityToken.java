@@ -20,6 +20,7 @@ package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
+import org.swssf.ext.SecurityContext;
 import org.swssf.ext.WSSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -32,8 +33,8 @@ public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
     private String alias = null;
     private byte[] binaryContent;
 
-    X509SubjectKeyIdentifierSecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) {
-        super(crypto, callbackHandler, id, processor);
+    X509SubjectKeyIdentifierSecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) {
+        super(Constants.TokenType.X509V3Token, securityContext, crypto, callbackHandler, id, processor);
         this.binaryContent = binaryContent;
     }
 
@@ -42,9 +43,5 @@ public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
             this.alias = getCrypto().getAliasForX509Cert(binaryContent);
         }
         return this.alias;
-    }
-
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
-        return Constants.KeyIdentifierType.SKI_KEY_IDENTIFIER;
     }
 }

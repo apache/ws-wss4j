@@ -16,6 +16,7 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
@@ -46,7 +47,7 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
      */
     private boolean signedElements;
 
-    public SignedEncryptedElements(boolean signedElements, SPConstants spConstants) {
+    public SignedEncryptedElements(Boolean signedElements, SPConstants spConstants) {
         this.signedElements = signedElements;
         setVersion(spConstants);
     }
@@ -158,13 +159,13 @@ public class SignedEncryptedElements extends AbstractSecurityAssertion {
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
         if (isSignedElements()) {
-            Collection<AssertionState> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
-            signedElementAssertionStates.add(new SignedElementAssertionState(this, true, getQNamesFromXPath()));
+            Map<Assertion, List<AssertionState>> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
+            addAssertionState(signedElementAssertionStates, this, new SignedElementAssertionState(this, true, getQNamesFromXPath()));
         } else {
-            Collection<AssertionState> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedElement);
-            encryptedElementAssertionStates.add(new EncryptedElementAssertionState(this, true, getQNamesFromXPath()));
+            Map<Assertion, List<AssertionState>> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedElement);
+            addAssertionState(encryptedElementAssertionStates, this, new EncryptedElementAssertionState(this, true, getQNamesFromXPath()));
         }
     }
 

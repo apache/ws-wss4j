@@ -20,6 +20,7 @@ import org.xmlsecurity.ns.configuration.AlgorithmType;
 import org.xmlsecurity.ns.configuration.JCEAlgorithmMappingsType;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +64,18 @@ public class JCEAlgorithmMapper {
         return algorithmsMap.get(AlgorithmURI).getKeyLength();
     }
 
-    public static String getJCEKeyAlgorithmFromURI(String AlgorithmURI) {
+    public static String getJCERequiredKeyFromURI(String AlgorithmURI) {
         return algorithmsMap.get(AlgorithmURI).getRequiredKey();
+    }
+
+    public static String translateJCEIDToURI(String jceId) {
+        Iterator<Map.Entry<String, String>> mapIterator = uriToJCEName.entrySet().iterator();
+        while (mapIterator.hasNext()) {
+            Map.Entry<String, String> next = mapIterator.next();
+            if (next.getValue().equals(jceId)) {
+                return next.getValue();
+            }
+        }
+        return null;
     }
 }

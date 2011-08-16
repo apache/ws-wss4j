@@ -199,7 +199,7 @@
                 </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
+                    <artifactId>xerces</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>xml-apis</groupId>

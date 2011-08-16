@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class WSSec {
 
+    //todo crl check
+    //todo outgoing client setup per policy
+
     static {
         try {
             Class c = WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
@@ -189,7 +192,7 @@ public class WSSec {
                         securityProperties.setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                     }
                     break;
-                case USERNAMETOKEN_SIGN:
+                case USERNAMETOKEN_SIGNED:
                     if (securityProperties.getTokenUser() == null) {
                         throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noTokenUser");
                     }
@@ -209,7 +212,7 @@ public class WSSec {
                     if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                         securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                     }
-                    securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED);
+                    securityProperties.setSignatureKeyIdentifierType(Constants.KeyIdentifierType.USERNAMETOKEN_REFERENCE);
                     if (securityProperties.getUsernameTokenPasswordType() == null) {
                         securityProperties.setUsernameTokenPasswordType(Constants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                     }

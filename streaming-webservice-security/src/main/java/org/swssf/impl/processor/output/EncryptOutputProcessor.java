@@ -81,7 +81,7 @@ public class EncryptOutputProcessor extends AbstractOutputProcessor {
                                 encryptionPartDef.setModifier(securePart.getModifier());
                                 encryptionPartDef.setEncRefId("ED-" + UUID.randomUUID().toString());
                                 encryptionPartDef.setKeyId(securityTokenProvider.getId());
-                                encryptionPartDef.setSymmetricKey(securityTokenProvider.getSecurityToken(null).getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
+                                encryptionPartDef.setSymmetricKey(securityTokenProvider.getSecurityToken(null).getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm(), null));
                                 outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
                                 internalEncryptionOutputProcessor =
                                         new InternalEncryptionOutputProcessor(

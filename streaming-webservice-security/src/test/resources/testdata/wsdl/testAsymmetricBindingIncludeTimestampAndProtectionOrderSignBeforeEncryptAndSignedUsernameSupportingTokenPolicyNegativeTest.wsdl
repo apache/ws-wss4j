@@ -5,6 +5,7 @@
         xmlns:tns="http://www.example.net/WSDLService"
         xmlns:wsp12="http://schemas.xmlsoap.org/ws/2004/09/policy"
         xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802"
+        xmlns:sp1="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
         xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
@@ -21,118 +22,89 @@
     <wsp12:Policy wsu:Id="MessagePolicy3">
         <wsp12:ExactlyOne>
             <wsp12:All>
-                <sp:AsymmetricBinding>
+                <sp1:AsymmetricBinding>
                     <wsp12:Policy>
-                        <sp:InitiatorToken>
+                        <sp1:InitiatorToken>
                             <wsp12:Policy>
-                                <sp:X509Token
-                                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                    <!--<sp:Issuer>wsa:EndpointReferenceType</sp:Issuer>-->
-                                    <sp:IssuerName>CN=test</sp:IssuerName>
+                                <sp1:X509Token IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <!--<sp1:Issuer>wsa:EndpointReferenceType</sp1:Issuer>-->
+                                    <sp1:IssuerName>CN=transmitter,OU=swssf,C=CH</sp1:IssuerName>
                                     <wsp12:Policy>
                                         <!-- 9 WSS: SOAP Message Security Options
                                         Optional and not implemented:-->
-                                        <!--<sp:RequireKeyIdentifierReference/> -->
-                                        <!--<sp:RequireIssuerSerialReference/>-->
+                                        <!--<sp1:RequireKeyIdentifierReference/> -->
+                                        <!--<sp1:RequireIssuerSerialReference/>-->
                                         <!--
-                                        <sp:RequireEmbeddedTokenReference/>
-                                        <sp:RequireThumbprintReference/>
+                                        <sp1:RequireEmbeddedTokenReference/>
+                                        <sp1:RequireThumbprintReference/>
                                         -->
-                                        <sp:WssX509V3Token11/>
+                                        <sp1:WssX509V3Token11/>
                                         <!--
-                                      <sp:WssX509Pkcs7Token10/>
-                                      <sp:WssX509PkiPathV1Token10/>
-                                      <sp:WssX509V1Token11/>
-                                      <sp:WssX509V3Token11/>
-                                      <sp:WssX509Pkcs7Token11/>
-                                      <sp:WssX509PkiPathV1Token11/>
+                                      <sp1:WssX509Pkcs7Token10/>
+                                      <sp1:WssX509PkiPathV1Token10/>
+                                      <sp1:WssX509V1Token11/>
+                                      <sp1:WssX509V3Token11/>
+                                      <sp1:WssX509Pkcs7Token11/>
+                                      <sp1:WssX509PkiPathV1Token11/>
                                       -->
                                     </wsp12:Policy>
-                                </sp:X509Token>
+                                </sp1:X509Token>
                             </wsp12:Policy>
-                        </sp:InitiatorToken>
-                        <sp:RecipientToken>
+                        </sp1:InitiatorToken>
+                        <sp1:RecipientToken>
                             <wsp12:Policy>
-                              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>
+                              <sp1:X509Token IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                  <sp1:IssuerName>CN=receiver,OU=swssf,C=CH</sp1:IssuerName>
                                   <wsp12:Policy>
                                       <!--
-                                      <sp:RequireIssuerSerialReference/>
+                                      <sp1:RequireIssuerSerialReference/>
                                       -->
-                                      <sp:WssX509V3Token11/>
+                                      <sp1:WssX509V3Token11/>
                                   </wsp12:Policy>
-                              </sp:X509Token>
+                              </sp1:X509Token>
                             </wsp12:Policy>
-                         </sp:RecipientToken>
-                        <sp:AlgorithmSuite>
+                         </sp1:RecipientToken>
+                        <sp1:AlgorithmSuite>
                             <wsp12:Policy>
-                                <sp:Basic256/>
+                                <sp1:Basic256/>
                             </wsp12:Policy>
-                        </sp:AlgorithmSuite>
-                        <sp:Layout>
+                        </sp1:AlgorithmSuite>
+                        <sp1:Layout>
                             <wsp12:Policy>
-                                <sp:Lax/>
+                                <sp1:Lax/>
                             </wsp12:Policy>
-                        </sp:Layout>
-                        <sp:IncludeTimestamp/>
-                        <!--<sp:EncryptBeforeSigning/>-->
-                        <sp:EncryptSignature/>
-                        <sp:ProtectTokens/>
-                        <sp:OnlySignEntireHeadersAndBody/>
+                        </sp1:Layout>
+                        <sp1:IncludeTimestamp/>
+                        <!--<sp1:EncryptBeforeSigning/>-->
+                        <sp1:EncryptSignature/>
+                        <sp1:ProtectTokens/>
+                        <sp1:OnlySignEntireHeadersAndBody/>
                     </wsp12:Policy>
-                </sp:AsymmetricBinding>
-                <sp:SignedParts>
-                    <sp:Header Name="Header1" Namespace="..."/>
-                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
-                    <sp:Body/>
-                </sp:SignedParts>
-                <sp:SignedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
-                </sp:SignedElements>
-                <sp:EncryptedParts>
-                    <sp:Header Name="Header2" Namespace="..."/>
-                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
-                    <sp:Body/>
-                </sp:EncryptedParts>
-                <sp:EncryptedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
-                </sp:EncryptedElements>
-                <sp:ContentEncryptedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Expires</sp:XPath>
-                </sp:ContentEncryptedElements>
-            </wsp12:All>
-            <!--
-            <wsp12:All>
-                <sp:AsymmetricBinding>
+                </sp1:AsymmetricBinding>
+                <sp1:SignedParts>
+                    <sp1:Body/>
+                    <sp1:Header Name="Header1" Namespace="..."/>
+                    <sp1:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+                </sp1:SignedParts>
+                <sp1:SignedElements>
+                    <sp1:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp1:XPath>
+                </sp1:SignedElements>
+                <sp1:EncryptedParts>
+                    <sp1:Body/>
+                </sp1:EncryptedParts>
+                <sp1:SignedSupportingTokens>
                     <wsp12:Policy>
-                        <sp:AlgorithmSuite>
+                        <sp1:UsernameToken IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                             <wsp12:Policy>
-                                <sp:Basic256Rsa15/>
+                                <!--<sp1:HashPassword/>-->
+                                <sp1:NoPassword/>
+                                <!--<sp1:Created/>
+                                <sp1:Nonce/>-->
                             </wsp12:Policy>
-                        </sp:AlgorithmSuite>
-                        <sp:IncludeTimestamp/>
+                        </sp1:UsernameToken>
                     </wsp12:Policy>
-                </sp:AsymmetricBinding>
-                <sp:SignedParts>
-                    <sp:Header Name="Header1" Namespace="..."/>
-                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsds"/>
-                </sp:SignedParts>
-                <sp:SignedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
-                </sp:SignedElements>
-                <sp:EncryptedParts>
-                    <sp:Header Name="Header2" Namespace="..."/>
-                    <sp:Header Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsds"/>
-                    <sp:Body/>
-                </sp:EncryptedParts>
-                <sp:EncryptedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Created</sp:XPath>
-                </sp:EncryptedElements>
-                <sp:ContentEncryptedElements>
-                    <sp:XPath xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">wsu:Expires</sp:XPath>
-                </sp:ContentEncryptedElements>
+                </sp1:SignedSupportingTokens>
             </wsp12:All>
-            -->
         </wsp12:ExactlyOne>
     </wsp12:Policy>
     <wsp12:Policy wsu:Id="MessagePolicy2">

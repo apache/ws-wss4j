@@ -18,33 +18,19 @@
  */
 package org.swssf.securityEvent;
 
+import org.swssf.ext.Constants;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class AlgorithmSuiteSecurityEvent extends SecurityEvent {
 
-    //@see http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.3/os/ws-securitypolicy-1.3-spec-os.html#_Toc212617893
-    //6.1
-
-    public enum Usage {
-        Sym_Sig,
-        Asym_Sig,
-        Dig,
-        Enc,
-        Sym_Key_Wrap,
-        Asym_Key_Wrap,
-        Comp_Key,
-        Enc_KD,
-        Sig_KD,
-        C14n,
-        Soap_Norm,
-        STR_Trans,
-        XPath,
-    }
+    //@see http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.3/os/ws-securitypolicy-1.3-spec-os.html
+    //chapter 6.1
 
     private String algorithmURI;
-    private Usage usage;
+    private Constants.KeyUsage keyUsage;
 
     public AlgorithmSuiteSecurityEvent(Event securityEventType) {
         super(securityEventType);
@@ -58,11 +44,11 @@ public class AlgorithmSuiteSecurityEvent extends SecurityEvent {
         this.algorithmURI = algorithmURI;
     }
 
-    public Usage getUsage() {
-        return usage;
+    public Constants.KeyUsage getKeyUsage() {
+        return keyUsage;
     }
 
-    public void setUsage(Usage usage) {
-        this.usage = usage;
+    public void setKeyUsage(Constants.KeyUsage keyUsage) {
+        this.keyUsage = keyUsage;
     }
 }

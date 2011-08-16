@@ -45,7 +45,7 @@ public interface SecurityToken {
      *
      * @return
      */
-    public Object getProccesor();
+    public Object getProcessor();
 
     /**
      * Returns the token type
@@ -61,7 +61,7 @@ public interface SecurityToken {
      * @return The requested key for the specified algorithmURI, or null if no matching key is found
      * @throws WSSecurityException if the key can't be loaded
      */
-    public Key getSecretKey(String algorithmURI) throws WSSecurityException;
+    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException;
 
     /**
      * Returns the public key if one exist for this token type
@@ -69,7 +69,7 @@ public interface SecurityToken {
      * @return The Public-Key for asymmetric algorithms
      * @throws WSSecurityException if the key can't be loaded
      */
-    public PublicKey getPublicKey() throws WSSecurityException;
+    public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException;
 
     /**
      * Returns the certificate chain if one exists for this token type
@@ -105,5 +105,5 @@ public interface SecurityToken {
      *
      * @return the KeyIdentifierType
      */
-    public Constants.KeyIdentifierType getKeyIdentifierType();
+    public Constants.TokenType getTokenType();
 }

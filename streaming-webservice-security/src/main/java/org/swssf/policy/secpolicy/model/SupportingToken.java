@@ -16,9 +16,13 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
+import org.swssf.policy.assertionStates.EncryptedElementAssertionState;
+import org.swssf.policy.assertionStates.SignedElementAssertionState;
+import org.swssf.policy.secpolicy.PolicyUtil;
 import org.swssf.policy.secpolicy.SP12Constants;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
@@ -26,7 +30,9 @@ import org.swssf.securityEvent.SecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * class lent from apache rampart
@@ -37,16 +43,16 @@ public class SupportingToken extends AbstractSecurityAssertion implements
     /**
      * Type of SupportingToken
      *
-     * @see SupportingToken#SUPPORTING
-     * @see SupportingToken#ENDORSING
-     * @see SupportingToken#SIGNED
-     * @see SupportingToken#SIGNED_ENDORSING
+     * @see SPConstants.SupportingTokenType#SUPPORTING
+     * @see SPConstants.SupportingTokenType#ENDORSING
+     * @see SPConstants.SupportingTokenType#SIGNED
+     * @see SPConstants.SupportingTokenType#SIGNED_ENDORSING
      */
-    private int type;
+    private SPConstants.SupportingTokenType type;
 
     private AlgorithmSuite algorithmSuite;
 
-    private List<Token> tokens = new ArrayList<Token>();
+    private Token token;
 
     private SignedEncryptedElements signedElements;
 
@@ -56,7 +62,7 @@ public class SupportingToken extends AbstractSecurityAssertion implements
 
     private SignedEncryptedParts encryptedParts;
 
-    public SupportingToken(int type, SPConstants spConstants) {
+    public SupportingToken(SPConstants.SupportingTokenType type, SPConstants spConstants) {
         this.type = type;
         setVersion(spConstants);
     }
@@ -78,28 +84,28 @@ public class SupportingToken extends AbstractSecurityAssertion implements
     /**
      * @return Returns the token.
      */
-    public List<Token> getTokens() {
-        return tokens;
+    public Token getTokens() {
+        return token;
     }
 
     /**
      * @param token The token to set.
      */
-    public void addToken(Token token) {
-        this.tokens.add(token);
+    public void setToken(Token token) {
+        this.token = token;
     }
 
     /**
      * @return Returns the type.
      */
-    public int getTokenType() {
+    public SPConstants.SupportingTokenType getTokenType() {
         return type;
     }
 
     /**
      * @param type The type to set.
      */
-    public void setTokenType(int type) {
+    public void setTokenType(SPConstants.SupportingTokenType type) {
         this.type = type;
     }
 
@@ -159,33 +165,23 @@ public class SupportingToken extends AbstractSecurityAssertion implements
         this.signedParts = signedParts;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.ws.security.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
-     */
-
-    public void setToken(Token tok) {
-        this.addToken(tok);
-    }
-
     public QName getName() {
         switch (type) {
-            case SPConstants.SUPPORTING_TOKEN_SUPPORTING:
+            case SUPPORTING:
                 return spConstants.getSupportingTokens();
-            case SPConstants.SUPPORTING_TOKEN_SIGNED:
-                return spConstants.getSignedSupportingTokens();
-            case SPConstants.SUPPORTING_TOKEN_ENDORSING:
+            case ENDORSING:
                 return spConstants.getEndorsingSupportingTokens();
-            case SPConstants.SUPPORTING_TOKEN_SIGNED_ENDORSING:
+            case SIGNED:
+                return spConstants.getSignedSupportingTokens();
+            case SIGNED_ENDORSING:
                 return spConstants.getSignedEndorsingSupportingTokens();
-            case SPConstants.SUPPORTING_TOKEN_ENCRYPTED:
-                return SP12Constants.ENCRYPTED_SUPPORTING_TOKENS;
-            case SPConstants.SUPPORTING_TOKEN_SIGNED_ENCRYPTED:
+            case SIGNED_ENCRYPTED:
                 return SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS;
-            case SPConstants.SUPPORTING_TOKEN_ENDORSING_ENCRYPTED:
+            case ENCRYPTED:
+                return SP12Constants.ENCRYPTED_SUPPORTING_TOKENS;
+            case ENDORSING_ENCRYPTED:
                 return SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
-            case SPConstants.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED:
+            case SIGNED_ENDORSING_ENCRYPTED:
                 return SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
             default:
                 return null;
@@ -197,29 +193,26 @@ public class SupportingToken extends AbstractSecurityAssertion implements
      */
 
     public boolean isEncryptedToken() {
-
         switch (type) {
-            case SPConstants.SUPPORTING_TOKEN_SUPPORTING:
+            case SUPPORTING:
                 return false;
-            case SPConstants.SUPPORTING_TOKEN_SIGNED:
+            case ENDORSING:
                 return false;
-            case SPConstants.SUPPORTING_TOKEN_ENDORSING:
+            case SIGNED:
                 return false;
-            case SPConstants.SUPPORTING_TOKEN_SIGNED_ENDORSING:
+            case SIGNED_ENDORSING:
                 return false;
-            case SPConstants.SUPPORTING_TOKEN_ENCRYPTED:
+            case SIGNED_ENCRYPTED:
                 return true;
-            case SPConstants.SUPPORTING_TOKEN_SIGNED_ENCRYPTED:
+            case ENCRYPTED:
                 return true;
-            case SPConstants.SUPPORTING_TOKEN_ENDORSING_ENCRYPTED:
+            case ENDORSING_ENCRYPTED:
                 return true;
-            case SPConstants.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED:
+            case SIGNED_ENDORSING_ENCRYPTED:
                 return true;
             default:
                 return false;
         }
-
-
     }
 
     public PolicyComponent normalize() {
@@ -256,12 +249,8 @@ public class SupportingToken extends AbstractSecurityAssertion implements
         writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(),
                 SPConstants.POLICY.getNamespaceURI());
 
-        Token token;
-        for (Iterator iterator = getTokens().iterator(); iterator.hasNext(); ) {
-            // [Token Assertion] +
-            token = (Token) iterator.next();
-            token.serialize(writer);
-        }
+        // [Token Assertion] +
+        token.serialize(writer);
 
 
         if (signedParts != null) {
@@ -285,23 +274,71 @@ public class SupportingToken extends AbstractSecurityAssertion implements
 
     @Override
     public SecurityEvent.Event[] getResponsibleAssertionEvents() {
-        //todo
-        return new SecurityEvent.Event[0];
+        return new SecurityEvent.Event[]{SecurityEvent.Event.SupportingToken};
     }
 
     @Override
-    public void getAssertions(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap, OperationPolicy operationPolicy) {
-        //todo
-    }
+    public void getAssertions(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap, OperationPolicy operationPolicy) {
+        token.getAssertions(assertionStateMap, operationPolicy);
+        boolean signed = false;
+        boolean encrypted = false;
+        switch (type) {
+            case SUPPORTING:
+                break;
+            case ENDORSING:
+                break;
+            case SIGNED:
+                signed = true;
+                break;
+            case SIGNED_ENDORSING:
+                signed = true;
+                break;
+            case SIGNED_ENCRYPTED:
+                signed = true;
+                encrypted = true;
+                break;
+            case ENCRYPTED:
+                encrypted = true;
+                break;
+            case ENDORSING_ENCRYPTED:
+                encrypted = true;
+                break;
+            case SIGNED_ENDORSING_ENCRYPTED:
+                signed = true;
+                encrypted = true;
+                break;
+        }
+        if (signed) {
+            QName xmlName = token.getXmlName();
+            Map<Assertion, List<AssertionState>> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
+            List<QName> qNames = new ArrayList<QName>();
+            qNames.add(xmlName);
 
-    /*
-    @Override
-    public void assertPolicy(SecurityEvent securityEvent) throws PolicyViolationException {
-    }
+            SignedEncryptedElements signedEncryptedElements = null;
+            List<Assertion> assertions = PolicyUtil.getPolicyAssertionsInSameAlternative(operationPolicy.getPolicy(), this, SignedEncryptedElements.class, Boolean.TRUE, spConstants);
+            for (int i = 0; i < assertions.size(); i++) {
+                signedEncryptedElements = (SignedEncryptedElements) assertions.get(i);
+                if (signedEncryptedElements.isSignedElements()) {
+                    break;
+                }
+            }
+            addAssertionState(signedElementAssertionStates, signedEncryptedElements, new SignedElementAssertionState(signedEncryptedElements, true, qNames));
+        }
+        if (encrypted) {
+            QName xmlName = token.getXmlName();
+            Map<Assertion, List<AssertionState>> encryptedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedElement);
+            List<QName> qNames = new ArrayList<QName>();
+            qNames.add(xmlName);
 
-    @Override
-    public boolean isAsserted() {
-        return true;
+            SignedEncryptedElements signedEncryptedElements = null;
+            List<Assertion> assertions = PolicyUtil.getPolicyAssertionsInSameAlternative(operationPolicy.getPolicy(), this, SignedEncryptedElements.class, Boolean.TRUE, spConstants);
+            for (int i = 0; i < assertions.size(); i++) {
+                signedEncryptedElements = (SignedEncryptedElements) assertions.get(i);
+                if (signedEncryptedElements.isSignedElements()) {
+                    break;
+                }
+            }
+            addAssertionState(encryptedElementAssertionStates, signedEncryptedElements, new EncryptedElementAssertionState(signedEncryptedElements, true, qNames));
+        }
     }
-    */
 }

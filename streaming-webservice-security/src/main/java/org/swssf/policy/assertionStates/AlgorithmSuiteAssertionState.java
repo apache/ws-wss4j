@@ -38,7 +38,7 @@ public class AlgorithmSuiteAssertionState extends AssertionState {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = (AlgorithmSuiteSecurityEvent) securityEvent;
         AlgorithmSuite algorithmSuite = (AlgorithmSuite) getAssertion();
 
-        switch (algorithmSuiteSecurityEvent.getUsage()) {
+        switch (algorithmSuiteSecurityEvent.getKeyUsage()) {
             case Sym_Sig:
                 if (!algorithmSuite.getSymmetricSignature().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
                     setAsserted(false);

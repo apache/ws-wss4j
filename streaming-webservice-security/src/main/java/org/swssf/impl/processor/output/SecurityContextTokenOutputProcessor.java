@@ -74,7 +74,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                     this.outputProcessor = outputProcessor;
                 }
 
-                public Object getProccesor() {
+                public Object getProcessor() {
                     return outputProcessor;
                 }
 
@@ -82,12 +82,12 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                     return wrappingSecurityToken.isAsymmetric();
                 }
 
-                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
-                    return wrappingSecurityToken.getSecretKey(algorithmURI);
+                public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
+                    return wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage);
                 }
 
-                public PublicKey getPublicKey() throws WSSecurityException {
-                    return wrappingSecurityToken.getPublicKey();
+                public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
+                    return wrappingSecurityToken.getPublicKey(keyUsage);
                 }
 
                 public X509Certificate[] getX509Certificates() throws WSSecurityException {
@@ -106,8 +106,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                     return null;
                 }
 
-                public Constants.KeyIdentifierType getKeyIdentifierType() {
-                    return Constants.KeyIdentifierType.SECURITY_CONTEXT_TOKEN;
+                public Constants.TokenType getTokenType() {
+                    return Constants.TokenType.SecurityContextToken;
                 }
             };
 
@@ -122,19 +122,19 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             };
 
             FinalSecurityContextTokenOutputProcessor finalSecurityContextTokenOutputProcessor = new FinalSecurityContextTokenOutputProcessor(getSecurityProperties(), getAction(), securityContextSecurityToken, identifier);
-            switch (action) {
+            switch (getAction()) {
                 case SIGNATURE_WITH_DERIVED_KEY:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
-                    if (wrappingSecurityToken.getProccesor() != null) {
-                        finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProccesor());
+                    if (wrappingSecurityToken.getProcessor() != null) {
+                        finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
                     } else {
                         finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
                     }
                     break;
                 case ENCRYPT_WITH_DERIVED_KEY:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
-                    if (wrappingSecurityToken.getProccesor() != null) {
-                        finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProccesor());
+                    if (wrappingSecurityToken.getProcessor() != null) {
+                        finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
                     } else {
                         finalSecurityContextTokenOutputProcessor.getAfterProcessors().add(EncryptEndingOutputProcessor.class.getName());
                     }

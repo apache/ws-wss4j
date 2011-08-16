@@ -16,11 +16,13 @@
 
 package org.swssf.policy.secpolicy.model;
 
+import org.apache.neethi.Assertion;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.securityEvent.SecurityEvent;
 
-import java.util.Collection;
+import javax.xml.namespace.QName;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -116,6 +118,8 @@ public abstract class Token extends AbstractSecurityAssertion {
         this.impliedDerivedKeys = impliedDerivedKeys;
     }
 
+    public abstract QName getXmlName();
+
     private SecurityEvent.Event[] securityEvents;
 
     public void setResponsibleAssertionEvents(SecurityEvent.Event[] securityEvents) {
@@ -128,7 +132,7 @@ public abstract class Token extends AbstractSecurityAssertion {
     }
 
     @Override
-    public boolean isAsserted(Map<SecurityEvent.Event, Collection<AssertionState>> assertionStateMap) {
+    public boolean isAsserted(Map<SecurityEvent.Event, Map<Assertion, List<AssertionState>>> assertionStateMap) {
         return super.isAsserted(assertionStateMap);
     }
 }

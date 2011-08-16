@@ -23,6 +23,8 @@ import org.swssf.ext.*;
 import org.swssf.impl.saml.SAMLAssertionWrapper;
 import org.swssf.impl.saml.SAMLKeyInfo;
 import org.swssf.impl.securityToken.SecurityTokenFactory;
+import org.swssf.securityEvent.SamlTokenSecurityEvent;
+import org.swssf.securityEvent.SecurityEvent;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +34,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.events.*;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Processor for the SAML Assertion XML Structure
@@ -48,9 +52,10 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         documentBuilderFactory.setNamespaceAware(true);
     }
 
-    public SAMLTokenInputHandler(InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
+    public SAMLTokenInputHandler(final InputProcessorChain inputProcessorChain, final SecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws WSSecurityException {
 
         final SAMLTokenParseable samlTokenParseable = (SAMLTokenParseable) parseStructure(eventQueue, index);
+
         final SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlTokenParseable.getDocument().getDocumentElement());
 
         if (samlAssertionWrapper.isSigned()) {
@@ -66,8 +71,21 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+
             public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                return SecurityTokenFactory.newInstance().getSecurityToken(samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo, crypto, securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
+                SecurityToken securityToken = securityTokens.get(crypto);
+                if (securityToken != null) {
+                    return securityToken;
+                }
+
+                securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                        samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo,
+                        inputProcessorChain.getSecurityContext(), crypto,
+                        securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
+                securityTokens.put(crypto, securityToken);
+                return securityToken;
             }
 
             public String getId() {
@@ -75,6 +93,12 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(samlAssertionWrapper.getId(), securityTokenProvider);
+
+        SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent(SecurityEvent.Event.SamlToken);
+        samlTokenSecurityEvent.setIssuerName(samlAssertionWrapper.getIssuerString());
+        samlTokenSecurityEvent.setSamlVersion(samlAssertionWrapper.getSAMLVersion());
+        samlTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken(null));
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(samlTokenSecurityEvent);
     }
 
     @Override

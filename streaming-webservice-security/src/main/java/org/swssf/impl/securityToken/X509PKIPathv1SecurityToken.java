@@ -20,6 +20,7 @@ package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
 import org.swssf.ext.Constants;
+import org.swssf.ext.SecurityContext;
 import org.swssf.ext.WSSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -33,8 +34,8 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     private String alias = null;
     private X509Certificate[] x509Certificates;
 
-    X509PKIPathv1SecurityToken(Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) throws WSSecurityException {
-        super(crypto, callbackHandler, id, processor);
+    X509PKIPathv1SecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent, String id, Object processor) throws WSSecurityException {
+        super(Constants.TokenType.X509PkiPathV1Token, securityContext, crypto, callbackHandler, id, processor);
         X509Certificate[] x509Certificates = crypto.getX509Certificates(binaryContent, false);
         if (x509Certificates != null && x509Certificates.length > 0) {
             this.x509Certificates = x509Certificates;
@@ -51,9 +52,5 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     @Override
     public X509Certificate[] getX509Certificates() throws WSSecurityException {
         return this.x509Certificates;
-    }
-
-    public Constants.KeyIdentifierType getKeyIdentifierType() {
-        return Constants.KeyIdentifierType.BST_EMBEDDED;
     }
 }

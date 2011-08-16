@@ -66,7 +66,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             }
 
             //prepare the symmetric session key for all encryption parts
-            String keyAlgorithm = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(securityProperties.getEncryptionSymAlgorithm());
+            String keyAlgorithm = JCEAlgorithmMapper.getJCERequiredKeyFromURI(securityProperties.getEncryptionSymAlgorithm());
             int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
             KeyGenerator keyGen = null;
             try {
@@ -92,7 +92,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     this.outputProcessor = outputProcessor;
                 }
 
-                public Object getProccesor() {
+                public Object getProcessor() {
                     return outputProcessor;
                 }
 
@@ -100,11 +100,11 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     return false;
                 }
 
-                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+                public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
                     return symmetricKey;
                 }
 
-                public PublicKey getPublicKey() throws WSSecurityException {
+                public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
                     return null;
                 }
 
@@ -123,7 +123,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     return null;
                 }
 
-                public Constants.KeyIdentifierType getKeyIdentifierType() {
+                public Constants.TokenType getTokenType() {
                     return null;
                 }
             };
@@ -139,27 +139,27 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             };
 
             FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(getSecurityProperties(), getAction(), encryptedKeySecurityToken);
-            switch (action) {
+            switch (getAction()) {
                 case ENCRYPT:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, ekId);
-                    if (wrappingSecurityToken.getProccesor() != null) {
-                        finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProccesor());
+                    if (wrappingSecurityToken.getProcessor() != null) {
+                        finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
                     } else {
                         finalEncryptedKeyOutputProcessor.getAfterProcessors().add(EncryptEndingOutputProcessor.class.getName());
                     }
                     break;
                 case SIGNATURE_WITH_DERIVED_KEY:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
-                    if (wrappingSecurityToken.getProccesor() != null) {
-                        finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProccesor());
+                    if (wrappingSecurityToken.getProcessor() != null) {
+                        finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
                     } else {
                         finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
                     }
                     break;
                 case ENCRYPT_WITH_DERIVED_KEY:
                     outputProcessorChain.getSecurityContext().put(Constants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
-                    if (wrappingSecurityToken.getProccesor() != null) {
-                        finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProccesor());
+                    if (wrappingSecurityToken.getProcessor() != null) {
+                        finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
                     } else {
                         finalEncryptedKeyOutputProcessor.getAfterProcessors().add(EncryptEndingOutputProcessor.class.getName());
                     }
@@ -235,7 +235,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         Cipher cipher = Cipher.getInstance(jceid);
                         cipher.init(Cipher.ENCRYPT_MODE, x509Certificate);
 
-                        byte[] ephemeralKey = securityToken.getSecretKey(null).getEncoded();
+                        byte[] ephemeralKey = securityToken.getSecretKey(null, null).getEncoded();
 
                         int blockSize = cipher.getBlockSize();
                         if (blockSize > 0 && blockSize < ephemeralKey.length) {

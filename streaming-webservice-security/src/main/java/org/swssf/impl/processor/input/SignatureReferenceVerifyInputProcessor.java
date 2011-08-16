@@ -27,10 +27,7 @@ import org.swssf.config.JCEAlgorithmMapper;
 import org.swssf.ext.*;
 import org.swssf.impl.securityToken.SecurityTokenReference;
 import org.swssf.impl.util.DigestOutputStream;
-import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.securityEvent.SignedElementSecurityEvent;
-import org.swssf.securityEvent.SignedPartSecurityEvent;
-import org.swssf.securityEvent.TimestampSecurityEvent;
+import org.swssf.securityEvent.*;
 import org.w3._2000._09.xmldsig_.CanonicalizationMethodType;
 import org.w3._2000._09.xmldsig_.ReferenceType;
 import org.w3._2000._09.xmldsig_.SignatureType;
@@ -189,15 +186,21 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
             this.startElement = startElement;
             this.referenceType = referenceType;
             try {
-                createMessageDigest();
+                createMessageDigest(inputProcessorChain.getSecurityContext());
                 buildTransformerChain(referenceType, inputProcessorChain);
             } catch (Exception e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
 
-        private void createMessageDigest() throws NoSuchAlgorithmException, NoSuchProviderException {
+        private void createMessageDigest(SecurityContext securityContext) throws WSSecurityException, NoSuchAlgorithmException, NoSuchProviderException {
             AlgorithmType digestAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(referenceType.getDigestMethod().getAlgorithm());
+
+            AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+            algorithmSuiteSecurityEvent.setAlgorithmURI(digestAlgorithm.getURI());
+            algorithmSuiteSecurityEvent.setKeyUsage(Constants.KeyUsage.Dig);
+            securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+
             MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm.getJCEName(), digestAlgorithm.getJCEProvider());
             this.digestOutputStream = new DigestOutputStream(messageDigest);
             this.bufferedDigestOutputStream = new BufferedOutputStream(this.digestOutputStream);
@@ -228,6 +231,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     }
                 }
                 algorithm = transformType.getAlgorithm();
+
+                AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+                algorithmSuiteSecurityEvent.setAlgorithmURI(algorithm);
+                algorithmSuiteSecurityEvent.setKeyUsage(Constants.KeyUsage.C14n);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
+
                 if (parentTransformer != null) {
                     parentTransformer = Utils.getTransformer(parentTransformer, transformType.getInclusiveNamespaces(), algorithm);
                 } else {
@@ -293,7 +302,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractInputProcess
                     }
 
                     if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "digestVerificationFailed");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "digestVerificationFailed", referenceType.getURI());
                     }
                     inputProcessorChain.removeProcessor(this);
                     inputProcessorChain.getDocumentContext().unsetIsInSignedContent();

@@ -90,6 +90,10 @@ public class SecurityProperties {
      * @return
      */
     public Class<? extends CryptoBase> getDecryptionCryptoClass() {
+        if (decryptionCryptoClass != null) {
+            return decryptionCryptoClass;
+        }
+        decryptionCryptoClass = org.swssf.crypto.Merlin.class;
         return decryptionCryptoClass;
     }
 
@@ -103,7 +107,6 @@ public class SecurityProperties {
     }
 
     private Crypto cachedDecryptionCrypto;
-    private Class<? extends CryptoBase> cachedDecryptionCryptoClass;
     private KeyStore cachedDecryptionKeyStore;
 
     /**
@@ -118,21 +121,16 @@ public class SecurityProperties {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "decryptionKeyStoreNotSet");
         }
 
-        if (this.getDecryptionCryptoClass() == cachedDecryptionCryptoClass
-                && this.getDecryptionKeyStore() == cachedDecryptionKeyStore) {
+        if (this.getDecryptionKeyStore() == cachedDecryptionKeyStore) {
             return cachedDecryptionCrypto;
         }
 
-        Class<? extends CryptoBase> decryptionCryptoClass = org.swssf.crypto.Merlin.class;
-        if (this.getDecryptionCryptoClass() != null) {
-            decryptionCryptoClass = this.getDecryptionCryptoClass();
-        }
+        Class<? extends CryptoBase> decryptionCryptoClass = this.getDecryptionCryptoClass();
 
         try {
             CryptoBase decryptionCrypto = decryptionCryptoClass.newInstance();
             decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
             cachedDecryptionCrypto = decryptionCrypto;
-            cachedDecryptionCryptoClass = decryptionCryptoClass;
             cachedDecryptionKeyStore = this.getDecryptionKeyStore();
             return decryptionCrypto;
         } catch (Exception e) {
@@ -197,6 +195,10 @@ public class SecurityProperties {
      * @return
      */
     public Class<? extends CryptoBase> getEncryptionCryptoClass() {
+        if (encryptionCryptoClass != null) {
+            return encryptionCryptoClass;
+        }
+        encryptionCryptoClass = org.swssf.crypto.Merlin.class;
         return encryptionCryptoClass;
     }
 
@@ -210,7 +212,6 @@ public class SecurityProperties {
     }
 
     private Crypto cachedEncryptionCrypto;
-    private Class<? extends CryptoBase> cachedEncryptionCryptoClass;
     private KeyStore cachedEncryptionKeyStore;
 
     /**
@@ -225,21 +226,16 @@ public class SecurityProperties {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
         }
 
-        if (this.getEncryptionCryptoClass() == cachedEncryptionCryptoClass
-                && this.getEncryptionKeyStore() == cachedEncryptionKeyStore) {
+        if (this.getEncryptionKeyStore() == cachedEncryptionKeyStore) {
             return cachedEncryptionCrypto;
         }
 
-        Class<? extends CryptoBase> encryptionCryptoClass = org.swssf.crypto.Merlin.class;
-        if (this.getEncryptionCryptoClass() != null) {
-            encryptionCryptoClass = this.getEncryptionCryptoClass();
-        }
+        Class<? extends CryptoBase> encryptionCryptoClass = this.getEncryptionCryptoClass();
 
         try {
             CryptoBase encryptionCrypto = encryptionCryptoClass.newInstance();
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
             cachedEncryptionCrypto = encryptionCrypto;
-            cachedEncryptionCryptoClass = encryptionCryptoClass;
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;
         } catch (Exception e) {
@@ -399,6 +395,10 @@ public class SecurityProperties {
     }
 
     public Class<? extends CryptoBase> getSignatureCryptoClass() {
+        if (signatureCryptoClass != null) {
+            return signatureCryptoClass;
+        }
+        signatureCryptoClass = org.swssf.crypto.Merlin.class;
         return signatureCryptoClass;
     }
 
@@ -416,15 +416,11 @@ public class SecurityProperties {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
         }
 
-        if (this.getSignatureCryptoClass() == cachedSignatureCryptoClass
-                && this.getSignatureKeyStore() == cachedSignatureKeyStore) {
+        if (this.getSignatureKeyStore() == cachedSignatureKeyStore) {
             return cachedSignatureCrypto;
         }
 
-        Class<? extends CryptoBase> signatureCryptoClass = org.swssf.crypto.Merlin.class;
-        if (this.getSignatureCryptoClass() != null) {
-            signatureCryptoClass = this.getSignatureCryptoClass();
-        }
+        Class<? extends CryptoBase> signatureCryptoClass = this.getSignatureCryptoClass();
 
         try {
             CryptoBase signatureCrypto = signatureCryptoClass.newInstance();
@@ -507,7 +503,8 @@ public class SecurityProperties {
         if (signatureVerificationCryptoClass != null) {
             return signatureVerificationCryptoClass;
         }
-        return org.swssf.crypto.Merlin.class;
+        signatureVerificationCryptoClass = org.swssf.crypto.Merlin.class;
+        return signatureVerificationCryptoClass;
     }
 
     public void setSignatureVerificationCryptoClass(Class<? extends CryptoBase> signatureVerificationCryptoClass) {
@@ -515,7 +512,6 @@ public class SecurityProperties {
     }
 
     private Crypto cachedSignatureVerificationCrypto;
-    private Class<? extends CryptoBase> cachedSignatureVerificationCryptoClass;
     private KeyStore cachedSignatureVerificationKeyStore;
 
     public Crypto getSignatureVerificationCrypto() throws WSSecurityException {
@@ -524,8 +520,7 @@ public class SecurityProperties {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
         }
 
-        if (this.getSignatureVerificationCryptoClass() == cachedSignatureVerificationCryptoClass
-                && this.getSignatureVerificationKeyStore() == cachedSignatureVerificationKeyStore) {
+        if (this.getSignatureVerificationKeyStore() == cachedSignatureVerificationKeyStore) {
             return cachedSignatureVerificationCrypto;
         }
 
@@ -535,7 +530,6 @@ public class SecurityProperties {
             CryptoBase signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
             cachedSignatureVerificationCrypto = signatureVerificationCrypto;
-            cachedSignatureVerificationCryptoClass = signatureVerificationCryptoClass;
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
         } catch (Exception e) {

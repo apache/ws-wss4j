@@ -22,6 +22,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.WSSec;
 import org.swssf.ext.*;
+import org.swssf.impl.securityToken.UsernameSecurityToken;
 import org.swssf.securityEvent.SecurityEvent;
 import org.swssf.securityEvent.SecurityEventListener;
 import org.swssf.securityEvent.UsernameTokenSecurityEvent;
@@ -158,7 +159,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     if (securityEvent instanceof UsernameTokenSecurityEvent) {
                         UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
-                        if (!"username".equals(usernameTokenSecurityEvent.getUsername())) {
+                        if (!"username".equals(((UsernameSecurityToken) usernameTokenSecurityEvent.getSecurityToken()).getUsername())) {
                             throw new WSSecurityException("Wrong username");
                         }
                     }
@@ -389,7 +390,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         {
             SecurityProperties securityProperties = new SecurityProperties();
-            Constants.Action[] actions = new Constants.Action[]{Constants.Action.USERNAMETOKEN_SIGN};
+            Constants.Action[] actions = new Constants.Action[]{Constants.Action.USERNAMETOKEN_SIGNED};
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setTokenUser("transmitter");

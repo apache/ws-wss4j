@@ -238,9 +238,9 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
                 || keyIdentifierType == Constants.KeyIdentifierType.BST_EMBEDDED)
                 && !useSingleCertificate) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_X509PKIPathv1);
-        } else if (securityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SAML_10) {
+        } else if (securityToken.getTokenType() == Constants.TokenType.Saml10Token || securityToken.getTokenType() == Constants.TokenType.Saml11Token) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_SAML11_TOKEN_PROFILE_TYPE);
-        } else if (securityToken.getKeyIdentifierType() == Constants.KeyIdentifierType.SAML_20) {
+        } else if (securityToken.getTokenType() == Constants.TokenType.Saml20Token) {
             attributes.put(Constants.ATT_wsse11_TokenType, Constants.NS_SAML20_TOKEN_PROFILE_TYPE);
         }
         createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_SecurityTokenReference, attributes);
@@ -263,8 +263,8 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         } else if (keyIdentifierType == Constants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
             createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
         } else if (keyIdentifierType == Constants.KeyIdentifierType.EMEDDED_KEYIDENTIFIER_REF) {
-            createEmbeddedKeyIdentifierStructure(outputProcessorChain, securityToken.getKeyIdentifierType(), tokenId);
-        } else if (keyIdentifierType == Constants.KeyIdentifierType.USERNAMETOKEN_SIGNED) {
+            createEmbeddedKeyIdentifierStructure(outputProcessorChain, securityToken.getTokenType(), tokenId);
+        } else if (keyIdentifierType == Constants.KeyIdentifierType.USERNAMETOKEN_REFERENCE) {
             createUsernameTokenReferenceStructure(outputProcessorChain, tokenId);
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken", keyIdentifierType.name());
@@ -368,11 +368,11 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         createEndElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_Reference);
     }
 
-    protected void createEmbeddedKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, Constants.KeyIdentifierType keyIdentifierType, String referenceId) throws XMLStreamException, WSSecurityException {
+    protected void createEmbeddedKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, Constants.TokenType tokenType, String referenceId) throws XMLStreamException, WSSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
-        if (keyIdentifierType == Constants.KeyIdentifierType.SAML_10) {
+        if (tokenType == Constants.TokenType.Saml10Token || tokenType == Constants.TokenType.Saml11Token) {
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_SAML10_TYPE);
-        } else if (keyIdentifierType == Constants.KeyIdentifierType.SAML_20) {
+        } else if (tokenType == Constants.TokenType.Saml20Token) {
             attributes.put(Constants.ATT_NULL_ValueType, Constants.NS_SAML20_TYPE);
         }
         createStartElementAndOutputAsEvent(outputProcessorChain, Constants.TAG_wsse_KeyIdentifier, attributes);

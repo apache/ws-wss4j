@@ -19,10 +19,7 @@
 package org.swssf.impl.securityToken;
 
 import org.swssf.crypto.Crypto;
-import org.swssf.ext.SecurityToken;
-import org.swssf.ext.Utils;
-import org.swssf.ext.WSPasswordCallback;
-import org.swssf.ext.WSSecurityException;
+import org.swssf.ext.*;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
@@ -35,24 +32,28 @@ import java.security.cert.X509Certificate;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public abstract class X509SecurityToken extends AbstractSecurityToken {
+public abstract class X509SecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
     private X509Certificate[] x509Certificates = null;
+    private Constants.TokenType tokenType;
 
-    X509SecurityToken(Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(crypto, callbackHandler, id, processor);
+    X509SecurityToken(Constants.TokenType tokenType, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+        super(securityContext, crypto, callbackHandler, id, processor);
+        this.tokenType = tokenType;
     }
 
     public boolean isAsymmetric() {
         return true;
     }
 
-    public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+    public Key getSecretKey(String algorithmURI, Constants.KeyUsage keyUsage) throws WSSecurityException {
+        super.getSecretKey(algorithmURI, keyUsage);
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         Utils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }
 
-    public PublicKey getPublicKey() throws WSSecurityException {
+    public PublicKey getPublicKey(Constants.KeyUsage keyUsage) throws WSSecurityException {
+        super.getPublicKey(keyUsage);
         X509Certificate[] x509Certificates = getX509Certificates();
         if (x509Certificates == null || x509Certificates.length == 0) {
             return null;
@@ -90,4 +91,8 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
     }
 
     protected abstract String getAlias() throws WSSecurityException;
+
+    public Constants.TokenType getTokenType() {
+        return tokenType;
+    }
 }
