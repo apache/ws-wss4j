@@ -276,7 +276,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customTokenValueType)) {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                }
+                } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                    secRef.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
+                } 
                 break;
                 
             case WSConstants.KEY_VALUE:

@@ -25,6 +25,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
@@ -526,6 +527,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
+        } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customReferenceValue)) {
+            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
+            secToken.setKeyIdentifier(customReferenceValue, encKeyId);
+            keyInfo.addUnknownElement(secToken.getElement());
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();
             tmpE.setAttributeNS(
@@ -545,7 +551,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 ref.setValueType(customReferenceValue);
             }
             secToken.setReference(ref);
-            secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+            if (KerberosSecurity.isKerberosToken(customReferenceValue)) {
+                secToken.addTokenType(customReferenceValue);
+            } else {
+                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+            }
             keyInfo.addUnknownElement(secToken.getElement());
         }
         Element keyInfoElement = keyInfo.getElement();

@@ -30,9 +30,11 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
@@ -281,6 +283,127 @@ public class BSTKerberosTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
     }
+    
+    /**
+     * A test for signing using a KeyIdentifier to a Kerberos token
+     */
+    @org.junit.Test
+    public void testKerberosSignatureKICreation() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        BinarySecurity bst = new BinarySecurity(doc);
+        bst.setValueType(AP_REQ);
+        bst.setEncodingType(BASE64_NS);
+        
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);
+        SecretKey key = keyGen.generateKey();
+        byte[] keyData = key.getEncoded();
+        
+        bst.setToken(keyData);
+        bst.setID("Id-" + bst.hashCode());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+        sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
+        
+        byte[] digestBytes = WSSecurityUtil.generateDigest(keyData);
+        sign.setCustomTokenId(Base64.encode(digestBytes));
+        sign.setSecretKey(keyData);
+        
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+    }
+    
+    /**
+     * A test for encryption using a direct reference to a Kerberos token
+     */
+    @org.junit.Test
+    public void testKerberosEncryptionDRCreation() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        BinarySecurity bst = new BinarySecurity(doc);
+        bst.setValueType(AP_REQ);
+        bst.setEncodingType(BASE64_NS);
+        
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);
+        SecretKey key = keyGen.generateKey();
+        byte[] keyData = key.getEncoded();
+        
+        bst.setToken(keyData);
+        bst.setID("Id-" + bst.hashCode());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        builder.setSymmetricKey(key);
+        builder.setEncryptSymmKey(false);
+        builder.setCustomReferenceValue(AP_REQ);
+        builder.setEncKeyId(bst.getID());
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+    }
+    
+    /**
+     * A test for encryption using a Key Identifier to a Kerberos token
+     */
+    @org.junit.Test
+    public void testKerberosEncryptionKICreation() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        BinarySecurity bst = new BinarySecurity(doc);
+        bst.setValueType(AP_REQ);
+        bst.setEncodingType(BASE64_NS);
+        
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);
+        SecretKey key = keyGen.generateKey();
+        byte[] keyData = key.getEncoded();
+        
+        bst.setToken(keyData);
+        bst.setID("Id-" + bst.hashCode());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        builder.setSymmetricKey(key);
+        builder.setEncryptSymmKey(false);
+        builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
+        
+        byte[] digestBytes = WSSecurityUtil.generateDigest(keyData);
+        builder.setEncKeyId(Base64.encode(digestBytes));
+        
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+    }
+
 
     
     /**
