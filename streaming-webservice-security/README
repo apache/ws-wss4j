@@ -15,3 +15,6 @@ maven-repository
 To begin with the integration look at the WSSec class
 ,the SecurityOutInterceptor, the SecurityInInterceptor and
 at the Test classes
+
+
+"Marc Giger" <gigerstyle@gmx.ch>
