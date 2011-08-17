@@ -22,8 +22,10 @@ package org.apache.ws.security.message.token;
 import java.security.Principal;
 import java.util.Set;
 
+import javax.crypto.SecretKey;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -39,6 +41,7 @@ public class KerberosSecurity extends BinarySecurity {
     
     private static org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(KerberosSecurity.class);
+    private SecretKey secretKey;
     
     /**
      * This constructor creates a new Kerberos token object and initializes
@@ -151,6 +154,8 @@ public class KerberosSecurity extends BinarySecurity {
                 new Object[] {"No Client principals found after login"}
             );
         }
+        // Store the TGT
+        KerberosTicket tgt = getKerberosTicket(clientSubject, null);
         
         // Get the service ticket
         KerberosClientAction action = 
@@ -165,11 +170,46 @@ public class KerberosSecurity extends BinarySecurity {
             log.debug("Successfully retrieved a service ticket");
         }
         
+        // Get the Service Ticket (private credential)
+        KerberosTicket serviceTicket = getKerberosTicket(clientSubject, tgt);
+        if (serviceTicket != null) {
+            secretKey = serviceTicket.getSessionKey();
+        }
+        
         setToken(ticket);
         
         if ("".equals(getValueType())) {
             setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         }
+    }
+    
+    /**
+     * Get a KerberosTicket from the clientSubject parameter, that is not equal to the supplied KerberosTicket
+     * parameter (can be null)
+     */
+    private KerberosTicket getKerberosTicket(Subject clientSubject, KerberosTicket previousTicket) {
+        Set<KerberosTicket> privateCredentials = clientSubject.getPrivateCredentials(KerberosTicket.class);
+        if (privateCredentials == null || privateCredentials.isEmpty()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Kerberos client subject private credentials are null");
+            }
+            return null;
+        }
+        
+        for (KerberosTicket privateCredential : privateCredentials) {
+            if (!privateCredential.equals(previousTicket)) {
+                return privateCredential;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Get the SecretKey associated with the service principal
+     * @return the SecretKey associated with the service principal
+     */
+    public SecretKey getSecretKey() {
+        return secretKey;
     }
     
     /**
