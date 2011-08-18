@@ -47,6 +47,19 @@ public class UsernameTokenProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found UsernameToken list element");
         }
+        // See if the token has been previously processed
+        String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        if (!"".equals(id)) {
+            Element foundElement = wsDocInfo.getTokenElement(id);
+            if (elem.equals(foundElement)) {
+                WSSecurityEngineResult result = wsDocInfo.getResult(id);
+                return java.util.Collections.singletonList(result);
+            } else if (foundElement != null) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+                );
+            }
+        }
         
         Validator validator = data.getValidator(WSSecurityEngine.USERNAME_TOKEN);
         Credential credential = handleUsernameToken(elem, validator, data);

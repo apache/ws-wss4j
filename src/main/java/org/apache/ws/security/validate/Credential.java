@@ -43,6 +43,24 @@ public class Credential {
     private AssertionWrapper assertion;
     private AssertionWrapper transformedToken;
     private Principal principal;
+    private byte[] secretKey;
+    
+    /**
+     * Set a SecretKey (byte[]) to be validated
+     * @param secretKey a SecretKey (byte) to be validated
+     */
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
+    }
+    
+    /**
+     * Get a SecretKey (byte[]) to be validated
+     * @return a SecretKey (byte[]) to be validated
+     */
+    public byte[] getSecretKey() {
+        return secretKey;
+    }
+    
     
     /**
      * Set a PublicKey to be validated

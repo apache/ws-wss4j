@@ -87,9 +87,9 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     public static final java.lang.String TAG_SIGNATURE_CONFIRMATION = "signature-confirmation";
 
     /**
-     * Tag denoting the X.509 certificate found, if applicable.
+     * Tag denoting the BinarySecurityToken found, if applicable.
      *
-     * The value under this tag is of type java.security.cert.X509Certificate.
+     * The value under this tag is of type BinarySecurity.
      */
     public static final String TAG_BINARY_SECURITY_TOKEN = "binary-security-token";
     

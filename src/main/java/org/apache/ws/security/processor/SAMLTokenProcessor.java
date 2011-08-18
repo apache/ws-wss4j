@@ -57,6 +57,18 @@ public class SAMLTokenProcessor implements Processor {
             log.debug(DOM2Writer.nodeToString(elem));
         }
         
+        // See if the token has been previously processed
+        String id = assertion.getId();
+        Element foundElement = wsDocInfo.getTokenElement(id);
+        if (elem.equals(foundElement)) {
+            WSSecurityEngineResult result = wsDocInfo.getResult(id);
+            return java.util.Collections.singletonList(result);
+        } else if (foundElement != null) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+            );
+        }
+
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (assertion.isSigned()) {

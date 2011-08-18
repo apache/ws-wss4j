@@ -32,11 +32,9 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
-import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
@@ -125,7 +123,17 @@ public class SignatureSTRParser implements STRParser {
                 secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
             QName el = new QName(token.getNamespaceURI(), token.getLocalName());
             if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                certs = getCertificatesTokenReference(secRef, token, crypto, bspCompliant);
+                Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
+                List<WSSecurityEngineResult> bstResult =
+                    proc.handleToken(token, data, wsDocInfo);
+                BinarySecurity bstToken = 
+                    (BinarySecurity)bstResult.get(0).get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (bspCompliant) {
+                    BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, bstToken);
+                }
+                certs = (X509Certificate[])bstResult.get(0).get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+                secretKey = (byte[])bstResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
+                principal = (Principal)bstResult.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
             } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
                 || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
                 Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
@@ -167,9 +175,7 @@ public class SignatureSTRParser implements STRParser {
                 List<WSSecurityEngineResult> encrResult =
                     proc.handleToken(token, data, wsDocInfo);
                 secretKey = 
-                    (byte[])encrResult.get(0).get(
-                                                  WSSecurityEngineResult.TAG_SECRET
-                    );
+                    (byte[])encrResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
                 principal = new CustomTokenPrincipal(token.getAttribute("Id"));
             } else {
                 String id = secRef.getReference().getURI();
@@ -274,64 +280,6 @@ public class SignatureSTRParser implements STRParser {
     public boolean isTrustedCredential() {
         return trustedCredential;
     }
-    /**
-     * Extracts the certificate(s) from the Binary Security token reference.
-     *
-     * @param elem The element containing the binary security token. This is
-     *             either X509 certificate(s) or a PKIPath.
-     * @return an array of X509 certificates
-     * @throws WSSecurityException
-     */
-    private static X509Certificate[] getCertificatesTokenReference(
-        SecurityTokenReference secRef,
-        Element elem, 
-        Crypto crypto,
-        boolean bspCompliant)
-        throws WSSecurityException {
-        if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
-        }
-        BinarySecurity token = createSecurityToken(elem, bspCompliant);
-        if (bspCompliant) {
-            BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
-        }
-        if (token instanceof PKIPathSecurity) {
-            return ((PKIPathSecurity) token).getX509Certificates(crypto);
-        } else {
-            X509Certificate cert = ((X509Security) token).getX509Certificate(crypto);
-            return new X509Certificate[]{cert};
-        }
-    }
-    
-    /**
-     * Checks the <code>element</code> and creates appropriate binary security object.
-     *
-     * @param element The XML element that contains either a <code>BinarySecurityToken
-     *                </code> or a <code>PKIPath</code> element. Other element types a not
-     *                supported
-     * @param bspCompliant Whether BSP compliance is enforced or not
-     * @return the BinarySecurity object, either a <code>X509Security</code> or a
-     *         <code>PKIPathSecurity</code> object.
-     * @throws WSSecurityException
-     */
-    private static BinarySecurity createSecurityToken(
-        Element element, 
-        boolean bspCompliant
-    ) throws WSSecurityException {
-        String type = element.getAttribute("ValueType");
-        if (X509Security.X509_V3_TYPE.equals(type)) {
-            X509Security x509 = new X509Security(element, bspCompliant);
-            return (BinarySecurity) x509;
-        } else if (PKIPathSecurity.getType().equals(type)) {
-            PKIPathSecurity pkiPath = new PKIPathSecurity(element, bspCompliant);
-            return (BinarySecurity) pkiPath;
-        }
-        throw new WSSecurityException(
-            WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-            "unsupportedBinaryTokenType", 
-            new Object[]{type}
-        );
-    }
     
     /**
      * A method to create a Principal from a SAML Assertion
@@ -422,6 +370,7 @@ public class SignatureSTRParser implements STRParser {
             }
             certs = 
                 (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             Boolean validatedToken = 
                 (Boolean)result.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
             if (validatedToken.booleanValue()) {

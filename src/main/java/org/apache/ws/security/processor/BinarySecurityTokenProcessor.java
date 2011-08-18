@@ -52,6 +52,19 @@ public class BinarySecurityTokenProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
+        // See if the token has been previously processed
+        String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        if (!"".equals(id)) {
+            Element foundElement = wsDocInfo.getTokenElement(id);
+            if (elem.equals(foundElement)) {
+                WSSecurityEngineResult result = wsDocInfo.getResult(id);
+                return java.util.Collections.singletonList(result);
+            } else if (foundElement != null) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+                );
+            }
+        }
         
         BinarySecurity token = createSecurityToken(elem, data.getWssConfig());
         X509Certificate[] certs = null;
@@ -67,7 +80,6 @@ public class BinarySecurityTokenProcessor implements Processor {
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         wsDocInfo.addTokenElement(elem);
-        String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         result.put(WSSecurityEngineResult.TAG_ID, id);
         
         if (validator != null) {
@@ -78,6 +90,7 @@ public class BinarySecurityTokenProcessor implements Processor {
             
             Credential returnedCredential = validator.validate(credential, data);
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+            result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
             
             if (returnedCredential.getTransformedToken() != null) {
                 result.put(
@@ -101,7 +114,7 @@ public class BinarySecurityTokenProcessor implements Processor {
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
      *
-     * @param token The BinarySecurity instance corrresponding to either X509Security or 
+     * @param token The BinarySecurity instance corresponding to either X509Security or 
      *              PKIPathSecurity
      * @return The X509Certificates associated with this reference
      * @throws WSSecurityException

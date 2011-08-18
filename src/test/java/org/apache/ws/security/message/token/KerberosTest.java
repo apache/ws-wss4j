@@ -28,7 +28,6 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.KerberosTokenValidator;
 import org.w3c.dom.Document;
@@ -145,16 +144,16 @@ public class KerberosTest extends org.junit.Assert {
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        bst.setID("Id-" + bst.hashCode());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
         WSSecSignature sign = new WSSecSignature();
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
-        sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-        sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+        sign.setCustomTokenId(bst.getID());
+        sign.setCustomTokenValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         
         SecretKey secretKey = bst.getSecretKey();
-        byte[] digestBytes = WSSecurityUtil.generateDigest(secretKey.getEncoded());
-        sign.setCustomTokenId(Base64.encode(digestBytes));
         sign.setSecretKey(secretKey.getEncoded());
         
         Document signedDoc = sign.build(doc, null, secHeader);
@@ -165,7 +164,6 @@ public class KerberosTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        /*
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -186,7 +184,6 @@ public class KerberosTest extends org.junit.Assert {
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof KerberosPrincipal);
         assertTrue(principal.getName().contains("alice"));
-        */
     }
     
     /**
