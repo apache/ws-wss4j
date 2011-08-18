@@ -126,6 +126,21 @@ public class AssertionWrapper {
     private SAMLKeyInfo signatureKeyInfo;
 
     /**
+     * Default Canonicalization algorithm used for signing.
+     */
+    private final String defaultCanonicalizationAlgorithm = SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
+
+    /**
+     * Default RSA Signature algorithm used for signing.
+     */
+    private final String defaultRSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
+
+    /**
+     * Default DSA Signature algorithm used for signing.
+     */
+    private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
+    
+    /**
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
      *
      * @param element of type Element
@@ -510,39 +525,55 @@ public class AssertionWrapper {
      * @param sendKeyValue whether to send the key value or not
      * @throws WSSecurityException
      */
-    public void signAssertion(
-        String issuerKeyName,
-        String issuerKeyPassword,
-        Crypto issuerCrypto,
-        boolean sendKeyValue
-    ) throws WSSecurityException {
+    public void signAssertion(String issuerKeyName, String issuerKeyPassword,
+            Crypto issuerCrypto, boolean sendKeyValue)
+            throws WSSecurityException {
+
+        signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto,
+                sendKeyValue, defaultCanonicalizationAlgorithm,
+                defaultRSASignatureAlgorithm);
+    }
+    
+    /**
+     * Create an enveloped signature on the assertion that has been created.
+     * 
+     * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
+     * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
+     * @param issuerCrypto the Issuer Crypto instance
+     * @param sendKeyValue whether to send the key value or not
+     * @param canonicalizationAlgorithm the canonicalization algorithm to be used for signing
+     * @param signatureAlgorithm the signature algorithm to be used for signing
+     * @throws WSSecurityException
+     */
+    public void signAssertion(String issuerKeyName, String issuerKeyPassword,
+            Crypto issuerCrypto, boolean sendKeyValue,
+            String canonicalizationAlgorithm, String signatureAlgorithm)
+            throws WSSecurityException {
         //
         // Create the signature
         //
         Signature signature = OpenSAMLUtil.buildSignature();
-        signature.setCanonicalizationAlgorithm(
-            SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS
-        );
-        
+        signature.setCanonicalizationAlgorithm(canonicalizationAlgorithm);
+        log.debug("Using Canonicalization algorithm " + canonicalizationAlgorithm);
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
         X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
             throw new WSSecurityException(
-                "No issuer certs were found to sign the SAML Assertion using issuer name: "
-                + issuerKeyName
-            );
+                    "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                            + issuerKeyName);
         }
 
-        String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
+        String sigAlgo = signatureAlgorithm;
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         if (log.isDebugEnabled()) {
             log.debug("automatic sig algo detection: " + pubKeyAlgo);
         }
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-            sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
+            sigAlgo = defaultDSASignatureAlgorithm;
         }
+        log.debug("Using Signature algorithm " + sigAlgo);
         PrivateKey privateKey = null;
         try {
             privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
@@ -565,12 +596,12 @@ public class AssertionWrapper {
             kiFactory.setEmitEntityCertificate(true);
         }
         try {
-            KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
+            KeyInfo keyInfo = kiFactory.newInstance().generate(
+                    signingCredential);
             signature.setKeyInfo(keyInfo);
         } catch (org.opensaml.xml.security.SecurityException ex) {
             throw new WSSecurityException(
-                "Error generating KeyInfo from signing credential", ex
-            );
+                    "Error generating KeyInfo from signing credential", ex);
         }
 
         // add the signature to the assertion
