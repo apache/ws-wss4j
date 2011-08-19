@@ -557,5 +557,104 @@ public class DerivedKeyToken {
             );
         }
     }
-
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        String algorithm = getAlgorithm();
+        if (algorithm != null) {
+            result = 31 * result + algorithm.hashCode();
+        }
+        try {
+            SecurityTokenReference tokenReference = getSecurityTokenReference();
+            if (tokenReference != null) {
+                result = 31 * result + tokenReference.hashCode();
+            }
+        } catch (WSSecurityException e) {
+            log.error(e);
+        }
+        
+        Map<String, String> properties = getProperties();
+        if (properties != null) {
+            result = 31 * result + properties.hashCode();
+        }
+        int generation = getGeneration();
+        if (generation != -1) {
+            result = 31 * result + generation;
+        }
+        int offset = getOffset();
+        if (offset != -1) {
+            result = 31 * result + offset;
+        }
+        int length = getLength();
+        if (length != -1) {
+            result = 31 * result + length;
+        }
+        String label = getLabel();
+        if (label != null) {
+            result = 31 * result + label.hashCode();
+        }
+        String nonce = getNonce();
+        if (nonce != null) {
+            result = 31 * result + nonce.hashCode();
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof DerivedKeyToken)) {
+            return false;
+        }
+        DerivedKeyToken token = (DerivedKeyToken)object;
+        if (!compare(getAlgorithm(), token.getAlgorithm())) {
+            return false;
+        }
+        try {
+            if (!getSecurityTokenReference().equals(token.getSecurityTokenReference())) {
+                return false;
+            }
+        } catch (WSSecurityException e) {
+            log.error(e);
+            return false;
+        }
+        if (!compare(getProperties(), token.getProperties())) {
+            return false;
+        }
+        if (getGeneration() != token.getGeneration()) {
+            return false;
+        }
+        if (getOffset() != token.getOffset()) {
+            return false;
+        }
+        if (getLength() != token.getLength()) {
+            return false;
+        }
+        if (!compare(getLabel(), token.getLabel())) {
+            return false;
+        }
+        if (!compare(getNonce(), token.getNonce())) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(String item1, String item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(Map<String, String> item1, Map<String, String> item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
+    }
 }

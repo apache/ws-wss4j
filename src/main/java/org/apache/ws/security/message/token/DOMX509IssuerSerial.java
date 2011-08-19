@@ -55,7 +55,12 @@ public final class DOMX509IssuerSerial {
                 element, WSConstants.X509_SERIAL_NUMBER_LN, WSConstants.SIG_NS
             );
         String serialNumberStr = getChildText(serialNumberElement);
-        serialNumber = new BigInteger(serialNumberStr);
+        if (serialNumberStr != null) {
+            serialNumber = new BigInteger(serialNumberStr);
+        } else {
+            serialNumber = null;
+        }
+        
     }
 
     /**
@@ -126,6 +131,9 @@ public final class DOMX509IssuerSerial {
     
     
     private String getChildText(Node parentNode) {
+        if (parentNode == null) {
+            return null;
+        }
         Node node = parentNode.getFirstChild();
         StringBuilder buffer = new StringBuilder();
         while (node != null) {

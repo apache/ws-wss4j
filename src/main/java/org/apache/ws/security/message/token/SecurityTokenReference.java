@@ -40,8 +40,10 @@ import javax.xml.namespace.QName;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
+import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 /**
  * Security Token Reference.
@@ -847,5 +849,118 @@ public class SecurityTokenReference {
                 );
             }
         }
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        try {
+            Reference reference = getReference();
+            if (reference != null) {
+                result = 31 * result + reference.hashCode();
+            }
+        } catch (WSSecurityException e) {
+            log.error(e);
+        }
+        String keyIdentifierEncodingType = getKeyIdentifierEncodingType();
+        if (keyIdentifierEncodingType != null) {
+            result = 31 * result + keyIdentifierEncodingType.hashCode();
+        }
+        String keyIdentifierValueType = getKeyIdentifierValueType();
+        if (keyIdentifierValueType != null) {
+            result = 31 * result + keyIdentifierValueType.hashCode();
+        }
+        String keyIdentifierValue = getKeyIdentifierValue();
+        if (keyIdentifierValue != null) {
+            result = 31 * result + keyIdentifierValue.hashCode();
+        }
+        String tokenType = getTokenType();
+        if (tokenType != null) {
+            result = 31 * result + tokenType.hashCode();
+        }
+        byte[] skiBytes = getSKIBytes();
+        if (skiBytes != null) {
+            result = 31 * result + Arrays.hashCode(skiBytes);
+        }
+        String issuer = null;
+        BigInteger serialNumber = null;
+        
+        try {
+            issuer = getIssuerSerial().getIssuer();
+            serialNumber = getIssuerSerial().getSerialNumber();
+        } catch (WSSecurityException e) {
+           log.error(e);
+        }
+        if (issuer != null) {
+            result = 31 * result + issuer.hashCode();
+        }
+        if (serialNumber != null) {
+            result = 31 * result + serialNumber.hashCode();
+        }
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof SecurityTokenReference)) {
+            return false;
+        }
+        SecurityTokenReference tokenReference = (SecurityTokenReference)object;
+        try {
+            if (!getReference().equals(tokenReference.getReference())) {
+                return false;
+            }
+        } catch (WSSecurityException e) {
+           log.error(e);
+           return false;
+        }
+        if (!compare(getKeyIdentifierEncodingType(), tokenReference.getKeyIdentifierEncodingType())) {
+            return false;
+        }
+        if (!compare(getKeyIdentifierValueType(), tokenReference.getKeyIdentifierValueType())) {
+            return false;
+        }
+        if (!compare(getKeyIdentifierValue(), tokenReference.getKeyIdentifierValue())) {
+            return false;
+        }
+        if (!compare(getTokenType(), tokenReference.getTokenType())) {
+            return false;
+        }
+        if (!Arrays.equals(getSKIBytes(), tokenReference.getSKIBytes())) {
+            return false;
+        }
+        try {
+            if (getIssuerSerial() != null && tokenReference.getIssuerSerial() != null) {
+                if (!compare(getIssuerSerial().getIssuer(), tokenReference.getIssuerSerial().getIssuer())) {
+                    return false;
+                }
+                if (!compare(getIssuerSerial().getSerialNumber(), tokenReference.getIssuerSerial().getSerialNumber())) {
+                    return false;
+                } 
+            }
+        } catch (WSSecurityException e) {
+           log.error(e);
+           return false;
+        }
+            
+        return true;
+    }
+    
+    private boolean compare(String item1, String item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(BigInteger item1, BigInteger item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
     }
 }

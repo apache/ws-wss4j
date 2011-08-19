@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.message.token;
 
+import javax.xml.namespace.QName;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -26,8 +28,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
 
 /**
  * Reference.
@@ -134,5 +134,43 @@ public class Reference {
      */
     public String toString() {
         return DOM2Writer.nodeToString((Node)element);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        String uri = getURI();
+        if (uri != null) {
+            result = 31 * result + uri.hashCode();
+        }
+        String valueType = getValueType();
+        if (valueType != null) {
+            result = 31 * result + valueType.hashCode();
+        }
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Reference)) {
+            return false;
+        }
+        Reference reference = (Reference)object;
+        if (!compare(getURI(), reference.getURI())) {
+            return false;
+        }
+        if (!compare(getValueType(), reference.getValueType())) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean compare(String item1, String item2) {
+        if (item1 == null && item2 != null) { 
+            return false;
+        } else if (item1 != null && !item1.equals(item2)) {
+            return false;
+        }
+        return true;
     }
 }

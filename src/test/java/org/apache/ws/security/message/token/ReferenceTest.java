@@ -46,7 +46,17 @@ public class ReferenceTest extends org.junit.Assert {
         +       "/>"
         ;
 
-
+    private Reference ref;
+    private Reference refEqual;
+    private Reference refNotEqual;
+    
+    public ReferenceTest() throws Exception{
+        ref = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());
+        refEqual = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());
+        refNotEqual = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "unequalscheck").getDocumentElement());
+    }
+    
+ 
     @org.junit.Test
     public void
     testConstructor() throws Exception {
@@ -101,6 +111,21 @@ public class ReferenceTest extends org.junit.Assert {
         );
         assertEquals(ref.getValueType(), "foo");
         assertEquals(ref.getURI(), "bar");
+    }
+    
+    @org.junit.Test
+    public void testEquals() throws Exception{
+        assertTrue(ref.equals(refEqual));
+        assertTrue(refEqual.equals(ref));
+        assertFalse(ref.equals(refNotEqual));
+        assertFalse(ref.equals(null));
+        assertFalse(ref.equals("string"));        
+    }
+    
+    @org.junit.Test
+    public void testHashcode() throws Exception{
+        assertEquals(ref.hashCode(), refEqual.hashCode());
+        assertTrue(!(ref.hashCode() == refNotEqual.hashCode()));
     }
     
     private static org.w3c.dom.Document
