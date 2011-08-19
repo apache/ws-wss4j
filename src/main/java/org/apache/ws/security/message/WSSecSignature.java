@@ -267,16 +267,20 @@ public class WSSecSignature extends WSSecSignatureBase {
                 break;
                 
             case WSConstants.CUSTOM_KEY_IDENTIFIER:
-                secRef.setKeyIdentifier(customTokenValueType, customTokenId);
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                    secRef.setKeyIdentifier(customTokenValueType, customTokenId);
                     secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                 } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                    secRef.setKeyIdentifier(customTokenValueType, customTokenId);
                     secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
                 } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customTokenValueType)) {
+                    secRef.setKeyIdentifier(customTokenValueType, customTokenId, true);
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customTokenValueType)) {
+                    secRef.setKeyIdentifier(customTokenValueType, customTokenId, true);
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customTokenValueType)) {
+                    secRef.setKeyIdentifier(customTokenValueType, customTokenId, true);
                     secRef.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
                 } 
                 break;

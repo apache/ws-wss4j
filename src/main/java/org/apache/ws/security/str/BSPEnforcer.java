@@ -22,6 +22,7 @@ package org.apache.ws.security.str;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
@@ -51,14 +52,10 @@ public final class BSPEnforcer {
         if (secRef.containsReference()) {
             // Check the ValueType attributes
             String valueType = secRef.getReference().getValueType();
-            if ((token instanceof X509Security) && !X509Security.X509_V3_TYPE.equals(valueType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidValueType", 
-                    new Object[]{valueType}
-                );
-            } else if ((token instanceof PKIPathSecurity) 
-                && (!PKIPathSecurity.PKI_TYPE.equals(valueType))) {
+            if (((token instanceof X509Security) && !X509Security.X509_V3_TYPE.equals(valueType))
+                || ((token instanceof PKIPathSecurity) && !PKIPathSecurity.PKI_TYPE.equals(valueType))
+                || ((token instanceof KerberosSecurity) 
+                        && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType))) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
@@ -68,7 +65,8 @@ public final class BSPEnforcer {
         } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
             if (!SecurityTokenReference.SKI_URI.equals(valueType) 
-                && !SecurityTokenReference.THUMB_URI.equals(valueType)) {
+                && !SecurityTokenReference.THUMB_URI.equals(valueType)
+                && !WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 

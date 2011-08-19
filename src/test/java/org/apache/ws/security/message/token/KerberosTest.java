@@ -28,6 +28,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.KerberosTokenValidator;
 import org.w3c.dom.Document;
@@ -185,6 +186,68 @@ public class KerberosTest extends org.junit.Assert {
         assertTrue(principal instanceof KerberosPrincipal);
         assertTrue(principal.getName().contains("alice"));
     }
+    
+    
+    /**
+     * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
+     * in a BinarySecurityToken, and use the session key to sign the SOAP Body.
+     */
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testKerberosSignatureKI() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        KerberosSecurity bst = new KerberosSecurity(doc);
+        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        bst.setID("Id-" + bst.hashCode());
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+        sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
+        
+        SecretKey secretKey = bst.getSecretKey();
+        byte[] keyData = secretKey.getEncoded();
+        sign.setSecretKey(keyData);
+        
+        byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
+        sign.setCustomTokenId(Base64.encode(digestBytes));
+        
+        Document signedDoc = sign.build(doc, null, secHeader);
+        
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        // Configure the Validator
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        KerberosTokenValidator validator = new KerberosTokenValidator();
+        validator.setJaasLoginModuleName("bob");
+        validator.setServiceName("bob@service.ws.apache.org");
+        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.setWssConfig(wssConfig);
+        
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, null, null);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        BinarySecurity token =
+            (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+        assertTrue(token != null);
+        
+        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
+    }
+    
     
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it

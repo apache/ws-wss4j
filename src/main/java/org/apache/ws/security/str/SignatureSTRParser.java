@@ -46,6 +46,7 @@ import org.w3c.dom.Element;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -194,8 +195,7 @@ public class SignatureSTRParser implements STRParser {
                 }
                 String id = secRef.getKeyIdentifierValue();
                 secretKey = 
-                    getSecretKeyFromToken(id, SecurityTokenReference.ENC_KEY_SHA1_URI, 
-                                          data);
+                    getSecretKeyFromToken(id, SecurityTokenReference.ENC_KEY_SHA1_URI, data);
                 principal = new CustomTokenPrincipal(id);
             } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
@@ -217,13 +217,7 @@ public class SignatureSTRParser implements STRParser {
                 publicKey = samlKi.getPublicKey();
                 principal = createPrincipalFromSAML(assertion);
             } else {
-                if (bspCompliant) {
-                    BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, null);
-                }
-                X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
-                if (foundCerts != null) {
-                    certs = new X509Certificate[]{foundCerts[0]};
-                }
+                parseBSTKeyIdentifier(secRef, crypto, wsDocInfo, bspCompliant);
             }
         } else {
             throw new WSSecurityException(
@@ -332,6 +326,41 @@ public class SignatureSTRParser implements STRParser {
         }
 
         return pwcb.getKey();
+    }
+    
+    /**
+     * Parse the KeyIdentifier for a BinarySecurityToken
+     */
+    private void parseBSTKeyIdentifier(
+        SecurityTokenReference secRef,
+        Crypto crypto,
+        WSDocInfo wsDocInfo,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        if (bspCompliant) {
+            BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, null);
+        }
+        String valueType = secRef.getKeyIdentifierValueType();
+        if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
+            byte[] keyBytes = secRef.getSKIBytes();
+            List<WSSecurityEngineResult> resultsList = 
+                wsDocInfo.getResultsByTag(WSConstants.BST);
+            for (WSSecurityEngineResult bstResult : resultsList) {
+                BinarySecurity bstToken = 
+                    (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                if (Arrays.equals(tokenDigest, keyBytes)) {
+                    secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
+                    principal = (Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                    break;
+                }
+            }
+        } else {
+            X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
+            if (foundCerts != null) {
+                certs = new X509Certificate[]{foundCerts[0]};
+            }
+        }
     }
     
     /**

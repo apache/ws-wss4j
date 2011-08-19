@@ -237,6 +237,24 @@ public class WSDocInfo {
         }
         return null;
     }
+    
+    /**
+     * Get a list of WSSecurityEngineResults of the given Integer tag
+     */
+    public List<WSSecurityEngineResult> getResultsByTag(Integer tag) {
+        List<WSSecurityEngineResult> foundResults = new ArrayList<WSSecurityEngineResult>();
+        if (resultsList != null) {
+            for (WSSecurityEngineResult result : resultsList) {
+                if (result != null) {
+                    Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+                    if (tag.intValue() == resultTag.intValue()) {
+                        foundResults.add(result);
+                    }
+                }
+            }
+        }
+        return resultsList;
+    }
 
     /**
      * @return the signature crypto class used to process
