@@ -1,0 +1,396 @@
+/**
+ * Copyright 2010, 2011 Marc Giger
+ *
+ * This file is part of the streaming-webservice-security-framework (swssf).
+ *
+ * The streaming-webservice-security-framework is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The streaming-webservice-security-framework is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with the streaming-webservice-security-framework.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.swssf.ext;
+
+import javax.xml.namespace.QName;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Constants for global use
+ *
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class Constants {
+
+    private Constants() {
+    }
+
+    public static final SecureRandom secureRandom;
+
+    static {
+        try {
+            secureRandom = SecureRandom.getInstance("SHA1PRNG");
+            secureRandom.setSeed(System.currentTimeMillis());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public enum Phase {
+        PREPROCESSING,
+        PROCESSING,
+        POSTPROCESSING,
+    }
+
+    public static final String XMLINPUTFACTORY = "XMLInputFactory";
+    public static final String TIMESTAMP_PROCESSED = "TimestampProcessed";
+
+    public static final String NS_XML = "http://www.w3.org/2000/xmlns/";
+    public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
+    public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
+    public static final String NS_WSSE10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    public static final String NS_WSSE11 = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";
+    public static final String NS_WSU10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    public static final String NS_SOAP11 = "http://schemas.xmlsoap.org/soap/envelope/";
+    public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
+
+    public static final String NS_WST = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    public static final String NS_WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
+
+    public static final String NS_SAML = "urn:oasis:names:tc:SAML:1.0:assertion";
+    public static final String NS_SAML2 = "urn:oasis:names:tc:SAML:2.0:assertion";
+
+    public static final String PREFIX_SOAPENV = "env";
+    public static final String TAG_soap_Envelope_LocalName = "Envelope";
+    public static final String TAG_soap_Header_LocalName = "Header";
+    public static final String TAG_soap_Body_LocalName = "Body";
+
+    public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap11_Header = new QName(NS_SOAP11, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap11_Body = new QName(NS_SOAP11, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
+    public static final QName ATT_soap11_Actor = new QName(NS_SOAP11, "actor", PREFIX_SOAPENV);
+
+    public static final QName TAG_soap12_Envelope = new QName(NS_SOAP12, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap12_Header = new QName(NS_SOAP12, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
+    public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
+    public static final QName ATT_soap12_Role = new QName(NS_SOAP12, "role", PREFIX_SOAPENV);
+
+    public static final String PREFIX_WSSE = "wsse";
+    public static final String PREFIX_WSSE11 = "wsse11";
+    public static final QName TAG_wsse_Security = new QName(NS_WSSE10, "Security", PREFIX_WSSE);
+
+    public static final String PREFIX_XENC = "xenc";
+    public static final QName TAG_xenc_EncryptedKey = new QName(NS_XMLENC, "EncryptedKey", PREFIX_XENC);
+    public static final QName ATT_NULL_Id = new QName(null, "Id");
+    public static final QName ATT_NULL_Type = new QName(null, "Type");
+    public static final QName ATT_NULL_MimeType = new QName(null, "MimeType");
+    public static final QName ATT_NULL_Encoding = new QName(null, "Encoding");
+
+    public static final QName TAG_xenc_EncryptionMethod = new QName(NS_XMLENC, "EncryptionMethod", PREFIX_XENC);
+    public static final QName ATT_NULL_Algorithm = new QName(null, "Algorithm");
+
+    public static final String PREFIX_DSIG = "dsig";
+    public static final QName TAG_dsig_KeyInfo = new QName(NS_DSIG, "KeyInfo", PREFIX_DSIG);
+
+    public static final QName TAG_wsse_SecurityTokenReference = new QName(NS_WSSE10, "SecurityTokenReference", PREFIX_WSSE);
+    public static final QName TAG_wsse_Reference = new QName(NS_WSSE10, "Reference", PREFIX_WSSE);
+    public static final QName ATT_wsse_Usage = new QName(NS_WSSE10, "Usage", PREFIX_WSSE);
+    public static final QName ATT_wsse11_TokenType = new QName(NS_WSSE11, "TokenType", PREFIX_WSSE11);
+
+    public static final QName TAG_wsse_KeyIdentifier = new QName(NS_WSSE10, "KeyIdentifier", PREFIX_WSSE);
+    public static final QName ATT_NULL_EncodingType = new QName(null, "EncodingType");
+    public static final QName ATT_NULL_ValueType = new QName(null, "ValueType");
+
+    public static final QName TAG_xenc_EncryptionProperties = new QName(NS_XMLENC, "EncryptionProperties", PREFIX_XENC);
+
+    public static final QName TAG_xenc_CipherData = new QName(NS_XMLENC, "CipherData", PREFIX_XENC);
+
+    public static final QName TAG_xenc_CipherValue = new QName(NS_XMLENC, "CipherValue", PREFIX_XENC);
+
+    public static final QName TAG_xenc_ReferenceList = new QName(NS_XMLENC, "ReferenceList", PREFIX_XENC);
+
+    public static final QName TAG_xenc_DataReference = new QName(NS_XMLENC, "DataReference", PREFIX_XENC);
+    public static final QName ATT_NULL_URI = new QName(null, "URI");
+
+    public static final QName TAG_wsse_BinarySecurityToken = new QName(NS_WSSE10, "BinarySecurityToken", PREFIX_WSSE);
+    public static final String PREFIX_WSU = "wsu";
+    public static final QName ATT_wsu_Id = new QName(NS_WSU10, "Id", PREFIX_WSU);
+
+    public static final QName TAG_xenc_EncryptedData = new QName(NS_XMLENC, "EncryptedData", PREFIX_XENC);
+
+    public static final QName TAG_wsse11_EncryptedHeader = new QName(NS_WSSE11, "EncryptedHeader", PREFIX_WSSE11);
+
+    public static final QName TAG_dsig_Signature = new QName(NS_DSIG, "Signature", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_SignedInfo = new QName(NS_DSIG, "SignedInfo", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_CanonicalizationMethod = new QName(NS_DSIG, "CanonicalizationMethod", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_SignatureMethod = new QName(NS_DSIG, "SignatureMethod", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_Reference = new QName(NS_DSIG, "Reference", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_Transforms = new QName(NS_DSIG, "Transforms", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_Transform = new QName(NS_DSIG, "Transform", PREFIX_DSIG);
+
+    public static final QName TAG_wsse_TransformationParameters = new QName(NS_WSSE10, "TransformationParameters", PREFIX_WSSE);
+
+    public static final QName TAG_dsig_DigestMethod = new QName(NS_DSIG, "DigestMethod", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_DigestValue = new QName(NS_DSIG, "DigestValue", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_SignatureValue = new QName(NS_DSIG, "SignatureValue", PREFIX_DSIG);
+
+    public static final QName TAG_wsu_Timestamp = new QName(NS_WSU10, "Timestamp", PREFIX_WSU);
+    public static final QName TAG_wsu_Created = new QName(NS_WSU10, "Created", PREFIX_WSU);
+    public static final QName TAG_wsu_Expires = new QName(NS_WSU10, "Expires", PREFIX_WSU);
+
+    public static final QName TAG_dsig_X509Data = new QName(NS_DSIG, "X509Data", PREFIX_DSIG);
+    public static final QName TAG_dsig_X509IssuerSerial = new QName(NS_DSIG, "X509IssuerSerial", PREFIX_DSIG);
+    public static final QName TAG_dsig_X509IssuerName = new QName(NS_DSIG, "X509IssuerName", PREFIX_DSIG);
+    public static final QName TAG_dsig_X509SerialNumber = new QName(NS_DSIG, "X509SerialNumber", PREFIX_DSIG);
+
+    public static final String NS10_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
+    public static final String NS11_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
+
+    public static final String NS_X509TOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
+
+    public static final String NS_X509_V3_TYPE = NS_X509TOKEN_PROFILE + "#X509v3";
+    public static final String NS_X509PKIPathv1 = NS_X509TOKEN_PROFILE + "#X509PKIPathv1";
+    public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
+    public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE_SECURITY + "#ThumbprintSHA1";
+
+    public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE_SECURITY + "#Base64Binary";
+
+    public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken", PREFIX_WSSE);
+    public static final QName TAG_wsse_Username = new QName(NS_WSSE10, "Username", PREFIX_WSSE);
+    public static final QName TAG_wsse_Password = new QName(NS_WSSE10, "Password", PREFIX_WSSE);
+    public static final QName TAG_wsse_Nonce = new QName(NS_WSSE10, "Nonce", PREFIX_WSSE);
+    public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
+    public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
+
+    public static final String NS_USERNAMETOKEN_PROFILE11 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE11 + "#PasswordDigest";
+    public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE11 + "#PasswordText";
+    public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE11 + "#UsernameToken";
+
+    public static final QName TAG_wsse11_SignatureConfirmation = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
+    public static final QName ATT_NULL_Value = new QName(null, "Value");
+
+    public static final String NS_C14N_EXCL = "http://www.w3.org/2001/10/xml-exc-c14n#";
+    public static final String PREFIX_C14N_EXCL = "c14nEx";
+    public static final QName ATT_NULL_PrefixList = new QName(null, "PrefixList");
+    public static final QName TAG_c14nExcl_InclusiveNamespaces = new QName(NS_C14N_EXCL, "InclusiveNamespaces", PREFIX_C14N_EXCL);
+
+    public static final QName TAG_wst_BinarySecret = new QName(NS_WST, "BinarySecret");
+
+    public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
+
+    public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
+    public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");
+
+    public static final String NS_SAML10_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
+    public static final String NS_SAML11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
+    public static final String NS_SAML10_TYPE = NS_SAML10_TOKEN_PROFILE + "#SAMLAssertionID";
+    public static final String NS_SAML20_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLID";
+    public static final String NS_SAML11_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV1.1";
+    public static final String NS_SAML20_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV2.0";
+
+    public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
+    public static final QName ATT_NULL_ID = new QName(null, "ID");
+
+
+    public static final String NS_WSC_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc";
+    public static final String NS_WSC_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
+    public static final String PREFIX_WSC = "wsc";
+
+    public static final QName TAG_wsc0502_SecurityContextToken = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
+    public static final QName TAG_wsc0512_SecurityContextToken = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Identifier = new QName(NS_WSC_05_02, "Identifier", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Identifier = new QName(NS_WSC_05_12, "Identifier", PREFIX_WSC);
+
+    public static final QName TAG_wsc0502_DerivedKeyToken = new QName(NS_WSC_05_02, "DerivedKeyToken", PREFIX_WSC);
+    public static final QName TAG_wsc0512_DerivedKeyToken = new QName(NS_WSC_05_12, "DerivedKeyToken", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    public static final QName TAG_wsc0502_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+
+    public static final String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    public static final String P_SHA_1_2005_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
+    public static final String WS_SecureConversation_DEFAULT_LABEL = "WS-SecureConversation";
+
+    public static final String NS_WSS_ENC_KEY_VALUE_TYPE = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKey";
+
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
+
+    public static final String PROP_TIMESTAMP_SECURITYEVENT = "PROP_TIMESTAMP";
+
+    public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
+
+    /**
+     * Length of UsernameToken derived key used by .NET WSE to sign a message.
+     */
+    public static final int WSE_DERIVED_KEY_LEN = 16;
+    public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
+
+    public enum Action {
+        TIMESTAMP,
+        SIGNATURE,
+        ENCRYPT,
+        USERNAMETOKEN,
+        USERNAMETOKEN_SIGNED,
+        SIGNATURE_CONFIRMATION,
+        SIGNATURE_WITH_DERIVED_KEY,
+        ENCRYPT_WITH_DERIVED_KEY,
+        SAML_TOKEN_SIGNED,
+        SAML_TOKEN_UNSIGNED,
+    }
+
+    public enum KeyIdentifierType {
+        DEFAULT_TOKEN,
+        ISSUER_SERIAL,
+        BST_DIRECT_REFERENCE,
+        BST_EMBEDDED,
+        X509_KEY_IDENTIFIER,
+        SKI_KEY_IDENTIFIER,
+        THUMBPRINT_IDENTIFIER,
+        EMBEDDED_SECURITY_TOKEN_REF,
+        EMEDDED_KEYIDENTIFIER_REF,
+        USERNAMETOKEN_REFERENCE,
+    }
+
+    public enum TokenType {
+        EncryptedKeyToken,
+        X509V3Token,
+        X509V1Token,
+        X509Pkcs7Token,
+        X509PkiPathV1Token,
+        UsernameToken,
+        SecurityContextToken,
+        Saml10Token,
+        Saml11Token,
+        Saml20Token,
+        IssuedToken,
+        SecureConversationToken,
+        HttpsToken,
+
+    }
+
+    public enum DerivedKeyTokenReference {
+        DirectReference,
+        EncryptedKey,
+        SecurityContextToken,
+    }
+
+    public enum UsernameTokenPasswordType {
+        PASSWORD_NONE(null),
+        PASSWORD_TEXT(NS_PASSWORD_TEXT),
+        PASSWORD_DIGEST(NS_PASSWORD_DIGEST);
+
+        private String namespace;
+        private static final Map<String, UsernameTokenPasswordType> lookup = new HashMap<String, UsernameTokenPasswordType>();
+
+        static {
+            for (UsernameTokenPasswordType u : EnumSet.allOf(UsernameTokenPasswordType.class))
+                lookup.put(u.getNamespace(), u);
+        }
+
+        UsernameTokenPasswordType(String namespace) {
+            this.namespace = namespace;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public static UsernameTokenPasswordType getUsernameTokenPasswordType(String namespace) {
+            return lookup.get(namespace);
+        }
+    }
+
+
+    /****************************************************************************
+     * Fault codes defined in the WSS 1.1 spec under section 12, Error handling
+     */
+
+    /**
+     * An unsupported token was provided
+     */
+    public static final QName UNSUPPORTED_SECURITY_TOKEN = new QName(NS_WSSE10, "UnsupportedSecurityToken");
+
+    /**
+     * An unsupported signature or encryption algorithm was used
+     */
+    public static final QName UNSUPPORTED_ALGORITHM = new QName(NS_WSSE10, "UnsupportedAlgorithm");
+
+    /**
+     * An error was discovered processing the <Security> header
+     */
+    public static final QName INVALID_SECURITY = new QName(NS_WSSE10, "InvalidSecurity");
+
+    /**
+     * An invalid security token was provided
+     */
+    public static final QName INVALID_SECURITY_TOKEN = new QName(NS_WSSE10, "InvalidSecurityToken");
+
+    /**
+     * The security token could not be authenticated or authorized
+     */
+    public static final QName FAILED_AUTHENTICATION = new QName(NS_WSSE10, "FailedAuthentication");
+
+    /**
+     * The signature or decryption was invalid
+     */
+    public static final QName FAILED_CHECK = new QName(NS_WSSE10, "FailedCheck");
+
+    /**
+     * Referenced security token could not be retrieved
+     */
+    public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName(NS_WSSE10, "SecurityTokenUnavailable");
+
+    /**
+     * The message has expired
+     */
+    public static final QName MESSAGE_EXPIRED = new QName(NS_WSSE10, "MessageExpired");
+
+    public enum KeyUsage {
+        Sym_Sig,
+        Asym_Sig,
+        Dig,
+        Enc,
+        Sym_Key_Wrap,
+        Asym_Key_Wrap,
+        Comp_Key,
+        Enc_KD,
+        Sig_KD,
+        C14n,
+        Soap_Norm,
+        STR_Trans,
+        XPath,
+    }
+}
