@@ -23,12 +23,15 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -38,9 +41,12 @@ import org.w3c.dom.Element;
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
+import javax.xml.namespace.QName;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element, found in the
@@ -92,13 +98,28 @@ public class SecurityTokenRefSTRParser implements STRParser {
         if (result != null) {
             processPreviousResult(result, secRef, data, parameters, wsDocInfo, bspCompliant);
         } else if (secRef.containsReference()) {
-            Reference reference = secRef.getReference();
-            // Try asking the CallbackHandler for the secret key
-            secretKey = getSecretKeyFromToken(uri, reference.getValueType(), data);
-            if (secretKey == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
-                );
+            Element token = 
+                secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+            QName el = new QName(token.getNamespaceURI(), token.getLocalName());
+            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+                Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
+                List<WSSecurityEngineResult> bstResult =
+                        proc.handleToken(token, data, wsDocInfo);
+                BinarySecurity bstToken = 
+                        (BinarySecurity)bstResult.get(0).get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                if (bspCompliant) {
+                    BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, bstToken);
+                }
+                secretKey = (byte[])bstResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
+            } else {
+                Reference reference = secRef.getReference();
+                // Try asking the CallbackHandler for the secret key
+                secretKey = getSecretKeyFromToken(uri, reference.getValueType(), data);
+                if (secretKey == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    );
+                }
             }
         } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
@@ -111,6 +132,19 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     );
                 secretKey = 
                     getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
+            } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
+                byte[] keyBytes = secRef.getSKIBytes();
+                List<WSSecurityEngineResult> resultsList = 
+                    wsDocInfo.getResultsByTag(WSConstants.BST);
+                for (WSSecurityEngineResult bstResult : resultsList) {
+                    BinarySecurity bstToken = 
+                        (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                    byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                    if (Arrays.equals(tokenDigest, keyBytes)) {
+                        secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
+                        break;
+                    }
+                }
             } else {
                 if (bspCompliant && SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
                     BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);

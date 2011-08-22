@@ -530,7 +530,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
-            secToken.setKeyIdentifier(customReferenceValue, encKeyId);
+            secToken.setKeyIdentifier(customReferenceValue, encKeyId, true);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();

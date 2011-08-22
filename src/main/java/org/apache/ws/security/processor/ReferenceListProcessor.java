@@ -57,9 +57,6 @@ public class ReferenceListProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found reference list element");
         }
-        if (data.getCallbackHandler() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
-        }
         List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
