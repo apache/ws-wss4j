@@ -310,6 +310,62 @@ public class KerberosTest extends org.junit.Assert {
      */
     @org.junit.Test
     @org.junit.Ignore
+    public void testKerberosEncryptionBSTFirst() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        KerberosSecurity bst = new KerberosSecurity(doc);
+        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        bst.setID("Id-" + bst.hashCode());
+        
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        SecretKey secretKey = bst.getSecretKey();
+        builder.setSymmetricKey(secretKey);
+        builder.setEncryptSymmKey(false);
+        builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
+        builder.setEncKeyId(bst.getID());
+
+        Document encryptedDoc = builder.build(doc, null, secHeader);
+        
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        // Configure the Validator
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        KerberosTokenValidator validator = new KerberosTokenValidator();
+        validator.setJaasLoginModuleName("bob");
+        validator.setServiceName("bob@service.ws.apache.org");
+        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.setWssConfig(wssConfig);
+        
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(encryptedDoc, null, null, null);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        BinarySecurity token =
+            (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+        assertTrue(token != null);
+        
+        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        assertTrue(principal instanceof KerberosPrincipal);
+        assertTrue(principal.getName().contains("alice"));
+    }
+    
+    /**
+     * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
+     * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
+     */
+    @org.junit.Test
+    @org.junit.Ignore
     public void testKerberosEncryptionKI() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 

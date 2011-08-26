@@ -287,7 +287,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             secretKey = 
                 getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
-        } else if (WSConstants.SCT == action) {
+        } else if (WSConstants.SCT == action || WSConstants.BST == action) {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         }
     }
