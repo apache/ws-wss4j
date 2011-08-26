@@ -98,28 +98,29 @@ public class SecurityTokenRefSTRParser implements STRParser {
         if (result != null) {
             processPreviousResult(result, secRef, data, parameters, wsDocInfo, bspCompliant);
         } else if (secRef.containsReference()) {
-            Element token = 
-                secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
-            QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
-                List<WSSecurityEngineResult> bstResult =
-                        proc.handleToken(token, data, wsDocInfo);
-                BinarySecurity bstToken = 
-                        (BinarySecurity)bstResult.get(0).get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                if (bspCompliant) {
-                    BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, bstToken);
-                }
-                secretKey = (byte[])bstResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
-            } else {
-                Reference reference = secRef.getReference();
-                // Try asking the CallbackHandler for the secret key
-                secretKey = getSecretKeyFromToken(uri, reference.getValueType(), data);
-                if (secretKey == null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
-                    );
-                }
+            Reference reference = secRef.getReference();
+            // Try asking the CallbackHandler for the secret key
+            secretKey = getSecretKeyFromToken(uri, reference.getValueType(), data);
+            if (secretKey == null) {
+                Element token = 
+                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+                QName el = new QName(token.getNamespaceURI(), token.getLocalName());
+                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
+                    List<WSSecurityEngineResult> bstResult =
+                            proc.handleToken(token, data, wsDocInfo);
+                    BinarySecurity bstToken = 
+                            (BinarySecurity)bstResult.get(0).get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                    if (bspCompliant) {
+                        BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, bstToken);
+                    }
+                    secretKey = (byte[])bstResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
+                } 
+            }
+            if (secretKey == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                );
             }
         } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
@@ -153,6 +154,11 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     getSecretKeyFromToken(
                         secRef.getKeyIdentifierValue(), secRef.getKeyIdentifierValueType(), data
                     );
+                if (secretKey == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    );
+                }
             }
         } else {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
@@ -222,7 +228,10 @@ public class SecurityTokenRefSTRParser implements STRParser {
             new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY, data);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
-            data.getCallbackHandler().handle(callbacks);
+            if (data.getCallbackHandler() != null) {
+                data.getCallbackHandler().handle(callbacks);
+                return pwcb.getKey();
+            }
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
@@ -232,7 +241,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             );
         }
 
-        return pwcb.getKey();
+        return null;
     }
     
     /**

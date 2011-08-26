@@ -312,7 +312,8 @@ public class SecurityTokenReference {
         //
         if (cb != null && (WSConstants.WSC_SCT.equals(type)
             || WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) 
-            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type))) {
+            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)
+            || KerberosSecurity.isKerberosToken(type))) {
             //try to find a custom token
             WSPasswordCallback pwcb = 
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
