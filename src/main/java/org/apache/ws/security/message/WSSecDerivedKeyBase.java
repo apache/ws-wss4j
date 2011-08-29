@@ -27,6 +27,7 @@ import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
 import org.apache.ws.security.conversation.dkalgo.DerivationAlgorithm;
 import org.apache.ws.security.message.token.DerivedKeyToken;
+import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.Base64;
@@ -256,9 +257,12 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
                 } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customValueType)) {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                     ref.setValueType(customValueType);
+                } else if (KerberosSecurity.isKerberosToken(customValueType)) {
+                    secRef.addTokenType(customValueType);
+                    ref.setValueType(customValueType);
                 } else if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(customValueType)) {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                }
+                } 
 
                 secRef.setReference(ref);
             }

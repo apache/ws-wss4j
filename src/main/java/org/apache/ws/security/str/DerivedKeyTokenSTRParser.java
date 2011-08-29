@@ -215,7 +215,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
             }
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-        } else if (WSConstants.SCT == action) {
+        } else if (WSConstants.SCT == action || WSConstants.BST == action) {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
             AssertionWrapper assertion = 
