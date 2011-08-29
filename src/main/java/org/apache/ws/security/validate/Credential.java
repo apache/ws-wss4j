@@ -24,6 +24,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -42,8 +43,25 @@ public class Credential {
     private BinarySecurity binarySecurityToken;
     private AssertionWrapper assertion;
     private AssertionWrapper transformedToken;
+    private SecurityContextToken securityContextToken;
     private Principal principal;
     private byte[] secretKey;
+    
+    /**
+     * Set a SecurityContextToken to be validated
+     * @param securityContextToken a SecurityContextToken to be validated
+     */
+    public void setSecurityContextToken(SecurityContextToken securityContextToken) {
+        this.securityContextToken = securityContextToken;
+    }
+    
+    /**
+     * Get a SecurityContextToken to be validated
+     * @return a SecurityContextToken to be validated
+     */
+    public SecurityContextToken getSecurityContextToken() {
+        return securityContextToken;
+    }
     
     /**
      * Set a SecretKey (byte[]) to be validated

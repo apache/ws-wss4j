@@ -26,11 +26,14 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityContextToken;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.Validator;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
 
 import java.util.List;
 import java.io.IOException;
@@ -48,13 +51,28 @@ public class SecurityContextTokenProcessor implements Processor {
         WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);
-        byte[] secret = getSecret(data.getCallbackHandler(), sct);
         
+        Validator validator = 
+            data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
+
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.SCT, sct);
+        if (validator != null) {
+            // Hook to allow the user to validate the SecurityContextToken
+            Credential credential = new Credential();
+            credential.setSecurityContextToken(sct);
+            
+            Credential returnedCredential = validator.validate(credential, data);
+            result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+            result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
+            result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
+        } else {
+            byte[] secret = getSecret(data.getCallbackHandler(), sct);
+            result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
+            result.put(WSSecurityEngineResult.TAG_SECRET, secret);
+        }
+        
         wsDocInfo.addTokenElement(elem);
-        result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
-        result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }

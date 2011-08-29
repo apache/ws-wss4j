@@ -191,7 +191,7 @@ public class SecurityContextToken {
     /**
      * Returns the dom element of this <code>SecurityContextToken</code> object.
      *
-     * @return the <code>wsse:UsernameToken</code> element
+     * @return the <code>wsse:SecurityContextToken</code> element
      */
     public Element getElement() {
         return element;
