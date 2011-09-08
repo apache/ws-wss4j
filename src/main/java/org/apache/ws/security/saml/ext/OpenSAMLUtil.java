@@ -28,6 +28,7 @@ import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 /**
@@ -101,10 +102,12 @@ public class OpenSAMLUtil {
     ) throws WSSecurityException {
         Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
         Element element = null;
-        Element orig = doc == null ? null : doc.getDocumentElement();
+        DocumentFragment frag = doc == null ? null : doc.createDocumentFragment();
         try {
-            if (orig != null) {
-                doc.removeChild(orig);
+            if (frag != null) {
+                while (doc.getFirstChild() != null) {
+                    frag.appendChild(doc.removeChild(doc.getFirstChild()));
+                }
             }
             try {
                 if (doc == null) {
@@ -147,13 +150,11 @@ public class OpenSAMLUtil {
                 }
             }
         } finally {
-            if (doc != null && doc.getDocumentElement() != orig) {
-                if (doc.getDocumentElement() != null) {
-                    doc.removeChild(doc.getDocumentElement());
+            if (frag != null) {
+                while (doc.getFirstChild() != null) {
+                    doc.removeChild(doc.getFirstChild());
                 }
-                if (orig != null) {
-                    doc.appendChild(orig);
-                }
+                doc.appendChild(frag);
             }
         }
         return element;
