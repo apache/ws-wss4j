@@ -260,6 +260,8 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
                 } else if (KerberosSecurity.isKerberosToken(customValueType)) {
                     secRef.addTokenType(customValueType);
                     ref.setValueType(customValueType);
+                } else if (WSConstants.WSC_SCT.equals(customValueType)) {
+                    ref.setValueType(customValueType);
                 } else if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(customValueType)) {
                     secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 } 
