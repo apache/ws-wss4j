@@ -27,16 +27,20 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
@@ -91,21 +95,58 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             // Now use the callback and get it
             secretKey = 
                 getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, data);
+            if (secretKey == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                );
+            }
         } else if (secRef.containsKeyIdentifier()) {
             String keyIdentifierValueType = secRef.getKeyIdentifierValueType();
-            if (bspCompliant 
-                && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-                BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
-            }
-            X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
-            if (certs == null || certs.length < 1 || certs[0] == null) {
+            if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(keyIdentifierValueType)) {
                 secretKey = 
-                    this.getSecretKeyFromToken(
+                    getSecretKeyFromToken(
                         secRef.getKeyIdentifierValue(), keyIdentifierValueType, 
                         WSPasswordCallback.SECRET_KEY, data
-                   ); 
+                    );
+                if (secretKey == null) {
+                    byte[] keyBytes = secRef.getSKIBytes();
+                    List<WSSecurityEngineResult> resultsList = 
+                        wsDocInfo.getResultsByTag(WSConstants.BST);
+                    for (WSSecurityEngineResult bstResult : resultsList) {
+                        BinarySecurity bstToken = 
+                            (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                        byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                        if (Arrays.equals(tokenDigest, keyBytes)) {
+                            secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
+                            break;
+                        }
+                    }
+                }
+                if (secretKey == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    );
+                }
             } else {
-                secretKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler()).getEncoded();
+                if (bspCompliant 
+                    && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                    BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
+                }
+                X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
+                if (certs == null || certs.length < 1 || certs[0] == null) {
+                    secretKey = 
+                        this.getSecretKeyFromToken(
+                            secRef.getKeyIdentifierValue(), keyIdentifierValueType, 
+                            WSPasswordCallback.SECRET_KEY, data
+                       ); 
+                    if (secretKey == null) {
+                        throw new WSSecurityException(
+                            WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                        );
+                    }
+                } else {
+                    secretKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler()).getEncoded();
+                }
             }
         } else {
             throw new WSSecurityException(
@@ -178,7 +219,10 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             new WSPasswordCallback(id, null, type, identifier, data);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
-            data.getCallbackHandler().handle(callbacks);
+            if (data.getCallbackHandler() != null) {
+                data.getCallbackHandler().handle(callbacks);
+                return pwcb.getKey();
+            }
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
@@ -188,7 +232,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             );
         }
 
-        return pwcb.getKey();
+        return null;
     }
     
     /**

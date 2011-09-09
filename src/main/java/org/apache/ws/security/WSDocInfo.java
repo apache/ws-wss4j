@@ -253,7 +253,7 @@ public class WSDocInfo {
                 }
             }
         }
-        return resultsList;
+        return foundResults;
     }
 
     /**

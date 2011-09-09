@@ -134,17 +134,26 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 secretKey = 
                     getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
             } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
-                byte[] keyBytes = secRef.getSKIBytes();
-                List<WSSecurityEngineResult> resultsList = 
-                    wsDocInfo.getResultsByTag(WSConstants.BST);
-                for (WSSecurityEngineResult bstResult : resultsList) {
-                    BinarySecurity bstToken = 
-                        (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                    byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
-                    if (Arrays.equals(tokenDigest, keyBytes)) {
-                        secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
-                        break;
+                secretKey = 
+                    getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
+                if (secretKey == null) {
+                    byte[] keyBytes = secRef.getSKIBytes();
+                    List<WSSecurityEngineResult> resultsList = 
+                        wsDocInfo.getResultsByTag(WSConstants.BST);
+                    for (WSSecurityEngineResult bstResult : resultsList) {
+                        BinarySecurity bstToken = 
+                            (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                        byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                        if (Arrays.equals(tokenDigest, keyBytes)) {
+                            secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
+                            break;
+                        }
                     }
+                }
+                if (secretKey == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    );
                 }
             } else {
                 if (bspCompliant && SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
