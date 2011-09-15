@@ -20,6 +20,9 @@
 package org.apache.ws.security;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.security.Provider;
 import java.security.Security;
 import java.util.HashMap;
@@ -361,21 +364,30 @@ public class WSSConfig {
         boolean wasSet = false;
         try {
             // Don't override if it was set explicitly
-            String lineBreakPropName = "org.apache.xml.security.ignoreLineBreaks";
-            if (System.getProperty(lineBreakPropName) == null) {
-                System.setProperty(lineBreakPropName, "true");
-            } else {
-                wasSet = true;
-            }
+            wasSet = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                public Boolean run() {
+                    String lineBreakPropName = "org.apache.xml.security.ignoreLineBreaks";
+                    if (System.getProperty(lineBreakPropName) == null) {
+                        System.setProperty(lineBreakPropName, "true");
+                        return false;
+                    }
+                    return true; 
+                }
+            });
         } catch (Throwable t) { //NOPMD
             //ignore
         }
         org.apache.xml.security.Init.init();
         if (!wasSet) {
             try {
-                Field f = XMLUtils.class.getDeclaredField("ignoreLineBreaks");
-                f.setAccessible(true);
-                f.set(null, Boolean.TRUE);
+                AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+                    public Boolean run() throws Exception {
+                        Field f = XMLUtils.class.getDeclaredField("ignoreLineBreaks");
+                        f.setAccessible(true);
+                        f.set(null, Boolean.TRUE);
+                        return false;
+                    }
+                });
             } catch (Throwable t) { //NOPMD
                 //ignore
             }
@@ -386,12 +398,17 @@ public class WSSConfig {
         if (!staticallyInitialized) {
             setXmlSecIgnoreLineBreak();
             if (addJceProviders) {
-                addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-                addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
-                Security.removeProvider("STRTransform");
-                appendJceProvider(
-                    "STRTransform", new org.apache.ws.security.transform.STRTransformProvider()
-                );
+                AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
+                        addJceProvider("XMLDSig", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+                        addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                        Security.removeProvider("STRTransform");
+                        appendJceProvider(
+                            "STRTransform", new org.apache.ws.security.transform.STRTransformProvider()
+                        );
+                        return true;
+                    }
+                });
             }
             staticallyInitialized = true;
         }
