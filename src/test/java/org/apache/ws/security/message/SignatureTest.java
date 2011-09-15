@@ -616,6 +616,36 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
     }
+    
+    /**
+     * The test uses the Issuer Serial key identifier type.
+     * <p/>
+     * 
+     * @throws java.lang.Exception Thrown when there is any problem in signing or verification
+     */
+    @org.junit.Test
+    public void testX509SignatureDefaultPassword() throws Exception {
+        Crypto passwordCrypto = CryptoFactory.getInstance("alice.properties");
+        
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo(passwordCrypto.getDefaultX509Identifier(), null);
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, passwordCrypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After Signing IS....");
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.processSecurityHeader(doc, null, null, passwordCrypto);
+    }
 
     /**
      * Verifies the soap envelope.

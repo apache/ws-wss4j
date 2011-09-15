@@ -93,6 +93,8 @@ public class Merlin extends CryptoBase {
         "org.apache.ws.security.crypto.merlin.keystore.type";
     public static final String KEYSTORE_ALIAS =
         "org.apache.ws.security.crypto.merlin.keystore.alias";
+    public static final String KEYSTORE_PRIVATE_PASSWORD =
+        "org.apache.ws.security.crypto.merlin.keystore.private.password";
     
     /*
      * TrustStore configuration types
@@ -122,6 +124,7 @@ public class Merlin extends CryptoBase {
     protected KeyStore truststore = null;
     protected CertStore crlCertStore = null;
     protected boolean loadCACerts = false;
+    protected boolean privatePasswordSet = false; 
     
     public Merlin() {
         // default constructor
@@ -190,6 +193,10 @@ public class Merlin extends CryptoBase {
                         "The KeyStore " + keyStoreLocation + " of type " + type 
                         + " has been loaded"
                     );
+                }
+                String privatePasswd = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
+                if (privatePasswd != null) {
+                    privatePasswordSet = true;
                 }
             } finally {
                 if (is != null) {
@@ -644,6 +651,12 @@ public class Merlin extends CryptoBase {
                 throw new WSSecurityException(msg);
             }
             String password = getPassword(identifier, callbackHandler);
+            if (password == null && privatePasswordSet) {
+                password = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
+                if (password != null) {
+                    password = password.trim();
+                }
+            }
             Key keyTmp = keystore.getKey(identifier, password == null 
                                          ? new char[]{} : password.toCharArray());
             if (!(keyTmp instanceof PrivateKey)) {
@@ -688,6 +701,12 @@ public class Merlin extends CryptoBase {
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 log.error(msg + logMsg);
                 throw new WSSecurityException(msg);
+            }
+            if (password == null && privatePasswordSet) {
+                password = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
+                if (password != null) {
+                    password = password.trim();
+                }
             }
             Key keyTmp = keystore.getKey(identifier, password == null 
                                          ? new char[]{} : password.toCharArray());
