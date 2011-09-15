@@ -45,6 +45,9 @@ Crypto implementations.
 New Validator interface</a>: WSS4J 1.6 moves all validation of security tokens into a new Validator
 interface, which allows for custom validation of specific tokens.
 </li>
+<li>
+Support for the Kerberos Token Profile (in WSS4J 1.6.2 and 1.6.3).
+</li>
 </ul>
 </subsection>
 <subsection name="Upgrade notes">

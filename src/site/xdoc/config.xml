@@ -69,6 +69,10 @@ Keystore properties:
 <td>org.apache.ws.security.crypto.merlin.keystore.alias</td>
 <td>The default keystore alias to use, if none is specified.</td>
 </tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.private.password</td>
+<td>The default password used to load the private key.</td>
+</tr>
 </table>
 <p>
 TrustStore properties:
