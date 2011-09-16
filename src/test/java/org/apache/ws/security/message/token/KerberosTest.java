@@ -85,7 +85,7 @@ public class KerberosTest extends org.junit.Assert {
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
-        validator.setJaasLoginModuleName("bob");
+        validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -168,7 +168,7 @@ public class KerberosTest extends org.junit.Assert {
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
-        validator.setJaasLoginModuleName("bob");
+        validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -229,7 +229,7 @@ public class KerberosTest extends org.junit.Assert {
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
-        validator.setJaasLoginModuleName("bob");
+        validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -285,7 +285,7 @@ public class KerberosTest extends org.junit.Assert {
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
-        validator.setJaasLoginModuleName("bob");
+        validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -341,7 +341,7 @@ public class KerberosTest extends org.junit.Assert {
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
-        validator.setJaasLoginModuleName("bob");
+        validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -399,7 +399,7 @@ public class KerberosTest extends org.junit.Assert {
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
-        validator.setJaasLoginModuleName("bob");
+        validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();

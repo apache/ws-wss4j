@@ -43,22 +43,40 @@ public class KerberosTokenValidator implements Validator {
     
     private String serviceName;
     private CallbackHandler callbackHandler;
-    private String jaasLoginModuleName;
+    private String contextName;
     
     /**
+     * Get the JAAS Login context name to use.
+     * @return the JAAS Login context name to use
+     */
+    public String getContextName() {
+        return contextName;
+    }
+
+    /**
+     * Set the JAAS Login context name to use.
+     * @param contextName the JAAS Login context name to use
+     */
+    public void setContextName(String contextName) {
+        this.contextName = contextName;
+    }
+    
+    /**
+     * @deprecated
      * Get the JAAS Login module name to use.
      * @return the JAAS Login module name to use
      */
     public String getJaasLoginModuleName() {
-        return jaasLoginModuleName;
+        return contextName;
     }
 
     /**
+     * @deprecated
      * Set the JAAS Login module name to use.
      * @param jaasLoginModuleName the JAAS Login module name to use
      */
     public void setJaasLoginModuleName(String jaasLoginModuleName) {
-        this.jaasLoginModuleName = jaasLoginModuleName;
+        this.contextName = jaasLoginModuleName;
     }
 
     /**
@@ -127,9 +145,9 @@ public class KerberosTokenValidator implements Validator {
         LoginContext loginContext = null;
         try {
             if (callbackHandler == null) {
-                loginContext = new LoginContext(jaasLoginModuleName);
+                loginContext = new LoginContext(getContextName());
             } else {
-                loginContext = new LoginContext(jaasLoginModuleName, callbackHandler);
+                loginContext = new LoginContext(getContextName(), callbackHandler);
             }
             loginContext.login();
         } catch (LoginException ex) {
