@@ -115,6 +115,13 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_VALIDATED_TOKEN = "validated-token";
     
+    /**
+     * Tag denoting the DOM Element of the processed token (if a token has been processed).
+     * 
+     * The value under this tag is of type org.w3c.dom.Element
+     */
+    public static final String TAG_TOKEN_ELEMENT = "token-element";
+    
     //
     // Keys and certs
     //
@@ -208,6 +215,10 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      */
     public static final String TAG_ID = "id";
     
+    public WSSecurityEngineResult(int act) {
+        put(TAG_ACTION, new Integer(act));
+    }
+    
     public WSSecurityEngineResult(
         int act, 
         AssertionWrapper ass
@@ -215,6 +226,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SAML_ASSERTION, ass);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, ass.getElement());
     }
 
     public WSSecurityEngineResult(
@@ -286,18 +298,21 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_ACTION, new Integer(act));
         put(TAG_TIMESTAMP, tstamp);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, tstamp.getElement());
     }
     
     public WSSecurityEngineResult(int act, SecurityContextToken sct) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SECURITY_CONTEXT_TOKEN, sct);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, sct.getElement());
     }
     
     public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
         put(TAG_ACTION, new Integer(act));
         put(TAG_SIGNATURE_CONFIRMATION, sc);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, sc.getElement());
     }
     
     public WSSecurityEngineResult(int act, UsernameToken usernameToken) {
@@ -309,6 +324,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         put(TAG_USERNAME_TOKEN, usernameToken);
         put(TAG_PRINCIPAL, principal);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, usernameToken.getElement());
     }
 
     public WSSecurityEngineResult(int act, BinarySecurity token, X509Certificate[] certs) {
@@ -319,6 +335,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
             put(TAG_X509_CERTIFICATE, certs[0]);
         }
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
+        put(TAG_TOKEN_ELEMENT, token.getElement());
     }
 
     

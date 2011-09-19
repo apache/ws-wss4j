@@ -70,6 +70,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_ID, dkt.getID());
         result.put(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN, dkt);
         result.put(WSSecurityEngineResult.TAG_SECRET, secret);
+        result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, dkt.getElement());
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
