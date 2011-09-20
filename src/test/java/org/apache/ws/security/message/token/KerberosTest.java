@@ -30,6 +30,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+// import org.apache.ws.security.validate.KerberosTokenDecoderImpl;
 import org.apache.ws.security.validate.KerberosTokenValidator;
 import org.w3c.dom.Document;
 
@@ -170,6 +171,7 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
+        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
@@ -231,6 +233,7 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
+        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
@@ -287,6 +290,7 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
+        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
@@ -343,6 +347,7 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
+        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
@@ -401,6 +406,7 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
+        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);

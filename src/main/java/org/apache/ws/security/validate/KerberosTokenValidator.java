@@ -32,7 +32,6 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.KerberosServiceAction;
-//import org.apache.ws.security.message.token.KerberosTicketDecoder;
 
 /**
  */
@@ -44,6 +43,7 @@ public class KerberosTokenValidator implements Validator {
     private String serviceName;
     private CallbackHandler callbackHandler;
     private String contextName;
+    private KerberosTokenDecoder kerberosTokenDecoder;
     
     /**
      * Get the JAAS Login context name to use.
@@ -111,6 +111,24 @@ public class KerberosTokenValidator implements Validator {
      */
     public String getServiceName() {
         return serviceName;
+    }
+    
+    /**
+     * Get the KerberosTokenDecoder instance used to extract a session key from the received Kerberos
+     * token.
+     * @return the KerberosTokenDecoder instance used to extract a session key
+     */
+    public KerberosTokenDecoder getKerberosTokenDecoder() {
+        return kerberosTokenDecoder;
+    }
+
+    /**
+     * Set the KerberosTokenDecoder instance used to extract a session key from the received Kerberos
+     * token.
+     * @param kerberosTokenDecoder the KerberosTokenDecoder instance used to extract a session key
+     */
+    public void setKerberosTokenDecoder(KerberosTokenDecoder kerberosTokenDecoder) {
+        this.kerberosTokenDecoder = kerberosTokenDecoder;
     }
     
     /**
@@ -191,11 +209,15 @@ public class KerberosTokenValidator implements Validator {
         }
         credential.setPrincipal(principal);
         
-        // Get the session key and store it in the returned Credential
-        //KerberosTicketDecoder decode = new KerberosTicketDecoder(token, subject);
-        //sun.security.krb5.EncryptionKey sessionKey = decode.getSessionKey();
-        //byte[] sessionKeyBytes = sessionKey.getBytes();
-        //credential.setSecretKey(sessionKeyBytes);
+        // Try to extract the session key from the token if a KerberosTokenDecoder implementation is
+        // available
+        if (kerberosTokenDecoder != null) {
+            kerberosTokenDecoder.clear();
+            kerberosTokenDecoder.setToken(token);
+            kerberosTokenDecoder.setSubject(subject);
+            byte[] sessionKey = kerberosTokenDecoder.getSessionKey();
+            credential.setSecretKey(sessionKey);
+        }
         
         if (log.isDebugEnabled()) {
             log.debug("Successfully validated a ticket");
