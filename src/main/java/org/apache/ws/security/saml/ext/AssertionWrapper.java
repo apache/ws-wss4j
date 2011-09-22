@@ -415,7 +415,7 @@ public class AssertionWrapper {
         }
         if (id == null || id.length() == 0) {
             log.error("AssertionWrapper: ID was null, seeting a new ID value");
-            id = UUIDGenerator.getUUID();
+            id = "_" + UUIDGenerator.getUUID();
             if (saml2 != null) {
                 saml2.setID(id);
             } else if (saml1 != null) {

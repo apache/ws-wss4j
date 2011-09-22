@@ -134,7 +134,7 @@ public class SAML2ComponentBuilder {
         }
         Assertion assertion = 
             assertionBuilder.buildObject(Assertion.DEFAULT_ELEMENT_NAME, Assertion.TYPE_NAME);
-        assertion.setID(UUIDGenerator.getUUID());
+        assertion.setID("_" + UUIDGenerator.getUUID());
         assertion.setVersion(SAMLVersion.VERSION_20);
         assertion.setIssueInstant(new DateTime());
         return assertion;

@@ -135,7 +135,7 @@ public class SAML1ComponentBuilder {
         assertion.setVersion(SAMLVersion.VERSION_11);
         assertion.setIssuer(issuer);
         assertion.setIssueInstant(new DateTime()); // now
-        assertion.setID(UUIDGenerator.getUUID());
+        assertion.setID("_" + UUIDGenerator.getUUID());
         return assertion;
     }
 
