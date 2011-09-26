@@ -126,6 +126,7 @@ public class EncryptionTest extends org.junit.Assert {
          */
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        builder.setSymmetricKey(null);
         java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
