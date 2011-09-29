@@ -446,8 +446,7 @@ public class WSSConfig {
     }
 
     /**
-     * Set the WS-I Basic Security Profile compliance mode. The default is false
-     * (dues to .Net interop problems).
+     * Set the WS-I Basic Security Profile compliance mode. The default is true.
      * 
      * @param wsiBSPCompliant
      */
