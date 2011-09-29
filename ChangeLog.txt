@@ -5,6 +5,31 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.3
+=============
+
+Bug
+
+    [WSS-304] - WSSecEncryptedKey should initialize cipher using WRAP_MODE instead of ENCRYPT_MODE.
+    [WSS-306] - It would be nice to have WSSecEncryptedKey generate secret keys by means of KeyGenerator
+    [WSS-317] - SAML Assertions have invalid ID values
+    [WSS-318] - WsiBSPCompliant defaults to true
+
+Improvement
+
+    [WSS-305] - Migrate to OpenSaml2 2.5.1 from 2.4.1
+    [WSS-307] - Support the ability to sign and encrypt message parts using a Kerberos Ticket
+    [WSS-309] - Improve the configurability of the SAML signature creation in AssertionWrapper
+    [WSS-310] - Reference and DerivedKeyToken message tokens are missing equals and hashcode methods for logical comparision
+    [WSS-312] - Improve logging levels
+    [WSS-314] - Add a Merlin configuration option to specify a default password to use to access a private key
+    [WSS-315] - jaasLoginModuleName methods in KerberosTokenValidator.java should be renamed to contextName
+
+New Feature
+
+    [WSS-313] - Support UsernameToken validation against JAAS LoginModule
+
+
 Release 1.6.2
 =============
 
