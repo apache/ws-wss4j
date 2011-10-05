@@ -483,7 +483,9 @@ public class SecurityTokenReference {
             }
         } else if (SKI_URI.equals(value)) {
             X509Certificate cert = getX509SKIAlias(crypto);
-            return new X509Certificate[]{cert};
+            if (cert != null) {
+                return new X509Certificate[]{cert};
+            }
         } else if (THUMB_URI.equals(value)) {
             Node node = getFirstElement().getFirstChild();
             if (node == null) {
