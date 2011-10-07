@@ -158,10 +158,10 @@ public class EncryptedKeyProcessor implements Processor {
                 Element ee = ReferenceListProcessor.findEncryptedDataElement(doc, wsDocInfo, uri);
                 String algorithmURI = X509Util.getEncAlgo(ee);
                 alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                size = JCEMapper.getKeyLengthFromURI(algorithmURI);
+                size = WSSecurityUtil.getKeyLength(algorithmURI);
             }
             KeyGenerator kgen = KeyGenerator.getInstance(alg);
-            kgen.init(size);
+            kgen.init(size * 8);
             SecretKey k = kgen.generateKey();
             return k.getEncoded();
         } catch (Exception ex) {
@@ -332,8 +332,14 @@ public class EncryptedKeyProcessor implements Processor {
         // Prepare the SecretKey object to decrypt EncryptedData
         //
         String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
-        SecretKey symmetricKey = 
-            WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedData);
+        SecretKey symmetricKey = null;
+        try {
+            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedData);
+        } catch (IllegalArgumentException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "badEncAlgo", new Object[]{symEncAlgo}
+            );
+        }
 
         return ReferenceListProcessor.decryptEncryptedData(
             doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
