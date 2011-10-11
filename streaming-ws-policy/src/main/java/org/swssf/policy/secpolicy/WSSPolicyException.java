@@ -19,7 +19,8 @@
 
 package org.swssf.policy.secpolicy;
 
-import org.swssf.ext.WSSecurityException;
+
+import org.swssf.wss.ext.WSSecurityException;
 
 /**
  * class lent from apache cxf

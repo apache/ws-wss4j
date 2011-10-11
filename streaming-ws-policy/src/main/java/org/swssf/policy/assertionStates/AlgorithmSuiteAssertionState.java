@@ -20,8 +20,10 @@ package org.swssf.policy.assertionStates;
 
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
 import org.swssf.policy.secpolicy.model.AlgorithmSuite;
-import org.swssf.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 /**
  * @author $Author$
@@ -38,86 +40,72 @@ public class AlgorithmSuiteAssertionState extends AssertionState {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = (AlgorithmSuiteSecurityEvent) securityEvent;
         AlgorithmSuite algorithmSuite = (AlgorithmSuite) getAssertion();
 
-        switch (algorithmSuiteSecurityEvent.getKeyUsage()) {
-            case Sym_Sig:
-                if (!algorithmSuite.getSymmetricSignature().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Symmetric signature algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Asym_Sig:
-                if (!algorithmSuite.getAsymmetricSignature().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Asymmetric signature algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Dig:
-                if (!algorithmSuite.getDigest().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Digest algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Enc:
-                if (!algorithmSuite.getEncryption().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Encryption algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Sym_Key_Wrap:
-                if (!algorithmSuite.getSymmetricKeyWrap().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Symmetric key wrap algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Asym_Key_Wrap:
-                if (!algorithmSuite.getAsymmetricKeyWrap().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Asymmetric key wrap algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Comp_Key:
-                if (!algorithmSuite.getComputedKey().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Computed key algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Enc_KD:
-                if (!algorithmSuite.getEncryptionKeyDerivation().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Encryption key derivation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Sig_KD:
-                if (!algorithmSuite.getSignatureKeyDerivation().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Signature key derivation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case C14n:
-                if (!algorithmSuite.getC14n().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("C14N algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case Soap_Norm:
-                if (!algorithmSuite.getSoapNormalization().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("Soap normalization algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case STR_Trans:
-                if (!algorithmSuite.getStrTransform().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("STR transformation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-            case XPath:
-                if (!algorithmSuite.getXPath().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                    setAsserted(false);
-                    setErrorMessage("XPath algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-                }
-                break;
-
+        XMLSecurityConstants.KeyUsage keyUsage = algorithmSuiteSecurityEvent.getKeyUsage();
+        if (WSSConstants.Sym_Sig.equals(keyUsage)) {
+            if (!algorithmSuite.getSymmetricSignature().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Symmetric signature algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Asym_Sig.equals(keyUsage)) {
+            if (!algorithmSuite.getAsymmetricSignature().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Asymmetric signature algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Dig.equals(keyUsage)) {
+            if (!algorithmSuite.getDigest().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Digest algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Enc.equals(keyUsage)) {
+            if (!algorithmSuite.getEncryption().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Encryption algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Sym_Key_Wrap.equals(keyUsage)) {
+            if (!algorithmSuite.getSymmetricKeyWrap().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Symmetric key wrap algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Asym_Key_Wrap.equals(keyUsage)) {
+            if (!algorithmSuite.getAsymmetricKeyWrap().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Asymmetric key wrap algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Comp_Key.equals(keyUsage)) {
+            if (!algorithmSuite.getComputedKey().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Computed key algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Enc_KD.equals(keyUsage)) {
+            if (!algorithmSuite.getEncryptionKeyDerivation().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Encryption key derivation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Sig_KD.equals(keyUsage)) {
+            if (!algorithmSuite.getSignatureKeyDerivation().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Signature key derivation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.C14n.equals(keyUsage)) {
+            if (!algorithmSuite.getC14n().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("C14N algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.Soap_Norm.equals(keyUsage)) {
+            if (!algorithmSuite.getSoapNormalization().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("Soap normalization algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.STR_Trans.equals(keyUsage)) {
+            if (!algorithmSuite.getStrTransform().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("STR transformation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
+        } else if (WSSConstants.XPath.equals(keyUsage)) {
+            if (!algorithmSuite.getXPath().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                setAsserted(false);
+                setErrorMessage("XPath algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
+            }
         }
         return isAsserted();
     }

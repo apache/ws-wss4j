@@ -1,4 +1,4 @@
- /**
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -19,14 +19,15 @@
 package org.swssf.policy.assertionStates;
 
 import org.opensaml.common.SAMLVersion;
-import org.swssf.ext.Constants;
-import org.swssf.ext.SecurityToken;
-import org.swssf.ext.WSSecurityException;
-import org.swssf.impl.securityToken.DelegatingSecurityToken;
-import org.swssf.impl.securityToken.UsernameSecurityToken;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.policy.secpolicy.model.*;
-import org.swssf.securityEvent.*;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
+import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
+import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public class TokenAssertionState extends AssertionState {
             setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
         }
-        if (samlToken.isRequireKeyIdentifierReference() && ((DelegatingSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+        if (samlToken.isRequireKeyIdentifierReference() && ((DelegatingSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
             setAsserted(false);
             setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
         }
@@ -187,26 +188,26 @@ public class TokenAssertionState extends AssertionState {
         //todo how to verify the issuer of the UsernameToken??
 
         setAsserted(true);
-        if (usernameToken.isNoPassword() && usernameTokenSecurityEvent.getUsernameTokenPasswordType() != Constants.UsernameTokenPasswordType.PASSWORD_NONE) {
+        if (usernameToken.isNoPassword() && usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
             setAsserted(false);
             setErrorMessage("UsernameToken contains a password but the policy prohibits it");
-        } else if (usernameToken.isHashPassword() && usernameTokenSecurityEvent.getUsernameTokenPasswordType() != Constants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
+        } else if (usernameToken.isHashPassword() && usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
             setAsserted(false);
             setErrorMessage("UsernameToken does not contain a hashed password");
         }
-        if (usernameToken.isCreatedTimestamp() && (usernameSecurityToken.getCreated() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != Constants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
+        if (usernameToken.isCreatedTimestamp() && (usernameSecurityToken.getCreated() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
             setAsserted(false);
             setErrorMessage("UsernameToken does not contain a created timestamp or password is not plain text");
         }
-        if (usernameToken.isNonce() && (usernameSecurityToken.getNonce() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != Constants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
+        if (usernameToken.isNonce() && (usernameSecurityToken.getNonce() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
             setAsserted(false);
             setErrorMessage("UsernameToken does not contain a nonce or password is not plain text");
         }
         //todo how does the profile 1.0 and 1.1 differ?? Both spec refer to the same namespace
-        if (usernameToken.isUseUTProfile10() && !usernameTokenSecurityEvent.getUsernameTokenProfile().equals(Constants.NS_USERNAMETOKEN_PROFILE11)) {
+        if (usernameToken.isUseUTProfile10() && !usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
             setAsserted(false);
             setErrorMessage("Policy enforces UsernameToken profile 1.0 but we got 1.1");
-        } else if (usernameToken.isUseUTProfile11() && !usernameTokenSecurityEvent.getUsernameTokenProfile().equals(Constants.NS_USERNAMETOKEN_PROFILE11)) {
+        } else if (usernameToken.isUseUTProfile11() && !usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
             setAsserted(false);
             setErrorMessage("Policy enforces UsernameToken profile 1.1 but we got 1.0");
         }
@@ -215,15 +216,14 @@ public class TokenAssertionState extends AssertionState {
 
     private void assertX509Token(X509Token x509Token, TokenSecurityEvent tokenSecurityEvent) {
         SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
-        loop:
         while (securityToken.getKeyWrappingToken() != null) {
             securityToken = securityToken.getKeyWrappingToken();
-            switch (securityToken.getTokenType()) {
-                case X509V3Token:
-                case X509V1Token:
-                case X509Pkcs7Token:
-                case X509PkiPathV1Token:
-                    break loop;
+            XMLSecurityConstants.TokenType tokenType = securityToken.getTokenType();
+            if (WSSConstants.X509V3Token.equals(tokenType)
+                    || WSSConstants.X509V1Token.equals(tokenType)
+                    || WSSConstants.X509Pkcs7Token.equals(tokenType)
+                    || WSSConstants.X509PkiPathV1Token.equals(tokenType)) {
+                break;
             }
         }
         if (!(securityToken instanceof DelegatingSecurityToken)) {
@@ -241,30 +241,30 @@ public class TokenAssertionState extends AssertionState {
                     setErrorMessage("IssuerName in Policy (" + x509Token.getIssuerName() + ") didn't match with the one in the certificate (" + certificateIssuerName + ")");
                 }
             }
-            if (x509Token.isRequireKeyIdentifierReference() && delegatingSecurityToken.getKeyIdentifierType() != Constants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            if (x509Token.isRequireKeyIdentifierReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
                 setAsserted(false);
                 setErrorMessage("Policy enforces KeyIdentifierReference but we got " + delegatingSecurityToken.getTokenType());
-            } else if (x509Token.isRequireIssuerSerialReference() && delegatingSecurityToken.getKeyIdentifierType() != Constants.KeyIdentifierType.ISSUER_SERIAL) {
+            } else if (x509Token.isRequireIssuerSerialReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
                 setAsserted(false);
                 setErrorMessage("Policy enforces IssuerSerialReference but we got " + delegatingSecurityToken.getTokenType());
-            } else if (x509Token.isRequireEmbeddedTokenReference() && delegatingSecurityToken.getKeyIdentifierType() != Constants.KeyIdentifierType.BST_EMBEDDED) {
+            } else if (x509Token.isRequireEmbeddedTokenReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.BST_EMBEDDED) {
                 setAsserted(false);
                 setErrorMessage("Policy enforces EmbeddedTokenReference but we got " + delegatingSecurityToken.getTokenType());
-            } else if (x509Token.isRequireThumbprintReference() && delegatingSecurityToken.getKeyIdentifierType() != Constants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            } else if (x509Token.isRequireThumbprintReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
                 setAsserted(false);
                 setErrorMessage("Policy enforces ThumbprintReference but we got " + delegatingSecurityToken.getTokenType());
             }
             if (x509Token.getTokenVersionAndType() != null) {
-                if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V3_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V3_TOKEN11)) && delegatingSecurityToken.getTokenType() != Constants.TokenType.X509V3Token && x509Certificate.getVersion() != 3) {
+                if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V3_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V3_TOKEN11)) && !WSSConstants.X509V3Token.equals(delegatingSecurityToken.getTokenType()) && x509Certificate.getVersion() != 3) {
                     setAsserted(false);
                     setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenVersionAndType());
-                } else if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V1_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V1_TOKEN11)) && delegatingSecurityToken.getTokenType() != Constants.TokenType.X509V1Token && x509Certificate.getVersion() != 1) {
+                } else if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V1_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_V1_TOKEN11)) && !WSSConstants.X509V1Token.equals(delegatingSecurityToken.getTokenType()) && x509Certificate.getVersion() != 1) {
                     setAsserted(false);
                     setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenVersionAndType());
                 } else if (x509Certificate.getVersion() == 2) {
                     setAsserted(false);
                     setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " not supported");
-                } else if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11)) && delegatingSecurityToken.getTokenType() != Constants.TokenType.X509PkiPathV1Token) {
+                } else if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11)) && delegatingSecurityToken.getTokenType() != WSSConstants.X509PkiPathV1Token) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + x509Token.getTokenVersionAndType() + " but we got " + delegatingSecurityToken.getTokenType());
                 } else if ((x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKCS7_TOKEN10) || x509Token.getTokenVersionAndType().equals(SPConstants.WSS_X509_PKCS7_TOKEN11))) {
@@ -272,7 +272,7 @@ public class TokenAssertionState extends AssertionState {
                     setErrorMessage("Unsupported token type: " + delegatingSecurityToken.getTokenType());
                 }
             }
-        } catch (WSSecurityException e) {
+        } catch (XMLSecurityException e) {
             setAsserted(false);
             setErrorMessage(e.getMessage());
         }

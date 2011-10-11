@@ -21,10 +21,10 @@
 package org.oasis_open.docs.ws_sx.ws_secureconversation._200512;
 
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
-import org.swssf.ext.Constants;
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
-import org.swssf.ext.Utils;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -114,9 +114,9 @@ public class DerivedKeyTokenType implements Parseable {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
-            if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+            if (attribute.getName().equals(WSSConstants.ATT_wsu_Id)) {
                 this.id = attribute.getValue();
-            } else if (attribute.getName().equals(Constants.ATT_NULL_Algorithm)) {
+            } else if (attribute.getName().equals(WSSConstants.ATT_NULL_Algorithm)) {
                 this.algorithm = attribute.getValue();
             }
         }
@@ -136,11 +136,11 @@ public class DerivedKeyTokenType implements Parseable {
             case XMLStreamConstants.START_ELEMENT:
                 StartElement startElement = xmlEvent.asStartElement();
 
-                if (startElement.getName().equals(Constants.TAG_wsse_SecurityTokenReference)) {
+                if (startElement.getName().equals(WSSConstants.TAG_wsse_SecurityTokenReference)) {
                     currentParseable = securityTokenReference = new SecurityTokenReferenceType(startElement);
-                } else if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Properties.getLocalPart())) {
+                } else if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Properties.getLocalPart())) {
                     currentParseable = properties = new PropertiesType(startElement);
-                } else if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Generation.getLocalPart())) {
+                } else if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Generation.getLocalPart())) {
                     currentParseable = new Parseable() {
                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
                             switch (xmlEvent.getEventType()) {
@@ -159,7 +159,7 @@ public class DerivedKeyTokenType implements Parseable {
                         public void validate() throws ParseException {
                         }
                     };
-                } else if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Offset.getLocalPart())) {
+                } else if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Offset.getLocalPart())) {
                     currentParseable = new Parseable() {
                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
                             switch (xmlEvent.getEventType()) {
@@ -178,7 +178,7 @@ public class DerivedKeyTokenType implements Parseable {
                         public void validate() throws ParseException {
                         }
                     };
-                } else if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Length.getLocalPart())) {
+                } else if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Length.getLocalPart())) {
                     currentParseable = new Parseable() {
                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
                             switch (xmlEvent.getEventType()) {
@@ -197,7 +197,7 @@ public class DerivedKeyTokenType implements Parseable {
                         public void validate() throws ParseException {
                         }
                     };
-                } else if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Label.getLocalPart())) {
+                } else if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Label.getLocalPart())) {
                     currentParseable = new Parseable() {
                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
                             switch (xmlEvent.getEventType()) {
@@ -216,7 +216,7 @@ public class DerivedKeyTokenType implements Parseable {
                         public void validate() throws ParseException {
                         }
                     };
-                } else if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Nonce.getLocalPart())) {
+                } else if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Nonce.getLocalPart())) {
                     currentParseable = new Parseable() {
                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
                             switch (xmlEvent.getEventType()) {
@@ -243,12 +243,12 @@ public class DerivedKeyTokenType implements Parseable {
             case XMLStreamConstants.END_ELEMENT:
                 currentParseable = null;
                 EndElement endElement = xmlEvent.asEndElement();
-                if (endElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_DerivedKeyToken.getLocalPart())) {
+                if (endElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_DerivedKeyToken.getLocalPart())) {
                     return true;
                 }
                 break;
             default:
-                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                throw new ParseException("Unexpected event received " + WSSUtils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }

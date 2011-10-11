@@ -20,10 +20,10 @@
 
 package org.oasis_open.docs.ws_sx.ws_secureconversation._200512;
 
-import org.swssf.ext.Constants;
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
-import org.swssf.ext.Utils;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.*;
@@ -91,7 +91,7 @@ public class SecurityContextTokenType implements Parseable {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
-            if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+            if (attribute.getName().equals(WSSConstants.ATT_wsu_Id)) {
                 this.id = attribute.getValue();
             }
         }
@@ -111,7 +111,7 @@ public class SecurityContextTokenType implements Parseable {
             case XMLStreamConstants.START_ELEMENT:
                 StartElement startElement = xmlEvent.asStartElement();
 
-                if (startElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_Identifier.getLocalPart())) {
+                if (startElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_Identifier.getLocalPart())) {
                     currentParseable = new Parseable() {
                         public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
                             switch (xmlEvent.getEventType()) {
@@ -138,12 +138,12 @@ public class SecurityContextTokenType implements Parseable {
             case XMLStreamConstants.END_ELEMENT:
                 currentParseable = null;
                 EndElement endElement = xmlEvent.asEndElement();
-                if (endElement.getName().getLocalPart().equals(Constants.TAG_wsc0502_SecurityContextToken.getLocalPart())) {
+                if (endElement.getName().getLocalPart().equals(WSSConstants.TAG_wsc0502_SecurityContextToken.getLocalPart())) {
                     return true;
                 }
                 break;
             default:
-                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                throw new ParseException("Unexpected event received " + WSSUtils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }

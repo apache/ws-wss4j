@@ -18,10 +18,10 @@
  */
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
-import org.swssf.ext.Constants;
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
-import org.swssf.ext.Utils;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.namespace.QName;
@@ -77,7 +77,7 @@ public class EncodedString
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
-            if (attribute.getName().equals(Constants.ATT_NULL_EncodingType)) {
+            if (attribute.getName().equals(WSSConstants.ATT_NULL_EncodingType)) {
                 this.encodingType = attribute.getValue();
             }
         }
@@ -99,7 +99,7 @@ public class EncodedString
             case XMLStreamConstants.CHARACTERS:
                 break;
             default:
-                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                throw new ParseException("Unexpected event received " + WSSUtils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }

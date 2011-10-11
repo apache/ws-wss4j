@@ -19,8 +19,8 @@
 package org.swssf.policy.assertionStates;
 
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
-import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.securityEvent.SignedElementSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.List;

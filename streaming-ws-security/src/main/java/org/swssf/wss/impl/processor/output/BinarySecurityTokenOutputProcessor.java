@@ -1,0 +1,292 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.swssf.wss.impl.processor.output;
+
+import org.apache.commons.codec.binary.Base64;
+import org.swssf.wss.ext.*;
+import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
+import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
+import org.swssf.wss.impl.securityToken.X509SecurityToken;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
+import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.ext.*;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.security.Key;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.*;
+
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
+
+    public BinarySecurityTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
+        super(securityProperties, action);
+    }
+
+    @Override
+    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        try {
+            final String bstId = "BST-" + UUID.randomUUID().toString();
+            final X509Certificate[] x509Certificates;
+            final Key key;
+
+            XMLSecurityConstants.Action action = getAction();
+            if (action.equals(WSSConstants.SIGNATURE)
+                    || action.equals(WSSConstants.SAML_TOKEN_SIGNED)
+                    || action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+
+                String alias = getSecurityProperties().getSignatureUser();
+                WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
+                WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
+                String password = pwCb.getPassword();
+                if (password == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
+                }
+                key = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password);
+                x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(getSecurityProperties().getSignatureUser());
+                if (x509Certificates == null || x509Certificates.length == 0) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
+                }
+            } else if (action.equals(WSSConstants.ENCRYPT) ||
+                    action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
+                X509Certificate x509Certificate = getReqSigCert(outputProcessorChain.getSecurityContext());
+                if (x509Certificate != null && ((WSSSecurityProperties) getSecurityProperties()).isUseReqSigCertForEncryption()) {
+                    x509Certificates = new X509Certificate[1];
+                    x509Certificates[0] = x509Certificate;
+                } else if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
+                    x509Certificate = getSecurityProperties().getEncryptionUseThisCertificate();
+                    x509Certificates = new X509Certificate[1];
+                    x509Certificates[0] = x509Certificate;
+                } else {
+                    x509Certificates = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
+                    if (x509Certificates == null || x509Certificates.length == 0) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound", getSecurityProperties().getEncryptionUser());
+                    }
+                }
+                key = null;
+            } else {
+                x509Certificates = null;
+                key = null;
+            }
+
+            final ProcessorInfoSecurityToken binarySecurityToken = new ProcessorInfoSecurityToken() {
+
+                private OutputProcessor outputProcessor;
+
+                public String getId() {
+                    return bstId;
+                }
+
+                public void setProcessor(OutputProcessor outputProcessor) {
+                    this.outputProcessor = outputProcessor;
+                }
+
+                public Object getProcessor() {
+                    return outputProcessor;
+                }
+
+                public boolean isAsymmetric() {
+                    return true;
+                }
+
+                public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                    return key;
+                }
+
+                public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                    return x509Certificates[0].getPublicKey();
+                }
+
+                public X509Certificate[] getX509Certificates() throws WSSecurityException {
+                    return x509Certificates;
+                }
+
+                public void verify() throws WSSecurityException {
+                }
+
+                public SecurityToken getKeyWrappingToken() {
+                    return null;
+                }
+
+                public String getKeyWrappingTokenAlgorithm() {
+                    return null;
+                }
+
+                public WSSConstants.TokenType getTokenType() {
+                    return null;
+                }
+            };
+
+            final SecurityTokenProvider binarySecurityTokenProvider = new SecurityTokenProvider() {
+                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+                    return binarySecurityToken;
+                }
+
+                public String getId() {
+                    return bstId;
+                }
+            };
+
+            if (action.equals(WSSConstants.SIGNATURE)
+                    || action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
+                if (((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                    outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, bstId);
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
+                    finalBinarySecurityTokenOutputProcessor.getBeforeProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
+                    outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
+                    binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
+                }
+            } else if (action.equals(WSSConstants.ENCRYPT)) {
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY, bstId);
+                if (((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
+                    finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
+                    outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
+                    binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
+                }
+            } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)
+                    || action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
+
+                WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference = ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyTokenReference();
+                switch (derivedKeyTokenReference) {
+
+                    case DirectReference:
+                        outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, bstId);
+                        break;
+                    case EncryptedKey:
+                        outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY, bstId);
+                        break;
+                    case SecurityContextToken:
+                        outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN, bstId);
+                        break;
+                }
+                if ((getAction() == WSSConstants.ENCRYPT_WITH_DERIVED_KEY
+                        && ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE)
+                        || (getAction() == WSSConstants.SIGNATURE_WITH_DERIVED_KEY
+                        && ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE)) {
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
+                    finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
+                    outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
+                    binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
+                }
+            }
+
+            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(bstId, binarySecurityTokenProvider);
+
+        } finally {
+            outputProcessorChain.removeProcessor(this);
+        }
+        outputProcessorChain.processEvent(xmlEvent);
+    }
+
+    private X509Certificate getReqSigCert(SecurityContext securityContext) throws XMLSecurityException {
+        List<SecurityEvent> securityEventList = securityContext.getAsList(SecurityEvent.class);
+        if (securityEventList != null) {
+            for (int i = 0; i < securityEventList.size(); i++) {
+                SecurityEvent securityEvent = securityEventList.get(i);
+                //todo find correct message signature token...however...
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureToken) {
+                    SignatureTokenSecurityEvent signatureTokenSecurityEvent = (SignatureTokenSecurityEvent) securityEvent;
+                    SecurityToken securityToken = signatureTokenSecurityEvent.getSecurityToken();
+                    if (securityToken instanceof DelegatingSecurityToken) {
+                        securityToken = ((DelegatingSecurityToken) securityToken).getDelegatedSecurityToken();
+                    }
+                    if (securityToken instanceof X509SecurityToken) {
+                        X509SecurityToken x509SecurityToken = (X509SecurityToken) securityToken;
+                        return x509SecurityToken.getX509Certificates()[0];
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    class FinalBinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
+
+        private SecurityToken securityToken;
+
+        FinalBinarySecurityTokenOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, SecurityToken securityToken) throws XMLSecurityException {
+            super(securityProperties, action);
+            this.getAfterProcessors().add(BinarySecurityTokenOutputProcessor.class.getName());
+            this.securityToken = securityToken;
+        }
+
+        @Override
+        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            outputProcessorChain.processEvent(xmlEvent);
+            if (xmlEvent.isStartElement()) {
+                StartElement startElement = xmlEvent.asStartElement();
+                if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+
+                    boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();
+                    createBinarySecurityTokenStructure(subOutputProcessorChain, securityToken.getId(), securityToken.getX509Certificates(), useSingleCertificate);
+
+                    outputProcessorChain.removeProcessor(this);
+                }
+            }
+        }
+
+        //todo common method
+        protected void createBinarySecurityTokenStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate) throws XMLStreamException, XMLSecurityException {
+            Map<QName, String> attributes = new HashMap<QName, String>();
+            String valueType;
+            if (useSingleCertificate) {
+                valueType = WSSConstants.NS_X509_V3_TYPE;
+            } else {
+                valueType = WSSConstants.NS_X509PKIPathv1;
+            }
+            attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
+            attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
+            attributes.put(WSSConstants.ATT_wsu_Id, referenceId);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, attributes);
+            try {
+                if (useSingleCertificate) {
+                    createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
+                } else {
+                    try {
+                        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
+                        List<X509Certificate> certificates = Arrays.asList(x509Certificates);
+                        createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
+                    } catch (CertificateException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+                    } catch (NoSuchProviderException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+                    }
+                }
+            } catch (CertificateEncodingException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            }
+            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
+        }
+    }
+}

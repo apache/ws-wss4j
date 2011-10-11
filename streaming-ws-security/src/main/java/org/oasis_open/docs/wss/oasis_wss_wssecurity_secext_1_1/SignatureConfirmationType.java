@@ -19,10 +19,10 @@
 package org.oasis_open.docs.wss.oasis_wss_wssecurity_secext_1_1;
 
 import org.apache.commons.codec.binary.Base64;
-import org.swssf.ext.Constants;
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
-import org.swssf.ext.Utils;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -70,9 +70,9 @@ public class SignatureConfirmationType implements Parseable {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
-            if (attribute.getName().equals(Constants.ATT_NULL_Value)) {
+            if (attribute.getName().equals(WSSConstants.ATT_NULL_Value)) {
                 this.value = Base64.decodeBase64(attribute.getValue());
-            } else if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+            } else if (attribute.getName().equals(WSSConstants.ATT_wsu_Id)) {
                 this.id = attribute.getValue();
             }
         }
@@ -80,7 +80,7 @@ public class SignatureConfirmationType implements Parseable {
 
     public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
         if (!xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(this.startElement.getName())) {
-            throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+            throw new ParseException("Unexpected event received " + WSSUtils.getXMLEventAsString(xmlEvent));
         }
         return true;
     }

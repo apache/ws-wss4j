@@ -26,10 +26,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.swssf.ext.Constants;
-import org.swssf.impl.util.ConcreteLSInput;
 import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.policy.secpolicybuilder.*;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.xmlsec.impl.util.ConcreteLSInput;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.LSInput;
@@ -253,12 +253,12 @@ public class PolicyEnforcerFactory {
                             SOAPOperation soapOperation = (SOAPOperation) extensibilityElement;
                             String soapActionUri = soapOperation.getSoapActionURI();
                             operationPolicy.setOperationAction(soapActionUri);
-                            operationPolicy.setSoapMessageVersionNamespace(Constants.NS_SOAP11);
+                            operationPolicy.setSoapMessageVersionNamespace(WSSConstants.NS_SOAP11);
                         } else if (extensibilityElement instanceof SOAP12Operation) {
                             SOAP12Operation soap12Operation = (SOAP12Operation) extensibilityElement;
                             String soapActionUri = soap12Operation.getSoapActionURI();
                             operationPolicy.setOperationAction(soapActionUri);
-                            operationPolicy.setSoapMessageVersionNamespace(Constants.NS_SOAP12);
+                            operationPolicy.setSoapMessageVersionNamespace(WSSConstants.NS_SOAP12);
                         }
                     }
 

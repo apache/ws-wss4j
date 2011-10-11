@@ -21,11 +21,11 @@ package org.swssf.policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.*;
-import org.swssf.ext.WSSecurityException;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
-import org.swssf.securityEvent.*;
+import org.swssf.wss.ext.WSSecurityException;
+import org.swssf.wss.securityEvent.*;
 
 import java.util.*;
 

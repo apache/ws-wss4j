@@ -20,8 +20,8 @@ package org.swssf.policy.assertionStates;
 
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
 import org.swssf.policy.secpolicy.model.Binding;
-import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.securityEvent.TimestampSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 
 /**
  * @author $Author$

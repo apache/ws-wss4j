@@ -26,7 +26,7 @@ import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.RequiredPartAssertionState;
 import org.swssf.policy.secpolicy.SP12Constants;
 import org.swssf.policy.secpolicy.SPConstants;
-import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

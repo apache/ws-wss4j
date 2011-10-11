@@ -18,10 +18,11 @@
  */
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0;
 
-import org.swssf.ext.Constants;
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
-import org.swssf.ext.Utils;
+
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.namespace.QName;
@@ -79,9 +80,9 @@ public class ReferenceType implements Parseable {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
-            if (attribute.getName().equals(Constants.ATT_NULL_URI)) {
-                this.uri = Utils.dropReferenceMarker(attribute.getValue());
-            } else if (attribute.getName().equals(Constants.ATT_NULL_ValueType)) {
+            if (attribute.getName().equals(WSSConstants.ATT_NULL_URI)) {
+                this.uri = WSSUtils.dropReferenceMarker(attribute.getValue());
+            } else if (attribute.getName().equals(WSSConstants.ATT_NULL_ValueType)) {
                 this.valueType = attribute.getValue();
             }
         }
@@ -99,7 +100,7 @@ public class ReferenceType implements Parseable {
         switch (xmlEvent.getEventType()) {
             case XMLStreamConstants.START_ELEMENT:
                 StartElement startElement = xmlEvent.asStartElement();
-                if (startElement.getName().equals(Constants.TAG_wsse_BinarySecurityToken)) {
+                if (startElement.getName().equals(WSSConstants.TAG_wsse_BinarySecurityToken)) {
                     currentParseable = this.binarySecurityTokenType = new BinarySecurityTokenType(startElement);
                 } else {
                     throw new ParseException("Unexpected Element: " + startElement.getName());
@@ -108,12 +109,12 @@ public class ReferenceType implements Parseable {
             case XMLStreamConstants.END_ELEMENT:
                 currentParseable = null;
                 EndElement endElement = xmlEvent.asEndElement();
-                if (endElement.getName().equals(Constants.TAG_wsse_Reference)) {
+                if (endElement.getName().equals(WSSConstants.TAG_wsse_Reference)) {
                     return true;
                 }
                 break;
             default:
-                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                throw new ParseException("Unexpected event received " + WSSUtils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }

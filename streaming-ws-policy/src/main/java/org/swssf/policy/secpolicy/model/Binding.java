@@ -20,14 +20,14 @@
 package org.swssf.policy.secpolicy.model;
 
 import org.apache.neethi.Assertion;
-import org.swssf.ext.Constants;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.IncludeTimeStampAssertionState;
 import org.swssf.policy.assertionStates.SignedElementAssertionState;
 import org.swssf.policy.secpolicy.PolicyUtil;
 import org.swssf.policy.secpolicy.SPConstants;
-import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -140,7 +140,7 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
 
             Map<Assertion, List<AssertionState>> signedElementAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedElement);
             List<QName> qNames = new ArrayList<QName>();
-            qNames.add(Constants.TAG_wsu_Timestamp);
+            qNames.add(WSSConstants.TAG_wsu_Timestamp);
 
             SignedEncryptedElements signedEncryptedElements = null;
             List<Assertion> assertions = PolicyUtil.getPolicyAssertionsInSameAlternative(operationPolicy.getPolicy(), this, SignedEncryptedElements.class, Boolean.TRUE, spConstants);

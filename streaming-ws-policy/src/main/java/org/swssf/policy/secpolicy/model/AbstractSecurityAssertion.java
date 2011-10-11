@@ -23,7 +23,7 @@ import org.apache.neethi.PolicyComponent;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
-import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;

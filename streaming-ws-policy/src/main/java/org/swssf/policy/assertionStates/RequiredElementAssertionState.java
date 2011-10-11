@@ -1,4 +1,4 @@
- /**
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -19,8 +19,8 @@
 package org.swssf.policy.assertionStates;
 
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
-import org.swssf.securityEvent.RequiredElementSecurityEvent;
-import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.RequiredElementSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 

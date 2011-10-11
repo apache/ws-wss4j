@@ -20,8 +20,8 @@
 
 package org.oasis_open.docs.ws_sx.ws_secureconversation._200512;
 
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.XmlAccessType;

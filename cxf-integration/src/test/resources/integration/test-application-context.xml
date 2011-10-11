@@ -1,5 +1,6 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://cxf.apache.org/configuration/security"
        xmlns:http="http://cxf.apache.org/transports/http/configuration"
@@ -7,6 +8,7 @@
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
        http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
        http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
@@ -15,13 +17,13 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
-    <bean name="inSecurityProperties" class="org.swssf.ext.SecurityProperties">
+    <bean name="inSecurityProperties" class="org.swssf.wss.ext.WSSSecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <value>TIMESTAMP</value>
-                <value>SIGNATURE</value>
-                <value>ENCRYPT</value>
+                <util:constant static-field="org.swssf.wss.ext.WSSConstants.TIMESTAMP"/>
+                <util:constant static-field="org.swssf.wss.ext.WSSConstants.SIGNATURE"/>
+                <util:constant static-field="org.swssf.wss.ext.WSSConstants.ENCRYPT"/>
             </list>
         </property>
         <!--<property name="encryptionUser" value="transmitter"/>-->
@@ -29,13 +31,13 @@
         <property name="skipDocumentEvents" value="true"/>
     </bean>
 
-    <bean name="outSecurityProperties" class="org.swssf.ext.SecurityProperties">
+    <bean name="outSecurityProperties" class="org.swssf.wss.ext.WSSSecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <value>TIMESTAMP</value>
-                <value>SIGNATURE</value>
-                <value>ENCRYPT</value>
+                <util:constant static-field="org.swssf.wss.ext.WSSConstants.TIMESTAMP"/>
+                <util:constant static-field="org.swssf.wss.ext.WSSConstants.SIGNATURE"/>
+                <util:constant static-field="org.swssf.wss.ext.WSSConstants.ENCRYPT"/>
             </list>
         </property>
         <property name="signatureUser" value="receiver"/>
@@ -93,7 +95,7 @@
     </bean>
     -->
 
-    <bean id="greeterServiceImpl" class="org.swssf.test.integration.GreeterServiceImpl">
+    <bean id="greeterServiceImpl" class="org.swssf.cxfIntegration.test.integration.GreeterServiceImpl">
     </bean>
 
     <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
@@ -107,17 +109,17 @@
         </jaxws:outInterceptors>
     </jaxws:endpoint>
 
-    <bean name="securityInInterceptor" class="org.swssf.interceptor.SecurityInInterceptor">
+    <bean name="securityInInterceptor" class="org.swssf.cxfIntegration.interceptor.SecurityInInterceptor">
         <constructor-arg index="0" value="post-stream"/>
         <constructor-arg index="1" ref="inSecurityProperties"/>
     </bean>
 
-    <bean name="securityOutInterceptor" class="org.swssf.interceptor.SecurityOutInterceptor">
+    <bean name="securityOutInterceptor" class="org.swssf.cxfIntegration.interceptor.SecurityOutInterceptor">
         <constructor-arg index="0" value="pre-stream"/>
         <constructor-arg index="1" ref="outSecurityProperties"/>
     </bean>
 
-    <bean name="callbackHandler" class="org.swssf.test.CallbackHandlerImpl">
+    <bean name="callbackHandler" class="org.swssf.wss.test.CallbackHandlerImpl">
     </bean>
 
     <jaxws:endpoint id="greeterServiceWSS4J" implementor="#greeterServiceImpl"
@@ -155,7 +157,7 @@
         </property>
     </bean>
 
-    <bean name="passwordCallbackHandlerWSS4J" class="org.swssf.test.WSS4JCallbackHandlerImpl">
+    <bean name="passwordCallbackHandlerWSS4J" class="org.swssf.wss.test.WSS4JCallbackHandlerImpl">
     </bean>
 
     <httpj:engine-factory bus="cxf">

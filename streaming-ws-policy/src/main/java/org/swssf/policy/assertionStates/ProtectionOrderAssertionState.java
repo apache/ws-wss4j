@@ -1,4 +1,4 @@
- /**
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -21,9 +21,9 @@ package org.swssf.policy.assertionStates;
 import org.swssf.policy.secpolicy.SPConstants;
 import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
 import org.swssf.policy.secpolicy.model.SymmetricAsymmetricBindingBase;
-import org.swssf.securityEvent.EncryptionTokenSecurityEvent;
-import org.swssf.securityEvent.SecurityEvent;
-import org.swssf.securityEvent.SignatureTokenSecurityEvent;
+import org.swssf.wss.securityEvent.EncryptionTokenSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
 
 /**
  * @author $Author: giger $

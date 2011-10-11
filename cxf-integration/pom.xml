@@ -15,7 +15,7 @@
     <name>Streaming WS Security CXF Integration</name>
 
     <properties>
-        <cxf.version>2.4.0</cxf.version>
+        <cxf.version>2.4.2</cxf.version>
     </properties>
 
     <dependencies>
@@ -32,6 +32,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>streaming-xml-security</artifactId>
+            <version>1.0.0</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.swssf</groupId>
             <artifactId>streaming-ws-security</artifactId>

@@ -21,13 +21,13 @@ package org.swssf.policy.secpolicy.model;
 
 import org.apache.neethi.Assertion;
 import org.apache.neethi.PolicyComponent;
-import org.swssf.ext.Constants;
 import org.swssf.policy.OperationPolicy;
 import org.swssf.policy.assertionStates.AssertionState;
 import org.swssf.policy.assertionStates.EncryptedPartAssertionState;
 import org.swssf.policy.assertionStates.SignedPartAssertionState;
 import org.swssf.policy.secpolicy.SPConstants;
-import org.swssf.securityEvent.SecurityEvent;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -180,14 +180,14 @@ public class SignedEncryptedParts extends AbstractSecurityAssertion {
             Map<Assertion, List<AssertionState>> signedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.SignedPart);
             List<QName> qNames = getQNamesFromHeaders();
             if (isBody()) {
-                qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), Constants.TAG_soap_Body_LocalName));
+                qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), WSSConstants.TAG_soap_Body_LocalName));
             }
             addAssertionState(signedPartsAssertionStates, this, new SignedPartAssertionState(this, true, qNames));
         } else {
             Map<Assertion, List<AssertionState>> encryptedPartsAssertionStates = assertionStateMap.get(SecurityEvent.Event.EncryptedPart);
             List<QName> qNames = getQNamesFromHeaders();
             if (isBody()) {
-                qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), Constants.TAG_soap_Body_LocalName));
+                qNames.add(new QName(operationPolicy.getSoapMessageVersionNamespace(), WSSConstants.TAG_soap_Body_LocalName));
             }
             addAssertionState(encryptedPartsAssertionStates, this, new EncryptedPartAssertionState(this, true, qNames));
         }

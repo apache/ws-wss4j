@@ -17,6 +17,7 @@
     </developers>
 
     <modules>
+    	<module>streaming-xml-security</module>
     	<module>streaming-ws-security</module>
     	<module>streaming-ws-policy</module>
     	<module>cxf-integration</module>

@@ -18,10 +18,10 @@
  */
 package org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0;
 
-import org.swssf.ext.Constants;
-import org.swssf.ext.ParseException;
-import org.swssf.ext.Parseable;
-import org.swssf.ext.Utils;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.xmlsec.ext.ParseException;
+import org.swssf.xmlsec.ext.Parseable;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.*;
@@ -91,7 +91,7 @@ public class TimestampType implements Parseable {
         Iterator<Attribute> attributeIterator = startElement.getAttributes();
         while (attributeIterator.hasNext()) {
             Attribute attribute = attributeIterator.next();
-            if (attribute.getName().equals(Constants.ATT_wsu_Id)) {
+            if (attribute.getName().equals(WSSConstants.ATT_wsu_Id)) {
                 CollapsedStringAdapter collapsedStringAdapter = new CollapsedStringAdapter();
                 this.id = collapsedStringAdapter.unmarshal(attribute.getValue());
             }
@@ -112,9 +112,9 @@ public class TimestampType implements Parseable {
             case XMLStreamConstants.START_ELEMENT:
                 StartElement startElement = xmlEvent.asStartElement();
 
-                if (startElement.getName().equals(Constants.TAG_wsu_Created)) {
+                if (startElement.getName().equals(WSSConstants.TAG_wsu_Created)) {
                     currentParseable = this.created = new AttributedDateTime(startElement);
-                } else if (startElement.getName().equals(Constants.TAG_wsu_Expires)) {
+                } else if (startElement.getName().equals(WSSConstants.TAG_wsu_Expires)) {
                     currentParseable = this.expires = new AttributedDateTime(startElement);
                 } else {
                     throw new ParseException("Unsupported Element: " + startElement.getName());
@@ -124,12 +124,12 @@ public class TimestampType implements Parseable {
             case XMLStreamConstants.END_ELEMENT:
                 currentParseable = null;
                 EndElement endElement = xmlEvent.asEndElement();
-                if (endElement.getName().equals(Constants.TAG_wsu_Timestamp)) {
+                if (endElement.getName().equals(WSSConstants.TAG_wsu_Timestamp)) {
                     return true;
                 }
                 break;
             default:
-                throw new ParseException("Unexpected event received " + Utils.getXMLEventAsString(xmlEvent));
+                throw new ParseException("Unexpected event received " + WSSUtils.getXMLEventAsString(xmlEvent));
         }
         return false;
     }
