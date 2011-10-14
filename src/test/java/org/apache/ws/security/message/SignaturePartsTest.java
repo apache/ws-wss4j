@@ -155,6 +155,10 @@ public class SignaturePartsTest extends org.junit.Assert {
         String c14nMethod = 
             (String)actionResult.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
         assertEquals(WSConstants.C14N_EXCL_OMIT_COMMENTS, c14nMethod);
+        
+        List<String> transformAlgorithms = wsDataRef.getTransformAlgorithms();
+        assertTrue(transformAlgorithms.size() == 1);
+        assertTrue(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithms.get(0)));
     }
     
     /**

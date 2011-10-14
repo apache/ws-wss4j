@@ -66,6 +66,7 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -513,6 +514,16 @@ public class SignatureProcessor implements Processor {
                 ref.setProtectedElement(se);
                 ref.setAlgorithm(signedInfo.getSignatureMethod().getAlgorithm());
                 ref.setDigestAlgorithm(siRef.getDigestMethod().getAlgorithm());
+                
+                // Set the Transform algorithms as well
+                @SuppressWarnings("unchecked")
+                List<Transform> transforms = (List<Transform>)siRef.getTransforms();
+                List<String> transformAlgorithms = new ArrayList<String>(transforms.size());
+                for (Transform transform : transforms) {
+                    transformAlgorithms.add(transform.getAlgorithm());
+                }
+                ref.setTransformAlgorithms(transformAlgorithms);
+                
                 ref.setXpath(ReferenceListProcessor.getXPath(se));
                 protectedRefs.add(ref);
             }

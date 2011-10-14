@@ -27,6 +27,8 @@ package org.apache.ws.security;
  * be used for validation. 
  */
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
@@ -51,6 +53,11 @@ public class WSDataRef {
      * Algorithm used to encrypt/sign the element
      */
     private String algorithm;
+    
+    /**
+     * A list of algorithms used to transform the element before digest
+     */
+    private List<String> transformAlgorithms;
     
     /**
      * If this reference represents signed content, this field
@@ -175,6 +182,20 @@ public class WSDataRef {
      */
     public void setDigestAlgorithm(String digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
+    }
+    
+    /**
+     * Set the Transform algorithm URIs used to transform the element before digest
+     */
+    public void setTransformAlgorithms(List<String> transformAlgorithms) {
+        this.transformAlgorithms = transformAlgorithms;
+    }
+    
+    /**
+     * Get the Transform algorithm URIs used to transform the element before digest
+     */
+    public List<String> getTransformAlgorithms() {
+        return transformAlgorithms;
     }
 
 }
