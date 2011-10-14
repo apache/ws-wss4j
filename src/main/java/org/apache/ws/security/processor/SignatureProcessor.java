@@ -464,46 +464,21 @@ public class SignatureProcessor implements Processor {
             String uri = siRef.getURI();
             
             if (!"".equals(uri)) {
-                Element se = null;
-                
-                List<?> transformsList = siRef.getTransforms();
-                
-                for (int j = 0; j < transformsList.size(); j++) {
-                    
-                    Transform transform = (Transform)transformsList.get(j);
-                    
-                    if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
-                        NodeSetData data = (NodeSetData)siRef.getDereferencedData();
-                        if (data != null) {
-                            java.util.Iterator<?> iter = data.iterator();
-                            
-                            Node securityTokenReference = null;
-                            while (iter.hasNext()) {
-                                Node node = (Node)iter.next();
-                                if ("SecurityTokenReference".equals(node.getLocalName())) {
-                                    securityTokenReference = node;
-                                    break;
-                                }
-                            }
-                            
-                            if (securityTokenReference != null) {
-                                SecurityTokenReference secTokenRef = 
-                                    new SecurityTokenReference(
-                                        (Element)securityTokenReference,
-                                        wssConfig.isWsiBSPCompliant()
-                                    );
-                                se = STRTransformUtil.dereferenceSTR(doc, secTokenRef, wsDocInfo);
+                Element se = dereferenceSTR(doc, siRef, wssConfig, wsDocInfo);
+                // If an STR Transform is not used then just find the cached element
+                if (se == null) {
+                    NodeSetData data = (NodeSetData)siRef.getDereferencedData();
+                    if (data != null) {
+                        java.util.Iterator<?> iter = data.iterator();
+                        
+                        while (iter.hasNext()) {
+                            Node n = (Node)iter.next();
+                            if (n instanceof Element) {
+                                se = (Element)n;
+                                break;
                             }
                         }
                     }
-                }
-                
-                if (se == null) {
-                    CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
-                    if (callbackLookup == null) {
-                        callbackLookup = new DOMCallbackLookup(doc);
-                    }
-                    se = callbackLookup.getElement(uri, null, false);
                 }
                 if (se == null) {
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
@@ -531,6 +506,52 @@ public class SignatureProcessor implements Processor {
         return protectedRefs;
     }
     
+    /**
+     * Check to see if a SecurityTokenReference transform was used, if so then return the
+     * dereferenced element.
+     */
+    private Element dereferenceSTR(
+        Document doc,
+        Reference siRef, 
+        WSSConfig wssConfig,
+        WSDocInfo wsDocInfo
+    ) throws WSSecurityException {
+        List<?> transformsList = siRef.getTransforms();
+        
+        for (int j = 0; j < transformsList.size(); j++) {
+            
+            Transform transform = (Transform)transformsList.get(j);
+            
+            if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
+                NodeSetData data = (NodeSetData)siRef.getDereferencedData();
+                if (data != null) {
+                    java.util.Iterator<?> iter = data.iterator();
+                    
+                    Node securityTokenReference = null;
+                    while (iter.hasNext()) {
+                        Node node = (Node)iter.next();
+                        if ("SecurityTokenReference".equals(node.getLocalName())) {
+                            securityTokenReference = node;
+                            break;
+                        }
+                    }
+                    
+                    if (securityTokenReference != null) {
+                        SecurityTokenReference secTokenRef = 
+                            new SecurityTokenReference(
+                                (Element)securityTokenReference,
+                                wssConfig.isWsiBSPCompliant()
+                            );
+                        Element se = STRTransformUtil.dereferenceSTR(doc, secTokenRef, wsDocInfo);
+                        if (se != null) {
+                            return se;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
     
 
 }
