@@ -864,6 +864,9 @@ public class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 doAction |= WSConstants.UT;
                 actions.add(new Integer(WSConstants.UT));
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_NO_PASSWORD)) {
+                doAction |= WSConstants.UT_NOPASSWORD;
+                actions.add(new Integer(WSConstants.UT_NOPASSWORD));
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 doAction |= WSConstants.SIGN;
                 actions.add(new Integer(WSConstants.SIGN));

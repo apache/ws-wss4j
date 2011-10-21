@@ -56,6 +56,11 @@ public class WSHandlerConstants {
      * Perform a UsernameToken action.
      */
     public static final String USERNAME_TOKEN = "UsernameToken";
+    
+    /**
+     * Perform a UsernameToken action with no password.
+     */
+    public static final String USERNAME_TOKEN_NO_PASSWORD = "UsernameTokenNoPassword";
 
     /**
      * Perform an unsigned SAML Token action.

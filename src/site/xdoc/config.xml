@@ -180,6 +180,11 @@ The configuration tags for WSHandler Actions are as follows:
 <td>Perform a UsernameToken action.</td>
 </tr>
 <tr>
+<td>USERNAME_TOKEN_NO_PASSWORD</td>
+<td>UsernameTokenNoPassword</td>
+<td>Used on the receiving side to specify a UsernameToken with no password</td>
+</tr>
+<tr>
 <td>SAML_TOKEN_UNSIGNED</td>
 <td>SAMLTokenUnsigned</td>
 <td>Perform an unsigned SAML Token action.</td>
