@@ -844,6 +844,12 @@ public class Merlin extends CryptoBase {
                     WSSecurityException.FAILURE, "certpath",
                     new Object[] { e.getMessage() }, e
                 );
+        } catch (NullPointerException e) {
+                // NPE thrown by JDK 1.7 for one of the test cases
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "certpath",
+                    new Object[] { e.getMessage() }, e
+                );
         }
     }
     
