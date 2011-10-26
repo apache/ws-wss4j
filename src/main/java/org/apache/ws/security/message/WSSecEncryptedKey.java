@@ -296,7 +296,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             break;
 
         case WSConstants.ISSUER_SERIAL:
-            String issuer = remoteCert.getIssuerDN().getName();
+            String issuer = remoteCert.getIssuerX500Principal().getName();
             java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
             DOMX509IssuerSerial domIssuerSerial = 
                 new DOMX509IssuerSerial(
