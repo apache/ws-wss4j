@@ -444,7 +444,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             config.getIdAllocator().createId("ED-", elementToEncrypt);
         try {
             String headerId = "";
-            if (modifier.equals("Header")) {
+            if ("Header".equals(modifier)) {
                 Element elem = 
                     doc.createElementNS(
                         WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
