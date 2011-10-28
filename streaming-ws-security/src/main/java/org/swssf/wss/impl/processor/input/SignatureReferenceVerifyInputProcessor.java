@@ -21,15 +21,17 @@ package org.swssf.wss.impl.processor.input;
 import org.apache.jcs.JCS;
 import org.apache.jcs.access.exception.CacheException;
 import org.apache.jcs.engine.ElementAttributes;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.TransformationParametersType;
+import org.swssf.binding.excc14n.InclusiveNamespaces;
+import org.swssf.binding.wss10.TransformationParametersType;
+import org.swssf.binding.xmldsig.CanonicalizationMethodType;
+import org.swssf.binding.xmldsig.ReferenceType;
+import org.swssf.binding.xmldsig.SignatureType;
+import org.swssf.binding.xmldsig.TransformType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenReference;
 import org.swssf.wss.securityEvent.*;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
-import org.w3._2000._09.xmldsig_.CanonicalizationMethodType;
-import org.w3._2000._09.xmldsig_.ReferenceType;
-import org.w3._2000._09.xmldsig_.SignatureType;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
@@ -40,6 +42,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +54,6 @@ import java.util.List;
 public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
     private static final String cacheRegionName = "timestamp";
-
     private static JCS cache;
 
     static {
@@ -85,7 +87,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
             ReferenceType referenceType = matchesReferenceId(startElement);
             if (referenceType != null) {
 
-                if (referenceType.isProcessed()) {
+                if (getProcessedReferences().contains(referenceType)) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
                 }
                 InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
@@ -94,7 +96,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
                     inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                 }
-                referenceType.setProcessed(true);
+                getProcessedReferences().add(referenceType);
                 inputProcessorChain.getDocumentContext().setIsInSignedContent();
 
                 //fire a SecurityEvent:
@@ -116,7 +118,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
         TimestampSecurityEvent timestampSecurityEvent = inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
         if (timestampSecurityEvent != null) {
-            final String cacheKey = String.valueOf(timestampSecurityEvent.getCreated().getTimeInMillis()) + getSignatureType().getSignatureValue().getRawValue();
+            final String cacheKey = String.valueOf(timestampSecurityEvent.getCreated().getTimeInMillis()) + "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
             if (cache.get(cacheKey) != null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
@@ -162,19 +164,20 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
         }
 
         protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain) throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-            List<org.w3._2000._09.xmldsig_.wss.TransformType> transformTypeList = (List<org.w3._2000._09.xmldsig_.wss.TransformType>) (List<?>) referenceType.getTransforms().getTransform();
+            List<TransformType> transformTypeList = (List<TransformType>) (List<?>) referenceType.getTransforms().getTransform();
 
             String algorithm = null;
             Transformer parentTransformer = null;
             for (int i = transformTypeList.size() - 1; i >= 0; i--) {
-                org.w3._2000._09.xmldsig_.wss.TransformType transformType = transformTypeList.get(i);
-
-                if (transformType.getTransformationParametersType() != null) {
-                    TransformationParametersType transformationParametersType = transformType.getTransformationParametersType();
-                    final CanonicalizationMethodType canonicalizationMethodType = transformationParametersType.getCanonicalizationMethodType();
+                TransformType transformType = transformTypeList.get(i);
+                TransformationParametersType transformationParametersType = XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_wsse_TransformationParameters);
+                if (transformationParametersType != null) {
+                    CanonicalizationMethodType canonicalizationMethodType = XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), WSSConstants.TAG_dsig_CanonicalizationMethod);
                     if (canonicalizationMethodType != null) {
-                        algorithm = canonicalizationMethodType.getAlgorithm();
-                        String inclusiveNamespaces = canonicalizationMethodType.getInclusiveNamespaces();
+
+                        InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                        String inclusiveNamespaces = getInclusiveNamespaces(inclusiveNamespacesType);
+
                         if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transformType.getAlgorithm())) {
                             if (inclusiveNamespaces == null) {
                                 inclusiveNamespaces = "#default";
@@ -182,6 +185,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                                 inclusiveNamespaces = "#default " + inclusiveNamespaces;
                             }
                         }
+                        algorithm = canonicalizationMethodType.getAlgorithm();
                         parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, this.getBufferedDigestOutputStream(), algorithm);
                     }
                 }
@@ -192,17 +196,20 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                 algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
 
+                InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                String inclusiveNamespaces = getInclusiveNamespaces(inclusiveNamespacesType);
+
                 if (parentTransformer != null) {
-                    parentTransformer = WSSUtils.getTransformer(parentTransformer, transformType.getInclusiveNamespaces(), algorithm);
+                    parentTransformer = WSSUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm);
                 } else {
-                    parentTransformer = WSSUtils.getTransformer(transformType.getInclusiveNamespaces(), this.getBufferedDigestOutputStream(), algorithm);
+                    parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, this.getBufferedDigestOutputStream(), algorithm);
                 }
             }
 
             this.setTransformer(parentTransformer);
 
             if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
-                SecurityTokenProvider securityTokenProvider = inputProcessorChain.getSecurityContext().getSecurityTokenProvider(referenceType.getURI());
+                SecurityTokenProvider securityTokenProvider = inputProcessorChain.getSecurityContext().getSecurityTokenProvider(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()));
                 if (securityTokenProvider == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noReference");
                 }

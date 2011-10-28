@@ -18,16 +18,18 @@
  */
 package org.swssf.xmlsec.impl.processor.input;
 
+import org.swssf.binding.excc14n.InclusiveNamespaces;
+import org.swssf.binding.xmldsig.CanonicalizationMethodType;
+import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmldsig.SignatureType;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 import org.swssf.xmlsec.impl.util.SignerOutputStream;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2000._09.xmldsig_.SignatureType;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -40,6 +42,7 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -49,13 +52,11 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
 
     public AbstractSignatureInputHandler(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException, XMLStreamException {
 
-        final SignatureType signatureType = (SignatureType) parseStructure(eventQueue, index);
+        @SuppressWarnings("unchecked")
+        final SignatureType signatureType = ((JAXBElement<SignatureType>) parseStructure(eventQueue, index)).getValue();
         verifySignedInfo(inputProcessorChain, securityProperties, signatureType, eventQueue, index);
         addSignatureReferenceInputProcessorToChain(inputProcessorChain, securityProperties, signatureType);
     }
-
-    @Override
-    protected abstract Parseable getParseable(StartElement startElement);
 
     protected abstract void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties, SignatureType signatureType);
 
@@ -89,8 +90,8 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
     }
 
     protected abstract SignatureVerifier newSignatureVerifier(InputProcessorChain inputProcessorChain,
-                                                     XMLSecurityProperties securityProperties,
-                                                     final SignatureType signatureType) throws XMLSecurityException;
+                                                              XMLSecurityProperties securityProperties,
+                                                              final SignatureType signatureType) throws XMLSecurityException;
 
 /*
     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature-1022834285">
@@ -166,7 +167,24 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 
             try {
-                transformer = XMLSecurityUtils.getTransformer(signatureType.getSignedInfo().getCanonicalizationMethod().getInclusiveNamespaces(), this.bufferedSignerOutputStream, signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
+                final CanonicalizationMethodType canonicalizationMethodType = signatureType.getSignedInfo().getCanonicalizationMethod();
+                InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                String inclusiveNamespaces = null;
+                if (inclusiveNamespacesType != null) {
+                    List<String> prefixList = inclusiveNamespacesType.getPrefixList();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (int i = 0; i < prefixList.size(); i++) {
+                        String s = prefixList.get(i);
+                        stringBuilder.append(s);
+                        stringBuilder.append(' ');
+                    }
+                    inclusiveNamespaces = stringBuilder.toString();
+                }
+                //todo hand over inclusive namespaces as list?
+                transformer = XMLSecurityUtils.getTransformer(
+                        inclusiveNamespaces,
+                        this.bufferedSignerOutputStream,
+                        canonicalizationMethodType.getAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
             } catch (InstantiationException e) {

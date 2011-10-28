@@ -18,8 +18,6 @@
  */
 package org.swssf.wss.impl.securityToken;
 
-import org.apache.commons.codec.binary.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
@@ -41,26 +39,16 @@ import java.util.Map;
  */
 public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
 
-    private static final int DEFAULT_ITERATION = 1000;
+    private static final long DEFAULT_ITERATION = 1000;
 
     private String username;
     private String password;
     private String created;
     private byte[] nonce;
     private byte[] salt;
-    private Integer iteration;
+    private Long iteration;
 
-    UsernameSecurityToken(UsernameTokenType usernameTokenType, SecurityContext securityContext, String id, Object processor) {
-        super(securityContext, id, processor);
-        this.username = usernameTokenType.getUsername();
-        this.password = usernameTokenType.getPassword();
-        this.created = usernameTokenType.getCreated();
-        this.nonce = usernameTokenType.getNonce() != null ? Base64.decodeBase64(usernameTokenType.getNonce()) : null;
-        this.salt = usernameTokenType.getSalt() != null ? Base64.decodeBase64(usernameTokenType.getSalt()) : null;
-        this.iteration = usernameTokenType.getIteration() != null ? Integer.parseInt(usernameTokenType.getIteration()) : null;
-    }
-
-    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Integer iteration, SecurityContext securityContext, String id, Object processor) {
+    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration, SecurityContext securityContext, String id, Object processor) {
         super(securityContext, id, processor);
         this.username = username;
         this.password = password;
@@ -90,7 +78,7 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
         return salt;
     }
 
-    public Integer getIteration() {
+    public Long getIteration() {
         return iteration;
     }
 
@@ -106,7 +94,7 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
      * @throws org.swssf.wss.ext.WSSecurityException
      *
      */
-    public byte[] generateDerivedKey(String rawPassword, byte[] salt, int iteration) throws WSSecurityException {
+    public byte[] generateDerivedKey(String rawPassword, byte[] salt, long iteration) throws WSSecurityException {
         if (iteration == 0) {
             iteration = DEFAULT_ITERATION;
         }
@@ -224,9 +212,8 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
         super.getSecretKey(algorithmURI, keyUsage);
         byte[] secretToken = null;
         if (getSalt() != null && getIteration() != null) {
-            int iteration = getIteration();
             byte[] salt = getSalt();
-            secretToken = generateDerivedKey(getPassword(), salt, iteration);
+            secretToken = generateDerivedKey(getPassword(), salt, getIteration());
         } else {
             secretToken = getSecretKey(getPassword(), WSSConstants.WSE_DERIVED_KEY_LEN, WSSConstants.LABEL_FOR_DERIVED_KEY);
         }

@@ -19,12 +19,13 @@
 package org.swssf.xmlsec.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.swssf.binding.excc14n.InclusiveNamespaces;
+import org.swssf.binding.xmldsig.ReferenceType;
+import org.swssf.binding.xmldsig.SignatureType;
+import org.swssf.binding.xmldsig.TransformType;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.util.DigestOutputStream;
-import org.w3._2000._09.xmldsig_.ReferenceType;
-import org.w3._2000._09.xmldsig_.SignatureType;
-import org.w3._2000._09.xmldsig_.TransformType;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
@@ -40,6 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +51,7 @@ import java.util.List;
 public abstract class AbstractSignatureReferenceVerifyInputProcessor extends AbstractInputProcessor {
 
     private SignatureType signatureType;
+    private List<ReferenceType> processedReferences = new ArrayList<ReferenceType>();
 
     public AbstractSignatureReferenceVerifyInputProcessor(SignatureType signatureType, XMLSecurityProperties securityProperties) {
         super(securityProperties);
@@ -57,6 +60,10 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
     public SignatureType getSignatureType() {
         return signatureType;
+    }
+
+    public List<ReferenceType> getProcessedReferences() {
+        return processedReferences;
     }
 
     @Override
@@ -74,7 +81,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
             ReferenceType referenceType = matchesReferenceId(startElement);
             if (referenceType != null) {
 
-                if (referenceType.isProcessed()) {
+                if (processedReferences.contains(referenceType)) {
                     throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
                 }
                 InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
@@ -83,7 +90,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
                     internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
                     inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                 }
-                referenceType.setProcessed(true);
+                processedReferences.add(referenceType);
                 inputProcessorChain.getDocumentContext().setIsInSignedContent();
             }
         }
@@ -96,7 +103,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
             List<ReferenceType> references = getSignatureType().getSignedInfo().getReference();
             for (int i = 0; i < references.size(); i++) {
                 ReferenceType referenceType = references.get(i);
-                if (refId.getValue().equals(referenceType.getURI())) {
+                if (refId.getValue().equals(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()))) {
                     logger.debug("Found signature reference: " + refId.getValue() + " on element" + startElement.getName());
                     return referenceType;
                 }
@@ -110,7 +117,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
         List<ReferenceType> references = getSignatureType().getSignedInfo().getReference();
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);
-            if (!referenceType.isProcessed()) {
+            if (!processedReferences.contains(referenceType)) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "unprocessedSignatureReferences");
             }
         }
@@ -151,17 +158,19 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
         protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain) throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
             List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
 
-            String algorithm = null;
             Transformer parentTransformer = null;
             for (int i = transformTypeList.size() - 1; i >= 0; i--) {
                 TransformType transformType = transformTypeList.get(i);
 
-                algorithm = transformType.getAlgorithm();
+                InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                String inclusiveNamespaces = getInclusiveNamespaces(inclusiveNamespacesType);
 
+                //todo hand over inclusive namespaces as list?
+                String algorithm = transformType.getAlgorithm();
                 if (parentTransformer != null) {
-                    parentTransformer = XMLSecurityUtils.getTransformer(parentTransformer, transformType.getInclusiveNamespaces(), algorithm);
+                    parentTransformer = XMLSecurityUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm);
                 } else {
-                    parentTransformer = XMLSecurityUtils.getTransformer(transformType.getInclusiveNamespaces(), this.getBufferedDigestOutputStream(), algorithm);
+                    parentTransformer = XMLSecurityUtils.getTransformer(inclusiveNamespaces, this.getBufferedDigestOutputStream(), algorithm);
                 }
             }
             this.setTransformer(parentTransformer);
@@ -197,7 +206,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
                     }
 
                     byte[] calculatedDigest = this.getDigestOutputStream().getDigestValue();
-                    byte[] storedDigest = Base64.decodeBase64(getReferenceType().getDigestValue());
+                    byte[] storedDigest = getReferenceType().getDigestValue();
 
                     if (logger.isDebugEnabled()) {
                         logger.debug("Calculated Digest: " + new String(Base64.encodeBase64(calculatedDigest)));
@@ -268,6 +277,21 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
         protected void setFinished(boolean finished) {
             this.finished = finished;
+        }
+
+        protected String getInclusiveNamespaces(InclusiveNamespaces inclusiveNamespacesType) {
+            if (inclusiveNamespacesType != null) {
+                StringBuilder stringBuilder = new StringBuilder();
+                List<String> prefixList = inclusiveNamespacesType.getPrefixList();
+
+                for (int j = 0; j < prefixList.size(); j++) {
+                    String s = prefixList.get(j);
+                    stringBuilder.append(s);
+                    stringBuilder.append(' ');
+                }
+                return stringBuilder.toString();
+            }
+            return null;
         }
     }
 }

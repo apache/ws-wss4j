@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.oasis_open.docs.wss.oasis_wss_wssecurity_secext_1_1.SignatureConfirmationType;
+import org.swssf.binding.wss11.SignatureConfirmationType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;

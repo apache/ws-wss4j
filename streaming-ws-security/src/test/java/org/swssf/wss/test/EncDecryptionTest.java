@@ -630,6 +630,7 @@ public class EncDecryptionTest extends AbstractTestBase {
      * }
      */
 
+/*  Not spec conform and therefore not supported!:
     @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenEmbedded() throws Exception {
 
@@ -677,8 +678,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
         }
-    }
-
+    }*/
     @Test
     public void testEncDecryptionKeyIdentifierX509KeyOutbound() throws Exception {
 

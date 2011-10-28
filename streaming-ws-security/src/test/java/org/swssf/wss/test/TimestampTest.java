@@ -22,7 +22,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.xmlsec.ext.ParseException;
 import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -407,10 +406,7 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                throwable = throwable.getCause();
-                Assert.assertNotNull(throwable);
-                Assert.assertTrue(throwable instanceof ParseException);
-                Assert.assertEquals(throwable.getMessage(), "Element \"Created\" is missing");
+                Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header (Created time is missing)");
             }
         }
     }
@@ -496,10 +492,7 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                throwable = throwable.getCause();
-                Assert.assertNotNull(throwable);
-                Assert.assertTrue(throwable instanceof ParseException);
-                Assert.assertEquals(throwable.getMessage(), "Element \"Created\" is missing");
+                Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header (Created time is missing)");
             }
         }
     }

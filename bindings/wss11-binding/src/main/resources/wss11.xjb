@@ -1,0 +1,18 @@
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb"
+          xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          version="2.1">
+    <bindings schemaLocation="schemas/oasis-wss-wssecurity-secext-1.1.xsd" version="1.0">
+        <schemaBindings>
+            <package name="org.swssf.binding.wss11"/>
+        </schemaBindings>
+        <bindings node="//xs:complexType[@name='EncryptedHeaderType']">
+            <bindings node="xs:attribute[@ref='soap11:mustUnderstand']">
+                <property name="mustUnderstand11"/>
+            </bindings>
+            <bindings node="xs:attribute[@ref='soap12:mustUnderstand']">
+                <property name="mustUnderstand12"/>
+            </bindings>
+        </bindings>
+    </bindings>
+</bindings>

@@ -22,6 +22,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.*;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -37,6 +38,7 @@ import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -61,6 +63,14 @@ public class SecurityContextTokenTest extends AbstractTestBase {
     @BeforeClass
     public void setUp() throws Exception {
         WSSConfig.init();
+    }
+
+    @DataProvider(name = "versionProvider")
+    public Object[][] versionProvider() {
+        return new Object[][]{
+                {ConversationConstants.VERSION_05_02},
+                {ConversationConstants.VERSION_05_12}
+        };
     }
 
     @Test
@@ -107,8 +117,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSCTDKTEncryptInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSCTDKTEncryptInbound(int version) throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -118,6 +128,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 
@@ -129,6 +140,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
             encrBuilder.build(doc, secHeader);
@@ -197,8 +209,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSCTKDKTSignInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSCTKDKTSignInbound(int version) throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -208,6 +220,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 
@@ -219,6 +232,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
@@ -242,8 +256,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSCTKDKTSignAbsoluteInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSCTKDKTSignAbsoluteInbound(int version) throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -253,6 +267,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 
@@ -262,6 +277,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
             sigBuilder.setTokenIdDirectId(true);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
@@ -286,8 +302,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSCTKDKTSignEncrypt() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSCTKDKTSignEncrypt(int version) throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -297,6 +313,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 
@@ -308,12 +325,14 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
 
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
             encrBuilder.build(doc, secHeader);
@@ -340,8 +359,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSCTKDKTEncryptSign() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSCTKDKTEncryptSign(int version) throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -351,6 +370,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 
@@ -362,12 +382,14 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
             encrBuilder.build(doc, secHeader);
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
@@ -394,8 +416,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSCTSign() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSCTSign(int version) throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -405,6 +427,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 

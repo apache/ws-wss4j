@@ -20,6 +20,8 @@ package org.swssf.wss.ext;
 
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -32,6 +34,15 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 public class WSSConstants extends XMLSecurityConstants {
+
+    static {
+        try {
+            //todo schema validation?
+            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.wss10:org.swssf.binding.wss11:org.swssf.binding.wsu10:org.swssf.binding.wssc13:org.swssf.binding.wssc200502:org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.excc14n"));
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     protected WSSConstants() {
     }

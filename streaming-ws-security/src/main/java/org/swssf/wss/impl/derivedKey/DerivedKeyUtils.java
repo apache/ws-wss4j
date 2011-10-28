@@ -18,7 +18,6 @@
  */
 package org.swssf.wss.impl.derivedKey;
 
-import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 
@@ -49,7 +48,6 @@ public class DerivedKeyUtils {
                 labelBytes = label.getBytes("UTF-8");
             }
 
-            nonce = Base64.decodeBase64(nonce);
             byte[] seed = new byte[labelBytes.length + nonce.length];
             System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
             System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);

@@ -18,7 +18,10 @@
  */
 package org.swssf.xmlsec.ext;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -30,10 +33,9 @@ import java.security.SecureRandom;
  */
 public class XMLSecurityConstants {
 
-    protected XMLSecurityConstants() {
-    }
-
     public static final SecureRandom secureRandom;
+    //todo jaxbContext pool?
+    private static JAXBContext jaxbContext;
 
     static {
         try {
@@ -42,6 +44,24 @@ public class XMLSecurityConstants {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+
+        try {
+            //todo schema validation?
+            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.excc14n"));
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected XMLSecurityConstants() {
+    }
+
+    protected static synchronized void setJaxbContext(JAXBContext jaxbContext) {
+        XMLSecurityConstants.jaxbContext = jaxbContext;
+    }
+
+    public static JAXBContext getJaxbContext() {
+        return jaxbContext;
     }
 
     public enum Phase {
@@ -51,6 +71,7 @@ public class XMLSecurityConstants {
     }
 
     public static final String XMLINPUTFACTORY = "XMLInputFactory";
+    public static final XMLEventFactory XMLEVENTFACTORY = XMLEventFactory.newFactory();
 
     public static final String NS_XML = "http://www.w3.org/2000/xmlns/";
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";

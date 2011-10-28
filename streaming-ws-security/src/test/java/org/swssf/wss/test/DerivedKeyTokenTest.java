@@ -23,6 +23,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.*;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -37,6 +38,7 @@ import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -60,6 +62,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
     @BeforeClass
     public void setUp() throws Exception {
         WSSConfig.init();
+    }
+
+    @DataProvider(name = "versionProvider")
+    public Object[][] versionProvider() {
+        return new Object[][]{
+                {ConversationConstants.VERSION_05_02},
+                {ConversationConstants.VERSION_05_12}
+        };
     }
 
     @Test
@@ -94,8 +104,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionTRIPLEDESInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testEncryptionDecryptionTRIPLEDESInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -105,6 +115,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+            sctBuilder.setWscVersion(version);
             sctBuilder.prepare(doc, crypto);
 
             //EncryptedKey
@@ -119,6 +130,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
             encrBuilder.build(doc, secHeader);
@@ -147,7 +159,6 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
     public void testEncryptionDecryptionAES128Outbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -179,8 +190,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptionDecryptionAES128Inbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testEncryptionDecryptionAES128Inbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -189,6 +200,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
 
@@ -204,6 +216,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
             encrBuilder.build(doc, secHeader);
@@ -265,8 +278,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSignatureInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -287,6 +300,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //Derived key encryption
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(ek, tokenIdentifier);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
@@ -360,8 +374,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureThumbprintSHA1Inbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSignatureThumbprintSHA1Inbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -377,6 +391,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             secToken.setKeyIdentifierThumb(certs[0]);
 
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             java.security.Key key = crypto.getPrivateKey("transmitter", "default");
             sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
@@ -450,8 +465,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureSKIInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSignatureSKIInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -467,6 +482,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             secToken.setKeyIdentifierSKI(certs[0], crypto);
 
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             java.security.Key key = crypto.getPrivateKey("transmitter", "default");
             sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
@@ -544,8 +560,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testSignatureEncryptInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testSignatureEncryptInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -567,12 +583,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //Derived key encryption
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(ek, tokenIdentifier);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             Document signedDoc = sigBuilder.build(doc, secHeader);
 
             //Derived key signature
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
             encrBuilder.build(signedDoc, secHeader);
@@ -656,8 +674,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test
-    public void testEncryptSignatureInbound() throws Exception {
+    @Test(dataProvider = "versionProvider")
+    public void testEncryptSignatureInbound(int version) throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -679,12 +697,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //Derived key signature
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
             encrBuilder.build(doc, secHeader);
 
             //Derived key encryption
             WSSecDKSign sigBuilder = new WSSecDKSign();
+            sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(ek, tokenIdentifier);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);

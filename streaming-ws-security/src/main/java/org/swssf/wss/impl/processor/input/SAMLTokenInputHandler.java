@@ -58,9 +58,9 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     public SAMLTokenInputHandler(final InputProcessorChain inputProcessorChain, final WSSSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final SAMLTokenParseable samlTokenParseable = (SAMLTokenParseable) parseStructure(eventQueue, index);
+        final Document samlTokenDocument = (Document) parseStructure(eventQueue, index);
 
-        final SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlTokenParseable.getDocument().getDocumentElement());
+        final SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlTokenDocument.getDocumentElement());
 
         if (samlAssertionWrapper.isSigned()) {
             SAMLKeyInfo samlIssuerKeyInfo = samlAssertionWrapper.verifySignature(securityProperties);
@@ -106,106 +106,101 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
     }
 
     @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new SAMLTokenParseable(startElement);
+    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException {
+        Document document = null;
+        try {
+            document = documentBuilderFactory.newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+        }
+
+        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        int curIdx = 0;
+        while (curIdx++ < index) {
+            xmlEventIterator.next();
+        }
+
+        Node currentNode = document;
+        while (xmlEventIterator.hasNext()) {
+            XMLEvent next = xmlEventIterator.next();
+            currentNode = parseXMLEvent(next, currentNode, document);
+        }
+        return (T) document;
     }
 
-    class SAMLTokenParseable implements Parseable {
-
-        private Document document;
-        private Node currentNode;
-
-        SAMLTokenParseable(StartElement startElement) {
-            try {
-                currentNode = document = documentBuilderFactory.newDocumentBuilder().newDocument();
-                parseXMLEvent(startElement);
-            } catch (ParserConfigurationException e) {
-                throw new RuntimeException(e);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+    //todo custom SAML unmarshaller directly to XMLObject?
+    public Node parseXMLEvent(XMLEvent xmlEvent, Node currentNode, Document document) throws WSSecurityException {
+        switch (xmlEvent.getEventType()) {
+            case XMLEvent.START_ELEMENT:
+                StartElement startElement = xmlEvent.asStartElement();
+                Element element = document.createElementNS(startElement.getName().getNamespaceURI(), startElement.getName().getLocalPart());
+                if (startElement.getName().getPrefix() != null && !"".equals(startElement.getName().getPrefix())) {
+                    element.setPrefix(startElement.getName().getPrefix());
+                }
+                currentNode = currentNode.appendChild(element);
+                @SuppressWarnings("unchecked")
+                Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
+                while (namespaceIterator.hasNext()) {
+                    Namespace next = namespaceIterator.next();
+                    parseXMLEvent(next, currentNode, document);
+                }
+                @SuppressWarnings("unchecked")
+                Iterator<Attribute> attributesIterator = startElement.getAttributes();
+                while (attributesIterator.hasNext()) {
+                    Attribute next = attributesIterator.next();
+                    parseXMLEvent(next, currentNode, document);
+                }
+                break;
+            case XMLEvent.END_ELEMENT:
+                if (currentNode.getParentNode() != null) {
+                    currentNode = currentNode.getParentNode();
+                }
+                break;
+            case XMLEvent.PROCESSING_INSTRUCTION:
+                Node piNode = document.createProcessingInstruction(((ProcessingInstruction) xmlEvent).getTarget(), ((ProcessingInstruction) xmlEvent).getTarget());
+                currentNode.appendChild(piNode);
+                break;
+            case XMLEvent.CHARACTERS:
+                Node characterNode = document.createTextNode(xmlEvent.asCharacters().getData());
+                currentNode.appendChild(characterNode);
+                break;
+            case XMLEvent.COMMENT:
+                Node commentNode = document.createComment(((Comment) xmlEvent).getText());
+                currentNode.appendChild(commentNode);
+                break;
+            case XMLEvent.START_DOCUMENT:
+                break;
+            case XMLEvent.END_DOCUMENT:
+                return currentNode;
+            case XMLEvent.ATTRIBUTE:
+                Attr attributeNode = document.createAttributeNS(((Attribute) xmlEvent).getName().getNamespaceURI(), ((Attribute) xmlEvent).getName().getLocalPart());
+                attributeNode.setPrefix(((Attribute) xmlEvent).getName().getPrefix());
+                attributeNode.setValue(((Attribute) xmlEvent).getValue());
+                ((Element) currentNode).setAttributeNodeNS(attributeNode);
+                break;
+            case XMLEvent.DTD:
+                //todo?:
+                /*
+                Node dtdNode = document.getDoctype().getEntities()
+                ((DTD)xmlEvent).getDocumentTypeDeclaration():
+                ((DTD)xmlEvent).getEntities()
+                */
+                break;
+            case XMLEvent.NAMESPACE:
+                Namespace namespace = (Namespace) xmlEvent;
+                Attr namespaceNode;
+                if ("".equals(namespace.getPrefix())) {
+                    namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns");
+                } else {
+                    namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns:" + namespace.getPrefix());
+                }
+                namespaceNode.setValue(namespace.getNamespaceURI());
+                ((Element) currentNode).setAttributeNodeNS(namespaceNode);
+                break;
+            default:
+                throw new WSSecurityException("Illegal XMLEvent received: " + xmlEvent.getEventType());
         }
-
-        //todo custom SAML unmarshaller directly to XMLObject?
-        public boolean parseXMLEvent(XMLEvent xmlEvent) throws ParseException {
-            switch (xmlEvent.getEventType()) {
-                case XMLEvent.START_ELEMENT:
-                    StartElement startElement = xmlEvent.asStartElement();
-                    Element element = document.createElementNS(startElement.getName().getNamespaceURI(), startElement.getName().getLocalPart());
-                    if (startElement.getName().getPrefix() != null && !"".equals(startElement.getName().getPrefix())) {
-                        element.setPrefix(startElement.getName().getPrefix());
-                    }
-                    currentNode = currentNode.appendChild(element);
-                    @SuppressWarnings("unchecked")
-                    Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
-                    while (namespaceIterator.hasNext()) {
-                        Namespace next = namespaceIterator.next();
-                        parseXMLEvent(next);
-                    }
-                    @SuppressWarnings("unchecked")
-                    Iterator<Attribute> attributesIterator = startElement.getAttributes();
-                    while (attributesIterator.hasNext()) {
-                        Attribute next = attributesIterator.next();
-                        parseXMLEvent(next);
-                    }
-                    break;
-                case XMLEvent.END_ELEMENT:
-                    if (currentNode.getParentNode() != null) {
-                        currentNode = currentNode.getParentNode();
-                    }
-                    break;
-                case XMLEvent.PROCESSING_INSTRUCTION:
-                    Node piNode = document.createProcessingInstruction(((ProcessingInstruction) xmlEvent).getTarget(), ((ProcessingInstruction) xmlEvent).getTarget());
-                    currentNode.appendChild(piNode);
-                    break;
-                case XMLEvent.CHARACTERS:
-                    Node characterNode = document.createTextNode(xmlEvent.asCharacters().getData());
-                    currentNode.appendChild(characterNode);
-                    break;
-                case XMLEvent.COMMENT:
-                    Node commentNode = document.createComment(((Comment) xmlEvent).getText());
-                    currentNode.appendChild(commentNode);
-                    break;
-                case XMLEvent.START_DOCUMENT:
-                    break;
-                case XMLEvent.END_DOCUMENT:
-                    return true;
-                case XMLEvent.ATTRIBUTE:
-                    Attr attributeNode = document.createAttributeNS(((Attribute) xmlEvent).getName().getNamespaceURI(), ((Attribute) xmlEvent).getName().getLocalPart());
-                    attributeNode.setPrefix(((Attribute) xmlEvent).getName().getPrefix());
-                    attributeNode.setValue(((Attribute) xmlEvent).getValue());
-                    ((Element) currentNode).setAttributeNodeNS(attributeNode);
-                    break;
-                case XMLEvent.DTD:
-                    //todo?:
-                    /*
-                    Node dtdNode = document.getDoctype().getEntities()
-                    ((DTD)xmlEvent).getDocumentTypeDeclaration():
-                    ((DTD)xmlEvent).getEntities()
-                    */
-                    break;
-                case XMLEvent.NAMESPACE:
-                    Namespace namespace = (Namespace) xmlEvent;
-                    Attr namespaceNode;
-                    if ("".equals(namespace.getPrefix())) {
-                        namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns");
-                    } else {
-                        namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns:" + namespace.getPrefix());
-                    }
-                    namespaceNode.setValue(namespace.getNamespaceURI());
-                    ((Element) currentNode).setAttributeNodeNS(namespaceNode);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Illegal XMLEvent received: " + xmlEvent.getEventType());
-            }
-            return false;
-        }
-
-        public void validate() throws ParseException {
-        }
-
-        public Document getDocument() {
-            return document;
-        }
+        return currentNode;
     }
+
 }

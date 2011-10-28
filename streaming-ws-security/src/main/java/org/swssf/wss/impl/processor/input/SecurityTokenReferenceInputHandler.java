@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
+import org.swssf.binding.wss10.KeyIdentifierType;
+import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
@@ -28,6 +28,7 @@ import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
@@ -49,10 +50,11 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
     public SecurityTokenReferenceInputHandler(InputProcessorChain inputProcessorChain, final WSSSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final SecurityTokenReferenceType securityTokenReferenceType = (SecurityTokenReferenceType) parseStructure(eventQueue, index);
+        @SuppressWarnings("unchecked")
+        final SecurityTokenReferenceType securityTokenReferenceType = ((JAXBElement<SecurityTokenReferenceType>) parseStructure(eventQueue, index)).getValue();
 
-        if (securityTokenReferenceType.getKeyIdentifierType() != null) {
-            KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
+        final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
+        if (keyIdentifierType != null) {
             if (WSSConstants.NS_SAML10_TYPE.equals(keyIdentifierType.getValueType())) {
                 InternalSecurityTokenReferenceInputHandler internalSecurityTokenReferenceInputHandler
                         = new InternalSecurityTokenReferenceInputHandler(securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_AssertionID, keyIdentifierType.getValue().trim(), securityProperties);
@@ -63,11 +65,6 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                 inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
             }
         }
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new SecurityTokenReferenceType(startElement);
     }
 
     class InternalSecurityTokenReferenceInputHandler extends AbstractInputProcessor {

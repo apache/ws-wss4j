@@ -18,11 +18,13 @@
  */
 package org.swssf.wss.impl.securityToken;
 
+import org.swssf.binding.xmldsig.X509DataType;
+import org.swssf.binding.xmldsig.X509IssuerSerialType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.w3._2000._09.xmldsig_.X509DataType;
+import org.swssf.xmlsec.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -41,7 +43,8 @@ public class X509DataSecurityToken extends X509SecurityToken {
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getAliasForX509Cert(x509DataType.getX509IssuerSerialType().getX509IssuerName(), x509DataType.getX509IssuerSerialType().getX509SerialNumber());
+            X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
+            this.alias = getCrypto().getAliasForX509Cert(x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber());
         }
         return this.alias;
     }

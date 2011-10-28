@@ -18,14 +18,13 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.oasis_open.docs.wss.oasis_wss_wssecurity_secext_1_1.SignatureConfirmationType;
+import org.swssf.binding.wss11.SignatureConfirmationType;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.Parseable;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
-import javax.xml.stream.events.StartElement;
+import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 
@@ -39,12 +38,8 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
 
     public SignatureConfirmationInputHandler(InputProcessorChain inputProcessorChain, final WSSSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final SignatureConfirmationType signatureConfirmationType = (SignatureConfirmationType) parseStructure(eventQueue, index);
+        @SuppressWarnings("unchecked")
+        final SignatureConfirmationType signatureConfirmationType = ((JAXBElement<SignatureConfirmationType>) parseStructure(eventQueue, index)).getValue();
         inputProcessorChain.getSecurityContext().putAsList(SignatureConfirmationType.class, signatureConfirmationType);
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new SignatureConfirmationType(startElement);
     }
 }

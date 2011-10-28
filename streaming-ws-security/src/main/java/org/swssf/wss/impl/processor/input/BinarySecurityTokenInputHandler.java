@@ -18,13 +18,13 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
+import org.swssf.binding.wss10.BinarySecurityTokenType;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
-import javax.xml.stream.events.StartElement;
+import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                                            final WSSSecurityProperties securityProperties,
                                            Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final BinarySecurityTokenType binarySecurityTokenType = (BinarySecurityTokenType) parseStructure(eventQueue, index);
+        final BinarySecurityTokenType binarySecurityTokenType = ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index)).getValue();
 
         if (binarySecurityTokenType.getId() == null) {
             binarySecurityTokenType.setId(UUID.randomUUID().toString());
@@ -70,10 +70,5 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
 
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new BinarySecurityTokenType(startElement);
     }
 }

@@ -19,20 +19,24 @@
 package org.swssf.xmlsec.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmlenc.EncryptedDataType;
+import org.swssf.binding.xmlenc.ReferenceList;
+import org.swssf.binding.xmlenc.ReferenceType;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 import org.swssf.xmlsec.impl.util.IVSplittingOutputStream;
 import org.swssf.xmlsec.impl.util.ReplaceableOuputStream;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2001._04.xmlenc_.EncryptedDataType;
-import org.w3._2001._04.xmlenc_.ReferenceList;
-import org.w3._2001._04.xmlenc_.ReferenceType;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -57,6 +61,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
     private ReferenceList referenceList;
     private KeyInfoType keyInfoType;
+    private List<ReferenceType> processedReferences = new ArrayList<ReferenceType>();
 
     //the prefix must start with a letter by spec!:
     private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
@@ -148,7 +153,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                 ReferenceType referenceType = matchesReferenceId(startElement);
                 if (referenceType != null) {
                     //duplicate id's are forbidden
-                    if (referenceType.isProcessed()) {
+                    if (processedReferences.contains(referenceType)) {
                         throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
                     }
 
@@ -167,22 +172,17 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                         comparableAttributeList = Arrays.copyOfRange(xmlEventNS.getAttributeList(), 1, xmlEventNS.getNamespaceList().length);
                     }
 
-                    EncryptedDataType currentEncryptedDataType = newEncryptedDataType(startElement);
-
-                    referenceType.setProcessed(true);
+                    processedReferences.add(referenceType);
                     inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
-
-                    //only fire here ContentEncryptedElementEvents
-                    //the other ones will be fired later, because we don't know the encrypted element name yet
-                    if (SecurePart.Modifier.Content.getModifier().equals(currentEncryptedDataType.getType())) {
-                        encryptedContentEvent(inputProcessorChain, xmlEvent);
-                    }
 
                     //the following logic reads the encryptedData structure and doesn't pass them further
                     //through the chain
                     InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
 
+                    Deque<XMLEvent> xmlEvents = new LinkedList<XMLEvent>();
+                    xmlEvents.push(xmlEvent);
                     XMLEvent encryptedDataXMLEvent;
+                    int count = 0;
                     do {
                         subInputProcessorChain.reset();
                         if (isSecurityHeaderEvent) {
@@ -191,37 +191,51 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                             encryptedDataXMLEvent = subInputProcessorChain.processEvent();
                         }
 
-                        //todo this self made parsing is ugly as hell. An idea would be to use JAXB with a custom WS-Security schema.
-                        //todo the schema would have only the declared the elements which we are supporting.
-                        try {
-                            currentEncryptedDataType.parseXMLEvent(encryptedDataXMLEvent);
-                        } catch (ParseException e) {
-                            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
+                        xmlEvents.push(encryptedDataXMLEvent);
+                        if (++count >= 50) {
+                            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
                         }
                     }
-                    while (!(encryptedDataXMLEvent.isStartElement() && encryptedDataXMLEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_xenc_CipherValue)));
+                    while (!(encryptedDataXMLEvent.isStartElement()
+                            && encryptedDataXMLEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_xenc_CipherValue)));
+
+                    xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_CipherValue, null));
+                    xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_CipherData, null));
+                    xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_EncryptedData, null));
+
+                    EncryptedDataType encryptedDataType;
 
                     try {
-                        currentEncryptedDataType.validate();
-                    } catch (ParseException e) {
+                        Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbContext().createUnmarshaller();
+                        JAXBElement<EncryptedDataType> encryptedDataTypeJAXBElement =
+                                (JAXBElement<EncryptedDataType>) unmarshaller.unmarshal(new XMLSecurityEventReader(xmlEvents, 0));
+                        encryptedDataType = encryptedDataTypeJAXBElement.getValue();
+
+                    } catch (JAXBException e) {
                         throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
+                    }
+
+                    //only fire here ContentEncryptedElementEvents
+                    //the other ones will be fired later, because we don't know the encrypted element name yet
+                    if (SecurePart.Modifier.Content.getModifier().equals(encryptedDataType.getType())) {
+                        encryptedContentEvent(inputProcessorChain, xmlEvent);
                     }
 
                     KeyInfoType keyInfoType;
                     if (this.keyInfoType != null) {
                         keyInfoType = this.keyInfoType;
                     } else {
-                        keyInfoType = currentEncryptedDataType.getKeyInfo();
+                        keyInfoType = encryptedDataType.getKeyInfo();
                     }
 
                     //create a new Thread for streaming decryption
                     DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent,
-                            currentEncryptedDataType, keyInfoType, xmlEventNS);
+                            encryptedDataType, keyInfoType, xmlEventNS);
 
                     Thread receiverThread = new Thread(decryptionThread);
                     receiverThread.setName("decrypting thread");
 
-                    AbstractDecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = newDecryptedEventReaderInputProccessor(encryptedHeader, comparableNamespaceList, comparableAttributeList, currentEncryptedDataType);
+                    AbstractDecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = newDecryptedEventReaderInputProccessor(encryptedHeader, comparableNamespaceList, comparableAttributeList, encryptedDataType);
 
                     //add the new created EventReader processor to the chain.
                     inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
@@ -278,8 +292,6 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
             List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType);
 
-    protected abstract EncryptedDataType newEncryptedDataType(StartElement startElement);
-
     protected abstract void encryptedContentEvent(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent) throws XMLSecurityException;
 
     protected ReferenceType matchesReferenceId(StartElement startElement) {
@@ -287,11 +299,11 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         Attribute refId = getReferenceIDAttribute(startElement);
         if (refId != null) {
             //exists the id in the referenceList?
-            List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
-            Iterator<ReferenceType> referenceTypeIterator = references.iterator();
+            List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
+            Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();
             while (referenceTypeIterator.hasNext()) {
-                ReferenceType referenceType = referenceTypeIterator.next();
-                if (refId.getValue().equals(referenceType.getURI())) {
+                ReferenceType referenceType = referenceTypeIterator.next().getValue();
+                if (refId.getValue().equals(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()))) {
                     logger.debug("Found encryption reference: " + refId.getValue() + " on element" + startElement.getName());
                     return referenceType;
                 }
@@ -303,11 +315,11 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     @Override
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //here we check if all references where processed.
-        List<ReferenceType> references = referenceList.getDataReferenceOrKeyReference();
-        Iterator<ReferenceType> referenceTypeIterator = references.iterator();
+        List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
+        Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();
         while (referenceTypeIterator.hasNext()) {
-            ReferenceType referenceType = referenceTypeIterator.next();
-            if (!referenceType.isProcessed()) {
+            ReferenceType referenceType = referenceTypeIterator.next().getValue();
+            if (!processedReferences.contains(referenceType)) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "unprocessedEncryptionReferences");
             }
         }
@@ -469,7 +481,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         private Key secretKey;
 
         protected DecryptionThread(InputProcessorChain inputProcessorChain, boolean header,
-                                EncryptedDataType encryptedDataType, KeyInfoType keyInfoType, XMLEventNS startXMLElement) throws XMLStreamException, XMLSecurityException {
+                                   EncryptedDataType encryptedDataType, KeyInfoType keyInfoType, XMLEventNS startXMLElement) throws XMLStreamException, XMLSecurityException {
 
             this.inputProcessorChain = inputProcessorChain;
             this.header = header;

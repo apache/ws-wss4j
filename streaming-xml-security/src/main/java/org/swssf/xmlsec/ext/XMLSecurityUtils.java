@@ -23,6 +23,7 @@ import org.swssf.xmlsec.config.TransformerAlgorithmMapper;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
@@ -222,5 +223,31 @@ public class XMLSecurityUtils {
             childTransformer = constructor.newInstance(methodParameter1, methodParameter2);
         }
         return childTransformer;
+    }
+
+    public static <T> T getType(List<Object> objects, Class<T> clazz) {
+        for (int i = 0; i < objects.size(); i++) {
+            Object o = objects.get(i);
+            if (o instanceof JAXBElement) {
+                o = ((JAXBElement) o).getValue();
+            }
+            if (clazz.isAssignableFrom(o.getClass())) {
+                return (T) o;
+            }
+        }
+        return null;
+    }
+
+    public static <T> T getQNameType(List<Object> objects, QName qName) {
+        for (int i = 0; i < objects.size(); i++) {
+            Object o = objects.get(i);
+            if (o instanceof JAXBElement) {
+                JAXBElement jaxbElement = (JAXBElement) o;
+                if (jaxbElement.getName().equals(qName)) {
+                    return (T) jaxbElement.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

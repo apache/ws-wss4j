@@ -498,6 +498,7 @@ public class SignatureTest extends AbstractTestBase {
         }
     }
 
+/*  Not spec conform and therefore not supported!:
     @Test
     public void testSignatureKeyIdentifierBinarySecurityTokenEmbedded() throws Exception {
 
@@ -549,7 +550,7 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-    }
+    }*/
 
     @Test
     public void testSignatureKeyIdentifierX509KeyOutbound() throws Exception {

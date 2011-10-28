@@ -18,12 +18,12 @@
  */
 package org.swssf.xmlsec.impl.securityToken;
 
+import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.xmlsec.config.ConfigurationProperties;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
 
 import javax.security.auth.callback.CallbackHandler;
 

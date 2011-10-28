@@ -20,11 +20,12 @@ package org.swssf.xmlsec.ext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 
-import javax.xml.stream.events.StartElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
-import java.util.Iterator;
 
 /**
  * Abstract class for SecurityHeaderHandlers with parse logic for the xml structures
@@ -36,35 +37,13 @@ public abstract class AbstractInputSecurityHeaderHandler {
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected abstract Parseable getParseable(StartElement startElement);
-
-    protected Parseable parseStructure(Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException {
-        Iterator<XMLEvent> iterator = eventDeque.descendingIterator();
-        //skip to <XY> Element
-        int i = 0;
-        while (i < index) {
-            iterator.next();
-            i++;
-        }
-
-        if (!iterator.hasNext()) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "unexpectedEndOfXML");
-        }
-        XMLEvent xmlEvent = iterator.next();
-        if (!xmlEvent.isStartElement()) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "notAStartElement");
-        }
-        Parseable parseable = getParseable(xmlEvent.asStartElement());
-
+    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException {
         try {
-            while (iterator.hasNext()) {
-                xmlEvent = iterator.next();
-                parseable.parseXMLEvent(xmlEvent);
-            }
-            parseable.validate();
-        } catch (ParseException e) {
+            Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbContext().createUnmarshaller();
+            return (T) unmarshaller.unmarshal(new XMLSecurityEventReader(eventDeque, index));
+
+        } catch (JAXBException e) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
-        return parseable;
     }
 }

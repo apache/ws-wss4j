@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0.TimestampType;
+import org.swssf.binding.wsu10.TimestampType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
@@ -27,13 +27,12 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.Parseable;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Calendar;
 import java.util.Deque;
@@ -58,7 +57,11 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
         inputProcessorChain.getSecurityContext().put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
-        final TimestampType timestampType = (TimestampType) parseStructure(eventQueue, index);
+        final TimestampType timestampType = ((JAXBElement<TimestampType>) parseStructure(eventQueue, index)).getValue();
+
+        if (timestampType.getCreated() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "missingCreated");
+        }
 
         try {
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
@@ -112,11 +115,6 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         } catch (IllegalArgumentException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new TimestampType(startElement);
     }
 
     /*

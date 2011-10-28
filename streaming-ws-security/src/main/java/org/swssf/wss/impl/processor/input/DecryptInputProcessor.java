@@ -18,6 +18,9 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmlenc.EncryptedDataType;
+import org.swssf.binding.xmlenc.ReferenceList;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
@@ -27,12 +30,8 @@ import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.processor.input.AbstractDecryptInputProcessor;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2001._04.xmlenc_.EncryptedDataType;
-import org.w3._2001._04.xmlenc_.ReferenceList;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         super(referenceList, securityProperties);
     }
 
-    public DecryptInputProcessor(org.w3._2000._09.xmldsig_.wss.KeyInfoType keyInfoType, ReferenceList referenceList,
+    public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties) {
         super(keyInfoType, referenceList, securityProperties);
     }
@@ -71,17 +70,9 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     }
 
     @Override
-    protected EncryptedDataType newEncryptedDataType(StartElement startElement) {
-        return new EncryptedDataType(startElement) {
-            @Override
-            protected KeyInfoType newKeyInfoType(StartElement startElement) {
-                return new org.w3._2000._09.xmldsig_.wss.KeyInfoType(startElement);
-            }
-        };
-    }
-
-    @Override
-    protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList, List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType) {
+    protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
+            boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
+            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType) {
         return new DecryptedEventReaderInputProcessor(getSecurityProperties(),
                 SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()),
                 encryptedHeader, comparableNamespaceList, comparableAttributeList,

@@ -25,6 +25,21 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>wss10-binding</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>wss11-binding</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>ws-secureconversation-binding</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>
             <scope>compile</scope>
@@ -148,24 +163,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includeSchemas>
-                        <includeSchema>security-config.xsd</includeSchema>
-                    </includeSchemas>
-                    <readOnly>true</readOnly>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

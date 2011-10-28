@@ -18,17 +18,19 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import org.swssf.binding.xmldsig.SignatureType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.InputProcessorChain;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityProperties;
 import org.swssf.xmlsec.impl.processor.input.AbstractSignatureInputHandler;
-import org.w3._2000._09.xmldsig_.*;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -49,37 +51,9 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
     }
 
     @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new SignatureType(startElement) {
-            @Override
-            protected KeyInfoType newKeyInfoType(StartElement startElement) {
-                return new org.w3._2000._09.xmldsig_.wss.KeyInfoType(startElement);
-            }
-
-            @Override
-            protected SignedInfoType newSignedInfoType(StartElement startElement) {
-                return new org.w3._2000._09.xmldsig_.wss.SignedInfoType(startElement) {
-                    @Override
-                    protected ReferenceType newReferenceType(StartElement startElement) {
-                        return new org.w3._2000._09.xmldsig_.wss.ReferenceType(startElement) {
-                            @Override
-                            protected TransformsType newTransformsType(StartElement startElement) {
-                                return new org.w3._2000._09.xmldsig_.wss.TransformsType(startElement) {
-                                    @Override
-                                    protected TransformType newTransformType(StartElement startElement) {
-                                        return new org.w3._2000._09.xmldsig_.wss.TransformType(startElement);
-                                    }
-                                };
-                            }
-                        };
-                    }
-                };
-            }
-        };
-    }
-
-    @Override
-    protected void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties, SignatureType signatureType) {
+    protected void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain,
+                                                              XMLSecurityProperties securityProperties,
+                                                              SignatureType signatureType) {
         //add processors to verify references
         inputProcessorChain.addProcessor(new SignatureReferenceVerifyInputProcessor(signatureType, securityProperties));
     }

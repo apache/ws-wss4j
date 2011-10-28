@@ -18,14 +18,12 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import org.swssf.binding.xmlenc.ReferenceList;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.Parseable;
 import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.w3._2001._04.xmlenc_.ReferenceList;
 
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 
@@ -45,10 +43,5 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
 
         //instantiate a new DecryptInputProcessor and add it to the chain
         inputProcessorChain.addProcessor(new org.swssf.wss.impl.processor.input.DecryptInputProcessor(referenceList, securityProperties));
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new ReferenceList(startElement);
     }
 }

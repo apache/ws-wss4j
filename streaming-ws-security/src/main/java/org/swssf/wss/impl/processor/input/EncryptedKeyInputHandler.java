@@ -18,9 +18,11 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.apache.commons.codec.binary.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ReferenceType;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
+import org.swssf.binding.wss10.ObjectFactory;
+import org.swssf.binding.wss10.ReferenceType;
+import org.swssf.binding.wss10.SecurityTokenReferenceType;
+import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
@@ -32,8 +34,6 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
-import org.w3._2001._04.xmlenc_.EncryptedKeyType;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.BadPaddingException;
@@ -41,7 +41,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.stream.events.StartElement;
+import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -61,7 +61,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                                     final WSSSecurityProperties securityProperties,
                                     Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final EncryptedKeyType encryptedKeyType = (EncryptedKeyType) parseStructure(eventQueue, index);
+        @SuppressWarnings("unchecked")
+        final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index)).getValue();
         if (encryptedKeyType.getId() == null) {
             encryptedKeyType.setId(UUID.randomUUID().toString());
         }
@@ -89,7 +90,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     AlgorithmType asyncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
                     Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
 
-                    org.w3._2000._09.xmldsig_.wss.KeyInfoType keyInfoType = (org.w3._2000._09.xmldsig_.wss.KeyInfoType) encryptedKeyType.getKeyInfo();
+                    KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
                     wrappingSecurityToken = SecurityTokenFactoryImpl.newInstance().getSecurityToken(
                             keyInfoType,
                             crypto,
@@ -99,8 +100,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     );
                     cipher.init(Cipher.DECRYPT_MODE, wrappingSecurityToken.getSecretKey(algorithmURI, wrappingSecurityToken.isAsymmetric() ? WSSConstants.Asym_Key_Wrap : WSSConstants.Sym_Key_Wrap));
 
-                    byte[] encryptedEphemeralKey = Base64.decodeBase64(encryptedKeyType.getCipherData().getCipherValue());
-                    secretToken = cipher.doFinal(encryptedEphemeralKey);
+                    secretToken = cipher.doFinal(encryptedKeyType.getCipherData().getCipherValue());
 
                 } catch (NoSuchPaddingException e) {
                     throw new WSSecurityException(
@@ -179,24 +179,15 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
         //and add it to the chain
         if (encryptedKeyType.getReferenceList() != null) {
-            org.w3._2000._09.xmldsig_.wss.KeyInfoType keyInfoType = new org.w3._2000._09.xmldsig_.wss.KeyInfoType();
+            KeyInfoType keyInfoType = new KeyInfoType();
             SecurityTokenReferenceType securityTokenReferenceType = new SecurityTokenReferenceType();
             ReferenceType referenceType = new ReferenceType();
             referenceType.setURI("#" + encryptedKeyType.getId());
-            securityTokenReferenceType.setReferenceType(referenceType);
-            keyInfoType.setSecurityTokenReferenceType(securityTokenReferenceType);
+            ObjectFactory objectFactory = new ObjectFactory();
+            securityTokenReferenceType.getAny().add(objectFactory.createReference(referenceType));
+            keyInfoType.getContent().add(objectFactory.createSecurityTokenReference(securityTokenReferenceType));
             inputProcessorChain.addProcessor(new org.swssf.wss.impl.processor.input.DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(), securityProperties));
         }
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new EncryptedKeyType(startElement) {
-            @Override
-            protected KeyInfoType newKeyInfoType(StartElement startElement) {
-                return new org.w3._2000._09.xmldsig_.wss.KeyInfoType(startElement);
-            }
-        };
     }
 
     /*

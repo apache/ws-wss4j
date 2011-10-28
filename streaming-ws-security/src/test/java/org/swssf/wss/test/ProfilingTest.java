@@ -22,7 +22,6 @@ import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.InboundWSSec;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
-import org.testng.annotations.Test;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -51,7 +50,7 @@ public class ProfilingTest extends AbstractTestBase {
     }
  */
 
-    @Test(invocationCount = 1)
+    //@Test(invocationCount = 1)
     public void testStreamingSecOutbound() throws Exception {
 /*
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -85,7 +84,7 @@ public class ProfilingTest extends AbstractTestBase {
     }
 */
 
-    @Test(invocationCount = 1, dependsOnMethods = {"testStreamingSecOutbound"})
+    //@Test(invocationCount = 1, dependsOnMethods = {"testStreamingSecOutbound"})
     public void testStreamingSecInbound() throws Exception {
 
         final ThreadStopper threadStopper = new ThreadStopper();

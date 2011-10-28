@@ -20,6 +20,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>xmldsig-binding</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>c14n-binding</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swssf</groupId>
+            <artifactId>xmlenc-binding</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
             <version>3.2.9</version>

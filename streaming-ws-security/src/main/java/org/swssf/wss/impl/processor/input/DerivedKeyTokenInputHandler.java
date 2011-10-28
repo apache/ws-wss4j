@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.oasis_open.docs.ws_sx.ws_secureconversation._200512.DerivedKeyTokenType;
+import org.swssf.binding.wssc.AbstractDerivedKeyTokenType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
@@ -32,7 +32,7 @@ import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.stream.events.StartElement;
+import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.util.Deque;
@@ -52,7 +52,8 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                        final WSSSecurityProperties securityProperties,
                                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final DerivedKeyTokenType derivedKeyTokenType = (DerivedKeyTokenType) parseStructure(eventQueue, index);
+        @SuppressWarnings("unchecked")
+        final AbstractDerivedKeyTokenType derivedKeyTokenType = ((JAXBElement<AbstractDerivedKeyTokenType>) parseStructure(eventQueue, index)).getValue();
         if (derivedKeyTokenType.getId() == null) {
             derivedKeyTokenType.setId(UUID.randomUUID().toString());
         }
@@ -113,10 +114,10 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         byte[] keyBytes = DerivedKeyUtils.deriveKey(
                                 derivedKeyTokenType.getAlgorithm(),
                                 derivedKeyTokenType.getLabel(),
-                                derivedKeyTokenType.getLength(),
+                                derivedKeyTokenType.getLength().intValue(),
                                 secret,
                                 nonce,
-                                derivedKeyTokenType.getOffset()
+                                derivedKeyTokenType.getOffset().intValue()
                         );
                         String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
                         return new SecretKeySpec(keyBytes, algo);
@@ -146,10 +147,5 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
             }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(derivedKeyTokenType.getId(), securityTokenProvider);
-    }
-
-    @Override
-    protected Parseable getParseable(StartElement startElement) {
-        return new DerivedKeyTokenType(startElement);
     }
 }

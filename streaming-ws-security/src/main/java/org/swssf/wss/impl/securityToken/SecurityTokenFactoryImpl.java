@@ -19,22 +19,17 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.apache.commons.codec.binary.Base64;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.BinarySecurityTokenType;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.KeyIdentifierType;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.SecurityTokenReferenceType;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.UsernameTokenType;
 import org.opensaml.common.SAMLVersion;
+import org.swssf.binding.wss10.*;
+import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmldsig.X509DataType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.SecurityContext;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.SecurityTokenProvider;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
-import org.w3._2000._09.xmldsig_.KeyInfoType;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.events.XMLEvent;
@@ -55,8 +50,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto,
                                           final CallbackHandler callbackHandler, SecurityContext securityContext,
                                           Object processor) throws XMLSecurityException {
-        if (keyInfoType != null && keyInfoType instanceof org.w3._2000._09.xmldsig_.wss.KeyInfoType) {
-            return getSecurityToken(((org.w3._2000._09.xmldsig_.wss.KeyInfoType) keyInfoType).getSecurityTokenReferenceType(), crypto, callbackHandler, securityContext, processor);
+        if (keyInfoType != null) {
+            final SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
+            return getSecurityToken(securityTokenReferenceType, crypto, callbackHandler, securityContext, processor);
         } else if (crypto.getDefaultX509Alias() != null) {
             return new X509DefaultSecurityToken(securityContext, crypto, callbackHandler, crypto.getDefaultX509Alias(), crypto.getDefaultX509Alias(), processor);
         }
@@ -71,13 +67,18 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef");
             }
 
-            if (securityTokenReferenceType.getX509DataType() != null) {
-                return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.ISSUER_SERIAL, new X509DataSecurityToken(securityContext, crypto, callbackHandler, securityTokenReferenceType.getX509DataType(), securityTokenReferenceType.getId(), processor));
+            final X509DataType x509DataType = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
+            final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
+            final ReferenceType referenceType = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
+            if (x509DataType != null) {
+                return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.ISSUER_SERIAL,
+                        new X509DataSecurityToken(securityContext, crypto, callbackHandler,
+                                x509DataType,
+                                securityTokenReferenceType.getId(), processor));
             }
-            //todo this is not supported by outputProcessor but can be implemented. We'll have a look at the spec if this is allowed
-            else if (securityTokenReferenceType.getKeyIdentifierType() != null) {
-                KeyIdentifierType keyIdentifierType = securityTokenReferenceType.getKeyIdentifierType();
-
+            //todo this is not supported by outputProcessor but can be implemented.
+            // We'll have a look at the spec if this is allowed
+            else if (keyIdentifierType != null) {
                 String valueType = keyIdentifierType.getValueType();
                 String encodingType = keyIdentifierType.getEncodingType();
 
@@ -99,40 +100,42 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     }
                     return securityTokenProvider.getSecurityToken(crypto);
                 }
-            } else if (securityTokenReferenceType.getReferenceType() != null) {
+            } else if (referenceType != null) {
 
-                String uri = securityTokenReferenceType.getReferenceType().getURI();
+                String uri = referenceType.getURI();
                 if (uri == null) {
                     throw new WSSecurityException("badReferenceURI");
                 }
                 uri = WSSUtils.dropReferenceMarker(uri);
                 //embedded BST:
-                if (securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType() != null
-                        && uri.equals(securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType().getId())) {
-                    BinarySecurityTokenType binarySecurityTokenType = securityTokenReferenceType.getReferenceType().getBinarySecurityTokenType();
+                //todo? this seems not to be schema valid!
+                /*BinarySecurityTokenType binarySecurityTokenType = XMLSecurityUtils.getQNameType(referenceType, WSSConstants.TAG_dsig_X509Data)
+                if (referenceType.getBinarySecurityTokenType() != null
+                        && uri.equals(referenceType.getBinarySecurityTokenType().getId())) {
+                    BinarySecurityTokenType binarySecurityTokenType = referenceType.getBinarySecurityTokenType();
                     return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.BST_EMBEDDED, getSecurityToken(binarySecurityTokenType, securityContext, crypto, callbackHandler, processor));
-                } else {//referenced BST:
-                    //we have to search BST somewhere in the doc. First we will check for a BST already processed and
-                    //stored in the context. Otherwise we will abort now.
+                } else {//referenced BST:*/
+                //we have to search BST somewhere in the doc. First we will check for a BST already processed and
+                //stored in the context. Otherwise we will abort now.
 
-                    //prevent recursive key reference DOS:
-                    Integer invokeCount = securityContext.<Integer>get("" + Thread.currentThread().hashCode());
-                    if (invokeCount == null) {
-                        invokeCount = 0;
-                    }
-                    invokeCount++;
-                    if (invokeCount == 10) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
-                    }
-                    securityContext.put("" + Thread.currentThread().hashCode(), invokeCount);
-
-                    SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
-                    if (securityTokenProvider == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
-                    }
-                    return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE, securityTokenProvider.getSecurityToken(crypto));
+                //prevent recursive key reference DOS:
+                Integer invokeCount = securityContext.<Integer>get("" + Thread.currentThread().hashCode());
+                if (invokeCount == null) {
+                    invokeCount = 0;
                 }
+                invokeCount++;
+                if (invokeCount == 10) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
+                }
+                securityContext.put("" + Thread.currentThread().hashCode(), invokeCount);
+
+                SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
+                if (securityTokenProvider == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
+                }
+                return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE, securityTokenProvider.getSecurityToken(crypto));
             }
+            //}
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         } finally {
             securityContext.remove("" + Thread.currentThread().hashCode());
@@ -157,8 +160,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         }
     }
 
-    public static SecurityToken getSecurityToken(UsernameTokenType usernameTokenType, SecurityContext securityContext, Object processor) throws WSSecurityException {
-        return new UsernameSecurityToken(usernameTokenType, securityContext, usernameTokenType.getId(), processor);
+    public static SecurityToken getSecurityToken(String username, String password, String created, byte[] nonce,
+                                                 byte[] salt, Long iteration, SecurityContext securityContext,
+                                                 String id, Object processor) throws WSSecurityException {
+        return new UsernameSecurityToken(username, password, created, nonce, salt, iteration, securityContext, id, processor);
     }
 
     public static SecurityToken getSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) throws WSSecurityException {

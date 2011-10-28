@@ -25,5 +25,5 @@ package org.swssf.wss.impl.derivedKey;
  */
 public interface DerivationAlgorithm {
 
-    public byte[] createKey(byte[] secret, byte[] seed, int offset, long length) throws ConversationException;
+    public byte[] createKey(byte[] secret, byte[] seed, int offset, int length) throws ConversationException;
 }

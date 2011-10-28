@@ -48,14 +48,14 @@ public class P_SHA1
         implements DerivationAlgorithm {
 
     public byte[] createKey(byte[] secret, byte[] seed, int offset,
-                            long length) throws ConversationException {
+                            int length) throws ConversationException {
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
 
             byte[] tempBytes = P_hash(secret, seed, mac,
-                    (offset + (int) length));
+                    (offset + length));
 
-            byte[] key = new byte[(int) length];
+            byte[] key = new byte[length];
 
             System.arraycopy(tempBytes, 0 + offset, key, 0, key.length);
 
