@@ -42,7 +42,7 @@ public class JCEAlgorithmMapper {
     }
 
     protected synchronized static void init(JCEAlgorithmMappingsType jceAlgorithmMappingsType) throws Exception {
-        List<AlgorithmType> algorithms = jceAlgorithmMappingsType.getAlgorithms().getAlgorithm();
+        List<AlgorithmType> algorithms = jceAlgorithmMappingsType.getAlgorithm();
         uriToJCEName = new HashMap<String, String>(algorithms.size());
         algorithmsMap = new HashMap<String, AlgorithmType>(algorithms.size());
 

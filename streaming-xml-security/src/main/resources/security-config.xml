@@ -50,7 +50,6 @@
                           JAVACLASS="org.apache.xml.security.transforms.implementations.TransformXPath2Filter" />
    </TransformAlgorithms>
    <JCEAlgorithmMappings>
-      <Algorithms>
          <!-- MessageDigest Algorithms -->
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#md5"
                     Description="MD5 message digest from RFC 1321"
@@ -337,8 +336,6 @@
                     RequiredKey="AES"
                     JCEProvider="BC"
                     JCEName="AESWrap"/>
-
-      </Algorithms>
    </JCEAlgorithmMappings>
    <ResourceResolvers>
       <Resolver JAVACLASS="org.apache.xml.security.utils.resolver.implementations.ResolverDirectHTTP"

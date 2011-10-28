@@ -137,9 +137,12 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <includeSchemas>
-                        <includeSchema>security-config.xsd</includeSchema>
-                    </includeSchemas>
+                    <schemaDirectory>
+                        ${basedir}/src/main/resources/schemas
+                    </schemaDirectory>
+                    <schemaIncludes>
+                        <schemaInclude>security-config.xsd</schemaInclude>
+                    </schemaIncludes>
                     <readOnly>true</readOnly>
                 </configuration>
             </plugin>

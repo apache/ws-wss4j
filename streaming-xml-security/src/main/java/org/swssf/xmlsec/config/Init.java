@@ -26,6 +26,9 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.UnmarshallerHandler;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.net.URL;
@@ -39,23 +42,28 @@ import java.net.URL;
  */
 public class Init {
 
-    private static String initialized = null;
+    private static URL initialized = null;
 
     @SuppressWarnings("unchecked")
     public synchronized static void init(URL url) throws XMLSecurityException {
-        if (initialized == null || (url != null && !url.toExternalForm().equals(initialized))) {
+        if (initialized == null || (url != null && !url.equals(initialized))) {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance("org.xmlsecurity.ns.configuration");
                 final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Schema schema = schemaFactory.newSchema(Init.class.getClassLoader().getResource("security-config.xsd"));
+                Schema schema = schemaFactory.newSchema(Init.class.getClassLoader().getResource("schemas/security-config.xsd"));
                 unmarshaller.setSchema(schema);
-                JAXBElement<ConfigurationType> configurationTypeJAXBElement;
-                if (url != null) {
-                    configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshaller.unmarshal(url);
-                } else {
-                    configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshaller.unmarshal(Init.class.getClassLoader().getResourceAsStream("security-config.xml"));
+                final UnmarshallerHandler unmarshallerHandler = unmarshaller.getUnmarshallerHandler();
+
+                SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+                saxParserFactory.setXIncludeAware(false);
+                saxParserFactory.setNamespaceAware(true);
+                SAXParser saxParser = saxParserFactory.newSAXParser();
+                if (url == null) {
+                    url = Init.class.getClassLoader().getResource("security-config.xml");
                 }
+                saxParser.parse(url.toExternalForm(), new XIncludeHandler(unmarshallerHandler));
+                JAXBElement<ConfigurationType> configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshallerHandler.getResult();
 
                 ConfigurationProperties.init(configurationTypeJAXBElement.getValue().getProperties());
                 SecurityHeaderHandlerMapper.init(configurationTypeJAXBElement.getValue().getSecurityHeaderHandlers());
@@ -65,7 +73,7 @@ public class Init {
             } catch (Exception e) {
                 throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, null, e);
             }
-            initialized = "security-config.xml";
+            initialized = url;
         }
     }
 }
