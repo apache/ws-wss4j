@@ -23,13 +23,9 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.*;
+import javax.xml.stream.events.*;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -41,11 +37,86 @@ import java.util.*;
 public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
-
     private OutputProcessorChain outputProcessorChain;
+    private Deque<QName> startElementStack = new ArrayDeque<QName>();
+    private QName openStartElement = null;
+    private List<Attribute> currentAttributes = new LinkedList<Attribute>();
+    private Deque<Map<String, Namespace>> nsStack;
+    private NamespaceContext namespaceContext;
+    private final NamespaceContext defaultNamespaceContext;
+    private boolean haveToWriteEndElement = false;
 
     public XMLSecurityStreamWriter(OutputProcessorChain outputProcessorChain) {
         this.outputProcessorChain = outputProcessorChain;
+        nsStack = new LinkedList<Map<String, Namespace>>();
+        nsStack.push(new LinkedHashMap<String, Namespace>());
+
+        defaultNamespaceContext = new NamespaceContext() {
+            @Override
+            public String getNamespaceURI(String prefix) {
+                Iterator<Map<String, Namespace>> stackIterator = nsStack.iterator();
+                while (stackIterator.hasNext()) {
+                    Map<String, Namespace> next = stackIterator.next();
+                    Iterator<Map.Entry<String, Namespace>> mapIterator = next.entrySet().iterator();
+                    while (mapIterator.hasNext()) {
+                        Map.Entry<String, Namespace> entry = mapIterator.next();
+                        if (prefix.equals(entry.getKey())) {
+                            return entry.getValue().getNamespaceURI();
+                        }
+                    }
+                }
+                if (namespaceContext != null) {
+                    return namespaceContext.getNamespaceURI(prefix);
+                }
+                return null;
+            }
+
+            @Override
+            public String getPrefix(String namespaceURI) {
+                Iterator<Map<String, Namespace>> stackIterator = nsStack.iterator();
+                while (stackIterator.hasNext()) {
+                    Map<String, Namespace> next = stackIterator.next();
+                    Iterator<Map.Entry<String, Namespace>> mapIterator = next.entrySet().iterator();
+                    while (mapIterator.hasNext()) {
+                        Map.Entry<String, Namespace> entry = mapIterator.next();
+                        if (namespaceURI.equals(entry.getValue().getNamespaceURI())) {
+                            return entry.getKey();
+                        }
+                    }
+                }
+                if (namespaceContext != null) {
+                    return namespaceContext.getPrefix(namespaceURI);
+                }
+                return null;
+            }
+
+            @Override
+            public Iterator getPrefixes(String namespaceURI) {
+                List<String> prefixList = new ArrayList<String>();
+                if (namespaceContext != null) {
+                    Iterator<String> iterator = namespaceContext.getPrefixes(namespaceURI);
+                    while (iterator.hasNext()) {
+                        String next = iterator.next();
+                        prefixList.add(next);
+                    }
+                }
+                Iterator<Map<String, Namespace>> stackIterator = nsStack.descendingIterator();
+                while (stackIterator.hasNext()) {
+                    Map<String, Namespace> next = stackIterator.next();
+                    Iterator<Map.Entry<String, Namespace>> mapIterator = next.entrySet().iterator();
+                    while (mapIterator.hasNext()) {
+                        Map.Entry<String, Namespace> entry = mapIterator.next();
+                        if (prefixList.contains(entry.getKey())) {
+                            prefixList.remove(entry.getKey());
+                        }
+                        if (namespaceURI.equals(entry.getValue().getNamespaceURI())) {
+                            prefixList.add(entry.getKey());
+                        }
+                    }
+                }
+                return Collections.unmodifiableList(prefixList).iterator();
+            }
+        };
     }
 
     private void chainProcessEvent(XMLEvent xmlEvent) throws XMLStreamException {
@@ -54,45 +125,47 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
             outputProcessorChain.processEvent(xmlEvent);
         } catch (XMLSecurityException e) {
             throw new XMLStreamException(e);
+        } catch (XMLStreamException e) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("Trying to declare prefix xmlns (illegal as per NS 1.1 #4)")) {
+                throw new XMLStreamException("If you hit this exception this most probably means" +
+                        "you are using the javax.xml.transform.stax.StAXResult. Don't use " +
+                        "it. It is buggy as hell.", e);
+            }
+            //NB1: net.java.dev.stax-utils also doesn work: [Fatal Error] :4:425: Attribute "xmlns" was already specified for element ...
+            //NB2: The spring version also doesn't work...
+            //it seems it is not trivial to write a StAXResult because I couldn't find a implementation which passes the testcases...hmm
+            throw e;
         }
     }
 
-    private Deque<QName> startElementStack = new ArrayDeque<QName>();
-    private QName openStartElement = null;
-    private List<Attribute> currentAttributes = new LinkedList<Attribute>();
-    private List<Namespace> currentNamespaces = new LinkedList<Namespace>();
-
     private void outputOpenStartElement() throws XMLStreamException {
         if (openStartElement != null) {
-            chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), currentNamespaces.iterator()));
+            chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), nsStack.peek().values().iterator()));
             currentAttributes.clear();
-            currentNamespaces.clear();
             openStartElement = null;
         }
+        if (haveToWriteEndElement) {
+            haveToWriteEndElement = false;
+            writeEndElement();
+        }
+        nsStack.push(new LinkedHashMap<String, Namespace>());
     }
 
     public void writeStartElement(String localName) throws XMLStreamException {
         outputOpenStartElement();
-        QName qName;
-        if (localName.contains(":")) {
-            String[] splittedName = localName.split(":");
-            qName = new QName(null, splittedName[1], splittedName[0]);
-        } else {
-            qName = new QName(localName);
-        }
+        QName qName = new QName(localName);
         startElementStack.push(qName);
         openStartElement = qName;
     }
 
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
         outputOpenStartElement();
-        QName qName;
-        if (localName.contains(":")) {
-            String[] splittedName = localName.split(":");
-            qName = new QName(null, splittedName[1], splittedName[0]);
-        } else {
-            qName = new QName(namespaceURI, localName);
+        String prefix = getNamespaceContext().getPrefix(namespaceURI);
+        if (prefix == null) {
+            throw new XMLStreamException("Unbound namespace URI '" + namespaceURI + "'");
         }
+        QName qName = new QName(namespaceURI, localName, prefix);
         startElementStack.push(qName);
         openStartElement = qName;
     }
@@ -105,43 +178,42 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
-        outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createStartElement(null, namespaceURI, localName));
-        chainProcessEvent(xmlEventFactory.createEndElement(null, namespaceURI, localName));
+        writeStartElement(namespaceURI, localName);
+        haveToWriteEndElement = true;
     }
 
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
-        outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createStartElement(prefix, namespaceURI, localName));
-        chainProcessEvent(xmlEventFactory.createEndElement(prefix, namespaceURI, localName));
+        writeStartElement(prefix, localName, namespaceURI);
+        haveToWriteEndElement = true;
     }
 
     public void writeEmptyElement(String localName) throws XMLStreamException {
-        outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createStartElement(null, null, localName));
-        chainProcessEvent(xmlEventFactory.createEndElement(null, null, localName));
+        writeStartElement(localName);
+        haveToWriteEndElement = true;
     }
 
     public void writeEndElement() throws XMLStreamException {
         outputOpenStartElement();
-
         List<Namespace> namespaceList = new LinkedList<Namespace>();
         QName element = startElementStack.pop();
         namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
         EndElement endElement = xmlEventFactory.createEndElement(element, namespaceList.iterator());
         chainProcessEvent(endElement);
+        nsStack.pop();
     }
 
     public void writeEndDocument() throws XMLStreamException {
         outputOpenStartElement();
         Iterator<QName> startElements = startElementStack.iterator();
         while (startElements.hasNext()) {
-            chainProcessEvent(xmlEventFactory.createEndElement(startElementStack.pop(), null));
+            chainProcessEvent(xmlEventFactory.createEndElement(startElements.next(), null));
         }
+        chainProcessEvent(xmlEventFactory.createEndDocument());
     }
 
     public void close() throws XMLStreamException {
         try {
+            writeEndDocument();
             outputProcessorChain.reset();
             outputProcessorChain.doFinal();
         } catch (XMLSecurityException e) {
@@ -161,16 +233,15 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
-        //todo: null is not correct!
-        currentAttributes.add(xmlEventFactory.createAttribute(null, namespaceURI, localName, value));
+        currentAttributes.add(xmlEventFactory.createAttribute(getNamespaceContext().getPrefix(namespaceURI), namespaceURI, localName, value));
     }
 
     public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
-        currentNamespaces.add(xmlEventFactory.createNamespace(prefix, namespaceURI));
+        nsStack.peek().put(prefix, xmlEventFactory.createNamespace(prefix, namespaceURI));
     }
 
     public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
-        currentNamespaces.add(xmlEventFactory.createNamespace(namespaceURI));
+        nsStack.peek().put("", xmlEventFactory.createNamespace(namespaceURI));
     }
 
     public void writeComment(String data) throws XMLStreamException {
@@ -180,7 +251,6 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public void writeProcessingInstruction(String target) throws XMLStreamException {
         outputOpenStartElement();
-        //todo null correct?
         chainProcessEvent(xmlEventFactory.createProcessingInstruction(target, null));
     }
 
@@ -199,10 +269,118 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         chainProcessEvent(xmlEventFactory.createDTD(dtd));
     }
 
-    public void writeEntityRef(String name) throws XMLStreamException {
+    public void writeEntityRef(final String name) throws XMLStreamException {
         outputOpenStartElement();
-        //todo null not correct
-        chainProcessEvent(xmlEventFactory.createEntityReference(name, null));
+        chainProcessEvent(xmlEventFactory.createEntityReference(name, new EntityDeclaration() {
+            @Override
+            public String getPublicId() {
+                return null;
+            }
+
+            @Override
+            public String getSystemId() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public String getNotationName() {
+                return null;
+            }
+
+            @Override
+            public String getReplacementText() {
+                return null;
+            }
+
+            @Override
+            public String getBaseURI() {
+                return null;
+            }
+
+            @Override
+            public int getEventType() {
+                return XMLStreamConstants.ENTITY_REFERENCE;
+            }
+
+            @Override
+            public Location getLocation() {
+                return null;
+            }
+
+            @Override
+            public boolean isStartElement() {
+                return false;
+            }
+
+            @Override
+            public boolean isAttribute() {
+                return false;
+            }
+
+            @Override
+            public boolean isNamespace() {
+                return false;
+            }
+
+            @Override
+            public boolean isEndElement() {
+                return false;
+            }
+
+            @Override
+            public boolean isEntityReference() {
+                return true;
+            }
+
+            @Override
+            public boolean isProcessingInstruction() {
+                return false;
+            }
+
+            @Override
+            public boolean isCharacters() {
+                return false;
+            }
+
+            @Override
+            public boolean isStartDocument() {
+                return false;
+            }
+
+            @Override
+            public boolean isEndDocument() {
+                return false;
+            }
+
+            @Override
+            public StartElement asStartElement() {
+                return null;
+            }
+
+            @Override
+            public EndElement asEndElement() {
+                return null;
+            }
+
+            @Override
+            public Characters asCharacters() {
+                return null;
+            }
+
+            @Override
+            public QName getSchemaType() {
+                return null;
+            }
+
+            @Override
+            public void writeAsEncodedUnicode(Writer writer) throws XMLStreamException {
+            }
+        }));
     }
 
     public void writeStartDocument() throws XMLStreamException {
@@ -228,27 +406,34 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public String getPrefix(String uri) throws XMLStreamException {
-        //todo
-        return null;
+        return defaultNamespaceContext.getPrefix(uri);
     }
 
     public void setPrefix(String prefix, String uri) throws XMLStreamException {
-        //todo
+        nsStack.peek().put(prefix, xmlEventFactory.createNamespace(prefix, uri));
+        if (openStartElement != null) {
+            if (openStartElement.getNamespaceURI().equals(uri)) {
+                openStartElement = new QName(openStartElement.getNamespaceURI(), openStartElement.getLocalPart(), prefix);
+            }
+        }
     }
 
     public void setDefaultNamespace(String uri) throws XMLStreamException {
-        //todo
+        nsStack.peek().put("", xmlEventFactory.createNamespace("", uri));
     }
 
     public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
-        //todo
+        if (context == null) {
+            throw new NullPointerException("context must not be null");
+        }
+        this.namespaceContext = context;
     }
 
     public NamespaceContext getNamespaceContext() {
-        return null;
+        return defaultNamespaceContext;
     }
 
     public Object getProperty(String name) throws IllegalArgumentException {
-        return null;
+        throw new IllegalArgumentException("Properties not supported");
     }
 }
