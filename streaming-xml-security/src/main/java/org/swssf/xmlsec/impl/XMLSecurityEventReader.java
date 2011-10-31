@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * @author $Author:$
- * @version $Revision:$ $Date:$
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class XMLSecurityEventReader implements XMLEventReader {
 
@@ -73,28 +73,27 @@ public class XMLSecurityEventReader implements XMLEventReader {
             return this.nextXMLEvent;
         }
         try {
-            this.nextXMLEvent = xmlEventIterator.next();
+            return this.nextXMLEvent = xmlEventIterator.next();
         } catch (NoSuchElementException e) {
-            throw new XMLStreamException(e);
+            return null;
         }
-        return this.nextXMLEvent;
     }
 
     @Override
     public String getElementText() throws XMLStreamException {
-        //todo
+        //ATM not needed and therefore not implemented
         throw new XMLStreamException(new UnsupportedOperationException());
     }
 
     @Override
     public XMLEvent nextTag() throws XMLStreamException {
-        //todo
+        //ATM not needed and therefore not implemented
         throw new XMLStreamException(new UnsupportedOperationException());
     }
 
     @Override
     public Object getProperty(String name) throws IllegalArgumentException {
-        //todo
+        //ATM not needed and therefore not implemented
         throw new IllegalArgumentException(new UnsupportedOperationException());
     }
 
