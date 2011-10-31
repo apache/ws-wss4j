@@ -45,8 +45,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1168553 $ $Date: 2011-08-21 12:41:49 +0200 (Sun, 21 Aug 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class VulnerabliltyVectorsTest extends AbstractTestBase {
 

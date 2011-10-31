@@ -19,8 +19,8 @@
 package org.swssf.wss.securityEvent;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 272 $ $Date: 2010-12-23 14:30:56 +0100 (Thu, 23 Dec 2010) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class EncryptionTokenSecurityEvent extends TokenSecurityEvent {
 
