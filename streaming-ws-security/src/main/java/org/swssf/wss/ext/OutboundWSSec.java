@@ -50,7 +50,7 @@ public class OutboundWSSec {
 
     /**
      * This method is the entry point for the incoming security-engine.
-     * Hand over the original XMLStreamReader and use the returned one for further processing
+     * Hand over a outputStream and use the returned XMLStreamWriter for further processing
      *
      * @param outputStream The original outputStream
      * @return A new XMLStreamWriter which does transparently the security processing.
@@ -62,14 +62,41 @@ public class OutboundWSSec {
 
     /**
      * This method is the entry point for the incoming security-engine.
-     * Hand over the original XMLStreamReader and use the returned one for further processing
+     * Hand over the original XMLStreamWriter and use the returned one for further processing
+     *
+     * @param outputStream The original outputStream
+     * @return A new XMLStreamWriter which does transparently the security processing.
+     * @throws WSSecurityException thrown when a Security failure occurs
+     */
+    public XMLStreamWriter processOutMessage(XMLStreamWriter xmlStreamWriter, String encoding, List<SecurityEvent> requestSecurityEvents) throws WSSecurityException {
+        return processOutMessage(xmlStreamWriter, encoding, requestSecurityEvents, null);
+    }
+
+    /**
+     * This method is the entry point for the incoming security-engine.
+     * Hand over a outputstream and use the returned XMLStreamWriter for further processing
      *
      * @param outputStream The original outputStream
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
+        return processOutMessage((Object) outputStream, encoding, requestSecurityEvents, securityEventListener);
+    }
 
+    /**
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamWriter and use the returned one for further processing
+     *
+     * @param outputStream The original outputStream
+     * @return A new XMLStreamWriter which does transparently the security processing.
+     * @throws WSSecurityException thrown when a Security failure occurs
+     */
+    public XMLStreamWriter processOutMessage(XMLStreamWriter xmlStreamWriter, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
+        return processOutMessage((Object) xmlStreamWriter, encoding, requestSecurityEvents, securityEventListener);
+    }
+
+    private XMLStreamWriter processOutMessage(Object output, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
         final WSSecurityContextImpl securityContextImpl = new WSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.setSecurityEventListener(securityEventListener);
@@ -149,8 +176,13 @@ public class OutboundWSSec {
                     processorChain.addProcessor(new SAMLTokenOutputProcessor(securityProperties, action));
                 }
             }
-
-            processorChain.addProcessor(new FinalOutputProcessor(outputStream, encoding, securityProperties, null));
+            if (output instanceof OutputStream) {
+                processorChain.addProcessor(new FinalOutputProcessor((OutputStream) output, encoding, securityProperties, null));
+            } else if (output instanceof XMLStreamWriter) {
+                processorChain.addProcessor(new FinalOutputProcessor((XMLStreamWriter) output, securityProperties, null));
+            } else {
+                throw new IllegalArgumentException(output + " is not supported as output");
+            }
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(e.getMessage(), e);
         }

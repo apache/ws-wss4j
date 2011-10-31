@@ -19,10 +19,12 @@
 package org.swssf.xmlsec.impl.processor.output;
 
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.XMLSecurityEventWriter;
 
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.io.OutputStream;
 
@@ -42,7 +44,9 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
     }
 
-    public FinalOutputProcessor(OutputStream outputStream, String encoding, XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
+    public FinalOutputProcessor(OutputStream outputStream, String encoding,
+                                XMLSecurityProperties securityProperties,
+                                XMLSecurityConstants.Action action) throws XMLSecurityException {
         super(securityProperties, action);
         setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
         try {
@@ -50,6 +54,14 @@ public class FinalOutputProcessor extends AbstractOutputProcessor {
         } catch (XMLStreamException e) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
         }
+    }
+
+    public FinalOutputProcessor(XMLStreamWriter xmlStreamWriter,
+                                XMLSecurityProperties securityProperties,
+                                XMLSecurityConstants.Action action) throws XMLSecurityException {
+        super(securityProperties, action);
+        setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
+        this.xmlEventWriter = new XMLSecurityEventWriter(xmlStreamWriter);
     }
 
     @Override
