@@ -25,6 +25,7 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.opensaml.common.SAMLVersion;
+import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ import java.util.List;
 
 /**
  * Class SAMLCallback will be called by the <code>AssertionWrapper</code> during the creation
- * of SAML statements (authentication, attribute, and authz decision).
- * <p/>
- * Created on May 18, 2009
+ * of SAML statements (authentication, attribute, and authz decision). Alternatively, the
+ * "assertionElement" member of this class can be set instead, for a pre-existing SAML
+ * Assertion.
  */
 public class SAMLCallback implements Callback {
     
@@ -73,6 +74,11 @@ public class SAMLCallback implements Callback {
      * A list of <code>AuthDecisionStatementBean</code> values
      */
     private List<AuthDecisionStatementBean> authDecisionStatementData;
+    
+    /**
+     * A DOM Element representation of this SAML Assertion
+     */
+    private Element assertionElement;
 
     /**
      * Constructor SAMLCallback creates a new SAMLCallback instance.
@@ -219,5 +225,21 @@ public class SAMLCallback implements Callback {
      */
     public SAMLVersion getSamlVersion() {
         return samlVersion;
+    }
+    
+    /**
+     * Set the DOM representation of this SAML Assertion
+     * @param assertionElement the DOM representation of this SAML Assertion
+     */
+    public void setAssertionElement(Element assertionElement) {
+        this.assertionElement = assertionElement;
+    }
+    
+    /**
+     * Get the DOM representation of this SAML Assertion
+     * @return the DOM representation of this SAML Assertion
+     */
+    public Element getAssertionElement() {
+        return assertionElement;
     }
 }

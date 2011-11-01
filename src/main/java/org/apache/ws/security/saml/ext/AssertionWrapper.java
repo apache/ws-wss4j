@@ -149,21 +149,7 @@ public class AssertionWrapper {
     public AssertionWrapper(Element element) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
         
-        this.xmlObject = OpenSAMLUtil.fromDom(element);
-        if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
-            this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
-            samlVersion = SAMLVersion.VERSION_11;
-        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
-            this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
-            samlVersion = SAMLVersion.VERSION_20;
-        } else {
-            log.error(
-                "AssertionWrapper: found unexpected type " 
-                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
-            );
-        }
-        
-        assertionElement = element;
+        parseElement(element);
     }
 
     /**
@@ -214,7 +200,6 @@ public class AssertionWrapper {
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
      * This constructor is primarily called on the client side to initialize
      * the wrapper from a configuration file. <br>
-     * NOTE: The OpenSaml library MUST be initialized prior to constructing an AssertionWrapper
      *
      * @param parms of type SAMLParms
      */
@@ -244,99 +229,13 @@ public class AssertionWrapper {
                 "UnsupportedCallbackException while creating SAML assertion wrapper", e
             );
         }
-
-        samlVersion = samlCallbacks[0].getSamlVersion();
-        if (samlVersion == null) {
-            samlVersion = parms.getSAMLVersion();
-        }
-        String issuer = samlCallbacks[0].getIssuer();
-        if (issuer == null && parms.getIssuer() != null) {
-            issuer = parms.getIssuer();
-        }
-        if (samlVersion.equals(SAMLVersion.VERSION_11)) {
-            // Build a SAML v1.1 assertion
-            saml1 = SAML1ComponentBuilder.createSamlv1Assertion(issuer);
-
-            try {
-                // Process the SAML authentication statement(s)
-                List<AuthenticationStatement> authenticationStatements = 
-                    SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
-                        samlCallbacks[0].getAuthenticationStatementData()
-                    );
-                saml1.getAuthenticationStatements().addAll(authenticationStatements);
-    
-                // Process the SAML attribute statement(s)            
-                List<AttributeStatement> attributeStatements =
-                        SAML1ComponentBuilder.createSamlv1AttributeStatement(
-                            samlCallbacks[0].getAttributeStatementData()
-                        );
-                saml1.getAttributeStatements().addAll(attributeStatements);
-    
-                // Process the SAML authorization decision statement(s)
-                List<AuthorizationDecisionStatement> authDecisionStatements =
-                        SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
-                            samlCallbacks[0].getAuthDecisionStatementData()
-                        );
-                saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
-    
-                // Build the complete assertion
-                org.opensaml.saml1.core.Conditions conditions = 
-                    SAML1ComponentBuilder.createSamlv1Conditions(samlCallbacks[0].getConditions());
-                saml1.setConditions(conditions);
-            } catch (org.opensaml.xml.security.SecurityException ex) {
-                throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
-                );
-            }
-
-            // Set the OpenSaml2 XMLObject instance
-            xmlObject = saml1;
-
-        } else if (samlVersion.equals(SAMLVersion.VERSION_20)) {
-            // Build a SAML v2.0 assertion
-            saml2 = SAML2ComponentBuilder.createAssertion();
-            Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
-
-            // Authn Statement(s)
-            List<AuthnStatement> authnStatements = 
-                SAML2ComponentBuilder.createAuthnStatement(
-                    samlCallbacks[0].getAuthenticationStatementData()
-                );
-            saml2.getAuthnStatements().addAll(authnStatements);
-
-            // Attribute statement(s)
-            List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
-                SAML2ComponentBuilder.createAttributeStatement(
-                    samlCallbacks[0].getAttributeStatementData()
-                );
-            saml2.getAttributeStatements().addAll(attributeStatements);
-
-            // AuthzDecisionStatement(s)
-            List<AuthzDecisionStatement> authDecisionStatements =
-                    SAML2ComponentBuilder.createAuthorizationDecisionStatement(
-                        samlCallbacks[0].getAuthDecisionStatementData()
-                    );
-            saml2.getAuthzDecisionStatements().addAll(authDecisionStatements);
-
-            // Build the SAML v2.0 assertion
-            saml2.setIssuer(samlIssuer);
-            
-            try {
-                org.opensaml.saml2.core.Subject subject = 
-                    SAML2ComponentBuilder.createSaml2Subject(samlCallbacks[0].getSubject());
-                saml2.setSubject(subject);
-            } catch (org.opensaml.xml.security.SecurityException ex) {
-                throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
-                );
-            }
-            
-            org.opensaml.saml2.core.Conditions conditions = 
-                SAML2ComponentBuilder.createConditions(samlCallbacks[0].getConditions());
-            saml2.setConditions(conditions);
-
-            // Set the OpenSaml2 XMLObject instance
-            xmlObject = saml2;
+        
+        // See if we already have a DOM element in SAMLCallback
+        if (samlCallbacks[0].getAssertionElement() != null) {
+            parseElement(samlCallbacks[0].getAssertionElement());
+        } else {
+            // If not then parse the SAMLCallback object
+            parseCallback(samlCallbacks[0], parms);
         }
     }
 
@@ -770,6 +669,128 @@ public class AssertionWrapper {
             }
         }
         return null;
+    }
+    
+    /**
+     * Parse the DOM Element into Opensaml objects.
+     */
+    private void parseElement(Element element) throws WSSecurityException {
+        this.xmlObject = OpenSAMLUtil.fromDom(element);
+        if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+            this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
+            samlVersion = SAMLVersion.VERSION_11;
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+            this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
+            samlVersion = SAMLVersion.VERSION_20;
+        } else {
+            log.error(
+                "AssertionWrapper: found unexpected type " 
+                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
+            );
+        }
+        
+        assertionElement = element;
+    }
+    
+    /**
+     * Parse a SAMLCallback object to create a SAML Assertion
+     */
+    private void parseCallback(
+        SAMLCallback samlCallback, SAMLParms parms
+    ) throws WSSecurityException {
+        samlVersion = samlCallback.getSamlVersion();
+        if (samlVersion == null) {
+            samlVersion = parms.getSAMLVersion();
+        }
+        String issuer = samlCallback.getIssuer();
+        if (issuer == null && parms.getIssuer() != null) {
+            issuer = parms.getIssuer();
+        }
+        if (samlVersion.equals(SAMLVersion.VERSION_11)) {
+            // Build a SAML v1.1 assertion
+            saml1 = SAML1ComponentBuilder.createSamlv1Assertion(issuer);
+
+            try {
+                // Process the SAML authentication statement(s)
+                List<AuthenticationStatement> authenticationStatements = 
+                    SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
+                        samlCallback.getAuthenticationStatementData()
+                    );
+                saml1.getAuthenticationStatements().addAll(authenticationStatements);
+    
+                // Process the SAML attribute statement(s)            
+                List<AttributeStatement> attributeStatements =
+                        SAML1ComponentBuilder.createSamlv1AttributeStatement(
+                            samlCallback.getAttributeStatementData()
+                        );
+                saml1.getAttributeStatements().addAll(attributeStatements);
+    
+                // Process the SAML authorization decision statement(s)
+                List<AuthorizationDecisionStatement> authDecisionStatements =
+                        SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
+                            samlCallback.getAuthDecisionStatementData()
+                        );
+                saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
+    
+                // Build the complete assertion
+                org.opensaml.saml1.core.Conditions conditions = 
+                    SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
+                saml1.setConditions(conditions);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new WSSecurityException(
+                    "Error generating KeyInfo from signing credential", ex
+                );
+            }
+
+            // Set the OpenSaml2 XMLObject instance
+            xmlObject = saml1;
+
+        } else if (samlVersion.equals(SAMLVersion.VERSION_20)) {
+            // Build a SAML v2.0 assertion
+            saml2 = SAML2ComponentBuilder.createAssertion();
+            Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
+
+            // Authn Statement(s)
+            List<AuthnStatement> authnStatements = 
+                SAML2ComponentBuilder.createAuthnStatement(
+                    samlCallback.getAuthenticationStatementData()
+                );
+            saml2.getAuthnStatements().addAll(authnStatements);
+
+            // Attribute statement(s)
+            List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
+                SAML2ComponentBuilder.createAttributeStatement(
+                    samlCallback.getAttributeStatementData()
+                );
+            saml2.getAttributeStatements().addAll(attributeStatements);
+
+            // AuthzDecisionStatement(s)
+            List<AuthzDecisionStatement> authDecisionStatements =
+                    SAML2ComponentBuilder.createAuthorizationDecisionStatement(
+                        samlCallback.getAuthDecisionStatementData()
+                    );
+            saml2.getAuthzDecisionStatements().addAll(authDecisionStatements);
+
+            // Build the SAML v2.0 assertion
+            saml2.setIssuer(samlIssuer);
+            
+            try {
+                org.opensaml.saml2.core.Subject subject = 
+                    SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
+                saml2.setSubject(subject);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new WSSecurityException(
+                    "Error generating KeyInfo from signing credential", ex
+                );
+            }
+            
+            org.opensaml.saml2.core.Conditions conditions = 
+                SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
+            saml2.setConditions(conditions);
+
+            // Set the OpenSaml2 XMLObject instance
+            xmlObject = saml2;
+        }
     }
 
 }
