@@ -68,7 +68,10 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
         } catch (XMLSecurityException e) {
             throw new XMLStreamException(e);
         }
-        return getCurrentEvent().getEventType();
+        if (currentEvent.isCharacters() && currentEvent.asCharacters().isIgnorableWhiteSpace()) {
+            return XMLStreamConstants.SPACE;
+        }
+        return currentEvent.getEventType();
     }
 
     private XMLEvent getCurrentEvent() {
@@ -440,7 +443,14 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public int getEventType() {
         XMLEvent xmlEvent = getCurrentEvent();
         if (xmlEvent == null) {
-            return XMLStreamConstants.START_DOCUMENT;
+            try {
+                return next();
+            } catch (XMLStreamException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        if (xmlEvent.isCharacters() && xmlEvent.asCharacters().isIgnorableWhiteSpace()) {
+            return XMLStreamConstants.SPACE;
         }
         return xmlEvent.getEventType();
     }
@@ -533,7 +543,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     }
 
     public String getEncoding() {
-        return null;
+        return inputProcessorChain.getDocumentContext().getEncoding();
     }
 
     public boolean hasText() {
