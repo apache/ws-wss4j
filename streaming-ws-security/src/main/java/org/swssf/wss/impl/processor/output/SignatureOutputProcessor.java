@@ -57,7 +57,7 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
 
             //avoid double signature when child elements matches too
             if (getActiveInternalSignatureOutputProcessor() == null) {
-                SecurePart securePart = securePartMatches(startElement, outputProcessorChain);
+                SecurePart securePart = securePartMatches(startElement, outputProcessorChain, securityProperties.getSignatureSecureParts());
                 if (securePart != null) {
 
                     logger.debug("Matched securePart for signature");

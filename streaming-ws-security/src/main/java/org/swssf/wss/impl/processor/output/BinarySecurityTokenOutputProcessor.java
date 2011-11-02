@@ -18,7 +18,6 @@
  */
 package org.swssf.wss.impl.processor.output;
 
-import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
 import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
@@ -28,18 +27,14 @@ import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author $Author$
@@ -249,44 +244,11 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                     boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();
-                    createBinarySecurityTokenStructure(subOutputProcessorChain, securityToken.getId(), securityToken.getX509Certificates(), useSingleCertificate);
+                    WSSUtils.createBinarySecurityTokenStructure(this, subOutputProcessorChain, securityToken.getId(), securityToken.getX509Certificates(), useSingleCertificate);
 
                     outputProcessorChain.removeProcessor(this);
                 }
             }
-        }
-
-        //todo common method
-        protected void createBinarySecurityTokenStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            String valueType;
-            if (useSingleCertificate) {
-                valueType = WSSConstants.NS_X509_V3_TYPE;
-            } else {
-                valueType = WSSConstants.NS_X509PKIPathv1;
-            }
-            attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
-            attributes.put(WSSConstants.ATT_wsu_Id, referenceId);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, attributes);
-            try {
-                if (useSingleCertificate) {
-                    createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
-                } else {
-                    try {
-                        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
-                        List<X509Certificate> certificates = Arrays.asList(x509Certificates);
-                        createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
-                    } catch (CertificateException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
-                    } catch (NoSuchProviderException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
-                    }
-                }
-            } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
-            }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
         }
     }
 }

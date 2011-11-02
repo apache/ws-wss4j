@@ -27,9 +27,7 @@ import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -38,7 +36,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,14 +45,12 @@ import java.util.List;
  */
 public abstract class AbstractSignatureOutputProcessor extends AbstractOutputProcessor {
 
-    private List<SecurePart> secureParts;
     private List<SignaturePartDef> signaturePartDefList = new LinkedList<SignaturePartDef>();
 
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
     public AbstractSignatureOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
         super(securityProperties, action);
-        secureParts = securityProperties.getSignatureSecureParts();
     }
 
     public List<SignaturePartDef> getSignaturePartDefList() {
@@ -64,46 +59,6 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
 
     @Override
     public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
-
-
-    protected SecurePart securePartMatches(StartElement startElement, OutputProcessorChain outputProcessorChain) {
-        SecurePart securePart = securePartMatches(startElement, this.secureParts);
-        if (securePart != null) {
-            return securePart;
-        }
-        List<SecurePart> secureParts = outputProcessorChain.getSecurityContext().getAsList(SecurePart.class);
-        if (secureParts == null) {
-            return null;
-        }
-        return securePartMatches(startElement, secureParts);
-    }
-
-    protected SecurePart securePartMatches(StartElement startElement, List<SecurePart> secureParts) {
-        Iterator<SecurePart> securePartIterator = secureParts.iterator();
-        while (securePartIterator.hasNext()) {
-            SecurePart securePart = securePartIterator.next();
-            if (securePart.getIdToSign() == null) {
-                if (startElement.getName().getLocalPart().equals(securePart.getName())
-                        && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
-                    return securePart;
-                }
-            } else {
-                @SuppressWarnings("unchecked")
-                Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                while (attributeIterator.hasNext()) {
-                    Attribute attribute = attributeIterator.next();
-                    if (attribute != null) {
-                        QName attributeName = attribute.getName();
-                        if ((attributeName.equals(XMLSecurityConstants.ATT_NULL_Id))
-                                && attribute.getValue().equals(securePart.getIdToSign())) {
-                            return securePart;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     protected InternalSignatureOutputProcessor getActiveInternalSignatureOutputProcessor() {
         return activeInternalSignatureOutputProcessor;

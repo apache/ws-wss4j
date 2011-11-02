@@ -35,8 +35,5 @@ public abstract class AbstractEncryptEndingOutputProcessor extends AbstractBuffe
     }
 
     @Override
-    protected abstract void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
-
-    @Override
     public abstract void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
 }

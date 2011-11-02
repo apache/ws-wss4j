@@ -32,7 +32,10 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,55 +51,14 @@ import java.util.*;
  */
 public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProcessor {
 
-    private List<SecurePart> secureParts;
     private AbstractInternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
 
     public AbstractEncryptOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
         super(securityProperties, action);
-        secureParts = securityProperties.getEncryptionSecureParts();
     }
 
     @Override
     public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
-
-    protected SecurePart securePartMatches(StartElement startElement, OutputProcessorChain outputProcessorChain) {
-        SecurePart securePart = securePartMatches(startElement, this.secureParts);
-        if (securePart != null) {
-            return securePart;
-        }
-        List<SecurePart> secureParts = outputProcessorChain.getSecurityContext().getAsList(SecurePart.class);
-        if (secureParts == null) {
-            return null;
-        }
-        return securePartMatches(startElement, secureParts);
-    }
-
-    protected SecurePart securePartMatches(StartElement startElement, List<SecurePart> secureParts) {
-        Iterator<SecurePart> securePartIterator = secureParts.iterator();
-        while (securePartIterator.hasNext()) {
-            SecurePart securePart = securePartIterator.next();
-            if (securePart.getIdToSign() == null) {
-                if (startElement.getName().getLocalPart().equals(securePart.getName())
-                        && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
-                    return securePart;
-                }
-            } else {
-                @SuppressWarnings("unchecked")
-                Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                while (attributeIterator.hasNext()) {
-                    Attribute attribute = attributeIterator.next();
-                    if (attribute != null) {
-                        QName attributeName = attribute.getName();
-                        if ((attributeName.equals(XMLSecurityConstants.ATT_NULL_Id))
-                                && attribute.getValue().equals(securePart.getIdToSign())) {
-                            return securePart;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     protected AbstractInternalEncryptionOutputProcessor getActiveInternalEncryptionOutputProcessor() {
         return activeInternalEncryptionOutputProcessor;

@@ -21,6 +21,7 @@ package org.swssf.xmlsec.ext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * An abstract OutputProcessor class for reusabilty
@@ -37,15 +38,15 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
         super(securityProperties, action);
     }
 
-    public ArrayDeque<XMLEvent> getXmlEventBuffer() {
+    public Deque<XMLEvent> getXmlEventBuffer() {
         return xmlEventBuffer;
     }
 
-    protected String getAppendAfterThisTokenId() {
+    public String getAppendAfterThisTokenId() {
         return appendAfterThisTokenId;
     }
 
-    protected void setAppendAfterThisTokenId(String appendAfterThisTokenId) {
+    public void setAppendAfterThisTokenId(String appendAfterThisTokenId) {
         this.appendAfterThisTokenId = appendAfterThisTokenId;
     }
 
@@ -57,5 +58,5 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
     @Override
     public abstract void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    protected abstract void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
 }

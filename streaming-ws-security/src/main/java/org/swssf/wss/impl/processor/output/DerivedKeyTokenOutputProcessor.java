@@ -26,7 +26,6 @@ import org.swssf.wss.impl.derivedKey.DerivationAlgorithm;
 import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.crypto.Merlin;
 import org.swssf.xmlsec.ext.*;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -35,12 +34,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.UnsupportedEncodingException;
-import java.security.*;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
+import java.security.Key;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author $Author$
@@ -281,132 +281,21 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
                 createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
             } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
-                createX509SubjectKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+                WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
-                createX509KeyIdentifierStructure(outputProcessorChain, x509Certificates);
+                WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
-                createThumbprintKeyIdentifierStructure(outputProcessorChain, x509Certificates);
+                WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.BST_EMBEDDED) {
-                createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, true);
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, true);
             } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
-                createBSTReferenceStructure(outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
             } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
-                createEmbeddedSecurityTokenReferenceStructure(outputProcessorChain, tokenId);
+                WSSUtils.createEmbeddedSecurityTokenReferenceStructure(this, outputProcessorChain, tokenId);
             } else {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken", keyIdentifierType.name());
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
-        }
-
-        //todo common method
-        protected void createX509SubjectKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLSecurityException, XMLStreamException {
-            // As per the 1.1 specification, SKI can only be used for a V3 certificate
-            if (x509Certificates[0].getVersion() != 3) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "invalidCertForSKI");
-            }
-
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
-            byte data[] = new Merlin().getSKIBytesFromCert(x509Certificates[0]);
-            createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
-        }
-
-        //todo common method
-        protected void createX509KeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
-            try {
-                createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
-            } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
-            }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
-        }
-
-        //todo common methdod
-        protected void createThumbprintKeyIdentifierStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
-            try {
-                MessageDigest sha;
-                sha = MessageDigest.getInstance("SHA-1");
-                sha.reset();
-                sha.update(x509Certificates[0].getEncoded());
-                byte[] data = sha.digest();
-
-                createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
-            } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
-            }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
-        }
-
-        //todo common method
-        protected void createBSTReferenceStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate, boolean embed) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            String valueType;
-            if (useSingleCertificate) {
-                valueType = WSSConstants.NS_X509_V3_TYPE;
-            } else {
-                valueType = WSSConstants.NS_X509PKIPathv1;
-            }
-            attributes.put(WSSConstants.ATT_NULL_URI, "#" + referenceId);
-            attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
-            if (embed) {
-                createBinarySecurityTokenStructure(outputProcessorChain, referenceId, x509Certificates, useSingleCertificate);
-            }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
-        }
-
-        //todo common method
-        protected void createEmbeddedSecurityTokenReferenceStructure(OutputProcessorChain outputProcessorChain, String referenceId) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_URI, "#" + referenceId);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
-        }
-
-        //todo common method
-        protected void createBinarySecurityTokenStructure(OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            String valueType;
-            if (useSingleCertificate) {
-                valueType = WSSConstants.NS_X509_V3_TYPE;
-            } else {
-                valueType = WSSConstants.NS_X509PKIPathv1;
-            }
-            attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-            attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
-            attributes.put(WSSConstants.ATT_wsu_Id, referenceId);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, attributes);
-            try {
-                if (useSingleCertificate) {
-                    createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
-                } else {
-                    try {
-                        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
-                        List<X509Certificate> certificates = Arrays.asList(x509Certificates);
-                        createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
-                    } catch (CertificateException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
-                    } catch (NoSuchProviderException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
-                    }
-                }
-            } catch (CertificateEncodingException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
-            }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
         }
     }
 }

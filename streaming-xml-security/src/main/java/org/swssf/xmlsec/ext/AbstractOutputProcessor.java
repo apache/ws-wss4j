@@ -151,7 +151,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         outputAsEvent(outputProcessorChain, startElement);
     }
 
-    protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
+    public void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
         List<Namespace> namespaceList = new LinkedList<Namespace>();
         namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
 
@@ -191,11 +191,11 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         return xmlEventFactory.createEndElement(element, namespaceList.iterator());
     }
 
-    protected void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
+    public void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
         outputAsEvent(outputProcessorChain, createEndElement(element));
     }
 
-    protected void createCharactersAndOutputAsEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, XMLSecurityException {
+    public void createCharactersAndOutputAsEvent(OutputProcessorChain outputProcessorChain, String characters) throws XMLStreamException, XMLSecurityException {
         outputAsEvent(outputProcessorChain, createCharacters(characters));
     }
 
@@ -247,5 +247,44 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
             createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference);
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList);
+    }
+
+    protected SecurePart securePartMatches(StartElement startElement, OutputProcessorChain outputProcessorChain, List<SecurePart> secureParts) {
+        SecurePart securePart = securePartMatches(startElement, secureParts);
+        if (securePart != null) {
+            return securePart;
+        }
+        List<SecurePart> dynamicSecureParts = outputProcessorChain.getSecurityContext().getAsList(SecurePart.class);
+        if (dynamicSecureParts == null) {
+            return null;
+        }
+        return securePartMatches(startElement, dynamicSecureParts);
+    }
+
+    protected SecurePart securePartMatches(StartElement startElement, List<SecurePart> secureParts) {
+        Iterator<SecurePart> securePartIterator = secureParts.iterator();
+        while (securePartIterator.hasNext()) {
+            SecurePart securePart = securePartIterator.next();
+            if (securePart.getIdToSign() == null) {
+                if (startElement.getName().getLocalPart().equals(securePart.getName())
+                        && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
+                    return securePart;
+                }
+            } else {
+                @SuppressWarnings("unchecked")
+                Iterator<Attribute> attributeIterator = startElement.getAttributes();
+                while (attributeIterator.hasNext()) {
+                    Attribute attribute = attributeIterator.next();
+                    if (attribute != null) {
+                        QName attributeName = attribute.getName();
+                        if ((attributeName.equals(XMLSecurityConstants.ATT_NULL_Id))
+                                && attribute.getValue().equals(securePart.getIdToSign())) {
+                            return securePart;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

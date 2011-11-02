@@ -59,7 +59,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
             //avoid double encryption when child elements matches too
             if (getActiveInternalEncryptionOutputProcessor() == null) {
-                SecurePart securePart = securePartMatches(startElement, outputProcessorChain);
+                SecurePart securePart = securePartMatches(startElement, outputProcessorChain, securityProperties.getEncryptionSecureParts());
                 if (securePart != null) {
                     logger.debug("Matched securePart for encryption");
                     InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
