@@ -268,7 +268,10 @@ public class SecurityTokenReference {
         //
         // Delegate finding the element to the CallbackLookup instance
         //
-        CallbackLookup callbackLookup = docInfo.getCallbackLookup();
+        CallbackLookup callbackLookup = null;
+        if (docInfo != null) {
+            callbackLookup = docInfo.getCallbackLookup();
+        }
         if (callbackLookup == null) {
             callbackLookup = new DOMCallbackLookup(doc);
         }
@@ -602,9 +605,6 @@ public class SecurityTokenReference {
 
     /**
      * Gets the certificate identified with X509 issuerSerial data.
-     * This method first tries to get the embedded certificate.
-     * If this fails it checks if the certificate is  in the
-     * keystore.
      *
      * @return a certificate array or null if nothing found
      */

@@ -181,9 +181,13 @@ public class STRTransform extends TransformService {
             //
             // Third and fourth step are performed by dereferenceSTR()
             //
-            WSDocInfo wsDocInfo = (WSDocInfo)xc.getProperty(TRANSFORM_WS_DOC_INFO);
-            if (wsDocInfo == null) {
-                throw new TransformException("no WSDocInfo found");
+            Object wsDocInfoObject = xc.getProperty(TRANSFORM_WS_DOC_INFO);
+            WSDocInfo wsDocInfo = null;
+            if (wsDocInfoObject instanceof WSDocInfo) {
+                wsDocInfo = (WSDocInfo)wsDocInfoObject;
+            }
+            if (wsDocInfo == null && doDebug) {
+                log.debug("STRTransform: no WSDocInfo found");
             }
 
             Document doc = str.getOwnerDocument();
