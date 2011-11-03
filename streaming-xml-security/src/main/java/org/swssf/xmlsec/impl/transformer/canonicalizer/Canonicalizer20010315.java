@@ -19,6 +19,7 @@
 package org.swssf.xmlsec.impl.transformer.canonicalizer;
 
 import java.io.OutputStream;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -26,7 +27,7 @@ import java.io.OutputStream;
  */
 public abstract class Canonicalizer20010315 extends CanonicalizerBase {
 
-    public Canonicalizer20010315(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+    public Canonicalizer20010315(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
         super(inclusiveNamespaces, includeComments, outputStream);
     }
 }

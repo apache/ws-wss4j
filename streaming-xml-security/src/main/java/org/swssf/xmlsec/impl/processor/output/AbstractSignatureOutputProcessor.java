@@ -36,6 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,7 +92,9 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
 
             try {
                 if (signaturePartDef.getTransformAlgo() != null) {
-                    Transformer transformer = XMLSecurityUtils.getTransformer("#default", this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
+                    List<String> inclusiveNamespaces = new ArrayList<String>();
+                    inclusiveNamespaces.add("#default");
+                    Transformer transformer = XMLSecurityUtils.getTransformer(inclusiveNamespaces, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
                     this.transformer = XMLSecurityUtils.getTransformer(transformer, null, signaturePartDef.getTransformAlgo());
                 } else {
                     transformer = XMLSecurityUtils.getTransformer(null, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());

@@ -66,28 +66,26 @@ public abstract class CanonicalizerBase implements Transformer {
     private boolean firstCall = true;
     private SortedSet<String> inclusiveNamespaces = null;
 
-    public CanonicalizerBase(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+    public CanonicalizerBase(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
         this.includeComments = includeComments;
-        this.inclusiveNamespaces = prefixStr2Set(inclusiveNamespaces);
+        this.inclusiveNamespaces = prefixList2Set(inclusiveNamespaces);
         this.outputStream = outputStream;
     }
 
-    public static SortedSet<String> prefixStr2Set(String inclusiveNamespaces) {
+    public static SortedSet<String> prefixList2Set(List<String> inclusiveNamespaces) {
 
-        if ((inclusiveNamespaces == null) || (inclusiveNamespaces.length() == 0)) {
+        if ((inclusiveNamespaces == null) || (inclusiveNamespaces.size() == 0)) {
             return null;
         }
 
         SortedSet<String> prefixes = new TreeSet<String>();
-        StringTokenizer st = new StringTokenizer(inclusiveNamespaces, " \t\r\n");
 
-        while (st.hasMoreTokens()) {
-            String prefix = st.nextToken();
-
-            if (prefix.equals("#default")) {
+        for (int i = 0; i < inclusiveNamespaces.size(); i++) {
+            String s = inclusiveNamespaces.get(i);
+            if ("#default".equals(s)) {
                 prefixes.add("");
             } else {
-                prefixes.add(prefix);
+                prefixes.add(s);
             }
         }
         return prefixes;

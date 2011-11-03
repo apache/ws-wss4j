@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -212,7 +214,12 @@ public class Canonicalizer20010315ExclusiveTest {
 
 */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_ExclOmitCommentsTransformer c = new Canonicalizer20010315_ExclOmitCommentsTransformer("env ns0 xsi wsu", baos);
+        List<String> inclusiveNamespaces = new ArrayList<String>();
+        inclusiveNamespaces.add("env");
+        inclusiveNamespaces.add("ns0");
+        inclusiveNamespaces.add("xsi");
+        inclusiveNamespaces.add("wsu");
+        Canonicalizer20010315_ExclOmitCommentsTransformer c = new Canonicalizer20010315_ExclOmitCommentsTransformer(inclusiveNamespaces, baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(XML)
         );

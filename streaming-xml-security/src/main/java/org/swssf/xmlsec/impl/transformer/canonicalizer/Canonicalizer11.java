@@ -33,7 +33,7 @@ import java.util.SortedSet;
  * @version $Revision$ $Date$
  */
 public class Canonicalizer11 extends CanonicalizerBase {
-    public Canonicalizer11(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+    public Canonicalizer11(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
         super(inclusiveNamespaces, includeComments, outputStream);
     }
 

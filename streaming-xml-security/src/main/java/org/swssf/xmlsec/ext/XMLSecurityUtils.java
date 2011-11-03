@@ -219,7 +219,7 @@ public class XMLSecurityUtils {
             Constructor<Transformer> constructor = transformerClass.getConstructor(Transformer.class);
             childTransformer = constructor.newInstance(methodParameter1);
         } catch (NoSuchMethodException e) {
-            Constructor<Transformer> constructor = transformerClass.getConstructor(String.class, OutputStream.class);
+            Constructor<Transformer> constructor = transformerClass.getConstructor(List.class, OutputStream.class);
             childTransformer = constructor.newInstance(methodParameter1, methodParameter2);
         }
         return childTransformer;

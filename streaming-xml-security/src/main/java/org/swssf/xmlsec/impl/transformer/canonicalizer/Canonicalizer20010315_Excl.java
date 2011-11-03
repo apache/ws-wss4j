@@ -35,7 +35,7 @@ import java.util.SortedSet;
  */
 public abstract class Canonicalizer20010315_Excl extends CanonicalizerBase {
 
-    public Canonicalizer20010315_Excl(String inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+    public Canonicalizer20010315_Excl(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
         super(inclusiveNamespaces, includeComments, outputStream);
     }
 

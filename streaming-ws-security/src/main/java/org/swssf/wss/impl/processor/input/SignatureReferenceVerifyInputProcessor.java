@@ -42,10 +42,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author $Author$
@@ -176,14 +173,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     if (canonicalizationMethodType != null) {
 
                         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-                        String inclusiveNamespaces = getInclusiveNamespaces(inclusiveNamespacesType);
-
+                        List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
                         if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transformType.getAlgorithm())) {
                             if (inclusiveNamespaces == null) {
-                                inclusiveNamespaces = "#default";
-                            } else {
-                                inclusiveNamespaces = "#default " + inclusiveNamespaces;
+                                inclusiveNamespaces = new ArrayList<String>();
                             }
+                            inclusiveNamespaces.add("#default");
                         }
                         algorithm = canonicalizationMethodType.getAlgorithm();
                         parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, this.getBufferedDigestOutputStream(), algorithm);
@@ -197,7 +192,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
 
                 InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-                String inclusiveNamespaces = getInclusiveNamespaces(inclusiveNamespacesType);
+                List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
 
                 if (parentTransformer != null) {
                     parentTransformer = WSSUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm);

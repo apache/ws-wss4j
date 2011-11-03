@@ -169,18 +169,7 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             try {
                 final CanonicalizationMethodType canonicalizationMethodType = signatureType.getSignedInfo().getCanonicalizationMethod();
                 InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-                String inclusiveNamespaces = null;
-                if (inclusiveNamespacesType != null) {
-                    List<String> prefixList = inclusiveNamespacesType.getPrefixList();
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (int i = 0; i < prefixList.size(); i++) {
-                        String s = prefixList.get(i);
-                        stringBuilder.append(s);
-                        stringBuilder.append(' ');
-                    }
-                    inclusiveNamespaces = stringBuilder.toString();
-                }
-                //todo hand over inclusive namespaces as list?
+                List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
                 transformer = XMLSecurityUtils.getTransformer(
                         inclusiveNamespaces,
                         this.bufferedSignerOutputStream,

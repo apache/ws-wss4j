@@ -163,9 +163,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
                 TransformType transformType = transformTypeList.get(i);
 
                 InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-                String inclusiveNamespaces = getInclusiveNamespaces(inclusiveNamespacesType);
-
-                //todo hand over inclusive namespaces as list?
+                List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
                 String algorithm = transformType.getAlgorithm();
                 if (parentTransformer != null) {
                     parentTransformer = XMLSecurityUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm);
@@ -277,21 +275,6 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
         protected void setFinished(boolean finished) {
             this.finished = finished;
-        }
-
-        protected String getInclusiveNamespaces(InclusiveNamespaces inclusiveNamespacesType) {
-            if (inclusiveNamespacesType != null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                List<String> prefixList = inclusiveNamespacesType.getPrefixList();
-
-                for (int j = 0; j < prefixList.size(); j++) {
-                    String s = prefixList.get(j);
-                    stringBuilder.append(s);
-                    stringBuilder.append(' ');
-                }
-                return stringBuilder.toString();
-            }
-            return null;
         }
     }
 }
