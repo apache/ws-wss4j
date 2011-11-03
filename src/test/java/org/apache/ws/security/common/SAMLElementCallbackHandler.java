@@ -53,7 +53,7 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
                 try {
                     assertionElement = getSAMLAssertion();
                 } catch (Exception e) {
-                    throw new IOException(e);
+                    throw new IOException(e.getMessage());
                 }
                 callback.setAssertionElement(assertionElement);
                 
