@@ -253,15 +253,12 @@ public class WSSConstants extends XMLSecurityConstants {
     }
 
     public enum KeyIdentifierType {
-        DEFAULT_TOKEN,
         ISSUER_SERIAL,
-        BST_DIRECT_REFERENCE,
-        BST_EMBEDDED,
+        SECURITY_TOKEN_DIRECT_REFERENCE,
         X509_KEY_IDENTIFIER,
         SKI_KEY_IDENTIFIER,
         THUMBPRINT_IDENTIFIER,
-        EMBEDDED_SECURITY_TOKEN_REF,
-        EMEDDED_KEYIDENTIFIER_REF,
+        EMBEDDED_KEYIDENTIFIER_REF,
         USERNAMETOKEN_REFERENCE,
     }
 

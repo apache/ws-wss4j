@@ -153,7 +153,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             if (action.equals(WSSConstants.SIGNATURE)
                     || action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
-                if (((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                if (((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                     outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, bstId);
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.getBeforeProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
@@ -162,7 +162,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 }
             } else if (action.equals(WSSConstants.ENCRYPT)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY, bstId);
-                if (((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                if (((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType() == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
                     outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
@@ -183,15 +183,6 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     case SecurityContextToken:
                         outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN, bstId);
                         break;
-                }
-                if ((getAction() == WSSConstants.ENCRYPT_WITH_DERIVED_KEY
-                        && ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE)
-                        || (getAction() == WSSConstants.SIGNATURE_WITH_DERIVED_KEY
-                        && ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE)) {
-                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
-                    finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
-                    outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
-                    binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }
             }
 

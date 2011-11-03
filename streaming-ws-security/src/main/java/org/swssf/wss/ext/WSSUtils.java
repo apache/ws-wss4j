@@ -204,7 +204,11 @@ public class WSSUtils extends XMLSecurityUtils {
         outputProcessorChain.reset();
     }
 
-    public static void createBinarySecurityTokenStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate) throws XMLStreamException, XMLSecurityException {
+    public static void createBinarySecurityTokenStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                          OutputProcessorChain outputProcessorChain,
+                                                          String referenceId, X509Certificate[] x509Certificates,
+                                                          boolean useSingleCertificate)
+            throws XMLStreamException, XMLSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         String valueType;
         if (useSingleCertificate) {
@@ -236,7 +240,10 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
     }
 
-    public static void createX509SubjectKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLSecurityException, XMLStreamException {
+    public static void createX509SubjectKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                               OutputProcessorChain outputProcessorChain,
+                                                               X509Certificate[] x509Certificates)
+            throws XMLSecurityException, XMLStreamException {
         // As per the 1.1 specification, SKI can only be used for a V3 certificate
         if (x509Certificates[0].getVersion() != 3) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "invalidCertForSKI");
@@ -251,7 +258,10 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
 
-    public static void createX509KeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, XMLSecurityException {
+    public static void createX509KeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                        OutputProcessorChain outputProcessorChain,
+                                                        X509Certificate[] x509Certificates)
+            throws XMLStreamException, XMLSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
         attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE);
@@ -264,7 +274,10 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
 
-    public static void createThumbprintKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, XMLSecurityException {
+    public static void createThumbprintKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                              OutputProcessorChain outputProcessorChain,
+                                                              X509Certificate[] x509Certificates)
+            throws XMLStreamException, XMLSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
         attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT);
@@ -285,32 +298,23 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
 
-    public static void createBSTReferenceStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, String referenceId, X509Certificate[] x509Certificates, boolean useSingleCertificate, boolean embed) throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        String valueType;
-        if (useSingleCertificate) {
-            valueType = WSSConstants.NS_X509_V3_TYPE;
-        } else {
-            valueType = WSSConstants.NS_X509PKIPathv1;
-        }
-        attributes.put(WSSConstants.ATT_NULL_URI, "#" + referenceId);
-        attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
-        if (embed) {
-            WSSUtils.createBinarySecurityTokenStructure(abstractOutputProcessor, outputProcessorChain, referenceId, x509Certificates, useSingleCertificate);
-        }
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
-    }
-
-    //todo I think this is not spec conform and can be dropped
-    public static void createEmbeddedSecurityTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, String referenceId) throws XMLStreamException, XMLSecurityException {
+    public static void createBSTReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                   OutputProcessorChain outputProcessorChain, String referenceId,
+                                                   String valueType)
+            throws XMLStreamException, XMLSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         attributes.put(WSSConstants.ATT_NULL_URI, "#" + referenceId);
+        if (valueType != null) {
+            attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
+        }
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
     }
 
-    public static void createEmbeddedKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, XMLSecurityConstants.TokenType tokenType, String referenceId) throws XMLStreamException, XMLSecurityException {
+    public static void createEmbeddedKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                            OutputProcessorChain outputProcessorChain,
+                                                            XMLSecurityConstants.TokenType tokenType, String referenceId)
+            throws XMLStreamException, XMLSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         if (tokenType.equals(WSSConstants.Saml10Token) || tokenType.equals(WSSConstants.Saml11Token)) {
             attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE);
@@ -322,7 +326,9 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
 
-    public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain, String tokenId) throws XMLStreamException, XMLSecurityException {
+    public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                             OutputProcessorChain outputProcessorChain, String tokenId)
+            throws XMLStreamException, XMLSecurityException {
         Map<QName, String> attributes = new HashMap<QName, String>();
         attributes.put(WSSConstants.ATT_NULL_URI, "#" + tokenId);
         attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken);

@@ -91,9 +91,7 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
 
         Map<QName, String> attributes = new HashMap<QName, String>();
         attributes.put(WSSConstants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
-        if ((keyIdentifierType == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE
-                || keyIdentifierType == WSSConstants.KeyIdentifierType.BST_EMBEDDED)
-                && !useSingleCertificate) {
+        if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
             attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1);
         } else if (WSSConstants.Saml10Token.equals(securityToken.getTokenType())
                 || WSSConstants.Saml11Token.equals(securityToken.getTokenType())) {
@@ -114,13 +112,15 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
             WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
         } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
             WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-        } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.BST_EMBEDDED) {
-            WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, true);
-        } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
-            WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, x509Certificates, useSingleCertificate, false);
-        } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.EMBEDDED_SECURITY_TOKEN_REF) {
-            WSSUtils.createEmbeddedSecurityTokenReferenceStructure(this, outputProcessorChain, tokenId);
-        } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.EMEDDED_KEYIDENTIFIER_REF) {
+        } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+            String valueType;
+            if (useSingleCertificate) {
+                valueType = WSSConstants.NS_X509_V3_TYPE;
+            } else {
+                valueType = WSSConstants.NS_X509PKIPathv1;
+            }
+            WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+        } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF) {
             WSSUtils.createEmbeddedKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), tokenId);
         } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.USERNAMETOKEN_REFERENCE) {
             WSSUtils.createUsernameTokenReferenceStructure(this, outputProcessorChain, tokenId);

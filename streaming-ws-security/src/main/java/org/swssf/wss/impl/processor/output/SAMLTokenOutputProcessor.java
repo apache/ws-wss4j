@@ -258,7 +258,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 StartElement startElement = xmlEvent.asStartElement();
                 if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                    if (senderVouches && ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE) {
+                    if (senderVouches && ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                         WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, binarySecurityTokenReferenceId, securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
                     }
                     outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);

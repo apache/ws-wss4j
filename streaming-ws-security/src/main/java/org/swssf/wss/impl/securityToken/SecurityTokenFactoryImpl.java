@@ -107,14 +107,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     throw new WSSecurityException("badReferenceURI");
                 }
                 uri = WSSUtils.dropReferenceMarker(uri);
-                //embedded BST:
-                //todo? this seems not to be schema valid!
-                /*BinarySecurityTokenType binarySecurityTokenType = XMLSecurityUtils.getQNameType(referenceType, WSSConstants.TAG_dsig_X509Data)
-                if (referenceType.getBinarySecurityTokenType() != null
-                        && uri.equals(referenceType.getBinarySecurityTokenType().getId())) {
-                    BinarySecurityTokenType binarySecurityTokenType = referenceType.getBinarySecurityTokenType();
-                    return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.BST_EMBEDDED, getSecurityToken(binarySecurityTokenType, securityContext, crypto, callbackHandler, processor));
-                } else {//referenced BST:*/
+                //referenced BST:*/
                 //we have to search BST somewhere in the doc. First we will check for a BST already processed and
                 //stored in the context. Otherwise we will abort now.
 
@@ -133,9 +126,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 if (securityTokenProvider == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
                 }
-                return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.BST_DIRECT_REFERENCE, securityTokenProvider.getSecurityToken(crypto));
+                return new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE, securityTokenProvider.getSecurityToken(crypto));
             }
-            //}
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         } finally {
             securityContext.remove("" + Thread.currentThread().hashCode());
