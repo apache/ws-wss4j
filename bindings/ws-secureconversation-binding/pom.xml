@@ -18,18 +18,18 @@
         <cobertura.skip>true</cobertura.skip>
     </properties>
 
-     <dependencies>
-         <dependency>
+    <dependencies>
+        <dependency>
             <groupId>org.swssf</groupId>
             <artifactId>xmldsig-binding</artifactId>
             <version>1.0.0</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.swssf</groupId>
             <artifactId>wss10-binding</artifactId>
             <version>1.0.0</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.swssf</groupId>
             <artifactId>wsu10-binding</artifactId>
             <version>1.0.0</version>
@@ -69,12 +69,12 @@
                             doesn't respect the catalog and will do online lookups :-( -->
                             <strict>false</strict>
                             <args>
-                              <arg>-Xinheritance</arg>
+                                <arg>-Xinheritance</arg>
                             </args>
                             <plugins>
                                 <plugin>
                                     <groupId>org.jvnet.jaxb2_commons</groupId>
-                                   <artifactId>jaxb2-basics</artifactId>
+                                    <artifactId>jaxb2-basics</artifactId>
                                     <version>0.6.3</version>
                                 </plugin>
                             </plugins>

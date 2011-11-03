@@ -66,7 +66,7 @@ public class XMLSecurityStreamReaderTest {
         inputProcessorChain.addProcessor(new EventReaderProcessor());
         XMLSecurityStreamReader xmlSecurityStreamReader = new XMLSecurityStreamReader(inputProcessorChain, securityProperties);
         int event = xmlSecurityStreamReader.next();
-        Assert.assertEquals(XMLStreamConstants.CHARACTERS, event);
+        Assert.assertEquals(XMLStreamConstants.START_ELEMENT, event);
     }
 
     @Test

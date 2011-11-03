@@ -36,8 +36,8 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>wstx-asl</artifactId>
-            <version>3.2.9</version>
+            <artifactId>woodstox-core-asl</artifactId>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>5.14.2</version>
+            <version>5.14.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -121,7 +121,7 @@
                 <configuration>
                     <instrumentation>
                         <excludes>
-                          <exclude>org/xmlsecurity/ns/configuration/*</exclude>
+                            <exclude>org/xmlsecurity/ns/configuration/*</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>

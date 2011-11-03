@@ -15,7 +15,7 @@
     <name>Streaming WebService Security</name>
 
     <properties>
-        <opensaml.version>2.4.1</opensaml.version>
+        <opensaml.version>2.5.1-1</opensaml.version>
     </properties>
 
     <dependencies>
@@ -51,6 +51,10 @@
                 <exclusion>
                     <groupId>commons-dbcp</groupId>
                     <artifactId>commons-dbcp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>commons-pool</groupId>
@@ -196,13 +200,13 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>5.14.2</version>
+            <version>5.14.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -18,15 +18,15 @@
 
     <modules>
         <module>bindings</module>
-    	<module>streaming-xml-security</module>
-    	<module>streaming-ws-security</module>
-    	<module>streaming-ws-policy</module>
-    	<module>cxf-integration</module>
+        <module>streaming-xml-security</module>
+        <module>streaming-ws-security</module>
+        <module>streaming-ws-policy</module>
+        <module>cxf-integration</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <xmlsec.version>1.4.4</xmlsec.version>
+        <xmlsec.version>1.4.6</xmlsec.version>
     </properties>
 
     <dependencyManagement>
@@ -40,6 +40,11 @@
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
                 <version>${xmlsec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.woodstox</groupId>
+                <artifactId>woodstox-core-asl</artifactId>
+                <version>4.1.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

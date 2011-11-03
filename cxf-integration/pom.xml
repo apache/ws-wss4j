@@ -15,7 +15,7 @@
     <name>Streaming WS Security CXF Integration</name>
 
     <properties>
-        <cxf.version>2.4.2</cxf.version>
+        <cxf.version>2.4.3</cxf.version>
     </properties>
 
     <dependencies>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>5.14.2</version>
+            <version>5.14.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
