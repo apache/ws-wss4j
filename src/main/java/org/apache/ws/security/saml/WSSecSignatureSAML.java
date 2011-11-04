@@ -19,6 +19,20 @@
 
 package org.apache.ws.security.saml;
 
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.XMLSignContext;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
@@ -38,25 +52,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMStructure;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.XMLSignContext;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
 public class WSSecSignatureSAML extends WSSecSignature {
 
@@ -72,8 +69,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
     private String issuerKeyPW = null;
     private boolean useDirectReferenceToAssertion = false;
     
-    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
-
     /**
      * Constructor.
      */
@@ -210,9 +205,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
         document = doc;
         issuerKeyName = iKeyName;
         issuerKeyPW = iKeyPW;
-        
-        keyInfoFactory = KeyInfoFactory.getInstance("DOM");
-        signatureFactory = XMLSignatureFactory.getInstance("DOM");
         
         samlToken = (Element) assertion.toDOM(doc);
 

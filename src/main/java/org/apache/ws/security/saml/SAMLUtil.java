@@ -49,6 +49,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.namespace.QName;
 
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -310,7 +311,12 @@ public class SAMLUtil {
         // (public key) credential
         //
         X509Certificate[] certs = null;
-        KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        KeyInfoFactory keyInfoFactory = null;
+        try {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        }
         XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
 
         try {

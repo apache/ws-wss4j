@@ -33,6 +33,7 @@ import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,19 +73,36 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private String strUri = null;
     private WSDocInfo wsDocInfo;
     
-    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
-    private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    private KeyInfoFactory keyInfoFactory;
+    private XMLSignatureFactory signatureFactory;
     private XMLSignature sig;
     private KeyInfo keyInfo;
     private CanonicalizationMethod c14nMethod;
     private Element securityHeader = null;
 
-
     public WSSecDKSign() {
         super();
+        init();
     }
+    
     public WSSecDKSign(WSSConfig config) {
         super(config);
+        init();
+    }
+    
+    private void init() {
+        // Try to install the Santuario Provider - fall back to the JDK provider if this does
+        // not work
+        try {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        }
+        try {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        }
     }
     
     public Document build(Document doc, WSSecHeader secHeader)

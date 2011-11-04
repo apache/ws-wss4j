@@ -63,6 +63,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
 import java.security.Key;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -75,9 +76,23 @@ public class SignatureProcessor implements Processor {
     private static org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SignatureProcessor.class);
     
-    private XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    private XMLSignatureFactory signatureFactory;
+    private KeyInfoFactory keyInfoFactory;
     
-    private KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+    public SignatureProcessor() {
+        // Try to install the Santuario Provider - fall back to the JDK provider if this does
+        // not work
+        try {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        }
+        try {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        }
+    }
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem,

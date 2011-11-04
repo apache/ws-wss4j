@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.security.NoSuchProviderException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +93,8 @@ public class WSSecSignature extends WSSecSignatureBase {
     protected String strUri = null;
     protected BinarySecurity bstToken = null;
     
-    protected KeyInfoFactory keyInfoFactory = KeyInfoFactory.getInstance("DOM");
-    protected XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM");
+    protected KeyInfoFactory keyInfoFactory;
+    protected XMLSignatureFactory signatureFactory;
     protected KeyInfo keyInfo;
     protected CanonicalizationMethod c14nMethod;
     protected XMLSignature sig;
@@ -110,9 +111,27 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     public WSSecSignature() {
         super();
+        init();
     }
+    
     public WSSecSignature(WSSConfig config) {
         super(config);
+        init();
+    }
+    
+    private void init() {
+        // Try to install the Santuario Provider - fall back to the JDK provider if this does
+        // not work
+        try {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        }
+        try {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        }
     }
    
     /**
