@@ -119,6 +119,13 @@ public class WSEncryptionPart {
     public String getEncModifier() {
         return encModifier;
     }
+    
+    /**
+     * Set the encryption modifier
+     */
+    public void setEncModifier(String encModifier) {
+        this.encModifier = encModifier;
+    }
 
     /**
      * @return Returns the id.
