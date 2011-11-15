@@ -161,6 +161,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @see WSConstants#AES_256
      */
     public void setSymmetricEncAlgorithm(String algo) {
+        if (symEncAlgo != null && !symEncAlgo.equals(algo)) {
+            symmetricKey = null;
+        }
         symEncAlgo = algo;
     }
 
