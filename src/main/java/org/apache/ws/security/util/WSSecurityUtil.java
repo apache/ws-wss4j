@@ -762,9 +762,27 @@ public class WSSecurityUtil {
      * Convert the raw key bytes into a SecretKey object of type symEncAlgo.
      */
     public static SecretKey prepareSecretKey(String symEncAlgo, byte[] rawKey) {
-        SecretKeySpec keySpec = 
-            new SecretKeySpec(rawKey, JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo));
-        return (SecretKey) keySpec;
+        // Do an additional check on the keysize required by the encryption algorithm
+        int size = 0;
+        try {
+            size = JCEMapper.getKeyLengthFromURI(symEncAlgo) / 8;
+        } catch (Exception e) {
+            // ignore - some unknown (to JCEMapper) encryption algorithm
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage());
+            }
+        }
+        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+        SecretKeySpec keySpec;
+        if (size > 0) {
+            keySpec = 
+                new SecretKeySpec(
+                    rawKey, 0, ((rawKey.length > size) ? size : rawKey.length), keyAlgorithm
+                );
+        } else {
+            keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
+        }
+        return (SecretKey)keySpec;
     }
 
 
