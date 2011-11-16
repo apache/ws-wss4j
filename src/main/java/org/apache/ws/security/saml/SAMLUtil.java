@@ -58,6 +58,11 @@ import java.util.List;
  * Utility methods for SAML stuff
  */
 public class SAMLUtil {
+    
+    private static final QName BINARY_SECRET = 
+        new QName(WSConstants.WST_NS, "BinarySecret");
+    private static final QName BINARY_SECRET_05_12 = 
+        new QName(WSConstants.WST_NS_05_12, "BinarySecret");
 
     /**
      * Get an AssertionWrapper object from parsing a SecurityTokenReference that uses
@@ -298,7 +303,7 @@ public class SAMLUtil {
                             WSSecurityEngineResult.TAG_SECRET
                         );
                     return new SAMLKeyInfo(secret);
-                } else if (el.equals(new QName(WSConstants.WST_NS, "BinarySecret"))) {
+                } else if (el.equals(BINARY_SECRET) || el.equals(BINARY_SECRET_05_12)) {
                     Text txt = (Text)node.getFirstChild();
                     return new SAMLKeyInfo(Base64.decode(txt.getData()));
                 }

@@ -119,6 +119,15 @@ public class WSConstants {
         "http://www.w3.org/2001/04/xmldsig-more#hmac-md5";
     
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    /**
+     * WS-Trust 1.3 namespace
+     */
+    public static final String WST_NS_05_12 = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
+    /**
+     * WS-Trust 1.4 namespace
+     */
+    public static final String WST_NS_08_02 = "http://docs.oasis-open.org/ws-sx/ws-trust/200802";
+    
     public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
 
     //
