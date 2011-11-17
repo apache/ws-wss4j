@@ -170,7 +170,7 @@ public class SignatureSTRParser implements STRParser {
                     }
                     SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
                     X509Certificate[] foundCerts = keyInfo.getCerts();
-                    if (foundCerts != null) {
+                    if (foundCerts != null && foundCerts.length > 0) {
                         certs = new X509Certificate[]{foundCerts[0]};
                     }
                     secretKey = keyInfo.getSecret();
@@ -189,7 +189,7 @@ public class SignatureSTRParser implements STRParser {
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
             X509Certificate[] foundCerts = secRef.getX509IssuerSerial(crypto);
-            if (foundCerts != null) {
+            if (foundCerts != null && foundCerts.length > 0) {
                 certs = new X509Certificate[]{foundCerts[0]};
             }
         } else if (secRef.containsKeyIdentifier()) {
@@ -214,7 +214,7 @@ public class SignatureSTRParser implements STRParser {
                     SAMLUtil.getCredentialFromSubject(assertion, data,
                                                       wsDocInfo, bspCompliant);
                 X509Certificate[] foundCerts = samlKi.getCerts();
-                if (foundCerts != null) {
+                if (foundCerts != null && foundCerts.length > 0) {
                     certs = new X509Certificate[]{foundCerts[0]};
                 }
                 secretKey = samlKi.getSecret();
@@ -231,7 +231,7 @@ public class SignatureSTRParser implements STRParser {
             );
         }
         
-        if (certs != null && principal == null) {
+        if (certs != null && certs.length > 0 && principal == null) {
             principal = certs[0].getSubjectX500Principal();
         }
     }
