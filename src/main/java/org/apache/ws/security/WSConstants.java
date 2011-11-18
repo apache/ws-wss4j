@@ -99,6 +99,10 @@ public class WSConstants {
         "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
     public static final String AES_192 = 
         "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
+    public static final String AES_128_GCM = 
+        "http://www.w3.org/2009/xmlenc11#aes128-gcm";
+    public static final String AES_256_GCM = 
+        "http://www.w3.org/2009/xmlenc11#aes256-gcm";
     public static final String DSA = 
         "http://www.w3.org/2000/09/xmldsig#dsa-sha1";
     public static final String RSA = 

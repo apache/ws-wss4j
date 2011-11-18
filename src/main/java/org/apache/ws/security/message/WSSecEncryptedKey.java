@@ -393,11 +393,13 @@ public class WSSecEncryptedKey extends WSSecBase {
                 keyAlgorithm = JCEMapper.translateURItoJCEID(symEncAlgo);
             }
             KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
                 keyGen.init(128);
             } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
                 keyGen.init(192);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
                 keyGen.init(256);
             }
             return keyGen;
