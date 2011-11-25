@@ -28,6 +28,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
+import org.apache.ws.security.spnego.SpnegoToken;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 // import org.apache.ws.security.validate.KerberosTokenDecoderImpl;
@@ -103,6 +104,22 @@ public class KerberosTest extends org.junit.Assert {
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof KerberosPrincipal);
         assertTrue(principal.getName().contains("alice"));
+    }
+    
+    /**
+     * Get a SPNEGO token.
+     */
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSpnego() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        SpnegoToken spnegoToken = new SpnegoToken();
+        spnegoToken.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        assertNotNull(spnegoToken.getToken());
     }
     
     /**
