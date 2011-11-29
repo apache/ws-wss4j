@@ -1025,7 +1025,6 @@ public class WSSecurityUtil {
         try {
             if (random == null) {
                 random = SecureRandom.getInstance("SHA1PRNG");
-                random.setSeed(System.nanoTime());
             }
             byte[] temp = new byte[length];
             random.nextBytes(temp);
