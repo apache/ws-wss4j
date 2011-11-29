@@ -1190,7 +1190,6 @@ public class WSSecurityUtil {
         if (random == null || !algorithm.equals(randomAlgorithm)) {
             random = SecureRandom.getInstance(algorithm);
             randomAlgorithm = algorithm;
-            random.setSeed(System.currentTimeMillis());
         }
         return random;
     }
