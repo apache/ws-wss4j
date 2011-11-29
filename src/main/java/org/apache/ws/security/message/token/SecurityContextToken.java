@@ -52,6 +52,8 @@ public class SecurityContextToken {
     
     private WSSConfig wssConfig = WSSConfig.getNewInstance();
     
+    private String tokenType = WSConstants.WSC_SCT;
+    
     /**
      * Constructor to create the SCT
      *
@@ -116,6 +118,12 @@ public class SecurityContextToken {
         element.appendChild(elementIdentifier);
 
         elementIdentifier.appendChild(doc.createTextNode(uuid));
+        
+        if (version == ConversationConstants.VERSION_05_02) {
+            tokenType = WSConstants.WSC_SCT;
+        } else {
+            tokenType = WSConstants.WSC_SCT_05_12;
+        }
     }
 
     
@@ -130,9 +138,11 @@ public class SecurityContextToken {
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
 
         // If the element is not a security context token, throw an exception
-        if (!(el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02) ||
-            el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_12))
-        ) {
+        if (el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_02)) {
+            tokenType = WSConstants.WSC_SCT;
+        } else if (el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_12)) {
+            tokenType = WSConstants.WSC_SCT_05_12;
+        } else {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN);
         }
 
@@ -170,6 +180,13 @@ public class SecurityContextToken {
             return getFirstNode(elementIdentifier).getData();
         }
         return null;
+    }
+    
+    /**
+     * Get the WS-Trust tokenType String associated with this token
+     */
+    public String getTokenType() {
+        return tokenType;
     }
 
     public void setElement(Element elem) {

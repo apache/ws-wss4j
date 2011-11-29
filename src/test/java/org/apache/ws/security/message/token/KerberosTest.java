@@ -107,7 +107,7 @@ public class KerberosTest extends org.junit.Assert {
     }
     
     /**
-     * Get a SPNEGO token.
+     * Get and validate a SPNEGO token.
      */
     @org.junit.Test
     @org.junit.Ignore
@@ -119,7 +119,13 @@ public class KerberosTest extends org.junit.Assert {
         
         SpnegoToken spnegoToken = new SpnegoToken();
         spnegoToken.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
-        assertNotNull(spnegoToken.getToken());
+        
+        byte[] token = spnegoToken.getToken();
+        assertNotNull(token);
+        
+        spnegoToken = new SpnegoToken();
+        spnegoToken.validateServiceTicket("bob", null, "bob@service.ws.apache.org", token);
+        assertTrue(spnegoToken.isEstablished());
     }
     
     /**

@@ -126,6 +126,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             SecurityContextToken receivedToken = 
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
             assertTrue(receivedToken != null);
+            assertTrue(WSConstants.WSC_SCT.equals(receivedToken.getTokenType()));
             
             SecurityContextToken clone = new SecurityContextToken(receivedToken.getElement());
             assertTrue(clone.equals(receivedToken));
@@ -145,6 +146,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             secHeader.insertSecurityHeader(doc);
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            sctBuilder.setWscVersion(ConversationConstants.VERSION_05_12);
             sctBuilder.prepare(doc, crypto);
 
             byte[] tempSecret = WSSecurityUtil.generateNonce(16);
@@ -167,7 +169,15 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 LOG.debug(out);
             }
 
-            verify(doc);
+            List<WSSecurityEngineResult> results = verify(doc);
+            
+            WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SCT);
+            SecurityContextToken receivedToken = 
+                (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
+            assertTrue(receivedToken != null);
+            assertTrue(WSConstants.WSC_SCT_05_12.equals(receivedToken.getTokenType()));
+            
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());

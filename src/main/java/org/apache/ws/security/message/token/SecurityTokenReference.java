@@ -314,6 +314,7 @@ public class SecurityTokenReference {
         // Try to find a custom token
         //
         if (cb != null && (WSConstants.WSC_SCT.equals(type)
+            || WSConstants.WSC_SCT_05_12.equals(type)
             || WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) 
             || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)
             || KerberosSecurity.isKerberosToken(type))) {

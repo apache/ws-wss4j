@@ -33,7 +33,7 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.MessageProp;
 
 /**
- * SPNEGO Token.
+ * A class that wraps some functionality to obtain and validate spnego tokens.
  */
 public class SpnegoToken {
     
@@ -106,10 +106,83 @@ public class SpnegoToken {
     }
     
     /**
-     * Get the SPNEGO token that was created in retrieveServiceTicket().
+     * Validate a service ticket.
+     * @param jaasLoginModuleName
+     * @param callbackHandler
+     * @param serviceName
+     * @param ticket
+     * @throws WSSecurityException
+     */
+    public void validateServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        byte[] ticket
+    ) throws WSSecurityException {
+        // Get a TGT from the KDC using JAAS
+        LoginContext loginContext = null;
+        try {
+            if (callbackHandler == null) {
+                loginContext = new LoginContext(jaasLoginModuleName);
+            } else {
+                loginContext = new LoginContext(jaasLoginModuleName, callbackHandler);
+            }
+            loginContext.login();
+        } catch (LoginException ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE,
+                "kerberosLoginError", 
+                new Object[] {ex.getMessage()}
+            );
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully authenticated to the TGT");
+        }
+
+        // Get the service name to use - fall back on the principal
+        Subject subject = loginContext.getSubject();
+        String service = serviceName;
+        if (service == null) {
+            Set<Principal> principals = subject.getPrincipals();
+            if (principals.isEmpty()) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, 
+                    "kerberosLoginError", 
+                    new Object[] {"No Client principals found after login"}
+                );
+            }
+            service = principals.iterator().next().getName();
+        }
+
+        // Validate the ticket
+        SpnegoServiceAction action = new SpnegoServiceAction(ticket, service);
+        token = Subject.doAs(subject, action);
+        
+        secContext = action.getContext();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully validated a service ticket");
+        }
+
+    }
+
+    /**
+     * Get the SPNEGO token that was created.
      */
     public byte[] getToken() {
         return token;
+    }
+    
+    /**
+     * Whether a connection has been established (at the service side)
+     */
+    public boolean isEstablished() {
+        if (secContext == null) {
+            return false;
+        }
+        return secContext.isEstablished();
     }
     
     /**
