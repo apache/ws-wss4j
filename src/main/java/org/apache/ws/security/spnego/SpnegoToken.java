@@ -159,7 +159,7 @@ public class SpnegoToken {
 
         // Validate the ticket
         SpnegoServiceAction action = new SpnegoServiceAction(ticket, service);
-        token = Subject.doAs(subject, action);
+        token = (byte[])Subject.doAs(subject, action);
         
         secContext = action.getContext();
         if (LOG.isDebugEnabled()) {
