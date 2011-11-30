@@ -67,7 +67,19 @@ public class SecurityContextTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
             result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
         } else {
-            byte[] secret = getSecret(data.getCallbackHandler(), sct);
+            String id = sct.getID();
+            if (id.charAt(0) == '#') {
+                id = id.substring(1);
+            }
+            byte[] secret = null;
+            try {
+                secret = getSecret(data.getCallbackHandler(), sct.getIdentifier());
+            } catch (WSSecurityException ex) {
+                secret = getSecret(data.getCallbackHandler(), id);
+            }
+            if (secret == null || secret.length == 0) {
+                secret = getSecret(data.getCallbackHandler(), id);
+            }
             result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
             result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         }
@@ -84,7 +96,7 @@ public class SecurityContextTokenProcessor implements Processor {
      * @param sct
      * @return The key collected using the callback handler
      */
-    private byte[] getSecret(CallbackHandler cb, SecurityContextToken sct)
+    private byte[] getSecret(CallbackHandler cb, String identifier)
         throws WSSecurityException {
 
         if (cb == null) {
@@ -92,9 +104,7 @@ public class SecurityContextTokenProcessor implements Processor {
         }
 
         WSPasswordCallback callback = 
-            new WSPasswordCallback(
-                sct.getIdentifier(), WSPasswordCallback.SECURITY_CONTEXT_TOKEN
-            );
+            new WSPasswordCallback(identifier, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
         try {
             Callback[] callbacks = new Callback[]{callback};
             cb.handle(callbacks);
@@ -102,14 +112,14 @@ public class SecurityContextTokenProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 
                 "noKey",
-                new Object[] {sct.getIdentifier()}, 
+                new Object[] {identifier}, 
                 e
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 
                 "noKey",
-                new Object[] {sct.getIdentifier()}, 
+                new Object[] {identifier}, 
                 e
             );
         }

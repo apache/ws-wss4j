@@ -202,6 +202,23 @@ public class SpnegoToken {
         }
     }
     
+    /**
+     * Wrap a key
+     */
+    public byte[] wrapKey(byte[] secret) throws WSSecurityException {
+        MessageProp mProp = new MessageProp(0, true);
+        try {
+            return secContext.wrap(secret, 0, secret.length, mProp);
+        } catch (GSSException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in cleaning up a GSS context", e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, "spnegoKeyError"
+            );
+        }
+    }
+    
     public void clear() {
         token = null;
         try {

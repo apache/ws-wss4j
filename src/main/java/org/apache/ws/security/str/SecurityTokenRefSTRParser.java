@@ -97,6 +97,12 @@ public class SecurityTokenRefSTRParser implements STRParser {
         WSSecurityEngineResult result = wsDocInfo.getResult(uri);
         if (result != null) {
             processPreviousResult(result, secRef, data, parameters, wsDocInfo, bspCompliant);
+            
+            if (secretKey == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                );
+            }
         } else if (secRef.containsReference()) {
             Reference reference = secRef.getReference();
             // Try asking the CallbackHandler for the secret key
