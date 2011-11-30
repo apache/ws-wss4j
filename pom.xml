@@ -160,7 +160,7 @@
                               javax.xml.crypto.*,
                               org.apache.xml.security.*,
                               org.bouncycastle.*;resolution:=optional,
-                              org.apache.jcp.xml.dsig.internal.dom.*,
+                              org.jcp.xml.dsig.internal.dom.*,
                               org.opensaml.*;resolution:=optional,
                               *;resolution:=optional
                         </Import-Package>
