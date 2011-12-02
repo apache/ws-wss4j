@@ -33,15 +33,16 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.MessageProp;
 
 /**
- * A class that wraps some functionality to obtain and validate spnego tokens.
+ * This class wraps a GSSContext and provides some functionality to obtain and validate spnego tokens.
  */
-public class SpnegoToken {
+public class SpnegoTokenContext {
     
     private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SpnegoToken.class);
+        org.apache.commons.logging.LogFactory.getLog(SpnegoTokenContext.class);
     
     private GSSContext secContext;
     private byte[] token;
+    private boolean mutualAuth;
 
     /**
      * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
@@ -91,6 +92,7 @@ public class SpnegoToken {
         
         // Get the service ticket
         SpnegoClientAction action = new SpnegoClientAction(serviceName);
+        action.setMutualAuth(mutualAuth);
         token = (byte[])Subject.doAs(clientSubject, action);
         if (token == null) {
             throw new WSSecurityException(
@@ -167,6 +169,13 @@ public class SpnegoToken {
         }
 
     }
+    
+    /**
+     * Whether to enable mutual authentication or not. This only applies to retrieve service ticket.
+     */
+    public void setMutualAuth(boolean mutualAuthentication) {
+        mutualAuth = mutualAuthentication;
+    }
 
     /**
      * Get the SPNEGO token that was created.
@@ -221,6 +230,7 @@ public class SpnegoToken {
     
     public void clear() {
         token = null;
+        mutualAuth = false;
         try {
             secContext.dispose();
         } catch (GSSException e) {

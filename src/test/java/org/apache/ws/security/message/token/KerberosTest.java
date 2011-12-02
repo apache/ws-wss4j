@@ -28,7 +28,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.spnego.SpnegoToken;
+import org.apache.ws.security.spnego.SpnegoTokenContext;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 // import org.apache.ws.security.validate.KerberosTokenDecoderImpl;
@@ -117,13 +117,13 @@ public class KerberosTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        SpnegoToken spnegoToken = new SpnegoToken();
+        SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
         spnegoToken.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
         
         byte[] token = spnegoToken.getToken();
         assertNotNull(token);
         
-        spnegoToken = new SpnegoToken();
+        spnegoToken = new SpnegoTokenContext();
         spnegoToken.validateServiceTicket("bob", null, "bob@service.ws.apache.org", token);
         assertTrue(spnegoToken.isEstablished());
     }

@@ -37,9 +37,17 @@ public class SpnegoClientAction implements PrivilegedAction<byte[]> {
     
     private String serviceName;
     private GSSContext secContext;
+    private boolean mutualAuth;
     
     public SpnegoClientAction(String serviceName) {
         this.serviceName = serviceName;
+    }
+    
+    /**
+     * Whether to enable mutual authentication or not.
+     */
+    public void setMutualAuth(boolean mutualAuthentication) {
+        mutualAuth = mutualAuthentication;
     }
     
     public byte[] run() {
@@ -51,7 +59,7 @@ public class SpnegoClientAction implements PrivilegedAction<byte[]> {
                 GSSName gssService = gssManager.createName(serviceName, GSSName.NT_HOSTBASED_SERVICE);
                 secContext = gssManager.createContext(gssService, oid, null, GSSContext.DEFAULT_LIFETIME);
                 
-                secContext.requestMutualAuth(Boolean.FALSE);
+                secContext.requestMutualAuth(mutualAuth);
                 secContext.requestCredDeleg(Boolean.FALSE);
             }
         
