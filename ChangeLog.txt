@@ -5,6 +5,23 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.4
+=============
+
+Bug
+
+    [WSS-319] - NPE when certificate identified by SKI can't be found
+    [WSS-320] - ClassCastException when verifying XML signature, multiple WARs deployed to same Tomcat instance
+    [WSS-321] - Cannot configure for no password element expected using Spring configuration
+    [WSS-323] - WS-Trust 1.3 namespace not supported when looking for a BinarySecret in a SAML KeyInfo
+    [WSS-324] - org.apache.ws.security.str.SignatureSTRParser throws ArrayIndexOutOfBoundsException: 0 when crypto returns zero-length array of certificates
+
+Improvement
+
+    [WSS-322] - Add the ability to set DOM Elements directly on a SAMLCallback object
+    [WSS-327] - Add support for obtaining and validating SPNEGO tokens.
+
+
 Release 1.6.3
 =============
 
