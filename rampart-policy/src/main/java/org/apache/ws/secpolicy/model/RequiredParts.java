@@ -1,98 +1,81 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.apache.neethi.Constants;
+import org.apache.neethi.Policy;
+import org.apache.ws.secpolicy.SPConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
-import org.apache.ws.secpolicy.SPConstants;
-
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
 public class RequiredParts extends AbstractSecurityAssertion {
-    
-    private ArrayList headers = new ArrayList();
-    
-    public RequiredParts(int version) {
-        setVersion(version);
-    }
 
-    /**
-     * @return Returns the headers.
-     */
-    public ArrayList getHeaders() {
-        return this.headers;
-    }
+    private List<Header> headers = new ArrayList<Header>();
 
-    /**
-     * @param headers The headers to set.
-     */
-    public void addHeader(Header header) {
-        this.headers.add(header);
+    public RequiredParts(SPConstants.SPVersion version, List<Header> headers) {
+        super(version);
+        this.headers.addAll(headers);
     }
-
 
     public QName getName() {
-         return SP12Constants.REQUIRED_PARTS;         
-    }
-
-    public PolicyComponent normalize() {
-        return this;
+        return getVersion().getSPConstants().getRequiredParts();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-
-        String prefix = writer.getPrefix(namespaceURI);
-
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
+        writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
+        writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
+        if (!isNormalized() && isOptional()) {
+            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
         }
-            
-        // <sp:RequiredParts> 
-        writer.writeStartElement(prefix, localName, namespaceURI);
-        
-        // xmlns:sp=".."
-        writer.writeNamespace(prefix, namespaceURI);
-        
-        Header header;        
-        for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
-            header = (Header) iterator.next();
-            // <sp:Header Name=".." Namespace=".." />
-            writer.writeStartElement(prefix, SPConstants.HEADER, namespaceURI);
-            // Name attribute is optional
+        if (isIgnorable()) {
+            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+        }
+        for (int i = 0; i < getHeaders().size(); i++) {
+            Header header = getHeaders().get(i);
+            final QName headerName = getVersion().getSPConstants().getHeader();
+            writer.writeEmptyElement(headerName.getPrefix(), headerName.getLocalPart(), headerName.getNamespaceURI());
             if (header.getName() != null) {
-                writer.writeAttribute("Name", header.getName());
+                writer.writeAttribute(SPConstants.NAME, header.getName());
             }
-            writer.writeAttribute("Namespace", header.getNamespace());
-            
-            writer.writeEndElement();
+            writer.writeAttribute(SPConstants.NAMESPACE, header.getNamespace());
         }
-        
-        // </sp:RequiredParts>
         writer.writeEndElement();
-    }    
-    
-    
+    }
+
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new RequiredParts(getVersion(), getHeaders());
+    }
+
+    public List<Header> getHeaders() {
+        return this.headers;
+    }
+
+    protected void addHeader(Header header) {
+        this.headers.add(header);
+    }
 }

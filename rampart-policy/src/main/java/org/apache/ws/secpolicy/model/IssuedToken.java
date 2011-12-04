@@ -1,223 +1,161 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Constants;
+import org.apache.neethi.Policy;
 import org.apache.ws.secpolicy.SPConstants;
+import org.apache.ws.secpolicy.SPUtils;
+import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Model bean for the IssuedToken assertion.
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
-public class IssuedToken extends Token {
+public class IssuedToken extends AbstractToken {
 
-    private OMElement issuerEpr;
-    
-    private OMElement issuerMex;
+    private Element requestSecurityTokenTemplate;
+    private boolean requireExternalReference;
+    private boolean requireInternalReference;
 
-    private OMElement rstTemplate;
+    public IssuedToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
+                       Element issuer, String issuerName, Element requestSecurityTokenTemplate, Element claims, Policy nestedPolicy) {
+        super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
+        setRequestSecurityTokenTemplate(requestSecurityTokenTemplate);
 
-    boolean requireExternalReference;
-
-    boolean requireInternalReference;
-    
-    public IssuedToken(int version) {
-        setVersion(version);
+        parseNestedPolicy(nestedPolicy, this);
     }
 
-    /**
-     * @return Returns the issuerEpr.
-     */
-    public OMElement getIssuerEpr() {
-        return issuerEpr;
+    public QName getName() {
+        return getVersion().getSPConstants().getIssuedToken();
     }
 
-    /**
-     * @param issuerEpr
-     *            The issuerEpr to set.
-     */
-    public void setIssuerEpr(OMElement issuerEpr) {
-        this.issuerEpr = issuerEpr;
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
+        writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
+        if (getIncludeTokenType() != null) {
+            writer.writeAttribute(
+                    getVersion().getSPConstants().getIncludeToken().getPrefix(),
+                    getVersion().getSPConstants().getIncludeToken().getNamespaceURI(),
+                    getVersion().getSPConstants().getIncludeToken().getLocalPart(),
+                    getVersion().getSPConstants().getAttributeValueFromInclusion(getIncludeTokenType())
+            );
+        }
+        if (!isNormalized() && isOptional()) {
+            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+        }
+        if (isIgnorable()) {
+            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+        }
+        if (getIssuer() != null) {
+            SPUtils.serialize(getIssuer(), writer);
+        }
+        if (getIssuerName() != null) {
+            writer.writeStartElement(
+                    getVersion().getSPConstants().getIssuerName().getPrefix(),
+                    getVersion().getSPConstants().getIssuerName().getLocalPart(),
+                    getVersion().getSPConstants().getIssuerName().getNamespaceURI()
+            );
+            writer.writeCharacters(getIssuerName());
+            writer.writeEndElement();
+        }
+        if (getClaims() != null) {
+            SPUtils.serialize(getClaims(), writer);
+        }
+        SPUtils.serialize(getRequestSecurityTokenTemplate(), writer);
+        getPolicy().serialize(writer);
+        writer.writeEndElement();
     }
 
-    /**
-     * @return Returns the requireExternalReference.
-     */
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new IssuedToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(),
+                getRequestSecurityTokenTemplate(), getClaims(), nestedPolicy);
+    }
+
+    protected void parseNestedPolicy(Policy nestedPolicy, IssuedToken issuedToken) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                DerivedKeys derivedKeys = DerivedKeys.lookUp(assertionName);
+                if (derivedKeys != null) {
+                    if (issuedToken.getDerivedKeys() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    issuedToken.setDerivedKeys(derivedKeys);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireExternalReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireExternalReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (issuedToken.isRequireExternalReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    issuedToken.setRequireExternalReference(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireInternalReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireInternalReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (issuedToken.isRequireInternalReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    issuedToken.setRequireInternalReference(true);
+                    continue;
+                }
+            }
+        }
+    }
+
     public boolean isRequireExternalReference() {
         return requireExternalReference;
     }
 
-    /**
-     * @param requireExternalReference
-     *            The requireExternalReference to set.
-     */
-    public void setRequireExternalReference(boolean requireExternalReference) {
+    protected void setRequireExternalReference(boolean requireExternalReference) {
         this.requireExternalReference = requireExternalReference;
     }
 
-    /**
-     * @return Returns the requireInternalReference.
-     */
     public boolean isRequireInternalReference() {
         return requireInternalReference;
     }
 
-    /**
-     * @param requireInternalReference
-     *            The requireInternalReference to set.
-     */
-    public void setRequireInternalReference(boolean requireInternalReference) {
+    protected void setRequireInternalReference(boolean requireInternalReference) {
         this.requireInternalReference = requireInternalReference;
     }
 
-    /**
-     * @return Returns the rstTemplate.
-     */
-    public OMElement getRstTemplate() {
-        return rstTemplate;
+    public Element getRequestSecurityTokenTemplate() {
+        return requestSecurityTokenTemplate;
     }
 
-    /**
-     * @param rstTemplate
-     *            The rstTemplate to set.
-     */
-    public void setRstTemplate(OMElement rstTemplate) {
-        this.rstTemplate = rstTemplate;
+    protected void setRequestSecurityTokenTemplate(Element requestSecurityTokenTemplate) {
+        this.requestSecurityTokenTemplate = requestSecurityTokenTemplate;
     }
-
-    public QName getName() {
-        if (version == SPConstants.SP_V12) {
-            return SP12Constants.ISSUED_TOKEN;
-        } else {
-            return SP11Constants.ISSUED_TOKEN; 
-        }      
-    }
-
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-
-        String prefix;
-        String writerPrefix = writer.getPrefix(namespaceURI);
-
-        if (writerPrefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-
-        } else {
-            prefix = writerPrefix;
-        }
-
-        // <sp:IssuedToken>
-        writer.writeStartElement(prefix, localname, namespaceURI);
-
-        if (writerPrefix == null) {
-            writer.writeNamespace(prefix, namespaceURI);
-        }
-
-        String inclusion;
-        
-        if (version == SPConstants.SP_V12) {
-            inclusion = SP12Constants.getAttributeValueFromInclusion(getInclusion());
-        } else {
-            inclusion = SP11Constants.getAttributeValueFromInclusion(getInclusion()); 
-        }
-        
-        if (inclusion != null) {
-            writer.writeAttribute(prefix, namespaceURI,
-                    SPConstants.ATTR_INCLUDE_TOKEN, inclusion);
-        }
-
-        if (issuerEpr != null) {
-            writer.writeStartElement(prefix, SPConstants.ISSUER,
-                    namespaceURI);
-            issuerEpr.serialize(writer);
-            writer.writeEndElement();
-        }
-
-        if (rstTemplate != null) {
-            // <sp:RequestSecurityTokenTemplate>
-            rstTemplate.serialize(writer);
-
-        }
-
-        String policyLocalName = SPConstants.POLICY.getLocalPart();
-        String policyNamespaceURI = SPConstants.POLICY.getNamespaceURI();
-
-        String wspPrefix;
-
-        String wspWriterPrefix = writer.getPrefix(policyNamespaceURI);
-
-        if (wspWriterPrefix == null) {
-            wspPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(wspPrefix, policyNamespaceURI);
-        } else {
-            wspPrefix = wspWriterPrefix;
-        }
-
-        if (isRequireExternalReference() || isRequireInternalReference() ||
-                this.isDerivedKeys()) {
-
-            // <wsp:Policy>
-            writer.writeStartElement(wspPrefix, policyLocalName,
-                    policyNamespaceURI);
-
-            if (wspWriterPrefix == null) {
-                // xmlns:wsp=".."
-                writer.writeNamespace(wspPrefix, policyNamespaceURI);
-            }
-
-            if (isRequireExternalReference()) {
-                // <sp:RequireExternalReference />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_EXTERNAL_REFERNCE,
-                        namespaceURI);
-            }
-
-            if (isRequireInternalReference()) {
-                // <sp:RequireInternalReference />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_INTERNAL_REFERNCE,
-                        namespaceURI);
-            }
-
-            if (this.isDerivedKeys()) {
-                // <sp:RequireDerivedKeys />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_DERIVED_KEYS,
-                        namespaceURI);
-            }
-            
-            // <wsp:Policy>
-            writer.writeEndElement();
-        }
-
-        // </sp:IssuedToken>
-        writer.writeEndElement();
-    }
-
-    public OMElement getIssuerMex() {
-        return issuerMex;
-    }
-
-    public void setIssuerMex(OMElement issuerMex) {
-        this.issuerMex = issuerMex;
-    }
-
 }

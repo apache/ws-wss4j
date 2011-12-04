@@ -1,185 +1,138 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import org.apache.axiom.om.OMElement;
+import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
+import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
 import org.apache.ws.secpolicy.SPConstants;
+import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Model class of SecureConversationToken assertion
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SecureConversationToken extends SecurityContextToken {
 
     private Policy bootstrapPolicy;
 
-    private OMElement issuerEpr;
-    
-    public SecureConversationToken(int version) {
-        super(version);
+    private boolean mustNotSendCancel;
+    private boolean mustNotSendAmend;
+    private boolean mustNotSendRenew;
+
+    public SecureConversationToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
+                                   Element issuer, String issuerName, Element claims, Policy nestedPolicy) {
+        super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
+
+        parseNestedPolicy(nestedPolicy, this);
     }
 
-    /**
-     * @return Returns the bootstrapPolicy.
-     */
+    public QName getName() {
+        return getVersion().getSPConstants().getSecureConversationToken();
+    }
+
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new SecureConversationToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+    }
+
+    protected void parseNestedPolicy(Policy nestedPolicy, SecureConversationToken secureConversationToken) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (getVersion().getSPConstants().getMustNotSendCancel().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustNotSendCancel().getNamespaceURI().equals(assertionNamespace)) {
+                    if (secureConversationToken.isMustNotSendCancel()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    secureConversationToken.setMustNotSendCancel(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustNotSendAmend().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustNotSendAmend().getNamespaceURI().equals(assertionNamespace)) {
+                    if (secureConversationToken.isMustNotSendAmend()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    secureConversationToken.setMustNotSendAmend(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustNotSendRenew().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustNotSendRenew().getNamespaceURI().equals(assertionNamespace)) {
+                    if (secureConversationToken.isMustNotSendRenew()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    secureConversationToken.setMustNotSendRenew(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getBootstrapPolicy().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getBootstrapPolicy().getNamespaceURI().equals(assertionNamespace)) {
+                    if (secureConversationToken.getBootstrapPolicy() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    PolicyContainingPrimitiveAssertion policyContainingPrimitiveAssertion = (PolicyContainingPrimitiveAssertion) assertion;
+                    secureConversationToken.setBootstrapPolicy(policyContainingPrimitiveAssertion.getPolicy());
+                    continue;
+                }
+            }
+        }
+    }
+
+    public boolean isMustNotSendCancel() {
+        return mustNotSendCancel;
+    }
+
+    protected void setMustNotSendCancel(boolean mustNotSendCancel) {
+        this.mustNotSendCancel = mustNotSendCancel;
+    }
+
+    public boolean isMustNotSendAmend() {
+        return mustNotSendAmend;
+    }
+
+    protected void setMustNotSendAmend(boolean mustNotSendAmend) {
+        this.mustNotSendAmend = mustNotSendAmend;
+    }
+
+    public boolean isMustNotSendRenew() {
+        return mustNotSendRenew;
+    }
+
+    protected void setMustNotSendRenew(boolean mustNotSendRenew) {
+        this.mustNotSendRenew = mustNotSendRenew;
+    }
+
     public Policy getBootstrapPolicy() {
         return bootstrapPolicy;
     }
 
-    /**
-     * @param bootstrapPolicy
-     *            The bootstrapPolicy to set.
-     */
-    public void setBootstrapPolicy(Policy bootstrapPolicy) {
+    protected void setBootstrapPolicy(Policy bootstrapPolicy) {
         this.bootstrapPolicy = bootstrapPolicy;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.neethi.Assertion#getName()
-     */
-    public QName getName() {
-        if ( version == SPConstants.SP_V12) {
-            return SP12Constants.SECURE_CONVERSATION_TOKEN;
-        } else {
-            return SP11Constants.SECURE_CONVERSATION_TOKEN; 
-        }      
-    }
-
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-        String prefix;
-
-        String writerPrefix = writer.getPrefix(namespaceURI);
-
-        if (writerPrefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        } else {
-            prefix = writerPrefix;
-        }
-
-        // <sp:SecureConversationToken>
-        writer.writeStartElement(prefix, localname, namespaceURI);
-
-        if (writerPrefix == null) {
-            // xmlns:sp=".."
-            writer.writeNamespace(prefix, namespaceURI);
-        }
-
-        String inclusion;
-        
-        if (version == SPConstants.SP_V12) {
-            inclusion = SP12Constants.getAttributeValueFromInclusion(getInclusion());
-        } else {
-            inclusion = SP11Constants.getAttributeValueFromInclusion(getInclusion()); 
-        }
-
-        if (inclusion != null) {
-            writer.writeAttribute(prefix, namespaceURI, SPConstants.ATTR_INCLUDE_TOKEN, inclusion);
-        }
-
-        if (issuerEpr != null) {
-            // <sp:Issuer>
-            writer.writeStartElement(prefix, SPConstants.ISSUER , namespaceURI);
-
-            issuerEpr.serialize(writer);
-
-            writer.writeEndElement();
-        }
-
-        if (isDerivedKeys() || isRequireExternalUriRef()
-                || isSc10SecurityContextToken() || (bootstrapPolicy != null)) {
-
-            String wspNamespaceURI = SPConstants.POLICY.getNamespaceURI();
-
-            String wspPrefix;
-
-            String wspWriterPrefix = writer.getPrefix(wspNamespaceURI);
-
-            if (wspWriterPrefix == null) {
-                wspPrefix = SPConstants.POLICY.getPrefix();
-                writer.setPrefix(wspPrefix, wspNamespaceURI);
-
-            } else {
-                wspPrefix = wspWriterPrefix;
-            }
-
-            // <wsp:Policy>
-            writer.writeStartElement(wspPrefix,
-                    SPConstants.POLICY.getLocalPart(), wspNamespaceURI);
-
-            if (wspWriterPrefix == null) {
-                // xmlns:wsp=".."
-                writer.writeNamespace(wspPrefix, wspNamespaceURI);
-            }
-            
-            if (isDerivedKeys()) {
-                // <sp:RequireDerivedKeys />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_DERIVED_KEYS, namespaceURI);
-            }
-            
-            if (isRequireExternalUriRef()) {
-                // <sp:RequireExternalUriReference />
-                writer.writeEmptyElement(prefix, SPConstants.REQUIRE_EXTERNAL_URI_REFERNCE, namespaceURI);
-            }
-            
-            if (isSc10SecurityContextToken()) {
-                // <sp:SC10SecurityContextToken />
-                writer.writeEmptyElement(prefix, SPConstants.SC10_SECURITY_CONTEXT_TOKEN, namespaceURI);
-            }
-            
-            if (bootstrapPolicy != null) {
-                // <sp:BootstrapPolicy ..>
-                writer.writeStartElement(prefix, SPConstants.BOOTSTRAP_POLICY, namespaceURI);
-                bootstrapPolicy.serialize(writer);
-                writer.writeEndElement();
-            }
-
-            // </wsp:Policy>
-            writer.writeEndElement();
-        }
-
-        // </sp:SecureConversationToken>
-        writer.writeEndElement();
-    }
-
-    /**
-     * @return Returns the issuerEpr.
-     */
-    public OMElement getIssuerEpr() {
-        return issuerEpr;
-    }
-
-    /**
-     * @param issuerEpr
-     *            The issuerEpr to set.
-     */
-    public void setIssuerEpr(OMElement issuerEpr) {
-        this.issuerEpr = issuerEpr;
-    }
-
 }

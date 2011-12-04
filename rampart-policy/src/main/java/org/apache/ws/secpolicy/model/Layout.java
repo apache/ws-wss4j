@@ -1,112 +1,113 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
+
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
+import org.apache.ws.secpolicy.SPConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.*;
 
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
-import org.apache.ws.secpolicy.SPConstants;
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class Layout extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
-public class Layout extends AbstractSecurityAssertion {
+    public enum LayoutType {
+        Strict,
+        Lax,
+        LaxTsFirst,
+        LaxTsLast;
 
-    private String value = SPConstants.LAYOUT_LAX;
-    
-    public Layout(int version) {
-        setVersion(version);
-    }
+        private static final Map<String, LayoutType> lookup = new HashMap<String, LayoutType>();
 
-    /**
-     * @return Returns the value.
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * @param value
-     *            The value to set.
-     */
-    public void setValue(String value) {
-        if (SPConstants.LAYOUT_LAX.equals(value)
-                || SPConstants.LAYOUT_STRICT.equals(value)
-                || SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST.equals(value)
-                || SPConstants.LAYOUT_LAX_TIMESTAMP_LAST.equals(value)) {
-            this.value = value;
-        } else {
-            // throw new WSSPolicyException("Incorrect layout value : " +
-            // value);
+        static {
+            for (LayoutType u : EnumSet.allOf(LayoutType.class))
+                lookup.put(u.name(), u);
         }
+
+        public static LayoutType lookUp(String name) {
+            return lookup.get(name);
+        }
+    }
+
+    private Policy nestedPolicy;
+    private LayoutType layoutType = LayoutType.Lax;
+
+    public Layout(SPConstants.SPVersion version, Policy nestedPolicy) {
+        super(version);
+        this.nestedPolicy = nestedPolicy;
+
+        parseNestedPolicy(nestedPolicy, this);
+    }
+
+    public Policy getPolicy() {
+        return nestedPolicy;
     }
 
     public QName getName() {
-        if ( version == SPConstants.SP_V12 ) {
-            return SP12Constants.LAYOUT;
-        } else {
-            return SP11Constants.LAYOUT; 
-        }  
+        return getVersion().getSPConstants().getLayout();
     }
 
     public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
+        return super.normalize(getPolicy());
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        super.serialize(writer, getPolicy());
+    }
 
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new Layout(getVersion(), nestedPolicy);
+    }
 
-        String prefix = writer.getPrefix(namespaceURI);
-
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
+    protected void parseNestedPolicy(Policy nestedPolicy, Layout layout) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                LayoutType layoutType = LayoutType.lookUp(assertionName);
+                if (layoutType != null) {
+                    layout.setLayoutType(layoutType);
+                    continue;
+                }
+            }
         }
+    }
 
-        // <sp:Layout>
-        writer.writeStartElement(prefix, localName, namespaceURI);
+    public LayoutType getLayoutType() {
+        return layoutType;
+    }
 
-        // <wsp:Policy>
-        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY
-                .getLocalPart(), SPConstants.POLICY.getNamespaceURI());
-
-        // .. <sp:Strict /> | <sp:Lax /> | <sp:LaxTsFirst /> | <sp:LaxTsLast /> ..
-        if (SPConstants.LAYOUT_STRICT.equals(value)) {
-            writer.writeStartElement(prefix, SPConstants.LAYOUT_STRICT, namespaceURI);
-            
-        } else if (SPConstants.LAYOUT_LAX.equals(value)) {
-            writer.writeStartElement(prefix, SPConstants.LAYOUT_LAX, namespaceURI);
-            
-        } else if (SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST.equals(value)) {
-            writer.writeStartElement(prefix, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST, namespaceURI);
-            
-        } else if (SPConstants.LAYOUT_LAX_TIMESTAMP_LAST.equals(value)) {
-            writer.writeStartElement(prefix, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST, namespaceURI);
-        }
-        
-        writer.writeEndElement();
-        
-        // </wsp:Policy>
-        writer.writeEndElement();
-        
-        // </sp:Layout>
-        writer.writeEndElement();
+    protected void setLayoutType(LayoutType layoutType) {
+        this.layoutType = layoutType;
     }
 }

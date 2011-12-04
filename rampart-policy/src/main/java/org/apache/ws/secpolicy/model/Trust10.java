@@ -1,204 +1,168 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
+
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
+import org.apache.ws.secpolicy.SPConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SPConstants;
-import org.apache.ws.secpolicy.SP12Constants;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Model bean to capture Trust10 assertion info
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
-public class Trust10 extends AbstractSecurityAssertion {
+public class Trust10 extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
+    private Policy nestedPolicy;
     private boolean mustSupportClientChallenge;
     private boolean mustSupportServerChallenge;
     private boolean requireClientEntropy;
     private boolean requireServerEntropy;
     private boolean mustSupportIssuedTokens;
-    
-    public Trust10(int version){
-        setVersion(version);
+
+    public Trust10(SPConstants.SPVersion version, Policy nestedPolicy) {
+        super(version);
+        this.nestedPolicy = nestedPolicy;
+
+        parseNestedTrust10Policy(nestedPolicy, this);
     }
-    
-    /**
-     * @return Returns the mustSupportClientChallenge.
-     */
+
+    public Policy getPolicy() {
+        return nestedPolicy;
+    }
+
+    public QName getName() {
+        return getVersion().getSPConstants().getTrust10();
+    }
+
+    public PolicyComponent normalize() {
+        return super.normalize(getPolicy());
+    }
+
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        super.serialize(writer, getPolicy());
+    }
+
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new Trust10(getVersion(), nestedPolicy);
+    }
+
+    protected void parseNestedTrust10Policy(Policy nestedPolicy, Trust10 trust10) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (getVersion().getSPConstants().getMustSupportClientChallenge().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportClientChallenge().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust10.isMustSupportClientChallenge()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust10.setMustSupportClientChallenge(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustSupportServerChallenge().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportServerChallenge().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust10.isMustSupportServerChallenge()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust10.setMustSupportServerChallenge(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireClientEntropy().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireClientEntropy().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust10.isRequireClientEntropy()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust10.setRequireClientEntropy(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireServerEntropy().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireServerEntropy().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust10.isRequireServerEntropy()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust10.setRequireServerEntropy(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustSupportIssuedTokens().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportIssuedTokens().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust10.isMustSupportIssuedTokens()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust10.setMustSupportIssuedTokens(true);
+                    continue;
+                }
+            }
+        }
+    }
+
     public boolean isMustSupportClientChallenge() {
         return mustSupportClientChallenge;
     }
 
-    /**
-     * @param mustSupportClientChallenge The mustSupportClientChallenge to set.
-     */
-    public void setMustSupportClientChallenge(boolean mustSupportClientChallenge) {
+    protected void setMustSupportClientChallenge(boolean mustSupportClientChallenge) {
         this.mustSupportClientChallenge = mustSupportClientChallenge;
     }
 
-    /**
-     * @return Returns the mustSupportIssuedTokens.
-     */
-    public boolean isMustSupportIssuedTokens() {
-        return mustSupportIssuedTokens;
-    }
-
-    /**
-     * @param mustSupportIssuedTokens The mustSupportIssuedTokens to set.
-     */
-    public void setMustSupportIssuedTokens(boolean mustSupportIssuedTokens) {
-        this.mustSupportIssuedTokens = mustSupportIssuedTokens;
-    }
-
-    /**
-     * @return Returns the mustSupportServerChallenge.
-     */
     public boolean isMustSupportServerChallenge() {
         return mustSupportServerChallenge;
     }
 
-    /**
-     * @param mustSupportServerChallenge The mustSupportServerChallenge to set.
-     */
-    public void setMustSupportServerChallenge(boolean mustSupportServerChallenge) {
+    protected void setMustSupportServerChallenge(boolean mustSupportServerChallenge) {
         this.mustSupportServerChallenge = mustSupportServerChallenge;
     }
 
-    /**
-     * @return Returns the requireClientEntropy.
-     */
     public boolean isRequireClientEntropy() {
         return requireClientEntropy;
     }
 
-    /**
-     * @param requireClientEntropy The requireClientEntropy to set.
-     */
-    public void setRequireClientEntropy(boolean requireClientEntropy) {
+    protected void setRequireClientEntropy(boolean requireClientEntropy) {
         this.requireClientEntropy = requireClientEntropy;
     }
 
-    /**
-     * @return Returns the requireServerEntropy.
-     */
     public boolean isRequireServerEntropy() {
         return requireServerEntropy;
     }
 
-    /**
-     * @param requireServerEntropy The requireServerEntropy to set.
-     */
-    public void setRequireServerEntropy(boolean requireServerEntropy) {
+    protected void setRequireServerEntropy(boolean requireServerEntropy) {
         this.requireServerEntropy = requireServerEntropy;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.neethi.Assertion#getName()
-     */
-    public QName getName() {
-            return SP11Constants.TRUST_10;
+    public boolean isMustSupportIssuedTokens() {
+        return mustSupportIssuedTokens;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.neethi.Assertion#isOptional()
-     */
-    public boolean isOptional() {
-        // TODO TODO Sanka
-        throw new UnsupportedOperationException("TODO Sanka");
+    protected void setMustSupportIssuedTokens(boolean mustSupportIssuedTokens) {
+        this.mustSupportIssuedTokens = mustSupportIssuedTokens;
     }
-
-    public PolicyComponent normalize() {
-        return this;
-    }
-
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-        
-        String prefix = writer.getPrefix(namespaceURI);
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
-        
-        // <sp:Trust10>
-        writer.writeStartElement(prefix, localname, namespaceURI);
-        // xmlns:sp=".."
-        writer.writeNamespace(prefix, namespaceURI);
-        
-        String wspPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        if (wspPrefix == null) {
-            wspPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(wspPrefix, SPConstants.POLICY.getNamespaceURI());
-        }
-        
-        // <wsp:Policy>
-        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(), SPConstants.POLICY.getNamespaceURI());
-        
-        if (isMustSupportClientChallenge()) {
-            // <sp:MustSupportClientChallenge />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportServerChallenge()) {
-            // <sp:MustSupportServerChallenge />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireClientEntropy()) {
-            // <sp:RequireClientEntropy />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_CLIENT_ENTROPY, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        
-        if (isRequireServerEntropy()) {
-            // <sp:RequireServerEntropy />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_SERVER_ENTROPY, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportIssuedTokens()) {
-            // <sp:MustSupportIssuedTokens />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_ISSUED_TOKENS, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        // </wsp:Policy>
-        writer.writeEndElement();
-        
-        
-        // </sp:Trust10>
-        writer.writeEndElement();
-        
-        
-        
-        
-    }
-
-    public short getType() {
-        return org.apache.neethi.Constants.TYPE_ASSERTION;
-    }
-
 }

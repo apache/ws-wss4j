@@ -1,0 +1,22 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:Wss11 xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:MustSupportRefKeyIdentifier/>
+                            <sp:MustSupportRefIssuerSerial/>
+                            <sp:MustSupportRefExternalURI/>
+                            <sp:MustSupportRefEmbeddedToken/>
+                            <sp:MustSupportRefThumbprint/>
+                            <sp:MustSupportRefEncryptedKey/>
+                            <sp:RequireSignatureConfirmation/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:Wss11>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

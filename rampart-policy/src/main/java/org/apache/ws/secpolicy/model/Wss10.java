@@ -1,157 +1,151 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
+
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
+import org.apache.ws.secpolicy.SPConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.Iterator;
+import java.util.List;
 
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
-import org.apache.ws.secpolicy.SPConstants;
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class Wss10 extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
-public class Wss10 extends AbstractSecurityAssertion {
-    
+    private Policy nestedPolicy;
     private boolean mustSupportRefKeyIdentifier;
-    private boolean MustSupportRefIssuerSerial;
-    private boolean MustSupportRefExternalURI;
-    private boolean MustSupportRefEmbeddedToken;
-    
-    public Wss10(int version) {
-        setVersion(version);
+    private boolean mustSupportRefIssuerSerial;
+    private boolean mustSupportRefExternalURI;
+    private boolean mustSupportRefEmbeddedToken;
+
+    public Wss10(SPConstants.SPVersion version, Policy nestedPolicy) {
+        super(version);
+        this.nestedPolicy = nestedPolicy;
+
+        parseNestedWss10Policy(nestedPolicy, this);
     }
-    
-    /**
-     * @return Returns the mustSupportRefEmbeddedToken.
-     */
-    public boolean isMustSupportRefEmbeddedToken() {
-        return MustSupportRefEmbeddedToken;
+
+    public Policy getPolicy() {
+        return this.nestedPolicy;
     }
-    /**
-     * @param mustSupportRefEmbeddedToken The mustSupportRefEmbeddedToken to set.
-     */
-    public void setMustSupportRefEmbeddedToken(boolean mustSupportRefEmbeddedToken) {
-        MustSupportRefEmbeddedToken = mustSupportRefEmbeddedToken;
+
+    public QName getName() {
+        return getVersion().getSPConstants().getWss10();
     }
-    /**
-     * @return Returns the mustSupportRefExternalURI.
-     */
-    public boolean isMustSupportRefExternalURI() {
-        return MustSupportRefExternalURI;
+
+    public PolicyComponent normalize() {
+        return super.normalize(getPolicy());
     }
-    /**
-     * @param mustSupportRefExternalURI The mustSupportRefExternalURI to set.
-     */
-    public void setMustSupportRefExternalURI(boolean mustSupportRefExternalURI) {
-        MustSupportRefExternalURI = mustSupportRefExternalURI;
+
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        super.serialize(writer, getPolicy());
     }
-    /**
-     * @return Returns the mustSupportRefIssuerSerial.
-     */
-    public boolean isMustSupportRefIssuerSerial() {
-        return MustSupportRefIssuerSerial;
+
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new Wss10(getVersion(), nestedPolicy);
     }
-    /**
-     * @param mustSupportRefIssuerSerial The mustSupportRefIssuerSerial to set.
-     */
-    public void setMustSupportRefIssuerSerial(boolean mustSupportRefIssuerSerial) {
-        MustSupportRefIssuerSerial = mustSupportRefIssuerSerial;
+
+    protected void parseNestedWss10Policy(Policy nestedPolicy, Wss10 wss10) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (getVersion().getSPConstants().getMustSupportRefKeyIdentifier().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportRefKeyIdentifier().getNamespaceURI().equals(assertionNamespace)) {
+                    if (wss10.isMustSupportRefKeyIdentifier()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    wss10.setMustSupportRefKeyIdentifier(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustSupportRefIssuerSerial().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportRefIssuerSerial().getNamespaceURI().equals(assertionNamespace)) {
+                    if (wss10.isMustSupportRefIssuerSerial()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    wss10.setMustSupportRefIssuerSerial(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustSupportRefExternalUri().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportRefExternalUri().getNamespaceURI().equals(assertionNamespace)) {
+                    if (wss10.isMustSupportRefExternalURI()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    wss10.setMustSupportRefExternalURI(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustSupportRefEmbeddedToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportRefEmbeddedToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (wss10.isMustSupportRefEmbeddedToken()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    wss10.setMustSupportRefEmbeddedToken(true);
+                    continue;
+                }
+            }
+        }
     }
-    /**
-     * @return Returns the mustSupportRefKeyIdentifier.
-     */
+
     public boolean isMustSupportRefKeyIdentifier() {
         return mustSupportRefKeyIdentifier;
     }
-    /**
-     * @param mustSupportRefKeyIdentifier The mustSupportRefKeyIdentifier to set.
-     */
-    public void setMustSupportRefKeyIdentifier(boolean mustSupportRefKeyIdentifier) {
+
+    protected void setMustSupportRefKeyIdentifier(boolean mustSupportRefKeyIdentifier) {
         this.mustSupportRefKeyIdentifier = mustSupportRefKeyIdentifier;
     }
-    
-    public QName getName() {
-        if ( version == SPConstants.SP_V12 ) {
-            return SP12Constants.WSS10;
-        } else {
-            return SP11Constants.WSS10;
-        }  
+
+    public boolean isMustSupportRefIssuerSerial() {
+        return mustSupportRefIssuerSerial;
     }
-    
-    public PolicyComponent normalize() {
-        return this;
+
+    protected void setMustSupportRefIssuerSerial(boolean mustSupportRefIssuerSerial) {
+        this.mustSupportRefIssuerSerial = mustSupportRefIssuerSerial;
     }
-    
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
 
-        String prefix = writer.getPrefix(namespaceURI);
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
+    public boolean isMustSupportRefExternalURI() {
+        return mustSupportRefExternalURI;
+    }
 
-        // <sp:Wss10>
-        writer.writeStartElement(prefix, localname, namespaceURI);
-        
-        // xmlns:sp=".."
-        writer.writeNamespace(prefix, namespaceURI);
-        
-        String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        if (pPrefix == null) {
-            writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getNamespaceURI());
-        }
-        
-        // <wsp:Policy>
-        writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY.getNamespaceURI());
-        
-        if (isMustSupportRefKeyIdentifier()) {
-            // <sp:MustSupportRefKeyIdentifier />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportRefIssuerSerial()) {
-            // <sp:MustSupportRefIssuerSerial />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportRefExternalURI()) {
-            // <sp:MustSupportRefExternalURI />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportRefEmbeddedToken()) {
-            // <sp:MustSupportRefEmbeddedToken />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN, namespaceURI);
-            writer.writeEndElement();
+    protected void setMustSupportRefExternalURI(boolean mustSupportRefExternalURI) {
+        this.mustSupportRefExternalURI = mustSupportRefExternalURI;
+    }
 
-            
-        }
-        
-        // </wsp:Policy>
-        writer.writeEndElement();
-        
-        // </sp:Wss10>
-        writer.writeEndElement();
+    public boolean isMustSupportRefEmbeddedToken() {
+        return mustSupportRefEmbeddedToken;
+    }
 
+    protected void setMustSupportRefEmbeddedToken(boolean mustSupportRefEmbeddedToken) {
+        this.mustSupportRefEmbeddedToken = mustSupportRefEmbeddedToken;
     }
 }

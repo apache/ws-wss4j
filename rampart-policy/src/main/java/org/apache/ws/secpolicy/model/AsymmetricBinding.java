@@ -1,225 +1,175 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.ws.secpolicy.SPConstants;
+
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.neethi.All;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
-import org.apache.ws.secpolicy.SPConstants;
-
-public class AsymmetricBinding extends SymmetricAsymmetricBindingBase {
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
 
     private InitiatorToken initiatorToken;
-
+    private InitiatorSignatureToken initiatorSignatureToken;
+    private InitiatorEncryptionToken initiatorEncryptionToken;
     private RecipientToken recipientToken;
-    
-    public AsymmetricBinding(int version) {
-        super(version);
+    private RecipientSignatureToken recipientSignatureToken;
+    private RecipientEncryptionToken recipientEncryptionToken;
+
+    public AsymmetricBinding(SPConstants.SPVersion version, Policy nestedPolicy) {
+        super(version, nestedPolicy);
+
+        parseNestedPolicy(nestedPolicy, this);
     }
 
-    /**
-     * @return Returns the initiatorToken.
-     */
+    public QName getName() {
+        return getVersion().getSPConstants().getAsymmetricBinding();
+    }
+
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new AsymmetricBinding(getVersion(), nestedPolicy);
+    }
+
+    protected void parseNestedPolicy(Policy nestedPolicy, AsymmetricBinding asymmetricBinding) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (getVersion().getSPConstants().getInitiatorToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getInitiatorToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (asymmetricBinding.getInitiatorToken() != null
+                            || asymmetricBinding.getInitiatorSignatureToken() != null
+                            || asymmetricBinding.getInitiatorEncryptionToken() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    asymmetricBinding.setInitiatorToken((InitiatorToken) assertion);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getInitiatorSignatureToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getInitiatorSignatureToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (asymmetricBinding.getInitiatorToken() != null
+                            || asymmetricBinding.getInitiatorSignatureToken() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    asymmetricBinding.setInitiatorSignatureToken((InitiatorSignatureToken) assertion);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getInitiatorEncryptionToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getInitiatorEncryptionToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (asymmetricBinding.getInitiatorToken() != null
+                            || asymmetricBinding.getInitiatorEncryptionToken() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    asymmetricBinding.setInitiatorEncryptionToken((InitiatorEncryptionToken) assertion);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRecipientToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRecipientToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (asymmetricBinding.getRecipientToken() != null
+                            || asymmetricBinding.getRecipientSignatureToken() != null
+                            || asymmetricBinding.getRecipientEncryptionToken() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    asymmetricBinding.setRecipientToken((RecipientToken) assertion);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRecipientSignatureToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRecipientSignatureToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (asymmetricBinding.getRecipientToken() != null
+                            || asymmetricBinding.getRecipientSignatureToken() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    asymmetricBinding.setRecipientSignatureToken((RecipientSignatureToken) assertion);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRecipientEncryptionToken().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRecipientEncryptionToken().getNamespaceURI().equals(assertionNamespace)) {
+                    if (asymmetricBinding.getRecipientToken() != null
+                            || asymmetricBinding.getRecipientEncryptionToken() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    asymmetricBinding.setRecipientEncryptionToken((RecipientEncryptionToken) assertion);
+                    continue;
+                }
+            }
+        }
+    }
+
     public InitiatorToken getInitiatorToken() {
         return initiatorToken;
     }
 
-    /**
-     * @param initiatorToken
-     *            The initiatorToken to set.
-     */
-    public void setInitiatorToken(InitiatorToken initiatorToken) {
+    protected void setInitiatorToken(InitiatorToken initiatorToken) {
         this.initiatorToken = initiatorToken;
     }
 
-    /**
-     * @return Returns the recipientToken.
-     */
+    public InitiatorSignatureToken getInitiatorSignatureToken() {
+        return initiatorSignatureToken;
+    }
+
+    protected void setInitiatorSignatureToken(InitiatorSignatureToken initiatorSignatureToken) {
+        this.initiatorSignatureToken = initiatorSignatureToken;
+    }
+
+    public InitiatorEncryptionToken getInitiatorEncryptionToken() {
+        return initiatorEncryptionToken;
+    }
+
+    protected void setInitiatorEncryptionToken(InitiatorEncryptionToken initiatorEncryptionToken) {
+        this.initiatorEncryptionToken = initiatorEncryptionToken;
+    }
+
     public RecipientToken getRecipientToken() {
         return recipientToken;
     }
 
-    /**
-     * @param recipientToken
-     *            The recipientToken to set.
-     */
-    public void setRecipientToken(RecipientToken recipientToken) {
+    protected void setRecipientToken(RecipientToken recipientToken) {
         this.recipientToken = recipientToken;
     }
 
-    public QName getName() {
-        if (version == SPConstants.SP_V12) {
-            return SP12Constants.ASYMMETRIC_BINDING;
-        } else {
-            return SP11Constants.ASYMMETRIC_BINDING; 
-        }       
+    public RecipientSignatureToken getRecipientSignatureToken() {
+        return recipientSignatureToken;
     }
 
-    public PolicyComponent normalize() {
-
-        if (isNormalized()) {
-            return this;
-        }
-
-        AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        List configs = algorithmSuite.getConfigurations();
-
-        Policy policy = new Policy();
-        ExactlyOne exactlyOne = new ExactlyOne();
-
-        policy.addPolicyComponent(exactlyOne);
-
-        All wrapper;
-        AsymmetricBinding asymmetricBinding;
-
-        for (Iterator iterator = configs.iterator(); iterator.hasNext();) {
-            wrapper = new All();
-            asymmetricBinding = new AsymmetricBinding(this.version);
-
-            asymmetricBinding.setAlgorithmSuite((AlgorithmSuite) iterator
-                    .next());
-            asymmetricBinding
-                    .setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
-            asymmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
-            asymmetricBinding.setInitiatorToken(getInitiatorToken());
-            asymmetricBinding.setLayout(getLayout());
-            asymmetricBinding.setProtectionOrder(getProtectionOrder());
-            asymmetricBinding.setRecipientToken(getRecipientToken());
-            asymmetricBinding.setSignatureProtection(isSignatureProtection());
-            asymmetricBinding
-                    .setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
-            asymmetricBinding.setTokenProtection(isTokenProtection());
-
-            asymmetricBinding.setNormalized(true);
-            wrapper.addPolicyComponent(wrapper);
-        }
-
-        return policy;
-
+    protected void setRecipientSignatureToken(RecipientSignatureToken recipientSignatureToken) {
+        this.recipientSignatureToken = recipientSignatureToken;
     }
 
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+    public RecipientEncryptionToken getRecipientEncryptionToken() {
+        return recipientEncryptionToken;
+    }
 
-        String prefix = writer.getPrefix(namespaceURI);
-        
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
-
-        // <sp:AsymmetricBinding>
-        writer.writeStartElement(prefix, localname, namespaceURI);
-        writer.writeNamespace(prefix, namespaceURI);
-
-        String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        if (pPrefix == null) {
-            pPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(pPrefix, SPConstants.POLICY.getNamespaceURI());
-        }
-
-        // <wsp:Policy>
-        writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(),
-                SPConstants.POLICY.getNamespaceURI());
-
-        if (initiatorToken == null) {
-            throw new RuntimeException("InitiatorToken is not set");
-        }
-
-        // <sp:InitiatorToken>
-        initiatorToken.serialize(writer);
-        // </sp:InitiatorToken>
-
-        if (recipientToken == null) {
-            throw new RuntimeException("RecipientToken is not set");
-        }
-
-        // <sp:RecipientToken>
-        recipientToken.serialize(writer);
-        // </sp:RecipientToken>
-
-        AlgorithmSuite algorithmSuite = getAlgorithmSuite();
-        if (algorithmSuite == null) {
-            throw new RuntimeException("AlgorithmSuite is not set");
-        }
-
-        // <sp:AlgorithmSuite>
-        algorithmSuite.serialize(writer);
-        // </sp:AlgorithmSuite>
-
-        Layout layout = getLayout();
-        if (layout != null) {
-            // <sp:Layout>
-            layout.serialize(writer);
-            // </sp:Layout>
-        }
-
-        if (isIncludeTimestamp()) {
-            // <sp:IncludeTimestamp>
-            writer.writeStartElement(prefix, SPConstants.INCLUDE_TIMESTAMP,
-                    namespaceURI);
-            writer.writeEndElement();
-            // </sp:IncludeTimestamp>
-        }
-
-        if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(getProtectionOrder())) {
-            // <sp:EncryptBeforeSign />
-            writer.writeStartElement(prefix, SPConstants.ENCRYPT_BEFORE_SIGNING,
-                    namespaceURI);
-            writer.writeEndElement();
-        }
-
-        if (isSignatureProtection()) {
-            // <sp:EncryptSignature />
-            // FIXME move the String constants to a QName
-            writer.writeStartElement(prefix, SPConstants.ENCRYPT_SIGNATURE,
-                    namespaceURI);
-            writer.writeEndElement();
-        }
-
-        if (isTokenProtection()) {
-            // <sp:ProtectTokens />
-            writer.writeStartElement(prefix, SPConstants.PROTECT_TOKENS,
-                    namespaceURI);
-            writer.writeEndElement();
-        }
-
-        if (isEntireHeadersAndBodySignatures()) {
-            // <sp:OnlySignEntireHeaderAndBody />
-            writer.writeStartElement(prefix,
-                    SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, namespaceURI);
-            writer.writeEndElement();
-        }
-
-        // </wsp:Policy>
-        writer.writeEndElement();
-
-        // </sp:AsymmetircBinding>
-        writer.writeEndElement();
+    protected void setRecipientEncryptionToken(RecipientEncryptionToken recipientEncryptionToken) {
+        this.recipientEncryptionToken = recipientEncryptionToken;
     }
 }

@@ -1,0 +1,65 @@
+<wsp:Policy
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:SymmetricBinding wsp:Optional="true">
+        <wsp:Policy>
+            <sp:ProtectionToken>
+                <wsp:Policy>
+                    <wsp:ExactlyOne>
+                        <sp:HttpsToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                            <wsp:Policy/>
+                        </sp:HttpsToken>
+                        <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                            <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                            <wsp:Policy>
+                                <wsp:ExactlyOne>
+                                    <wsp:All>
+                                        <sp:RequireDerivedKeys/>
+                                        <sp:RequireKeyIdentifierReference/>
+                                        <sp:RequireIssuerSerialReference/>
+                                        <sp:RequireEmbeddedTokenReference/>
+                                        <sp:RequireThumbprintReference/>
+                                        <sp:WssX509V3Token10/>
+                                    </wsp:All>
+                                    <wsp:All>
+                                        <sp:RequireImpliedDerivedKeys/>
+                                        <sp:RequireKeyIdentifierReference/>
+                                        <sp:RequireIssuerSerialReference/>
+                                        <sp:RequireEmbeddedTokenReference/>
+                                        <sp:RequireThumbprintReference/>
+                                        <sp:WssX509PkiPathV1Token11/>
+                                    </wsp:All>
+                                </wsp:ExactlyOne>
+                            </wsp:Policy>
+                        </sp:X509Token>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:ProtectionToken>
+            <sp:AlgorithmSuite>
+                <wsp:Policy>
+                    <wsp:ExactlyOne>
+                        <sp:Basic256/>
+                        <sp:TripleDesRsa15/>
+                        <sp:InclusiveC14N/>
+                        <sp:SOAPNormalization10/>
+                        <sp:STRTransform10/>
+                        <sp:XPath10/>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+                <wsp:Policy>
+                    <wsp:ExactlyOne>
+                        <sp:Strict/>
+                        <sp:Lax/>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:Layout>
+            <sp:IncludeTimestamp/>
+        </wsp:Policy>
+    </sp:SymmetricBinding>
+    <sp:SignedParts wsp:Ignorable="true">
+        <sp:Body/>
+        <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+    </sp:SignedParts>
+</wsp:Policy>

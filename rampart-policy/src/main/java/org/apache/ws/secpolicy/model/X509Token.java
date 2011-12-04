@@ -1,228 +1,179 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.Constants;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.ws.secpolicy.SPConstants;
+import org.w3c.dom.Element;
 
-public class X509Token extends Token {
+import javax.xml.namespace.QName;
+import java.util.*;
+
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class X509Token extends AbstractToken {
+
+    public enum TokenType {
+        WssX509V3Token10,
+        WssX509Pkcs7Token10,
+        WssX509PkiPathV1Token10,
+        WssX509V1Token11,
+        WssX509V3Token11,
+        WssX509Pkcs7Token11,
+        WssX509PkiPathV1Token11;
+
+        private static final Map<String, TokenType> lookup = new HashMap<String, TokenType>();
+
+        static {
+            for (TokenType u : EnumSet.allOf(TokenType.class))
+                lookup.put(u.name(), u);
+        }
+
+        public static TokenType lookUp(String name) {
+            return lookup.get(name);
+        }
+    }
 
     private boolean requireKeyIdentifierReference;
-    
     private boolean requireIssuerSerialReference;
-    
     private boolean requireEmbeddedTokenReference;
-    
     private boolean requireThumbprintReference;
-    
-    private String tokenVersionAndType = Constants.WSS_X509_V3_TOKEN10;
-    
-    private String encryptionUser;
 
-    private String userCertAlias;
+    private TokenType tokenType;
 
-    public String getEncryptionUser() {
-        return encryptionUser;
+    public X509Token(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
+                     Element issuer, String issuerName, Element claims, Policy nestedPolicy) {
+        super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
+
+        parseNestedPolicy(nestedPolicy, this);
     }
 
-    public void setEncryptionUser(String encryptionUser) {
-        this.encryptionUser = encryptionUser;
+    public QName getName() {
+        return getVersion().getSPConstants().getX509Token();
     }
 
-    public String getUserCertAlias() {
-        return userCertAlias;
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new X509Token(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
     }
 
-    public void setUserCertAlias(String userCertAlias) {
-        this.userCertAlias = userCertAlias;
-    }
-    
-    public X509Token(int version) {
-        setVersion(version);
-    }
-    
-    /**
-     * @return Returns the requireEmbeddedTokenReference.
-     */
-    public boolean isRequireEmbeddedTokenReference() {
-        return requireEmbeddedTokenReference;
+    protected void parseNestedPolicy(Policy nestedPolicy, X509Token x509Token) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                DerivedKeys derivedKeys = DerivedKeys.lookUp(assertionName);
+                if (derivedKeys != null) {
+                    if (x509Token.getDerivedKeys() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    x509Token.setDerivedKeys(derivedKeys);
+                    continue;
+                }
+                TokenType tokenType = TokenType.lookUp(assertionName);
+                if (tokenType != null) {
+                    if (x509Token.getTokenType() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    x509Token.setTokenType(tokenType);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireKeyIdentifierReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireKeyIdentifierReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (x509Token.isRequireKeyIdentifierReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    x509Token.setRequireKeyIdentifierReference(true);
+                    continue;
+                } else if (getVersion().getSPConstants().getRequireIssuerSerialReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireIssuerSerialReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (x509Token.isRequireIssuerSerialReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    x509Token.setRequireIssuerSerialReference(true);
+                    continue;
+                } else if (getVersion().getSPConstants().getRequireEmbeddedTokenReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireEmbeddedTokenReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (x509Token.isRequireEmbeddedTokenReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    x509Token.setRequireEmbeddedTokenReference(true);
+                    continue;
+                } else if (getVersion().getSPConstants().getRequireThumbprintReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireThumbprintReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (x509Token.isRequireThumbprintReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    x509Token.setRequireThumbprintReference(true);
+                    continue;
+
+                }
+            }
+        }
     }
 
-    /**
-     * @param requireEmbeddedTokenReference The requireEmbeddedTokenReference to set.
-     */
-    public void setRequireEmbeddedTokenReference(
-            boolean requireEmbeddedTokenReference) {
-        this.requireEmbeddedTokenReference = requireEmbeddedTokenReference;
-    }
-
-    /**
-     * @return Returns the requireIssuerSerialReference.
-     */
-    public boolean isRequireIssuerSerialReference() {
-        return requireIssuerSerialReference;
-    }
-
-    /**
-     * @param requireIssuerSerialReference The requireIssuerSerialReference to set.
-     */
-    public void setRequireIssuerSerialReference(boolean requireIssuerSerialReference) {
-        this.requireIssuerSerialReference = requireIssuerSerialReference;
-    }
-
-    /**
-     * @return Returns the requireKeyIdentifierReference.
-     */
     public boolean isRequireKeyIdentifierReference() {
         return requireKeyIdentifierReference;
     }
 
-    /**
-     * @param requireKeyIdentifierReference The requireKeyIdentifierReference to set.
-     */
-    public void setRequireKeyIdentifierReference(
-            boolean requireKeyIdentifierReference) {
+    protected void setRequireKeyIdentifierReference(boolean requireKeyIdentifierReference) {
         this.requireKeyIdentifierReference = requireKeyIdentifierReference;
     }
 
-    /**
-     * @return Returns the requireThumbprintReference.
-     */
+    public boolean isRequireIssuerSerialReference() {
+        return requireIssuerSerialReference;
+    }
+
+    protected void setRequireIssuerSerialReference(boolean requireIssuerSerialReference) {
+        this.requireIssuerSerialReference = requireIssuerSerialReference;
+    }
+
+    public boolean isRequireEmbeddedTokenReference() {
+        return requireEmbeddedTokenReference;
+    }
+
+    protected void setRequireEmbeddedTokenReference(boolean requireEmbeddedTokenReference) {
+        this.requireEmbeddedTokenReference = requireEmbeddedTokenReference;
+    }
+
     public boolean isRequireThumbprintReference() {
         return requireThumbprintReference;
     }
 
-    /**
-     * @param requireThumbprintReference The requireThumbprintReference to set.
-     */
-    public void setRequireThumbprintReference(boolean requireThumbprintReference) {
+    protected void setRequireThumbprintReference(boolean requireThumbprintReference) {
         this.requireThumbprintReference = requireThumbprintReference;
     }
 
-    /**
-     * @return Returns the tokenVersionAndType.
-     */
-    public String getTokenVersionAndType() {
-        return tokenVersionAndType;
+    public TokenType getTokenType() {
+        return tokenType;
     }
 
-    /**
-     * @param tokenVersionAndType The tokenVersionAndType to set.
-     */
-    public void setTokenVersionAndType(String tokenVersionAndType) {
-        this.tokenVersionAndType = tokenVersionAndType;
+    protected void setTokenType(TokenType tokenType) {
+        this.tokenType = tokenType;
     }
-
-    public QName getName() {
-        if ( version == SPConstants.SP_V12) {
-            return SP12Constants.X509_TOKEN;
-        } else {
-            return SP11Constants.X509_TOKEN;
-        }      
-    }
-
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
-    }
-
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-
-        String prefix = writer.getPrefix(namespaceURI);
-
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
-            
-        // <sp:X509Token> 
-        writer.writeStartElement(prefix, localName, namespaceURI);
-        
-        String inclusion;
-        
-        if (version == SPConstants.SP_V12) {
-            inclusion = SP12Constants.getAttributeValueFromInclusion(getInclusion());
-        } else {
-            inclusion = SP11Constants.getAttributeValueFromInclusion(getInclusion()); 
-        }
-        
-        if (inclusion != null) {
-            writer.writeAttribute(prefix, namespaceURI, SPConstants.ATTR_INCLUDE_TOKEN , inclusion);
-        }
-        
-        
-        String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        if (pPrefix == null) {
-            pPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(pPrefix, SPConstants.POLICY.getNamespaceURI());
-        }
-        
-        // <wsp:Policy>
-        writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY.getNamespaceURI());
-        
-        if (isRequireKeyIdentifierReference()) {
-            // <sp:RequireKeyIdentifierReference />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_KEY_IDENTIFIRE_REFERENCE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireIssuerSerialReference()) {
-            // <sp:RequireIssuerSerialReference />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireEmbeddedTokenReference()) {
-            // <sp:RequireEmbeddedTokenReference />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireThumbprintReference()) {
-            // <sp:RequireThumbprintReference />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_THUMBPRINT_REFERENCE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (tokenVersionAndType != null) {
-            // <sp:WssX509V1Token10 /> | ..
-            writer.writeStartElement(prefix, tokenVersionAndType, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if(isDerivedKeys()) {
-            // <sp:RequireDerivedKeys/>
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_DERIVED_KEYS, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        // </wsp:Policy>
-        writer.writeEndElement();
-        
-        // </sp:X509Token>
-        writer.writeEndElement();
-    }
-       
 }

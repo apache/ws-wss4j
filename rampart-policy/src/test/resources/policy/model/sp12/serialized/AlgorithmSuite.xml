@@ -1,0 +1,11 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Optional="true" wsp:Ignorable="true">
+        <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+            <sp:TripleDesSha256Rsa15/>
+            <sp:InclusiveC14N/>
+            <sp:SOAPNormalization10/>
+            <sp:STRTransform10/>
+            <sp:AbsXPath/>
+        </wsp:Policy>
+    </sp:AlgorithmSuite>
+</wsp:Policy>

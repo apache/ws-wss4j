@@ -1,134 +1,109 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.HashMap;
+import org.apache.neethi.Constants;
+import org.apache.neethi.Policy;
+import org.apache.ws.secpolicy.SPConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
-import org.apache.ws.secpolicy.SP12Constants;
-import org.apache.ws.secpolicy.SPConstants;
-
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
 public class RequiredElements extends AbstractSecurityAssertion {
 
-    private ArrayList xPathExpressions = new ArrayList();
-    
-    private HashMap declaredNamespaces = new HashMap();
-
     private String xPathVersion;
+    private List<XPath> xPaths = new ArrayList<XPath>();
 
-    public RequiredElements(int version) {
-        setVersion(version);
+    public RequiredElements(SPConstants.SPVersion version, String xPathVersion, List<XPath> xPaths) {
+        super(version);
+
+        this.xPathVersion = xPathVersion;
+        this.xPaths.addAll(xPaths);
     }
 
-    /**
-     * @return Returns the xPathExpressions.
-     */
-    public ArrayList getXPathExpressions() {
-        return xPathExpressions;
+    public QName getName() {
+        return getVersion().getSPConstants().getRequiredElements();
     }
 
-    public void addXPathExpression(String expr) {
-        this.xPathExpressions.add(expr);
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new RequiredElements(getVersion(), getXPathVersion(), getXPaths());
     }
 
-    /**
-     * @return Returns the xPathVersion.
-     */
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
+        writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
+        if (!isNormalized() && isOptional()) {
+            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+        }
+        if (getXPathVersion() != null) {
+            writer.writeAttribute(SPConstants.XPATH_VERSION, getXPathVersion());
+        }
+        if (isIgnorable()) {
+            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+        }
+        for (int i = 0; i < xPaths.size(); i++) {
+            XPath xPath = xPaths.get(i);
+            if (XPath.Version.V1 == xPath.getVersion()) {
+                writer.writeStartElement(
+                        getVersion().getSPConstants().getXPathExpression().getPrefix(),
+                        getVersion().getSPConstants().getXPathExpression().getLocalPart(),
+                        getVersion().getSPConstants().getXPathExpression().getNamespaceURI());
+            } else if (XPath.Version.V2 == xPath.getVersion()) {
+                writer.writeStartElement(
+                        getVersion().getSPConstants().getXPath2Expression().getPrefix(),
+                        getVersion().getSPConstants().getXPath2Expression().getLocalPart(),
+                        getVersion().getSPConstants().getXPath2Expression().getNamespaceURI());
+                writer.writeNamespace(
+                        getVersion().getSPConstants().getXPath2Expression().getPrefix(),
+                        getVersion().getSPConstants().getXPath2Expression().getNamespaceURI());
+                writer.writeAttribute(SPConstants.FILTER, xPath.getFilter());
+            }
+            Iterator<Map.Entry<String, String>> namespaceIterator = xPath.getPrefixNamespaceMap().entrySet().iterator();
+            while (namespaceIterator.hasNext()) {
+                Map.Entry<String, String> namespaceEntry = namespaceIterator.next();
+                writer.writeNamespace(namespaceEntry.getKey(), namespaceEntry.getValue());
+            }
+            writer.writeCharacters(xPath.getXPath());
+            writer.writeEndElement();
+        }
+        writer.writeEndElement();
+    }
+
+    public List<XPath> getXPaths() {
+        return xPaths;
+    }
+
     public String getXPathVersion() {
         return xPathVersion;
     }
 
-    /**
-     * @param pathVersion
-     *            The xPathVersion to set.
-     */
-    public void setXPathVersion(String pathVersion) {
-        xPathVersion = pathVersion;
-    }
-    
-    public HashMap getDeclaredNamespaces () {
-        return declaredNamespaces;
-    }
-    
-    public void addDeclaredNamespaces(String uri, String prefix ) {
-        declaredNamespaces.put(prefix, uri);
-    }
-        
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-
-        String localName = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-
-        String prefix;
-        String writerPrefix = writer.getPrefix(namespaceURI);
-
-        if (writerPrefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        } else {
-            prefix = writerPrefix;
-        }
-
-        //  <sp:RequiredElements>
-        writer.writeStartElement(prefix, localName, namespaceURI);
-        
-        // xmlns:sp=".."
-        writer.writeNamespace(prefix, namespaceURI);
-
-        if (writerPrefix == null) {
-            // xmlns:sp=".."
-            writer.writeNamespace(prefix, namespaceURI);
-        }
-
-        if (xPathVersion != null) {
-            writer.writeAttribute(prefix, namespaceURI, SPConstants.XPATH_VERSION, xPathVersion);
-        }
-
-        String xpathExpression;
-
-        for (Iterator iterator = xPathExpressions.iterator(); iterator
-                .hasNext();) {
-            xpathExpression = (String) iterator.next();
-            // <sp:XPath ..>
-            writer.writeStartElement(prefix, SPConstants.XPATH_EXPR, namespaceURI);
-            writer.writeCharacters(xpathExpression);
-            writer.writeEndElement();
-        }
-
-        //</sp:RequiredElements>
-        writer.writeEndElement();
-    }
-
-    public QName getName() {
-        if (version == SPConstants.SP_V12) {
-            return SP12Constants.REQUIRED_ELEMENTS;
-        } else {
-            return SP11Constants.REQUIRED_ELEMENTS;
-        }      
-    }
-
-    public PolicyComponent normalize() {
-        return this;
+    protected void setXPathVersion(String xPathVersion) {
+        this.xPathVersion = xPathVersion;
     }
 }

@@ -1,0 +1,12 @@
+<wsp:Policy
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:Wss10 wsp:Optional="true" wsp:Ignorable="true">
+        <wsp:Policy>
+            <sp:MustSupportRefKeyIdentifier/>
+            <sp:MustSupportRefIssuerSerial/>
+            <sp:MustSupportRefExternalURI/>
+            <sp:MustSupportRefEmbeddedToken/>
+        </wsp:Policy>
+    </sp:Wss10>
+</wsp:Policy>

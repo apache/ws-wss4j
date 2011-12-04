@@ -1,0 +1,22 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:SamlToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                          sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once"
+                          wsp:Ignorable="true">
+                <sp:IssuerName>issuerName</sp:IssuerName>
+                <wst:Claims xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512">...</wst:Claims>
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:RequireDerivedKeys/>
+                            <sp:RequireKeyIdentifierReference/>
+                            <sp:WssSamlV20Token11/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SamlToken>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

@@ -1,247 +1,133 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.ws.secpolicy.SPConstants;
-import org.apache.ws.secpolicy.SP12Constants;
+
+import javax.xml.namespace.QName;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Model bean to capture Trust10 assertion info
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
-public class Trust13 extends AbstractSecurityAssertion {
+public class Trust13 extends Trust10 {
 
-    private boolean mustSupportClientChallenge;
-    private boolean mustSupportServerChallenge;
-    private boolean requireClientEntropy;
-    private boolean requireServerEntropy;
-    private boolean mustSupportIssuedTokens;
     private boolean requireRequestSecurityTokenCollection;
     private boolean requireAppliesTo;
-    
-    public Trust13(int version){
-        setVersion(version);
-    }
-    
-    /**
-     * @return Returns the mustSupportClientChallenge.
-     */
-    public boolean isMustSupportClientChallenge() {
-        return mustSupportClientChallenge;
+    private boolean scopePolicy15;
+    private boolean mustSupportInteractiveChallenge;
+
+    public Trust13(SPConstants.SPVersion version, Policy nestedPolicy) {
+        super(version, nestedPolicy);
+
+        parseNestedTrust13Policy(nestedPolicy, this);
     }
 
-    /**
-     * @param mustSupportClientChallenge The mustSupportClientChallenge to set.
-     */
-    public void setMustSupportClientChallenge(boolean mustSupportClientChallenge) {
-        this.mustSupportClientChallenge = mustSupportClientChallenge;
+    public QName getName() {
+        return getVersion().getSPConstants().getTrust13();
     }
 
-    /**
-     * @return Returns the mustSupportIssuedTokens.
-     */
-    public boolean isMustSupportIssuedTokens() {
-        return mustSupportIssuedTokens;
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(org.apache.neethi.Policy nestedPolicy) {
+        return new Trust13(getVersion(), nestedPolicy);
     }
 
-    /**
-     * @param mustSupportIssuedTokens The mustSupportIssuedTokens to set.
-     */
-    public void setMustSupportIssuedTokens(boolean mustSupportIssuedTokens) {
-        this.mustSupportIssuedTokens = mustSupportIssuedTokens;
+    protected void parseNestedTrust13Policy(Policy nestedPolicy, Trust13 trust13) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (getVersion().getSPConstants().getRequireRequestSecurityTokenCollection().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireRequestSecurityTokenCollection().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust13.isRequireRequestSecurityTokenCollection()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust13.setRequireRequestSecurityTokenCollection(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireAppliesTo().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireAppliesTo().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust13.isRequireAppliesTo()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust13.setRequireAppliesTo(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getScopePolicy15().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getScopePolicy15().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust13.isScopePolicy15()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust13.setScopePolicy15(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getMustSupportInteractiveChallenge().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getMustSupportInteractiveChallenge().getNamespaceURI().equals(assertionNamespace)) {
+                    if (trust13.isMustSupportInteractiveChallenge()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    trust13.setMustSupportInteractiveChallenge(true);
+                    continue;
+                }
+            }
+        }
     }
 
-    /**
-     * @return Returns the mustSupportServerChallenge.
-     */
-    public boolean isMustSupportServerChallenge() {
-        return mustSupportServerChallenge;
-    }
-
-    /**
-     * @param mustSupportServerChallenge The mustSupportServerChallenge to set.
-     */
-    public void setMustSupportServerChallenge(boolean mustSupportServerChallenge) {
-        this.mustSupportServerChallenge = mustSupportServerChallenge;
-    }
-
-    /**
-     * @return Returns the requireClientEntropy.
-     */
-    public boolean isRequireClientEntropy() {
-        return requireClientEntropy;
-    }
-
-    /**
-     * @param requireClientEntropy The requireClientEntropy to set.
-     */
-    public void setRequireClientEntropy(boolean requireClientEntropy) {
-        this.requireClientEntropy = requireClientEntropy;
-    }
-
-    /**
-     * @return Returns the requireServerEntropy.
-     */
-    public boolean isRequireServerEntropy() {
-        return requireServerEntropy;
-    }
-
-    /**
-     * @param requireServerEntropy The requireServerEntropy to set.
-     */
-    public void setRequireServerEntropy(boolean requireServerEntropy) {
-        this.requireServerEntropy = requireServerEntropy;
-    }
-    
-    /**
-     * @return Returns the requireRequestSecurityTokenCollection.
-     */
     public boolean isRequireRequestSecurityTokenCollection() {
         return requireRequestSecurityTokenCollection;
     }
 
-    /**
-     * @param requireRequestSecurityTokenCollection The requireRequestSecurityTokenCollection to set.
-     */
-    public void setRequireRequestSecurityTokenCollection(boolean requireRequestSecurityTokenCollection) {
+    protected void setRequireRequestSecurityTokenCollection(boolean requireRequestSecurityTokenCollection) {
         this.requireRequestSecurityTokenCollection = requireRequestSecurityTokenCollection;
     }
-    
-    /**
-     * @return Returns the requireAppliesTo.
-     */
+
     public boolean isRequireAppliesTo() {
         return requireAppliesTo;
     }
 
-    /**
-     * @param requireAppliesTo The requireAppliesTo to set.
-     */
-    public void setRequireAppliesTo(boolean requireAppliesTo) {
+    protected void setRequireAppliesTo(boolean requireAppliesTo) {
         this.requireAppliesTo = requireAppliesTo;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.neethi.Assertion#getName()
-     */
-    public QName getName() {
-            return SP12Constants.TRUST_13;
+    public boolean isScopePolicy15() {
+        return scopePolicy15;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.neethi.Assertion#isOptional()
-     */
-    public boolean isOptional() {
-        // TODO TODO Sanka
-        throw new UnsupportedOperationException("TODO Sanka");
+    protected void setScopePolicy15(boolean scopePolicy15) {
+        this.scopePolicy15 = scopePolicy15;
     }
 
-    public PolicyComponent normalize() {
-        return this;
+    public boolean isMustSupportInteractiveChallenge() {
+        return mustSupportInteractiveChallenge;
     }
 
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-        
-        String prefix = writer.getPrefix(namespaceURI);
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
-        
-        // <sp:Trust13>
-        writer.writeStartElement(prefix, localname, namespaceURI);
-        // xmlns:sp=".."
-        writer.writeNamespace(prefix, namespaceURI);
-        
-        String wspPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        
-        if (wspPrefix == null) {
-            wspPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(wspPrefix, SPConstants.POLICY.getNamespaceURI());
-        }
-        
-        // <wsp:Policy>
-        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(), SPConstants.POLICY.getNamespaceURI());
-        
-        if (isMustSupportClientChallenge()) {
-            // <sp:MustSupportClientChallenge />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportServerChallenge()) {
-            // <sp:MustSupportServerChallenge />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireClientEntropy()) {
-            // <sp:RequireClientEntropy />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_CLIENT_ENTROPY, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        
-        if (isRequireServerEntropy()) {
-            // <sp:RequireServerEntropy />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_SERVER_ENTROPY, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isMustSupportIssuedTokens()) {
-            // <sp:MustSupportIssuedTokens />
-            writer.writeStartElement(prefix, SPConstants.MUST_SUPPORT_ISSUED_TOKENS, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireRequestSecurityTokenCollection()) {
-            // <sp:RequireRequestSecurityTokenCollection />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        if (isRequireAppliesTo()) {
-            // <sp:RequireAppliesTo />
-            writer.writeStartElement(prefix, SPConstants.REQUIRE_APPLIES_TO, namespaceURI);
-            writer.writeEndElement();
-        }
-        
-        // </wsp:Policy>
-        writer.writeEndElement();
-        
-        
-        // </sp:Trust13>
-        writer.writeEndElement();
-        
-        
-        
-        
+    protected void setMustSupportInteractiveChallenge(boolean mustSupportInteractiveChallenge) {
+        this.mustSupportInteractiveChallenge = mustSupportInteractiveChallenge;
     }
-
-    public short getType() {
-        return org.apache.neethi.Constants.TYPE_ASSERTION;
-    }
-
 }

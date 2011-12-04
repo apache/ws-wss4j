@@ -1,144 +1,99 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.ws.secpolicy.SPConstants;
-import org.apache.ws.secpolicy.SP12Constants;
+import org.w3c.dom.Element;
+
+import javax.xml.namespace.QName;
+import java.util.*;
 
 /**
- * 
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
-public class HttpsToken extends Token {
+public class HttpsToken extends AbstractToken {
 
-    public HttpsToken(int version){
-        setVersion(version);
-    }
-    
-    private boolean requireClientCertificate = false;
-    private boolean httpBasicAuthentication = false;
-    private boolean httpDigestAuthentication = false;
+    public enum AuthenticationType {
+        HttpBasicAuthentication,
+        HttpDigestAuthentication,
+        RequireClientCertificate;
 
-    public boolean isRequireClientCertificate() {
-        return requireClientCertificate;
-    }
+        private static final Map<String, AuthenticationType> lookup = new HashMap<String, AuthenticationType>();
 
-    public void setRequireClientCertificate(boolean requireClientCertificate) {
-        this.requireClientCertificate = requireClientCertificate;
-    }
-    
-    /**
-     * @return the httpBasicAuthentication
-     */
-    public boolean isHttpBasicAuthentication()
-    {
-        return httpBasicAuthentication;
+        static {
+            for (AuthenticationType u : EnumSet.allOf(AuthenticationType.class))
+                lookup.put(u.name(), u);
+        }
+
+        public static AuthenticationType lookUp(String name) {
+            return lookup.get(name);
+        }
     }
 
-    /**
-     * @param httpBasicAuthentication the httpBasicAuthentication to set
-     */
-    public void setHttpBasicAuthentication(boolean httpBasicAuthentication)
-    {
-        this.httpBasicAuthentication = httpBasicAuthentication;
-    }
+    private AuthenticationType authenticationType;
 
-    /**
-     * @return the httpDigestAuthentication
-     */
-    public boolean isHttpDigestAuthentication()
-    {
-        return httpDigestAuthentication;
-    }
+    public HttpsToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
+                      Element issuer, String issuerName, Element claims, Policy nestedPolicy) {
+        super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
 
-    /**
-     * @param httpDigestAuthentication the httpDigestAuthentication to set
-     */
-    public void setHttpDigestAuthentication(boolean httpDigestAuthentication)
-    {
-        this.httpDigestAuthentication = httpDigestAuthentication;
+        parseNestedPolicy(nestedPolicy, this);
     }
 
     public QName getName() {
-        if (version == SPConstants.SP_V12) {
-            return SP12Constants.HTTPS_TOKEN;
-        } else {
-            return SP11Constants.HTTPS_TOKEN;
-        }
+        return getVersion().getSPConstants().getHttpsToken();
     }
 
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new HttpsToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
     }
 
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
-
-        String prefix = writer.getPrefix(namespaceURI);
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
-
-        // <sp:HttpsToken
-        writer.writeStartElement(prefix, localname, namespaceURI);
-
-
-        if (version == SPConstants.SP_V12) {
-            
-            if (isRequireClientCertificate() ||
-                isHttpBasicAuthentication() ||
-                isHttpDigestAuthentication()) {
-                // <wsp:Policy>
-                writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(), SPConstants.POLICY.getNamespaceURI());
-                
-                /*
-                 *  The ws policy 1.2 specification states that only one of those should be present, although
-                 * a web server (say tomcat) could be normally configured to require both a client certificate and 
-                 * a http user/pwd authentication. Nevertheless stick to the specification.
-                 */
-                if(isHttpBasicAuthentication()) {
-                    writer.writeStartElement(prefix, SPConstants.HTTP_BASIC_AUTHENTICATION.getLocalPart(), namespaceURI);
-                    writer.writeEndElement();
-                } else if(isHttpDigestAuthentication()) {
-                    writer.writeStartElement(prefix, SPConstants.HTTP_DIGEST_AUTHENTICATION.getLocalPart(), namespaceURI);
-                    writer.writeEndElement();
-                } else if(isRequireClientCertificate()) {
-                    writer.writeStartElement(prefix, SPConstants.REQUIRE_CLIENT_CERTIFICATE.getLocalPart(), namespaceURI);
-                    writer.writeEndElement();
+    protected void parseNestedPolicy(Policy nestedPolicy, HttpsToken httpsToken) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                AuthenticationType authenticationType = AuthenticationType.lookUp(assertionName);
+                if (authenticationType != null) {
+                    if (httpsToken.getAuthenticationType() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    httpsToken.setAuthenticationType(authenticationType);
+                    continue;
                 }
-                // </wsp:Policy>
-                writer.writeEndElement();
             }
-        } else {
-            // RequireClientCertificate=".."
-            writer.writeAttribute(SPConstants.REQUIRE_CLIENT_CERTIFICATE.getLocalPart(), Boolean
-                            .toString(isRequireClientCertificate()));
         }
+    }
 
-        writer.writeEndElement();
-        // </sp:HttpsToken>
+    public AuthenticationType getAuthenticationType() {
+        return authenticationType;
+    }
+
+    protected void setAuthenticationType(AuthenticationType authenticationType) {
+        this.authenticationType = authenticationType;
     }
 }

@@ -1,0 +1,16 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:LaxTsFirst/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:Layout>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

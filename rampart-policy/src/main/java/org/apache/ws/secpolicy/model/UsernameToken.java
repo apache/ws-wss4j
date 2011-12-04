@@ -1,174 +1,174 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-
 package org.apache.ws.secpolicy.model;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.neethi.PolicyComponent;
-import org.apache.ws.secpolicy.SP11Constants;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.ws.secpolicy.SPConstants;
-import org.apache.ws.secpolicy.SP12Constants;
+import org.w3c.dom.Element;
 
-public class UsernameToken extends Token {
+import javax.xml.namespace.QName;
+import java.util.*;
 
-    private boolean useUTProfile10 = false;
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class UsernameToken extends AbstractToken {
 
-    private boolean useUTProfile11 = false;
-    
-    private boolean noPassword;
-    
-    private boolean hashPassword;
-    
-    public UsernameToken(int version){
-        setVersion(version);
-    }
+    public enum PasswordType {
+        NoPassword,
+        HashPassword;
 
-    /**
-     * @return Returns the useUTProfile11.
-     */
-    public boolean isUseUTProfile11() {
-        return useUTProfile11;
-    }
+        private static final Map<String, PasswordType> lookup = new HashMap<String, PasswordType>();
 
-    /**
-     * @param useUTProfile11
-     *            The useUTProfile11 to set.
-     */
-    public void setUseUTProfile11(boolean useUTProfile11) {
-        this.useUTProfile11 = useUTProfile11;
-    }
-    
-    public boolean isNoPassword() {
-        return noPassword;
-    }
-    
-    public void setNoPassword(boolean noPassword) {
-        this.noPassword = noPassword;
-    }
-    
-    public boolean isHashPassword() {
-        return hashPassword;
-    }
-    
-    public void setHashPassword(boolean hashPassword) {
-        this.hashPassword = hashPassword;
+        static {
+            for (PasswordType u : EnumSet.allOf(PasswordType.class))
+                lookup.put(u.name(), u);
+        }
+
+        public static PasswordType lookUp(String name) {
+            return lookup.get(name);
+        }
     }
 
-    public boolean isUseUTProfile10() {
-        return useUTProfile10;
+    public enum UsernameTokenType {
+        WssUsernameToken10,
+        WssUsernameToken11;
+
+        private static final Map<String, UsernameTokenType> lookup = new HashMap<String, UsernameTokenType>();
+
+        static {
+            for (UsernameTokenType u : EnumSet.allOf(UsernameTokenType.class))
+                lookup.put(u.name(), u);
+        }
+
+        public static UsernameTokenType lookUp(String name) {
+            return lookup.get(name);
+        }
     }
 
-    public void setUseUTProfile10(boolean useUTProfile10) {
-        this.useUTProfile10 = useUTProfile10;
+    private PasswordType passwordType;
+    private boolean created;
+    private boolean nonce;
+    private UsernameTokenType usernameTokenType;
+
+    public UsernameToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
+                         Element issuer, String issuerName, Element claims, Policy nestedPolicy) {
+        super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
+
+        parseNestedPolicy(nestedPolicy, this);
     }
 
     public QName getName() {
-        if (version == SPConstants.SP_V12) {
-            return SP12Constants.USERNAME_TOKEN;
-        } else {
-            return SP11Constants.USERNAME_TOKEN;
+        return getVersion().getSPConstants().getUsernameToken();
+    }
+
+    @Override
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+        return new UsernameToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+    }
+
+    protected void parseNestedPolicy(Policy nestedPolicy, UsernameToken usernameToken) {
+        Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
+        //we just process the first alternative
+        //this means that if we have a compact policy only the first alternative is visible
+        //in contrary to a normalized policy where just one alternative exists
+        if (alternatives.hasNext()) {
+            List<Assertion> assertions = alternatives.next();
+            for (int i = 0; i < assertions.size(); i++) {
+                Assertion assertion = assertions.get(i);
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                PasswordType passwordType = PasswordType.lookUp(assertionName);
+                if (passwordType != null) {
+                    if (usernameToken.getPasswordType() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    usernameToken.setPasswordType(passwordType);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getCreated().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getCreated().getNamespaceURI().equals(assertionNamespace)) {
+                    if (usernameToken.isCreated()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    usernameToken.setCreated(true);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getNonce().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getNonce().getNamespaceURI().equals(assertionNamespace)) {
+                    if (usernameToken.isNonce()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    usernameToken.setNonce(true);
+                    continue;
+                }
+                DerivedKeys derivedKeys = DerivedKeys.lookUp(assertionName);
+                if (derivedKeys != null) {
+                    if (usernameToken.getDerivedKeys() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    usernameToken.setDerivedKeys(derivedKeys);
+                    continue;
+                }
+                UsernameTokenType usernameTokenType = UsernameTokenType.lookUp(assertionName);
+                if (usernameTokenType != null) {
+                    if (usernameToken.getUsernameTokenType() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    usernameToken.setUsernameTokenType(usernameTokenType);
+                    continue;
+                }
+            }
         }
     }
 
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException();
+    public PasswordType getPasswordType() {
+        return passwordType;
     }
 
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getName().getLocalPart();
-        String namespaceURI = getName().getNamespaceURI();
+    protected void setPasswordType(PasswordType passwordType) {
+        this.passwordType = passwordType;
+    }
 
-        String prefix = writer.getPrefix(namespaceURI);
-        if (prefix == null) {
-            prefix = getName().getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
+    public boolean isCreated() {
+        return created;
+    }
 
-        // <sp:UsernameToken
-        writer.writeStartElement(prefix, localname, namespaceURI);
+    protected void setCreated(boolean created) {
+        this.created = created;
+    }
 
-        writer.writeNamespace(prefix, namespaceURI);
+    public boolean isNonce() {
+        return nonce;
+    }
 
-        String inclusion;
-        
-        if (version == SPConstants.SP_V12) {
-            inclusion = SP12Constants.getAttributeValueFromInclusion(getInclusion());
-        } else {
-            inclusion = SP11Constants.getAttributeValueFromInclusion(getInclusion()); 
-        }
+    protected void setNonce(boolean nonce) {
+        this.nonce = nonce;
+    }
 
-        if (inclusion != null) {
-            writer.writeAttribute(prefix, namespaceURI, SPConstants.ATTR_INCLUDE_TOKEN, inclusion);
-        }
+    public UsernameTokenType getUsernameTokenType() {
+        return usernameTokenType;
+    }
 
-        if (isUseUTProfile10() || isUseUTProfile11()) {
-            String pPrefix = writer.getPrefix(SPConstants.POLICY
-                    .getNamespaceURI());
-            if (pPrefix == null) {
-                writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY
-                        .getNamespaceURI());
-            }
-
-            // <wsp:Policy>
-            writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(),
-                    SPConstants.POLICY.getNamespaceURI());
-
-            // CHECKME
-            if (isUseUTProfile10()) {
-                // <sp:WssUsernameToken10 />
-                writer.writeStartElement(prefix, SPConstants.USERNAME_TOKEN10 , namespaceURI);
-            } else {
-                // <sp:WssUsernameToken11 />
-                writer.writeStartElement(prefix, SPConstants.USERNAME_TOKEN11 , namespaceURI);
-            }
-            
-            if (version == SPConstants.SP_V12) {
-                
-                if (isNoPassword()) {
-                    writer.writeStartElement(prefix, SPConstants.NO_PASSWORD, namespaceURI);
-                    writer.writeEndElement();    
-                } else if (isHashPassword()){
-                    writer.writeStartElement(prefix, SPConstants.HASH_PASSWORD, namespaceURI);
-                    writer.writeEndElement(); 
-                }
-                
-                if (isDerivedKeys()) {
-                    writer.writeStartElement(prefix, SPConstants.REQUIRE_DERIVED_KEYS, namespaceURI);
-                    writer.writeEndElement();  
-                } else if (isExplicitDerivedKeys()) {
-                    writer.writeStartElement(prefix, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS, namespaceURI);
-                    writer.writeEndElement();  
-                } else if (isImpliedDerivedKeys()) {
-                    writer.writeStartElement(prefix, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS, namespaceURI);
-                    writer.writeEndElement();  
-                }
-                
-            }
-            writer.writeEndElement();
-
-            // </wsp:Policy>
-            writer.writeEndElement();
-
-        }
-
-        writer.writeEndElement();
-        // </sp:UsernameToken>
-
+    protected void setUsernameTokenType(UsernameTokenType usernameTokenType) {
+        this.usernameTokenType = usernameTokenType;
     }
 }

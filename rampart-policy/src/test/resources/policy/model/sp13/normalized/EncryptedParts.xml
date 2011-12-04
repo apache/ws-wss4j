@@ -1,0 +1,19 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:EncryptedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                               wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Name="1" Namespace="ns1"/>
+                <sp:Header Name="2" Namespace="ns2"/>
+                <sp:Attachments xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp13:ContentSignatureTransform
+                            xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802"/>
+                    <sp13:AttachmentCompleteSignatureTransform
+                            xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802"/>
+                </sp:Attachments>
+            </sp:EncryptedParts>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

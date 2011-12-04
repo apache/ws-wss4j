@@ -1,0 +1,26 @@
+<wsp:Policy
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:SupportingTokens wsp:Optional="true" wsp:Ignorable="true">
+        <wsp:Policy>
+            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:X509Token>
+            <sp:AlgorithmSuite>
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:SignedParts>
+                <sp:Body/>
+            </sp:SignedParts>
+            <sp:SignedElements XPathVersion="1.0">
+            </sp:SignedElements>
+            <sp:EncryptedParts>
+                <sp:Body/>
+            </sp:EncryptedParts>
+            <sp:EncryptedElements XPathVersion="1.0">
+            </sp:EncryptedElements>
+        </wsp:Policy>
+    </sp:SupportingTokens>
+</wsp:Policy>
