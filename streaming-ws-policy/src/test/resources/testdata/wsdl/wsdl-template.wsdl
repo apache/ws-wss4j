@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="PlainService"
+        targetNamespace="http://www.example.net/WSDLService"
+        xmlns:tns="http://www.example.net/WSDLService"
+        xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        >
+
+    <wsdl:types>
+        <xs:schema>
+        </xs:schema>
+    </wsdl:types>
+
+    <wsp:Policy wsu:Id="Policy1">
+    </wsp:Policy>
+
+    <wsdl:message name="WsdlRequest">
+        <wsp:PolicyReference URI="#Policy1"/>
+        <wsdl:part name="parameters" element="wsdl:definitions"/>
+    </wsdl:message>
+    <wsdl:message name="WsdlResponse">
+        <wsdl:part name="parameters" element="wsdl:definitions"/>
+    </wsdl:message>
+    <wsdl:message name="WsdlFault">
+        <wsdl:part name="parameters" element="wsdl:definitions"/>
+    </wsdl:message>
+
+    <wsdl:portType name="WsdlPort">
+        <wsdl:operation name="definitions">
+            <wsdl:input message="tns:WsdlRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:WsdlResponse">
+            </wsdl:output>
+            <wsdl:fault name="WsdlFault" message="tns:WsdlFault">
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="WsdlSOAPBinding" type="tns:WsdlPort">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="definitions">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="WsdlFault">
+                <soap:fault name="WsdlFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="WsdlService">
+        <wsdl:port name="Wsdl" binding="tns:WsdlSOAPBinding">
+            <soap:address
+                    location="http://localhost:8080/WsdlService"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
+        

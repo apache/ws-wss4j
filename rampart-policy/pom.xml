@@ -99,6 +99,7 @@
                         <exclude>.checkstyle/**</exclude>
                         <exclude>src/main/resources/**</exclude>
                         <exclude>src/test/resources/**</exclude>
+                        <exclude>**/*.patch</exclude>
                     </excludes>
                 </configuration>
             </plugin>

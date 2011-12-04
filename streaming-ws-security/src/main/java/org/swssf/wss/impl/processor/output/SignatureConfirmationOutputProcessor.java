@@ -23,7 +23,7 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
+import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
@@ -63,9 +63,9 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                 List<SecurityEvent> requestSecurityEvents = outputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
                 for (int i = 0; i < requestSecurityEvents.size(); i++) {
                     SecurityEvent securityEvent = requestSecurityEvents.get(i);
-                    if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureToken) {
+                    if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureValue) {
                         aSignatureFound = true;
-                        SignatureTokenSecurityEvent signatureTokenSecurityEvent = (SignatureTokenSecurityEvent) securityEvent;
+                        SignatureValueSecurityEvent signatureTokenSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 
                         Map<QName, String> attributes = new HashMap<QName, String>();
                         attributes.put(WSSConstants.ATT_wsu_Id, "SigConf-" + UUID.randomUUID().toString());

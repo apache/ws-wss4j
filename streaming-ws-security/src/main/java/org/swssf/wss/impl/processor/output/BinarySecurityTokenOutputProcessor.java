@@ -19,11 +19,9 @@
 package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.*;
-import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
 import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
-import org.swssf.wss.impl.securityToken.X509SecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
+import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
@@ -200,15 +198,14 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
                 //todo find correct message signature token...however...
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureToken) {
-                    SignatureTokenSecurityEvent signatureTokenSecurityEvent = (SignatureTokenSecurityEvent) securityEvent;
-                    SecurityToken securityToken = signatureTokenSecurityEvent.getSecurityToken();
-                    if (securityToken instanceof DelegatingSecurityToken) {
-                        securityToken = ((DelegatingSecurityToken) securityToken).getDelegatedSecurityToken();
+                if (securityEvent instanceof TokenSecurityEvent) {
+                    TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
+                    if (tokenSecurityEvent.getTokenUsage() != TokenSecurityEvent.TokenUsage.Signature) {
+                        continue;
                     }
-                    if (securityToken instanceof X509SecurityToken) {
-                        X509SecurityToken x509SecurityToken = (X509SecurityToken) securityToken;
-                        return x509SecurityToken.getX509Certificates()[0];
+                    X509Certificate[] x509Certificates = tokenSecurityEvent.getSecurityToken().getX509Certificates();
+                    if (x509Certificates != null && x509Certificates.length > 0) {
+                        return x509Certificates[0];
                     }
                 }
             }

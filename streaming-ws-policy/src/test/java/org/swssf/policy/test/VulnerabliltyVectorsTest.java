@@ -22,7 +22,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyEnforcerFactory;
 import org.swssf.policy.PolicyInputProcessor;
-import org.swssf.policy.secpolicy.WSSPolicyException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
@@ -89,7 +88,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(), "SOAPAction (emptyPolicyOperation) does not match with the current Operation: {http://schemas.xmlsoap.org/wsdl/}definitions");
+            Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.apache.ws.secpolicy.WSSPolicyException: SOAPAction (emptyPolicyOperation) does not match with the current Operation: {http://schemas.xmlsoap.org/wsdl/}definitions");
         }
     }
 
@@ -135,8 +135,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSPolicyException);
-            Assert.assertEquals(throwable.getMessage(), "No policy alternative could be satisfied");
+            Assert.assertTrue(throwable instanceof WSSecurityException);
+            Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
         }
     }
 }

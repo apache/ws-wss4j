@@ -18,18 +18,15 @@
  */
 package org.swssf.policy;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.swssf.policy.secpolicy.WSSPolicyException;
-import org.swssf.policy.secpolicybuilder.*;
+import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.xmlsec.impl.util.ConcreteLSInput;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.LSInput;
@@ -45,19 +42,12 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -79,44 +69,23 @@ public class PolicyEnforcerFactory {
     private Map<Element, Policy> elementPolicyCache;
 
     static {
-        addAssertionBuilder(new AlgorithmSuiteBuilder());
-        addAssertionBuilder(new AsymmetricBindingBuilder());
-        addAssertionBuilder(new ContentEncryptedElementsBuilder());
-        addAssertionBuilder(new EncryptedElementsBuilder());
-        addAssertionBuilder(new EncryptedPartsBuilder());
-        addAssertionBuilder(new HttpsTokenBuilder());
-        addAssertionBuilder(new InitiatorTokenBuilder());
-        addAssertionBuilder(new IssuedTokenBuilder());
-        addAssertionBuilder(new LayoutBuilder());
-        addAssertionBuilder(new ProtectionTokenBuilder());
-        addAssertionBuilder(new RecipientTokenBuilder());
-        addAssertionBuilder(new RequiredElementsBuilder());
-        addAssertionBuilder(new RequiredPartsBuilder());
-        addAssertionBuilder(new SecureConversationTokenBuilder());
-        addAssertionBuilder(new SignedElementsBuilder());
-        addAssertionBuilder(new SignedPartsBuilder());
-        addAssertionBuilder(new SupportingTokensBuilder());
-        addAssertionBuilder(new SymmetricBindingBuilder());
-        addAssertionBuilder(new TransportBindingBuilder());
-        addAssertionBuilder(new TransportTokenBuilder());
-        addAssertionBuilder(new Trust13Builder());
-        addAssertionBuilder(new UsernameTokenBuilder());
-        addAssertionBuilder(new WSS10Builder());
-        addAssertionBuilder(new WSS11Builder());
-        addAssertionBuilder(new X509TokenBuilder());
-
         List<Source> sourceList = new ArrayList<Source>();
 
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-200507.xsd")));
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.2.xsd")));
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.2-errata-cd-01.xsd")));
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.3.xsd")));
         sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-200802.xsd")));
+        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.2-errata-cd-01.xsd")));
+        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-200507.xsd")));
 
         try {
             schemaFactory.setResourceResolver(new LSResourceResolver() {
                 public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
+                    if ("http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/ws-securitypolicy-1.2-errata-cd-01.xsd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setSystemId(systemId);
+                        concreteLSInput.setBaseURI(baseURI);
+                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.2-errata-cd-01.xsd"));
+                        return concreteLSInput;
+                    }
                     if ("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd".equals(systemId)) {
                         ConcreteLSInput concreteLSInput = new ConcreteLSInput();
                         concreteLSInput.setSystemId(systemId);
@@ -205,6 +174,12 @@ public class PolicyEnforcerFactory {
         return policyEnforcerFactory;
     }
 
+    public static PolicyEnforcerFactory newInstance(Document document) throws WSSPolicyException {
+        PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory();
+        policyEnforcerFactory.parseWsdl(document);
+        return policyEnforcerFactory;
+    }
+
     //todo enforce uniqueness of operation names to prevent SOAPAction spoofing.
     private void parseWsdl(URL wsdlUrl) throws WSSPolicyException {
         try {
@@ -212,6 +187,19 @@ public class PolicyEnforcerFactory {
             WSDLReader reader = wsdlFactory.newWSDLReader();
             reader.setFeature("javax.wsdl.verbose", false);
             wsdlDefinition = reader.readWSDL(wsdlUrl.toString());
+            operationPolicies = findPoliciesByOperation(wsdlDefinition);
+        } catch (WSDLException e) {
+            throw new WSSPolicyException(e.getMessage(), e);
+        }
+    }
+
+    //todo enforce uniqueness of operation names to prevent SOAPAction spoofing.
+    private void parseWsdl(Document document) throws WSSPolicyException {
+        try {
+            WSDLFactory wsdlFactory = WSDLFactory.newInstance();
+            WSDLReader reader = wsdlFactory.newWSDLReader();
+            reader.setFeature("javax.wsdl.verbose", false);
+            wsdlDefinition = reader.readWSDL(document.getDocumentURI(), document);
             operationPolicies = findPoliciesByOperation(wsdlDefinition);
         } catch (WSDLException e) {
             throw new WSSPolicyException(e.getMessage(), e);
@@ -415,33 +403,15 @@ public class PolicyEnforcerFactory {
         Validator validator = schemas.newValidator();
         try {
             validator.setFeature("http://apache.org/xml/features/honour-all-schemaLocations", true);
-            validator.validate(new DOMSource(element));
+            //todo remove schema validation completely because e.g attachments with child elements are not
+            //allowed per schema but per spec 1.3
+            //validator.validate(new DOMSource(element));
         } catch (SAXException e) {
             throw new WSSPolicyException(e.getMessage(), e);
-        } catch (IOException e) {
+        } /*catch (IOException e) {
             throw new WSSPolicyException(e.getMessage(), e);
-        }
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        XMLStreamReader xmlStreamReader;
-        try {
-            //because of old JAXP implementation in the jdk 1.6 we get the
-            //following exception when we try to create an XMLStreamReader from DOMSource:
-            //java.lang.UnsupportedOperationException: Cannot create XMLStreamReader or XMLEventReader from a javax.xml.transform.dom.DOMSource
-            //xmlStreamReader = xmlInputFactory.createXMLStreamReader(new DOMSource(element));
-            //so we serialize / deserialze the xml...
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-            transformer.transform(new DOMSource(element), new StreamResult(baos));
-            xmlStreamReader = xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray()));
-        } catch (XMLStreamException e) {
-            throw new WSSPolicyException(e.getMessage(), e);
-        } catch (TransformerConfigurationException e) {
-            throw new WSSPolicyException(e.getMessage(), e);
-        } catch (TransformerException e) {
-            throw new WSSPolicyException(e.getMessage(), e);
-        }
-        OMElement omElement = OMXMLBuilderFactory.createStAXOMBuilder(OMAbstractFactory.getOMFactory(), xmlStreamReader).getDocumentElement();
-        Policy policy = PolicyEngine.getPolicy(omElement);
+        }*/
+        Policy policy = PolicyEngine.getPolicy(element);
         elementPolicyCache.put(element, policy);
         return policy;
     }

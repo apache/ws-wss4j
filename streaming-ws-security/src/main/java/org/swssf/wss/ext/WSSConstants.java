@@ -245,6 +245,10 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final TokenType IssuedToken = new TokenType("IssuedToken");
     public static final TokenType SecureConversationToken = new TokenType("SecureConversationToken");
     public static final TokenType HttpsToken = new TokenType("HttpsToken");
+    public static final TokenType KerberosToken = new TokenType("KerberosToken");
+    public static final TokenType SpnegoContextToken = new TokenType("SpnegoContextToken");
+    public static final TokenType RelToken = new TokenType("RelToken");
+    public static final TokenType KeyValueToken = new TokenType("KeyValueToken");
 
     public static class TokenType extends XMLSecurityConstants.TokenType {
         protected TokenType(String name) {

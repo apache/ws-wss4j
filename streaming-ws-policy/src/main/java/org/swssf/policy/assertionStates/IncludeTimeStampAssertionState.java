@@ -18,8 +18,10 @@
  */
 package org.swssf.policy.assertionStates;
 
-import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
-import org.swssf.policy.secpolicy.model.Binding;
+import org.apache.ws.secpolicy.AssertionState;
+import org.apache.ws.secpolicy.model.AbstractBinding;
+import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
+import org.swssf.policy.Assertable;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 
@@ -27,15 +29,22 @@ import org.swssf.wss.securityEvent.TimestampSecurityEvent;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class IncludeTimeStampAssertionState extends AssertionState {
+public class IncludeTimeStampAssertionState extends AssertionState implements Assertable {
 
     public IncludeTimeStampAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
     }
 
+    @Override
+    public SecurityEvent.Event[] getSecurityEventType() {
+        return new SecurityEvent.Event[]{
+                SecurityEvent.Event.Timestamp
+        };
+    }
+
     public boolean assertEvent(SecurityEvent securityEvent) {
         TimestampSecurityEvent timestampSecurityEvent = (TimestampSecurityEvent) securityEvent;
-        boolean isIncludeTimestamp = ((Binding) getAssertion()).isIncludeTimestamp();
+        boolean isIncludeTimestamp = ((AbstractBinding) getAssertion()).isIncludeTimestamp();
 
         if (isIncludeTimestamp) {
             setAsserted(true);

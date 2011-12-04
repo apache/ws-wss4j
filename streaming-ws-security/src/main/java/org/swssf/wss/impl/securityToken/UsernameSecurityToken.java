@@ -242,6 +242,6 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
     }
 
     public WSSConstants.TokenType getTokenType() {
-        return null;
+        return WSSConstants.UsernameToken;
     }
 }

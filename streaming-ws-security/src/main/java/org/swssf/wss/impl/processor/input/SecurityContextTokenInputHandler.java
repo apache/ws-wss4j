@@ -88,7 +88,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
 
             public WSSConstants.TokenType getTokenType() {
                 //todo and set externalUriRef
-                return null;
+                return WSSConstants.SecurityContextToken;
             }
         };
 

@@ -75,10 +75,10 @@
                             </wsp12:Policy>
                         </sp1:Layout>
                         <sp1:IncludeTimestamp/>
-                        <!--<sp1:EncryptBeforeSigning/>-->
+                        <!--<sp1:EncryptBeforeSigning/>
                         <sp1:EncryptSignature/>
                         <sp1:ProtectTokens/>
-                        <sp1:OnlySignEntireHeadersAndBody/>
+                        <sp1:OnlySignEntireHeadersAndBody/>-->
                     </wsp12:Policy>
                 </sp1:AsymmetricBinding>
                 <sp1:SignedParts>

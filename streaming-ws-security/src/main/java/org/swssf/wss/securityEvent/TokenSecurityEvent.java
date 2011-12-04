@@ -26,7 +26,13 @@ import org.swssf.xmlsec.ext.SecurityToken;
  */
 public abstract class TokenSecurityEvent extends SecurityEvent {
 
+    public enum TokenUsage {
+        Signature,
+        Encryption
+    }
+
     private SecurityToken securityToken;
+    private TokenUsage tokenUsage;
 
     public TokenSecurityEvent(Event securityEventType) {
         super(securityEventType);
@@ -38,5 +44,13 @@ public abstract class TokenSecurityEvent extends SecurityEvent {
 
     public void setSecurityToken(SecurityToken securityToken) {
         this.securityToken = securityToken;
+    }
+
+    public TokenUsage getTokenUsage() {
+        return tokenUsage;
+    }
+
+    public void setTokenUsage(TokenUsage tokenUsage) {
+        this.tokenUsage = tokenUsage;
     }
 }

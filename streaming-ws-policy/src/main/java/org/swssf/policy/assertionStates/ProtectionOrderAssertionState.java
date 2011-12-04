@@ -18,19 +18,19 @@
  */
 package org.swssf.policy.assertionStates;
 
-import org.swssf.policy.secpolicy.SPConstants;
-import org.swssf.policy.secpolicy.model.AbstractSecurityAssertion;
-import org.swssf.policy.secpolicy.model.SymmetricAsymmetricBindingBase;
-import org.swssf.wss.securityEvent.EncryptionTokenSecurityEvent;
+import org.apache.ws.secpolicy.AssertionState;
+import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
+import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
+import org.swssf.policy.Assertable;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
+import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 
-public class ProtectionOrderAssertionState extends AssertionState {
+public class ProtectionOrderAssertionState extends AssertionState implements Assertable {
 
     boolean firstEvent = true;
 
@@ -39,21 +39,39 @@ public class ProtectionOrderAssertionState extends AssertionState {
     }
 
     @Override
-    public boolean assertEvent(SecurityEvent securityEvent) {
-        SPConstants.ProtectionOrder protectionOrder = ((SymmetricAsymmetricBindingBase) getAssertion()).getProtectionOrder();
+    public SecurityEvent.Event[] getSecurityEventType() {
+        return new SecurityEvent.Event[]{
+                SecurityEvent.Event.UsernameToken,
+                SecurityEvent.Event.IssuedToken,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.KerberosToken,
+                SecurityEvent.Event.SpnegoContextToken,
+                SecurityEvent.Event.SecurityContextToken,
+                SecurityEvent.Event.SecureConversationToken,
+                SecurityEvent.Event.SamlToken,
+                SecurityEvent.Event.RelToken,
+                SecurityEvent.Event.HttpsToken,
+                SecurityEvent.Event.KeyValueToken
+        };
+    }
 
+    @Override
+    public boolean assertEvent(SecurityEvent securityEvent) {
+        AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
+        TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
+        setAsserted(true);
         if (firstEvent) {
             firstEvent = false;
             //we have to invert the logic. When SignBeforeEncrypt is set then the Encryption token appears as first
             //in contrary if EncryptBeforeSign is set then the SignatureToken appears as first. So...:
-            if (protectionOrder.equals(SPConstants.ProtectionOrder.SignBeforeEncrypting)
-                    && securityEvent instanceof SignatureTokenSecurityEvent) {
+            if (protectionOrder.equals(AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting)
+                    && tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Signature) {
                 setAsserted(false);
-                setErrorMessage("ProtectionOrder is " + SPConstants.ProtectionOrder.SignBeforeEncrypting + " but we got " + securityEvent.getSecurityEventType() + " first");
-            } else if (protectionOrder.equals(SPConstants.ProtectionOrder.EncryptBeforeSigning)
-                    && securityEvent instanceof EncryptionTokenSecurityEvent) {
+                setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
+            } else if (protectionOrder.equals(AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning)
+                    && tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption) {
                 setAsserted(false);
-                setErrorMessage("ProtectionOrder is " + SPConstants.ProtectionOrder.SignBeforeEncrypting + " but we got " + securityEvent.getSecurityEventType() + " first");
+                setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
             }
         }
         return isAsserted();

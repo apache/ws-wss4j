@@ -29,11 +29,11 @@ public class SignedElementSecurityEvent extends SecurityEvent {
     //todo xpath or something unique
     //todo message signature or supporting sig
     private QName element;
-    private boolean notSigned;
+    private boolean signed;
 
-    public SignedElementSecurityEvent(Event securityEventType, boolean notSigned) {
+    public SignedElementSecurityEvent(Event securityEventType, boolean signed) {
         super(securityEventType);
-        this.notSigned = notSigned;
+        this.signed = signed;
     }
 
     public QName getElement() {
@@ -44,11 +44,11 @@ public class SignedElementSecurityEvent extends SecurityEvent {
         this.element = element;
     }
 
-    public boolean isNotSigned() {
-        return notSigned;
+    public boolean isSigned() {
+        return signed;
     }
 
-    public void setNotSigned(boolean notSigned) {
-        this.notSigned = notSigned;
+    public void setSigned(boolean signed) {
+        this.signed = signed;
     }
 }

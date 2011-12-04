@@ -323,7 +323,7 @@ public class PolicyTest extends AbstractTestBase {
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer(null);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
 
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.TransportToken);
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter"));
@@ -438,7 +438,7 @@ public class PolicyTest extends AbstractTestBase {
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer(null);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
 
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.TransportToken);
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
         httpsTokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
         httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "CN=transmitter,OU=swssf,C=CH"));

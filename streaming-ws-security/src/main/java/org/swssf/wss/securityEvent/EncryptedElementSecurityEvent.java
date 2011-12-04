@@ -28,11 +28,11 @@ public class EncryptedElementSecurityEvent extends SecurityEvent {
 
     //todo xpath or something unique
     private QName element;
-    private boolean notEncrypted; //if true this element is not encrypted.
+    private boolean encrypted; //if true this element is not encrypted.
 
-    public EncryptedElementSecurityEvent(Event securityEventType, boolean notEncrypted) {
+    public EncryptedElementSecurityEvent(Event securityEventType, boolean encrypted) {
         super(securityEventType);
-        this.notEncrypted = notEncrypted;
+        this.encrypted = encrypted;
     }
 
     public QName getElement() {
@@ -43,11 +43,11 @@ public class EncryptedElementSecurityEvent extends SecurityEvent {
         this.element = element;
     }
 
-    public boolean isNotEncrypted() {
-        return notEncrypted;
+    public boolean isEncrypted() {
+        return encrypted;
     }
 
-    public void setNotEncrypted(boolean notEncrypted) {
-        this.notEncrypted = notEncrypted;
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
     }
 }

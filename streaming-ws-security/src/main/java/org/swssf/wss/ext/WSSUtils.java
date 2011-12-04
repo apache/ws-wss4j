@@ -19,6 +19,7 @@
 package org.swssf.wss.ext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.swssf.wss.securityEvent.*;
 import org.swssf.xmlsec.crypto.Merlin;
 import org.swssf.xmlsec.ext.*;
 
@@ -334,5 +335,47 @@ public class WSSUtils extends XMLSecurityUtils {
         attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken);
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
+    }
+
+    public static TokenSecurityEvent createTokenSecurityEvent(SecurityToken securityToken) throws WSSecurityException {
+        while (securityToken.getKeyWrappingToken() != null) {
+            securityToken = securityToken.getKeyWrappingToken();
+        }
+        WSSConstants.TokenType tokenType = (WSSConstants.TokenType) securityToken.getTokenType();
+
+        TokenSecurityEvent tokenSecurityEvent;
+        if (tokenType == WSSConstants.X509V1Token
+                || tokenType == WSSConstants.X509V3Token
+                || tokenType == WSSConstants.X509Pkcs7Token
+                || tokenType == WSSConstants.X509PkiPathV1Token) {
+            //todo parameter to *TokenSecurityEvent can most probably be eliminated
+            tokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
+        } else if (tokenType == WSSConstants.UsernameToken) {
+            tokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
+        } else if (tokenType == WSSConstants.IssuedToken) {
+            tokenSecurityEvent = new IssuedTokenSecurityEvent(SecurityEvent.Event.IssuedToken);
+        } else if (tokenType == WSSConstants.KerberosToken) {
+            tokenSecurityEvent = new KerberosTokenSecurityEvent(SecurityEvent.Event.KerberosToken);
+        } else if (tokenType == WSSConstants.SpnegoContextToken) {
+            tokenSecurityEvent = new SpnegoContextTokenSecurityEvent(SecurityEvent.Event.SpnegoContextToken);
+        } else if (tokenType == WSSConstants.SecurityContextToken) {
+            tokenSecurityEvent = new SecurityContextTokenSecurityEvent(SecurityEvent.Event.SecurityContextToken);
+        } else if (tokenType == WSSConstants.SecureConversationToken) {
+            tokenSecurityEvent = new SecureConversationTokenSecurityEvent(SecurityEvent.Event.SecureConversationToken);
+        } else if (tokenType == WSSConstants.Saml10Token
+                || tokenType == WSSConstants.Saml11Token
+                || tokenType == WSSConstants.Saml20Token) {
+            tokenSecurityEvent = new SamlTokenSecurityEvent(SecurityEvent.Event.SamlToken);
+        } else if (tokenType == WSSConstants.RelToken) {
+            tokenSecurityEvent = new RelTokenSecurityEvent(SecurityEvent.Event.RelToken);
+        } else if (tokenType == WSSConstants.HttpsToken) {
+            tokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
+        } else if (tokenType == WSSConstants.KeyValueToken) {
+            tokenSecurityEvent = new KeyValueTokenSecurityEvent(SecurityEvent.Event.KeyValueToken);
+        } else {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
+        }
+        tokenSecurityEvent.setSecurityToken(securityToken);
+        return tokenSecurityEvent;
     }
 }

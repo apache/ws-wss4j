@@ -37,7 +37,7 @@ public abstract class X509SecurityToken extends AbstractAlgorithmSuiteSecurityEv
     private X509Certificate[] x509Certificates = null;
     private XMLSecurityConstants.TokenType tokenType;
 
-    X509SecurityToken(XMLSecurityConstants.TokenType tokenType, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+    protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
         super(securityContext, crypto, callbackHandler, id, processor);
         this.tokenType = tokenType;
     }

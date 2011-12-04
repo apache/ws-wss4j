@@ -23,14 +23,10 @@ import org.swssf.binding.wss10.ReferenceType;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.binding.xmlenc.EncryptedKeyType;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.wss.ext.WSSecurityException;
+import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractAlgorithmSuiteSecurityEventFiringSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
-import org.swssf.wss.securityEvent.EncryptionTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
@@ -166,12 +162,12 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         };
 
         final SecurityToken securityToken = securityTokenProvider.getSecurityToken(securityProperties.getDecryptionCrypto());
-        //fire a RecipientSecurityTokenEvent
-        EncryptionTokenSecurityEvent encryptionTokenSecurityEvent =
-                new EncryptionTokenSecurityEvent(SecurityEvent.Event.EncryptionToken);
 
-        encryptionTokenSecurityEvent.setSecurityToken(securityToken.getKeyWrappingToken());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptionTokenSecurityEvent);
+        //fire a RecipientSecurityTokenEvent
+        TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+        //todo: is this always the main encryption?
+        tokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(tokenSecurityEvent);
 
         //register the key token for decryption:
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(encryptedKeyType.getId(), securityTokenProvider);

@@ -20,10 +20,12 @@ package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.xmldsig.SignatureType;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignatureTokenSecurityEvent;
+import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
+import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -66,11 +68,16 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         SignatureVerifier signatureVerifier = new SignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
             @Override
-            protected void createSignatureAlgorithm(SecurityToken securityToken) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, XMLSecurityException {
-                SignatureTokenSecurityEvent signatureTokenSecurityEvent = new SignatureTokenSecurityEvent(SecurityEvent.Event.SignatureToken);
-                signatureTokenSecurityEvent.setSecurityToken(securityToken);
-                signatureTokenSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
-                securityContext.registerSecurityEvent(signatureTokenSecurityEvent);
+            protected void createSignatureAlgorithm(SecurityToken securityToken)
+                    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, XMLSecurityException {
+                TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+                //todo: is this always the main signature?
+                tokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+                securityContext.registerSecurityEvent(tokenSecurityEvent);
+
+                SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent(SecurityEvent.Event.SignatureValue);
+                signatureValueSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
+                securityContext.registerSecurityEvent(signatureValueSecurityEvent);
 
                 AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
                 algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());

@@ -36,13 +36,18 @@ public abstract class SecurityEvent {
         RequiredElement,
         RequiredPart,
         AlgorithmSuite,
-        SignatureToken,
-        EncryptionToken,
+        IssuedToken,
+        KerberosToken,
+        SpnegoContextToken,
         SamlToken,
         SecurityContextToken,
+        SecureConversationToken,
+        RelToken,
         UsernameToken,
+        KeyValueToken,
+        X509Token,
+        HttpsToken,
         SupportingToken,
-        TransportToken,
     }
 
     private Event securityEventType;

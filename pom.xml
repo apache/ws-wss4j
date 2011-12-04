@@ -20,6 +20,7 @@
         <module>bindings</module>
         <module>streaming-xml-security</module>
         <module>streaming-ws-security</module>
+        <module>rampart-policy</module>
         <module>streaming-ws-policy</module>
         <module>cxf-integration</module>
     </modules>
@@ -40,6 +41,11 @@
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
                 <version>${xmlsec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.neethi</groupId>
+                <artifactId>neethi</artifactId>
+                <version>3.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>

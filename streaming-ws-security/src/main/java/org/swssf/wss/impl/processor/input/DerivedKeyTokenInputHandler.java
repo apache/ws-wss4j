@@ -124,8 +124,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     public SecurityToken getKeyWrappingToken() {
-                        //todo?
-                        return null;
+                        return referencedSecurityToken;
                     }
 
                     public String getKeyWrappingTokenAlgorithm() {

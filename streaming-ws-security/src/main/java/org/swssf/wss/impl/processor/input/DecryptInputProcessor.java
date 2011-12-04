@@ -58,12 +58,12 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
             //soap:body content encryption counts as EncryptedPart
             EncryptedPartSecurityEvent encryptedPartSecurityEvent =
-                    new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                    new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
             encryptedPartSecurityEvent.setElement(parentElement);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
         } else {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
-                    new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, false);
+                    new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, true);
             contentEncryptedElementSecurityEvent.setElement(parentElement);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
@@ -115,12 +115,12 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                     && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent =
-                        new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                        new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
                 encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
             } else {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent =
-                        new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
+                        new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
                 encryptedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedElementSecurityEvent);
             }

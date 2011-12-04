@@ -18,7 +18,7 @@
  */
 package org.swssf.policy;
 
-import org.swssf.policy.secpolicy.WSSPolicyException;
+import org.apache.ws.secpolicy.WSSPolicyException;
 
 /**
  * Exception for PolicyViolation
