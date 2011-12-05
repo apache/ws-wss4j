@@ -26,6 +26,7 @@ import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.IdResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -416,6 +417,10 @@ public class WSSecurityEngine {
                 node = node.getNextSibling();
             }
         }
+        
+        // Remove stored signature elements from the Santuario IdResolver cache
+        IdResolver.unregisterDocument(securityHeader.getOwnerDocument());
+        
         return returnResults;
     }
 }
