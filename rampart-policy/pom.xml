@@ -121,5 +121,14 @@
         </plugins>
     </reporting>
 -->
+    <repositories>
+        <repository>
+            <id>Apache snapshot</id>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>http://repository.apache.org/snapshots</url>
+        </repository>
+    </repositories>
 
 </project>
