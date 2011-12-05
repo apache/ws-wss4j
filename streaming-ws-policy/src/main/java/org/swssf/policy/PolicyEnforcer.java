@@ -189,12 +189,15 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false));
         } else if (abstractSecurityAssertion instanceof AlgorithmSuite) {
             assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, true));
-        } else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
+        } else if (abstractSecurityAssertion instanceof AsymmetricBinding
+                || abstractSecurityAssertion instanceof SymmetricBinding) {
             assertableList.add(new IncludeTimeStampAssertionState(abstractSecurityAssertion, false));
             assertableList.add(new ProtectionOrderAssertionState(abstractSecurityAssertion, false));
             assertableList.add(new SignatureProtectionAssertionState(abstractSecurityAssertion, false));
             //todo token protection
             assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, false));
+        } else if (abstractSecurityAssertion instanceof TransportBinding) {
+            assertableList.add(new IncludeTimeStampAssertionState(abstractSecurityAssertion, false));
         } else if (abstractSecurityAssertion instanceof Layout) {
             assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
         }

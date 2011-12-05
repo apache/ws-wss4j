@@ -21,6 +21,7 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
+import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.ws.secpolicy.model.AsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
@@ -56,7 +57,7 @@ public class SignatureProtectionAssertionState extends AssertionState implements
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
-        AsymmetricBinding asymmetricBinding = (AsymmetricBinding) getAssertion();
+        AbstractSymmetricAsymmetricBinding asymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
         //todo better matching until we have a streaming xpath evaluation engine (work in progress)
 
         for (int i = 0; i < elements.size(); i++) {

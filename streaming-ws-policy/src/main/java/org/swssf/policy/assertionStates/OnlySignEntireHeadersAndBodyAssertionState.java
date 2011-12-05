@@ -21,6 +21,7 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
+import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.ws.secpolicy.model.AsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.policy.PolicyConstants;
@@ -47,7 +48,7 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
-        AsymmetricBinding asymmetricBinding = (AsymmetricBinding) getAssertion();
+        AbstractSymmetricAsymmetricBinding asymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
         if (!asymmetricBinding.isOnlySignEntireHeadersAndBody()) {
             setAsserted(true);
             return true;
