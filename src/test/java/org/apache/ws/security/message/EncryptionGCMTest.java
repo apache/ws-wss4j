@@ -66,7 +66,6 @@ public class EncryptionGCMTest extends org.junit.Assert {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testAES128GCM() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -88,7 +87,6 @@ public class EncryptionGCMTest extends org.junit.Assert {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testAES256GCM() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");

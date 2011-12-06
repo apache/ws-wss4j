@@ -36,6 +36,7 @@ import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.xml.security.utils.IdResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -172,6 +173,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
         ((org.w3c.dom.Element)valueNode).setAttributeNS(
              WSConstants.WSU_NS, "wsu:Id", "id-250"
         );
+        
+        // Clear the Santuario IdResolver cache
+        IdResolver.unregisterDocument(signedDoc);
             
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -316,10 +320,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
     
     /**
      * Test for when an EncryptedData structure is modified
-     * TODO Re-enable this test once Santuario 1.4.6 is released.
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testModifiedEncryptedDataStructure() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");

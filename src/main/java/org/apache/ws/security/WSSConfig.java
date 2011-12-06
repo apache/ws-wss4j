@@ -30,13 +30,13 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.validate.Validator;
 import org.apache.xml.security.utils.XMLUtils;
-import org.jcp.xml.dsig.internal.dom.XMLDSigRI;
 
 /**
  * WSSConfig <p/> Carries configuration data so the WSS4J spec compliance can be
@@ -426,7 +426,7 @@ public class WSSConfig {
     }
     
     public static void addXMLDSigRIInternal() {
-        addJceProvider("XMLDSig", new XMLDSigRI());
+        addJceProvider("ApacheXMLDSig", new XMLDSigRI());
     }
 
     /**
