@@ -27,6 +27,7 @@ import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
+import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
@@ -65,6 +66,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectLocalityDnsAddress = null;
     protected String resource = null;
     protected List<?> customAttributeValues = null;
+    protected ConditionsBean conditions = null;
+    
+    public void setConditions(ConditionsBean conditionsBean) {
+        this.conditions = conditionsBean;
+    }
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;

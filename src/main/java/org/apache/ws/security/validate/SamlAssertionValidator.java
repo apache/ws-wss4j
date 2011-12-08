@@ -26,6 +26,8 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.joda.time.DateTime;
+import org.opensaml.common.SAMLVersion;
 
 /**
  * This class validates a SAML Assertion, which is wrapped in an "AssertionWrapper" instance.
@@ -35,6 +37,9 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
  * and verifies that the Assertion is signed as well for holder-of-key. 
  */
 public class SamlAssertionValidator extends SignatureTrustValidator {
+    
+    private static org.apache.commons.logging.Log LOG = 
+        org.apache.commons.logging.LogFactory.getLog(SamlAssertionValidator.class);
     
     /**
      * Validate the credential argument. It must contain a non-null AssertionWrapper. 
@@ -58,12 +63,32 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         }
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
             if (assertion.getSubjectKeyInfo() == null) {
+                LOG.debug("There is no Subject KeyInfo to match the holder-of-key subject conf method");
                 throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
             }
             // The assertion must have been signed for HOK
             if (!assertion.isSigned()) {
+                LOG.debug("A holder-of-key assertion must be signed");
                 throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
             }
+        }
+        
+        // Check conditions
+        DateTime validFrom = null;
+        DateTime validTill = null;
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && assertion.getSaml2().getConditions() != null) {
+            validFrom = assertion.getSaml2().getConditions().getNotBefore();
+            validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && assertion.getSaml1().getConditions() != null) {
+            validFrom = assertion.getSaml1().getConditions().getNotBefore();
+            validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+        }
+        if (validFrom != null && validTill != null 
+            && !(validFrom.isBeforeNow() && validTill.isAfterNow())) {
+            LOG.debug("SAML Token condition not met");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
 
         // Verify trust on the signature

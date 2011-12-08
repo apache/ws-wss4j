@@ -54,8 +54,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 /**
  * Some tests for how SAML tokens are referenced.
- * TODO - Add tests for references from an EncryptedData structure to a SAML Assertion when
- * WSS-265 is fixed: https://issues.apache.org/jira/browse/WSS-265
  */
 public class SamlReferenceTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

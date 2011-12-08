@@ -59,6 +59,10 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(SAMLVersion.VERSION_11);
                 callback.setIssuer(issuer);
+                if (conditions != null) {
+                    callback.setConditions(conditions);
+                }
+                
                 SubjectBean subjectBean = 
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
