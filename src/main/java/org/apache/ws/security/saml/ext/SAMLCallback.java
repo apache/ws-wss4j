@@ -43,7 +43,7 @@ public class SAMLCallback implements Callback {
     /**
      * The SAML Version of the Assertion to create
      */
-    private SAMLVersion samlVersion = SAMLVersion.VERSION_11;
+    private SAMLVersion samlVersion;
     
     /**
      * SAML subject representation

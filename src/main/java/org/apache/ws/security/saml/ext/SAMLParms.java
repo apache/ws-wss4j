@@ -32,7 +32,7 @@ import org.opensaml.common.SAMLVersion;
  */
 public class SAMLParms {
     private String issuer;
-    private SAMLVersion samlVersion;
+    private SAMLVersion samlVersion = SAMLVersion.VERSION_11;
     private CallbackHandler samlCallbackHandler;
 
     /**
