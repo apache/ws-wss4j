@@ -356,6 +356,7 @@ public class SignatureProcessor implements Processor {
         
         XMLValidateContext context = new DOMValidateContext(key, elem);
         context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
+        context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
         
         try {
