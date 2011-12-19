@@ -376,7 +376,7 @@ public abstract class WSHandler {
                     if (sigVal.length != 0) {
                         throw new WSSecurityException(
                             "Received a SignatureConfirmation element, but there are no stored"
-                             + "signature values"
+                             + " signature values"
                         );
                     }
                 } else {
@@ -392,7 +392,7 @@ public abstract class WSHandler {
                     if (!found) {
                         throw new WSSecurityException(
                             "Received a SignatureConfirmation element, but there are no matching"
-                            + "stored signature values"
+                            + " stored signature values"
                         );
                     } 
                 }
