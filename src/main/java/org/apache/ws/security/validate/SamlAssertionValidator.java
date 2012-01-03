@@ -74,22 +74,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         }
         
         // Check conditions
-        DateTime validFrom = null;
-        DateTime validTill = null;
-        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
-            && assertion.getSaml2().getConditions() != null) {
-            validFrom = assertion.getSaml2().getConditions().getNotBefore();
-            validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
-            && assertion.getSaml1().getConditions() != null) {
-            validFrom = assertion.getSaml1().getConditions().getNotBefore();
-            validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-        }
-        if (validFrom != null && validTill != null 
-            && !(validFrom.isBeforeNow() && validTill.isAfterNow())) {
-            LOG.debug("SAML Token condition not met");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
-        }
+        checkConditions(assertion);
 
         // Verify trust on the signature
         if (assertion.isSigned()) {
@@ -115,6 +100,33 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
         trustCredential.setCertificates(samlKeyInfo.getCerts());
         return super.validate(trustCredential, data);
+    }
+    
+    /**
+     * Check the Conditions of the Assertion.
+     */
+    protected void checkConditions(AssertionWrapper assertion) throws WSSecurityException {
+        DateTime validFrom = null;
+        DateTime validTill = null;
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && assertion.getSaml2().getConditions() != null) {
+            validFrom = assertion.getSaml2().getConditions().getNotBefore();
+            validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && assertion.getSaml1().getConditions() != null) {
+            validFrom = assertion.getSaml1().getConditions().getNotBefore();
+            validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+        }
+        
+        if (validFrom != null && validFrom.isAfterNow()) {
+            LOG.debug("SAML Token condition (Not Before) not met");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+
+        if (validTill != null && validTill.isBeforeNow()) {
+            LOG.debug("SAML Token condition (Not On Or After) not met");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
     }
     
 }

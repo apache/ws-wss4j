@@ -19,39 +19,25 @@
 
 package org.apache.ws.security.saml;
 
+import java.util.List;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.CustomSamlAssertionValidator;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
-import org.apache.ws.security.common.SAMLElementCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
-
 import org.joda.time.DateTime;
-import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.saml2.core.AttributeValue;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.schema.XSAny;
 import org.w3c.dom.Document;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Test-case for sending and processing an a SAML Token with a custom Conditions element.
