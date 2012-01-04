@@ -22,60 +22,31 @@ package org.apache.ws.security.spnego;
 import java.security.PrivilegedAction;
 
 import org.ietf.jgss.GSSContext;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.GSSManager;
-import org.ietf.jgss.GSSName;
-import org.ietf.jgss.Oid;
 
 /**
- * This class represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket from a 
- * Kerberos Key Distribution Center.
+ * This interface represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket 
+ * from a Kerberos Key Distribution Center.
  */
-public class SpnegoClientAction implements PrivilegedAction<byte[]> {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(SpnegoClientAction.class);
-    
-    private String serviceName;
-    private GSSContext secContext;
-    private boolean mutualAuth;
-    
-    public SpnegoClientAction(String serviceName) {
-        this.serviceName = serviceName;
-    }
+public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
     
     /**
      * Whether to enable mutual authentication or not.
      */
-    public void setMutualAuth(boolean mutualAuthentication) {
-        mutualAuth = mutualAuthentication;
-    }
+    public void setMutualAuth(boolean mutualAuthentication);
     
-    public byte[] run() {
-        try {
-            if (secContext == null) {
-                GSSManager gssManager = GSSManager.getInstance();
-                Oid oid = new Oid("1.3.6.1.5.5.2");
-                
-                GSSName gssService = gssManager.createName(serviceName, GSSName.NT_HOSTBASED_SERVICE);
-                secContext = gssManager.createContext(gssService, oid, null, GSSContext.DEFAULT_LIFETIME);
-                
-                secContext.requestMutualAuth(mutualAuth);
-                secContext.requestCredDeleg(Boolean.FALSE);
-            }
-        
-            byte[] token = new byte[0];
-            return secContext.initSecContext(token, 0, token.length);
-        } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in obtaining a Kerberos token", e);
-            }
-        }
+    /**
+     * The Service Name
+     */
+    public void setServiceName(String serviceName);
 
-        return null;
-    }
+    /**
+     * Obtain a service ticket
+     */
+    public byte[] run();
     
-    public GSSContext getContext() {
-        return secContext;
-    }
+    /**
+     * Get the GSSContext that was created after a service ticket was obtained
+     */
+    public GSSContext getContext();
     
 }

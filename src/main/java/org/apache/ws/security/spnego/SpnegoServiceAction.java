@@ -22,49 +22,31 @@ package org.apache.ws.security.spnego;
 import java.security.PrivilegedAction;
 
 import org.ietf.jgss.GSSContext;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.GSSManager;
-import org.ietf.jgss.GSSName;
-import org.ietf.jgss.Oid;
 
 /**
- * This class represents a PrivilegedAction implementation to validate a received (SPNEGO) ticket to a KDC.
+ * This interface represents a PrivilegedAction implementation to validate a received (SPNEGO) 
+ * ticket to a KDC.
  */
-public class SpnegoServiceAction implements PrivilegedAction<byte[]> {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(SpnegoServiceAction.class);
+public interface SpnegoServiceAction extends PrivilegedAction<byte[]> {
     
-    private byte[] ticket;
-    private String serviceName;
-    private GSSContext secContext;
+    /**
+     * Set the ticket to validate
+     */
+    public void setTicket(byte[] ticket);
     
-    public SpnegoServiceAction(byte[] ticket, String serviceName) {
-        this.ticket = ticket;
-        this.serviceName = serviceName;
-    }
+    /**
+     * The Service Name
+     */
+    public void setServiceName(String serviceName);
     
-    public byte[] run() {
-        try {
-            if (secContext == null) {
-                GSSManager gssManager = GSSManager.getInstance();
-                Oid oid = new Oid("1.3.6.1.5.5.2");
-                
-                GSSName gssService = gssManager.createName(serviceName, GSSName.NT_HOSTBASED_SERVICE);
-                secContext = gssManager.createContext(gssService, oid, null, GSSContext.DEFAULT_LIFETIME);
-            }
-        
-            return secContext.acceptSecContext(ticket, 0, ticket.length);
-        } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in obtaining a Kerberos token", e);
-            }
-        }
-
-        return null;
-    }
+    /**
+     * Validate a service ticket
+     */
+    public byte[] run();
     
-    public GSSContext getContext() {
-        return secContext;
-    }
+    /**
+     * Get the GSSContext that was created after a service ticket was obtained
+     */
+    public GSSContext getContext();
     
 }

@@ -43,6 +43,8 @@ public class SpnegoTokenContext {
     private GSSContext secContext;
     private byte[] token;
     private boolean mutualAuth;
+    private SpnegoClientAction clientAction = new DefaultSpnegoClientAction();
+    private SpnegoServiceAction serviceAction = new DefaultSpnegoServiceAction();
 
     /**
      * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
@@ -91,16 +93,16 @@ public class SpnegoTokenContext {
         }
         
         // Get the service ticket
-        SpnegoClientAction action = new SpnegoClientAction(serviceName);
-        action.setMutualAuth(mutualAuth);
-        token = (byte[])Subject.doAs(clientSubject, action);
+        clientAction.setServiceName(serviceName);
+        clientAction.setMutualAuth(mutualAuth);
+        token = (byte[])Subject.doAs(clientSubject, clientAction);
         if (token == null) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "kerberosServiceTicketError"
             );
         }
         
-        secContext = action.getContext();
+        secContext = clientAction.getContext();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully retrieved a service ticket");
         }
@@ -160,10 +162,11 @@ public class SpnegoTokenContext {
         }
 
         // Validate the ticket
-        SpnegoServiceAction action = new SpnegoServiceAction(ticket, service);
-        token = (byte[])Subject.doAs(subject, action);
+        serviceAction.setTicket(ticket);
+        serviceAction.setServiceName(service);
+        token = (byte[])Subject.doAs(subject, serviceAction);
         
-        secContext = action.getContext();
+        secContext = serviceAction.getContext();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully validated a service ticket");
         }
@@ -226,6 +229,20 @@ public class SpnegoTokenContext {
                 WSSecurityException.FAILURE, "spnegoKeyError"
             );
         }
+    }
+    
+    /**
+     * Set a custom SpnegoClientAction implementation to use
+     */
+    public void setSpnegoClientAction(SpnegoClientAction spnegoClientAction) {
+        this.clientAction = spnegoClientAction;
+    }
+    
+    /**
+     * Set a custom SpnegoServiceAction implementation to use
+     */
+    public void setSpnegoServiceAction(SpnegoServiceAction spnegoServiceAction) {
+        this.serviceAction = spnegoServiceAction;
     }
     
     public void clear() {
