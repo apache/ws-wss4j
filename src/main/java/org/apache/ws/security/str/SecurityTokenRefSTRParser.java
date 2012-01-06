@@ -31,6 +31,7 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
@@ -313,7 +314,16 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
         } else if (WSConstants.SCT == action || WSConstants.BST == action) {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-        }
+        } else if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+            if (bspCompliant) {
+                BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
+            }
+            UsernameToken usernameToken = 
+                (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
+
+            usernameToken.setRawPassword(data);
+            secretKey = usernameToken.getDerivedKey();
+        } 
     }
     
     

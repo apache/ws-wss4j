@@ -553,7 +553,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             secToken.setReference(ref);
             if (KerberosSecurity.isKerberosToken(customReferenceValue)) {
                 secToken.addTokenType(customReferenceValue);
-            } else {
+            } else if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(customReferenceValue)) {
                 secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             keyInfo.addUnknownElement(secToken.getElement());
