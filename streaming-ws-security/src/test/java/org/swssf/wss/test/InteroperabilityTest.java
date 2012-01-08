@@ -72,7 +72,27 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(securityProperties,
+                xmlInputFactory.createXMLStreamReader(
+                        new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -105,7 +125,27 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(
+                securityProperties,
+                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -139,7 +179,30 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedElement,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(
+                securityProperties,
+                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -208,7 +271,24 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(
+                securityProperties,
+                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -309,7 +389,29 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedElement,
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -499,7 +601,97 @@ public class InteroperabilityTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.SignatureValue,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.EncryptedPart,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+            };
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, new TestSecurityEventListener(expectedSecurityEvents));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -531,7 +723,26 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -606,7 +817,26 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.SignatureValue,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Timestamp,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.AlgorithmSuite,
+        };
+        Document document = doInboundSecurity(
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();

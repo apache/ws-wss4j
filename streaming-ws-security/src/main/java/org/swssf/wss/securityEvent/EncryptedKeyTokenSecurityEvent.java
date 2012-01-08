@@ -18,24 +18,15 @@
  */
 package org.swssf.wss.securityEvent;
 
-import org.opensaml.common.SAMLVersion;
-import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SamlTokenSecurityEvent extends TokenSecurityEvent {
+public class EncryptedKeyTokenSecurityEvent extends TokenSecurityEvent {
 
-    public SamlTokenSecurityEvent() {
-        super(Event.SamlToken);
-    }
+    //todo implement
 
-    public SAMLVersion getSamlVersion() {
-        return ((SAMLSecurityToken) getSecurityToken()).getSamlVersion();
-    }
-
-    public String getIssuerName() {
-        return ((SAMLSecurityToken) getSecurityToken()).getIssuer();
+    public EncryptedKeyTokenSecurityEvent() {
+        super(Event.EncryptedKeyToken);
     }
 }

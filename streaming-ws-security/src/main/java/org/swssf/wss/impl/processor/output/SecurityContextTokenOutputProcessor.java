@@ -87,11 +87,11 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 }
 
                 public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                    return wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage);
+                    return wrappingSecurityToken.getSecretKey(algorithmURI, null);
                 }
 
-                public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                    return wrappingSecurityToken.getPublicKey(keyUsage);
+                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    return wrappingSecurityToken.getPublicKey(null, null);
                 }
 
                 public X509Certificate[] getX509Certificates() throws XMLSecurityException {

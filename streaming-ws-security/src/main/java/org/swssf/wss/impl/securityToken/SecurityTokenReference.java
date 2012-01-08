@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.impl.securityToken;
 
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
@@ -39,8 +41,9 @@ public class SecurityTokenReference extends AbstractSecurityToken {
     private SecurityToken securityToken;
     private Deque<XMLEvent> xmlEvents;
 
-    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLEvent> xmlEvents, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(crypto, callbackHandler, id, processor);
+    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLEvent> xmlEvents, WSSecurityContext wsSecurityContext,
+                                  Crypto crypto, CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
         this.securityToken = securityToken;
         this.xmlEvents = xmlEvents;
     }
@@ -53,12 +56,12 @@ public class SecurityTokenReference extends AbstractSecurityToken {
         return securityToken.isAsymmetric();
     }
 
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         return securityToken.getSecretKey(algorithmURI, keyUsage);
     }
 
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        return securityToken.getPublicKey(keyUsage);
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+        return securityToken.getPublicKey(algorithmURI, keyUsage);
     }
 
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {

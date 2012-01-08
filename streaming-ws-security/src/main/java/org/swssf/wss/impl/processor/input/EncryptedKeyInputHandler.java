@@ -24,7 +24,7 @@ import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.*;
-import org.swssf.wss.impl.securityToken.AbstractAlgorithmSuiteSecurityEventFiringSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
@@ -39,10 +39,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.util.*;
 
 /**
@@ -53,9 +50,9 @@ import java.util.*;
  */
 public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public EncryptedKeyInputHandler(final InputProcessorChain inputProcessorChain,
-                                    final WSSSecurityProperties securityProperties,
-                                    Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index)).getValue();
@@ -94,7 +91,15 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             inputProcessorChain.getSecurityContext(),
                             this
                     );
-                    cipher.init(Cipher.DECRYPT_MODE, wrappingSecurityToken.getSecretKey(algorithmURI, wrappingSecurityToken.isAsymmetric() ? WSSConstants.Asym_Key_Wrap : WSSConstants.Sym_Key_Wrap));
+                    WSSConstants.KeyUsage keyUsage;
+                    if (wrappingSecurityToken.isAsymmetric()) {
+                        keyUsage = WSSConstants.Asym_Key_Wrap;
+                    } else {
+                        keyUsage = WSSConstants.Sym_Key_Wrap;
+                    }
+                    cipher.init(Cipher.DECRYPT_MODE,
+                            wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage)
+                    );
 
                     secretToken = cipher.doFinal(encryptedKeyType.getCipherData().getCipherValue());
 
@@ -120,7 +125,9 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
                 final String algorithm = algorithmURI;
 
-                securityToken = new AbstractAlgorithmSuiteSecurityEventFiringSecurityToken(inputProcessorChain.getSecurityContext(), encryptedKeyType.getId()) {
+                securityToken = new AbstractSecurityToken(
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null, null,
+                        encryptedKeyType.getId(), null, null) {
 
                     private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
@@ -128,8 +135,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         return false;
                     }
 
-                    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                        super.getSecretKey(algorithmURI, keyUsage);
+                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                         if (keyTable.containsKey(algorithmURI)) {
                             return keyTable.get(algorithmURI);
                         } else {
@@ -138,6 +144,11 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             keyTable.put(algorithmURI, key);
                             return key;
                         }
+                    }
+
+                    @Override
+                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                        return null;
                     }
 
                     public SecurityToken getKeyWrappingToken() {
@@ -162,11 +173,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         };
 
         final SecurityToken securityToken = securityTokenProvider.getSecurityToken(securityProperties.getDecryptionCrypto());
-
-        //fire a RecipientSecurityTokenEvent
+        //fire a securityTokenEvent
         TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
-        //todo: is this always the main encryption?
-        tokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(tokenSecurityEvent);
 
         //register the key token for decryption:
@@ -182,7 +190,9 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
             ObjectFactory objectFactory = new ObjectFactory();
             securityTokenReferenceType.getAny().add(objectFactory.createReference(referenceType));
             keyInfoType.getContent().add(objectFactory.createSecurityTokenReference(securityTokenReferenceType));
-            inputProcessorChain.addProcessor(new org.swssf.wss.impl.processor.input.DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(), securityProperties));
+            inputProcessorChain.addProcessor(
+                    new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(), (WSSSecurityProperties) securityProperties)
+            );
         }
     }
 

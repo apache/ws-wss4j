@@ -26,7 +26,7 @@ public class KeyValueTokenSecurityEvent extends TokenSecurityEvent {
 
     //todo implement
 
-    public KeyValueTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public KeyValueTokenSecurityEvent() {
+        super(Event.KeyValueToken);
     }
 }

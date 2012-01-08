@@ -19,7 +19,6 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss10.BinarySecurityTokenType;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
@@ -39,11 +38,12 @@ import java.util.UUID;
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public BinarySecurityTokenInputHandler(final InputProcessorChain inputProcessorChain,
-                                           final WSSSecurityProperties securityProperties,
-                                           Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final BinarySecurityTokenType binarySecurityTokenType = ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index)).getValue();
+        final BinarySecurityTokenType binarySecurityTokenType =
+                ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index)).getValue();
 
         if (binarySecurityTokenType.getId() == null) {
             binarySecurityTokenType.setId(UUID.randomUUID().toString());
@@ -58,7 +58,12 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 if (securityToken != null) {
                     return securityToken;
                 }
-                securityToken = SecurityTokenFactoryImpl.getSecurityToken(binarySecurityTokenType, inputProcessorChain.getSecurityContext(), crypto, securityProperties.getCallbackHandler(), null);
+                securityToken = SecurityTokenFactoryImpl.getSecurityToken(
+                        binarySecurityTokenType,
+                        inputProcessorChain.getSecurityContext(),
+                        crypto,
+                        securityProperties.getCallbackHandler(),
+                        null);
                 securityTokens.put(crypto, securityToken);
                 return securityToken;
             }
@@ -69,6 +74,5 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         };
 
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
-
     }
 }

@@ -106,6 +106,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         return processEvent(inputProcessorChain, false);
     }
 
+    //todo split this methods in smaller ones...
     private XMLEvent processEvent(InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
         if (!tmpXmlEventList.isEmpty()) {
@@ -215,12 +216,6 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                         throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
                     }
 
-                    //only fire here ContentEncryptedElementEvents
-                    //the other ones will be fired later, because we don't know the encrypted element name yet
-                    if (SecurePart.Modifier.Content.getModifier().equals(encryptedDataType.getType())) {
-                        encryptedContentEvent(inputProcessorChain, xmlEvent);
-                    }
-
                     KeyInfoType keyInfoType;
                     if (this.keyInfoType != null) {
                         keyInfoType = this.keyInfoType;
@@ -228,14 +223,50 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                         keyInfoType = encryptedDataType.getKeyInfo();
                     }
 
+                    final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
+
+                    //retrieve the securityToken which must be used for decryption
+                    SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
+                            keyInfoType, getSecurityProperties().getDecryptionCrypto(),
+                            getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext(), this);
+
+                    handleSecurityToken(securityToken, inputProcessorChain.getSecurityContext(), encryptedDataType);
+                    //only fire here ContentEncryptedElementEvents
+                    //the other ones will be fired later, because we don't know the encrypted element name yet
+                    if (SecurePart.Modifier.Content.getModifier().equals(encryptedDataType.getType())) {
+                        handleEncryptedContent(inputProcessorChain, xmlEvent, securityToken);
+                    }
+
+                    Cipher symCipher = null;
+                    try {
+                        AlgorithmType symEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
+                        symCipher = Cipher.getInstance(symEncAlgo.getJCEName(), symEncAlgo.getJCEProvider());
+                        //we have to defer the initialization of the cipher until we can extract the IV...
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new XMLSecurityException(
+                                XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                e, "No such algorithm: " + algorithmURI
+                        );
+                    } catch (NoSuchPaddingException e) {
+                        throw new XMLSecurityException(
+                                XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                e, "No such padding: " + algorithmURI
+                        );
+                    } catch (NoSuchProviderException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
+                    }
+
                     //create a new Thread for streaming decryption
-                    DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent,
-                            encryptedDataType, keyInfoType, xmlEventNS);
+                    DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent, xmlEventNS);
+                    decryptionThread.setSecretKey(securityToken.getSecretKey(algorithmURI, XMLSecurityConstants.Enc));
+                    decryptionThread.setSymmetricCipher(symCipher);
 
                     Thread receiverThread = new Thread(decryptionThread);
                     receiverThread.setName("decrypting thread");
 
-                    AbstractDecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = newDecryptedEventReaderInputProccessor(encryptedHeader, comparableNamespaceList, comparableAttributeList, encryptedDataType);
+                    AbstractDecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = newDecryptedEventReaderInputProccessor(
+                            encryptedHeader, comparableNamespaceList, comparableAttributeList, encryptedDataType, securityToken
+                    );
 
                     //add the new created EventReader processor to the chain.
                     inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
@@ -290,9 +321,13 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
     protected abstract AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
             boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
-            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType);
+            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType, SecurityToken securityToken);
 
-    protected abstract void encryptedContentEvent(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent) throws XMLSecurityException;
+    protected abstract void handleSecurityToken(
+            SecurityToken securityToken, SecurityContext securityContext, EncryptedDataType encryptedDataType) throws XMLSecurityException;
+
+    protected abstract void handleEncryptedContent(
+            InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException;
 
     protected ReferenceType matchesReferenceId(StartElement startElement) {
 
@@ -338,6 +373,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         private SecurePart.Modifier encryptionModifier;
         private boolean encryptedHeader = false;
         private int documentLevel = 0;
+        private SecurityToken securityToken;
 
         private boolean rootElementProcessed;
 
@@ -345,13 +381,15 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                 XMLSecurityProperties securityProperties, SecurePart.Modifier encryptionModifier,
                 boolean encryptedHeader, List<ComparableNamespace>[] namespaceList,
                 List<ComparableAttribute>[] attributeList,
-                AbstractDecryptInputProcessor decryptInputProcessor
+                AbstractDecryptInputProcessor decryptInputProcessor,
+                SecurityToken securityToken
         ) {
             super(securityProperties);
             getAfterProcessors().add(decryptInputProcessor);
             this.encryptionModifier = encryptionModifier;
             rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
             this.encryptedHeader = encryptedHeader;
+            this.securityToken = securityToken;
             for (int i = 0; i < namespaceList.length; i++) {
                 List<ComparableNamespace> namespaces = namespaceList[i];
                 nsStack.push(namespaces);
@@ -389,7 +427,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                 inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
 
                 if (!rootElementProcessed) {
-                    encryptedElementEvent(inputProcessorChain, xmlEvent);
+                    handleEncryptedElement(inputProcessorChain, xmlEvent, this.securityToken);
                     rootElementProcessed = true;
                 }
 
@@ -447,7 +485,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             return xmlEvent;
         }
 
-        protected abstract void encryptedElementEvent(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent) throws XMLSecurityException;
+        protected abstract void handleEncryptedElement(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException;
 
         private Throwable thrownException;
 
@@ -481,44 +519,11 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         private Key secretKey;
 
         protected DecryptionThread(InputProcessorChain inputProcessorChain, boolean header,
-                                   EncryptedDataType encryptedDataType, KeyInfoType keyInfoType, XMLEventNS startXMLElement) throws XMLStreamException, XMLSecurityException {
+                                   XMLEventNS startXMLElement) throws XMLStreamException, XMLSecurityException {
 
             this.inputProcessorChain = inputProcessorChain;
             this.header = header;
             this.startXMLElement = startXMLElement;
-
-            final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
-
-            //retrieve the securityToken which must be used for decryption
-            SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
-                    keyInfoType, getSecurityProperties().getDecryptionCrypto(),
-                    getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext(), this);
-
-            setSecretKey(securityToken.getSecretKey(algorithmURI, XMLSecurityConstants.Enc));
-
-            try {
-                AlgorithmType syncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
-                setSymmetricCipher(Cipher.getInstance(syncEncAlgo.getJCEName(), syncEncAlgo.getJCEProvider()));
-                //we have to defer the initialization of the cipher until we can extract the IV...
-            } catch (NoSuchAlgorithmException e) {
-                throw new XMLSecurityException(
-                        XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        e, "No such algorithm: " + algorithmURI
-                );
-            } catch (NoSuchPaddingException e) {
-                throw new XMLSecurityException(
-                        XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        e, "No such padding: " + algorithmURI
-                );
-            } catch (NoSuchProviderException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
-            }
-
-            //fire an AlgorithmSuiteSecurityEvent
-            /*AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
-            algorithmSuiteSecurityEvent.setAlgorithmURI(algorithmURI);
-            algorithmSuiteSecurityEvent.setKeyUsage(XMLSecurityConstants.KeyUsage.Enc);
-            inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);*/
 
             //prepare the piped streams and connect them:
             //5 * 8192 seems to be a fine value

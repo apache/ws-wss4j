@@ -19,29 +19,81 @@
 package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
-import org.swssf.wss.securityEvent.RelTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.impl.securityToken.X509SecurityToken;
+import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
+
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class RelTokenTest extends AbstractPolicyTestBase {
 
     @Test
     public void testPolicy() throws Exception {
         String policyString =
-                "<sp:RelToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:WssRelV20Token11/>\n" +
+                        "<sp:InitiatorToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:RelToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:WssRelV20Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:RelToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:InitiatorToken>\n" +
+                        "<sp:RecipientToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:RelToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:WssRelV20Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:RelToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:RecipientToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:RelToken>";
+                        "</sp:AsymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        RelTokenSecurityEvent relTokenSecurityEvent = new RelTokenSecurityEvent(SecurityEvent.Event.RelToken);
-        policyEnforcer.registerSecurityEvent(relTokenSecurityEvent);
+        RelTokenSecurityEvent initiatorTokenSecurityEvent = new RelTokenSecurityEvent();
+        initiatorTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
+
+        RelTokenSecurityEvent recipientTokenSecurityEvent = new RelTokenSecurityEvent();
+        recipientTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 

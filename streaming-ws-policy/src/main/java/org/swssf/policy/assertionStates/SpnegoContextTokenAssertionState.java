@@ -26,8 +26,8 @@ import org.swssf.wss.securityEvent.SpnegoContextTokenSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1197077 $ $Date: 2011-11-03 13:17:40 +0100 (Don, 03. Nov 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 
 public class SpnegoContextTokenAssertionState extends TokenAssertionState {
@@ -44,11 +44,12 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public void assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof SpnegoContextTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a SpnegoContextTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
         setAsserted(true);
         //todo
+        return isAsserted();
     }
 }

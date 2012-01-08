@@ -51,11 +51,13 @@ import java.util.List;
 public abstract class AbstractSignatureReferenceVerifyInputProcessor extends AbstractInputProcessor {
 
     private SignatureType signatureType;
+    private SecurityToken securityToken;
     private List<ReferenceType> processedReferences = new ArrayList<ReferenceType>();
 
-    public AbstractSignatureReferenceVerifyInputProcessor(SignatureType signatureType, XMLSecurityProperties securityProperties) {
+    public AbstractSignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityToken securityToken, XMLSecurityProperties securityProperties) {
         super(securityProperties);
         this.signatureType = signatureType;
+        this.securityToken = securityToken;
     }
 
     public SignatureType getSignatureType() {
@@ -64,6 +66,10 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
     public List<ReferenceType> getProcessedReferences() {
         return processedReferences;
+    }
+
+    public SecurityToken getSecurityToken() {
+        return securityToken;
     }
 
     @Override

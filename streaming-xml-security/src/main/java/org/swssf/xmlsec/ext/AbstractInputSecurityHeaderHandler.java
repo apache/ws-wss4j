@@ -33,7 +33,7 @@ import java.util.Deque;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public abstract class AbstractInputSecurityHeaderHandler {
+public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityHeaderHandler {
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 

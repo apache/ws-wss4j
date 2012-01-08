@@ -338,9 +338,6 @@ public class WSSUtils extends XMLSecurityUtils {
     }
 
     public static TokenSecurityEvent createTokenSecurityEvent(SecurityToken securityToken) throws WSSecurityException {
-        while (securityToken.getKeyWrappingToken() != null) {
-            securityToken = securityToken.getKeyWrappingToken();
-        }
         WSSConstants.TokenType tokenType = (WSSConstants.TokenType) securityToken.getTokenType();
 
         TokenSecurityEvent tokenSecurityEvent;
@@ -348,30 +345,33 @@ public class WSSUtils extends XMLSecurityUtils {
                 || tokenType == WSSConstants.X509V3Token
                 || tokenType == WSSConstants.X509Pkcs7Token
                 || tokenType == WSSConstants.X509PkiPathV1Token) {
-            //todo parameter to *TokenSecurityEvent can most probably be eliminated
-            tokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
+            tokenSecurityEvent = new X509TokenSecurityEvent();
         } else if (tokenType == WSSConstants.UsernameToken) {
-            tokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
+            tokenSecurityEvent = new UsernameTokenSecurityEvent();
         } else if (tokenType == WSSConstants.IssuedToken) {
-            tokenSecurityEvent = new IssuedTokenSecurityEvent(SecurityEvent.Event.IssuedToken);
+            tokenSecurityEvent = new IssuedTokenSecurityEvent();
         } else if (tokenType == WSSConstants.KerberosToken) {
-            tokenSecurityEvent = new KerberosTokenSecurityEvent(SecurityEvent.Event.KerberosToken);
+            tokenSecurityEvent = new KerberosTokenSecurityEvent();
         } else if (tokenType == WSSConstants.SpnegoContextToken) {
-            tokenSecurityEvent = new SpnegoContextTokenSecurityEvent(SecurityEvent.Event.SpnegoContextToken);
+            tokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
         } else if (tokenType == WSSConstants.SecurityContextToken) {
-            tokenSecurityEvent = new SecurityContextTokenSecurityEvent(SecurityEvent.Event.SecurityContextToken);
+            tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         } else if (tokenType == WSSConstants.SecureConversationToken) {
-            tokenSecurityEvent = new SecureConversationTokenSecurityEvent(SecurityEvent.Event.SecureConversationToken);
+            tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
         } else if (tokenType == WSSConstants.Saml10Token
                 || tokenType == WSSConstants.Saml11Token
                 || tokenType == WSSConstants.Saml20Token) {
-            tokenSecurityEvent = new SamlTokenSecurityEvent(SecurityEvent.Event.SamlToken);
+            tokenSecurityEvent = new SamlTokenSecurityEvent();
         } else if (tokenType == WSSConstants.RelToken) {
-            tokenSecurityEvent = new RelTokenSecurityEvent(SecurityEvent.Event.RelToken);
+            tokenSecurityEvent = new RelTokenSecurityEvent();
         } else if (tokenType == WSSConstants.HttpsToken) {
-            tokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
+            tokenSecurityEvent = new HttpsTokenSecurityEvent();
         } else if (tokenType == WSSConstants.KeyValueToken) {
-            tokenSecurityEvent = new KeyValueTokenSecurityEvent(SecurityEvent.Event.KeyValueToken);
+            tokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
+        } else if (tokenType == WSSConstants.DerivedKeyToken) {
+            tokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
+        } else if (tokenType == WSSConstants.EncryptedKeyToken) {
+            tokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
         }

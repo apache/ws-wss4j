@@ -47,7 +47,8 @@ public abstract class SecurityEvent {
         KeyValueToken,
         X509Token,
         HttpsToken,
-        SupportingToken,
+        DerivedKeyToken,
+        EncryptedKeyToken,
     }
 
     private Event securityEventType;

@@ -21,7 +21,7 @@ package org.swssf.policy.test;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -29,8 +29,8 @@ import org.testng.annotations.Test;
 import javax.xml.namespace.QName;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SignedPartsTest extends AbstractPolicyTestBase {
 
@@ -46,7 +46,12 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
                         "</sp:Attachments>\n" +
                         "</sp:SignedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
         signedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         signedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -69,10 +74,15 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
                         "</sp:Attachments>\n" +
                         "</sp:SignedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
         signedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-        signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
         signedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
@@ -88,7 +98,12 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
                 "<sp:SignedParts xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "</sp:SignedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
         signedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         signedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -104,14 +119,19 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
                 "<sp:SignedParts xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "</sp:SignedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
         signedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
         }
-        signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
         signedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
@@ -133,7 +153,12 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
                         "</sp:Attachments>\n" +
                         "</sp:SignedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
         signedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         signedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -156,10 +181,15 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
                         "</sp:Attachments>\n" +
                         "</sp:SignedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
         signedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-        signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
         signedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);

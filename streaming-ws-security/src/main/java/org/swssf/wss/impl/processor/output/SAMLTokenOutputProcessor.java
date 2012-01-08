@@ -153,7 +153,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return secretKey;
                     }
 
-                    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                    public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                         return x509Certificates[0].getPublicKey();
                     }
 
@@ -201,7 +201,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             } else {
                 securityTokenProvider = new SecurityTokenProvider() {
                     public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                        return new SAMLSecurityToken(samlCallback.getSamlVersion(), samlKeyInfo, outputProcessorChain.getSecurityContext(), crypto, getSecurityProperties().getCallbackHandler(), tokenId, finalSAMLTokenOutputProcessor);
+                        return new SAMLSecurityToken(
+                                samlCallback.getSamlVersion(), samlKeyInfo, (WSSecurityContext) outputProcessorChain.getSecurityContext(),
+                                crypto, getSecurityProperties().getCallbackHandler(), tokenId, finalSAMLTokenOutputProcessor);
                     }
 
                     public String getId() {

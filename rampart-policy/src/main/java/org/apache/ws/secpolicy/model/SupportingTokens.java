@@ -87,7 +87,9 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
                 if (assertion instanceof AbstractToken) {
-                    supportingTokens.addToken((AbstractToken) assertion);
+                    AbstractToken abstractToken = (AbstractToken) assertion;
+                    supportingTokens.addToken(abstractToken);
+                    abstractToken.setParentAssertion(supportingTokens);
                     continue;
                 }
                 if (getVersion().getSPConstants().getAlgorithmSuite().getLocalPart().equals(assertionName)

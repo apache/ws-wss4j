@@ -22,50 +22,77 @@ import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
+
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class HttpsTokenTest extends AbstractPolicyTestBase {
 
     @Test
     public void testPolicy() throws Exception {
         String policyString =
-                "<sp:HttpsToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:TransportBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:RequireClientCertificate/>\n" +
+                        "<sp:TransportToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:HttpsToken>\n" +
+                        "       <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "       <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "           <sp:RequireClientCertificate/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "       </sp:HttpsToken>" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:TransportToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:HttpsToken>";
+                        "</sp:TransportBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
         httpsTokenSecurityEvent.setIssuerName("xs:anyURI");
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
     @Test
     public void testPolicyNegative() throws Exception {
         String policyString =
-                "<sp:HttpsToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:TransportBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:RequireClientCertificate/>\n" +
+                        "<sp:TransportToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:HttpsToken>\n" +
+                        "       <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "       <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "           <sp:RequireClientCertificate/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "       </sp:HttpsToken>" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:TransportToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:HttpsToken>";
+                        "</sp:TransportBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         httpsTokenSecurityEvent.setIssuerName("xs:anyURI");
+        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
         try {
-            policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);

@@ -24,7 +24,7 @@ package org.swssf.wss.securityEvent;
  */
 public class X509TokenSecurityEvent extends TokenSecurityEvent {
 
-    public X509TokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public X509TokenSecurityEvent() {
+        super(Event.X509Token);
     }
 }

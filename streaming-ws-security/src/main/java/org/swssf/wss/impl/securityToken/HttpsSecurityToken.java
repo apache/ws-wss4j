@@ -19,6 +19,7 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
@@ -44,14 +45,14 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
         httpDigestAuthentication,
     }
 
-    public HttpsSecurityToken(X509Certificate x509Certificate) throws WSSecurityException {
-        super(null, null, UUID.randomUUID().toString(), null);
+    public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext) throws WSSecurityException {
+        super(wsSecurityContext, null, null, UUID.randomUUID().toString(), null, null);
         this.x509Certificate = x509Certificate;
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
-    public HttpsSecurityToken(boolean basicAuthentication, String username) throws WSSecurityException {
-        super(null, null, UUID.randomUUID().toString(), null);
+    public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext) throws WSSecurityException {
+        super(wsSecurityContext, null, null, UUID.randomUUID().toString(), null, null);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;
         } else {
@@ -68,11 +69,11 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
         return true;
     }
 
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
         return null;
     }
 
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
         if (x509Certificate != null) {
             return x509Certificate.getPublicKey();
         }
@@ -89,5 +90,17 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
 
     public WSSConstants.TokenType getTokenType() {
         return WSSConstants.HttpsToken;
+    }
+
+    public X509Certificate getX509Certificate() {
+        return x509Certificate;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public AuthenticationType getAuthenticationType() {
+        return authenticationType;
     }
 }

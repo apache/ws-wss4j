@@ -26,8 +26,8 @@ public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
 
     private String issuerName;
 
-    public KerberosTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public KerberosTokenSecurityEvent() {
+        super(Event.KerberosToken);
     }
 
     public String getIssuerName() {

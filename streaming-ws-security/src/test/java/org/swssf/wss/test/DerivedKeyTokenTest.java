@@ -150,7 +150,18 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.DerivedKeyToken,
+                    SecurityEvent.Event.EncryptedPart,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+            };
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())), null, new TestSecurityEventListener(expectedSecurityEvents));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -159,6 +170,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
+    @Test
     public void testEncryptionDecryptionAES128Outbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

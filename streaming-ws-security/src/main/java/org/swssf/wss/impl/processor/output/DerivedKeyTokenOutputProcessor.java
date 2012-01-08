@@ -153,7 +153,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                 }
 
-                public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                     return null;
                 }
 

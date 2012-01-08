@@ -24,9 +24,7 @@ import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.saml.SAMLAssertionWrapper;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
-import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
-import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 import org.w3c.dom.Attr;
@@ -56,19 +54,21 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         documentBuilderFactory.setNamespaceAware(true);
     }
 
-    public SAMLTokenInputHandler(final InputProcessorChain inputProcessorChain, final WSSSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final Document samlTokenDocument = (Document) parseStructure(eventQueue, index);
 
         final SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlTokenDocument.getDocumentElement());
 
         if (samlAssertionWrapper.isSigned()) {
-            SAMLKeyInfo samlIssuerKeyInfo = samlAssertionWrapper.verifySignature(securityProperties);
+            SAMLKeyInfo samlIssuerKeyInfo = samlAssertionWrapper.verifySignature((WSSSecurityProperties) securityProperties);
             // Verify trust on the signature
-            samlAssertionWrapper.verifySignedAssertion(samlIssuerKeyInfo, securityProperties);
+            samlAssertionWrapper.verifySignedAssertion(samlIssuerKeyInfo, (WSSSecurityProperties) securityProperties);
         }
         // Parse the HOK subject if it exists
-        final SAMLKeyInfo samlSubjectKeyInfo = samlAssertionWrapper.parseHOKSubject(securityProperties);
+        final SAMLKeyInfo samlSubjectKeyInfo = samlAssertionWrapper.parseHOKSubject((WSSSecurityProperties) securityProperties);
 
         if (logger.isDebugEnabled()) {
             logger.debug("SAML Assertion issuer " + samlAssertionWrapper.getIssuerString());
@@ -84,10 +84,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     return securityToken;
                 }
 
-                securityToken = SecurityTokenFactoryImpl.getSecurityToken(
-                        samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo,
-                        inputProcessorChain.getSecurityContext(), crypto,
+                securityToken = new SAMLSecurityToken(samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo,
+                        samlAssertionWrapper.getIssuerString(),
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), crypto,
                         securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
+
                 securityTokens.put(crypto, securityToken);
                 return securityToken;
             }
@@ -98,11 +99,13 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(samlAssertionWrapper.getId(), securityTokenProvider);
 
-        SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent(SecurityEvent.Event.SamlToken);
+/*
+        SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent();
         samlTokenSecurityEvent.setIssuerName(samlAssertionWrapper.getIssuerString());
         samlTokenSecurityEvent.setSamlVersion(samlAssertionWrapper.getSAMLVersion());
         samlTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken(null));
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(samlTokenSecurityEvent);
+*/
     }
 
     @Override
@@ -157,7 +160,10 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 }
                 break;
             case XMLEvent.PROCESSING_INSTRUCTION:
-                Node piNode = document.createProcessingInstruction(((ProcessingInstruction) xmlEvent).getTarget(), ((ProcessingInstruction) xmlEvent).getTarget());
+                Node piNode = document.createProcessingInstruction(
+                        ((ProcessingInstruction) xmlEvent).getTarget(),
+                        ((ProcessingInstruction) xmlEvent).getTarget()
+                );
                 currentNode.appendChild(piNode);
                 break;
             case XMLEvent.CHARACTERS:
@@ -173,7 +179,9 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             case XMLEvent.END_DOCUMENT:
                 return currentNode;
             case XMLEvent.ATTRIBUTE:
-                Attr attributeNode = document.createAttributeNS(((Attribute) xmlEvent).getName().getNamespaceURI(), ((Attribute) xmlEvent).getName().getLocalPart());
+                Attr attributeNode = document.createAttributeNS(
+                        ((Attribute) xmlEvent).getName().getNamespaceURI(), ((Attribute) xmlEvent).getName().getLocalPart()
+                );
                 attributeNode.setPrefix(((Attribute) xmlEvent).getName().getPrefix());
                 attributeNode.setValue(((Attribute) xmlEvent).getValue());
                 ((Element) currentNode).setAttributeNodeNS(attributeNode);

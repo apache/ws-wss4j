@@ -22,15 +22,15 @@ import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
-import org.apache.ws.secpolicy.model.AsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.policy.PolicyConstants;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState implements Assertable {
 
@@ -48,12 +48,12 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
-        AbstractSymmetricAsymmetricBinding asymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
-        if (!asymmetricBinding.isOnlySignEntireHeadersAndBody()) {
+        AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
+        if (!abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
             setAsserted(true);
             return true;
         }
-        if (asymmetricBinding.isOnlySignEntireHeadersAndBody()
+        if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()
                 && (signedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap11_Body)
                 || signedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap12_Body))) {
             if (signedPartSecurityEvent.isSigned()) {
@@ -66,8 +66,13 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
             }
         }
         //body processed above. so this must be a header element
-        if (asymmetricBinding.isOnlySignEntireHeadersAndBody()) {
-            if (signedPartSecurityEvent.isSigned()) {
+        if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
+            if (signedPartSecurityEvent.isSigned()
+                    //todo revisit: the equality check for wsse_Security probably opens the door
+                    //for a rewriting attack! If the Security Header is not signed then all child
+                    //elements must be signed!
+                    // @see http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.3/os/ws-securitypolicy-1.3-spec-os.html#_Toc212617840
+                    || signedPartSecurityEvent.getElement().equals(WSSConstants.TAG_wsse_Security)) {
                 setAsserted(true);
                 return true;
             } else {

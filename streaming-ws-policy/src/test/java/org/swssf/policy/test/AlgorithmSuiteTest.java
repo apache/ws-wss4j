@@ -23,9 +23,11 @@ import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author $Author$
@@ -42,8 +44,14 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:AlgorithmSuite>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+        algorithmSuiteSecurityEvent.setKeyLength(192);
         algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         policyEnforcer.doFinal();
@@ -58,8 +66,14 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:AlgorithmSuite>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+        algorithmSuiteSecurityEvent.setKeyLength(192);
         algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#sha256");
@@ -81,8 +95,14 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:AlgorithmSuite>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
+        algorithmSuiteSecurityEvent.setKeyLength(128);
         algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
@@ -104,8 +124,14 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:AlgorithmSuite>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+        algorithmSuiteSecurityEvent.setKeyLength(192);
         algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         policyEnforcer.doFinal();
@@ -123,8 +149,14 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:AlgorithmSuite>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent(SecurityEvent.Event.AlgorithmSuite);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
+        algorithmSuiteSecurityEvent.setKeyLength(128);
         algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);

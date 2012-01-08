@@ -19,10 +19,10 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss11.SignatureConfirmationType;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityProperties;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
@@ -36,10 +36,13 @@ import java.util.Deque;
  */
 public class SignatureConfirmationInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public SignatureConfirmationInputHandler(InputProcessorChain inputProcessorChain, final WSSSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
-        final SignatureConfirmationType signatureConfirmationType = ((JAXBElement<SignatureConfirmationType>) parseStructure(eventQueue, index)).getValue();
+        final SignatureConfirmationType signatureConfirmationType =
+                ((JAXBElement<SignatureConfirmationType>) parseStructure(eventQueue, index)).getValue();
         inputProcessorChain.getSecurityContext().putAsList(SignatureConfirmationType.class, signatureConfirmationType);
     }
 }

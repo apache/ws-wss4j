@@ -23,6 +23,7 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityProperties;
 
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
@@ -35,13 +36,13 @@ import java.util.Deque;
  */
 public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public ReferenceListInputHandler(InputProcessorChain inputProcessorChain,
-                                     final WSSSecurityProperties securityProperties,
-                                     Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index);
 
         //instantiate a new DecryptInputProcessor and add it to the chain
-        inputProcessorChain.addProcessor(new org.swssf.wss.impl.processor.input.DecryptInputProcessor(referenceList, securityProperties));
+        inputProcessorChain.addProcessor(new DecryptInputProcessor(referenceList, (WSSSecurityProperties) securityProperties));
     }
 }

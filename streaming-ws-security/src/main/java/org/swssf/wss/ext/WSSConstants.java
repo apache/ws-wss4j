@@ -212,6 +212,7 @@ public class WSSConstants extends XMLSecurityConstants {
         }
     }
 
+    //todo rename KeyUsage because C14N, etc are not keys...
     public static final KeyUsage Sym_Sig = new KeyUsage(XMLSecurityConstants.Sym_Sig.toString());
     public static final KeyUsage Asym_Sig = new KeyUsage(XMLSecurityConstants.Asym_Sig.toString());
     public static final KeyUsage Enc = new KeyUsage(XMLSecurityConstants.Enc.toString());
@@ -249,6 +250,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final TokenType SpnegoContextToken = new TokenType("SpnegoContextToken");
     public static final TokenType RelToken = new TokenType("RelToken");
     public static final TokenType KeyValueToken = new TokenType("KeyValueToken");
+    public static final TokenType DerivedKeyToken = new TokenType("DerivedKeyToken");
 
     public static class TokenType extends XMLSecurityConstants.TokenType {
         protected TokenType(String name) {

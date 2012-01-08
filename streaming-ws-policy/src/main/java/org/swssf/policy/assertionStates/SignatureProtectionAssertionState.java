@@ -22,7 +22,6 @@ import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
-import org.apache.ws.secpolicy.model.AsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
@@ -33,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SignatureProtectionAssertionState extends AssertionState implements Assertable {
 
@@ -57,23 +56,23 @@ public class SignatureProtectionAssertionState extends AssertionState implements
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
-        AbstractSymmetricAsymmetricBinding asymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
+        AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
         //todo better matching until we have a streaming xpath evaluation engine (work in progress)
 
         for (int i = 0; i < elements.size(); i++) {
             QName qName = elements.get(i);
             if (qName.equals(encryptedElementSecurityEvent.getElement())) {
                 if (encryptedElementSecurityEvent.isEncrypted()) {
-                    if (asymmetricBinding.isEncryptSignature()) {
+                    if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                         setAsserted(true);
                         return true;
                     } else {
                         setAsserted(false);
-                        setErrorMessage("Element " + encryptedElementSecurityEvent.getElement() + " must be encrypted");
+                        setErrorMessage("Element " + encryptedElementSecurityEvent.getElement() + " must not be encrypted");
                         return false;
                     }
                 } else {
-                    if (asymmetricBinding.isEncryptSignature()) {
+                    if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                         setAsserted(false);
                         setErrorMessage("Element " + encryptedElementSecurityEvent.getElement() + " must be encrypted");
                         return false;

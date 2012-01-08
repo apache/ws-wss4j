@@ -16,26 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.swssf.wss.securityEvent;
+package org.swssf.xmlsec.ext;
 
-import org.opensaml.common.SAMLVersion;
-import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
+import javax.xml.stream.events.XMLEvent;
+import java.util.Deque;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SamlTokenSecurityEvent extends TokenSecurityEvent {
+public interface XMLSecurityHeaderHandler {
 
-    public SamlTokenSecurityEvent() {
-        super(Event.SamlToken);
-    }
+    void handle(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
+                Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException;
 
-    public SAMLVersion getSamlVersion() {
-        return ((SAMLSecurityToken) getSecurityToken()).getSamlVersion();
-    }
-
-    public String getIssuerName() {
-        return ((SAMLSecurityToken) getSecurityToken()).getIssuer();
-    }
 }

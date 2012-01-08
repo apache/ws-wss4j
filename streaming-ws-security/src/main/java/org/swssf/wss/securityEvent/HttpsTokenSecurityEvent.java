@@ -31,10 +31,12 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
     }
 
     private AuthenticationType authenticationType;
+    //todo issuer only when a client cert is provided
+    //todo remove issuerName here and reference it directly from the security token?
     private String issuerName;
 
-    public HttpsTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public HttpsTokenSecurityEvent() {
+        super(Event.HttpsToken);
     }
 
     public AuthenticationType getAuthenticationType() {

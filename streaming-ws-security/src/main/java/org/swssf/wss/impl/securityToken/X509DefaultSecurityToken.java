@@ -19,8 +19,8 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -32,8 +32,9 @@ import javax.security.auth.callback.CallbackHandler;
 public class X509DefaultSecurityToken extends X509SecurityToken {
     private String alias = null;
 
-    X509DefaultSecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String alias, String id, Object processor) {
-        super(WSSConstants.X509V3Token, securityContext, crypto, callbackHandler, id, processor);
+    X509DefaultSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                             String alias, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
         this.alias = alias;
     }
 

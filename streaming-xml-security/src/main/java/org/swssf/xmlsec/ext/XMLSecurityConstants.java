@@ -244,4 +244,10 @@ public class XMLSecurityConstants {
             return this.toString().compareTo(o.toString());
         }
     }
+
+    public enum ContentType {
+        PLAIN,
+        SIGNATURE,
+        ENCRYPTION
+    }
 }

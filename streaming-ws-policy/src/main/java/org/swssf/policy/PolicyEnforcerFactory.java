@@ -25,13 +25,9 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.xmlsec.impl.util.ConcreteLSInput;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSResourceResolver;
-import org.xml.sax.SAXException;
 
 import javax.wsdl.*;
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -40,14 +36,7 @@ import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import java.net.URL;
 import java.util.*;
 
@@ -61,100 +50,10 @@ import java.util.*;
 public class PolicyEnforcerFactory {
 
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcerFactory.class);
-    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
 
-    private static Schema schemas;
     private Definition wsdlDefinition;
     private List<OperationPolicy> operationPolicies;
     private Map<Element, Policy> elementPolicyCache;
-
-    static {
-        List<Source> sourceList = new ArrayList<Source>();
-
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-200802.xsd")));
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.2-errata-cd-01.xsd")));
-        sourceList.add(new StreamSource(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-200507.xsd")));
-
-        try {
-            schemaFactory.setResourceResolver(new LSResourceResolver() {
-                public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-                    if ("http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/ws-securitypolicy-1.2-errata-cd-01.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-securitypolicy-1.2-errata-cd-01.xsd"));
-                        return concreteLSInput;
-                    }
-                    if ("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/oasis-wss-wssecurity-secext-1.1.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/xmldsig-core-schema.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://www.w3.org/2005/08/addressing".equals(systemId) || "http://www.w3.org/2006/03/addressing/ws-addr.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-addr200508.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://schemas.xmlsoap.org/ws/2004/08/addressing".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-addr200408.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://schemas.xmlsoap.org/ws/2004/09/policy/ws-policy.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/ws-policy-200409.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://www.w3.org/2001/xml.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/xml.xsd"));
-                        return concreteLSInput;
-                    } else if ("XMLSchema.dtd".equals(systemId) || "http://www.w3.org/2001/XMLSchema.dtd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/XMLSchema.dtd"));
-                        return concreteLSInput;
-                    } else if ("datatypes.dtd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setSystemId(systemId);
-                        concreteLSInput.setBaseURI(baseURI);
-                        concreteLSInput.setByteStream(PolicyEnforcerFactory.class.getClassLoader().getResourceAsStream("schemas/datatypes.dtd"));
-                        return concreteLSInput;
-                    }
-                    throw new IllegalArgumentException("Offline resource not available: " + systemId);
-                }
-            });
-            schemas = schemaFactory.newSchema(sourceList.toArray(new Source[sourceList.size()]));
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private static void addAssertionBuilder(AssertionBuilder assertionBuilder) {
         QName[] knownElements = assertionBuilder.getKnownElements();
@@ -251,7 +150,7 @@ public class PolicyEnforcerFactory {
                     }
 
                     Policy policy = getPolicy(service, port, binding, bindingOperation, operation);
-                    operationPolicy.setPolicy((Policy) policy.normalize(true));
+                    operationPolicy.setPolicy(policy.normalize(true));
                 }
             }
         }
@@ -400,17 +299,6 @@ public class PolicyEnforcerFactory {
         if (elementPolicyCache.containsKey(element)) {
             return elementPolicyCache.get(element);
         }
-        Validator validator = schemas.newValidator();
-        try {
-            validator.setFeature("http://apache.org/xml/features/honour-all-schemaLocations", true);
-            //todo remove schema validation completely because e.g attachments with child elements are not
-            //allowed per schema but per spec 1.3
-            //validator.validate(new DOMSource(element));
-        } catch (SAXException e) {
-            throw new WSSPolicyException(e.getMessage(), e);
-        } /*catch (IOException e) {
-            throw new WSSPolicyException(e.getMessage(), e);
-        }*/
         Policy policy = PolicyEngine.getPolicy(element);
         elementPolicyCache.put(element, policy);
         return policy;

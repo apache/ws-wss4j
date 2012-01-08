@@ -38,38 +38,41 @@ public interface SecurityToken {
      *
      * @return The id
      */
-    public String getId();
+    String getId();
 
     /**
      * Returns the responsible processor for this token
      *
      * @return
      */
-    public Object getProcessor();
+    Object getProcessor();
 
     /**
      * Returns the token type
      *
      * @return true if asymmetric token, false if symmetric token
      */
-    public boolean isAsymmetric();
+    boolean isAsymmetric();
 
     /**
      * Returns the secret key
      *
      * @param algorithmURI for the requested key
+     * @param keyUsage
      * @return The requested key for the specified algorithmURI, or null if no matching key is found
      * @throws XMLSecurityException if the key can't be loaded
      */
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException;
+    Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException;
 
     /**
      * Returns the public key if one exist for this token type
      *
+     * @param algorithmURI
+     * @param keyUsage
      * @return The Public-Key for asymmetric algorithms
      * @throws XMLSecurityException if the key can't be loaded
      */
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException;
+    PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException;
 
     /**
      * Returns the certificate chain if one exists for this token type
@@ -77,33 +80,33 @@ public interface SecurityToken {
      * @return The certificate chain
      * @throws XMLSecurityException if the certificates can't be retrieved
      */
-    public X509Certificate[] getX509Certificates() throws XMLSecurityException;
+    X509Certificate[] getX509Certificates() throws XMLSecurityException;
 
     /**
      * Verifies the key if applicable
      *
      * @throws XMLSecurityException if the key couldn't be verified or the key isn't valid
      */
-    public void verify() throws XMLSecurityException;
+    void verify() throws XMLSecurityException;
 
     /**
      * Returns the key wrapping token
      *
      * @return The wrapping SecurityToken
      */
-    public SecurityToken getKeyWrappingToken();
+    SecurityToken getKeyWrappingToken();
 
     /**
      * Returns the Key wrapping token's algorithm
      *
      * @return the KeyWrappingToken algorithm
      */
-    public String getKeyWrappingTokenAlgorithm();
+    String getKeyWrappingTokenAlgorithm();
 
     /**
      * Returns the KeyIdentifierType
      *
      * @return the KeyIdentifierType
      */
-    public XMLSecurityConstants.TokenType getTokenType();
+    XMLSecurityConstants.TokenType getTokenType();
 }

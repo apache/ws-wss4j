@@ -40,8 +40,9 @@ public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecu
     }
 
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-        if (securityEventListener != null) {
-            securityEventListener.registerSecurityEvent(securityEvent);
+        if (securityEventListener == null) {
+            return;
         }
+        securityEventListener.registerSecurityEvent(securityEvent);
     }
 }

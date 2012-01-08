@@ -28,8 +28,8 @@ public class OperationSecurityEvent extends SecurityEvent {
 
     private QName operation;
 
-    public OperationSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public OperationSecurityEvent() {
+        super(Event.Operation);
     }
 
     public QName getOperation() {

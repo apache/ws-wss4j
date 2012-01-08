@@ -19,8 +19,13 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSPasswordCallback;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
@@ -33,28 +38,31 @@ import java.security.cert.X509Certificate;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public abstract class X509SecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
+public abstract class X509SecurityToken extends AbstractSecurityToken {
     private X509Certificate[] x509Certificates = null;
     private XMLSecurityConstants.TokenType tokenType;
 
-    protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(securityContext, crypto, callbackHandler, id, processor);
+    protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
+                                Crypto crypto, CallbackHandler callbackHandler, String id,
+                                WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
         this.tokenType = tokenType;
     }
 
+    @Override
     public boolean isAsymmetric() {
         return true;
     }
 
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getSecretKey(algorithmURI, keyUsage);
+    @Override
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         XMLSecurityUtils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }
 
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getPublicKey(keyUsage);
+    @Override
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         X509Certificate[] x509Certificates = getX509Certificates();
         if (x509Certificates == null || x509Certificates.length == 0) {
             return null;
@@ -62,6 +70,7 @@ public abstract class X509SecurityToken extends AbstractAlgorithmSuiteSecurityEv
         return x509Certificates[0].getPublicKey();
     }
 
+    @Override
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         if (this.x509Certificates == null) {
             this.x509Certificates = getCrypto().getCertificates(getAlias());
@@ -69,6 +78,7 @@ public abstract class X509SecurityToken extends AbstractAlgorithmSuiteSecurityEv
         return this.x509Certificates;
     }
 
+    @Override
     public void verify() throws XMLSecurityException {
         try {
             X509Certificate[] x509Certificates = getX509Certificates();
@@ -83,16 +93,19 @@ public abstract class X509SecurityToken extends AbstractAlgorithmSuiteSecurityEv
         }
     }
 
+    @Override
     public SecurityToken getKeyWrappingToken() {
         return null;
     }
 
+    @Override
     public String getKeyWrappingTokenAlgorithm() {
         return null;
     }
 
     protected abstract String getAlias() throws XMLSecurityException;
 
+    @Override
     public XMLSecurityConstants.TokenType getTokenType() {
         return tokenType;
     }

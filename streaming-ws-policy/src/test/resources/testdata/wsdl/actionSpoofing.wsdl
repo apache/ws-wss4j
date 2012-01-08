@@ -34,9 +34,9 @@
                 <sp:SignedParts>
                     <sp:Body/>
                 </sp:SignedParts>
-                <sp:EncryptedParts>
-                    <spBody/>
-                </sp:EncryptedParts>
+                <!--<sp:EncryptedParts>
+                    <sp:Body/>
+                </sp:EncryptedParts>-->
             </wsp12:All>
         </wsp12:ExactlyOne>
     </wsp12:Policy>

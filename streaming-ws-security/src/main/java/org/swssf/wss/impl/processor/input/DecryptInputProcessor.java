@@ -23,11 +23,12 @@ import org.swssf.binding.xmlenc.EncryptedDataType;
 import org.swssf.binding.xmlenc.ReferenceList;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.processor.input.AbstractDecryptInputProcessor;
 
@@ -52,18 +53,20 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         super(keyInfoType, referenceList, securityProperties);
     }
 
-    protected void encryptedContentEvent(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent) throws XMLSecurityException {
+    protected void handleEncryptedContent(
+            InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException {
+
         QName parentElement = inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType());
         if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
             //soap:body content encryption counts as EncryptedPart
             EncryptedPartSecurityEvent encryptedPartSecurityEvent =
-                    new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+                    new EncryptedPartSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
             encryptedPartSecurityEvent.setElement(parentElement);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
         } else {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
-                    new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, true);
+                    new ContentEncryptedElementSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
             contentEncryptedElementSecurityEvent.setElement(parentElement);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
@@ -72,11 +75,29 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     @Override
     protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
             boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
-            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType) {
+            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType, SecurityToken securityToken) {
         return new DecryptedEventReaderInputProcessor(getSecurityProperties(),
                 SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()),
                 encryptedHeader, comparableNamespaceList, comparableAttributeList,
-                this);
+                this,
+                securityToken);
+    }
+
+    @Override
+    protected void handleSecurityToken(
+            SecurityToken securityToken, SecurityContext securityContext, EncryptedDataType encryptedDataType) throws XMLSecurityException {
+        TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+        tokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        ((WSSecurityContext) securityContext).registerSecurityEvent(tokenSecurityEvent);
+
+        /*AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
+       algorithmSuiteSecurityEvent.setAlgorithmURI(encryptedDataType.getEncryptionMethod().getAlgorithm());
+       if (securityToken.isAsymmetric()) {
+           algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Asym_Key_Wrap);
+       } else {
+           algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Sym_Key_Wrap);
+       }
+       ((WSSecurityContext) securityContext).registerSecurityEvent(algorithmSuiteSecurityEvent);*/
     }
 
     /*
@@ -105,25 +126,33 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 XMLSecurityProperties securityProperties, SecurePart.Modifier encryptionModifier,
                 boolean encryptedHeader, List<ComparableNamespace>[] namespaceList,
                 List<ComparableAttribute>[] attributeList,
-                DecryptInputProcessor decryptInputProcessor
+                DecryptInputProcessor decryptInputProcessor,
+                SecurityToken securityToken
         ) {
-            super(securityProperties, encryptionModifier, encryptedHeader, namespaceList, attributeList, decryptInputProcessor);
+            super(securityProperties, encryptionModifier, encryptedHeader, namespaceList, attributeList, decryptInputProcessor, securityToken);
         }
 
-        protected void encryptedElementEvent(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent) throws XMLSecurityException {
+        protected void handleEncryptedElement(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException {
             //fire a SecurityEvent:
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                     && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent =
-                        new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+                        new EncryptedPartSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
                 encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
             } else {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent =
-                        new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+                        new EncryptedElementSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
                 encryptedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedElementSecurityEvent);
             }
         }
+    }
+
+    public static boolean isInSignedContent(InputProcessorChain inputProcessorChain) {
+        //todo. Also todo: ProtectionOrderAssertionState
+        //how can we find out if a signature is done over plaintext or over ciphertext.
+        //problem contentEncryptedElements, the signature occurs always firstly...
+        return false;
     }
 }

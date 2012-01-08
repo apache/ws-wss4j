@@ -37,6 +37,7 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
 
     private Policy nestedPolicy;
     private AbstractToken token;
+    private AbstractSecurityAssertion parentAssertion;
 
     protected AbstractTokenWrapper(SPConstants.SPVersion version, Policy nestedPolicy) {
         super(version);
@@ -70,7 +71,9 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
                     if (tokenWrapper.getToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    tokenWrapper.setToken((AbstractToken) assertion);
+                    final AbstractToken abstractToken = (AbstractToken) assertion;
+                    tokenWrapper.setToken(abstractToken);
+                    abstractToken.setParentAssertion(tokenWrapper);
                     continue;
                 }
             }
@@ -83,5 +86,13 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
 
     protected void setToken(AbstractToken token) {
         this.token = token;
+    }
+
+    public AbstractSecurityAssertion getParentAssertion() {
+        return parentAssertion;
+    }
+
+    public void setParentAssertion(AbstractSecurityAssertion parentAssertion) {
+        this.parentAssertion = parentAssertion;
     }
 }

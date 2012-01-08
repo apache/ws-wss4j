@@ -20,10 +20,10 @@ package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wssc.AbstractDerivedKeyTokenType;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.derivedKey.DerivedKeyUtils;
-import org.swssf.wss.impl.securityToken.AbstractAlgorithmSuiteSecurityEventFiringSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
@@ -35,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,12 +49,13 @@ import java.util.UUID;
  */
 public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public DerivedKeyTokenInputHandler(final InputProcessorChain inputProcessorChain,
-                                       final WSSSecurityProperties securityProperties,
-                                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
-        final AbstractDerivedKeyTokenType derivedKeyTokenType = ((JAXBElement<AbstractDerivedKeyTokenType>) parseStructure(eventQueue, index)).getValue();
+        final AbstractDerivedKeyTokenType derivedKeyTokenType =
+                ((JAXBElement<AbstractDerivedKeyTokenType>) parseStructure(eventQueue, index)).getValue();
         if (derivedKeyTokenType.getId() == null) {
             derivedKeyTokenType.setId(UUID.randomUUID().toString());
         }
@@ -80,14 +82,15 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         null
                 );
 
-                securityToken = new AbstractAlgorithmSuiteSecurityEventFiringSecurityToken(inputProcessorChain.getSecurityContext(), derivedKeyTokenType.getId()) {
+                securityToken = new AbstractSecurityToken(
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null, null,
+                        derivedKeyTokenType.getId(), null, null) {
 
                     public boolean isAsymmetric() {
                         return false;
                     }
 
-                    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                        super.getSecretKey(algorithmURI, keyUsage);
+                    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                         byte[] secret;
                         if (referencedSecurityToken != null) {
                             if (referencedSecurityToken instanceof UsernameSecurityToken) {
@@ -102,7 +105,13 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 secret = samlSecurityToken.getSamlKeyInfo().getSecret();
                             } else {
                                 //todo is this the correct algo and KeyUsage?
-                                secret = referencedSecurityToken.getSecretKey(algorithmURI, WSSConstants.Sig_KD).getEncoded();
+                                WSSConstants.KeyUsage newKeyUsage;
+                                if (keyUsage == WSSConstants.Sym_Sig || keyUsage == WSSConstants.Asym_Sig || keyUsage == WSSConstants.Sig_KD) {
+                                    newKeyUsage = WSSConstants.Sig_KD;
+                                } else {
+                                    newKeyUsage = WSSConstants.Enc_KD;
+                                }
+                                secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage).getEncoded();
                             }
                         } else {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId");
@@ -123,6 +132,11 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         return new SecretKeySpec(keyBytes, algo);
                     }
 
+                    @Override
+                    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                        return null;
+                    }
+
                     public SecurityToken getKeyWrappingToken() {
                         return referencedSecurityToken;
                     }
@@ -133,8 +147,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     public WSSConstants.TokenType getTokenType() {
-                        //todo?
-                        return null;
+                        return WSSConstants.DerivedKeyToken;
                     }
                 };
                 securityTokens.put(crypto, securityToken);

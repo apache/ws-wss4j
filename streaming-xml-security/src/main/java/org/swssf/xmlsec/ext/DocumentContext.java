@@ -19,6 +19,7 @@
 package org.swssf.xmlsec.ext;
 
 import javax.xml.namespace.QName;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -95,4 +96,7 @@ public interface DocumentContext {
      * @return true if we currently stay in signed content
      */
     public boolean isInSignedContent();
+
+
+    public Deque<XMLSecurityConstants.ContentType> getContentTypeDeque();
 }

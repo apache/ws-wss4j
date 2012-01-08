@@ -19,8 +19,8 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -34,24 +34,25 @@ import java.security.cert.X509Certificate;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SecureConversationSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
+public class SecureConversationSecurityToken extends AbstractSecurityToken {
 
     //todo implement
 
-    public SecureConversationSecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(securityContext, crypto, callbackHandler, id, processor);
+    public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto,
+                                           CallbackHandler callbackHandler, String id,
+                                           WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
     }
 
     public boolean isAsymmetric() {
         return false;
     }
 
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getSecretKey(algorithmURI, keyUsage);
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         return null;
     }
 
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         return null;
     }
 

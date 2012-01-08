@@ -21,54 +21,148 @@ package org.swssf.policy.test;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
+import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
+import org.swssf.wss.securityEvent.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
+import java.util.Date;
+
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class UsernameTokenTest extends AbstractPolicyTestBase {
 
     @Test
     public void testPolicy() throws Exception {
         String policyString =
-                "<sp:UsernameToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:HashPassword/>\n" +
-                        "<sp:WssUsernameToken11/>\n" +
+                        "<sp:EncryptionToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:UsernameToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:HashPassword/>\n" +
+                        "               <sp:WssUsernameToken11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:UsernameToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:EncryptionToken>\n" +
+                        "<sp:SignatureToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:UsernameToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:HashPassword/>\n" +
+                        "               <sp:WssUsernameToken11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:UsernameToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:SignatureToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:UsernameToken>";
+                        "</sp:SymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
-        usernameTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
-        usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
-        policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
+        UsernameTokenSecurityEvent initiatorTokenSecurityEvent = new UsernameTokenSecurityEvent();
+        initiatorTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        initiatorTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        initiatorTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
+                (WSSecurityContext) null, null, null));
+        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
+
+        UsernameTokenSecurityEvent recipientTokenSecurityEvent = new UsernameTokenSecurityEvent();
+        recipientTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        recipientTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
+                (WSSecurityContext) null, null, null));
+        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
     @Test
     public void testPolicyNegative() throws Exception {
         String policyString =
-                "<sp:UsernameToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:HashPassword/>\n" +
-                        "<sp:WssUsernameToken11/>\n" +
+                        "<sp:EncryptionToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:UsernameToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:HashPassword/>\n" +
+                        "               <sp:WssUsernameToken11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:UsernameToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:EncryptionToken>\n" +
+                        "<sp:SignatureToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:UsernameToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:HashPassword/>\n" +
+                        "               <sp:WssUsernameToken11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:UsernameToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:SignatureToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:UsernameToken>";
+                        "</sp:SymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
+        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        usernameTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
+                (WSSecurityContext) null, null, null));
+        usernameTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
+
+        UsernameTokenSecurityEvent recipientTokenSecurityEvent = new UsernameTokenSecurityEvent();
+        recipientTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        recipientTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
+                (WSSecurityContext) null, null, null));
+        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
         try {
-            policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);

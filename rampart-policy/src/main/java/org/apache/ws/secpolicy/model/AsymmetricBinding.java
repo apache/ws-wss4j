@@ -72,7 +72,9 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                             || asymmetricBinding.getInitiatorEncryptionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    asymmetricBinding.setInitiatorToken((InitiatorToken) assertion);
+                    final InitiatorToken initiatorToken1 = (InitiatorToken) assertion;
+                    asymmetricBinding.setInitiatorToken(initiatorToken1);
+                    initiatorToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
                 if (getVersion().getSPConstants().getInitiatorSignatureToken().getLocalPart().equals(assertionName)
@@ -81,7 +83,9 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                             || asymmetricBinding.getInitiatorSignatureToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    asymmetricBinding.setInitiatorSignatureToken((InitiatorSignatureToken) assertion);
+                    final InitiatorSignatureToken initiatorSignatureToken1 = (InitiatorSignatureToken) assertion;
+                    asymmetricBinding.setInitiatorSignatureToken(initiatorSignatureToken1);
+                    initiatorSignatureToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
                 if (getVersion().getSPConstants().getInitiatorEncryptionToken().getLocalPart().equals(assertionName)
@@ -90,7 +94,9 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                             || asymmetricBinding.getInitiatorEncryptionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    asymmetricBinding.setInitiatorEncryptionToken((InitiatorEncryptionToken) assertion);
+                    final InitiatorEncryptionToken initiatorEncryptionToken1 = (InitiatorEncryptionToken) assertion;
+                    asymmetricBinding.setInitiatorEncryptionToken(initiatorEncryptionToken1);
+                    initiatorEncryptionToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
                 if (getVersion().getSPConstants().getRecipientToken().getLocalPart().equals(assertionName)
@@ -100,7 +106,9 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                             || asymmetricBinding.getRecipientEncryptionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    asymmetricBinding.setRecipientToken((RecipientToken) assertion);
+                    final RecipientToken recipientToken1 = (RecipientToken) assertion;
+                    asymmetricBinding.setRecipientToken(recipientToken1);
+                    recipientToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
                 if (getVersion().getSPConstants().getRecipientSignatureToken().getLocalPart().equals(assertionName)
@@ -109,7 +117,9 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                             || asymmetricBinding.getRecipientSignatureToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    asymmetricBinding.setRecipientSignatureToken((RecipientSignatureToken) assertion);
+                    final RecipientSignatureToken recipientSignatureToken1 = (RecipientSignatureToken) assertion;
+                    asymmetricBinding.setRecipientSignatureToken(recipientSignatureToken1);
+                    recipientSignatureToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
                 if (getVersion().getSPConstants().getRecipientEncryptionToken().getLocalPart().equals(assertionName)
@@ -118,7 +128,9 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                             || asymmetricBinding.getRecipientEncryptionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    asymmetricBinding.setRecipientEncryptionToken((RecipientEncryptionToken) assertion);
+                    final RecipientEncryptionToken recipientEncryptionToken1 = (RecipientEncryptionToken) assertion;
+                    asymmetricBinding.setRecipientEncryptionToken(recipientEncryptionToken1);
+                    recipientEncryptionToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
             }

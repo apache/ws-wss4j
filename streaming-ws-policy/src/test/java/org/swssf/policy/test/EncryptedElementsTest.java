@@ -22,15 +22,15 @@ import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class EncryptedElementsTest extends AbstractPolicyTestBase {
 
@@ -41,7 +41,12 @@ public class EncryptedElementsTest extends AbstractPolicyTestBase {
                         "<sp:XPath xmlns:b=\"http://example.org\">/b:a</sp:XPath>\n" +
                         "</sp:EncryptedElements>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
         encryptedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
         encryptedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -59,10 +64,15 @@ public class EncryptedElementsTest extends AbstractPolicyTestBase {
                         "<sp:XPath xmlns:b=\"http://example.org\">/b:a</sp:XPath>\n" +
                         "</sp:EncryptedElements>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
         encryptedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
+        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, false);
         encryptedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);

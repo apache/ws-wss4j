@@ -24,14 +24,14 @@ import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.SamlToken;
 import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1197077 $ $Date: 2011-11-03 13:17:40 +0100 (Don, 03. Nov 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 
 public class SamlTokenAssertionState extends TokenAssertionState {
@@ -48,7 +48,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public void assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof SamlTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a SamlTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
@@ -60,7 +60,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
         }
-        if (samlToken.isRequireKeyIdentifierReference() && ((DelegatingSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+        if (samlToken.isRequireKeyIdentifierReference() && ((AbstractSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
             setAsserted(false);
             setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
         }
@@ -89,5 +89,6 @@ public class SamlTokenAssertionState extends TokenAssertionState {
                 setErrorMessage("Unsupported token type: " + samlToken.getSamlTokenType());
                 break;
         }
+        return isAsserted();
     }
 }

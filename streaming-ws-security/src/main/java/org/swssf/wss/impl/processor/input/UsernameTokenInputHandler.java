@@ -29,7 +29,6 @@ import org.swssf.binding.wss10.UsernameTokenType;
 import org.swssf.binding.wsu10.AttributedDateTime;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
@@ -60,9 +59,9 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
     }
 
-    public UsernameTokenInputHandler(final InputProcessorChain inputProcessorChain,
-                                     final WSSSecurityProperties securityProperties,
-                                     Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final UsernameTokenType usernameTokenType = ((JAXBElement<UsernameTokenType>) parseStructure(eventQueue, index)).getValue();
         if (usernameTokenType.getId() == null) {
@@ -190,7 +189,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                     return securityToken;
                 }
                 securityToken = SecurityTokenFactoryImpl.getSecurityToken(username.getValue(), password,
-                        created, nonceVal, salt, iteration, inputProcessorChain.getSecurityContext(), usernameTokenType.getId(), null);
+                        created, nonceVal, salt, iteration, (WSSecurityContext) inputProcessorChain.getSecurityContext(), usernameTokenType.getId());
                 securityTokens.put(crypto, securityToken);
                 return securityToken;
             }
@@ -201,7 +200,9 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(usernameTokenType.getId(), securityTokenProvider);
 
-        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent(SecurityEvent.Event.UsernameToken);
+        //todo remove me?
+        //atm used for verification of the supplied username
+        UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
         usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken(null));
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);

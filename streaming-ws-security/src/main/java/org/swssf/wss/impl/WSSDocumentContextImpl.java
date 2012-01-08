@@ -73,8 +73,7 @@ public class WSSDocumentContextImpl extends org.swssf.xmlsec.impl.DocumentContex
         documentContext.setEncoding(this.getEncoding());
         documentContext.setPath(subPath);
         documentContext.setInSecurityHeader(isInSecurityHeader());
-        documentContext.setActualEncryptedContentCounter(this.getActualEncryptedContentCounter());
-        documentContext.setActualSignedContentCounter(this.getActualSignedContentCounter());
+        documentContext.setContentTypeDeque(getContentTypeDeque());
         return documentContext;
     }
 }

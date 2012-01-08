@@ -532,7 +532,7 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                Assert.assertEquals(throwable.getMessage(), "The message has expired (WSSecurityEngine: Invalid timestamp: Message contains two or more timestamps)");
+                Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header (WSSecurityEngine: Invalid timestamp: Message contains two or more timestamps)");
             }
         }
     }

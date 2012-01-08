@@ -19,10 +19,13 @@
 package org.swssf.xmlsec.impl;
 
 import org.swssf.xmlsec.ext.DocumentContext;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -81,48 +84,42 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
         return getPath().size();
     }
 
-    private int actualEncryptedContentCounter = 0;
-
-    protected int getActualEncryptedContentCounter() {
-        return actualEncryptedContentCounter;
-    }
-
-    protected void setActualEncryptedContentCounter(int actualEncryptedContentCounter) {
-        this.actualEncryptedContentCounter = actualEncryptedContentCounter;
-    }
+    Deque<XMLSecurityConstants.ContentType> contentTypeDeque = new LinkedList<XMLSecurityConstants.ContentType>();
 
     public synchronized void setIsInEncryptedContent() {
-        this.actualEncryptedContentCounter++;
+        contentTypeDeque.push(XMLSecurityConstants.ContentType.ENCRYPTION);
     }
 
     public synchronized void unsetIsInEncryptedContent() {
-        this.actualEncryptedContentCounter--;
+        if (!contentTypeDeque.isEmpty()) {
+            contentTypeDeque.pop();
+        }
     }
 
     public boolean isInEncryptedContent() {
-        return this.actualEncryptedContentCounter > 0;
-    }
-
-    private int actualSignedContentCounter = 0;
-
-    protected int getActualSignedContentCounter() {
-        return actualSignedContentCounter;
-    }
-
-    protected void setActualSignedContentCounter(int actualSignedContentCounter) {
-        this.actualSignedContentCounter = actualSignedContentCounter;
+        return contentTypeDeque.contains(XMLSecurityConstants.ContentType.ENCRYPTION);
     }
 
     public synchronized void setIsInSignedContent() {
-        this.actualSignedContentCounter++;
+        contentTypeDeque.push(XMLSecurityConstants.ContentType.SIGNATURE);
     }
 
     public synchronized void unsetIsInSignedContent() {
-        this.actualSignedContentCounter--;
+        if (!contentTypeDeque.isEmpty()) {
+            contentTypeDeque.pop();
+        }
     }
 
     public boolean isInSignedContent() {
-        return this.actualSignedContentCounter > 0;
+        return contentTypeDeque.contains(XMLSecurityConstants.ContentType.SIGNATURE);
+    }
+
+    public Deque<XMLSecurityConstants.ContentType> getContentTypeDeque() {
+        return contentTypeDeque;
+    }
+
+    protected void setContentTypeDeque(Deque<XMLSecurityConstants.ContentType> contentTypeDeque) {
+        this.contentTypeDeque.addAll(contentTypeDeque);
     }
 
     @Override
@@ -133,8 +130,7 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
         subPath.addAll(this.getPath());
         documentContext.setEncoding(this.encoding);
         documentContext.setPath(subPath);
-        documentContext.actualEncryptedContentCounter = this.actualEncryptedContentCounter;
-        documentContext.actualSignedContentCounter = this.actualSignedContentCounter;
+        documentContext.setContentTypeDeque(getContentTypeDeque());
         return documentContext;
     }
 }

@@ -20,32 +20,58 @@ package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.impl.securityToken.X509SecurityToken;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
+
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class LayoutTest extends AbstractPolicyTestBase {
 
     @Test
     public void testPolicyLaxTsFirst() throws Exception {
         String policyString =
-                "<sp:Layout xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "<sp:Layout xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "<sp:LaxTsFirst/>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:Layout>";
+                        "</sp:Layout>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:AsymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(x509TokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
@@ -58,9 +84,19 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
         try {
-            policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
@@ -76,10 +112,21 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
@@ -92,11 +139,21 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
         try {
-            policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);

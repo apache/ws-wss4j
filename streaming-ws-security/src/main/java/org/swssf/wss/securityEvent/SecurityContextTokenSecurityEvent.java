@@ -27,8 +27,8 @@ public class SecurityContextTokenSecurityEvent extends TokenSecurityEvent {
     private boolean externalUriRef;
     private String issuerName;
 
-    public SecurityContextTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public SecurityContextTokenSecurityEvent() {
+        super(Event.SecurityContextToken);
     }
 
     public boolean isExternalUriRef() {

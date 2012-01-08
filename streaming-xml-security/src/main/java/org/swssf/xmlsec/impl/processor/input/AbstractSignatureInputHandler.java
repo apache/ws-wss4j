@@ -50,17 +50,23 @@ import java.util.List;
  */
 public abstract class AbstractSignatureInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public AbstractSignatureInputHandler(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException, XMLStreamException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final SignatureType signatureType = ((JAXBElement<SignatureType>) parseStructure(eventQueue, index)).getValue();
-        verifySignedInfo(inputProcessorChain, securityProperties, signatureType, eventQueue, index);
-        addSignatureReferenceInputProcessorToChain(inputProcessorChain, securityProperties, signatureType);
+        SecurityToken securityToken = verifySignedInfo(inputProcessorChain, securityProperties, signatureType, eventQueue, index);
+        addSignatureReferenceInputProcessorToChain(inputProcessorChain, securityProperties, signatureType, securityToken);
     }
 
-    protected abstract void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties, SignatureType signatureType);
+    protected abstract void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain,
+                                                                       XMLSecurityProperties securityProperties,
+                                                                       SignatureType signatureType, SecurityToken securityToken);
 
-    protected void verifySignedInfo(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties, SignatureType signatureType, Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException, XMLStreamException {
+    protected SecurityToken verifySignedInfo(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
+                                             SignatureType signatureType, Deque<XMLEvent> eventDeque, int index)
+            throws XMLSecurityException {
         //todo reparse SignedInfo when custom canonicalization method is used
         //verify SignedInfo
         SignatureVerifier signatureVerifier = newSignatureVerifier(inputProcessorChain, securityProperties, signatureType);
@@ -73,20 +79,25 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             i++;
         }
 
-        boolean verifyElement = false;
-        while (iterator.hasNext()) {
-            XMLEvent xmlEvent = iterator.next();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
-                verifyElement = true;
-            } else if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
-                signatureVerifier.processEvent(xmlEvent);
-                break;
+        try {
+            boolean verifyElement = false;
+            while (iterator.hasNext()) {
+                XMLEvent xmlEvent = iterator.next();
+                if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
+                    verifyElement = true;
+                } else if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
+                    signatureVerifier.processEvent(xmlEvent);
+                    break;
+                }
+                if (verifyElement) {
+                    signatureVerifier.processEvent(xmlEvent);
+                }
             }
-            if (verifyElement) {
-                signatureVerifier.processEvent(xmlEvent);
-            }
+        } catch (XMLStreamException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
         }
         signatureVerifier.doFinal();
+        return signatureVerifier.getSecurityToken();
     }
 
     protected abstract SignatureVerifier newSignatureVerifier(InputProcessorChain inputProcessorChain,
@@ -126,13 +137,16 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
     </ds:Signature>
      */
 
-    public static class SignatureVerifier {
+    //todo can this class be made abstract somehow?
+    public class SignatureVerifier {
 
         private SignatureType signatureType;
+        private SecurityToken securityToken;
 
         private SignerOutputStream signerOutputStream;
         private OutputStream bufferedSignerOutputStream;
         private Transformer transformer;
+        private XMLSecurityProperties xmlSecurityProperties;
 
         public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext,
                                  XMLSecurityProperties securityProperties) throws XMLSecurityException {
@@ -145,30 +159,48 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             securityToken.verify();
 
             try {
-                createSignatureAlgorithm(securityToken);
+                handleSecurityToken(securityToken);
+                createSignatureAlgorithm(securityToken, signatureType);
             } catch (Exception e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
             }
+            this.securityToken = securityToken;
         }
 
-        protected void createSignatureAlgorithm(SecurityToken securityToken) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException, XMLSecurityException {
+        public SecurityToken getSecurityToken() {
+            return securityToken;
+        }
+
+        protected void handleSecurityToken(SecurityToken securityToken) throws XMLSecurityException {
+        }
+
+        protected void createSignatureAlgorithm(SecurityToken securityToken, SignatureType signatureType)
+                throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException,
+                CertificateException, XMLSecurityException {
 
             Key verifyKey;
+            final String algorithmURI = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
             if (securityToken.isAsymmetric()) {
-                verifyKey = securityToken.getPublicKey(XMLSecurityConstants.Asym_Sig);
+                verifyKey = securityToken.getPublicKey(algorithmURI, XMLSecurityConstants.Asym_Sig);
             } else {
                 verifyKey = securityToken.getSecretKey(
-                        signatureType.getSignedInfo().getSignatureMethod().getAlgorithm(), XMLSecurityConstants.Sym_Sig);
+                        algorithmURI, XMLSecurityConstants.Sym_Sig);
             }
 
-            SignatureAlgorithm signatureAlgorithm = SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(signatureType.getSignedInfo().getSignatureMethod().getAlgorithm());
+            SignatureAlgorithm signatureAlgorithm =
+                    SignatureAlgorithmFactory.getInstance().getSignatureAlgorithm(
+                            algorithmURI);
             signatureAlgorithm.engineInitVerify(verifyKey);
             signerOutputStream = new SignerOutputStream(signatureAlgorithm);
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 
             try {
                 final CanonicalizationMethodType canonicalizationMethodType = signatureType.getSignedInfo().getCanonicalizationMethod();
-                InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                InclusiveNamespaces inclusiveNamespacesType =
+                        XMLSecurityUtils.getQNameType(
+                                canonicalizationMethodType.getContent(),
+                                XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces
+                        );
                 List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
                 transformer = XMLSecurityUtils.getTransformer(
                         inclusiveNamespaces,

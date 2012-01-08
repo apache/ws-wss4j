@@ -21,8 +21,8 @@ package org.swssf.wss.impl.securityToken;
 import org.swssf.binding.xmldsig.X509DataType;
 import org.swssf.binding.xmldsig.X509IssuerSerialType;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityUtils;
 
@@ -33,17 +33,20 @@ import javax.security.auth.callback.CallbackHandler;
  * @version $Revision$ $Date$
  */
 public class X509DataSecurityToken extends X509SecurityToken {
+
     private String alias = null;
     protected X509DataType x509DataType;
 
-    X509DataSecurityToken(SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, X509DataType x509DataType, String id, Object processor) {
-        super(WSSConstants.X509V3Token, securityContext, crypto, callbackHandler, id, processor);
+    X509DataSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                          X509DataType x509DataType, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
         this.x509DataType = x509DataType;
     }
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
+            X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
+                    x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
             this.alias = getCrypto().getAliasForX509Cert(x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber());
         }
         return this.alias;

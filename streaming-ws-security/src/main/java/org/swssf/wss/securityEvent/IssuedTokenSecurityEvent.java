@@ -29,8 +29,8 @@ public class IssuedTokenSecurityEvent extends TokenSecurityEvent {
     private boolean internalReference;
     private String issuerName;
 
-    public IssuedTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public IssuedTokenSecurityEvent() {
+        super(Event.IssuedToken);
     }
 
     public boolean isInternalReference() {

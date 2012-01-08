@@ -105,7 +105,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     return symmetricKey;
                 }
 
-                public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                     return null;
                 }
 

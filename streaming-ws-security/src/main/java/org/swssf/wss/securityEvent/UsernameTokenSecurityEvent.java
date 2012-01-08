@@ -29,8 +29,8 @@ public class UsernameTokenSecurityEvent extends TokenSecurityEvent {
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String usernameTokenProfile;
 
-    public UsernameTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public UsernameTokenSecurityEvent() {
+        super(Event.UsernameToken);
     }
 
     public WSSConstants.UsernameTokenPasswordType getUsernameTokenPasswordType() {

@@ -48,26 +48,34 @@ import java.util.Map;
  */
 public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    public SecurityTokenReferenceInputHandler(InputProcessorChain inputProcessorChain, final WSSSecurityProperties securityProperties, Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
-        final SecurityTokenReferenceType securityTokenReferenceType = ((JAXBElement<SecurityTokenReferenceType>) parseStructure(eventQueue, index)).getValue();
+        final SecurityTokenReferenceType securityTokenReferenceType =
+                ((JAXBElement<SecurityTokenReferenceType>) parseStructure(eventQueue, index)).getValue();
 
-        final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
+        final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(
+                securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
         if (keyIdentifierType != null) {
             if (WSSConstants.NS_SAML10_TYPE.equals(keyIdentifierType.getValueType())) {
-                InternalSecurityTokenReferenceInputHandler internalSecurityTokenReferenceInputHandler
-                        = new InternalSecurityTokenReferenceInputHandler(securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_AssertionID, keyIdentifierType.getValue().trim(), securityProperties);
+                InternalSecurityTokenReferenceInputProcessor internalSecurityTokenReferenceInputHandler
+                        = new InternalSecurityTokenReferenceInputProcessor(
+                        securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_AssertionID,
+                        keyIdentifierType.getValue().trim(), (WSSSecurityProperties) securityProperties);
                 inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
             } else if (WSSConstants.NS_SAML20_TYPE.equals(keyIdentifierType.getValueType())) {
-                InternalSecurityTokenReferenceInputHandler internalSecurityTokenReferenceInputHandler
-                        = new InternalSecurityTokenReferenceInputHandler(securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_ID, keyIdentifierType.getValue().trim(), securityProperties);
+                InternalSecurityTokenReferenceInputProcessor internalSecurityTokenReferenceInputHandler
+                        = new InternalSecurityTokenReferenceInputProcessor(
+                        securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_ID,
+                        keyIdentifierType.getValue().trim(), (WSSSecurityProperties) securityProperties);
                 inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
             }
         }
     }
 
-    class InternalSecurityTokenReferenceInputHandler extends AbstractInputProcessor {
+    class InternalSecurityTokenReferenceInputProcessor extends AbstractInputProcessor {
 
         private String securityTokenReferenceId;
         private QName attribute;
@@ -79,7 +87,8 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
         private ArrayDeque<XMLEvent> xmlEventList = new ArrayDeque<XMLEvent>();
 
-        InternalSecurityTokenReferenceInputHandler(String securityTokenReferenceId, QName attribute, String attributeValue, WSSSecurityProperties securityProperties) {
+        InternalSecurityTokenReferenceInputProcessor(String securityTokenReferenceId, QName attribute,
+                                                     String attributeValue, WSSSecurityProperties securityProperties) {
             super(securityProperties);
             this.securityTokenReferenceId = securityTokenReferenceId;
             this.attribute = attribute;
@@ -87,12 +96,14 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
             return inputProcessorChain.processHeaderEvent();
         }
 
         @Override
-        public XMLEvent processNextEvent(final InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLEvent processNextEvent(final InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
             XMLEvent xmlEvent = inputProcessorChain.processEvent();
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
@@ -107,7 +118,8 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                 }
             } else if (xmlEvent.isEndElement()) {
                 EndElement endElement = xmlEvent.asEndElement();
-                if (startElementName != null && endElement.getName().equals(startElementName) && inputProcessorChain.getDocumentContext().getDocumentLevel() == startElementLevel - 1) {
+                if (startElementName != null && endElement.getName().equals(startElementName)
+                        && inputProcessorChain.getDocumentContext().getDocumentLevel() == startElementLevel - 1) {
                     end = true;
                     xmlEventList.push(xmlEvent);
 

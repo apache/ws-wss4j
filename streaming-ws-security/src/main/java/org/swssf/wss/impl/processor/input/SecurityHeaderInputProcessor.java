@@ -22,10 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.ext.*;
 import org.swssf.xmlsec.config.SecurityHeaderHandlerMapper;
-import org.swssf.xmlsec.ext.AbstractInputProcessor;
-import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.processor.input.XMLEventReaderInputProcessor;
 
 import javax.xml.namespace.QName;
@@ -33,11 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Deque;
 
 /**
@@ -125,7 +118,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                     //remove this processor from chain now. the next events will go directly to the other processors
                     subInputProcessorChain.removeProcessor(this);
-                    //since we clone the inputProcessor list we have to add the processors from
+                    //since we cloned the inputProcessor list we have to add the processors from
                     //the subChain to the main chain.
                     inputProcessorChain.getProcessors().clear();
                     inputProcessorChain.getProcessors().addAll(subInputProcessorChain.getProcessors());
@@ -137,91 +130,43 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 } else if (subInputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                         && ((WSSDocumentContext) subInputProcessorChain.getDocumentContext()).isInSecurityHeader()) {
                     //we are in the security header and the depth is +1, so every child
-                    //element should have a responsible processor:
-                    engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(), xmlEventList, startIndexForProcessor, endElement.getName());
+                    //element should have a responsible handler:
+                    engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
+                            xmlEventList, startIndexForProcessor, endElement.getName());
                 }
             }
 
         } while (!(xmlEvent.isStartElement()
                 && xmlEvent.asStartElement().getName().getLocalPart().equals(WSSConstants.TAG_soap_Body_LocalName)
-                && xmlEvent.asStartElement().getName().getNamespaceURI().equals(((WSSDocumentContext) subInputProcessorChain.getDocumentContext()).getSOAPMessageVersionNamespace())
+                && xmlEvent.asStartElement().getName().getNamespaceURI().equals(
+                ((WSSDocumentContext) subInputProcessorChain.getDocumentContext()).getSOAPMessageVersionNamespace())
         ));
         //if we reach this state we didn't find a security header
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityHeader");
     }
 
     @SuppressWarnings("unchecked")
-    private static void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain,
-                                                    XMLSecurityProperties securityProperties,
-                                                    Deque eventQueue,
-                                                    Integer index,
-                                                    QName elementName)
+    private void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain,
+                                             XMLSecurityProperties securityProperties,
+                                             Deque eventQueue,
+                                             Integer index,
+                                             QName elementName)
             throws WSSecurityException, XMLStreamException {
 
-        Class clazz = SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
+        Class<XMLSecurityHeaderHandler> clazz = SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
         if (clazz == null) {
+            logger.warn("No matching handler found for " + elementName);
             return;
         }
-        Constructor[] constructors = clazz.getConstructors();
-        Comparator<Constructor> comparator = new Comparator<Constructor>() {
-            public int compare(Constructor o1, Constructor o2) {
-                if (o1.getParameterTypes().length == o2.getParameterTypes().length) {
-                    return 0;
-                } else if (o1.getParameterTypes().length > o2.getParameterTypes().length) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        };
-
-        Arrays.sort(constructors, comparator);
-
-        for (int i = 0; i < constructors.length; i++) {
-            Constructor constructor = constructors[i];
-            Class[] parameterTypes = constructor.getParameterTypes();
-
-            boolean ok = true;
-            Object[] parameterObjects = new Object[parameterTypes.length];
-            for (int j = 0; j < parameterTypes.length; j++) {
-                Class parameterType = parameterTypes[j];
-                if (parameterType.isAssignableFrom(inputProcessorChain.getClass())) {
-                    parameterObjects[j] = inputProcessorChain;
-                } else if (parameterType.isAssignableFrom(securityProperties.getClass())) {
-                    parameterObjects[j] = securityProperties;
-                } else if (parameterType.isAssignableFrom(eventQueue.getClass())) {
-                    parameterObjects[j] = eventQueue;
-                } else if (parameterType.isAssignableFrom(index.getClass())) {
-                    parameterObjects[j] = index;
-                } else if (parameterType.isAssignableFrom(elementName.getClass())) {
-                    parameterObjects[j] = elementName;
-                } else {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) {
-                try {
-                    constructor.newInstance(parameterObjects);
-                } catch (InstantiationException e) {
-                    logger.warn(e);
-                } catch (IllegalAccessException e) {
-                    logger.warn(e);
-                } catch (InvocationTargetException e) {
-                    Throwable cause = e.getCause();
-                    if (cause instanceof WSSecurityException) {
-                        throw (WSSecurityException) cause;
-                    } else if (cause instanceof XMLSecurityException) {
-                        throw new WSSecurityException(e.getMessage(), cause.getCause());
-                    } else if (cause instanceof XMLStreamException) {
-                        throw (XMLStreamException) cause;
-                    } else {
-                        throw new RuntimeException(e.getCause());
-                    }
-                }
-                return;
-            }
-            logger.warn("No matching handler found for " + elementName);
+        try {
+            XMLSecurityHeaderHandler xmlSecurityHeaderHandler = clazz.newInstance();
+            xmlSecurityHeaderHandler.handle(inputProcessorChain, securityProperties, eventQueue, index);
+        } catch (InstantiationException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (IllegalAccessException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(e.getMessage(), e.getCause());
         }
     }
 

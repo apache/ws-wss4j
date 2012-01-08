@@ -68,7 +68,7 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
         };
     }
 
-    protected void addElement(QName element) {
+    public void addElement(QName element) {
         this.elements.add(element);
     }
 

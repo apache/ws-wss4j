@@ -19,18 +19,16 @@
 package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
-import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
 import org.swssf.wss.impl.securityToken.X509SecurityToken;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
+import org.swssf.wss.securityEvent.*;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PublicKey;
@@ -38,8 +36,8 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class X509TokenTest extends AbstractPolicyTestBase {
 
@@ -48,7 +46,7 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        return new X509SecurityToken(tokenType, null, null, null, "", null) {
+        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER, null) {
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return "transmitter";
@@ -64,7 +62,7 @@ public class X509TokenTest extends AbstractPolicyTestBase {
             }
 
             @Override
-            public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                 try {
                     return keyStore.getCertificate("transmitter").getPublicKey();
                 } catch (Exception e) {
@@ -94,44 +92,175 @@ public class X509TokenTest extends AbstractPolicyTestBase {
     @Test
     public void testPolicy() throws Exception {
         String policyString =
-                "<sp:X509Token xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:RequireThumbprintReference/>\n" +
-                        "<sp:WssX509V3Token11/>\n" +
+                        "<sp:InitiatorToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:X509Token>\n" +
+                        "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireThumbprintReference/>\n" +
+                        "               <sp:WssX509V3Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:X509Token>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:InitiatorToken>\n" +
+                        "<sp:RecipientToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:X509Token>\n" +
+                        "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireThumbprintReference/>\n" +
+                        "               <sp:WssX509V3Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:X509Token>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:RecipientToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:X509Token>";
+                        "</sp:AsymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
-        x509TokenSecurityEvent.setSecurityToken(
-                new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER,
-                        getX509Token(WSSConstants.X509V3Token)));
-        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+        X509TokenSecurityEvent initiatorX509TokenSecurityEvent = new X509TokenSecurityEvent();
+        initiatorX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
+        initiatorX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(initiatorX509TokenSecurityEvent);
+
+        X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
+        recipientX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
+        recipientX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
     @Test
     public void testPolicyNegative() throws Exception {
         String policyString =
-                "<sp:X509Token xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:RequireThumbprintReference/>\n" +
-                        "<sp:WssX509V3Token11/>\n" +
+                        "<sp:InitiatorToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:X509Token>\n" +
+                        "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireThumbprintReference/>\n" +
+                        "               <sp:WssX509V3Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:X509Token>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:InitiatorToken>\n" +
+                        "<sp:RecipientToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:X509Token>\n" +
+                        "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireThumbprintReference/>\n" +
+                        "               <sp:WssX509V3Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:X509Token>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:RecipientToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:X509Token>";
+                        "</sp:AsymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent(SecurityEvent.Event.X509Token);
-        x509TokenSecurityEvent.setSecurityToken(
-                new DelegatingSecurityToken(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER,
-                        getX509Token(WSSConstants.X509V1Token)));
+        X509TokenSecurityEvent initiatorX509TokenSecurityEvent = new X509TokenSecurityEvent();
+        initiatorX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V1Token));
+        initiatorX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(initiatorX509TokenSecurityEvent);
+
+        X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
+        recipientX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
+        recipientX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
         try {
-            policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testSupportingTokenPolicy() throws Exception {
+        String policyString =
+                "<sp:SupportingTokens xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "       <sp:X509Token>\n" +
+                        "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireThumbprintReference/>\n" +
+                        "               <sp:WssX509V3Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:X509Token>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:SupportingTokens>";
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        policyEnforcer.doFinal();
+    }
+
+    @Test
+    public void testSupportingTokenPolicyNegative() throws Exception {
+        String policyString =
+                "<sp:SupportingTokens xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "       <sp:X509Token>\n" +
+                        "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireThumbprintReference/>\n" +
+                        "               <sp:WssX509V3Token11/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:X509Token>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:SupportingTokens>";
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V1Token));
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        try {
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            Assert.fail("Exception expected");
+        } catch (WSSecurityException e) {
+            Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
         }
     }
 }

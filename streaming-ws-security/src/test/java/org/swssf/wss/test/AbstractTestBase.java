@@ -37,6 +37,7 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
+import org.testng.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -833,6 +834,20 @@ public abstract class AbstractTestBase {
 
         public void setPassword(Object msgContext, String password) {
             ((MessageContext) msgContext).setProperty(Call.PASSWORD_PROPERTY, password);
+        }
+    }
+
+    protected class TestSecurityEventListener implements SecurityEventListener {
+        private int eventNr = 0;
+        private SecurityEvent.Event[] expectedEvents;
+
+        public TestSecurityEventListener(SecurityEvent.Event[] expectedEvents) {
+            this.expectedEvents = expectedEvents;
+        }
+
+        @Override
+        public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+            Assert.assertEquals(securityEvent.getSecurityEventType(), expectedEvents[eventNr++]);
         }
     }
 }

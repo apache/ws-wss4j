@@ -74,7 +74,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                             nonceValue,
                             null,
                             null,
-                            outputProcessorChain.getSecurityContext(),
                             wsuId,
                             outputProcessor
                     );

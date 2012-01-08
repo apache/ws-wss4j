@@ -20,16 +20,16 @@ package org.swssf.policy.test;
 
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.policy.PolicyEnforcer;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.RequiredElementSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class RequiredElementsTest extends AbstractPolicyTestBase {
 
@@ -40,7 +40,12 @@ public class RequiredElementsTest extends AbstractPolicyTestBase {
                         "<sp:XPath xmlns:b=\"http://example.org\">/b:a</sp:XPath>\n" +
                         "</sp:RequiredElements>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent(SecurityEvent.Event.RequiredElement);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         requiredElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
         requiredElementSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -58,7 +63,12 @@ public class RequiredElementsTest extends AbstractPolicyTestBase {
                         "<sp:XPath xmlns:b=\"http://example.org\">/b:a</sp:XPath>\n" +
                         "</sp:RequiredElements>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent(SecurityEvent.Event.RequiredElement);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         requiredElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
         try {

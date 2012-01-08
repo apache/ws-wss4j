@@ -19,15 +19,15 @@
 package org.swssf.wss.securityEvent;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1195414 $ $Date: 2011-10-31 12:26:48 +0100 (Mon, 31 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SpnegoContextTokenSecurityEvent extends TokenSecurityEvent {
 
     private String issuerName;
 
-    public SpnegoContextTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public SpnegoContextTokenSecurityEvent() {
+        super(Event.SpnegoContextToken);
     }
 
     public String getIssuerName() {

@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.swssf.xmlsec.ext.SecurityToken;
+
 import javax.xml.namespace.QName;
 
 /**
@@ -30,9 +32,11 @@ public class SignedPartSecurityEvent extends SecurityEvent {
     //todo message signature or supporting sig
     private QName element;
     private boolean signed;
+    private SecurityToken securityToken;
 
-    public SignedPartSecurityEvent(Event securityEventType, boolean signed) {
-        super(securityEventType);
+    public SignedPartSecurityEvent(SecurityToken securityToken, boolean signed) {
+        super(Event.SignedPart);
+        this.securityToken = securityToken;
         this.signed = signed;
     }
 
@@ -50,5 +54,13 @@ public class SignedPartSecurityEvent extends SecurityEvent {
 
     public void setSigned(boolean signed) {
         this.signed = signed;
+    }
+
+    public SecurityToken getSecurityToken() {
+        return securityToken;
+    }
+
+    public void setSecurityToken(SecurityToken securityToken) {
+        this.securityToken = securityToken;
     }
 }

@@ -26,8 +26,8 @@ public class SignatureValueSecurityEvent extends SecurityEvent {
 
     private byte[] signatureValue;
 
-    public SignatureValueSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public SignatureValueSecurityEvent() {
+        super(Event.SignatureValue);
     }
 
     public byte[] getSignatureValue() {

@@ -22,17 +22,11 @@ package org.swssf.wss.securityEvent;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-//todo assert supporting tokens
-public class SupportingTokenSecurityEvent extends SecurityEvent {
+public class DerivedKeyTokenSecurityEvent extends TokenSecurityEvent {
 
-    private TokenSecurityEvent tokenSecurityEvent;
+    //todo implement
 
-    public SupportingTokenSecurityEvent(Event securityEventType, TokenSecurityEvent tokenSecurityEvent) {
-        super(securityEventType);
-        this.tokenSecurityEvent = tokenSecurityEvent;
-    }
-
-    public TokenSecurityEvent getTokenSecurityEvent() {
-        return tokenSecurityEvent;
+    public DerivedKeyTokenSecurityEvent() {
+        super(Event.DerivedKeyToken);
     }
 }

@@ -43,7 +43,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 256),
+                256, 192, 256, 256, 1024, 4096),
         Basic192(
                 SPConstants.SHA1,
                 SPConstants.AES192,
@@ -51,7 +51,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic128(
                 SPConstants.SHA1,
                 SPConstants.AES128,
@@ -59,7 +59,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 128),
+                128, 128, 128, 128, 1024, 4096),
         TripleDes(
                 SPConstants.SHA1,
                 SPConstants.TRIPLE_DES,
@@ -67,7 +67,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic256Rsa15(
                 SPConstants.SHA1,
                 SPConstants.AES256,
@@ -75,7 +75,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, -1),
+                256, 192, 256, 256, 1024, 4096),
         Basic192Rsa15(
                 SPConstants.SHA1,
                 SPConstants.AES192,
@@ -83,7 +83,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic128Rsa15(
                 SPConstants.SHA1,
                 SPConstants.AES128,
@@ -91,7 +91,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 128),
+                128, 128, 128, 128, 1024, 4096),
         TripleDesRsa15(
                 SPConstants.SHA1,
                 SPConstants.TRIPLE_DES,
@@ -99,7 +99,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic256Sha256(
                 SPConstants.SHA256,
                 SPConstants.AES256,
@@ -107,7 +107,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 256, 256, -1),
+                256, 256, 256, 256, 1024, 4096),
         Basic192Sha256(
                 SPConstants.SHA256,
                 SPConstants.AES192,
@@ -115,7 +115,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic128Sha256(
                 SPConstants.SHA256,
                 SPConstants.AES128,
@@ -123,7 +123,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 128),
+                128, 128, 128, 128, 1024, 4096),
         TripleDesSha256(
                 SPConstants.SHA256,
                 SPConstants.TRIPLE_DES,
@@ -131,7 +131,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic256Sha256Rsa15(
                 SPConstants.SHA256,
                 SPConstants.AES256,
@@ -139,7 +139,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, -1),
+                256, 192, 256, 256, 1024, 4096),
         Basic192Sha256Rsa15(
                 SPConstants.SHA256,
                 SPConstants.AES192,
@@ -147,7 +147,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192),
+                192, 192, 192, 192, 1024, 4096),
         Basic128Sha256Rsa15(
                 SPConstants.SHA256,
                 SPConstants.AES128,
@@ -155,7 +155,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 192),
+                128, 128, 128, 192, 1024, 4096),
         TripleDesSha256Rsa15(
                 SPConstants.SHA256,
                 SPConstants.TRIPLE_DES,
@@ -163,7 +163,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192);
+                192, 192, 192, 192, 1024, 4096);
 
         private String digest;
         private String encryption;
@@ -175,6 +175,8 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private int signatureDerivedKeyLength;
         private int minimumSymmetricKeyLength;
         private int maximumSymmetricKeyLength;
+        private int minimumAsymmetricKeyLength;
+        private int maximumAsymmetricKeyLength;
 
         private static final Map<String, AlgorithmSuiteType> lookup = new HashMap<String, AlgorithmSuiteType>();
 
@@ -190,7 +192,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         AlgorithmSuiteType(String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
                            String encryptionKeyDerivation, String signatureKeyDerivation, int encryptionDerivedKeyLength,
                            int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
-                           int maximumSymmetricKeyLength) {
+                           int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength, int maximumAsymmetricKeyLength) {
             this.digest = digest;
             this.encryption = encryption;
             this.symmetricKeyWrap = symmetricKeyWrap;
@@ -201,6 +203,8 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.signatureDerivedKeyLength = signatureDerivedKeyLength;
             this.minimumSymmetricKeyLength = minimumSymmetricKeyLength;
             this.maximumSymmetricKeyLength = maximumSymmetricKeyLength;
+            this.minimumAsymmetricKeyLength = minimumAsymmetricKeyLength;
+            this.maximumAsymmetricKeyLength = maximumAsymmetricKeyLength;
         }
 
         public String getDigest() {
@@ -241,6 +245,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
 
         public int getMaximumSymmetricKeyLength() {
             return maximumSymmetricKeyLength;
+        }
+
+        public int getMinimumAsymmetricKeyLength() {
+            return minimumAsymmetricKeyLength;
+        }
+
+        public int getMaximumAsymmetricKeyLength() {
+            return maximumAsymmetricKeyLength;
         }
     }
 

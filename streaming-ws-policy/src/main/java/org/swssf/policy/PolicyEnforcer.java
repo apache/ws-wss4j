@@ -21,12 +21,17 @@ package org.swssf.policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.*;
+import org.apache.neethi.builders.PrimitiveAssertion;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.*;
 import org.swssf.policy.assertionStates.*;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.SecurityToken;
 
+import javax.xml.namespace.QName;
 import java.util.*;
 
 /**
@@ -38,16 +43,27 @@ import java.util.*;
  */
 public class PolicyEnforcer implements SecurityEventListener {
 
+    //todo:
+    // AlgorithmSuite SoapNorm
+    // AlgorithmSuite STR Trans
+    // AlgorithmSuite XPath
+    // AlgorithmSuite Comp Key
+    // Token Protection
+    // finishing Layout
+    // HttpsToken Algorithms
+    //ProtectionOrder
+    //Derived Keys property
+
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcer.class);
 
     private List<OperationPolicy> operationPolicies;
     private OperationPolicy effectivePolicy;
     private List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap;
-    private ArrayDeque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
-    private boolean messageSignatureSecurityEventProcessed = false;
-    private boolean messageEncryptionSecurityEventProcessed = false;
-    private Map<String, TokenSecurityEvent> processedSecurityTokens = new HashMap<String, TokenSecurityEvent>();
+    //securityEventQueue can probably be eliminated if we queue the events in the streaming-ws-security framework and
+    //the first emitted event will be the operation event!
+    private Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
     private boolean transportSecurityActive = false;
+    private boolean operationSecurityEventOccured = false;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
@@ -134,6 +150,11 @@ public class PolicyEnforcer implements SecurityEventListener {
                     addAssertionState(assertables, abstractSecurityAssertion, assertable);
                 }
             }
+            if (abstractSecurityAssertion instanceof PolicyContainingAssertion) {
+                buildAssertionStateMap(((PolicyContainingAssertion) abstractSecurityAssertion).getPolicy(), assertionStateMap, alternative);
+            }
+        } else if (policyComponent instanceof PrimitiveAssertion) {
+            //nothing to-do. should be covered by the surrounding assertion
         } else {
             throw new WSSPolicyException("Unsupported PolicyComponent: " + policyComponent + " type: " + policyComponent.getType());
         }
@@ -150,7 +171,6 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     protected List<Assertable> getAssertableForAssertion(AbstractSecurityAssertion abstractSecurityAssertion) throws WSSPolicyException {
         List<Assertable> assertableList = new ArrayList<Assertable>();
-        //todo the initialState property can probably be eliminated
         if (abstractSecurityAssertion instanceof ContentEncryptedElements) {
             assertableList.add(new ContentEncryptedElementsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof EncryptedParts) {
@@ -189,18 +209,53 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false));
         } else if (abstractSecurityAssertion instanceof AlgorithmSuite) {
             assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, true));
-        } else if (abstractSecurityAssertion instanceof AsymmetricBinding
-                || abstractSecurityAssertion instanceof SymmetricBinding) {
-            assertableList.add(new IncludeTimeStampAssertionState(abstractSecurityAssertion, false));
-            assertableList.add(new ProtectionOrderAssertionState(abstractSecurityAssertion, false));
-            assertableList.add(new SignatureProtectionAssertionState(abstractSecurityAssertion, false));
-            //todo token protection
-            assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, false));
+        } else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
+        } else if (abstractSecurityAssertion instanceof SymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof TransportBinding) {
-            assertableList.add(new IncludeTimeStampAssertionState(abstractSecurityAssertion, false));
         } else if (abstractSecurityAssertion instanceof Layout) {
             assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
         }
+
+        if (abstractSecurityAssertion instanceof AbstractBinding) {
+            AbstractBinding abstractBinding = (AbstractBinding) abstractSecurityAssertion;
+            if (abstractBinding instanceof AbstractSymmetricAsymmetricBinding) {
+                AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) abstractSecurityAssertion;
+                //todo:
+                //assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, false));
+                assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, true));
+                assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, false));
+                //todo token protection
+            } else if (abstractSecurityAssertion instanceof TransportBinding) {
+                if (abstractBinding.isIncludeTimestamp()) {
+                    RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(abstractBinding, false);
+                    requiredElementsAssertionState.addElement(WSSConstants.TAG_wsu_Timestamp);
+                    assertableList.add(requiredElementsAssertionState);
+                }
+            }
+
+            assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, true));
+            if (abstractBinding.isIncludeTimestamp()) {
+                SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(abstractSecurityAssertion, true);
+                signedElementsAssertionState.addElement(WSSConstants.TAG_wsu_Timestamp);
+                assertableList.add(signedElementsAssertionState);
+            }
+        } else if (abstractSecurityAssertion instanceof AbstractToken) {
+            AbstractToken abstractToken = (AbstractToken) abstractSecurityAssertion;
+            AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
+            if (parentAssertion instanceof SupportingTokens) {
+                SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
+                SupportingTokenType supportingTokenType = supportingTokens.getSupportingTokenType();
+                if (supportingTokenType.getName().getLocalPart().startsWith("Signed")) {
+                    SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(abstractSecurityAssertion, true);
+                    assertableList.add(signedElementsAssertionState);
+                    //todo the other tokens?
+                    if (abstractToken instanceof UsernameToken) {
+                        signedElementsAssertionState.addElement(WSSConstants.TAG_wsse_UsernameToken);
+                    }
+                }
+            }
+        }
+
         return assertableList;
     }
 
@@ -211,24 +266,8 @@ public class PolicyEnforcer implements SecurityEventListener {
      * @throws WSSPolicyException
      */
     private void verifyPolicy(SecurityEvent securityEvent) throws WSSPolicyException {
-
-        /*if (securityEvent instanceof TokenSecurityEvent
-                && !(securityEvent instanceof HttpsTokenSecurityEvent)
-                && !(securityEvent instanceof EncryptionTokenSecurityEvent)
-                && !(securityEvent instanceof SignatureTokenSecurityEvent)) {
-            //safety check: message tokens or supporting tokens are only allowed
-            throw new WSSPolicyException("Illegal security event received: " + securityEvent.getSecurityEventType());
-        }*/
-
-        if (log.isDebugEnabled()) {
-            log.debug("Verifying SecurityEvent: " + securityEvent.getSecurityEventType());
-            if (securityEvent.getSecurityEventType() == SecurityEvent.Event.AlgorithmSuite) {
-                log.debug("Algo: " + ((AlgorithmSuiteSecurityEvent) securityEvent).getAlgorithmURI());
-                log.debug("KeyUsage: " + ((AlgorithmSuiteSecurityEvent) securityEvent).getKeyUsage());
-            }
-        }
-
         int notAssertedCount = 0;
+        alternative:
         for (int i = 0; i < assertionStateMap.size(); i++) {
             Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMap.get(i);
 
@@ -236,7 +275,6 @@ public class PolicyEnforcer implements SecurityEventListener {
             Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
             if (assertionListMap != null && assertionListMap.size() > 0) {
 
-                alternative:
                 for (Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = assertionListMap.entrySet().iterator(); assertionStateIterator.hasNext(); ) {
                     Map.Entry<Assertion, List<Assertable>> assertionStateEntry = assertionStateIterator.next();
                     List<Assertable> assertionStates = assertionStateEntry.getValue();
@@ -246,7 +284,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                         //...so if one fails, continue with the next map entry and increment the notAssertedCount
                         if (!asserted) {
                             notAssertedCount++;
-                            break alternative;
+                            continue alternative;
                         }
                     }
                 }
@@ -268,10 +306,10 @@ public class PolicyEnforcer implements SecurityEventListener {
      */
     private void verifyPolicy() throws WSSPolicyException {
         int notAsserted = 0;
+        alternative:
         for (int i = 0; i < assertionStateMap.size(); i++) {
             Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMap.get(i);
             Iterator<Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> iterator = map.entrySet().iterator();
-            alternative:
             while (iterator.hasNext()) {
                 Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>> mapEntry = iterator.next();
                 Iterator<Map.Entry<Assertion, List<Assertable>>> assertableIterator = mapEntry.getValue().entrySet().iterator();
@@ -319,46 +357,26 @@ public class PolicyEnforcer implements SecurityEventListener {
     //multiple threads can call this method concurrently -> synchronize access
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
-        //we do decide here if we have a message signature/encryption or a supporting signature/encryption
-        //this information is not known in the WSS framework because it knows nothing
-        //about the transportToken
-        if (securityEvent instanceof TokenSecurityEvent) {
-            final TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
-            if (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Signature) {
-                if (!messageSignatureSecurityEventProcessed) {
-                    messageSignatureSecurityEventProcessed = true;
-                } else {
-                    securityEvent = new SupportingTokenSecurityEvent(SecurityEvent.Event.SupportingToken, tokenSecurityEvent);
-                }
-                processedSecurityTokens.put(tokenSecurityEvent.getSecurityToken().getId(), tokenSecurityEvent);
-            } else if (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption) {
-                if (!messageEncryptionSecurityEventProcessed) {
-                    messageEncryptionSecurityEventProcessed = true;
-                } else {
-                    securityEvent = new SupportingTokenSecurityEvent(SecurityEvent.Event.SupportingToken, tokenSecurityEvent);
-                }
-                processedSecurityTokens.put(tokenSecurityEvent.getSecurityToken().getId(), tokenSecurityEvent);
-            }
-        }
         if (securityEvent instanceof HttpsTokenSecurityEvent) {
             transportSecurityActive = true;
         }
 
-        if (effectivePolicy != null) {
-            //soap-action spoofing detection
-            if (securityEvent.getSecurityEventType().equals(SecurityEvent.Event.Operation)) {
-                if (!effectivePolicy.getOperationName().equals(((OperationSecurityEvent) securityEvent).getOperation().getLocalPart())) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, new WSSPolicyException("SOAPAction (" + effectivePolicy.getOperationName() + ") does not match with the current Operation: " + ((OperationSecurityEvent) securityEvent).getOperation()));
-                }
-            }
+        if (operationSecurityEventOccured) {
             try {
                 verifyPolicy(securityEvent);
             } catch (WSSPolicyException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-        } else {
+        }
 
-            if (securityEvent.getSecurityEventType().equals(SecurityEvent.Event.Operation)) {
+        if (securityEvent.getSecurityEventType().equals(SecurityEvent.Event.Operation)) {
+            operationSecurityEventOccured = true;
+            if (effectivePolicy != null) {
+                //soap-action spoofing detection
+                if (!effectivePolicy.getOperationName().equals(((OperationSecurityEvent) securityEvent).getOperation().getLocalPart())) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, new WSSPolicyException("SOAPAction (" + effectivePolicy.getOperationName() + ") does not match with the current Operation: " + ((OperationSecurityEvent) securityEvent).getOperation()));
+                }
+            } else {
                 effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, ((OperationSecurityEvent) securityEvent).getOperation().getLocalPart());
                 if (effectivePolicy == null) {
                     //no policy to the operation given
@@ -370,31 +388,311 @@ public class PolicyEnforcer implements SecurityEventListener {
                 } catch (WSSPolicyException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
+            }
 
-                Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
-                while (securityEventIterator.hasNext()) {
-                    SecurityEvent prevSecurityEvent = securityEventIterator.next();
+            try {
+                identifySecurityTokenDepenedenciesAndUsage(securityEventQueue);
+            } catch (PolicyViolationException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
 
-                    if (prevSecurityEvent instanceof TokenSecurityEvent) {
-                        final TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) prevSecurityEvent;
-                        String id = tokenSecurityEvent.getSecurityToken().getId();
-                        if (!processedSecurityTokens.containsKey(id)) {
-                            prevSecurityEvent = new SupportingTokenSecurityEvent(SecurityEvent.Event.SupportingToken, tokenSecurityEvent);
-                            processedSecurityTokens.put(id, tokenSecurityEvent);
-                        }
-                    }
-                    try {
-                        verifyPolicy(prevSecurityEvent);
-                    } catch (WSSPolicyException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-                    }
+            Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
+            while (securityEventIterator.hasNext()) {
+                SecurityEvent prevSecurityEvent = securityEventIterator.next();
+                try {
+                    verifyPolicy(prevSecurityEvent);
+                } catch (WSSPolicyException e) {
+                    //todo better exceptions
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
+            }
+            securityEventQueue.clear();
+        } else {
+            //queue events until the operation security event occured
+            securityEventQueue.push(securityEvent);
+        }
+    }
 
-            } else {
-                //queue event until policy is resolved
-                securityEventQueue.push(securityEvent);
+    private void identifySecurityTokenDepenedenciesAndUsage(Deque<SecurityEvent> securityEventDeque) throws PolicyViolationException, WSSecurityException {
+
+        List<TokenSecurityEvent> messageSignatureTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> messageEncryptionTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> supportingTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> signedSupportingTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> endorsingSupportingTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> signedEndorsingSupportingTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> signedEncryptedSupportingTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> endorsingEncryptedSupportingTokens = new ArrayList<TokenSecurityEvent>();
+        List<TokenSecurityEvent> signedEndorsingEncryptedSupportingTokens = new ArrayList<TokenSecurityEvent>();
+
+        List<TokenSecurityEvent> tokenSecurityEvents = new LinkedList<TokenSecurityEvent>();
+        for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
+            SecurityEvent securityEvent = iterator.next();
+            //todo it is probably better to use the EventType Enum instead of InstanceOf?
+            if (securityEvent instanceof TokenSecurityEvent) {
+                //iterator.remove();
+                if (securityEvent instanceof HttpsTokenSecurityEvent) {
+                    HttpsTokenSecurityEvent httpsTokenSecurityEvent = (HttpsTokenSecurityEvent) securityEvent;
+                    httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.MainSignature);
+                    messageSignatureTokens.add(httpsTokenSecurityEvent);
+                    HttpsTokenSecurityEvent clonedHttpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+                    clonedHttpsTokenSecurityEvent.setAuthenticationType(httpsTokenSecurityEvent.getAuthenticationType());
+                    clonedHttpsTokenSecurityEvent.setIssuerName(httpsTokenSecurityEvent.getIssuerName());
+                    clonedHttpsTokenSecurityEvent.setSecurityToken(httpsTokenSecurityEvent.getSecurityToken());
+                    clonedHttpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.MainEncryption);
+                    messageEncryptionTokens.add(clonedHttpsTokenSecurityEvent);
+                    continue;
+                }
+                tokenSecurityEvents.add((TokenSecurityEvent) securityEvent);
             }
         }
+
+        Iterator<TokenSecurityEvent> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
+        while (tokenSecurityEventIterator.hasNext()) {
+            TokenSecurityEvent tokenSecurityEvent = tokenSecurityEventIterator.next();
+            if (tokenSecurityEvent.getSecurityToken().getKeyWrappingToken() == null) {
+                supportingTokens.add(tokenSecurityEvent);
+            } else if (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption) {
+                SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
+                while (securityToken.getKeyWrappingToken() != null) {
+                    securityToken = securityToken.getKeyWrappingToken();
+                }
+                TokenSecurityEvent encTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+                encTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+                //todo handle multiple encryption tokens
+                messageEncryptionTokens.add(encTokenSecurityEvent);
+                securityEventDeque.offer(encTokenSecurityEvent);
+            }
+        }
+
+        Iterator<TokenSecurityEvent> supportingTokensIterator = supportingTokens.iterator();
+        while (supportingTokensIterator.hasNext()) {
+            TokenSecurityEvent tokenSecurityEvent = supportingTokensIterator.next();
+            List<SecurityToken> signingSecurityTokens = isSignedToken(tokenSecurityEvent, securityEventDeque);
+            boolean signsSignature = signsElement(tokenSecurityEvent, WSSConstants.TAG_dsig_Signature, securityEventDeque);
+            boolean signsSignatureConfirmation = signsElement(tokenSecurityEvent, WSSConstants.TAG_wsse11_SignatureConfirmation, securityEventDeque);
+            boolean signsTimestamp = signsElement(tokenSecurityEvent, WSSConstants.TAG_wsu_Timestamp, securityEventDeque);
+            if (!this.transportSecurityActive && signsSignatureConfirmation && signsTimestamp) {
+                supportingTokensIterator.remove();
+                messageSignatureTokens.add(tokenSecurityEvent);
+            } else if (!this.transportSecurityActive && signsSignatureConfirmation) {
+                supportingTokensIterator.remove();
+                messageSignatureTokens.add(tokenSecurityEvent);
+            } else if (!this.transportSecurityActive && signsTimestamp) {
+                supportingTokensIterator.remove();
+                messageSignatureTokens.add(tokenSecurityEvent);
+            } else if (signsSignature && signingSecurityTokens.size() > 0) {
+                supportingTokensIterator.remove();
+                signedEndorsingSupportingTokens.add(tokenSecurityEvent);
+            } else if (signsSignature) {
+                supportingTokensIterator.remove();
+                endorsingSupportingTokens.add(tokenSecurityEvent);
+            } else if (signingSecurityTokens.size() > 0) {
+                supportingTokensIterator.remove();
+                signedSupportingTokens.add(tokenSecurityEvent);
+            }
+        }
+
+        if (messageSignatureTokens.size() == 0) {
+            SecurityToken messageSignatureToken = getSupportingTokenSigningToken(
+                    signedSupportingTokens,
+                    signedEndorsingSupportingTokens,
+                    signedEncryptedSupportingTokens,
+                    signedEndorsingEncryptedSupportingTokens,
+                    securityEventDeque);
+
+            TokenSecurityEvent tokenSecurityEvent = getTokenSecurityEvent(messageSignatureToken, tokenSecurityEvents);
+            if (tokenSecurityEvent != null) {
+                supportingTokens.remove(tokenSecurityEvent);
+                signedSupportingTokens.remove(tokenSecurityEvent);
+                endorsingSupportingTokens.remove(tokenSecurityEvent);
+                signedEndorsingSupportingTokens.remove(tokenSecurityEvent);
+                signedEncryptedSupportingTokens.remove(tokenSecurityEvent);
+                endorsingEncryptedSupportingTokens.remove(tokenSecurityEvent);
+                signedEndorsingEncryptedSupportingTokens.remove(tokenSecurityEvent);
+                messageSignatureTokens.add(tokenSecurityEvent);
+            }
+        }
+
+        if (messageSignatureTokens.size() == 0) {
+            for (Iterator<TokenSecurityEvent> iterator = supportingTokens.iterator(); iterator.hasNext(); ) {
+                TokenSecurityEvent supportingToken = iterator.next();
+                if (supportingToken.getTokenUsage() == TokenSecurityEvent.TokenUsage.Signature) {
+                    iterator.remove();
+                    messageSignatureTokens.add(supportingToken);
+                    break;
+                }
+            }
+        }
+
+        if (messageEncryptionTokens.size() == 0) {
+            for (Iterator<TokenSecurityEvent> iterator = supportingTokens.iterator(); iterator.hasNext(); ) {
+                TokenSecurityEvent supportingToken = iterator.next();
+                if (supportingToken.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption) {
+                    iterator.remove();
+                    messageEncryptionTokens.add(supportingToken);
+                    break;
+                }
+            }
+        }
+
+        setTokenUsage(messageSignatureTokens, TokenSecurityEvent.TokenUsage.MainSignature);
+        setTokenUsage(messageEncryptionTokens, TokenSecurityEvent.TokenUsage.MainEncryption);
+        setTokenUsage(supportingTokens, TokenSecurityEvent.TokenUsage.SupportingToken);
+        setTokenUsage(signedSupportingTokens, TokenSecurityEvent.TokenUsage.SignedSupportingTokens);
+        setTokenUsage(endorsingSupportingTokens, TokenSecurityEvent.TokenUsage.EndorsingSupportingTokens);
+        setTokenUsage(signedEndorsingSupportingTokens, TokenSecurityEvent.TokenUsage.SignedEndorsingSupportingTokens);
+        setTokenUsage(signedEncryptedSupportingTokens, TokenSecurityEvent.TokenUsage.SignedEncryptedSupportingTokens);
+        setTokenUsage(endorsingEncryptedSupportingTokens, TokenSecurityEvent.TokenUsage.EndorsingEncryptedSupportingTokens);
+        setTokenUsage(signedEndorsingEncryptedSupportingTokens, TokenSecurityEvent.TokenUsage.SignedEndorsingEncryptedSupportingTokens);
+    }
+
+    private TokenSecurityEvent getTokenSecurityEvent(SecurityToken securityToken, List<TokenSecurityEvent> tokenSecurityEvents) {
+        for (int i = 0; i < tokenSecurityEvents.size(); i++) {
+            TokenSecurityEvent tokenSecurityEvent = tokenSecurityEvents.get(i);
+            if (tokenSecurityEvent.getSecurityToken() == securityToken) {
+                return tokenSecurityEvent;
+            }
+        }
+        return null;
+    }
+
+    private SecurityToken getSupportingTokenSigningToken(
+            List<TokenSecurityEvent> signedSupportingTokens,
+            List<TokenSecurityEvent> signedEndorsingSupportingTokens,
+            List<TokenSecurityEvent> signedEncryptedSupportingTokens,
+            List<TokenSecurityEvent> signedEndorsingEncryptedSupportingTokens,
+            Deque<SecurityEvent> securityEventDeque
+    ) {
+
+        //todo we have to check if the signingTokens also cover the other supporting tokens!
+        for (int i = 0; i < signedSupportingTokens.size(); i++) {
+            TokenSecurityEvent tokenSecurityEvent = signedSupportingTokens.get(i);
+            List<SecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
+            if (signingSecurityTokens.size() == 1) {
+                return signingSecurityTokens.get(0);
+            }
+        }
+        for (int i = 0; i < signedEndorsingSupportingTokens.size(); i++) {
+            TokenSecurityEvent tokenSecurityEvent = signedEndorsingSupportingTokens.get(i);
+            List<SecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
+            if (signingSecurityTokens.size() == 1) {
+                return signingSecurityTokens.get(0);
+            }
+        }
+        for (int i = 0; i < signedEncryptedSupportingTokens.size(); i++) {
+            TokenSecurityEvent tokenSecurityEvent = signedEncryptedSupportingTokens.get(i);
+            List<SecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
+            if (signingSecurityTokens.size() == 1) {
+                return signingSecurityTokens.get(0);
+            }
+        }
+        for (int i = 0; i < signedEndorsingEncryptedSupportingTokens.size(); i++) {
+            TokenSecurityEvent tokenSecurityEvent = signedEndorsingEncryptedSupportingTokens.get(i);
+            List<SecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
+            if (signingSecurityTokens.size() == 1) {
+                return signingSecurityTokens.get(0);
+            }
+        }
+        return null;
+    }
+
+    private List<SecurityToken> getSigningToken(TokenSecurityEvent tokenSecurityEvent, Deque<SecurityEvent> securityEventDeque) {
+        QName elementName = null;
+        //todo element name in security Token?
+        //todo the element name equality must be checked more precisely (inkl. path)!
+        switch (tokenSecurityEvent.getSecurityEventType()) {
+            case UsernameToken:
+                elementName = WSSConstants.TAG_wsse_UsernameToken;
+                break;
+            case X509Token:
+                //todo not always correct:
+                elementName = WSSConstants.TAG_wsse_BinarySecurityToken;
+                break;
+        }
+        if (elementName == null) {
+            throw new RuntimeException("todo other token types...");
+        }
+
+        List<SecurityToken> signingSecurityTokens = new ArrayList<SecurityToken>();
+
+        for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
+            SecurityEvent securityEvent = iterator.next();
+            if (securityEvent instanceof SignedElementSecurityEvent) {
+                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+                if (signedElementSecurityEvent.isSigned()
+                        && signedElementSecurityEvent.getElement().equals(elementName)) {
+                    signingSecurityTokens.add(signedElementSecurityEvent.getSecurityToken());
+                }
+            }
+        }
+        return signingSecurityTokens;
+    }
+
+    //todo overall linked-list and iterate with an iterator
+    private void setTokenUsage(List<TokenSecurityEvent> tokenSecurityEvents, TokenSecurityEvent.TokenUsage tokenUsage) {
+        for (int i = 0; i < tokenSecurityEvents.size(); i++) {
+            TokenSecurityEvent tokenSecurityEvent = tokenSecurityEvents.get(i);
+            tokenSecurityEvent.setTokenUsage(tokenUsage);
+        }
+    }
+
+    private List<SecurityToken> isSignedToken(TokenSecurityEvent tokenSecurityEvent, Deque<SecurityEvent> securityEventDeque) {
+        List<SecurityToken> securityTokenList = new ArrayList<SecurityToken>();
+        for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
+            SecurityEvent securityEvent = iterator.next();
+            //todo it is probably better to use the EventType Enum instead of InstanceOf?
+            if (securityEvent instanceof SignedElementSecurityEvent) {
+                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+                //todo the element name equality must be checked more precisely (inkl. path)!
+                if (signedElementSecurityEvent.isSigned()
+                        //todo element name in security Tokem?
+                        && tokenSecurityEvent instanceof UsernameTokenSecurityEvent
+                        && WSSConstants.TAG_wsse_UsernameToken.equals(signedElementSecurityEvent.getElement())) {
+
+                    if (!securityTokenList.contains(signedElementSecurityEvent.getSecurityToken())) {
+                        securityTokenList.add(signedElementSecurityEvent.getSecurityToken());
+                    }
+                }
+            }
+        }
+        return securityTokenList;
+    }
+
+    private List<SecurityToken> getElementSigningToken(QName element, Deque<SecurityEvent> securityEventDeque) {
+        List<SecurityToken> securityTokenList = new ArrayList<SecurityToken>();
+        for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
+            SecurityEvent securityEvent = iterator.next();
+            //todo it is probably better to use the EventType Enum instead of InstanceOf?
+            if (securityEvent instanceof SignedElementSecurityEvent) {
+                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+                //todo the element name equality must be checked more precisely (inkl. path)!
+                if (signedElementSecurityEvent.isSigned()
+                        && element.equals(signedElementSecurityEvent.getElement())) {
+                    if (!securityTokenList.contains(signedElementSecurityEvent.getSecurityToken())) {
+                        securityTokenList.add(signedElementSecurityEvent.getSecurityToken());
+                    }
+                }
+            }
+        }
+        return securityTokenList;
+    }
+
+    private boolean signsElement(TokenSecurityEvent tokenSecurityEvent, QName element, Deque<SecurityEvent> securityEventDeque) {
+        for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
+            SecurityEvent securityEvent = iterator.next();
+            //todo it is probably better to use the EventType Enum instead of InstanceOf?
+            if (securityEvent instanceof SignedElementSecurityEvent) {
+                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+                //todo the element name equality must be checked more precisely (inkl. path)!
+                if (signedElementSecurityEvent.isSigned()
+                        && signedElementSecurityEvent.getSecurityToken() == tokenSecurityEvent.getSecurityToken()
+                        && element.equals(signedElementSecurityEvent.getElement())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

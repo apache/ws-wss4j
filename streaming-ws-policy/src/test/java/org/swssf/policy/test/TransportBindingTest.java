@@ -27,6 +27,8 @@ import org.swssf.wss.securityEvent.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -42,23 +44,37 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:TransportBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username"));
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        requiredElementSecurityEvent.setElement(WSSConstants.TAG_wsu_Timestamp);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
         encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+
+        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
         encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, true);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
         signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
@@ -70,15 +86,23 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:TransportBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username"));
+
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
+        policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
         try {
-            policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
@@ -94,17 +118,30 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:TransportBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username"));
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        requiredElementSecurityEvent.setElement(WSSConstants.TAG_wsu_Timestamp);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, false);
         encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
@@ -117,23 +154,37 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:TransportBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
-        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent(SecurityEvent.Event.HttpsToken);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username"));
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        requiredElementSecurityEvent.setElement(WSSConstants.TAG_wsu_Timestamp);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+
+        HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+
         httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
         encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, true);
+
+        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
         encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
         signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 }

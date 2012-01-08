@@ -109,6 +109,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         soapEnvElement.removeChild(bodyElement);
 
         Element newBody = securedDocument.createElementNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
+        Element operationElement = securedDocument.createElementNS("http://schemas.xmlsoap.org/wsdl/", "definitions");
+        newBody.appendChild(operationElement);
         soapEnvElement.appendChild(newBody);
 
         xPathExpression = getXPath("/env:Envelope/env:Header");

@@ -18,7 +18,10 @@
  */
 package org.swssf.xmlsec.test;
 
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.InputProcessor;
+import org.swssf.xmlsec.ext.InputProcessorChain;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.InputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.testng.Assert;

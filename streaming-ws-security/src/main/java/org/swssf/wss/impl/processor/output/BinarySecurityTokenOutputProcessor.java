@@ -114,7 +114,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     return key;
                 }
 
-                public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                     return x509Certificates[0].getPublicKey();
                 }
 
@@ -197,7 +197,6 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         if (securityEventList != null) {
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
-                //todo find correct message signature token...however...
                 if (securityEvent instanceof TokenSecurityEvent) {
                     TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
                     if (tokenSecurityEvent.getTokenUsage() != TokenSecurityEvent.TokenUsage.Signature) {

@@ -43,21 +43,27 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     public RequiredElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
 
-        RequiredElements requiredElements = (RequiredElements) assertion;
-        for (int i = 0; i < requiredElements.getXPaths().size(); i++) {
-            XPath xPath = requiredElements.getXPaths().get(i);
-            String[] xPathElements = xPath.getXPath().split("/");
-            String[] xPathElement = xPathElements[xPathElements.length - 1].split(":");
-            if (xPathElement.length == 2) {
-                String ns = xPath.getPrefixNamespaceMap().get(xPathElement[0]);
-                if (ns == null) {
-                    throw new IllegalArgumentException("Namespace not declared");
+        if (assertion instanceof RequiredElements) {
+            RequiredElements requiredElements = (RequiredElements) assertion;
+            for (int i = 0; i < requiredElements.getXPaths().size(); i++) {
+                XPath xPath = requiredElements.getXPaths().get(i);
+                String[] xPathElements = xPath.getXPath().split("/");
+                String[] xPathElement = xPathElements[xPathElements.length - 1].split(":");
+                if (xPathElement.length == 2) {
+                    String ns = xPath.getPrefixNamespaceMap().get(xPathElement[0]);
+                    if (ns == null) {
+                        throw new IllegalArgumentException("Namespace not declared");
+                    }
+                    elements.put(new QName(ns, xPathElement[1]), Boolean.FALSE);
+                } else {
+                    elements.put(new QName(xPathElement[1]), Boolean.FALSE);
                 }
-                elements.put(new QName(ns, xPathElement[1]), Boolean.FALSE);
-            } else {
-                elements.put(new QName(xPathElement[1]), Boolean.FALSE);
             }
         }
+    }
+
+    public void addElement(QName element) {
+        this.elements.put(element, Boolean.FALSE);
     }
 
     @Override

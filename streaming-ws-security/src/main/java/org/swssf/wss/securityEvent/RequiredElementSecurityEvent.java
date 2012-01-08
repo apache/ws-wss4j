@@ -29,8 +29,8 @@ public class RequiredElementSecurityEvent extends SecurityEvent {
     //todo xpath or something unique
     private QName element;
 
-    public RequiredElementSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public RequiredElementSecurityEvent() {
+        super(Event.RequiredElement);
     }
 
     public QName getElement() {

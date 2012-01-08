@@ -27,8 +27,8 @@ public class SecureConversationTokenSecurityEvent extends TokenSecurityEvent {
     private boolean externalUriRef;
     private String issuerName;
 
-    public SecureConversationTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public SecureConversationTokenSecurityEvent() {
+        super(Event.SecureConversationToken);
     }
 
     public boolean isExternalUriRef() {

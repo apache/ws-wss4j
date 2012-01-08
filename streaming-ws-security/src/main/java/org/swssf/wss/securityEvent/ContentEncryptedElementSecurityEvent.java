@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.swssf.xmlsec.ext.SecurityToken;
+
 import javax.xml.namespace.QName;
 
 /**
@@ -27,12 +29,16 @@ import javax.xml.namespace.QName;
 public class ContentEncryptedElementSecurityEvent extends SecurityEvent {
 
     //todo xpath or something unique
-    private QName element; //this contents parent element
-    private boolean encrypted; //if true this element is not encrypted.
+    private QName element; //parent element
+    private boolean encrypted;
+    private SecurityToken securityToken;
+    private boolean signedContent;
 
-    public ContentEncryptedElementSecurityEvent(Event securityEventType, boolean encrypted) {
-        super(securityEventType);
+    public ContentEncryptedElementSecurityEvent(SecurityToken securityToken, boolean encrypted, boolean signedContent) {
+        super(Event.ContentEncrypted);
+        this.securityToken = securityToken;
         this.encrypted = encrypted;
+        this.signedContent = signedContent;
     }
 
     public QName getElement() {
@@ -49,5 +55,21 @@ public class ContentEncryptedElementSecurityEvent extends SecurityEvent {
 
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
+    }
+
+    public SecurityToken getSecurityToken() {
+        return securityToken;
+    }
+
+    public void setSecurityToken(SecurityToken securityToken) {
+        this.securityToken = securityToken;
+    }
+
+    public boolean isSignedContent() {
+        return signedContent;
+    }
+
+    public void setSignedContent(boolean signedContent) {
+        this.signedContent = signedContent;
     }
 }

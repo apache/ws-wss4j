@@ -20,52 +20,156 @@ package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityContextTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.impl.securityToken.X509SecurityToken;
+import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
+
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SecurityContextTokenTest extends AbstractPolicyTestBase {
 
     @Test
     public void testPolicy() throws Exception {
         String policyString =
-                "<sp:SecurityContextToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:RequireExternalUriReference/>\n" +
+                        "<sp:EncryptionToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:SecurityContextToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireExternalUriReference/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:SecurityContextToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:EncryptionToken>\n" +
+                        "<sp:SignatureToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:SecurityContextToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireExternalUriReference/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:SecurityContextToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:SignatureToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:SecurityContextToken>";
+                        "</sp:SymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent(SecurityEvent.Event.SecurityContextToken);
-        securityContextTokenSecurityEvent.setIssuerName("xs:anyURI");
-        securityContextTokenSecurityEvent.setExternalUriRef(true);
-        policyEnforcer.registerSecurityEvent(securityContextTokenSecurityEvent);
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
+        initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
+        initiatorTokenSecurityEvent.setExternalUriRef(true);
+        initiatorTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
+
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
+        recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
+        recipientTokenSecurityEvent.setExternalUriRef(true);
+        recipientTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
     @Test
     public void testPolicyNegative() throws Exception {
         String policyString =
-                "<sp:SecurityContextToken xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" " +
-                        "xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
-                        "<sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
-                        "<sp:RequireExternalUriReference/>\n" +
+                        "<sp:EncryptionToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:SecurityContextToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireExternalUriReference/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:SecurityContextToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:EncryptionToken>\n" +
+                        "<sp:SignatureToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:SecurityContextToken>\n" +
+                        "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RequireExternalUriReference/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:SecurityContextToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:SignatureToken>\n" +
                         "</wsp:Policy>\n" +
-                        "</sp:SecurityContextToken>";
+                        "</sp:SymmetricBinding>";
+
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent(SecurityEvent.Event.SecurityContextToken);
-        securityContextTokenSecurityEvent.setIssuerName("sss");
-        securityContextTokenSecurityEvent.setExternalUriRef(true);
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
+        initiatorTokenSecurityEvent.setIssuerName("sss");
+        initiatorTokenSecurityEvent.setExternalUriRef(true);
+        initiatorTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
+
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
+        recipientTokenSecurityEvent.setIssuerName("sss");
+        recipientTokenSecurityEvent.setExternalUriRef(true);
+        recipientTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return null;
+            }
+        });
+        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
+        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
+        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
         try {
-            policyEnforcer.registerSecurityEvent(securityContextTokenSecurityEvent);
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);

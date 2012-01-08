@@ -20,9 +20,9 @@ package org.swssf.wss.impl.securityToken;
 
 import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -38,14 +38,25 @@ import java.security.cert.X509Certificate;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SAMLSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
+public class SAMLSecurityToken extends AbstractSecurityToken {
 
     private SAMLVersion samlVersion;
     private SAMLKeyInfo samlKeyInfo;
+    private String issuer;
     private X509Certificate[] x509Certificate;
 
-    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, SecurityContext securityContext, Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(securityContext, crypto, callbackHandler, id, processor);
+    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, String issuer,
+                             WSSecurityContext wsSecurityContext,
+                             Crypto crypto, CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, null);
+        this.samlVersion = samlVersion;
+        this.samlKeyInfo = samlKeyInfo;
+        this.issuer = issuer;
+    }
+
+    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, WSSecurityContext wsSecurityContext,
+                             Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
+        super(wsSecurityContext, crypto, callbackHandler, id, null, processor);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
     }
@@ -54,13 +65,11 @@ public class SAMLSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiring
         return true;
     }
 
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getSecretKey(algorithmURI, keyUsage);
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         return samlKeyInfo.getPrivateKey();
     }
 
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getPublicKey(keyUsage);
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         PublicKey publicKey = samlKeyInfo.getPublicKey();
         if (publicKey == null) {
             publicKey = getX509Certificates()[0].getPublicKey();
@@ -109,5 +118,13 @@ public class SAMLSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiring
     public SAMLKeyInfo getSamlKeyInfo() {
         //todo AlgoSecEvent?
         return samlKeyInfo;
+    }
+
+    public SAMLVersion getSamlVersion() {
+        return samlVersion;
+    }
+
+    public String getIssuer() {
+        return issuer;
     }
 }

@@ -21,7 +21,7 @@ package org.swssf.policy.test;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -29,8 +29,8 @@ import org.testng.annotations.Test;
 import javax.xml.namespace.QName;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SignedElementsTest extends AbstractPolicyTestBase {
 
@@ -41,7 +41,12 @@ public class SignedElementsTest extends AbstractPolicyTestBase {
                         "<sp:XPath xmlns:b=\"http://example.org\">/b:a</sp:XPath>\n" +
                         "</sp:SignedElements>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(null, true);
         signedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
         signedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -59,10 +64,15 @@ public class SignedElementsTest extends AbstractPolicyTestBase {
                         "<sp:XPath xmlns:b=\"http://example.org\">/b:a</sp:XPath>\n" +
                         "</sp:SignedElements>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(null, true);
         signedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
-        signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, false);
+        signedElementSecurityEvent = new SignedElementSecurityEvent(null, false);
         signedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);

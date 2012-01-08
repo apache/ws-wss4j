@@ -23,11 +23,11 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityProperties;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -45,14 +45,13 @@ import java.util.GregorianCalendar;
 public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
     //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
-    public TimestampInputHandler(InputProcessorChain inputProcessorChain,
-                                 final WSSSecurityProperties securityProperties,
-                                 Deque<XMLEvent> eventQueue,
-                                 Integer index) throws XMLSecurityException {
+    @Override
+    public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
+                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         Boolean alreadyProcessed = inputProcessorChain.getSecurityContext().<Boolean>get(WSSConstants.TIMESTAMP_PROCESSED);
         if (Boolean.TRUE.equals(alreadyProcessed)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
                     "Message contains two or more timestamps");
         }
         inputProcessorChain.getSecurityContext().put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
@@ -84,15 +83,15 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
             Calendar rightNow = Calendar.getInstance();
             Calendar ttl = Calendar.getInstance();
-            ttl.add(Calendar.SECOND, -securityProperties.getTimestampTTL());
+            ttl.add(Calendar.SECOND, -((WSSSecurityProperties) securityProperties).getTimestampTTL());
 
-            if (exp != null && securityProperties.isStrictTimestampCheck() && exp.before(rightNow)) {
+            if (exp != null && ((WSSSecurityProperties) securityProperties).isStrictTimestampCheck() && exp.before(rightNow)) {
                 logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                         "The security semantics of the message have expired");
             }
 
-            if (crea != null && securityProperties.isStrictTimestampCheck() && crea.before(ttl)) {
+            if (crea != null && ((WSSSecurityProperties) securityProperties).isStrictTimestampCheck() && crea.before(ttl)) {
                 logger.debug("Time now: " + datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                         "The security semantics of the message have expired");
@@ -104,7 +103,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                         "The security semantics of the message is invalid");
             }
 
-            TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent(SecurityEvent.Event.Timestamp);
+            TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
             timestampSecurityEvent.setCreated(crea);
             timestampSecurityEvent.setExpires(exp);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(timestampSecurityEvent);

@@ -307,4 +307,12 @@ public class CallbackHandlerImpl implements CallbackHandler {
     public void setSamlVersion(SAMLVersion samlVersion) {
         this.samlVersion = samlVersion;
     }
+
+    public byte[] getSecret() {
+        return secret;
+    }
+
+    public void setSecret(byte[] secret) {
+        this.secret = secret;
+    }
 }

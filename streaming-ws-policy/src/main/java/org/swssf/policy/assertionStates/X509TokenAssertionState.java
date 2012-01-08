@@ -23,19 +23,18 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.X509Token;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.impl.securityToken.DelegatingSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
-import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import java.security.cert.X509Certificate;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1197077 $ $Date: 2011-11-03 13:17:40 +0100 (Don, 03. Nov 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 
 public class X509TokenAssertionState extends TokenAssertionState {
@@ -52,25 +51,24 @@ public class X509TokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public void assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof X509TokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a X509TokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
 
         X509Token x509Token = (X509Token) abstractToken;
-        SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
+
+        AbstractSecurityToken securityToken = (AbstractSecurityToken) tokenSecurityEvent.getSecurityToken();
         XMLSecurityConstants.TokenType tokenType = securityToken.getTokenType();
         if (!(WSSConstants.X509V3Token.equals(tokenType)
                 || WSSConstants.X509V1Token.equals(tokenType)
                 || WSSConstants.X509Pkcs7Token.equals(tokenType)
-                || WSSConstants.X509PkiPathV1Token.equals(tokenType))
-                && !(securityToken instanceof DelegatingSecurityToken)) {
+                || WSSConstants.X509PkiPathV1Token.equals(tokenType))) {
             throw new WSSPolicyException("Invalid Token for this assertion");
         }
-        DelegatingSecurityToken delegatingSecurityToken = (DelegatingSecurityToken) securityToken;
         setAsserted(true);
         try {
-            X509Certificate x509Certificate = delegatingSecurityToken.getX509Certificates()[0];
+            X509Certificate x509Certificate = securityToken.getX509Certificates()[0];
             if (x509Token.getIssuerName() != null) {
                 final String certificateIssuerName = x509Certificate.getIssuerX500Principal().getName();
                 if (!x509Token.getIssuerName().equals(certificateIssuerName)) {
@@ -78,18 +76,18 @@ public class X509TokenAssertionState extends TokenAssertionState {
                     setErrorMessage("IssuerName in Policy (" + x509Token.getIssuerName() + ") didn't match with the one in the certificate (" + certificateIssuerName + ")");
                 }
             }
-            if (x509Token.isRequireKeyIdentifierReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            if (x509Token.isRequireKeyIdentifierReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
                 setAsserted(false);
-                setErrorMessage("Policy enforces KeyIdentifierReference but we got " + delegatingSecurityToken.getTokenType());
-            } else if (x509Token.isRequireIssuerSerialReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
+                setErrorMessage("Policy enforces KeyIdentifierReference but we got " + securityToken.getKeyIdentifierType());
+            } else if (x509Token.isRequireIssuerSerialReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
                 setAsserted(false);
-                setErrorMessage("Policy enforces IssuerSerialReference but we got " + delegatingSecurityToken.getTokenType());
-            } else if (x509Token.isRequireEmbeddedTokenReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+                setErrorMessage("Policy enforces IssuerSerialReference but we got " + securityToken.getKeyIdentifierType());
+            } else if (x509Token.isRequireEmbeddedTokenReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                 setAsserted(false);
-                setErrorMessage("Policy enforces EmbeddedTokenReference but we got " + delegatingSecurityToken.getTokenType());
-            } else if (x509Token.isRequireThumbprintReference() && delegatingSecurityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+                setErrorMessage("Policy enforces EmbeddedTokenReference but we got " + securityToken.getKeyIdentifierType());
+            } else if (x509Token.isRequireThumbprintReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
                 setAsserted(false);
-                setErrorMessage("Policy enforces ThumbprintReference but we got " + delegatingSecurityToken.getTokenType());
+                setErrorMessage("Policy enforces ThumbprintReference but we got " + securityToken.getKeyIdentifierType());
             }
             if (x509Certificate.getVersion() == 2) {
                 setAsserted(false);
@@ -98,33 +96,34 @@ public class X509TokenAssertionState extends TokenAssertionState {
             switch (x509Token.getTokenType()) {
                 case WssX509V3Token10:
                 case WssX509V3Token11:
-                    if (WSSConstants.X509V3Token != delegatingSecurityToken.getTokenType() || x509Certificate.getVersion() != 3) {
+                    if (WSSConstants.X509V3Token != securityToken.getTokenType() || x509Certificate.getVersion() != 3) {
                         setAsserted(false);
                         setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
                     }
                     break;
                 case WssX509V1Token11:
-                    if (WSSConstants.X509V1Token != delegatingSecurityToken.getTokenType() || x509Certificate.getVersion() != 1) {
+                    if (WSSConstants.X509V1Token != securityToken.getTokenType() || x509Certificate.getVersion() != 1) {
                         setAsserted(false);
                         setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
                     }
                     break;
                 case WssX509PkiPathV1Token10:
                 case WssX509PkiPathV1Token11:
-                    if (delegatingSecurityToken.getTokenType() != WSSConstants.X509PkiPathV1Token) {
+                    if (securityToken.getTokenType() != WSSConstants.X509PkiPathV1Token) {
                         setAsserted(false);
-                        setErrorMessage("Policy enforces " + x509Token.getTokenType() + " but we got " + delegatingSecurityToken.getTokenType());
+                        setErrorMessage("Policy enforces " + x509Token.getTokenType() + " but we got " + securityToken.getTokenType());
                     }
                     break;
                 case WssX509Pkcs7Token10:
                 case WssX509Pkcs7Token11:
                     setAsserted(false);
-                    setErrorMessage("Unsupported token type: " + delegatingSecurityToken.getTokenType());
+                    setErrorMessage("Unsupported token type: " + securityToken.getTokenType());
                     break;
             }
         } catch (XMLSecurityException e) {
             setAsserted(false);
             setErrorMessage(e.getMessage());
         }
+        return isAsserted();
     }
 }

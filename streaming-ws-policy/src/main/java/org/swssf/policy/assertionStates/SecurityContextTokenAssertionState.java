@@ -27,8 +27,8 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1197077 $ $Date: 2011-11-03 13:17:40 +0100 (Don, 03. Nov 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 
 public class SecurityContextTokenAssertionState extends TokenAssertionState {
@@ -45,7 +45,7 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public void assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof SecurityContextTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a SecurityContextTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
@@ -64,5 +64,6 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
         }
         //todo sp:SC13SecurityContextToken:
         //if (securityContextToken.isSc10SecurityContextToken() && )
+        return isAsserted();
     }
 }

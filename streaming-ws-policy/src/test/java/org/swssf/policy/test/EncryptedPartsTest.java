@@ -22,15 +22,15 @@ import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class EncryptedPartsTest extends AbstractPolicyTestBase {
 
@@ -43,7 +43,12 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
                         "<sp:Attachments/>\n" +
                         "</sp:EncryptedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, true, false);
         encryptedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
         encryptedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -63,10 +68,15 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
                         "<sp:Attachments/>\n" +
                         "</sp:EncryptedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, true, false);
         encryptedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
-        encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+        encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, false, false);
         encryptedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
@@ -82,7 +92,12 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
                 "<sp:EncryptedParts xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "</sp:EncryptedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, true, false);
         encryptedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
         encryptedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -98,7 +113,12 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
                 "<sp:EncryptedParts xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "</sp:EncryptedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, false, false);
         encryptedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         try {
             policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
@@ -116,7 +136,12 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
                         "<sp:Attachments/>\n" +
                         "</sp:EncryptedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, true, false);
         encryptedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
         encryptedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
@@ -136,10 +161,15 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
                         "<sp:Attachments/>\n" +
                         "</sp:EncryptedParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, true);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, true, false);
         encryptedPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
-        encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+        encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, false, false);
         encryptedPartSecurityEvent.setElement(new QName("http://example.org", "a"));
         try {
             policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);

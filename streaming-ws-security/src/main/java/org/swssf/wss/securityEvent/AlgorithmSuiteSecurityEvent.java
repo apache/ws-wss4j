@@ -30,11 +30,20 @@ public class AlgorithmSuiteSecurityEvent extends SecurityEvent {
     //@see http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.3/os/ws-securitypolicy-1.3-spec-os.html
     //chapter 6.1
 
+    private int keyLength;
     private String algorithmURI;
     private XMLSecurityConstants.KeyUsage keyUsage;
 
-    public AlgorithmSuiteSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public AlgorithmSuiteSecurityEvent() {
+        super(Event.AlgorithmSuite);
+    }
+
+    public int getKeyLength() {
+        return keyLength;
+    }
+
+    public void setKeyLength(int keyLength) {
+        this.keyLength = keyLength;
     }
 
     public String getAlgorithmURI() {

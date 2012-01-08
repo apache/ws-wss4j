@@ -47,7 +47,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public void assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof UsernameTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a UsernameSecurityTokenEvent but got " + tokenSecurityEvent.getClass().getName());
         }
@@ -56,19 +56,21 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
         UsernameToken usernameToken = (UsernameToken) abstractToken;
 
         setAsserted(true);
-        switch (usernameToken.getPasswordType()) {
-            case NoPassword:
-                if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
-                    setAsserted(false);
-                    setErrorMessage("UsernameToken contains a password but the policy prohibits it");
-                }
-                break;
-            case HashPassword:
-                if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
-                    setAsserted(false);
-                    setErrorMessage("UsernameToken does not contain a hashed password");
-                }
-                break;
+        if (usernameToken.getPasswordType() != null) {
+            switch (usernameToken.getPasswordType()) {
+                case NoPassword:
+                    if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
+                        setAsserted(false);
+                        setErrorMessage("UsernameToken contains a password but the policy prohibits it");
+                    }
+                    break;
+                case HashPassword:
+                    if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
+                        setAsserted(false);
+                        setErrorMessage("UsernameToken does not contain a hashed password");
+                    }
+                    break;
+            }
         }
         if (usernameToken.isCreated() && (usernameSecurityToken.getCreated() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
             setAsserted(false);
@@ -78,19 +80,22 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
             setAsserted(false);
             setErrorMessage("UsernameToken does not contain a nonce or password is not plain text");
         }
-        switch (usernameToken.getUsernameTokenType()) {
-            case WssUsernameToken10:
-                if (usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
-                    setAsserted(false);
-                    setErrorMessage("Policy enforces UsernameToken profile 1.0 but we got 1.1");
-                }
-                break;
-            case WssUsernameToken11:
-                if (!usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
-                    setAsserted(false);
-                    setErrorMessage("Policy enforces UsernameToken profile 1.1 but we got 1.0");
-                }
-                break;
+        if (usernameToken.getUsernameTokenType() != null) {
+            switch (usernameToken.getUsernameTokenType()) {
+                case WssUsernameToken10:
+                    if (usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces UsernameToken profile 1.0 but we got 1.1");
+                    }
+                    break;
+                case WssUsernameToken11:
+                    if (!usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces UsernameToken profile 1.1 but we got 1.0");
+                    }
+                    break;
+            }
         }
+        return isAsserted();
     }
 }

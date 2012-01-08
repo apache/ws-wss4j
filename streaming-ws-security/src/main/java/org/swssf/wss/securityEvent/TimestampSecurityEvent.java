@@ -29,8 +29,8 @@ public class TimestampSecurityEvent extends SecurityEvent {
     private Calendar created;
     private Calendar expires;
 
-    public TimestampSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public TimestampSecurityEvent() {
+        super(Event.Timestamp);
     }
 
     public Calendar getCreated() {

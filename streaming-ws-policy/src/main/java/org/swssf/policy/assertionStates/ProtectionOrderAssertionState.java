@@ -19,11 +19,15 @@
 package org.swssf.policy.assertionStates;
 
 import org.apache.ws.secpolicy.AssertionState;
+import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.*;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -32,7 +36,8 @@ import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 public class ProtectionOrderAssertionState extends AssertionState implements Assertable {
 
-    boolean firstEvent = true;
+    private List<QName> signedElements = new ArrayList<QName>();
+    private List<QName> encryptedElements = new ArrayList<QName>();
 
     public ProtectionOrderAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
@@ -41,39 +46,80 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
     @Override
     public SecurityEvent.Event[] getSecurityEventType() {
         return new SecurityEvent.Event[]{
-                SecurityEvent.Event.UsernameToken,
-                SecurityEvent.Event.IssuedToken,
-                SecurityEvent.Event.X509Token,
-                SecurityEvent.Event.KerberosToken,
-                SecurityEvent.Event.SpnegoContextToken,
-                SecurityEvent.Event.SecurityContextToken,
-                SecurityEvent.Event.SecureConversationToken,
-                SecurityEvent.Event.SamlToken,
-                SecurityEvent.Event.RelToken,
-                SecurityEvent.Event.HttpsToken,
-                SecurityEvent.Event.KeyValueToken
+                SecurityEvent.Event.SignedElement,
+                SecurityEvent.Event.SignedPart,
+                SecurityEvent.Event.EncryptedElement,
+                SecurityEvent.Event.EncryptedPart,
+                SecurityEvent.Event.ContentEncrypted,
         };
     }
 
     @Override
-    public boolean assertEvent(SecurityEvent securityEvent) {
+    public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
-        TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
         setAsserted(true);
+        switch (securityEvent.getSecurityEventType()) {
+            case SignedElement:
+                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+                if (!signedElementSecurityEvent.isSigned()) {
+                    return true;
+                }
+                if (!encryptedElements.contains(signedElementSecurityEvent.getElement())) {
+                    signedElements.add(signedElementSecurityEvent.getElement());
+                } else {
+
+                }
+                System.out.println("Sig: " + signedElementSecurityEvent.getElement());
+                break;
+            case SignedPart:
+                SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
+                if (!signedPartSecurityEvent.isSigned()) {
+                    return true;
+                }
+                System.out.println("Sig: " + signedPartSecurityEvent.getElement());
+                break;
+            case EncryptedElement:
+                EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
+                if (!encryptedElementSecurityEvent.isEncrypted()) {
+                    return true;
+                }
+                System.out.println("Enc: " + encryptedElementSecurityEvent.getElement() + " signed: " + encryptedElementSecurityEvent.isSignedContent());
+                break;
+            case EncryptedPart:
+                EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
+                if (!encryptedPartSecurityEvent.isEncrypted()) {
+                    return true;
+                }
+                System.out.println("Enc: " + encryptedPartSecurityEvent.getElement() + " signed: " + encryptedPartSecurityEvent.isSignedContent());
+                break;
+            case ContentEncrypted:
+                ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
+                if (!contentEncryptedElementSecurityEvent.isEncrypted()) {
+                    return true;
+                }
+                System.out.println("Enc: " + contentEncryptedElementSecurityEvent.getElement() + " signed: " + contentEncryptedElementSecurityEvent.isSignedContent());
+                break;
+        }
+
+
+/*
         if (firstEvent) {
             firstEvent = false;
             //we have to invert the logic. When SignBeforeEncrypt is set then the Encryption token appears as first
             //in contrary if EncryptBeforeSign is set then the SignatureToken appears as first. So...:
             if (protectionOrder.equals(AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting)
-                    && tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Signature) {
-                setAsserted(false);
+                    && (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Signature ||
+                        tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.MainSignature)) {
+                //setAsserted(false);
                 setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
             } else if (protectionOrder.equals(AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning)
-                    && tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption) {
-                setAsserted(false);
-                setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
+                    && (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption ||
+                        tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.MainEncryption)) {
+                //setAsserted(false);
+                setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
             }
         }
+*/
         return isAsserted();
     }
 }

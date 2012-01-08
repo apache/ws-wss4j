@@ -66,10 +66,15 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
         }
         if (xmlEvent.isStartElement() && inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
-            RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent(SecurityEvent.Event.RequiredPart);
+            RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
             requiredPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
             policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
-            RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent(SecurityEvent.Event.RequiredElement);
+            RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+            requiredElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+            policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+        } else if (xmlEvent.isStartElement() && inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
+            //test for required elements
+            RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
             requiredElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
             policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
         }
@@ -89,7 +94,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
 
         if (xmlEvent.isStartElement()) {
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
-                OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent(SecurityEvent.Event.Operation);
+                OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
                 operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             }
@@ -100,8 +105,15 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             try {
                 policyEnforcer.doFinal();
             } catch (WSSPolicyException e) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
+        }
+
+        //test for required elements
+        if (xmlEvent.isStartElement() && inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
+            RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+            requiredElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+            policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
         }
 
         //test if non encrypted element have to be encrypted per policy
@@ -120,15 +132,15 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         if (xmlEvent.isStartElement()) {
 
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
-                SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+                SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
                 signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
             } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 2 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
-                SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(SecurityEvent.Event.SignedPart, false);
+                SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
                 signedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
             } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
-                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(SecurityEvent.Event.SignedElement, false);
+                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(null, false);
                 signedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
             }
@@ -140,27 +152,27 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         if (xmlEvent.isStartElement()) {
 
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
-                EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, false, inputProcessorChain.getDocumentContext().isInSignedContent());
                 encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
             } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
-                EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(SecurityEvent.Event.EncryptedPart, false);
+                EncryptedPartSecurityEvent encryptedPartSecurityEvent = new EncryptedPartSecurityEvent(null, false, inputProcessorChain.getDocumentContext().isInSignedContent());
                 encryptedPartSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
                 policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
             } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() > 3) {
-                EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(SecurityEvent.Event.EncryptedElement, false);
+                EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, inputProcessorChain.getDocumentContext().isInSignedContent());
                 encryptedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
                 policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
                 //... or it could be a contentEncryption too...
-                ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, false);
+                ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, false, inputProcessorChain.getDocumentContext().isInSignedContent());
                 contentEncryptedElementSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
                 policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
             }
 
         } else if (xmlEvent.isCharacters() || xmlEvent.isEntityReference() || xmlEvent.isProcessingInstruction()) {
             //can only be a content encryption
-            ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(SecurityEvent.Event.ContentEncrypted, false);
+            ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, false, inputProcessorChain.getDocumentContext().isInSignedContent());
             contentEncryptedElementSecurityEvent.setElement(inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType()));
             policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }

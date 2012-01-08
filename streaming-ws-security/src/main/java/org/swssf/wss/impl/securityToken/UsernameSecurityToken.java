@@ -19,9 +19,9 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.ext.SecurityContext;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFiringSecurityToken {
+public class UsernameSecurityToken extends AbstractSecurityToken {
 
     private static final long DEFAULT_ITERATION = 1000;
 
@@ -48,8 +48,20 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
     private byte[] salt;
     private Long iteration;
 
-    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration, SecurityContext securityContext, String id, Object processor) {
-        super(securityContext, id, processor);
+    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
+                                 WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, null, null, id, keyIdentifierType, null);
+        this.username = username;
+        this.password = password;
+        this.created = created;
+        this.nonce = nonce;
+        this.salt = salt;
+        this.iteration = iteration;
+    }
+
+    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
+                                 String id, Object processor) {
+        super(null, null, null, id, null, processor);
         this.username = username;
         this.password = password;
         this.created = created;
@@ -208,8 +220,7 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
 
     private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
-    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getSecretKey(algorithmURI, keyUsage);
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         byte[] secretToken = null;
         if (getSalt() != null && getIteration() != null) {
             byte[] salt = getSalt();
@@ -228,8 +239,7 @@ public class UsernameSecurityToken extends AbstractAlgorithmSuiteSecurityEventFi
         }
     }
 
-    public PublicKey getPublicKey(XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        super.getPublicKey(keyUsage);
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         return null;
     }
 

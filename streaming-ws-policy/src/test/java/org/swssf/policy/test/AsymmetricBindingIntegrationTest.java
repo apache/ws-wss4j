@@ -1,0 +1,2100 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.swssf.policy.test;
+
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.opensaml.common.SAMLVersion;
+import org.swssf.policy.PolicyEnforcer;
+import org.swssf.policy.PolicyInputProcessor;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSecurityException;
+import org.swssf.wss.test.CallbackHandlerImpl;
+import org.swssf.xmlsec.crypto.Merlin;
+import org.swssf.xmlsec.ext.SecurePart;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.security.KeyStore;
+
+/**
+ * @author $Author$
+ * @version $Revision$ $Date$
+ */
+public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
+
+    @Test
+    public void testIncludeTimestampPolicy() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test
+    public void testIncludeTimestampPolicy2ndAlternative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                       <wsp:ExactlyOne>\n" +
+                        "                       <wsp:All>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V1Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                       </wsp:All>\n" +
+                        "                       <wsp:All>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                       </wsp:All>\n" +
+                        "                       </wsp:ExactlyOne>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test
+    public void testIncludeTimestampPolicyNegativeTest() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testIncludeTimestampAndSignedUsernameSupportingTokenPolicy() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "                <sp:SignedSupportingTokens>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:NoPassword/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:UsernameToken>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:SignedSupportingTokens>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.setTokenUser("transmitter");
+        outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test
+    public void testIncludeTimestampAndSignedUsernameSupportingTokenPolicyNegativeTest() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "                <sp:SignedSupportingTokens>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:NoPassword/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:UsernameToken>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:SignedSupportingTokens>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.setTokenUser("transmitter");
+        outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testIncludeTimestampAndSignedUsernameSupportingTokenPolicyNegativeTest2() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "                <sp:SignedSupportingTokens>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:NoPassword/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:UsernameToken>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:SignedSupportingTokens>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.setTokenUser("transmitter");
+        outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testIncludeTimestampAndProtectionOrderEncryptBeforeSignAndSignedUsernameSupportingTokenPolicyTest() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:EncryptBeforeSigning/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:SignedSupportingTokens>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:NoPassword/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:UsernameToken>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:SignedSupportingTokens>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.setTokenUser("transmitter");
+        outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.ENCRYPT, WSSConstants.SIGNATURE};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test
+    public void testSignatureAlgorithmSuiteNegative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testC14NAlgorithmSuiteNegative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2006/12/xml-c14n11");
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testSignatureDigestAlgorithmSuiteNegative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#md5");
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testEncryptionAlgorithmSuiteNegative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:ProtectTokens/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testSignatureProtectionPolicy() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:EncryptSignature/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature.getLocalPart(), WSSConstants.TAG_dsig_Signature.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test
+    public void testSignatureProtectionPolicyNegative1() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:EncryptSignature/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testSignatureProtectionPolicyNegative2() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature.getLocalPart(), WSSConstants.TAG_dsig_Signature.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testEntireHeaderAndBodySignature() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:OnlySignEntireHeadersAndBody/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart("definitions", "http://schemas.xmlsoap.org/wsdl/", SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+
+    @Test
+    public void testEntireHeaderAndBodySignatureNegative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                        <sp:OnlySignEntireHeadersAndBody/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testLayoutLaxTimestampFirstNegative() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:LaxTsFirst/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+        }
+    }
+
+    @Test
+    public void testSamlToken() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                               <sp:SamlToken>\n" +
+                        "                                  <sp:IssuerName>www.example.com</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "                                        <sp:WssSamlV20Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:SamlToken>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED, WSSConstants.ENCRYPT_WITH_DERIVED_KEY};
+        outSecurityProperties.setOutAction(actions);
+        CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+        callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+        callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        callbackHandler.setIssuer("www.example.com");
+        byte[] secret = new byte[128 / 8];
+        WSSConstants.secureRandom.nextBytes(secret);
+        callbackHandler.setSecret(secret);
+        KeyStore keyStore = KeyStore.getInstance("jks");
+        keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
+        Merlin crypto = new Merlin();
+        crypto.setKeyStore(keyStore);
+        callbackHandler.setCerts(crypto.getCertificates("transmitter"));
+        outSecurityProperties.setCallbackHandler(callbackHandler);
+        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+        //read the whole stream:
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
+                    }
+                }
+        ));
+    }
+}

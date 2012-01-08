@@ -28,7 +28,16 @@ public abstract class TokenSecurityEvent extends SecurityEvent {
 
     public enum TokenUsage {
         Signature,
-        Encryption
+        MainSignature,
+        Encryption,
+        MainEncryption,
+        SupportingToken,
+        SignedSupportingTokens,
+        EndorsingSupportingTokens,
+        SignedEndorsingSupportingTokens,
+        SignedEncryptedSupportingTokens,
+        EndorsingEncryptedSupportingTokens,
+        SignedEndorsingEncryptedSupportingTokens,
     }
 
     private SecurityToken securityToken;

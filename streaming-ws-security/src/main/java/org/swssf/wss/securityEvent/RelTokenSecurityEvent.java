@@ -26,7 +26,7 @@ public class RelTokenSecurityEvent extends TokenSecurityEvent {
 
     //todo implement
 
-    public RelTokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
+    public RelTokenSecurityEvent() {
+        super(Event.RelToken);
     }
 }

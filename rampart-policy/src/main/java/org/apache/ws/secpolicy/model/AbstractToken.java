@@ -61,6 +61,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
     private String issuerName;
     private DerivedKeys derivedKeys;
     private Policy nestedPolicy;
+    private AbstractSecurityAssertion parentAssertion;
 
     protected AbstractToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
                             Element issuer, String issuerName, Element claims, Policy nestedPolicy) {
@@ -118,6 +119,14 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
 
     protected void setDerivedKeys(DerivedKeys derivedKeys) {
         this.derivedKeys = derivedKeys;
+    }
+
+    public AbstractSecurityAssertion getParentAssertion() {
+        return parentAssertion;
+    }
+
+    public void setParentAssertion(AbstractSecurityAssertion parentAssertion) {
+        this.parentAssertion = parentAssertion;
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
