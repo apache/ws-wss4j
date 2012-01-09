@@ -23,7 +23,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 
 import org.apache.ws.security.common.CustomHandler;
-import org.apache.ws.security.message.token.Timestamp;
 
 
 /**
