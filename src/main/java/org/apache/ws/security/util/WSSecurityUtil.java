@@ -801,10 +801,23 @@ public class WSSecurityUtil {
                 new Object[] { "No such padding: " + cipherAlgo }, ex
             );
         } catch (NoSuchAlgorithmException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                new Object[] { "No such algorithm: " + cipherAlgo }, ex
-            );
+            // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
+            // Some JDKs don't support RSA/ECB/OAEPPadding
+            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(cipherAlgo)) {
+                try {
+                    return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
+                } catch (Exception e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                        new Object[] { "No such algorithm: " + cipherAlgo }, e
+                    );
+                }
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    new Object[] { "No such algorithm: " + cipherAlgo }, ex
+                );
+            }
         }
     }
     
