@@ -36,7 +36,6 @@ import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
-import org.apache.xml.security.utils.IdResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -174,9 +173,6 @@ public class ModifiedRequestTest extends org.junit.Assert {
              WSConstants.WSU_NS, "wsu:Id", "id-250"
         );
         
-        // Clear the Santuario IdResolver cache
-        IdResolver.unregisterDocument(signedDoc);
-            
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString = 
