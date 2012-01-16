@@ -397,7 +397,7 @@ public class SignatureSTRParser implements STRParser {
 
             usernameToken.setRawPassword(data);
             if (usernameToken.isDerivedKey()) {
-                secretKey = usernameToken.getDerivedKey();
+                secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             } else {
                 int keyLength = ((Integer)parameters.get(SECRET_KEY_LENGTH)).intValue();
                 secretKey = usernameToken.getSecretKey(keyLength);

@@ -66,11 +66,17 @@ public class UsernameTokenProcessor implements Processor {
         UsernameToken token = credential.getUsernametoken();
         
         int action = WSConstants.UT;
+        byte[] secretKey = null;
         if (token.getPassword() == null) { 
             action = WSConstants.UT_NOPASSWORD;
+            if (token.isDerivedKey()) {
+                token.setRawPassword(data);
+                secretKey = token.getDerivedKey();
+            } 
         }
         WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);
         result.put(WSSecurityEngineResult.TAG_ID, token.getID());
+        result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
         
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);

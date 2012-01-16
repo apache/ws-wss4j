@@ -29,7 +29,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -250,10 +249,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             if (bspCompliant) {
                 BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
             }
-            UsernameToken usernameToken = 
-                (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-            usernameToken.setRawPassword(data);
-            secretKey = usernameToken.getDerivedKey();
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.ENCR == action) {
             if (bspCompliant) {
                 BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
