@@ -422,7 +422,7 @@ public class SignatureProcessor implements Processor {
                 element = wsDocInfo.getTokenElement(uri);
             }
             if (element != null) {
-                WSSecurityUtil.storeElementInContext(((DOMValidateContext)context), element);
+                WSSecurityUtil.storeElementInContext(((DOMValidateContext)context), uri, element);
             }
         }
     }
