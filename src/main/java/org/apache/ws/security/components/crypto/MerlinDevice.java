@@ -157,7 +157,7 @@ public class MerlinDevice extends Merlin {
                 }
             }
         } else {
-            truststore = load(null, trustStorePassword, provider, trustStorePassword);
+            truststore = load(null, trustStorePassword, provider, trustStoreType);
         }
         //
         // Load the CRL file
