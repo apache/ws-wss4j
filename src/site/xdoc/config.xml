@@ -299,7 +299,8 @@ summarised here:
 <tr>
 <td>SIG_PROP_REF_ID</td>
 <td>signaturePropRefId</td>
-<td>The String ID that is used to store a reference to the Crypto Properties object for Signature.
+<td>The String ID that is used to store a reference to the Crypto object or the Crypto Properties 
+object for Signature.
 </td>
 </tr>
 <tr>
@@ -310,8 +311,8 @@ summarised here:
 <tr>
 <td>DEC_PROP_REF_ID</td>
 <td>decryptionPropRefId</td>
-<td>The String ID that is used to store a reference to the Crypto Properties object for 
-decryption.</td>
+<td>The String ID that is used to store a reference to the Crypto object or the Crypto Properties 
+object for decryption.</td>
 </tr>
 <tr>
 <td>ENC_PROP_FILE</td>
@@ -321,8 +322,8 @@ decryption.</td>
 <tr>
 <td>ENC_PROP_REF_ID</td>
 <td>encryptionPropRefId</td>
-<td>The String ID that is used to store a reference to the Crypto Properties object for 
-encryption.</td>
+<td>The String ID that is used to store a reference to the Crypto object or the Crypto Properties 
+object for encryption.</td>
 </tr>
 <tr>
 <td>SAML_PROP_FILE</td>

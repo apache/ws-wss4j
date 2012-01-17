@@ -784,13 +784,16 @@ public abstract class WSHandler {
         //
         String refId = getString(cryptoPropertyRefId, mc);
         if (refId != null) {
-            Object propObj = getProperty(mc, refId);
-            if (propObj instanceof Properties) {
+            Object obj = getProperty(mc, refId);
+            if (obj instanceof Properties) {
                 crypto = cryptos.get(refId);
                 if (crypto == null) {
-                    crypto = CryptoFactory.getInstance((Properties)propObj);
+                    crypto = CryptoFactory.getInstance((Properties)obj);
                     cryptos.put(refId, crypto);
                 }
+            } else if (obj instanceof Crypto) {
+                crypto = (Crypto)obj;
+                cryptos.put(refId, crypto);
             }
         }
         

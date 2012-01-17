@@ -263,10 +263,11 @@ public class WSHandlerConstants {
     public static final String SIG_PROP_FILE = "signaturePropFile";
 
     /**
-     * The key that holds the reference of the <code>java.util.Properties</code> 
-     * object holding complete information about the signature Crypto implementation. 
-     * This should contain all information that would contain in an equivalent 
-     * properties file which includes the Crypto implementation class name.
+     * The key that holds a reference to the object holding complete information about 
+     * the signature Crypto implementation. This object can either be a Crypto instance or a
+     * <code>java.util.Properties</code> file, which should contain all information that 
+     * would contain in an equivalent properties file which includes the Crypto implementation
+     * class name.
      * 
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      */
@@ -285,10 +286,11 @@ public class WSHandlerConstants {
     public static final String DEC_PROP_FILE = "decryptionPropFile";
     
     /**
-     * The key that hold the reference of the <code>java.util.Properties</code> 
-     * object holding complete information about the decryption Crypto implementation. 
-     * This should contain all information that would contain in an equivalent 
-     * properties file which includes the Crypto implementation class name.
+     * The key that holds a reference to the object holding complete information about 
+     * the decryption Crypto implementation. This object can either be a Crypto instance or a
+     * <code>java.util.Properties</code> file, which should contain all information that 
+     * would contain in an equivalent properties file which includes the Crypto implementation
+     * class name.
      * 
      * Refer to documentation of {@link #DEC_PROP_FILE}.
      */
@@ -307,10 +309,11 @@ public class WSHandlerConstants {
     public static final String ENC_PROP_FILE = "encryptionPropFile";
     
     /**
-     * The key that hold the reference of the <code>java.util.Properties</code> 
-     * object holding complete information about the encryption Crypto implementation. 
-     * This should contain all information that would contain in an equivalent 
-     * properties file which includes the Crypto implementation class name.
+     * The key that holds a reference to the object holding complete information about 
+     * the encryption Crypto implementation. This object can either be a Crypto instance or a
+     * <code>java.util.Properties</code> file, which should contain all information that 
+     * would contain in an equivalent properties file which includes the Crypto implementation
+     * class name.
      * 
      * Refer to documentation of {@link #ENC_PROP_FILE}.
      */
