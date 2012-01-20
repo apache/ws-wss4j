@@ -269,6 +269,9 @@ public class SAML1ComponentBuilder {
         } else {
             DateTime newNotBefore = new DateTime();
             conditions.setNotBefore(newNotBefore);
+            if (tokenPeriodMinutes <= 0) {
+                tokenPeriodMinutes = 5;
+            }
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(tokenPeriodMinutes));
         }
         
