@@ -445,6 +445,14 @@ public class WSHandlerConstants {
      * </pre>
      */
     public static final String ENC_SYM_ENC_KEY = "encryptSymmetricEncryptionKey";
+    
+    /**
+     * Whether the engine needs to enforce EncryptedData elements are
+     * in a signed subtree of the document. This can be used to prevent
+     * some wrapping based attacks when encrypt-before-sign token
+     * protection is selected.
+     */
+    public static final String REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS = "requireSignedEncryptedDataElements";
 
     //
     // (Non-boolean) Configuration parameters for the actions/processors
@@ -662,6 +670,7 @@ public class WSHandlerConstants {
      * Timestamps, set this value to "0". 
      */
     public static final String TTL_FUTURE_TIMESTAMP = "futureTimeToLive";
+    
     
     //
     // Internal storage constants

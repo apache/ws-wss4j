@@ -367,6 +367,12 @@ The configuration tags for WSHandler properties that are configured via a boolea
 <td>Whether to enable strict Username Token password type handling. Default is "false".</td>
 </tr>
 <tr>
+<td>REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS</td>
+<td>requireSignedEncryptedDataElements</td>
+<td>Whether the engine needs to enforce EncryptedData elements are in a signed subtree of the document.
+Default is "false".</td>
+</tr>
+<tr>
 <td>ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES</td>
 <td>allowNamespaceQualifiedPasswordTypes</td>
 <td>Whether (wsse) namespace qualified password types are accepted when processing UsernameTokens. 

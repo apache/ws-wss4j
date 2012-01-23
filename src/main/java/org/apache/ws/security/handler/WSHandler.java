@@ -280,6 +280,7 @@ public abstract class WSHandler {
         if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
             decodeDecryptionParameter(reqData);
         }
+        decodeRequireSignedEncryptedDataElements(reqData);
     }
 
     protected boolean checkReceiverResults(
@@ -694,6 +695,13 @@ public abstract class WSHandler {
         );
     }
     
+    protected void decodeRequireSignedEncryptedDataElements(RequestData reqData) 
+        throws WSSecurityException {
+        reqData.setRequireSignedEncryptedDataElements(decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, false
+        ));
+    }
+
     protected boolean decodeBooleanConfigValue(
         RequestData reqData, String configTag, boolean defaultToTrue
     ) throws WSSecurityException {

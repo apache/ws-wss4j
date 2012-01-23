@@ -75,6 +75,7 @@ public class RequestData {
     private boolean useSingleCert = true;
     private CallbackHandler callback = null;
     private boolean enableRevocation = false;
+    protected boolean requireSignedEncryptedDataElements = false;
 
     public void clear() {
         soapConstants = null;
@@ -397,6 +398,25 @@ public class RequestData {
      */
     public boolean isRevocationEnabled() {
         return enableRevocation;
+    }
+    
+    /**
+     * @return whether EncryptedData elements are required to be signed
+     */
+    public boolean isRequireSignedEncryptedDataElements() {
+        return requireSignedEncryptedDataElements;
+    }
+
+    /**
+     * Configure the engine to verify that EncryptedData elements
+     * are in a signed subtree of the document. This can be used to
+     * prevent some wrapping based attacks when encrypt-before-sign
+     * token protection is selected.
+     *  
+     * @param requireSignedEncryptedDataElements
+     */
+    public void setRequireSignedEncryptedDataElements(boolean requireSignedEncryptedDataElements) {
+        this.requireSignedEncryptedDataElements = requireSignedEncryptedDataElements;
     }
     
     /**

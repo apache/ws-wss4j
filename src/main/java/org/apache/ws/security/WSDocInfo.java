@@ -32,17 +32,16 @@ package org.apache.ws.security;
  * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.message.CallbackLookup;
-import org.apache.ws.security.util.WSSecurityUtil;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.dom.DOMCryptoContext;
+
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.message.CallbackLookup;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class WSDocInfo {
     private Document doc = null;
@@ -50,6 +49,7 @@ public class WSDocInfo {
     private List<Element> tokenList = null;
     private List<WSSecurityEngineResult> resultsList = null;
     private CallbackLookup callbackLookup = null;
+    private Element securityHeader = null;
 
     public WSDocInfo(Document doc) {
         //
@@ -293,4 +293,19 @@ public class WSDocInfo {
         return callbackLookup;
     }
 
+    /**
+     * @return the wsse header being processed
+     */
+    public Element getSecurityHeader() {
+        return securityHeader;
+    }
+    
+    /**
+     * Sets the wsse header being processed
+     * 
+     * @param securityHeader
+     */
+    public void setSecurityHeader(Element securityHeader) {
+        this.securityHeader = securityHeader;
+    }
 }

@@ -79,6 +79,10 @@ public class ReferenceListProcessor implements Processor {
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
+        //find out if there's an EncryptedKey in the doc (AsymmetricBinding)
+        Element wsseHeaderElement = wsDocInfo.getSecurityHeader();
+        boolean asymBinding = WSSecurityUtil.getDirectChildElement(
+            wsseHeaderElement, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS) != null;
         for (Node node = elem.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()
@@ -92,7 +96,7 @@ public class ReferenceListProcessor implements Processor {
                 }
                 WSDataRef dataRef = 
                     decryptDataRefEmbedded(
-                        elem.getOwnerDocument(), dataRefURI, data, wsDocInfo);
+                        elem.getOwnerDocument(), dataRefURI, data, wsDocInfo, asymBinding);
                 dataRefs.add(dataRef);
             }
         }
@@ -108,7 +112,8 @@ public class ReferenceListProcessor implements Processor {
         Document doc, 
         String dataRefURI, 
         RequestData data,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        boolean asymBinding
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found data reference: " + dataRefURI);
@@ -117,6 +122,10 @@ public class ReferenceListProcessor implements Processor {
         // Find the encrypted data element referenced by dataRefURI
         //
         Element encryptedDataElement = findEncryptedDataElement(doc, wsDocInfo, dataRefURI);
+        
+        if (encryptedDataElement != null && asymBinding && data.isRequireSignedEncryptedDataElements()) {
+            WSSecurityUtil.verifySignedElement(encryptedDataElement, doc, wsDocInfo.getSecurityHeader());
+        }
         //
         // Prepare the SecretKey object to decrypt EncryptedData
         //

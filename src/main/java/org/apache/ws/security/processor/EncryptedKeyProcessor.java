@@ -119,8 +119,8 @@ public class EncryptedKeyProcessor implements Processor {
             decryptedBytes = getRandomKey(dataRefURIs, elem.getOwnerDocument(), wsDocInfo);
         }
 
-        List<WSDataRef> dataRefs = 
-            decryptDataRefs(dataRefURIs, elem.getOwnerDocument(), wsDocInfo, decryptedBytes);
+        List<WSDataRef> dataRefs = decryptDataRefs(dataRefURIs, elem.getOwnerDocument(), wsDocInfo,
+            decryptedBytes, data);
         
         WSSecurityEngineResult result = new WSSecurityEngineResult(
                 WSConstants.ENCR, 
@@ -293,8 +293,8 @@ public class EncryptedKeyProcessor implements Processor {
     /**
      * Decrypt all data references
      */
-    private List<WSDataRef> decryptDataRefs(
-        List<String> dataRefURIs, Document doc, WSDocInfo docInfo, byte[] decryptedBytes
+    private List<WSDataRef> decryptDataRefs(List<String> dataRefURIs, Document doc,
+        WSDocInfo docInfo, byte[] decryptedBytes, RequestData data
     ) throws WSSecurityException {
         //
         // At this point we have the decrypted session (symmetric) key. According
@@ -305,7 +305,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (String dataRefURI : dataRefURIs) {
-            WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes);
+            WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);
             dataRefs.add(dataRef);
         }
         return dataRefs;
@@ -318,7 +318,8 @@ public class EncryptedKeyProcessor implements Processor {
         Document doc, 
         String dataRefURI, 
         WSDocInfo docInfo,
-        byte[] decryptedData
+        byte[] decryptedData,
+        RequestData data
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("found data reference: " + dataRefURI);
@@ -328,6 +329,9 @@ public class EncryptedKeyProcessor implements Processor {
         //
         Element encryptedDataElement = 
             ReferenceListProcessor.findEncryptedDataElement(doc, docInfo, dataRefURI);
+        if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
+            WSSecurityUtil.verifySignedElement(encryptedDataElement, doc, docInfo.getSecurityHeader());
+        }
         //
         // Prepare the SecretKey object to decrypt EncryptedData
         //

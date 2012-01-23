@@ -74,6 +74,11 @@ public class EncryptedDataProcessor implements Processor {
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
             );
         }
+        
+        if (elem != null && request.isRequireSignedEncryptedDataElements()) {
+            WSSecurityUtil.verifySignedElement(elem, elem.getOwnerDocument(), wsDocInfo.getSecurityHeader());
+        }
+        
         EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
         List<WSSecurityEngineResult> encrKeyResults = 
             encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);

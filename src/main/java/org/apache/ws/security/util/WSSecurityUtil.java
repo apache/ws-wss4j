@@ -50,8 +50,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * WS-Security Utility methods. <p/>
@@ -1291,6 +1293,58 @@ public class WSSecurityUtil {
         if (element.hasAttributeNS(null, "AssertionID")) {
             context.setIdAttributeNS(element, null, "AssertionID");
         }
+    }
+    
+    public static void verifySignedElement(Element elem, Document doc, Element securityHeader)
+        throws WSSecurityException {
+        final Element envelope = doc.getDocumentElement();
+        final Set<String> signatureRefIDs = getSignatureReferenceIDs(securityHeader);
+        if (!signatureRefIDs.isEmpty()) {
+            Node cur = elem;
+            while (!cur.isSameNode(envelope)) {
+                if (cur.getNodeType() == Node.ELEMENT_NODE) {
+                    if (WSConstants.SIG_LN.equals(cur.getLocalName())
+                        && WSConstants.SIG_NS.equals(cur.getNamespaceURI())) {
+                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+                            "requiredElementNotSigned", new Object[] {elem});
+                    } else if (isLinkedBySignatureRefs((Element)cur, signatureRefIDs)) {
+                        return;
+                    }
+                }
+                cur = cur.getParentNode();
+            }
+        }
+        throw new WSSecurityException(
+            WSSecurityException.FAILED_CHECK, "requiredElementNotSigned", new Object[] {elem});
+    }
+    
+    private static boolean isLinkedBySignatureRefs(Element elem, Set<String> allIDs) {
+        // Try the wsu:Id first
+        String attributeNS = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+        if (!"".equals(attributeNS) && allIDs.contains(attributeNS)) {
+            return true;
+        }
+        attributeNS = elem.getAttributeNS(null, "Id");
+        return (!"".equals(attributeNS) && allIDs.contains(attributeNS));
+    }
+    
+    private static Set<String> getSignatureReferenceIDs(Element wsseHeader) throws WSSecurityException {
+        final Set<String> refs = new HashSet<String>();
+        final List<Element> signatures = WSSecurityUtil.getDirectChildElements(wsseHeader, WSConstants.SIG_LN, WSConstants.SIG_NS);
+        for (Element signature : signatures) {
+            Element sigInfo = WSSecurityUtil.getDirectChildElement(signature, WSConstants.SIG_INFO_LN, WSConstants.SIG_NS);
+            List<Element> references = WSSecurityUtil.getDirectChildElements(sigInfo, WSConstants.REF_LN, WSConstants.SIG_NS);
+            for (Element reference : references) {
+                String uri = reference.getAttributeNS(null, "URI");
+                if (!"".equals(uri)) {
+                    boolean added = refs.add(WSSecurityUtil.getIDFromReference(uri));
+                    if (!added) {
+                        log.warn("Duplicated reference uri: " + uri);
+                    }
+                }
+            }
+        }
+        return refs;
     }
     
 }

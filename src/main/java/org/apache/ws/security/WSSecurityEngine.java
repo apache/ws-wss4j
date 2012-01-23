@@ -361,6 +361,7 @@ public class WSSecurityEngine {
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCallbackLookup(callbackLookup);
         wsDocInfo.setCrypto(requestData.getSigCrypto());
+        wsDocInfo.setSecurityHeader(securityHeader);
 
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();

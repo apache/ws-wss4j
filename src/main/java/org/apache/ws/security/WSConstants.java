@@ -147,9 +147,11 @@ public class WSConstants {
     public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";
     public static final String ENC_KEY_SHA1_URI = "EncryptedKeySHA1";
     public static final String SIG_LN = "Signature";
+    public static final String SIG_INFO_LN = "SignedInfo";
     public static final String ENC_KEY_LN = "EncryptedKey";
     public static final String ENC_DATA_LN = "EncryptedData";
     public static final String REF_LIST_LN = "ReferenceList";
+    public static final String REF_LN = "Reference";
     public static final String USERNAME_TOKEN_LN = "UsernameToken";
     public static final String BINARY_TOKEN_LN = "BinarySecurityToken";
     public static final String TIMESTAMP_TOKEN_LN = "Timestamp";
