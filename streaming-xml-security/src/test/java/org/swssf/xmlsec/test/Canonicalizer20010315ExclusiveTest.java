@@ -128,6 +128,44 @@ public class Canonicalizer20010315ExclusiveTest {
 
         assertTrue(equals);
     }
+    
+    @Test
+    public void test24excl() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null, baos);
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+                this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_4.xml")
+        );
+
+        XMLEvent xmlEvent = null;
+        while (xmlEventReader.hasNext()) {
+            xmlEvent = xmlEventReader.nextEvent();
+            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+                break;
+            }
+        }
+        while (xmlEventReader.hasNext()) {
+
+            c.transform(xmlEvent);
+
+            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+                break;
+            }
+            xmlEvent = xmlEventReader.nextEvent();
+        }
+
+        byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_4_c14nized.xml"));
+        boolean equals = java.security.MessageDigest.isEqual(reference, baos.toByteArray());
+
+        if (!equals) {
+            System.out.println("Expected:\n" + new String(reference, "UTF-8"));
+            System.out.println("");
+            System.out.println("Got:\n" + new String(baos.toByteArray(), "UTF-8"));
+        }
+
+        assertTrue(equals);
+    }
 
     @Test
     public void testComplexDocexcl() throws Exception {
