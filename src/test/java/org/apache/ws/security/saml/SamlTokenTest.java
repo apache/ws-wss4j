@@ -224,6 +224,7 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
         callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setResource("http://resource.org");
         
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(callbackHandler);
@@ -335,6 +336,7 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHZ);
         callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setResource("http://resource.org");
         
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(callbackHandler);

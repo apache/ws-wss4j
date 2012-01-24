@@ -269,7 +269,11 @@ public class SAML2ComponentBuilder {
         if (authBeans != null && authBeans.size() > 0) {
             for (AuthenticationStatementBean statementBean : authBeans) {
                 AuthnStatement authnStatement = authnStatementBuilder.buildObject();
-                authnStatement.setAuthnInstant(statementBean.getAuthenticationInstant());
+                DateTime authInstant = statementBean.getAuthenticationInstant();
+                if (authInstant == null) {
+                    authInstant = new DateTime();
+                }
+                authnStatement.setAuthnInstant(authInstant);
                 
                 if (statementBean.getSessionIndex() != null) {
                     authnStatement.setSessionIndex(statementBean.getSessionIndex());
@@ -302,7 +306,6 @@ public class SAML2ComponentBuilder {
     /**
      * Transform the user-supplied authentication method value into one of the supported 
      * specification-compliant values.
-     * NOTE: Only "Password" is supported at this time.
      *
      * @param sourceMethod of type String
      * @return String
@@ -312,6 +315,8 @@ public class SAML2ComponentBuilder {
 
         if ("Password".equalsIgnoreCase(sourceMethod)) {
             transformedMethod = SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD;
+        } else if (sourceMethod != null && !"".equals(sourceMethod)) {
+            return sourceMethod;
         }
 
         return transformedMethod;
@@ -646,6 +651,9 @@ public class SAML2ComponentBuilder {
         }
         Action actionElement = actionElementBuilder.buildObject();
         actionElement.setNamespace(actionBean.getActionNamespace());
+        if (actionBean.getActionNamespace() == null) {
+            actionElement.setNamespace("urn:oasis:names:tc:SAML:1.0:action:rwedc-negation");
+        }
         actionElement.setAction(actionBean.getContents());
 
         return actionElement;

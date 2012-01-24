@@ -28,6 +28,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.xml.validation.ValidationException;
+import org.opensaml.xml.validation.ValidatorSuite;
 
 /**
  * This class validates a SAML Assertion, which is wrapped in an "AssertionWrapper" instance.
@@ -75,6 +77,9 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         
         // Check conditions
         checkConditions(assertion);
+        
+        // Validate the assertion against schemas/profiles
+        validateAssertion(assertion);
 
         // Verify trust on the signature
         if (assertion.isSigned()) {
@@ -126,6 +131,37 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         if (validTill != null && validTill.isBeforeNow()) {
             LOG.debug("SAML Token condition (Not On Or After) not met");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+    }
+    
+    /**
+     * Validate the assertion against schemas/profiles
+     */
+    protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
+        if (assertion.getSaml1() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
+            try {
+                schemaValidators.validate(assertion.getSaml1());
+                specValidators.validate(assertion.getSaml1());
+            } catch (ValidationException e) {
+                LOG.debug("Saml Validation error: " + e.getMessage(), e);
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        } else if (assertion.getSaml2() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
+            try {
+                schemaValidators.validate(assertion.getSaml2());
+                specValidators.validate(assertion.getSaml2());
+            } catch (ValidationException e) {
+                LOG.debug("Saml Validation error: " + e.getMessage(), e);
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
         }
     }
     
