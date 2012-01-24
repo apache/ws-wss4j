@@ -353,7 +353,7 @@
     </profiles>
 
     <properties>
-        <xmlsec.version>1.5.0-SNAPSHOT</xmlsec.version>
+        <xmlsec.version>1.5.0</xmlsec.version>
         <opensaml.version>2.5.1-1</opensaml.version>
         <xml.apis.version>1.3.04</xml.apis.version>
         <bcprov.version>1.46</bcprov.version>
