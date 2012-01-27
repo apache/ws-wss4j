@@ -54,7 +54,7 @@ public class XMLSecurityStreamWriterTest {
         XMLSecurityStreamWriter xmlSecurityStreamWriter = new XMLSecurityStreamWriter(outputProcessorChain);
 
         StringWriter stdStringWriter = new StringWriter();
-        XMLStreamWriter stdXmlStreamWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(stdStringWriter);
+        XMLStreamWriter stdXmlStreamWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(stdStringWriter);
 
         NamespaceContext namespaceContext = new NamespaceContext() {
             @Override
@@ -76,7 +76,7 @@ public class XMLSecurityStreamWriterTest {
             }
 
             @Override
-            public Iterator getPrefixes(String namespaceURI) {
+            public Iterator<?> getPrefixes(String namespaceURI) {
                 List<String> ns = new ArrayList<String>();
                 ns.add(getPrefix(namespaceURI));
                 return ns.iterator();

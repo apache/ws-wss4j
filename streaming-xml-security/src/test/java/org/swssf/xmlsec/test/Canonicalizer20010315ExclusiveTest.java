@@ -49,7 +49,7 @@ public class Canonicalizer20010315ExclusiveTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        this.xmlInputFactory = XMLInputFactory.newFactory();
+        this.xmlInputFactory = XMLInputFactory.newInstance();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
     }
 

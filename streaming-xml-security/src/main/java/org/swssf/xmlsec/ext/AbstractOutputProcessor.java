@@ -40,7 +40,7 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected static final XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
+    protected static final XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
     protected XMLSecurityProperties securityProperties;
     protected XMLSecurityConstants.Action action;
 

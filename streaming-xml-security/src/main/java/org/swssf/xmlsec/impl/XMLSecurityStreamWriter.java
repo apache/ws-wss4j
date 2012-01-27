@@ -36,7 +36,7 @@ import java.util.*;
  */
 public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
-    private XMLEventFactory xmlEventFactory = XMLEventFactory.newFactory();
+    private XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
     private OutputProcessorChain outputProcessorChain;
     private Deque<QName> startElementStack = new ArrayDeque<QName>();
     private QName openStartElement = null;

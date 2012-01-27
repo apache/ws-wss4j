@@ -40,7 +40,6 @@ public class XMLSecurityConstants {
     static {
         try {
             secureRandom = SecureRandom.getInstance("SHA1PRNG");
-            secureRandom.setSeed(System.currentTimeMillis());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +70,7 @@ public class XMLSecurityConstants {
     }
 
     public static final String XMLINPUTFACTORY = "XMLInputFactory";
-    public static final XMLEventFactory XMLEVENTFACTORY = XMLEventFactory.newFactory();
+    public static final XMLEventFactory XMLEVENTFACTORY = XMLEventFactory.newInstance();
 
     public static final String NS_XML = "http://www.w3.org/2000/xmlns/";
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";

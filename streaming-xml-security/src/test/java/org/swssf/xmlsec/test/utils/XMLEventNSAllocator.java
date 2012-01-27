@@ -53,7 +53,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
     }
 
     private XMLEventNSAllocator(ArrayDeque<List<ComparableNamespace>> nsStack, ArrayDeque<List<ComparableAttribute>> attrStack) throws Exception {
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         if (xmlInputFactory.getClass().getName().equals("com.sun.xml.internal.stream.XMLInputFactoryImpl")) {
             xmlEventAllocator = (XMLEventAllocator) Class.forName("com.sun.xml.internal.stream.events.XMLEventAllocatorImpl").newInstance();
         } else if (xmlInputFactory.getClass().getName().equals("com.ctc.wstx.stax.WstxInputFactory")) {

@@ -102,6 +102,7 @@
                         <exclude>.git/**</exclude>
                         <exclude>.svn/**</exclude>
                         <exclude>.pmd/**</exclude>
+                        <exclude>.externalToolBuilders/**</exclude>
                         <exclude>.checkstyle/**</exclude>
                         <exclude>src/main/resources/**</exclude>
                         <exclude>src/test/resources/**</exclude>

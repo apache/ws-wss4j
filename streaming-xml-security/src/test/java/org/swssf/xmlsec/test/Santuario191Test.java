@@ -19,8 +19,6 @@
 package org.swssf.xmlsec.test;
 
 import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer11_OmitCommentsTransformer;
-import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315_ExclOmitCommentsTransformer;
-import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315_ExclWithCommentsTransformer;
 import org.swssf.xmlsec.test.utils.XMLEventNSAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -30,15 +28,9 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * This is a test for Santuario-191:
@@ -67,7 +59,7 @@ public class Santuario191Test {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        this.xmlInputFactory = XMLInputFactory.newFactory();
+        this.xmlInputFactory = XMLInputFactory.newInstance();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
     }
 

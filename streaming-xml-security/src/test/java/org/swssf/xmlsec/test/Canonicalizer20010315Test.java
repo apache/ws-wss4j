@@ -46,7 +46,7 @@ public class Canonicalizer20010315Test {
     private XMLInputFactory xmlInputFactory;
 
     public Canonicalizer20010315Test() throws Exception {
-        this.xmlInputFactory = XMLInputFactory.newFactory();
+        this.xmlInputFactory = XMLInputFactory.newInstance();
         this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
         XMLResolver xmlResolver = new XMLResolver() {
             public Object resolveEntity(String publicID, String systemID, String baseURI, String namespace) throws XMLStreamException {
@@ -138,9 +138,6 @@ public class Canonicalizer20010315Test {
     @Test
     public void test31withCommentsSubtree() throws Exception {
 
-        String descri =
-                "3.1: PIs, Comments, and Outside of Document Element. (commented)";
-
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n-comments.xml");
 
@@ -155,8 +152,6 @@ public class Canonicalizer20010315Test {
     @Test
     public void test31subtree() throws Exception {
 
-        String descri =
-                "3.1: PIs, Comments, and Outside of Document Element. (uncommented)";
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_c14n.xml");
 
@@ -171,7 +166,6 @@ public class Canonicalizer20010315Test {
     @Test
     public void test32subtree() throws Exception {
 
-        String descri = "3.2 Whitespace in Document Content. (uncommented)";
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/32_c14n.xml");
 
@@ -186,8 +180,6 @@ public class Canonicalizer20010315Test {
     @Test
     public void test33subtree() throws Exception {
 
-        String descri = "3.3 Start and End Tags. (uncommented)";
-
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/33_c14n.xml");
 
@@ -201,9 +193,6 @@ public class Canonicalizer20010315Test {
      */
     @Test
     public void test34() throws Exception {
-
-        String descri =
-                "3.4 Character Modifications and Character References. (uncommented)";
 
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n.xml");
@@ -227,9 +216,6 @@ public class Canonicalizer20010315Test {
     @Test
     public void test34subtree() throws Exception {
         //todo enable validation
-        String descri =
-                "3.4 Character Modifications and Character References. (uncommented, patched to run on validating Parsers)";
-
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input_validatingParser.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n_validatingParser.xml");
 
@@ -244,7 +230,6 @@ public class Canonicalizer20010315Test {
     @Test
     public void test35subtree() throws Exception {
         //todo enable validation
-        String descri = "3.5 Entity References. (uncommented)";
 
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_c14n.xml");
@@ -259,8 +244,6 @@ public class Canonicalizer20010315Test {
      */
     @Test
     public void test36subtree() throws Exception {
-
-        String descri = "3.6 UTF-8 Encoding. (uncommented)";
 
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/36_c14n.xml");

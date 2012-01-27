@@ -115,7 +115,7 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
             //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream, "UTF-8");
             //we have to output a fake element to workaround text-only encryption:
-            xmlEventWriter.add(XMLEventFactory.newFactory().createStartElement(new QName("a"), null, null));
+            xmlEventWriter.add(XMLEventFactory.newInstance().createStartElement(new QName("a"), null, null));
         }
 
         @Override
@@ -232,7 +232,7 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
         protected void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             try {
-                xmlEventWriter.add(XMLEventFactory.newFactory().createEndElement(new QName("a"), null));
+                xmlEventWriter.add(XMLEventFactory.newInstance().createEndElement(new QName("a"), null));
                 //close the event writer to flush all outstanding events to the encrypt stream
                 xmlEventWriter.close();
                 //call close to force a cipher.doFinal()
