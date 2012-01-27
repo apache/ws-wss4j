@@ -24,6 +24,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.cache.ReplayCache;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -76,6 +77,8 @@ public class RequestData {
     private CallbackHandler callback = null;
     private boolean enableRevocation = false;
     protected boolean requireSignedEncryptedDataElements = false;
+    private ReplayCache timestampReplayCache;
+    private ReplayCache nonceReplayCache;
 
     public void clear() {
         soapConstants = null;
@@ -97,6 +100,8 @@ public class RequestData {
         useSingleCert = true;
         callback = null;
         enableRevocation = false;
+        timestampReplayCache = null;
+        nonceReplayCache = null;
     }
 
     public Object getMsgContext() {
@@ -447,4 +452,33 @@ public class RequestData {
         }
         return null;
     }
+    
+    /**
+     * Set the replay cache for Timestamps
+     */
+    public void setTimestampReplayCache(ReplayCache newCache) {
+        timestampReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for Timestamps
+     */
+    public ReplayCache getTimestampReplayCache() {
+        return timestampReplayCache;
+    }
+    
+    /**
+     * Set the replay cache for Nonces
+     */
+    public void setNonceReplayCache(ReplayCache newCache) {
+        nonceReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for Nonces
+     */
+    public ReplayCache getNonceReplayCache() {
+        return nonceReplayCache;
+    }
+
 }

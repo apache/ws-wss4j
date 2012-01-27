@@ -28,17 +28,20 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.cache.ReplayCache;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SignatureSTRParser;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.transform.STRTransformUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 
@@ -67,7 +70,10 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +192,7 @@ public class SignatureProcessor implements Processor {
         }
         
         XMLSignature xmlSignature = 
-            verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, wsDocInfo);
+            verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, data, wsDocInfo);
         byte[] signatureValue = xmlSignature.getSignatureValue().getValue();
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
         // The c14n algorithm must be as specified by the BSP spec
@@ -335,6 +341,7 @@ public class SignatureProcessor implements Processor {
         PublicKey publicKey,
         byte[] secretKey,
         String signatureMethod,
+        RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
@@ -361,6 +368,10 @@ public class SignatureProcessor implements Processor {
         
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
+            
+            // Test for replay attacks
+            testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), data, wsDocInfo);
+            
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo, elem.getOwnerDocument());
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
@@ -386,6 +397,8 @@ public class SignatureProcessor implements Processor {
                     LOG.debug("Reference " + id + " check: " + referenceValidationCheck);
                 }
             }
+        } catch (WSSecurityException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, null, null, ex
@@ -569,5 +582,71 @@ public class SignatureProcessor implements Processor {
         return null;
     }
     
+    /**
+     * Test for a replayed message. The cache key is the Timestamp Created String and the signature value.
+     * @param signatureElement
+     * @param signatureValue
+     * @param requestData
+     * @param wsDocInfo
+     * @throws WSSecurityException
+     */
+    private void testMessageReplay(
+        Element signatureElement,
+        byte[] signatureValue,
+        RequestData requestData,
+        WSDocInfo wsDocInfo
+    ) throws WSSecurityException {
+        ReplayCache replayCache = requestData.getTimestampReplayCache();
+        if (replayCache == null) {
+            return;
+        }
+        
+        // Find the Timestamp
+        List<WSSecurityEngineResult> foundResults = wsDocInfo.getResultsByTag(WSConstants.TS);
+        Timestamp timeStamp = null;
+        if (foundResults.isEmpty()) {
+            // Search for a Timestamp below the Signature
+            Node sibling = signatureElement.getNextSibling();
+            while (sibling != null) {
+                if (sibling instanceof Element 
+                    && WSConstants.TIMESTAMP_TOKEN_LN.equals(((Element)sibling).getLocalName())
+                    && WSConstants.WSU_NS.equals(((Element)sibling).getNamespaceURI())) {
+                    timeStamp = new Timestamp((Element)sibling, requestData.getWssConfig().isWsiBSPCompliant());
+                    break;
+                }
+                sibling = sibling.getNextSibling();
+            }
+        } else {
+            timeStamp = (Timestamp)foundResults.get(0).get(WSSecurityEngineResult.TAG_TIMESTAMP);
+        }
+        if (timeStamp == null) {
+            return;
+        }
+        
+        // Test for replay attacks
+        Date created = timeStamp.getCreated();
+        DateFormat zulu = new XmlSchemaDateFormat();
+        String identifier = zulu.format(created) + "" + Arrays.hashCode(signatureValue);
+
+        if (replayCache.contains(identifier)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY,
+                "invalidTimestamp",
+                new Object[] {"A replay attack has been detected"}
+            );
+        }
+
+        // Store the Timestamp/SignatureValue combination in the cache
+        Date expires = timeStamp.getExpires();
+        if (expires != null) {
+            Date rightNow = new Date();
+            long currentTime = rightNow.getTime();
+            long expiresTime = expires.getTime();
+            replayCache.add(identifier, ((expiresTime - currentTime) / 1000L));
+        } else {
+            replayCache.add(identifier);
+        }
+        
+    }
 
 }
