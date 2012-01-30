@@ -102,7 +102,7 @@ public class InboundWSSec {
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.setSecurityEventListener(securityEventListener);
 
-        final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         securityContextImpl.put(WSSConstants.XMLINPUTFACTORY, xmlInputFactory);

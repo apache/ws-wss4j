@@ -128,7 +128,7 @@ public class ProfilingTest extends AbstractTestBase {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
         XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(sourceDocument));
 
-        XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
+        XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
         XmlReaderToWriter.writeAll(outXmlStreamReader, xmlOutputFactory.createXMLStreamWriter(new OutputStream() {
             @Override
             public void write(int b) throws IOException {
