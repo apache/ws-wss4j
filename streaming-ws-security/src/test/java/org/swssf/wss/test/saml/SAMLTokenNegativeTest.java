@@ -87,7 +87,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -140,7 +140,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -184,7 +184,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -227,7 +227,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());

@@ -30,6 +30,7 @@ import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 import java.io.IOException;
 
 /**
@@ -37,7 +38,7 @@ import java.io.IOException;
  * authentication assertion using Sender Vouches.
  */
 public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
-
+    
     public SAML1CallbackHandler() throws Exception {
         if (certs == null) {
             Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
@@ -45,29 +46,36 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
             cryptoType.setAlias("transmitter");
             certs = crypto.getX509Certificates(cryptoType);
         }
-
+        
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
     }
-
+    
     public void handle(Callback[] callbacks)
-            throws IOException, UnsupportedCallbackException {
+        throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(SAMLVersion.VERSION_11);
                 callback.setIssuer(issuer);
-                SubjectBean subjectBean =
-                        new SubjectBean(
-                                subjectName, subjectQualifier, confirmationMethod
-                        );
+                if (conditions != null) {
+                    callback.setConditions(conditions);
+                }
+                
+                SubjectBean subjectBean = 
+                    new SubjectBean(
+                        subjectName, subjectQualifier, confirmationMethod
+                    );
+                if (subjectNameIDFormat != null) {
+                    subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
+                }
                 if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
                     try {
                         KeyInfoBean keyInfo = createKeyInfo();
                         subjectBean.setKeyInfo(keyInfo);
                     } catch (Exception ex) {
-                        throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
+                        throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
                     }
                 }
                 createAndSetStatement(subjectBean, callback);
@@ -76,5 +84,5 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
             }
         }
     }
-
+    
 }

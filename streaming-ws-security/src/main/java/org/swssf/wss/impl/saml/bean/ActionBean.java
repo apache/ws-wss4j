@@ -23,20 +23,20 @@ package org.swssf.wss.impl.saml.bean;
 /**
  * Class SamlAction represents the raw data required by the <code>AssertionWrapper</code> when
  * creating the <code>Action</code> element of the SAML Authorization Decision Statement.
- * <p/>
+ *
  * Created on May 19, 2009
  */
 public class ActionBean {
 
-    /**
+    /** 
      * A URI reference representing the namespace in which the name of the specified action is to be
-     * interpreted. If this element is absent, the namespace
-     * urn:oasis:names:tc:SAML:1.0:action:rwedcnegation specified in Section 7.2.2 is in effect.
+     * interpreted. If this element is absent, the namespace 
+     * urn:oasis:names:tc:SAML:1.0:action:rwedcnegation specified in Section 7.2.2 is in effect.  
      */
     private String actionNamespace;
 
-    /**
-     * An action sought to be performed on the specified resource (i.e. Read, Write, Update, Delete)
+    /** 
+     * An action sought to be performed on the specified resource (i.e. Read, Write, Update, Delete) 
      */
     private String contents;
 
@@ -50,7 +50,7 @@ public class ActionBean {
      * Constructor SamlAction creates a new SamlAction instance.
      *
      * @param actionNamespace of type String
-     * @param contents        of type String
+     * @param contents of type String
      */
     public ActionBean(String actionNamespace, String contents) {
         this.actionNamespace = actionNamespace;
@@ -92,7 +92,7 @@ public class ActionBean {
     public void setContents(String contents) {
         this.contents = contents;
     }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -105,7 +105,7 @@ public class ActionBean {
         } else if (contents != null && !contents.equals(that.contents)) {
             return false;
         }
-
+        
         if (actionNamespace == null && that.actionNamespace != null) {
             return false;
         } else if (actionNamespace != null && !actionNamespace.equals(that.actionNamespace)) {

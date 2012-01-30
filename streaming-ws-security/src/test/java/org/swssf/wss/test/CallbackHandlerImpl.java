@@ -20,12 +20,12 @@ package org.swssf.wss.test;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSPasswordCallback;
 import org.swssf.wss.impl.saml.SAMLCallback;
 import org.swssf.wss.impl.saml.bean.*;
 import org.swssf.wss.impl.saml.builder.SAML1Constants;
+import org.swssf.wss.impl.saml.builder.SAML2Constants;
 import org.swssf.xmlsec.crypto.CryptoBase;
 import org.swssf.xmlsec.crypto.Merlin;
 import org.w3c.dom.Document;
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -63,6 +64,13 @@ public class CallbackHandlerImpl implements CallbackHandler {
     private byte[] ephemeralKey = null;
     private String issuer = null;
     private SAMLVersion samlVersion = SAMLVersion.VERSION_11;
+    
+    private String subjectNameIDFormat = null;
+    private String subjectLocalityIpAddress = null;
+    private String subjectLocalityDnsAddress = null;
+    private String resource = null;
+    private List<?> customAttributeValues = null;
+    private ConditionsBean conditions = null;
 
     private boolean signAssertion = true;
 
@@ -106,41 +114,34 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 samlCallback.setIssuerKeyName("samlissuer");
                 samlCallback.setIssuerKeyPassword("default");
                 samlCallback.setSignAssertion(this.signAssertion);
+                samlCallback.setIssuer(issuer);
+                
+                if (conditions != null) {
+                    samlCallback.setConditions(conditions);
+                }
+                
+                SubjectBean subjectBean =
+                        new SubjectBean(subjectName, subjectQualifier, confirmationMethod);
+                if (subjectNameIDFormat != null) {
+                    subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
+                }
+                
+                if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)
+                        || SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
+                    try {
+                        KeyInfoBean keyInfo = createKeyInfo();
+                        subjectBean.setKeyInfo(keyInfo);
+                    } catch (Exception ex) {
+                        throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
+                    }
+                }
+                samlCallback.setSubject(subjectBean);
 
                 if (getSamlVersion() == SAMLVersion.VERSION_11) {
-
                     samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
-                    samlCallback.setIssuer(issuer);
-                    SubjectBean subjectBean =
-                            new SubjectBean(
-                                    subjectName, subjectQualifier, confirmationMethod
-                            );
-                    if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
-                        try {
-                            KeyInfoBean keyInfo = createKeyInfo();
-                            subjectBean.setKeyInfo(keyInfo);
-                        } catch (Exception ex) {
-                            throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
-                        }
-                    }
-                    samlCallback.setSubject(subjectBean);
                     createAndSetStatement(subjectBean, samlCallback);
                 } else {
                     samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
-                    samlCallback.setIssuer(issuer);
-                    SubjectBean subjectBean =
-                            new SubjectBean(
-                                    subjectName, subjectQualifier, confirmationMethod
-                            );
-                    if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
-                        try {
-                            KeyInfoBean keyInfo = createKeyInfo();
-                            subjectBean.setKeyInfo(keyInfo);
-                        } catch (Exception ex) {
-                            throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
-                        }
-                    }
-                    samlCallback.setSubject(subjectBean);
                     createAndSetStatement(null, samlCallback);
                 }
             } catch (Exception e) {
@@ -158,16 +159,29 @@ public class CallbackHandlerImpl implements CallbackHandler {
             if (subjectBean != null) {
                 authBean.setSubject(subjectBean);
             }
+            if (subjectLocalityIpAddress != null || subjectLocalityDnsAddress != null) {
+                SubjectLocalityBean subjectLocality = new SubjectLocalityBean();
+                subjectLocality.setIpAddress(subjectLocalityIpAddress);
+                subjectLocality.setDnsAddress(subjectLocalityDnsAddress);
+                authBean.setSubjectLocality(subjectLocality);
+            }
             authBean.setAuthenticationMethod("Password");
             callback.setAuthenticationStatementData(Collections.singletonList(authBean));
         } else if (statement == Statement.ATTR) {
             AttributeStatementBean attrBean = new AttributeStatementBean();
+            AttributeBean attributeBean = new AttributeBean();
             if (subjectBean != null) {
                 attrBean.setSubject(subjectBean);
+                attributeBean.setSimpleName("role");
+                attributeBean.setQualifiedName("http://custom-ns");
+            } else {
+                attributeBean.setQualifiedName("role");
             }
-            AttributeBean attributeBean = new AttributeBean();
-            attributeBean.setSimpleName("role");
-            attributeBean.setAttributeValues(Collections.singletonList("user"));
+            if (customAttributeValues != null) {
+                attributeBean.setCustomAttributeValues(customAttributeValues);   
+            } else {
+                attributeBean.setAttributeValues(Collections.singletonList("user"));
+            }
             attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             callback.setAttributeStatementData(Collections.singletonList(attrBean));
         } else {
@@ -180,6 +194,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
             authzBean.setActions(Collections.singletonList(actionBean));
             authzBean.setResource("endpoint");
             authzBean.setDecision(AuthDecisionStatementBean.Decision.PERMIT);
+            authzBean.setResource(resource);
             callback.setAuthDecisionStatementData(Collections.singletonList(authzBean));
         }
     }
@@ -199,7 +214,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
 
             // Create an Encrypted Key
             WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
-            encrKey.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+            encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(doc, null);
             ephemeralKey = encrKey.getEphemeralKey();
@@ -314,5 +329,26 @@ public class CallbackHandlerImpl implements CallbackHandler {
 
     public void setSecret(byte[] secret) {
         this.secret = secret;
+    }
+    
+    public void setConditions(ConditionsBean conditionsBean) {
+        this.conditions = conditionsBean;
+    }
+    
+    public void setSubjectNameIDFormat(String subjectNameIDFormat) {
+        this.subjectNameIDFormat = subjectNameIDFormat;
+    }
+    
+    public void setSubjectLocality(String ipAddress, String dnsAddress) {
+        this.subjectLocalityIpAddress = ipAddress;
+        this.subjectLocalityDnsAddress = dnsAddress;
+    }
+    
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+    
+    public void setCustomAttributeValues(List<?> customAttributeValues) {
+        this.customAttributeValues = customAttributeValues;
     }
 }

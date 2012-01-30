@@ -25,13 +25,14 @@ import org.joda.time.DateTime;
 /**
  * Class ConditionsBean represents a SAML Conditions object (can be used to create
  * both SAML v1.1 and v2.0 statements)
- * <p/>
+ *
  * Created on May 20, 2009
  */
 public class ConditionsBean {
     private DateTime notBefore;
     private DateTime notAfter;
     private int tokenPeriodMinutes;
+    private String audienceURI;
 
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
@@ -43,27 +44,27 @@ public class ConditionsBean {
      * Constructor ConditionsBean creates a new ConditionsBean instance.
      *
      * @param notBefore The notBefore instance
-     * @param notAfter  The notAfter instance
+     * @param notAfter The notAfter instance
      */
     public ConditionsBean(
-            DateTime notBefore,
-            DateTime notAfter
+        DateTime notBefore, 
+        DateTime notAfter
     ) {
         this.notBefore = notBefore;
         this.notAfter = notAfter;
     }
-
+    
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
      *
      * @param tokenPeriodMinutes how long the token is valid for in minutes
      */
     public ConditionsBean(
-            int tokenPeriodMinutes
+        int tokenPeriodMinutes
     ) {
         this.tokenPeriodMinutes = tokenPeriodMinutes;
     }
-
+    
     /**
      * Get the notBefore instance
      *
@@ -81,7 +82,7 @@ public class ConditionsBean {
     public void setNotBefore(DateTime notBefore) {
         this.notBefore = notBefore;
     }
-
+    
     /**
      * Get the notAfter instance
      *
@@ -99,7 +100,7 @@ public class ConditionsBean {
     public void setNotAfter(DateTime notAfter) {
         this.notAfter = notAfter;
     }
-
+    
     /**
      * Get the tokenPeriodMinutes of this object.
      *
@@ -117,6 +118,24 @@ public class ConditionsBean {
     public void setTokenPeriodMinutes(int tokenPeriodMinutes) {
         this.tokenPeriodMinutes = tokenPeriodMinutes;
     }
+    
+    /**
+     * Get the audienceURI instance
+     *
+     * @return the audienceURI instance
+     */
+    public String getAudienceURI() {
+        return audienceURI;
+    }
+
+    /**
+     * Set the audienceURI instance
+     *
+     * @param audienceURI the audienceURI instance to set
+     */
+    public void setAudienceURI(String audienceURI) {
+        this.audienceURI = audienceURI;
+    }
 
     /**
      * Method equals ...
@@ -132,17 +151,23 @@ public class ConditionsBean {
         ConditionsBean that = (ConditionsBean) o;
 
         if (tokenPeriodMinutes != that.tokenPeriodMinutes) return false;
-
+        
         if (notBefore == null && that.notBefore != null) {
             return false;
         } else if (notBefore != null && !notBefore.equals(that.notBefore)) {
             return false;
         }
-
+        
         if (notAfter == null && that.notAfter != null) {
             return false;
         } else if (notAfter != null && !notAfter.equals(that.notAfter)) {
+            return false; 
+        }
+        
+        if (audienceURI == null && that.audienceURI != null) {
             return false;
+        } else if (audienceURI != null && !audienceURI.equals(that.audienceURI)) {
+            return false; 
         }
 
         return true;
@@ -159,6 +184,9 @@ public class ConditionsBean {
         }
         if (notAfter != null) {
             result = 31 * result + notAfter.hashCode();
+        }
+        if (audienceURI != null) {
+            result = 31 * result + audienceURI.hashCode();
         }
         return result;
     }

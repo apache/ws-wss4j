@@ -19,12 +19,21 @@
 package org.swssf.wss.test.saml;
 
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.joda.time.DateTime;
+import org.opensaml.Configuration;
+import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml2.core.AttributeValue;
+import org.opensaml.saml2.core.Conditions;
+import org.opensaml.xml.XMLObjectBuilder;
+import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.schema.XSAny;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.InboundWSSec;
 import org.swssf.wss.ext.OutboundWSSec;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.impl.saml.builder.SAML1Constants;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.test.AbstractTestBase;
 import org.swssf.wss.test.CallbackHandlerImpl;
@@ -43,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -473,4 +483,248 @@ public class SAMLTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
+     * a user-specified SubjectNameIDFormat.
+     */
+    @Test
+    public void testSAML1SubjectNameIDFormatOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+            callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
+            securityProperties.setCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
+     * a user-specified SubjectNameIDFormat.
+     */
+    @Test
+    public void testSAML2SubjectNameIDFormatOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+            callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
+            securityProperties.setCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
+     * a user-specified SubjectLocality statement.
+     */
+    @Test
+    public void testSAML1SubjectLocalityOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+            callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
+            securityProperties.setCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
+     * a user-specified SubjectLocality statement.
+     */
+    @Test
+    public void testSAML2SubjectLocalityOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
+            securityProperties.setCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 1.1 authz assertion with
+     * a Resource URI
+     */
+    @Test
+    public void testSAML1ResourceOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHZ);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setResource("http://resource.org");
+            callbackHandler.setSignAssertion(false);
+            securityProperties.setCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 attribute assertion. The attributeValue
+     * has a custom XMLObject (not a String) value.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2AttrAssertionCustomAttributeOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
+            securityProperties.setOutAction(actions);
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            
+            // Create and add a custom Attribute (conditions Object)
+            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+            
+            SAMLObjectBuilder<Conditions> conditionsV2Builder = 
+                    (SAMLObjectBuilder<Conditions>)builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
+            Conditions conditions = conditionsV2Builder.buildObject();
+            DateTime newNotBefore = new DateTime();
+            conditions.setNotBefore(newNotBefore);
+            conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
+            
+            XMLObjectBuilder<XSAny> xsAnyBuilder = builderFactory.getBuilder(XSAny.TYPE_NAME);
+            XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+            attributeValue.getUnknownXMLObjects().add(conditions);
+            
+            callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
+            
+            securityProperties.setCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
 }

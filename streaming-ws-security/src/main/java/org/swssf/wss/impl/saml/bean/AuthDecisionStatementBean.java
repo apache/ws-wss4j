@@ -19,47 +19,45 @@
 
 package org.swssf.wss.impl.saml.bean;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 
 /**
  * Class SamlDecision represents the raw data to be used by the <code>AssertionWrapper</code> when
  * creating SAML Authorization Decision Statements.
- * <p/>
+ *
  * Created on May 19, 2009
  */
 public class AuthDecisionStatementBean {
 
-    /**
-     * The SAML subject
+    /** 
+     * The SAML subject  
      */
     private SubjectBean subject;
 
-    /**
-     * enum representing the possible decision types as specified in the SAML spec
+    /** 
+     * enum representing the possible decision types as specified in the SAML spec 
      */
-    public enum Decision {
-        PERMIT, INDETERMINATE, DENY
-    }
+    public enum Decision {PERMIT, INDETERMINATE, DENY}
 
-    /**
-     * The decision rendered by the SAML authority with respect to the specified resource
+    /** 
+     * The decision rendered by the SAML authority with respect to the specified resource 
      */
     private Decision decision;
 
-    /**
-     * A URI reference identifying the resource to which access authorization is sought
+    /** 
+     * A URI reference identifying the resource to which access authorization is sought 
      */
     private String resource;
 
-    /**
-     * The set of actions authorized to be performed on the specified resource (one or more)
+    /** 
+     * The set of actions authorized to be performed on the specified resource (one or more) 
      */
     private List<ActionBean> actionBeans;
 
-    /**
-     * A set of assertions that the SAML authority relied on in making the decision (optional)
+    /** 
+     * A set of assertions that the SAML authority relied on in making the decision (optional) 
      */
     private Object evidence;
 
@@ -73,18 +71,18 @@ public class AuthDecisionStatementBean {
     /**
      * Constructor SamlDecision creates a new SamlDecision instance.
      *
-     * @param decision    of type Decision
-     * @param resource    of type String
-     * @param subject     of type SubjectBean
-     * @param evidence    of type Object
+     * @param decision of type Decision
+     * @param resource of type String
+     * @param subject of type SubjectBean
+     * @param evidence of type Object
      * @param actionBeans of type List<SamlAction>
      */
     public AuthDecisionStatementBean(
-            Decision decision,
-            String resource,
-            SubjectBean subject,
-            Object evidence,
-            List<ActionBean> actionBeans
+        Decision decision, 
+        String resource, 
+        SubjectBean subject,
+        Object evidence,
+        List<ActionBean> actionBeans
     ) {
         this.decision = decision;
         this.resource = resource;
@@ -167,7 +165,6 @@ public class AuthDecisionStatementBean {
 
     /**
      * Get the Subject
-     *
      * @return the Subject
      */
     public SubjectBean getSubject() {
@@ -176,13 +173,12 @@ public class AuthDecisionStatementBean {
 
     /**
      * Set the Subject
-     *
      * @param subject the SubjectBean instance to set
      */
     public void setSubject(SubjectBean subject) {
         this.subject = subject;
     }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -195,25 +191,25 @@ public class AuthDecisionStatementBean {
         } else if (subject != null && !subject.equals(that.subject)) {
             return false;
         }
-
+        
         if (decision == null && that.decision != null) {
             return false;
         } else if (decision != null && !decision.equals(that.decision)) {
             return false;
         }
-
+        
         if (evidence == null && that.evidence != null) {
             return false;
         } else if (evidence != null && !evidence.equals(that.evidence)) {
             return false;
         }
-
+        
         if (actionBeans == null && that.actionBeans != null) {
             return false;
         } else if (actionBeans != null && !actionBeans.equals(that.actionBeans)) {
             return false;
         }
-
+        
         if (resource == null && that.resource != null) {
             return false;
         } else if (resource != null && !resource.equals(that.resource)) {

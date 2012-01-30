@@ -22,6 +22,7 @@ package org.swssf.wss.impl.saml;
 import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.impl.saml.bean.*;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public class SAMLCallback implements Callback {
      * A list of <code>AuthDecisionStatementBean</code> values
      */
     private List<AuthDecisionStatementBean> authDecisionStatementData;
+    
+    /**
+     * A DOM Element representation of this SAML Assertion
+     */
+    private Element assertionElement;
 
     /**
      * Constructor SAMLCallback creates a new SAMLCallback instance.
@@ -268,5 +274,21 @@ public class SAMLCallback implements Callback {
      */
     public SAMLVersion getSamlVersion() {
         return samlVersion;
+    }
+    
+    /**
+     * Set the DOM representation of this SAML Assertion
+     * @param assertionElement the DOM representation of this SAML Assertion
+     */
+    public void setAssertionElement(Element assertionElement) {
+        this.assertionElement = assertionElement;
+    }
+    
+    /**
+     * Get the DOM representation of this SAML Assertion
+     * @return the DOM representation of this SAML Assertion
+     */
+    public Element getAssertionElement() {
+        return assertionElement;
     }
 }
