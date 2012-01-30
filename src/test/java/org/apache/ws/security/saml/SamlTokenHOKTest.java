@@ -23,6 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
@@ -159,10 +160,9 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        /*
-         * TODO - reenable when we pick up OpenSAML 2.4.2
+        Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, keystoreCallbackHandler, crypto, userCrypto);
+            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto, decCrypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
@@ -173,7 +173,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
         assertTrue(receivedAssertion.isSigned());
-        */
     }
     
     /**
@@ -246,10 +245,9 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        /*
-         * TODO - reenable when we pick up OpenSAML 2.4.2
+        Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, keystoreCallbackHandler, crypto, userCrypto);
+            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto, decCrypto);
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
@@ -259,7 +257,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         AssertionWrapper receivedAssertion = 
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
-        */
     }
 
     /**

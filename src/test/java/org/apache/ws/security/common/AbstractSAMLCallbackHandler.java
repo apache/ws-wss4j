@@ -177,7 +177,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                   
             // Create an Encrypted Key
             WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
-            encrKey.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+            encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(doc, null);
             ephemeralKey = encrKey.getEphemeralKey();
