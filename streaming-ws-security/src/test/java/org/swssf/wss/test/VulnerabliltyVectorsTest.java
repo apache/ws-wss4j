@@ -101,7 +101,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
-            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
@@ -187,7 +187,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();

@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.soap.SOAPConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -217,7 +216,7 @@ public class SignatureTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
 
@@ -594,7 +593,7 @@ public class SignatureTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
 

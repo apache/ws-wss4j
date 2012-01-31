@@ -196,7 +196,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -237,7 +237,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -289,7 +289,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -327,7 +327,7 @@ public class TimestampTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
 
@@ -360,7 +360,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -400,7 +400,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Throwable throwable = e.getCause();
@@ -486,7 +486,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Throwable throwable = e.getCause();
@@ -526,7 +526,7 @@ public class TimestampTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Throwable throwable = e.getCause();

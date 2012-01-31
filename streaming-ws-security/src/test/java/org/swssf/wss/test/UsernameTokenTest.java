@@ -115,7 +115,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
@@ -169,7 +169,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new ArrayList<SecurityEvent>(), securityEventListener);
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertEquals(e.getMessage(), "org.swssf.wss.ext.WSSecurityException: Wrong username");

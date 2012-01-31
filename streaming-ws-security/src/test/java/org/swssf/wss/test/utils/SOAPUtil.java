@@ -53,5 +53,13 @@ public class SOAPUtil {
         DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(in);
     }
+    
+    /**
+     * Convert an SOAP Envelope as an InputStream to a org.w3c.dom.Document.
+     */
+    public static org.w3c.dom.Document toSOAPPart(InputStream in) throws Exception {
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(in);
+    }
 
 }

@@ -32,9 +32,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.rpc.JAXRPCException;
-import javax.xml.rpc.handler.MessageContext;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -45,6 +42,7 @@ import javax.xml.xpath.XPathExpression;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -114,7 +112,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -318,7 +316,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-        Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }
 
     @Test
@@ -337,7 +335,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
         String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
-        Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }
 
     @Test
@@ -356,7 +354,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
 
         String action = WSHandlerConstants.SIGNATURE;
-        Document document = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }
 
     @Test(invocationCount = 1)
@@ -434,8 +432,8 @@ public class InteroperabilityTest extends AbstractTestBase {
             String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
-            MessageContext messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, SOAPConstants.SOAP_1_1_PROTOCOL);
-            Document securedDocument = (Document) messageContext.getProperty(SECURED_DOCUMENT);
+            Map<String, Object> messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
+            Document securedDocument = (Document) messageContext.get(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -505,7 +503,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, true);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, true);
         }
     }
 
@@ -547,7 +545,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
 
@@ -591,7 +589,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
 
         //done signature; now test sig-verification:
@@ -805,7 +803,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ACTOR, "test");
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -858,14 +856,14 @@ public class InteroperabilityTest extends AbstractTestBase {
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://www.w3.org/2003/05/soap-envelope}Body;");
-        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
         properties.setProperty(WSHandlerConstants.ACTOR, "test");
-        securedDocument = doOutboundSecurityWithWSS4J(new ByteArrayInputStream(baos.toByteArray()), action, properties, SOAPConstants.SOAP_1_2_PROTOCOL);
+        securedDocument = doOutboundSecurityWithWSS4J(new ByteArrayInputStream(baos.toByteArray()), action, properties);
 
         transformer = TRANSFORMER_FACTORY.newTransformer();
         baos.reset();
@@ -910,7 +908,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ACTOR, "test");
-        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
     }
 
     @Test(invocationCount = 1)
@@ -933,9 +931,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ACTOR, "anotherTest");
         try {
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
-            Assert.fail("Expected JAXRPCException");
-        } catch (JAXRPCException e) {
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
+            Assert.fail("Expected WSSecurityException");
+        } catch (org.apache.ws.security.WSSecurityException e) {
             Assert.assertEquals(e.getMessage(), "WSS4JHandler: Request does not contain required Security header");
         }
     }
@@ -960,7 +958,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ACTOR, "test");
-        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_2_PROTOCOL, properties, false);
+        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
     }
 
     @Test(invocationCount = 1)
@@ -985,6 +983,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ACTOR, "test");
-        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_2_PROTOCOL, properties, false);
+        doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
     }
 }

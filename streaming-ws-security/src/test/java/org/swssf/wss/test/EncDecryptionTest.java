@@ -28,7 +28,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.soap.SOAPConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -295,7 +294,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //done encryption; now test decryption:
         {
             String action = WSHandlerConstants.ENCRYPT;
-            Document doc = doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
 
@@ -714,7 +713,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, SOAPConstants.SOAP_1_1_PROTOCOL, properties, false);
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
 
