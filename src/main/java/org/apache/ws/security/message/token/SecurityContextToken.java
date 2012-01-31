@@ -91,7 +91,7 @@ public class SecurityContextToken {
 
         element.appendChild(elementIdentifier);
 
-        String uuid = UUIDGenerator.getUUID();
+        String uuid = "uuid:" + UUIDGenerator.getUUID();
         
         elementIdentifier.appendChild(doc.createTextNode(uuid));
         
