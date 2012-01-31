@@ -108,6 +108,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 */
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException {
         Document document = null;

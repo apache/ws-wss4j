@@ -62,6 +62,16 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             final SAMLCallback samlCallback = new SAMLCallback();
             WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), samlCallback);
             SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlCallback);
+            
+            // todo support setting signature and c14n algorithms
+            if (samlCallback.isSignAssertion()) {
+                samlAssertionWrapper.signAssertion(
+                    samlCallback.getIssuerKeyName(), 
+                    samlCallback.getIssuerKeyPassword(), 
+                    samlCallback.getIssuerCrypto(), 
+                    samlCallback.isSendKeyValue()
+                );
+            }
 
             boolean senderVouches = false;
             List<String> methods = samlAssertionWrapper.getConfirmationMethods();

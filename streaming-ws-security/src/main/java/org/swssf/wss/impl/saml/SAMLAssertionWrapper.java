@@ -999,10 +999,6 @@ public class SAMLAssertionWrapper {
             // Set the OpenSaml2 XMLObject instance
             xmlObject = saml2;
         }
-        
-        if (samlCallback.isSignAssertion()) {
-            signAssertion(samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword(), samlCallback.getIssuerCrypto(), samlCallback.isSendKeyValue());
-        }
     }
 
 }
