@@ -231,16 +231,19 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         //encrypt the symmetric session key with the public key from the receiver:
                         String jceid = JCEAlgorithmMapper.translateURItoJCEID(getSecurityProperties().getEncryptionKeyTransportAlgorithm());
                         Cipher cipher = Cipher.getInstance(jceid);
-                        cipher.init(Cipher.ENCRYPT_MODE, x509Certificate);
+                        cipher.init(Cipher.WRAP_MODE, x509Certificate);
 
-                        byte[] ephemeralKey = securityToken.getSecretKey(null, null).getEncoded();
+                        Key secretKey = securityToken.getSecretKey(null, null);
 
                         int blockSize = cipher.getBlockSize();
-                        if (blockSize > 0 && blockSize < ephemeralKey.length) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyTransp", "public key algorithm too weak to encrypt symmetric key"
+                        if (blockSize > 0 && blockSize < secretKey.getEncoded().length) {
+                            throw new WSSecurityException(
+                                WSSecurityException.ErrorCode.FAILURE, 
+                                "unsupportedKeyTransp", 
+                                "public key algorithm too weak to encrypt symmetric key"
                             );
                         }
-                        byte[] encryptedEphemeralKey = cipher.doFinal(ephemeralKey);
+                        byte[] encryptedEphemeralKey = cipher.wrap(secretKey);
 
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
@@ -249,8 +252,6 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                     } catch (InvalidKeyException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (BadPaddingException e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                     } catch (IllegalBlockSizeException e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);

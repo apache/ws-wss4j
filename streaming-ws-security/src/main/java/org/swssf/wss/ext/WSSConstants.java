@@ -179,15 +179,10 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final String NS_WSS_ENC_KEY_VALUE_TYPE = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKey";
 
-    public static final String PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE = "PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE";
-    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION";
-    public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
 
     public static final String PROP_TIMESTAMP_SECURITYEVENT = "PROP_TIMESTAMP";
-
-    public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
 
     /**
      * Length of UsernameToken derived key used by .NET WSE to sign a message.
