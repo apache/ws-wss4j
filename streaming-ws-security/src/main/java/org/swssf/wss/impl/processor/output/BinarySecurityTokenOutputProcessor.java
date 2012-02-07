@@ -23,6 +23,7 @@ import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.stream.XMLStreamException;
@@ -64,7 +65,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
                 }
                 key = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password);
-                x509Certificates = getSecurityProperties().getSignatureCrypto().getCertificates(getSecurityProperties().getSignatureUser());
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(getSecurityProperties().getSignatureUser());
+                x509Certificates = getSecurityProperties().getSignatureCrypto().getX509Certificates(cryptoType);
                 if (x509Certificates == null || x509Certificates.length == 0) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
                 }
@@ -79,7 +82,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     x509Certificates = new X509Certificate[1];
                     x509Certificates[0] = x509Certificate;
                 } else {
-                    x509Certificates = getSecurityProperties().getEncryptionCrypto().getCertificates(getSecurityProperties().getEncryptionUser());
+                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                    cryptoType.setAlias(getSecurityProperties().getEncryptionUser());
+                    x509Certificates = getSecurityProperties().getEncryptionCrypto().getX509Certificates(cryptoType);
                     if (x509Certificates == null || x509Certificates.length == 0) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound", getSecurityProperties().getEncryptionUser());
                     }

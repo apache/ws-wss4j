@@ -18,9 +18,12 @@
  */
 package org.swssf.wss.impl.securityToken;
 
+import java.security.cert.X509Certificate;
+
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -41,7 +44,10 @@ public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getAliasForX509Cert(binaryContent);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
+            cryptoType.setBytes(binaryContent);
+            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+            this.alias = getCrypto().getX509Identifier(certs[0]);
         }
         return this.alias;
     }

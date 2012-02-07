@@ -18,22 +18,16 @@
  */
 package org.swssf.xmlsec.crypto;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.config.ConfigurationProperties;
 
-/**
- * class lent from apache wss4j
- */
-
-/**
- * Created by IntelliJ IDEA.
- * User: dims
- * Date: Sep 15, 2005
- * Time: 9:50:40 AM
- * To change this template use File | Settings | File Templates.
- */
-public class Merlin extends CryptoBase {
+public class Merlin extends MerlinBase {
 
     private static final Log log = LogFactory.getLog(Merlin.class.getName());
 
@@ -44,9 +38,33 @@ public class Merlin extends CryptoBase {
      */
     public Merlin() {
         super();
+        
+        if (truststore == null) {
+            InputStream cacertsIs = null;
+
+            try {
+                String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+                cacertsIs = new FileInputStream(cacertsPath);
+                String cacertsPasswd = ConfigurationProperties.getProperty("CACertKeyStorePassword");
+
+                truststore = KeyStore.getInstance(KeyStore.getDefaultType());
+                truststore.load(cacertsIs, cacertsPasswd.toCharArray());
+                loadCACerts = true;
+            } catch (Exception e) {
+                log.warn("CA certs could not be loaded: " + e.getMessage());
+            } finally {
+                if (cacertsIs != null) {
+                    try {
+                        cacertsIs.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+            }
+        }
     }
 
-    protected String getCryptoProvider() {
+    public String getCryptoProvider() {
         return ConfigurationProperties.getProperty("CertProvider");
     }
 

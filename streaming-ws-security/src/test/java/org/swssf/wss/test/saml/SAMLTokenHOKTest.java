@@ -30,6 +30,7 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.test.AbstractTestBase;
 import org.swssf.wss.test.CallbackHandlerImpl;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.crypto.Merlin;
 import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
@@ -72,7 +73,9 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
             crypto.setKeyStore(keyStore);
-            callbackHandler.setCerts(crypto.getCertificates("transmitter"));
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("transmitter");
+            callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
 
@@ -204,7 +207,9 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
             crypto.setKeyStore(keyStore);
-            callbackHandler.setCerts(crypto.getCertificates("transmitter"));
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("transmitter");
+            callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
 

@@ -19,7 +19,7 @@
 package org.swssf.xmlsec.ext;
 
 import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.crypto.CryptoBase;
+import org.swssf.xmlsec.crypto.MerlinBase;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.net.URL;
@@ -57,7 +57,7 @@ public class XMLSecurityProperties {
         return inputProcessorList;
     }
 
-    private Class<? extends CryptoBase> decryptionCryptoClass;
+    private Class<? extends MerlinBase> decryptionCryptoClass;
     private KeyStore decryptionKeyStore;
     private CallbackHandler callbackHandler;
 
@@ -88,7 +88,7 @@ public class XMLSecurityProperties {
      *
      * @return
      */
-    public Class<? extends CryptoBase> getDecryptionCryptoClass() {
+    public Class<? extends MerlinBase> getDecryptionCryptoClass() {
         if (decryptionCryptoClass != null) {
             return decryptionCryptoClass;
         }
@@ -101,7 +101,7 @@ public class XMLSecurityProperties {
      *
      * @param decryptionCryptoClass
      */
-    public void setDecryptionCryptoClass(Class<? extends CryptoBase> decryptionCryptoClass) {
+    public void setDecryptionCryptoClass(Class<? extends MerlinBase> decryptionCryptoClass) {
         this.decryptionCryptoClass = decryptionCryptoClass;
     }
 
@@ -124,10 +124,10 @@ public class XMLSecurityProperties {
             return cachedDecryptionCrypto;
         }
 
-        Class<? extends CryptoBase> decryptionCryptoClass = this.getDecryptionCryptoClass();
+        Class<? extends MerlinBase> decryptionCryptoClass = this.getDecryptionCryptoClass();
 
         try {
-            CryptoBase decryptionCrypto = decryptionCryptoClass.newInstance();
+            MerlinBase decryptionCrypto = decryptionCryptoClass.newInstance();
             decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
             cachedDecryptionCrypto = decryptionCrypto;
             cachedDecryptionKeyStore = this.getDecryptionKeyStore();
@@ -157,7 +157,7 @@ public class XMLSecurityProperties {
 
     private XMLSecurityConstants.Action[] outAction;
 
-    private Class<? extends CryptoBase> encryptionCryptoClass;
+    private Class<? extends MerlinBase> encryptionCryptoClass;
     private KeyStore encryptionKeyStore;
     private String encryptionUser;
     private X509Certificate encryptionUseThisCertificate;
@@ -192,7 +192,7 @@ public class XMLSecurityProperties {
      *
      * @return
      */
-    public Class<? extends CryptoBase> getEncryptionCryptoClass() {
+    public Class<? extends MerlinBase> getEncryptionCryptoClass() {
         if (encryptionCryptoClass != null) {
             return encryptionCryptoClass;
         }
@@ -205,7 +205,7 @@ public class XMLSecurityProperties {
      *
      * @param encryptionCryptoClass
      */
-    public void setEncryptionCryptoClass(Class<? extends CryptoBase> encryptionCryptoClass) {
+    public void setEncryptionCryptoClass(Class<? extends MerlinBase> encryptionCryptoClass) {
         this.encryptionCryptoClass = encryptionCryptoClass;
     }
 
@@ -228,10 +228,10 @@ public class XMLSecurityProperties {
             return cachedEncryptionCrypto;
         }
 
-        Class<? extends CryptoBase> encryptionCryptoClass = this.getEncryptionCryptoClass();
+        Class<? extends MerlinBase> encryptionCryptoClass = this.getEncryptionCryptoClass();
 
         try {
-            CryptoBase encryptionCrypto = encryptionCryptoClass.newInstance();
+            MerlinBase encryptionCrypto = encryptionCryptoClass.newInstance();
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
             cachedEncryptionCrypto = encryptionCrypto;
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
@@ -326,7 +326,7 @@ public class XMLSecurityProperties {
     private String signatureAlgorithm;
     private String signatureDigestAlgorithm;
     private String signatureCanonicalizationAlgorithm;
-    private Class<? extends CryptoBase> signatureCryptoClass;
+    private Class<? extends MerlinBase> signatureCryptoClass;
     private KeyStore signatureKeyStore;
     private String signatureUser;
     private boolean useSingleCert = true;
@@ -373,7 +373,7 @@ public class XMLSecurityProperties {
         this.signatureKeyStore = keyStore;
     }
 
-    public Class<? extends CryptoBase> getSignatureCryptoClass() {
+    public Class<? extends MerlinBase> getSignatureCryptoClass() {
         if (signatureCryptoClass != null) {
             return signatureCryptoClass;
         }
@@ -381,7 +381,7 @@ public class XMLSecurityProperties {
         return signatureCryptoClass;
     }
 
-    public void setSignatureCryptoClass(Class<? extends CryptoBase> signatureCryptoClass) {
+    public void setSignatureCryptoClass(Class<? extends MerlinBase> signatureCryptoClass) {
         this.signatureCryptoClass = signatureCryptoClass;
     }
 
@@ -398,10 +398,10 @@ public class XMLSecurityProperties {
             return cachedSignatureCrypto;
         }
 
-        Class<? extends CryptoBase> signatureCryptoClass = this.getSignatureCryptoClass();
+        Class<? extends MerlinBase> signatureCryptoClass = this.getSignatureCryptoClass();
 
         try {
-            CryptoBase signatureCrypto = signatureCryptoClass.newInstance();
+            MerlinBase signatureCrypto = signatureCryptoClass.newInstance();
             signatureCrypto.setKeyStore(this.getSignatureKeyStore());
             cachedSignatureCrypto = signatureCrypto;
             cachedSignatureKeyStore = this.getSignatureKeyStore();
@@ -445,7 +445,7 @@ public class XMLSecurityProperties {
         this.signatureCanonicalizationAlgorithm = signatureCanonicalizationAlgorithm;
     }
 
-    private Class<? extends CryptoBase> signatureVerificationCryptoClass;
+    private Class<? extends MerlinBase> signatureVerificationCryptoClass;
     private KeyStore signatureVerificationKeyStore;
 
     public KeyStore getSignatureVerificationKeyStore() {
@@ -458,7 +458,7 @@ public class XMLSecurityProperties {
         this.signatureVerificationKeyStore = keyStore;
     }
 
-    public Class<? extends CryptoBase> getSignatureVerificationCryptoClass() {
+    public Class<? extends MerlinBase> getSignatureVerificationCryptoClass() {
         if (signatureVerificationCryptoClass != null) {
             return signatureVerificationCryptoClass;
         }
@@ -466,7 +466,7 @@ public class XMLSecurityProperties {
         return signatureVerificationCryptoClass;
     }
 
-    public void setSignatureVerificationCryptoClass(Class<? extends CryptoBase> signatureVerificationCryptoClass) {
+    public void setSignatureVerificationCryptoClass(Class<? extends MerlinBase> signatureVerificationCryptoClass) {
         this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
     }
 
@@ -483,10 +483,10 @@ public class XMLSecurityProperties {
             return cachedSignatureVerificationCrypto;
         }
 
-        Class<? extends CryptoBase> signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
+        Class<? extends MerlinBase> signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
 
         try {
-            CryptoBase signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
+            MerlinBase signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
             cachedSignatureVerificationCrypto = signatureVerificationCrypto;
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();

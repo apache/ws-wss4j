@@ -22,6 +22,7 @@ import org.swssf.wss.ext.WSPasswordCallback;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -73,7 +74,9 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
     @Override
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         if (this.x509Certificates == null) {
-            this.x509Certificates = getCrypto().getCertificates(getAlias());
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(getAlias());
+            this.x509Certificates = getCrypto().getX509Certificates(cryptoType);
         }
         return this.x509Certificates;
     }

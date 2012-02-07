@@ -41,6 +41,7 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.saml.builder.SAML1ComponentBuilder;
 import org.swssf.wss.impl.saml.builder.SAML2ComponentBuilder;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -292,7 +293,9 @@ public class SAMLAssertionWrapper {
         signature.setCanonicalizationAlgorithm(canonicalizationAlgorithm);
 
         // prepare to sign the SAML token
-        X509Certificate[] issuerCerts = issuerCrypto.getCertificates(issuerKeyName);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(issuerKeyName);
+        X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
             throw new WSSecurityException(
                     "No issuer certs were found to sign the SAML Assertion using issuer name: "
@@ -457,7 +460,11 @@ public class SAMLAssertionWrapper {
                                         WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile"
                                 );
                             }
-                            certs = securityProperties.getSignatureVerificationCrypto().getCertificates(((X509IssuerSerial) x509obj).getIssuerName(), ((X509IssuerSerial) x509obj).getSerialNumber());
+                            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+                            cryptoType.setIssuerSerial(
+                                    ((X509IssuerSerial) x509obj).getIssuerName(), ((X509IssuerSerial) x509obj).getSerialNumber()
+                            );
+                            certs = securityProperties.getSignatureVerificationCrypto().getX509Certificates(cryptoType);
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
                                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
@@ -742,7 +749,9 @@ public class SAMLAssertionWrapper {
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
 
-        X509Certificate[] foundCerts = crypto.getCertificates(issuerString, issuerSerial);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+        cryptoType.setIssuerSerial(issuerString, issuerSerial);
+        X509Certificate[] foundCerts = crypto.getX509Certificates(cryptoType);
 
         //
         // If a certificate has been found, the certificates must be compared
@@ -804,7 +813,9 @@ public class SAMLAssertionWrapper {
         // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the
         // keystore or the truststore
         //
-        X509Certificate[] foundCerts = crypto.getCertificates(issuerString);
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(issuerString);
+        X509Certificate[] foundCerts = crypto.getX509Certificates(cryptoType);
 
         // If the certs have not been found, the issuer is not in the keystore/truststore
         // As a direct result, do not trust the transmitted certificate

@@ -43,7 +43,7 @@ public class X509_V3SecurityToken extends X509SecurityToken {
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getAliasForX509Cert(this.x509Certificates[0]);
+            this.alias = getCrypto().getX509Identifier(this.x509Certificates[0]);
         }
         return this.alias;
     }

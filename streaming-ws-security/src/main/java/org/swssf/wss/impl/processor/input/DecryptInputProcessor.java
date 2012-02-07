@@ -18,6 +18,11 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import java.util.List;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.events.XMLEvent;
+
 import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.binding.xmlenc.EncryptedDataType;
 import org.swssf.binding.xmlenc.ReferenceList;
@@ -29,12 +34,16 @@ import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.ComparableAttribute;
+import org.swssf.xmlsec.ext.ComparableNamespace;
+import org.swssf.xmlsec.ext.InputProcessorChain;
+import org.swssf.xmlsec.ext.SecurePart;
+import org.swssf.xmlsec.ext.SecurityContext;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityProperties;
 import org.swssf.xmlsec.impl.processor.input.AbstractDecryptInputProcessor;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
-import java.util.List;
+import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 
 /**
  * Processor for decryption of EncryptedData XML structures
@@ -81,6 +90,15 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 encryptedHeader, comparableNamespaceList, comparableAttributeList,
                 this,
                 securityToken);
+    }
+    
+    @Override
+    protected SecurityToken findSecurityToken(
+            KeyInfoType keyInfoType, XMLSecurityProperties securityProperties,
+            SecurityContext securityContext, Object processor) throws XMLSecurityException {
+        return SecurityTokenFactory.newInstance().getSecurityToken(
+                keyInfoType, getSecurityProperties().getDecryptionCrypto(),
+                getSecurityProperties().getCallbackHandler(), securityContext, processor);
     }
 
     @Override

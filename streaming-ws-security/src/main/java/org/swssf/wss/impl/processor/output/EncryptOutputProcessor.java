@@ -18,26 +18,27 @@
  */
 package org.swssf.wss.impl.processor.output;
 
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSDocumentContext;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.impl.EncryptionPartDef;
-import org.swssf.xmlsec.impl.processor.output.AbstractEncryptOutputProcessor;
-
-import javax.crypto.NoSuchPaddingException;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
+
+import javax.crypto.NoSuchPaddingException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
+
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSDocumentContext;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.xmlsec.ext.OutputProcessorChain;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.impl.EncryptionPartDef;
+import org.swssf.xmlsec.impl.processor.output.XMLEncryptOutputProcessor;
 
 /**
  * Processor to encrypt XML structures
@@ -45,58 +46,37 @@ import java.util.UUID;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
+public class EncryptOutputProcessor extends XMLEncryptOutputProcessor {
 
     public EncryptOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
         super(securityProperties, action);
     }
-
+    
+    /**
+     * Return InternalEncryptionOutputProcessor, which writes out a SecurityTokenReference in the KeyInfo
+     * of the EncryptedData
+     */
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-
-            //avoid double encryption when child elements matches too
-            if (getActiveInternalEncryptionOutputProcessor() == null) {
-                SecurePart securePart = securePartMatches(startElement, outputProcessorChain, securityProperties.getEncryptionSecureParts());
-                if (securePart != null) {
-                    logger.debug("Matched securePart for encryption");
-                    InternalEncryptionOutputProcessor internalEncryptionOutputProcessor = null;
-                    try {
-                        String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
-                        SecurityTokenProvider securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
-                        EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
-                        encryptionPartDef.setModifier(securePart.getModifier());
-                        encryptionPartDef.setEncRefId("ED-" + UUID.randomUUID().toString());
-                        encryptionPartDef.setKeyId(securityTokenProvider.getId());
-                        encryptionPartDef.setSymmetricKey(securityTokenProvider.getSecurityToken(null).getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm(), null));
-                        outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
-                        internalEncryptionOutputProcessor =
-                                new InternalEncryptionOutputProcessor(
-                                        ((WSSSecurityProperties) getSecurityProperties()),
+    protected AbstractInternalEncryptionOutputProcessor createInternalEncryptionOutputProcessor(
+        EncryptionPartDef encryptionPartDef,
+        StartElement startElement,
+        OutputProcessorChain outputProcessorChain
+    ) throws XMLStreamException, XMLSecurityException {
+        try {
+            return new InternalEncryptionOutputProcessor((WSSSecurityProperties)getSecurityProperties(),
                                         getAction(),
                                         encryptionPartDef,
                                         startElement,
-                                        outputProcessorChain.getDocumentContext().getEncoding()
-                                );
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (NoSuchPaddingException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (InvalidKeyException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (IOException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    }
-
-                    setActiveInternalEncryptionOutputProcessor(internalEncryptionOutputProcessor);
-                    outputProcessorChain.addProcessor(internalEncryptionOutputProcessor);
-                }
-            }
+                                        outputProcessorChain.getDocumentContext().getEncoding());
+        } catch (NoSuchAlgorithmException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+        } catch (NoSuchPaddingException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+        } catch (InvalidKeyException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+        } catch (IOException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
         }
-
-        outputProcessorChain.processEvent(xmlEvent);
     }
 
     /**

@@ -26,8 +26,8 @@ import org.swssf.wss.impl.saml.SAMLCallback;
 import org.swssf.wss.impl.saml.bean.*;
 import org.swssf.wss.impl.saml.builder.SAML1Constants;
 import org.swssf.wss.impl.saml.builder.SAML2Constants;
-import org.swssf.xmlsec.crypto.CryptoBase;
 import org.swssf.xmlsec.crypto.Merlin;
+import org.swssf.xmlsec.crypto.MerlinBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -108,7 +108,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 SAMLCallback samlCallback = (SAMLCallback) callbacks[0];
                 KeyStore keyStore = KeyStore.getInstance("jks");
                 keyStore.load(this.getClass().getClassLoader().getResourceAsStream("saml/issuer.jks"), "default".toCharArray());
-                CryptoBase crypto = new Merlin();
+                MerlinBase crypto = new Merlin();
                 crypto.setKeyStore(keyStore);
                 samlCallback.setIssuerCrypto(crypto);
                 samlCallback.setIssuerKeyName("samlissuer");

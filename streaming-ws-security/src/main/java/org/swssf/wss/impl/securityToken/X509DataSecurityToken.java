@@ -18,11 +18,14 @@
  */
 package org.swssf.wss.impl.securityToken;
 
+import java.security.cert.X509Certificate;
+
 import org.swssf.binding.xmldsig.X509DataType;
 import org.swssf.binding.xmldsig.X509IssuerSerialType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityUtils;
 
@@ -47,7 +50,12 @@ public class X509DataSecurityToken extends X509SecurityToken {
         if (this.alias == null) {
             X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
                     x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
-            this.alias = getCrypto().getAliasForX509Cert(x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber());
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+            cryptoType.setIssuerSerial(
+                    x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber()
+            );
+            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+            this.alias = getCrypto().getX509Identifier(certs[0]);
         }
         return this.alias;
     }

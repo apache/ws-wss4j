@@ -29,6 +29,7 @@ import org.swssf.wss.impl.saml.bean.SubjectBean;
 import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
 import org.w3c.dom.*;
 
@@ -91,7 +92,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (senderVouches) {
                 // prepare to sign the SAML token
-                certificates = samlCallback.getIssuerCrypto().getCertificates(samlCallback.getIssuerKeyName());
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(samlCallback.getIssuerKeyName());
+                certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
                 if (certificates == null) {
                     throw new WSSecurityException(
                             "No issuer certs were found to sign the SAML Assertion using issuer name: "
@@ -110,13 +113,15 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     if (keyInfoBean != null) {
                         X509Certificate x509Certificate = keyInfoBean.getCertificate();
                         if (x509Certificate != null) {
-                            String alias = getSecurityProperties().getSignatureCrypto().getAliasForX509Cert(x509Certificate);
+                            String alias = getSecurityProperties().getSignatureCrypto().getX509Identifier(x509Certificate);
                             if (alias == null) {
                                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
                             WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                             WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), wsPasswordCallback);
-                            certificates = getSecurityProperties().getSignatureCrypto().getCertificates(alias);
+                            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                            cryptoType.setAlias(alias);
+                            certificates = getSecurityProperties().getSignatureCrypto().getX509Certificates(cryptoType);
                             privateKey = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
                         }
                     }

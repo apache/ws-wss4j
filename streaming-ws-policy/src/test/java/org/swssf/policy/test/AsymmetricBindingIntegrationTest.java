@@ -26,6 +26,7 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.test.CallbackHandlerImpl;
+import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.crypto.Merlin;
 import org.swssf.xmlsec.ext.SecurePart;
 import org.testng.Assert;
@@ -2064,7 +2065,9 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
         Merlin crypto = new Merlin();
         crypto.setKeyStore(keyStore);
-        callbackHandler.setCerts(crypto.getCertificates("transmitter"));
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("transmitter");
+        callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
         outSecurityProperties.setCallbackHandler(callbackHandler);
         outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());

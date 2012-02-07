@@ -56,10 +56,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
             return getSecurityToken(securityTokenReferenceType, crypto, callbackHandler, securityContext, processor);
-        } else if (crypto.getDefaultX509Alias() != null) {
+        } else if (crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityToken(
-                    (WSSecurityContext) securityContext, crypto, callbackHandler, crypto.getDefaultX509Alias(),
-                    crypto.getDefaultX509Alias(), null, processor
+                    (WSSecurityContext) securityContext, crypto, callbackHandler, crypto.getDefaultX509Identifier(),
+                    crypto.getDefaultX509Identifier(), null, processor
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");

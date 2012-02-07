@@ -24,7 +24,15 @@ import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.cert.CertPath;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -38,15 +46,27 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     X509PKIPathv1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
                                byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) throws XMLSecurityException {
         super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
-        X509Certificate[] x509Certificates = crypto.getX509Certificates(binaryContent, false);
-        if (x509Certificates != null && x509Certificates.length > 0) {
-            this.x509Certificates = x509Certificates;
+        
+        InputStream in = new ByteArrayInputStream(binaryContent);
+        try {
+            CertPath certPath = getCrypto().getCertificateFactory().generateCertPath(in);
+            List<? extends Certificate> l = certPath.getCertificates();
+            X509Certificate[] certs = new X509Certificate[l.size()];
+            Iterator<? extends Certificate> iterator = l.iterator();
+            for (int i = 0; i < l.size(); i++) {
+                certs[i] = (X509Certificate) iterator.next();
+            }
+            if (certs.length > 0) {
+                this.x509Certificates = certs;
+            }
+        } catch (CertificateException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e);
         }
     }
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getAliasForX509Cert(this.x509Certificates[0]);
+            this.alias = getCrypto().getX509Identifier(this.x509Certificates[0]);
         }
         return this.alias;
     }

@@ -18,18 +18,24 @@
  */
 package org.swssf.xmlsec.impl.processor.input;
 
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.swssf.binding.xmldsig.KeyInfoType;
-import org.swssf.binding.xmlenc.EncryptedDataType;
-import org.swssf.binding.xmlenc.ReferenceList;
-import org.swssf.binding.xmlenc.ReferenceType;
-import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.impl.XMLSecurityEventReader;
-import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
-import org.swssf.xmlsec.impl.util.IVSplittingOutputStream;
-import org.swssf.xmlsec.impl.util.ReplaceableOuputStream;
-import org.xmlsecurity.ns.configuration.AlgorithmType;
+import java.io.BufferedWriter;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -45,11 +51,30 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.*;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.*;
+
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmlenc.EncryptedDataType;
+import org.swssf.binding.xmlenc.ReferenceList;
+import org.swssf.binding.xmlenc.ReferenceType;
+import org.swssf.xmlsec.config.JCEAlgorithmMapper;
+import org.swssf.xmlsec.ext.AbstractInputProcessor;
+import org.swssf.xmlsec.ext.ComparableAttribute;
+import org.swssf.xmlsec.ext.ComparableNamespace;
+import org.swssf.xmlsec.ext.InputProcessorChain;
+import org.swssf.xmlsec.ext.SecurePart;
+import org.swssf.xmlsec.ext.SecurityContext;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.UncheckedXMLSecurityException;
+import org.swssf.xmlsec.ext.XMLEventNS;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.swssf.xmlsec.ext.XMLSecurityUtils;
+import org.swssf.xmlsec.impl.XMLSecurityEventReader;
+import org.swssf.xmlsec.impl.util.IVSplittingOutputStream;
+import org.swssf.xmlsec.impl.util.ReplaceableOuputStream;
+import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 /**
  * Processor for decryption of EncryptedData XML structures
@@ -69,6 +94,10 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
     private ArrayDeque<XMLEvent> tmpXmlEventList = new ArrayDeque<XMLEvent>();
 
+    public AbstractDecryptInputProcessor(XMLSecurityProperties securityProperties) {
+        super(securityProperties);
+    }
+    
     public AbstractDecryptInputProcessor(ReferenceList referenceList, XMLSecurityProperties securityProperties) {
         super(securityProperties);
         this.referenceList = referenceList;
@@ -152,7 +181,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             //check if the current start-element has the name EncryptedData and an Id attribute
             if (startElement.getName().equals(XMLSecurityConstants.TAG_xenc_EncryptedData)) {
                 ReferenceType referenceType = matchesReferenceId(startElement);
-                if (referenceType != null) {
+                if (referenceType != null || referenceList == null) {
                     //duplicate id's are forbidden
                     if (processedReferences.contains(referenceType)) {
                         throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
@@ -226,11 +255,15 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                     final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
 
                     //retrieve the securityToken which must be used for decryption
-                    SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
-                            keyInfoType, getSecurityProperties().getDecryptionCrypto(),
-                            getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext(), this);
-
-                    handleSecurityToken(securityToken, inputProcessorChain.getSecurityContext(), encryptedDataType);
+                    SecurityToken securityToken = 
+                            findSecurityToken(keyInfoType, getSecurityProperties(), 
+                                    inputProcessorChain.getSecurityContext(), this);
+                    if (securityToken != null) {
+                        handleSecurityToken(
+                            securityToken, inputProcessorChain.getSecurityContext(), encryptedDataType
+                        );
+                    }
+                    
                     //only fire here ContentEncryptedElementEvents
                     //the other ones will be fired later, because we don't know the encrypted element name yet
                     if (SecurePart.Modifier.Content.getModifier().equals(encryptedDataType.getType())) {
@@ -323,6 +356,10 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
             List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType, SecurityToken securityToken);
 
+    protected abstract SecurityToken findSecurityToken(
+            KeyInfoType keyInfoType, XMLSecurityProperties securityProperties,
+            SecurityContext securityContext, Object processor) throws XMLSecurityException;
+    
     protected abstract void handleSecurityToken(
             SecurityToken securityToken, SecurityContext securityContext, EncryptedDataType encryptedDataType) throws XMLSecurityException;
 
@@ -350,12 +387,14 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     @Override
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         //here we check if all references where processed.
-        List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
-        Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();
-        while (referenceTypeIterator.hasNext()) {
-            ReferenceType referenceType = referenceTypeIterator.next().getValue();
-            if (!processedReferences.contains(referenceType)) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "unprocessedEncryptionReferences");
+        if (referenceList != null) {
+            List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
+            Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();
+            while (referenceTypeIterator.hasNext()) {
+                ReferenceType referenceType = referenceTypeIterator.next().getValue();
+                if (!processedReferences.contains(referenceType)) {
+                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "unprocessedEncryptionReferences");
+                }
             }
         }
         inputProcessorChain.doFinal();
