@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.impl.EncryptionPartDef;
 import org.swssf.xmlsec.impl.util.RFC2253Parser;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
@@ -110,6 +111,9 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
 
         for (int i = 0; i < attributeList.size(); i++) {
             Attribute attribute = attributeList.get(i);
+            if (XMLConstants.NULL_NS_URI.equals(attribute.getName().getNamespaceURI())) {
+                continue;
+            }
             boolean found = false;
             for (int j = 0; j < namespaceList.size(); j++) {
                 Namespace namespace = namespaceList.get(j);
