@@ -21,6 +21,7 @@ package org.swssf.xmlsec.impl.algorithms;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
+import java.io.IOException;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -88,12 +89,18 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
 
     public byte[] engineSign() throws XMLSecurityException {
         try {
-            return signature.sign();
+            byte[] jcebytes = signature.sign();
+            if (algorithmType.getJCEName().contains("ECDSA")) {
+                return ECDSAUtils.convertASN1toXMLDSIG(jcebytes);
+            }
+            return jcebytes;
         } catch (SignatureException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+        } catch (IOException e) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
-
+    
     public void engineInitVerify(Key verificationKey) throws XMLSecurityException {
         try {
             signature.initVerify((PublicKey) verificationKey);
@@ -104,8 +111,14 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
 
     public boolean engineVerify(byte[] signature) throws XMLSecurityException {
         try {
-            return this.signature.verify(signature);
+            byte[] jcebytes = signature;
+            if (algorithmType.getJCEName().contains("ECDSA")) {
+                jcebytes = ECDSAUtils.convertXMLDSIGtoASN1(jcebytes);
+            }
+            return this.signature.verify(jcebytes);
         } catch (SignatureException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+        } catch (IOException e) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }

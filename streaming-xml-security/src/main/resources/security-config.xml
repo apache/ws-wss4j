@@ -174,11 +174,37 @@
                     Description="ECDSA Signature with SHA-1 message digest"
                     AlgorithmClass="Signature"
                     RequirementLevel="OPTIONAL"
-                    SpecificationURL="http://www.ietf.org/internet-drafts/draft-eastlake-xmldsig-uri-02.txt"
-                    KeyLength="160"
-                    RequiredKey="ECDSAwithSHA1"
+                    SpecificationURL="http://www.ietf.org/rfc/rfc4051.txt"
+                    RequiredKey="SHA1withECDSA"
                     JCEProvider="BC"
-                    JCEName="ECDSAwithSHA1"/>
+                    JCEName="SHA1withECDSA"/>
+
+         <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"
+                    Description="ECDSA Signature with SHA-256 message digest"
+                    AlgorithmClass="Signature"
+                    RequirementLevel="OPTIONAL"
+                    SpecificationURL="http://www.ietf.org/rfc/rfc4051.txt"
+                    RequiredKey="SHA256withECDSA"
+                    JCEProvider="BC"
+                    JCEName="SHA256withECDSA"/>
+
+         <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"
+                    Description="ECDSA Signature with SHA-384 message digest"
+                    AlgorithmClass="Signature"
+                    RequirementLevel="OPTIONAL"
+                    SpecificationURL="http://www.ietf.org/rfc/rfc4051.txt"
+                    RequiredKey="SHA384withECDSA"
+                    JCEProvider="BC"
+                    JCEName="SHA384withECDSA"/>
+
+         <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"
+                    Description="ECDSA Signature with SHA-512 message digest"
+                    AlgorithmClass="Signature"
+                    RequirementLevel="OPTIONAL"
+                    SpecificationURL="http://www.ietf.org/rfc/rfc4051.txt"
+                    RequiredKey="SHA512withECDSA"
+                    JCEProvider="BC"
+                    JCEName="SHA512withECDSA"/>
 
          <!-- MAC Algorithms -->
          <Algorithm URI="http://www.w3.org/2001/04/xmldsig-more#hmac-md5"
