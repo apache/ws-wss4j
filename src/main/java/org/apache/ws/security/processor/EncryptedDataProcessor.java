@@ -25,6 +25,8 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.str.STRParser;
+import org.apache.ws.security.str.SecurityTokenRefSTRParser;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -35,7 +37,9 @@ import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
@@ -63,28 +67,50 @@ public class EncryptedDataProcessor implements Processor {
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "noKeyinfo"
             );
         }
-        String symEncAlgo = X509Util.getEncAlgo(elem);
         
+        String symEncAlgo = X509Util.getEncAlgo(elem);
+        // Check BSP compliance
+        if (request.getWssConfig().isWsiBSPCompliant()) {
+            checkBSPCompliance(symEncAlgo);
+        }
+        
+        // Get the Key either via a SecurityTokenReference or an EncryptedKey
+        Element secRefToken = 
+            WSSecurityUtil.getDirectChildElement(
+                kiElem, "SecurityTokenReference", WSConstants.WSSE_NS
+            );
         Element encryptedKeyElement = 
             WSSecurityUtil.getDirectChildElement(
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
-        if (encryptedKeyElement == null) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
-            );
-        }
         
         if (elem != null && request.isRequireSignedEncryptedDataElements()) {
             WSSecurityUtil.verifySignedElement(elem, elem.getOwnerDocument(), wsDocInfo.getSecurityHeader());
         }
         
-        EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
-        List<WSSecurityEngineResult> encrKeyResults = 
-            encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
-        byte[] symmKey = 
-            (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
-        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, symmKey);
+        SecretKey key = null;
+        List<WSSecurityEngineResult> encrKeyResults = null;
+        if (secRefToken != null) {
+            STRParser strParser = new SecurityTokenRefSTRParser();
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
+            strParser.parseSecurityTokenReference(
+                secRefToken, request,
+                wsDocInfo, parameters
+            );
+            byte[] secretKey = strParser.getSecretKey();
+            key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
+        } else if (encryptedKeyElement != null) {
+            EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
+            encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
+            byte[] symmKey = 
+                (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
+            key = WSSecurityUtil.prepareSecretKey(symEncAlgo, symmKey);
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
+            );
+        }
         
         // initialize Cipher ....
         XMLCipher xmlCipher = null;
@@ -126,12 +152,38 @@ public class EncryptedDataProcessor implements Processor {
                     proc.handleToken(decryptedElem, request, wsDocInfo);
                 List<WSSecurityEngineResult> completeResults = 
                     new ArrayList<WSSecurityEngineResult>();
-                completeResults.addAll(encrKeyResults);
+                if (encrKeyResults != null) {
+                    completeResults.addAll(encrKeyResults);
+                }
                 completeResults.addAll(0, results);
                 return completeResults;
             }
         }
         return encrKeyResults;
+    }
+    
+    /**
+     * Check for BSP compliance
+     * @param encAlgo The encryption algorithm
+     * @throws WSSecurityException
+     */
+    private static void checkBSPCompliance(
+        String encAlgo
+    ) throws WSSecurityException {
+        // EncryptionAlgorithm cannot be null
+        if (encAlgo == null) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+            );
+        }
+        // EncryptionAlgorithm must be 3DES, or AES128, or AES256
+        if (!WSConstants.TRIPLE_DES.equals(encAlgo)
+            && !WSConstants.AES_128.equals(encAlgo)
+            && !WSConstants.AES_256.equals(encAlgo)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
+            );
+        }
     }
 
 }
