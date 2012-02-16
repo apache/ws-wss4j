@@ -18,20 +18,22 @@
  */
 package org.apache.ws.secpolicy.tests;
 
-import junit.framework.TestCase;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyEngine;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.List;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
+import junit.framework.TestCase;
+
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyBuilder;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.XMLUnit;
 
 /**
  * @author $Author$
@@ -53,7 +55,7 @@ public abstract class AbstractTestBase extends TestCase {
         XMLUnit.setIgnoreWhitespace(true);
         final Diff diff = new Diff(expected, actual);
         DetailedDiff myDiff = new DetailedDiff(diff);
-        List allDifferences = myDiff.getAllDifferences();
+        List<?> allDifferences = myDiff.getAllDifferences();
         assertEquals(myDiff.toString(), 0, allDifferences.size());
     }
 
@@ -71,6 +73,10 @@ public abstract class AbstractTestBase extends TestCase {
     }
 
     protected Policy loadPolicy(String policy) throws Exception {
-        return PolicyEngine.getPolicy(new ByteArrayInputStream(policy.getBytes("UTF-8")));
+        return loadPolicy(policy, new PolicyBuilder());
+    }
+    
+    protected Policy loadPolicy(String policy, PolicyBuilder policyBuilder) throws Exception {
+        return policyBuilder.getPolicy(new ByteArrayInputStream(policy.getBytes("UTF-8")));
     }
 }

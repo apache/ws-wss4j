@@ -34,11 +34,11 @@ public class Wss11Test extends AbstractTestBase {
     public void testWss11() throws Exception {
         String fileName = "Wss11.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);
-        String serializedPolicyRefereneFile = loadPolicyFile("policy/model/sp12/serialized/" + fileName);
+        String serializedPolicyReferenceFile = loadPolicyFile("policy/model/sp12/serialized/" + fileName);
         String normalizedPolicyReferenceFile = loadPolicyFile("policy/model/sp12/normalized/" + fileName);
         Policy policy = loadPolicy(policyFile);
         String serializedPolicy = serializePolicy(policy);
-        assertXMLisEqual(serializedPolicy, serializedPolicyRefereneFile);
+        assertXMLisEqual(serializedPolicy, serializedPolicyReferenceFile);
 
         Iterator<List<Assertion>> alternativeIterator = policy.getAlternatives();
         int count = 0;

@@ -34,11 +34,11 @@ public class Trust10Test extends AbstractTestBase {
     public void testTrust10_11() throws Exception {
         String fileName = "Trust10.xml";
         String policyFile = loadPolicyFile("policy/model/sp11/" + fileName);
-        String serializedPolicyRefereneFile = loadPolicyFile("policy/model/sp11/serialized/" + fileName);
+        String serializedPolicyReferenceFile = loadPolicyFile("policy/model/sp11/serialized/" + fileName);
         String normalizedPolicyReferenceFile = loadPolicyFile("policy/model/sp11/normalized/" + fileName);
         Policy policy = loadPolicy(policyFile);
         String serializedPolicy = serializePolicy(policy);
-        assertXMLisEqual(serializedPolicy, serializedPolicyRefereneFile);
+        assertXMLisEqual(serializedPolicy, serializedPolicyReferenceFile);
 
         Iterator<List<Assertion>> alternativeIterator = policy.getAlternatives();
         int count = 0;

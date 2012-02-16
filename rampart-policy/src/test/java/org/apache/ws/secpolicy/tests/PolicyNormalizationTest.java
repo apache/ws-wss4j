@@ -33,17 +33,17 @@ public class PolicyNormalizationTest extends AbstractTestBase {
     public void testWSP15_432Normalization() throws Exception {
         String fileName = "WSP15_432-compact.xml";
         String policyFile = loadPolicyFile("policy/" + fileName);
-        String serializedPolicyRefereneFile = loadPolicyFile("policy/WSP15_432-serialized.xml");
+        String serializedPolicyReferenceFile = loadPolicyFile("policy/WSP15_432-serialized.xml");
         String normalizedPolicyReferenceFile = loadPolicyFile("policy/WSP15_432-normalized.xml");
         Policy policy = loadPolicy(policyFile);
         String serializedPolicy = serializePolicy(policy);
-        assertXMLisEqual(serializedPolicy, serializedPolicyRefereneFile);
+        assertXMLisEqual(serializedPolicy, serializedPolicyReferenceFile);
 
         policy = policy.normalize(true);
         Iterator<List<Assertion>> iterator = policy.getAlternatives();
         int count = 0;
         while (iterator.hasNext()) {
-            List<Assertion> next = iterator.next();
+            iterator.next();
             count++;
         }
         assertEquals(37, count);

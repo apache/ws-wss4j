@@ -47,12 +47,6 @@
             <version>2.6</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <version>1.2.13-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>

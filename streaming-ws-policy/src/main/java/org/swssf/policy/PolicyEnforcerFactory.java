@@ -18,18 +18,22 @@
  */
 package org.swssf.policy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyEngine;
-import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.ws.secpolicy.WSSPolicyException;
-import org.swssf.wss.ext.WSSConstants;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import javax.wsdl.*;
+import javax.wsdl.Binding;
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.Operation;
+import javax.wsdl.Port;
+import javax.wsdl.PortType;
+import javax.wsdl.Service;
+import javax.wsdl.WSDLElement;
+import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.wsdl.extensions.soap.SOAPOperation;
@@ -37,8 +41,16 @@ import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-import java.net.URL;
-import java.util.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyBuilder;
+import org.apache.ws.secpolicy.WSSPolicyException;
+import org.swssf.wss.ext.WSSConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * PolicyEnforcerFactory builds a map of all the possible effective Policies
@@ -54,14 +66,6 @@ public class PolicyEnforcerFactory {
     private Definition wsdlDefinition;
     private List<OperationPolicy> operationPolicies;
     private Map<Element, Policy> elementPolicyCache;
-
-    private static void addAssertionBuilder(AssertionBuilder assertionBuilder) {
-        QName[] knownElements = assertionBuilder.getKnownElements();
-        for (int i = 0; i < knownElements.length; i++) {
-            QName knownElement = knownElements[i];
-            PolicyEngine.registerBuilder(knownElement, assertionBuilder);
-        }
-    }
 
     private PolicyEnforcerFactory() {
         elementPolicyCache = new HashMap<Element, Policy>();
@@ -299,7 +303,8 @@ public class PolicyEnforcerFactory {
         if (elementPolicyCache.containsKey(element)) {
             return elementPolicyCache.get(element);
         }
-        Policy policy = PolicyEngine.getPolicy(element);
+        PolicyBuilder policyBuilder = new PolicyBuilder();
+        Policy policy = policyBuilder.getPolicy(element);
         elementPolicyCache.put(element, policy);
         return policy;
     }
