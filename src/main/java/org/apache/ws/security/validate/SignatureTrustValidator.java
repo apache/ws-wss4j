@@ -167,7 +167,7 @@ public class SignatureTrustValidator implements Validator {
         //
         // FIRST step - Search the keystore for the transmitted certificate
         //
-        if (isCertificateInKeyStore(crypto, cert)) {
+        if (!enableRevocation && isCertificateInKeyStore(crypto, cert)) {
             return true;
         }
 

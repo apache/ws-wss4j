@@ -142,6 +142,45 @@ public class SignatureCRLTest extends org.junit.Assert {
         }
     }
     
+    
+    /**
+     * Test signing a SOAP message using a BST. Revocation is enabled and so the test
+     * should fail. The trust store that is used is the keystore that contains the revoked
+     * certificate. See WSS-341:
+     * https://issues.apache.org/jira/browse/WSS-341
+     */
+    @org.junit.Test
+    public void testSignatureDirectReferenceRevocationKeyStore() throws Exception {
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("wss40rev", "security");
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        //
+        // Verify the signature
+        //
+        try {
+            verify(signedDoc, crypto, true);
+            fail ("Failure expected on a revoked certificate");
+        } catch (Exception ex) {
+            String errorMessage = ex.getMessage();
+            // Different errors using different JDKs...
+            assertTrue(errorMessage.contains("Certificate has been revoked")
+                || errorMessage.contains("Certificate revocation")
+                || errorMessage.contains("Error during certificate path validation"));
+        }
+    }
+    
     /**
      * Verifies the soap envelope
      * <p/>
