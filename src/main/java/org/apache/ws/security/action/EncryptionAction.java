@@ -19,11 +19,15 @@
 
 package org.apache.ws.security.action;
 
+import java.security.cert.X509Certificate;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -62,6 +66,16 @@ public class EncryptionAction implements Action {
         }
         wsEncrypt.setUserInfo(reqData.getEncUser());
         wsEncrypt.setUseThisCert(reqData.getEncCert());
+        Crypto crypto = reqData.getEncCrypto();
+        boolean enableRevocation = Boolean.valueOf(handler.getStringOption(WSHandlerConstants.ENABLE_REVOCATION));
+        if (enableRevocation && crypto != null) {
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias(reqData.getEncUser());
+            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+            if (certs != null && certs.length > 0) {
+                crypto.verifyTrust(certs, enableRevocation);
+            }
+        }
         if (reqData.getEncryptParts().size() > 0) {
             wsEncrypt.setParts(reqData.getEncryptParts());
         }
