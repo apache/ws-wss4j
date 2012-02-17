@@ -23,7 +23,6 @@ import org.apache.ws.secpolicy.model.AbstractBinding;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 
 /**
  * @author $Author$
@@ -43,7 +42,7 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
     }
 
     public boolean assertEvent(SecurityEvent securityEvent) {
-        TimestampSecurityEvent timestampSecurityEvent = (TimestampSecurityEvent) securityEvent;
+        // TimestampSecurityEvent timestampSecurityEvent = (TimestampSecurityEvent) securityEvent;
         boolean isIncludeTimestamp = ((AbstractBinding) getAssertion()).isIncludeTimestamp();
 
         if (isIncludeTimestamp) {

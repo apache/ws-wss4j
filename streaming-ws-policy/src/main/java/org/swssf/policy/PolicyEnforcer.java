@@ -105,7 +105,6 @@ public class PolicyEnforcer implements SecurityEventListener {
             List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap) throws WSSPolicyException {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
-            @SuppressWarnings("unchecked")
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
             int alternative = 0;
             for (int i = 0; i < policyComponents.size(); i++) {
@@ -127,7 +126,6 @@ public class PolicyEnforcer implements SecurityEventListener {
             List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap, int alternative) throws WSSPolicyException {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
-            @SuppressWarnings("unchecked")
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
             for (int i = 0; i < policyComponents.size(); i++) {
                 PolicyComponent curPolicyComponent = policyComponents.get(i);
@@ -291,7 +289,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
         }
         //if the notAssertedCount equals the size of the list (the size of the list is equal to the alternatives)
-        //then we could not satify any alternative
+        //then we could not satisfy any alternative
         if (notAssertedCount == assertionStateMap.size()) {
             logFailedAssertions();
             throw new PolicyViolationException("No policy alternative could be satisfied");

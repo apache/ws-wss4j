@@ -18,16 +18,21 @@
  */
 package org.swssf.policy.assertionStates;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
-import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
-import org.swssf.wss.securityEvent.*;
-
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.List;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
+import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 
 /**
  * @author $Author$
@@ -56,7 +61,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
-        AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
+        // AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
         setAsserted(true);
         switch (securityEvent.getSecurityEventType()) {
             case SignedElement:

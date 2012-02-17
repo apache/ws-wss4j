@@ -82,7 +82,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
@@ -132,7 +132,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), policyEnforcer);
+            doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), policyEnforcer);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();

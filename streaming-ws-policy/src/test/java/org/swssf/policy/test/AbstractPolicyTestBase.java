@@ -50,9 +50,9 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         NodeList nodeList = document.getElementsByTagNameNS("*", SPConstants.P_LOCALNAME);
 
         Document policyDocument = documentBuilder.parse(new ByteArrayInputStream(policyString.getBytes("UTF-8")));
-        Node polcyNode = document.importNode(policyDocument.getDocumentElement(), true);
+        Node policyNode = document.importNode(policyDocument.getDocumentElement(), true);
         Element element = (Element) nodeList.item(0);
-        element.appendChild(polcyNode);
+        element.appendChild(policyNode);
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(document);
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("");
 
