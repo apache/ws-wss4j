@@ -281,6 +281,7 @@ public class ReferenceListProcessor implements Processor {
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            xmlCipher.setSecureValidation(true);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(

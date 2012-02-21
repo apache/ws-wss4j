@@ -116,6 +116,7 @@ public class EncryptedDataProcessor implements Processor {
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            xmlCipher.setSecureValidation(true);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, key);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
