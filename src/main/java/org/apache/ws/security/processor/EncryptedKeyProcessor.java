@@ -41,9 +41,12 @@ import org.w3c.dom.Text;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,7 +104,18 @@ public class EncryptedKeyProcessor implements Processor {
 
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            OAEPParameterSpec oaepParameterSpec = null;
+            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)) {
+                oaepParameterSpec = 
+                    new OAEPParameterSpec(
+                        "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                    );
+            }
+            if (oaepParameterSpec == null) {
+                cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            } else {
+                cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParameterSpec);
+            }
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
         }

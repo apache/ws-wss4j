@@ -19,14 +19,18 @@
 
 package org.apache.ws.security.message;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.security.spec.MGF1ParameterSpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -227,8 +231,23 @@ public class WSSecEncryptedKey extends WSSecBase {
     ) throws WSSecurityException {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            cipher.init(Cipher.WRAP_MODE, remoteCert);
+            OAEPParameterSpec oaepParameterSpec = null;
+            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)) {
+                oaepParameterSpec = 
+                    new OAEPParameterSpec(
+                        "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                    );
+            }
+            if (oaepParameterSpec == null) {
+                cipher.init(Cipher.WRAP_MODE, remoteCert);
+            } else {
+                cipher.init(Cipher.WRAP_MODE, remoteCert.getPublicKey(), oaepParameterSpec);
+            }
         } catch (InvalidKeyException e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+            );
+        } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, e
             );
@@ -396,7 +415,8 @@ public class WSSecEncryptedKey extends WSSecBase {
             if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
                 || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
                 keyGen.init(128);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
                 keyGen.init(192);
             } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
                 || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {

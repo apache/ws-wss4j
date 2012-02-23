@@ -101,6 +101,8 @@ public class WSConstants {
         "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
     public static final String AES_128_GCM = 
         "http://www.w3.org/2009/xmlenc11#aes128-gcm";
+    public static final String AES_192_GCM = 
+        "http://www.w3.org/2009/xmlenc11#aes192-gcm";
     public static final String AES_256_GCM = 
         "http://www.w3.org/2009/xmlenc11#aes256-gcm";
     public static final String DSA = 
