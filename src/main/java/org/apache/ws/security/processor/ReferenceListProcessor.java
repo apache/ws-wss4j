@@ -214,7 +214,9 @@ public class ReferenceListProcessor implements Processor {
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
         if (!WSConstants.TRIPLE_DES.equals(encAlgo)
             && !WSConstants.AES_128.equals(encAlgo)
-            && !WSConstants.AES_256.equals(encAlgo)) {
+            && !WSConstants.AES_128_GCM.equals(encAlgo)
+            && !WSConstants.AES_256.equals(encAlgo)
+            && !WSConstants.AES_256_GCM.equals(encAlgo)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
             );
