@@ -147,7 +147,7 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
             encryptedKeyTransportMethod
         );
-        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
+        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);

@@ -255,6 +255,30 @@ public class WSDocInfo {
         }
         return foundResults;
     }
+    
+    /**
+     * Get a WSSecurityEngineResult of the given Integer tag for the given Id
+     */
+    public WSSecurityEngineResult getResultByTag(Integer tag, String uri) {
+        String id = uri;
+        if (id == null) {
+            return null;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        if (resultsList != null) {
+            for (WSSecurityEngineResult result : resultsList) {
+                if (result != null) {
+                    Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+                    String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                    if ((tag.intValue() == resultTag.intValue()) && id.equals(cId)) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * @return the signature crypto class used to process

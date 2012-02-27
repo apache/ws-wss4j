@@ -20,6 +20,7 @@
 package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -37,6 +38,7 @@ import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +135,28 @@ public class EncryptedDataProcessor implements Processor {
             );
         }
         
+        WSDataRef dataRef = new WSDataRef();
+        dataRef.setWsuId(elem.getAttributeNS(null, "Id"));
+        dataRef.setAlgorithm(symEncAlgo);
+        dataRef.setContent(false);
+        
+        Node decryptedNode;
+        if (previousSibling == null) {
+            decryptedNode = parent.getFirstChild();
+        } else {
+            decryptedNode = previousSibling.getNextSibling();
+        }
+        if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
+            dataRef.setProtectedElement((Element)decryptedNode);
+        }
+        dataRef.setXpath(ReferenceListProcessor.getXPath(decryptedNode));
+        
+        WSSecurityEngineResult result = 
+                new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));
+        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
+        
         WSSConfig wssConfig = request.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
@@ -156,10 +179,12 @@ public class EncryptedDataProcessor implements Processor {
                 if (encrKeyResults != null) {
                     completeResults.addAll(encrKeyResults);
                 }
+                completeResults.add(result);
                 completeResults.addAll(0, results);
                 return completeResults;
             }
         }
+        encrKeyResults.add(result);
         return encrKeyResults;
     }
     
@@ -180,7 +205,9 @@ public class EncryptedDataProcessor implements Processor {
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
         if (!WSConstants.TRIPLE_DES.equals(encAlgo)
             && !WSConstants.AES_128.equals(encAlgo)
-            && !WSConstants.AES_256.equals(encAlgo)) {
+            && !WSConstants.AES_128_GCM.equals(encAlgo)
+            && !WSConstants.AES_256.equals(encAlgo)
+            && !WSConstants.AES_256_GCM.equals(encAlgo)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
             );

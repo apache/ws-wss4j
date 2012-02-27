@@ -60,6 +60,7 @@ public class ReferenceListProcessor implements Processor {
         List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
+        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
@@ -94,10 +95,13 @@ public class ReferenceListProcessor implements Processor {
                 if (dataRefURI.charAt(0) == '#') {
                     dataRefURI = dataRefURI.substring(1);
                 }
-                WSDataRef dataRef = 
-                    decryptDataRefEmbedded(
-                        elem.getOwnerDocument(), dataRefURI, data, wsDocInfo, asymBinding);
-                dataRefs.add(dataRef);
+                
+                if (wsDocInfo.getResultByTag(WSConstants.ENCR, dataRefURI) == null) {
+                    WSDataRef dataRef = 
+                        decryptDataRefEmbedded(
+                            elem.getOwnerDocument(), dataRefURI, data, wsDocInfo, asymBinding);
+                    dataRefs.add(dataRef);
+                }
             }
         }
         
