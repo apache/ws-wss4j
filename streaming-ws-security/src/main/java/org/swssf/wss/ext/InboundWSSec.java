@@ -20,10 +20,12 @@ package org.swssf.wss.ext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.wss.impl.InboundWSSecurityContextImpl;
 import org.swssf.wss.impl.WSSDocumentContextImpl;
-import org.swssf.wss.impl.WSSecurityContextImpl;
+import org.swssf.wss.impl.processor.input.OperationInputProcessor;
 import org.swssf.wss.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.wss.impl.processor.input.SignatureConfirmationInputProcessor;
+import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.ext.InputProcessor;
@@ -98,9 +100,22 @@ public class InboundWSSec {
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
 
-        final WSSecurityContextImpl securityContextImpl = new WSSecurityContextImpl();
+        if (requestSecurityEvents == null) {
+            requestSecurityEvents = new ArrayList<SecurityEvent>();
+        }
+
+        final InboundWSSecurityContextImpl securityContextImpl = new InboundWSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
-        securityContextImpl.setSecurityEventListener(securityEventListener);
+        securityContextImpl.addSecurityEventListener(securityEventListener);
+
+        for (int i = 0; i < requestSecurityEvents.size(); i++) {
+            SecurityEvent securityEvent = requestSecurityEvents.get(i);
+            if (securityEvent instanceof HttpsTokenSecurityEvent) {
+                securityContextImpl.registerSecurityEvent(securityEvent);
+                securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
+                break;
+            }
+        }
 
         final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
@@ -113,6 +128,7 @@ public class InboundWSSec {
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContextImpl, documentContext);
         inputProcessorChain.addProcessor(new XMLEventReaderInputProcessor(securityProperties, xmlEventReader));
         inputProcessorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
+        inputProcessorChain.addProcessor(new OperationInputProcessor(securityProperties));
 
         if (securityProperties.isEnableSignatureConfirmationVerification()) {
             inputProcessorChain.addProcessor(new SignatureConfirmationInputProcessor(securityProperties));

@@ -64,7 +64,7 @@ public class OutboundWSSec {
      * This method is the entry point for the incoming security-engine.
      * Hand over the original XMLStreamWriter and use the returned one for further processing
      *
-     * @param outputStream The original outputStream
+     * @param xmlStreamWriter The original xmlStreamWriter
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
@@ -88,7 +88,7 @@ public class OutboundWSSec {
      * This method is the entry point for the incoming security-engine.
      * Hand over the original XMLStreamWriter and use the returned one for further processing
      *
-     * @param outputStream The original outputStream
+     * @param xmlStreamWriter The original outputStream
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
@@ -99,7 +99,7 @@ public class OutboundWSSec {
     private XMLStreamWriter processOutMessage(Object output, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
         final WSSecurityContextImpl securityContextImpl = new WSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
-        securityContextImpl.setSecurityEventListener(securityEventListener);
+        securityContextImpl.addSecurityEventListener(securityEventListener);
         final WSSDocumentContextImpl documentContext = new WSSDocumentContextImpl();
         documentContext.setEncoding(encoding);
 

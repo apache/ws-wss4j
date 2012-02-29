@@ -24,11 +24,14 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.EncryptedElements;
 import org.apache.ws.secpolicy.model.XPath;
 import org.swssf.policy.Assertable;
+import org.swssf.policy.PolicyUtils;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,7 +40,7 @@ import java.util.List;
  */
 public class EncryptedElementsAssertionState extends AssertionState implements Assertable {
 
-    private List<QName> elements = new ArrayList<QName>();
+    private List<List<QName>> pathElements = new ArrayList<List<QName>>();
 
     public EncryptedElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
@@ -45,17 +48,8 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
         EncryptedElements encryptedElements = (EncryptedElements) assertion;
         for (int i = 0; i < encryptedElements.getXPaths().size(); i++) {
             XPath xPath = encryptedElements.getXPaths().get(i);
-            String[] xPathElements = xPath.getXPath().split("/");
-            String[] xPathElement = xPathElements[xPathElements.length - 1].split(":");
-            if (xPathElement.length == 2) {
-                String ns = xPath.getPrefixNamespaceMap().get(xPathElement[0]);
-                if (ns == null) {
-                    throw new IllegalArgumentException("Namespace not declared");
-                }
-                elements.add(new QName(ns, xPathElement[1]));
-            } else {
-                elements.add(new QName(xPathElement[1]));
-            }
+            List<QName> elements = PolicyUtils.getElementPath(xPath);
+            pathElements.add(elements);
         }
     }
 
@@ -69,23 +63,23 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
-        //todo better matching until we have a streaming xpath evaluation engine (work in progress)
 
-        for (int i = 0; i < elements.size(); i++) {
-            QName qName = elements.get(i);
-            if (qName.equals(encryptedElementSecurityEvent.getElement())) {
+        Iterator<List<QName>> pathElementIterator = pathElements.iterator();
+        while (pathElementIterator.hasNext()) {
+            List<QName> pathElements = pathElementIterator.next();
+            if (WSSUtils.pathMatches(pathElements, encryptedElementSecurityEvent.getElementPath(), true, false)) {
                 if (encryptedElementSecurityEvent.isEncrypted()) {
                     setAsserted(true);
                     return true;
                 } else {
-                    //an element must be signed but isn't
+                    //an element must be encrypted but isn't
                     setAsserted(false);
-                    setErrorMessage("Element " + encryptedElementSecurityEvent.getElement() + " must be encrypted");
+                    setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
                     return false;
                 }
             }
         }
-        //if we return false here other signed elements will trigger a PolicyViolationException
+        //if we return false here other encrypted elements will trigger a PolicyViolationException
         return true;
     }
 }

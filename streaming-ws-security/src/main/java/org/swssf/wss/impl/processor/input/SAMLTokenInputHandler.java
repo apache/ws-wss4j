@@ -18,27 +18,24 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.wss.ext.WSSecurityException;
+import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.saml.SAMLAssertionWrapper;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
-import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.events.*;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Processor for the SAML Assertion XML Structure
@@ -74,38 +71,38 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             logger.debug("SAML Assertion issuer " + samlAssertionWrapper.getIssuerString());
         }
 
+        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+            private WSSecurityToken securityToken = null;
 
-            public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
+            @Override
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
+                if (this.securityToken != null) {
+                    return this.securityToken;
                 }
 
-                securityToken = new SAMLSecurityToken(samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo,
+                this.securityToken = new SAMLSecurityToken(samlAssertionWrapper.getSAMLVersion(), samlSubjectKeyInfo,
                         samlAssertionWrapper.getIssuerString(),
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), crypto,
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), securityProperties.getSignatureVerificationCrypto(),
                         securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
 
-                securityTokens.put(crypto, securityToken);
-                return securityToken;
+                this.securityToken.setElementPath(elementPath);
+                return this.securityToken;
             }
 
+            @Override
             public String getId() {
                 return samlAssertionWrapper.getId();
             }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(samlAssertionWrapper.getId(), securityTokenProvider);
 
-/*
+        //fire a tokenSecurityEvent
         SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent();
-        samlTokenSecurityEvent.setIssuerName(samlAssertionWrapper.getIssuerString());
-        samlTokenSecurityEvent.setSamlVersion(samlAssertionWrapper.getSAMLVersion());
-        samlTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken(null));
+        samlTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(samlTokenSecurityEvent);
-*/
     }
 
     @SuppressWarnings("unchecked")

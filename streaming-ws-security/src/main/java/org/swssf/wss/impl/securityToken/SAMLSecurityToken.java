@@ -46,17 +46,17 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
     private X509Certificate[] x509Certificate;
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, String issuer,
-                             WSSecurityContext wsSecurityContext,
-                             Crypto crypto, CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, null);
+                             WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                             String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
         this.issuer = issuer;
     }
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, WSSecurityContext wsSecurityContext,
-                             Crypto crypto, CallbackHandler callbackHandler, String id, Object processor) {
-        super(wsSecurityContext, crypto, callbackHandler, id, null, processor);
+                             Crypto crypto, CallbackHandler callbackHandler, String id) {
+        super(wsSecurityContext, crypto, callbackHandler, id, null);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
     }
@@ -99,10 +99,6 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
     }
 
     public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
-    public String getKeyWrappingTokenAlgorithm() {
         return null;
     }
 

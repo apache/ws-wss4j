@@ -18,20 +18,9 @@
  */
 package org.swssf.policy;
 
-import javax.xml.namespace.QName;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class PolicyConstants {
-
-    public static final String NS_SOAP11 = "http://schemas.xmlsoap.org/soap/envelope/";
-    public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
-
-    public static final String PREFIX_SOAPENV = "env";
-    public static final String TAG_soap_Body_LocalName = "Body";
-
-    public static final QName TAG_soap11_Body = new QName(NS_SOAP11, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
-    public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
 }

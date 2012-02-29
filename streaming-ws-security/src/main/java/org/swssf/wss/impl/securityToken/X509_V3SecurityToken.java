@@ -36,8 +36,8 @@ public class X509_V3SecurityToken extends X509SecurityToken {
     private X509Certificate[] x509Certificates;
 
     X509_V3SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent,
-                         String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) throws XMLSecurityException {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                         String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.x509Certificates = new X509Certificate[]{getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent))};
     }
 

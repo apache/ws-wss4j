@@ -128,7 +128,7 @@ public class Canonicalizer20010315ExclusiveTest {
 
         assertTrue(equals);
     }
-    
+
     @Test
     public void test24excl() throws Exception {
 

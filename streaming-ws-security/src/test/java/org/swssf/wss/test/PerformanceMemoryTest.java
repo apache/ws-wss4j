@@ -130,7 +130,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
     @Test(groups = "streaming-memory-out")
     public void testStreamingOutMemoryPerformance() throws Exception {
 
-        FileWriter samples = new FileWriter("memory-samples-stream-out.txt");
+        FileWriter samples = new FileWriter("target/memory-samples-stream-out.txt");
         long memoryDiff = 0;
 
         for (int i = 1; i <= 15; i++) {
@@ -176,7 +176,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
     @Test(groups = "dom-memory-out")
     public void testDOMOutMemoryPerformance() throws Exception {
 
-        FileWriter samples = new FileWriter("memory-samples-dom-out.txt");
+        FileWriter samples = new FileWriter("target/memory-samples-dom-out.txt");
         long memoryDiff = 0;
         long leakedMemory = 0;
 
@@ -227,7 +227,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
     @Test(groups = "stream")
     public void testStreamingMemoryPerformance() throws Exception {
 
-        FileWriter samples = new FileWriter("memory-samples-stream.txt");
+        FileWriter samples = new FileWriter("target/memory-samples-stream.txt");
         long memoryDiff = 0;
 
         for (int i = 1; i <= 15; i++) {
@@ -302,7 +302,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
     @Test(groups = "dom")
     public void testDOMMemoryPerformance() throws Exception {
 
-        FileWriter samples = new FileWriter("memory-samples-dom.txt");
+        FileWriter samples = new FileWriter("target/memory-samples-dom.txt");
         long memoryDiff = 0;
         long leakedMemory = 0;
 

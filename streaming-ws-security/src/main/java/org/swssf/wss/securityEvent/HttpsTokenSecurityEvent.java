@@ -18,6 +18,15 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+
+import java.security.Key;
+import java.security.PublicKey;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -53,5 +62,40 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
 
     public void setIssuerName(String issuerName) {
         this.issuerName = issuerName;
+    }
+
+    @Override
+    public SecurityToken getSecurityToken() {
+        SecurityToken securityToken = super.getSecurityToken();
+        if (securityToken == null) {
+            securityToken = new AbstractSecurityToken(null, null, null, null, null) {
+                @Override
+                protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    return null;
+                }
+
+                @Override
+                protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    return null;
+                }
+
+                @Override
+                public boolean isAsymmetric() {
+                    return false;
+                }
+
+                @Override
+                public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
+                    return null;
+                }
+
+                @Override
+                public XMLSecurityConstants.TokenType getTokenType() {
+                    return WSSConstants.HttpsToken;
+                }
+            };
+        }
+        setSecurityToken(securityToken);
+        return securityToken;
     }
 }

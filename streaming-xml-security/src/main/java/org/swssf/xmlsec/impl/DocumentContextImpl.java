@@ -22,8 +22,7 @@ import org.swssf.xmlsec.ext.DocumentContext;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +36,7 @@ import java.util.List;
 public class DocumentContextImpl implements DocumentContext, Cloneable {
 
     private static final QName nullElement = new QName("", "");
-    private List<QName> path = new ArrayList<QName>(10);
+    private List<QName> path = new LinkedList<QName>();
     private String encoding;
 
     public String getEncoding() {
@@ -49,11 +48,11 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
     }
 
     public void addPathElement(QName qName) {
-        getPath().add(qName);
+        this.path.add(qName);
     }
 
     public QName removePathElement() {
-        return getPath().remove(getPath().size() - 1);
+        return this.path.remove(this.path.size() - 1);
     }
 
     protected void setPath(List<QName> path) {
@@ -61,27 +60,19 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
     }
 
     public List<QName> getPath() {
-        return path;
+        return Collections.unmodifiableList(path);
     }
 
-    public QName getParentElement(int eventType) {
-        if (eventType == XMLStreamConstants.START_ELEMENT || eventType == XMLStreamConstants.END_ELEMENT) {
-            if (getPath().size() >= 2) {
-                return getPath().get(getPath().size() - 2);
-            } else {
-                return nullElement;
-            }
-        } else {
-            if (getPath().size() >= 1) {
-                return getPath().get(getPath().size() - 1);
-            } else {
-                return nullElement;
-            }
+    public List<QName> getParentElementPath(int eventType) {
+        List<QName> parentPath = new LinkedList<QName>();
+        if (this.path.size() >= 1) {
+            parentPath.addAll(this.path.subList(0, this.path.size() - 1));
         }
+        return parentPath;
     }
 
     public int getDocumentLevel() {
-        return getPath().size();
+        return this.path.size();
     }
 
     Deque<XMLSecurityConstants.ContentType> contentTypeDeque = new LinkedList<XMLSecurityConstants.ContentType>();
@@ -126,8 +117,8 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
     protected DocumentContextImpl clone() throws CloneNotSupportedException {
         super.clone();
         DocumentContextImpl documentContext = new DocumentContextImpl();
-        List<QName> subPath = new ArrayList<QName>();
-        subPath.addAll(this.getPath());
+        List<QName> subPath = new LinkedList<QName>();
+        subPath.addAll(this.path);
         documentContext.setEncoding(this.encoding);
         documentContext.setPath(subPath);
         documentContext.setContentTypeDeque(getContentTypeDeque());

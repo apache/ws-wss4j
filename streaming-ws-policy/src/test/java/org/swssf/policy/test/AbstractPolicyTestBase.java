@@ -22,7 +22,11 @@ import org.apache.ws.secpolicy.SPConstants;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyEnforcerFactory;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.impl.securityToken.X509SecurityToken;
 import org.swssf.wss.test.AbstractTestBase;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,6 +38,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
@@ -57,5 +66,53 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("");
 
         return policyEnforcer;
+    }
+
+    public X509SecurityToken getX509Token(WSSConstants.TokenType tokenType) throws Exception {
+
+        final KeyStore keyStore = KeyStore.getInstance("jks");
+        keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
+
+        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            @Override
+            protected String getAlias() throws XMLSecurityException {
+                return "transmitter";
+            }
+
+            @Override
+            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                try {
+                    return keyStore.getKey("transmitter", "default".toCharArray());
+                } catch (Exception e) {
+                    throw new XMLSecurityException(e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                try {
+                    return keyStore.getCertificate("transmitter").getPublicKey();
+                } catch (Exception e) {
+                    throw new XMLSecurityException(e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public X509Certificate[] getX509Certificates() throws XMLSecurityException {
+                Certificate[] certificates;
+                try {
+                    certificates = keyStore.getCertificateChain("transmitter");
+                } catch (Exception e) {
+                    throw new XMLSecurityException(e.getMessage(), e);
+                }
+
+                X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
+                for (int i = 0; i < certificates.length; i++) {
+                    Certificate certificate = certificates[i];
+                    x509Certificates[i] = (X509Certificate) certificate;
+                }
+                return x509Certificates;
+            }
+        };
     }
 }

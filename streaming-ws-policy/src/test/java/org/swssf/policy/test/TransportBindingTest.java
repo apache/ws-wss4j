@@ -24,10 +24,13 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.HttpsSecurityToken;
 import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -48,15 +51,16 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        requiredElementSecurityEvent.setElement(WSSConstants.TAG_wsu_Timestamp);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -64,15 +68,21 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         policyEnforcer.doFinal();
@@ -88,11 +98,9 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
@@ -123,19 +131,23 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        requiredElementSecurityEvent.setElement(WSSConstants.TAG_wsu_Timestamp);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -158,23 +170,30 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        requiredElementSecurityEvent.setElement(WSSConstants.TAG_wsu_Timestamp);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "username", null));
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
-
-        httpsTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -182,7 +201,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         policyEnforcer.doFinal();

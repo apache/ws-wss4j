@@ -19,13 +19,13 @@
 
 package org.swssf.wss.impl.saml.bean;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Class SamlAttributeStatement represents a SAML attribute statement
- *
+ * <p/>
  * Created on May 20, 2009
  */
 public class AttributeStatementBean {
@@ -38,15 +38,16 @@ public class AttributeStatementBean {
     public AttributeStatementBean() {
         attributeBeans = new ArrayList<AttributeBean>();
     }
-    
+
     /**
      * Constructor SamlAttributeStatement creates a new SamlAttributeStatement instance.
-     * @param subject A new SubjectBean instance
+     *
+     * @param subject        A new SubjectBean instance
      * @param attributeBeans A list of Attributes
      */
     public AttributeStatementBean(
-        SubjectBean subject,
-        List<AttributeBean> attributeBeans
+            SubjectBean subject,
+            List<AttributeBean> attributeBeans
     ) {
         this.subject = subject;
         this.attributeBeans = attributeBeans;
@@ -65,7 +66,6 @@ public class AttributeStatementBean {
      * Method setSamlAttributes sets the samlAttributes of this SamlAttributeStatement object.
      *
      * @param attributeBeans the samlAttributes of this SamlAttributeStatement object.
-     *
      */
     public void setSamlAttributes(List<AttributeBean> attributeBeans) {
         this.attributeBeans = attributeBeans;
@@ -73,6 +73,7 @@ public class AttributeStatementBean {
 
     /**
      * Get the Subject
+     *
      * @return the Subject
      */
     public SubjectBean getSubject() {
@@ -81,6 +82,7 @@ public class AttributeStatementBean {
 
     /**
      * Set the Subject
+     *
      * @param subject the SubjectBean instance to set
      */
     public void setSubject(SubjectBean subject) {
@@ -99,7 +101,7 @@ public class AttributeStatementBean {
         } else if (attributeBeans != null && !attributeBeans.equals(that.attributeBeans)) {
             return false;
         }
-        
+
         if (subject == null && that.subject != null) {
             return false;
         } else if (subject != null && !subject.equals(that.subject)) {

@@ -22,8 +22,7 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
-import org.swssf.xmlsec.crypto.Crypto;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.namespace.QName;
@@ -58,7 +57,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
-            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
+            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
@@ -66,60 +65,53 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             final String wsuId = "SCT-" + UUID.randomUUID().toString();
             final String identifier = UUID.randomUUID().toString();
 
-            final ProcessorInfoSecurityToken securityContextSecurityToken = new ProcessorInfoSecurityToken() {
+            final AbstractSecurityToken securityContextSecurityToken = new AbstractSecurityToken(wsuId) {
 
-                private OutputProcessor outputProcessor;
-
-                public String getId() {
-                    return wsuId;
-                }
-
-                public void setProcessor(OutputProcessor outputProcessor) {
-                    this.outputProcessor = outputProcessor;
-                }
-
-                public Object getProcessor() {
-                    return outputProcessor;
-                }
-
+                @Override
                 public boolean isAsymmetric() {
                     return wrappingSecurityToken.isAsymmetric();
                 }
 
-                public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                @Override
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                     return wrappingSecurityToken.getSecretKey(algorithmURI, null);
                 }
 
-                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                @Override
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                     return wrappingSecurityToken.getPublicKey(null, null);
                 }
 
+                @Override
                 public X509Certificate[] getX509Certificates() throws XMLSecurityException {
                     return wrappingSecurityToken.getX509Certificates();
                 }
 
+                @Override
                 public void verify() throws XMLSecurityException {
                     wrappingSecurityToken.verify();
                 }
 
+                @Override
                 public SecurityToken getKeyWrappingToken() {
                     return wrappingSecurityToken;
                 }
 
-                public String getKeyWrappingTokenAlgorithm() {
-                    return null;
-                }
-
+                @Override
                 public WSSConstants.TokenType getTokenType() {
                     return WSSConstants.SecurityContextToken;
                 }
             };
+            wrappingSecurityToken.addWrappedToken(securityContextSecurityToken);
 
             SecurityTokenProvider securityContextSecurityTokenProvider = new SecurityTokenProvider() {
-                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+
+                @Override
+                public SecurityToken getSecurityToken() throws WSSecurityException {
                     return securityContextSecurityToken;
                 }
 
+                @Override
                 public String getId() {
                     return wsuId;
                 }

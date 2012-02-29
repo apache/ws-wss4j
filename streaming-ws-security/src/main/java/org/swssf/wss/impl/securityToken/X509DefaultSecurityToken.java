@@ -33,8 +33,8 @@ public class X509DefaultSecurityToken extends X509SecurityToken {
     private String alias = null;
 
     X509DefaultSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                             String alias, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                             String alias, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.alias = alias;
     }
 

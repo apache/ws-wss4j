@@ -18,8 +18,6 @@
  */
 package org.swssf.wss.impl.securityToken;
 
-import java.security.cert.X509Certificate;
-
 import org.swssf.binding.xmldsig.X509DataType;
 import org.swssf.binding.xmldsig.X509IssuerSerialType;
 import org.swssf.wss.ext.WSSConstants;
@@ -30,6 +28,7 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
+import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
@@ -41,8 +40,8 @@ public class X509DataSecurityToken extends X509SecurityToken {
     protected X509DataType x509DataType;
 
     X509DataSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                          X509DataType x509DataType, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                          X509DataType x509DataType, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.x509DataType = x509DataType;
     }
 

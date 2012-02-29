@@ -34,26 +34,26 @@ import static org.testng.Assert.assertEquals;
 
 /**
  * This is a test for Santuario-191:
- * 
+ * <p/>
  * https://issues.apache.org/jira/browse/SANTUARIO-191
- *
+ * <p/>
  * An xml:Id attribute is appearing in a child element, contrary to the C14n11 spec.
  */
 public class Santuario191Test {
 
     private static final String INPUT_DATA =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-      + "<test xml:id=\"testid1\">"
-      + "<data>"
-      + "    <user1>Alice</user1>"
-      + "    <user2>Bob</user2>"
-      + "</data>"
-      + "</test>";
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                    + "<test xml:id=\"testid1\">"
+                    + "<data>"
+                    + "    <user1>Alice</user1>"
+                    + "    <user2>Bob</user2>"
+                    + "</data>"
+                    + "</test>";
     private static final String EXPECTED_RESULT =
-        "<data>"
-      + "    <user1>Alice</user1>"
-      + "    <user2>Bob</user2>"
-      + "</data>";
+            "<data>"
+                    + "    <user1>Alice</user1>"
+                    + "    <user2>Bob</user2>"
+                    + "</data>";
 
     private XMLInputFactory xmlInputFactory;
 
@@ -69,12 +69,12 @@ public class Santuario191Test {
         // Parse the Data
         //
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer11_OmitCommentsTransformer c = 
-            new Canonicalizer11_OmitCommentsTransformer(null, baos);
+        Canonicalizer11_OmitCommentsTransformer c =
+                new Canonicalizer11_OmitCommentsTransformer(null, baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(INPUT_DATA)
         );
-        
+
         XMLEvent xmlEvent = null;
         while (xmlEventReader.hasNext()) {
             xmlEvent = xmlEventReader.nextEvent();
@@ -82,7 +82,7 @@ public class Santuario191Test {
                 break;
             }
         }
-        
+
         while (xmlEventReader.hasNext()) {
             c.transform(xmlEvent);
             if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName(null, "data"))) {
@@ -90,8 +90,8 @@ public class Santuario191Test {
             }
             xmlEvent = xmlEventReader.nextEvent();
         }
-        
+
         assertEquals(new String(baos.toByteArray()), EXPECTED_RESULT);
     }
-    
+
 }

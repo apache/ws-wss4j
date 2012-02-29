@@ -24,11 +24,14 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,13 +40,21 @@ import java.util.List;
  */
 public class SignatureProtectionAssertionState extends AssertionState implements Assertable {
 
-    private List<QName> elements = new ArrayList<QName>();
+    private List<List<QName>> elementPaths = new ArrayList<List<QName>>();
 
     public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
+        List<QName> signature11Path = new LinkedList<QName>();
+        signature11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+        signature11Path.add(WSSConstants.TAG_wsse_Security);
+        signature11Path.add(WSSConstants.TAG_dsig_Signature);
+        elementPaths.add(signature11Path);
 
-        elements.add(WSSConstants.TAG_dsig_Signature);
-        elements.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        List<QName> signatureConfirmation11Path = new LinkedList<QName>();
+        signatureConfirmation11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+        signatureConfirmation11Path.add(WSSConstants.TAG_wsse_Security);
+        signatureConfirmation11Path.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        elementPaths.add(signatureConfirmation11Path);
     }
 
     @Override
@@ -59,22 +70,23 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
         //todo better matching until we have a streaming xpath evaluation engine (work in progress)
 
-        for (int i = 0; i < elements.size(); i++) {
-            QName qName = elements.get(i);
-            if (qName.equals(encryptedElementSecurityEvent.getElement())) {
+        Iterator<List<QName>> pathElementsIterator = elementPaths.iterator();
+        while (pathElementsIterator.hasNext()) {
+            List<QName> qNameList = pathElementsIterator.next();
+            if (WSSUtils.pathMatches(qNameList, encryptedElementSecurityEvent.getElementPath(), true, false)) {
                 if (encryptedElementSecurityEvent.isEncrypted()) {
                     if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                         setAsserted(true);
                         return true;
                     } else {
                         setAsserted(false);
-                        setErrorMessage("Element " + encryptedElementSecurityEvent.getElement() + " must not be encrypted");
+                        setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must not be encrypted");
                         return false;
                     }
                 } else {
                     if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                         setAsserted(false);
-                        setErrorMessage("Element " + encryptedElementSecurityEvent.getElement() + " must be encrypted");
+                        setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
                         return false;
                     } else {
                         setAsserted(true);

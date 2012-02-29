@@ -27,18 +27,18 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
+import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -63,28 +63,38 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
 
+        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+            private AbstractSecurityToken derivedKeySecurityToken = null;
 
-            public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
 
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
+                if (this.derivedKeySecurityToken != null) {
+                    return this.derivedKeySecurityToken;
                 }
 
-                final SecurityToken referencedSecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
-                        derivedKeyTokenType.getSecurityTokenReference(),
-                        securityProperties.getDecryptionCrypto(),
-                        securityProperties.getCallbackHandler(),
-                        inputProcessorChain.getSecurityContext(),
-                        null
-                );
-
-                securityToken = new AbstractSecurityToken(
+                this.derivedKeySecurityToken = new AbstractSecurityToken(
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(), null, null,
-                        derivedKeyTokenType.getId(), null, null) {
+                        derivedKeyTokenType.getId(), null) {
+
+                    private SecurityToken referencedSecurityToken = null;
+
+                    private SecurityToken getReferencedSecurityToken() throws XMLSecurityException {
+                        if (this.referencedSecurityToken != null) {
+                            return referencedSecurityToken;
+                        }
+
+                        this.referencedSecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
+                                derivedKeyTokenType.getSecurityTokenReference(),
+                                securityProperties.getDecryptionCrypto(),
+                                securityProperties.getCallbackHandler(),
+                                inputProcessorChain.getSecurityContext()
+                        );
+                        this.referencedSecurityToken.addWrappedToken(this);
+                        return this.referencedSecurityToken;
+                    }
 
                     public boolean isAsymmetric() {
                         return false;
@@ -92,6 +102,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
                     protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                         byte[] secret;
+                        SecurityToken referencedSecurityToken = getReferencedSecurityToken();
                         if (referencedSecurityToken != null) {
                             if (referencedSecurityToken instanceof UsernameSecurityToken) {
                                 UsernameSecurityToken usernameSecurityToken = (UsernameSecurityToken) referencedSecurityToken;
@@ -104,13 +115,6 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 SAMLSecurityToken samlSecurityToken = (SAMLSecurityToken) referencedSecurityToken;
                                 secret = samlSecurityToken.getSamlKeyInfo().getSecret();
                             } else {
-                                //todo is this the correct algo and KeyUsage?
-                                WSSConstants.KeyUsage newKeyUsage;
-                                if (keyUsage == WSSConstants.Sym_Sig || keyUsage == WSSConstants.Asym_Sig || keyUsage == WSSConstants.Sig_KD) {
-                                    newKeyUsage = WSSConstants.Sig_KD;
-                                } else {
-                                    newKeyUsage = WSSConstants.Enc_KD;
-                                }
                                 secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage).getEncoded();
                             }
                         } else {
@@ -128,6 +132,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 nonce,
                                 derivedKeyTokenType.getOffset().intValue()
                         );
+                        //todo algo sec event here!
                         String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
                         return new SecretKeySpec(keyBytes, algo);
                     }
@@ -137,21 +142,16 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         return null;
                     }
 
-                    public SecurityToken getKeyWrappingToken() {
-                        return referencedSecurityToken;
-                    }
-
-                    public String getKeyWrappingTokenAlgorithm() {
-                        //todo?
-                        return null;
+                    public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
+                        return getReferencedSecurityToken();
                     }
 
                     public WSSConstants.TokenType getTokenType() {
                         return WSSConstants.DerivedKeyToken;
                     }
                 };
-                securityTokens.put(crypto, securityToken);
-                return securityToken;
+                this.derivedKeySecurityToken.setElementPath(elementPath);
+                return this.derivedKeySecurityToken;
             }
 
             public String getId() {
@@ -159,5 +159,10 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
             }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(derivedKeyTokenType.getId(), securityTokenProvider);
+
+        //fire a tokenSecurityEvent
+        DerivedKeyTokenSecurityEvent derivedKeyTokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
+        derivedKeyTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(derivedKeyTokenSecurityEvent);
     }
 }

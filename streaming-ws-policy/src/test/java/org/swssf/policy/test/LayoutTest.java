@@ -22,16 +22,14 @@ import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.X509SecurityToken;
-import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
-import org.swssf.wss.securityEvent.TimestampSecurityEvent;
-import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -55,17 +53,22 @@ public class LayoutTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(x509TokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -85,12 +88,9 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -113,12 +113,9 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
@@ -142,12 +139,9 @@ public class LayoutTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();

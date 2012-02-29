@@ -23,9 +23,8 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.derivedKey.AlgoFactory;
 import org.swssf.wss.impl.derivedKey.ConversationException;
 import org.swssf.wss.impl.derivedKey.DerivationAlgorithm;
-import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -64,7 +63,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
-            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
+            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
@@ -121,28 +120,17 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(e.getMessage(), e);
             }
 
-            final ProcessorInfoSecurityToken derivedKeySecurityToken = new ProcessorInfoSecurityToken() {
+            final AbstractSecurityToken derivedKeySecurityToken = new AbstractSecurityToken(wsuIdDKT) {
 
                 private Map<String, Key> keyTable = new Hashtable<String, Key>();
-                private OutputProcessor outputProcessor;
 
-                public String getId() {
-                    return wsuIdDKT;
-                }
-
-                public void setProcessor(OutputProcessor outputProcessor) {
-                    this.outputProcessor = outputProcessor;
-                }
-
-                public Object getProcessor() {
-                    return outputProcessor;
-                }
-
+                @Override
                 public boolean isAsymmetric() {
                     return false;
                 }
 
-                public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                @Override
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                     if (keyTable.containsKey(algorithmURI)) {
                         return keyTable.get(algorithmURI);
                     } else {
@@ -153,35 +141,37 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                 }
 
-                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                @Override
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                     return null;
                 }
 
+                @Override
                 public X509Certificate[] getX509Certificates() throws WSSecurityException {
                     return null;
                 }
 
-                public void verify() throws WSSecurityException {
-                }
-
+                @Override
                 public SecurityToken getKeyWrappingToken() {
                     return wrappingSecurityToken;
                 }
 
-                public String getKeyWrappingTokenAlgorithm() {
-                    return null;
-                }
-
+                @Override
                 public WSSConstants.TokenType getTokenType() {
                     return null;
                 }
             };
 
+            wrappingSecurityToken.addWrappedToken(derivedKeySecurityToken);
+
             SecurityTokenProvider derivedKeysecurityTokenProvider = new SecurityTokenProvider() {
-                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+
+                @Override
+                public SecurityToken getSecurityToken() throws WSSecurityException {
                     return derivedKeySecurityToken;
                 }
 
+                @Override
                 public String getId() {
                     return wsuIdDKT;
                 }

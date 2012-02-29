@@ -20,9 +20,11 @@ package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,6 +56,9 @@ public class HttpsTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        httpsTokenSecurityEvent.setSecurityToken(securityToken);
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
         httpsTokenSecurityEvent.setIssuerName("xs:anyURI");
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
@@ -85,6 +90,9 @@ public class HttpsTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        httpsTokenSecurityEvent.setSecurityToken(securityToken);
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         httpsTokenSecurityEvent.setIssuerName("xs:anyURI");
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);

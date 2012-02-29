@@ -120,6 +120,8 @@ public class SAMLTokenTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -190,6 +192,8 @@ public class SAMLTokenTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -260,6 +264,8 @@ public class SAMLTokenTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -331,6 +337,8 @@ public class SAMLTokenTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -402,6 +410,8 @@ public class SAMLTokenTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -473,6 +483,8 @@ public class SAMLTokenTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -483,7 +495,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
      * a user-specified SubjectNameIDFormat.
@@ -520,7 +532,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * a user-specified SubjectNameIDFormat.
@@ -558,7 +570,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
      * a user-specified SubjectLocality statement.
@@ -595,7 +607,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * a user-specified SubjectLocality statement.
@@ -633,7 +645,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authz assertion with
      * a Resource URI
@@ -670,8 +682,8 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
-    
+
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 attribute assertion. The attributeValue
      * has a custom XMLObject (not a String) value.
@@ -690,23 +702,23 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            
+
             // Create and add a custom Attribute (conditions Object)
             XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
-            
-            SAMLObjectBuilder<Conditions> conditionsV2Builder = 
-                    (SAMLObjectBuilder<Conditions>)builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
+
+            SAMLObjectBuilder<Conditions> conditionsV2Builder =
+                    (SAMLObjectBuilder<Conditions>) builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
             Conditions conditions = conditionsV2Builder.buildObject();
             DateTime newNotBefore = new DateTime();
             conditions.setNotBefore(newNotBefore);
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
-            
+
             XMLObjectBuilder<XSAny> xsAnyBuilder = builderFactory.getBuilder(XSAny.TYPE_NAME);
             XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attributeValue.getUnknownXMLObjects().add(conditions);
-            
+
             callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
-            
+
             securityProperties.setCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -726,5 +738,5 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
 }

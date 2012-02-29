@@ -20,6 +20,8 @@ package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
+import org.swssf.wss.ext.WSSecurityException;
+import org.swssf.wss.ext.WSSecurityToken;
 import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.SecurityToken;
@@ -28,32 +30,61 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAKey;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public abstract class AbstractSecurityToken implements SecurityToken {
+public abstract class AbstractSecurityToken implements WSSecurityToken {
+
+    //todo Probably we should introduce a dynamic proxy
+    //for this class which then could test for invocation count and could also be
+    //used for SecurityEvents and such.
+    //prevent recursice key references:
+    private int invocationCount = 0;
 
     private WSSecurityContext wsSecurityContext;
     private Crypto crypto;
     private CallbackHandler callbackHandler;
     private String id;
     private Object processor;
+    private List<QName> elementPath;
     private WSSConstants.KeyIdentifierType keyIdentifierType;
+    private List<SecurityToken> wrappedTokens;
+    private List<TokenUsage> tokenUsages = new ArrayList<TokenUsage>();
+
+    public AbstractSecurityToken(String id) {
+        this.id = id;
+        wrappedTokens = new ArrayList<SecurityToken>();
+    }
 
     public AbstractSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                 String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
+                                 String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
         this.wsSecurityContext = wsSecurityContext;
         this.crypto = crypto;
         this.callbackHandler = callbackHandler;
         this.id = id;
         this.keyIdentifierType = keyIdentifierType;
-        this.processor = processor;
+        wrappedTokens = new ArrayList<SecurityToken>();
+    }
+
+    private void incrementAndTestInvocationCount() throws WSSecurityException {
+        invocationCount++;
+        if (invocationCount >= 10) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
+        }
+    }
+
+    private void decrementInvocationCount() {
+        invocationCount--;
     }
 
     public WSSConstants.KeyIdentifierType getKeyIdentifierType() {
@@ -68,6 +99,19 @@ public abstract class AbstractSecurityToken implements SecurityToken {
         return processor;
     }
 
+    public void setProcessor(Object processor) {
+        this.processor = processor;
+    }
+
+    @Override
+    public List<QName> getElementPath() {
+        return elementPath;
+    }
+
+    public void setElementPath(List<QName> elementPath) {
+        this.elementPath = Collections.unmodifiableList(elementPath);
+    }
+
     public Crypto getCrypto() {
         return crypto;
     }
@@ -80,6 +124,7 @@ public abstract class AbstractSecurityToken implements SecurityToken {
 
     @Override
     public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+        incrementAndTestInvocationCount();
         Key key = getKey(algorithmURI, keyUsage);
         if (key != null && this.wsSecurityContext != null) {
             AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
@@ -94,6 +139,7 @@ public abstract class AbstractSecurityToken implements SecurityToken {
             }
             this.wsSecurityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
         }
+        decrementInvocationCount();
         return key;
     }
 
@@ -101,6 +147,7 @@ public abstract class AbstractSecurityToken implements SecurityToken {
 
     @Override
     public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+        incrementAndTestInvocationCount();
         PublicKey publicKey = getPubKey(algorithmURI, keyUsage);
         if (publicKey != null) {
             AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
@@ -113,6 +160,7 @@ public abstract class AbstractSecurityToken implements SecurityToken {
             }
             wsSecurityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
         }
+        decrementInvocationCount();
         return publicKey;
     }
 
@@ -121,5 +169,32 @@ public abstract class AbstractSecurityToken implements SecurityToken {
     }
 
     public void verify() throws XMLSecurityException {
+    }
+
+    @Override
+    public List<SecurityToken> getWrappedTokens() {
+        return Collections.unmodifiableList(wrappedTokens);
+    }
+
+    @Override
+    public void addWrappedToken(SecurityToken securityToken) {
+        wrappedTokens.add(securityToken);
+    }
+
+    @Override
+    public void addTokenUsage(TokenUsage tokenUsage) throws XMLSecurityException {
+        incrementAndTestInvocationCount();
+        if (!this.tokenUsages.contains(tokenUsage)) {
+            this.tokenUsages.add(tokenUsage);
+        }
+        if (getKeyWrappingToken() != null) {
+            getKeyWrappingToken().addTokenUsage(tokenUsage);
+        }
+        decrementInvocationCount();
+    }
+
+    @Override
+    public List<TokenUsage> getTokenUsages() {
+        return tokenUsages;
     }
 }

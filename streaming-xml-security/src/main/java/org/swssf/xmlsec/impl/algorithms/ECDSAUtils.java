@@ -29,16 +29,15 @@ public final class ECDSAUtils {
     private ECDSAUtils() {
         // complete
     }
-    
+
     /**
      * Converts an ASN.1 ECDSA value to a XML Signature ECDSA Value.
-     *
+     * <p/>
      * The JAVA JCE ECDSA Signature algorithm creates ASN.1 encoded (r,s) value
      * pairs; the XML Signature requires the core BigInteger values.
      *
      * @param asn1Bytes
      * @return the decode bytes
-     *
      * @throws IOException
      * @see <A HREF="http://www.w3.org/TR/xmldsig-core/#dsa-sha1">6.4.1 DSA</A>
      * @see <A HREF="ftp://ftp.rfc-editor.org/in-notes/rfc4050.txt">3.3. ECDSA Signatures</A>
@@ -60,51 +59,51 @@ public final class ECDSAUtils {
         byte rLength = asn1Bytes[offset + 1];
         int i;
 
-        for (i = rLength; (i > 0) && (asn1Bytes[(offset + 2 + rLength) - i] == 0); i--);
+        for (i = rLength; (i > 0) && (asn1Bytes[(offset + 2 + rLength) - i] == 0); i--) ;
 
         byte sLength = asn1Bytes[offset + 2 + rLength + 1];
         int j;
 
         for (j = sLength;
-            (j > 0) && (asn1Bytes[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--);
+             (j > 0) && (asn1Bytes[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--)
+            ;
 
         int rawLen = Math.max(i, j);
 
         if ((asn1Bytes[offset - 1] & 0xff) != asn1Bytes.length - offset
-            || (asn1Bytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
-            || asn1Bytes[offset] != 2
-            || asn1Bytes[offset + 2 + rLength] != 2) {
+                || (asn1Bytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
+                || asn1Bytes[offset] != 2
+                || asn1Bytes[offset + 2 + rLength] != 2) {
             throw new IOException("Invalid ASN.1 format of ECDSA signature");
-        } 
-        byte xmldsigBytes[] = new byte[2*rawLen];
+        }
+        byte xmldsigBytes[] = new byte[2 * rawLen];
 
         System.arraycopy(asn1Bytes, (offset + 2 + rLength) - i, xmldsigBytes, rawLen - i, i);
         System.arraycopy(asn1Bytes, (offset + 2 + rLength + 2 + sLength) - j, xmldsigBytes,
-                         2*rawLen - j, j);
+                2 * rawLen - j, j);
 
-        return xmldsigBytes;      
+        return xmldsigBytes;
     }
 
     /**
      * Converts a XML Signature ECDSA Value to an ASN.1 DSA value.
-     *
+     * <p/>
      * The JAVA JCE ECDSA Signature algorithm creates ASN.1 encoded (r,s) value
      * pairs; the XML Signature requires the core BigInteger values.
      *
      * @param xmldsigBytes
      * @return the encoded ASN.1 bytes
-     *
      * @throws IOException
      * @see <A HREF="http://www.w3.org/TR/xmldsig-core/#dsa-sha1">6.4.1 DSA</A>
      * @see <A HREF="ftp://ftp.rfc-editor.org/in-notes/rfc4050.txt">3.3. ECDSA Signatures</A>
      */
     public static byte[] convertXMLDSIGtoASN1(byte xmldsigBytes[]) throws IOException {
 
-        int rawLen = xmldsigBytes.length/2;
+        int rawLen = xmldsigBytes.length / 2;
 
         int i;
 
-        for (i = rawLen; (i > 0) && (xmldsigBytes[rawLen - i] == 0); i--);
+        for (i = rawLen; (i > 0) && (xmldsigBytes[rawLen - i] == 0); i--) ;
 
         int j = i;
 
@@ -114,11 +113,11 @@ public final class ECDSAUtils {
 
         int k;
 
-        for (k = rawLen; (k > 0) && (xmldsigBytes[2*rawLen - k] == 0); k--);
+        for (k = rawLen; (k > 0) && (xmldsigBytes[2 * rawLen - k] == 0); k--) ;
 
         int l = k;
 
-        if (xmldsigBytes[2*rawLen - k] < 0) {
+        if (xmldsigBytes[2 * rawLen - k] < 0) {
             l += 1;
         }
 
@@ -148,7 +147,7 @@ public final class ECDSAUtils {
         asn1Bytes[offset++] = 2;
         asn1Bytes[offset++] = (byte) l;
 
-        System.arraycopy(xmldsigBytes, 2*rawLen - k, asn1Bytes, (offset + l) - k, k);
+        System.arraycopy(xmldsigBytes, 2 * rawLen - k, asn1Bytes, (offset + l) - k, k);
 
         return asn1Bytes;
     }

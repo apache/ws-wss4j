@@ -24,12 +24,13 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.Header;
 import org.apache.ws.secpolicy.model.RequiredParts;
 import org.swssf.policy.Assertable;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.RequiredPartSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import javax.xml.namespace.QName;
+import java.util.*;
 
 /**
  * @author $Author$
@@ -59,15 +60,18 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         RequiredPartSecurityEvent requiredPartSecurityEvent = (RequiredPartSecurityEvent) securityEvent;
-        //todo better matching until we have a streaming xpath evaluation engine (work in progress)
 
         Iterator<Map.Entry<Header, Boolean>> elementMapIterator = headers.entrySet().iterator();
         while (elementMapIterator.hasNext()) {
             Map.Entry<Header, Boolean> next = elementMapIterator.next();
             Header header = next.getKey();
-            if (header.getNamespace().equals(requiredPartSecurityEvent.getElement().getNamespaceURI())
-                    && (header.getName() == null //== wildcard
-                    || header.getName().equals(requiredPartSecurityEvent.getElement().getLocalPart()))) {
+            QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
+
+            List<QName> header11Path = new LinkedList<QName>();
+            header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+            header11Path.add(headerQName);
+
+            if (WSSUtils.pathMatches(header11Path, requiredPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
                 next.setValue(Boolean.TRUE);
                 break;
             }

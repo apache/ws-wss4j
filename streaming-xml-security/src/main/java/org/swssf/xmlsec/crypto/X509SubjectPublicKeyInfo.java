@@ -19,9 +19,9 @@
 
 package org.swssf.xmlsec.crypto;
 
-import java.security.PublicKey;
-
 import org.swssf.xmlsec.ext.XMLSecurityException;
+
+import java.security.PublicKey;
 
 /**
  * Represents the X.509 SubjectPublicKeyInfo for a public key, as specified
@@ -42,17 +42,17 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
      * Construct a SubjectPublicKeyInfo for the given public key.
      *
      * @param key the public key.
-     * @throws XMLSecurityException if the public key encoding format is 
-     *                             not X.509 or the encoding is null.
+     * @throws XMLSecurityException if the public key encoding format is
+     *                              not X.509 or the encoding is null.
      */
     public X509SubjectPublicKeyInfo(PublicKey key) throws XMLSecurityException {
         super(key.getEncoded());
-        if (!("X.509".equalsIgnoreCase(key.getFormat()) 
+        if (!("X.509".equalsIgnoreCase(key.getFormat())
                 || "X509".equalsIgnoreCase(key.getFormat()))) {
             throw new XMLSecurityException(
-                XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                "noSKIHandling",
-                new Object[] { "Support for X.509-encoded public keys only" }
+                    XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
+                    "noSKIHandling",
+                    new Object[]{"Support for X.509-encoded public keys only"}
             );
         }
     }
@@ -86,18 +86,18 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Unsupported X.509 public key format" }
+                    new Object[]{"Unsupported X.509 public key format"}
             );
         }
         skip(algIDlen);           // AlgorithmIdentifier contents
         expect(TYPE_BIT_STRING);  // subjectPublicKey BIT STRING
-        int keyLen = getLength()-1;
+        int keyLen = getLength() - 1;
         if (keyLen < 0) {
             // Invalid BIT STRING length
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid X.509 public key format" }
+                    new Object[]{"Invalid X.509 public key format"}
             );
         }
         skip(1);   // number unused bits

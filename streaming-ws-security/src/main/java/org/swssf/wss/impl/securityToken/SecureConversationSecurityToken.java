@@ -40,8 +40,8 @@ public class SecureConversationSecurityToken extends AbstractSecurityToken {
 
     public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto,
                                            CallbackHandler callbackHandler, String id,
-                                           WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                                           WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
     }
 
     public boolean isAsymmetric() {
@@ -64,10 +64,6 @@ public class SecureConversationSecurityToken extends AbstractSecurityToken {
     }
 
     public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
-    public String getKeyWrappingTokenAlgorithm() {
         return null;
     }
 

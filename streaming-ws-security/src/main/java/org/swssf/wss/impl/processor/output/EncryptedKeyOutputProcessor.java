@@ -20,12 +20,14 @@ package org.swssf.wss.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.*;
-import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -61,7 +63,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
-            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
+            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
@@ -81,31 +83,17 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             final String ekId = "EK-" + UUID.randomUUID().toString();
 
-            final ProcessorInfoSecurityToken encryptedKeySecurityToken = new ProcessorInfoSecurityToken() {
-
-                private OutputProcessor outputProcessor;
-
-                public String getId() {
-                    return ekId;
-                }
-
-                public void setProcessor(OutputProcessor outputProcessor) {
-                    this.outputProcessor = outputProcessor;
-                }
-
-                public Object getProcessor() {
-                    return outputProcessor;
-                }
+            final AbstractSecurityToken encryptedKeySecurityToken = new AbstractSecurityToken(ekId) {
 
                 public boolean isAsymmetric() {
                     return false;
                 }
 
-                public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                     return symmetricKey;
                 }
 
-                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                     return null;
                 }
 
@@ -113,27 +101,24 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     return null;
                 }
 
-                public void verify() throws XMLSecurityException {
-                }
-
                 public SecurityToken getKeyWrappingToken() {
                     return wrappingSecurityToken;
-                }
-
-                public String getKeyWrappingTokenAlgorithm() {
-                    return null;
                 }
 
                 public WSSConstants.TokenType getTokenType() {
                     return null;
                 }
             };
+            wrappingSecurityToken.addWrappedToken(encryptedKeySecurityToken);
 
             final SecurityTokenProvider encryptedKeySecurityTokenProvider = new SecurityTokenProvider() {
-                public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+
+                @Override
+                public SecurityToken getSecurityToken() throws XMLSecurityException {
                     return encryptedKeySecurityToken;
                 }
 
+                @Override
                 public String getId() {
                     return ekId;
                 }
@@ -238,9 +223,9 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         int blockSize = cipher.getBlockSize();
                         if (blockSize > 0 && blockSize < secretKey.getEncoded().length) {
                             throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.FAILURE, 
-                                "unsupportedKeyTransp", 
-                                "public key algorithm too weak to encrypt symmetric key"
+                                    WSSecurityException.ErrorCode.FAILURE,
+                                    "unsupportedKeyTransp",
+                                    "public key algorithm too weak to encrypt symmetric key"
                             );
                         }
                         byte[] encryptedEphemeralKey = cipher.wrap(secretKey);

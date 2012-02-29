@@ -20,7 +20,6 @@ package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -42,8 +41,8 @@ public class SecurityTokenReference extends AbstractSecurityToken {
     private Deque<XMLEvent> xmlEvents;
 
     public SecurityTokenReference(SecurityToken securityToken, Deque<XMLEvent> xmlEvents, WSSecurityContext wsSecurityContext,
-                                  Crypto crypto, CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                                  CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, null, callbackHandler, id, keyIdentifierType);
         this.securityToken = securityToken;
         this.xmlEvents = xmlEvents;
     }
@@ -72,12 +71,8 @@ public class SecurityTokenReference extends AbstractSecurityToken {
         securityToken.verify();
     }
 
-    public SecurityToken getKeyWrappingToken() {
+    public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
         return securityToken.getKeyWrappingToken();
-    }
-
-    public String getKeyWrappingTokenAlgorithm() {
-        return securityToken.getKeyWrappingTokenAlgorithm();
     }
 
     public XMLSecurityConstants.TokenType getTokenType() {

@@ -60,7 +60,7 @@ public interface DocumentContext {
      * @param eventType current event type
      * @return the name of the parent element
      */
-    public QName getParentElement(int eventType);
+    public List<QName> getParentElementPath(int eventType);
 
     /**
      * @return The current level in the document

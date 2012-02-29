@@ -25,7 +25,6 @@ import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.bind.JAXBElement;
@@ -37,8 +36,6 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Processor for the SecurityTokenReference XML Structure
@@ -125,18 +122,16 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
                     SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-                        private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+                        private SecurityToken securityToken = null;
 
-                        public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
-                            SecurityToken securityToken = securityTokens.get(crypto);
-                            if (securityToken != null) {
-                                return securityToken;
+                        public SecurityToken getSecurityToken() throws XMLSecurityException {
+                            if (this.securityToken != null) {
+                                return this.securityToken;
                             }
-                            securityToken = SecurityTokenFactoryImpl.getSecurityToken(
-                                    attributeValue, xmlEventList, crypto, getSecurityProperties().getCallbackHandler(),
-                                    inputProcessorChain.getSecurityContext(), securityTokenReferenceId, this);
-                            securityTokens.put(crypto, securityToken);
-                            return securityToken;
+                            this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(
+                                    attributeValue, xmlEventList, getSecurityProperties().getCallbackHandler(),
+                                    inputProcessorChain.getSecurityContext(), securityTokenReferenceId);
+                            return this.securityToken;
                         }
 
                         public String getId() {

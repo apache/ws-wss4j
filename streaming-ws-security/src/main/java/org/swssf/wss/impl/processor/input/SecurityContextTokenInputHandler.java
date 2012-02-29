@@ -21,8 +21,8 @@ package org.swssf.wss.impl.processor.input;
 import org.swssf.binding.wssc.AbstractSecurityContextTokenType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
+import org.swssf.wss.securityEvent.SecurityContextTokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -32,8 +32,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -59,10 +58,12 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final String identifier = (String) XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),
                 new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(), WSSConstants.TAG_wsc0502_Identifier.getLocalPart()));
 
-        final SecurityToken securityContextToken =
+        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+
+        final WSSecurityToken securityContextToken =
                 new AbstractSecurityToken(
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(), null,
-                        null, securityContextTokenType.getId(), null, this) {
+                        null, securityContextTokenType.getId(), null) {
 
                     public boolean isAsymmetric() {
                         return false;
@@ -87,26 +88,16 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                         return null;
                     }
 
-                    public String getKeyWrappingTokenAlgorithm() {
-                        return null;
-                    }
-
                     public WSSConstants.TokenType getTokenType() {
                         //todo and set externalUriRef
                         return WSSConstants.SecurityContextToken;
                     }
                 };
+        securityContextToken.setElementPath(elementPath);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
-
-            public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
-                }
-                securityTokens.put(crypto, securityContextToken);
+            public SecurityToken getSecurityToken() throws WSSecurityException {
                 return securityContextToken;
             }
 
@@ -116,17 +107,15 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(securityContextTokenType.getId(), securityTokenProvider);
 
+        //fire a tokenSecurityEvent
+        SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
+        securityContextTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(securityContextTokenSecurityEvent);
+
         //also register a SecurityProvider with the identifier. @see SecurityContexTest#testSCTKDKTSignAbsolute
         SecurityTokenProvider securityTokenProviderDirectReference = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
-
-            public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
-                }
-                securityTokens.put(crypto, securityContextToken);
+            public SecurityToken getSecurityToken() throws WSSecurityException {
                 return securityContextToken;
             }
 
@@ -135,14 +124,5 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
             }
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(identifier, securityTokenProviderDirectReference);
-
-        /* todo remove me?
-        SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
-        securityContextTokenSecurityEvent.setSecurityToken(securityContextToken);
-        //todo how to find the issuer?
-        securityContextTokenSecurityEvent.setIssuerName(identifier);
-        securityContextTokenSecurityEvent.setExternalUriRef(identifier != null);
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(securityContextTokenSecurityEvent);
-        */
     }
 }

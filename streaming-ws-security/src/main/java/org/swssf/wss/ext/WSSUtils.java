@@ -337,7 +337,7 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
     }
 
-    public static TokenSecurityEvent createTokenSecurityEvent(SecurityToken securityToken) throws WSSecurityException {
+    public static TokenSecurityEvent createTokenSecurityEvent(final SecurityToken securityToken) throws WSSecurityException {
         WSSConstants.TokenType tokenType = (WSSConstants.TokenType) securityToken.getTokenType();
 
         TokenSecurityEvent tokenSecurityEvent;
@@ -377,5 +377,44 @@ public class WSSUtils extends XMLSecurityUtils {
         }
         tokenSecurityEvent.setSecurityToken(securityToken);
         return tokenSecurityEvent;
+    }
+
+    public static boolean pathMatches(List<QName> path1, List<QName> path2, boolean matchAnySoapNS, boolean lastElementWildCard) {
+        //todo remove these null checks! paths must not be null!
+        if (path1 == null || path2 == null || path1.size() != path2.size()) {
+            return false;
+        }
+        Iterator<QName> path1Iterator = path1.iterator();
+        Iterator<QName> path2Iterator = path2.iterator();
+        while (path1Iterator.hasNext()) {
+            QName qName1 = path1Iterator.next();
+            QName qName2 = path2Iterator.next();
+            if (matchAnySoapNS && (WSSConstants.NS_SOAP11.equals(qName1.getNamespaceURI())
+                    || WSSConstants.NS_SOAP12.equals(qName1.getNamespaceURI()))) {
+                if (!qName1.getLocalPart().equals(qName2.getLocalPart())) {
+                    return false;
+                }
+            } else if (!qName1.equals(qName2)) {
+                if (!path1Iterator.hasNext() && lastElementWildCard) {
+                    if (!qName1.getNamespaceURI().equals(qName2.getNamespaceURI())) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static String pathAsString(List<QName> path) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<QName> pathIterator = path.iterator();
+        while (pathIterator.hasNext()) {
+            QName qName = pathIterator.next();
+            stringBuilder.append('/');
+            stringBuilder.append(qName.toString());
+        }
+        return stringBuilder.toString();
     }
 }

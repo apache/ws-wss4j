@@ -18,8 +18,6 @@
  */
 package org.swssf.wss.impl.securityToken;
 
-import java.security.cert.X509Certificate;
-
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.crypto.Crypto;
@@ -27,6 +25,7 @@ import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
+import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
@@ -37,8 +36,8 @@ public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
     private byte[] binaryContent;
 
     X509SubjectKeyIdentifierSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                          byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                                          byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.binaryContent = binaryContent;
     }
 

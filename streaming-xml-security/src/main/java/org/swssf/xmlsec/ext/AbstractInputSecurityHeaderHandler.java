@@ -24,8 +24,11 @@ import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * Abstract class for SecurityHeaderHandlers with parse logic for the xml structures
@@ -45,5 +48,19 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
         } catch (JAXBException e) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
+    }
+
+    protected List<QName> getElementPath(DocumentContext documentContext, Deque<XMLEvent> eventDeque) throws XMLSecurityException {
+        List<QName> elementPath = new ArrayList<QName>();
+        elementPath.addAll(documentContext.getPath());
+        XMLEvent xmlEvent = eventDeque.peek();
+        if (xmlEvent.isStartElement()) {
+            elementPath.add(xmlEvent.asStartElement().getName());
+        } else if (xmlEvent.isEndElement()) {
+            elementPath.add(xmlEvent.asEndElement().getName());
+        } else {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+        return elementPath;
     }
 }

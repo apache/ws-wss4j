@@ -20,6 +20,7 @@ package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
@@ -27,6 +28,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -47,12 +50,16 @@ public class EncryptedElementsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+        encryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        encryptedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.add(new QName("http://example.org", "a"));
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
         //additional EncryptedElements are also allowed!
-        encryptedElementSecurityEvent.setElement(new QName("http://example.com", "b"));
+        headerPath = new ArrayList<QName>();
+        headerPath.add(new QName("http://example.org", "b"));
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -70,10 +77,12 @@ public class EncryptedElementsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+        encryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, false);
-        encryptedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.add(new QName("http://example.org", "a"));
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         try {
             policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
             Assert.fail("Exception expected");

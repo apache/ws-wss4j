@@ -18,9 +18,11 @@
  */
 package org.swssf.xmlsec.ext;
 
+import javax.xml.namespace.QName;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * This class represents the different token types which can occur in WS-Security
@@ -32,6 +34,20 @@ import java.security.cert.X509Certificate;
  * @version $Revision$ $Date$
  */
 public interface SecurityToken {
+
+    public enum TokenUsage {
+        Signature,
+        MainSignature,
+        Encryption,
+        MainEncryption,
+        SupportingToken,
+        SignedSupportingTokens,
+        EndorsingSupportingTokens,
+        SignedEndorsingSupportingTokens,
+        SignedEncryptedSupportingTokens,
+        EndorsingEncryptedSupportingTokens,
+        SignedEndorsingEncryptedSupportingTokens,
+    }
 
     /**
      * Returns the token id aka wsu:Id
@@ -46,6 +62,14 @@ public interface SecurityToken {
      * @return
      */
     Object getProcessor();
+
+
+    /**
+     * Returns the absolute path to the XMLElement
+     *
+     * @return A list containing full qualified element names
+     */
+    List<QName> getElementPath();
 
     /**
      * Returns the token type
@@ -94,14 +118,11 @@ public interface SecurityToken {
      *
      * @return The wrapping SecurityToken
      */
-    SecurityToken getKeyWrappingToken();
+    SecurityToken getKeyWrappingToken() throws XMLSecurityException;
 
-    /**
-     * Returns the Key wrapping token's algorithm
-     *
-     * @return the KeyWrappingToken algorithm
-     */
-    String getKeyWrappingTokenAlgorithm();
+    List<SecurityToken> getWrappedTokens() throws XMLSecurityException;
+
+    void addWrappedToken(SecurityToken securityToken);
 
     /**
      * Returns the KeyIdentifierType
@@ -109,4 +130,8 @@ public interface SecurityToken {
      * @return the KeyIdentifierType
      */
     XMLSecurityConstants.TokenType getTokenType();
+
+    void addTokenUsage(TokenUsage tokenUsage) throws XMLSecurityException;
+
+    List<TokenUsage> getTokenUsages();
 }

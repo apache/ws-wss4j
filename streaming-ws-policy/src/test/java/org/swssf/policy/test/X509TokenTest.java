@@ -21,73 +21,21 @@ package org.swssf.policy.test;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.X509SecurityToken;
-import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class X509TokenTest extends AbstractPolicyTestBase {
-
-    public X509SecurityToken getX509Token(WSSConstants.TokenType tokenType) throws Exception {
-
-        final KeyStore keyStore = KeyStore.getInstance("jks");
-        keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
-
-        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return "transmitter";
-            }
-
-            @Override
-            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                try {
-                    return keyStore.getKey("transmitter", "default".toCharArray());
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                try {
-                    return keyStore.getCertificate("transmitter").getPublicKey();
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-                Certificate[] certificates;
-                try {
-                    certificates = keyStore.getCertificateChain("transmitter");
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-
-                X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
-                for (int i = 0; i < certificates.length; i++) {
-                    Certificate certificate = certificates[i];
-                    x509Certificates[i] = (X509Certificate) certificate;
-                }
-                return x509Certificates;
-            }
-        };
-    }
 
     @Test
     public void testPolicy() throws Exception {
@@ -121,21 +69,23 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent initiatorX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        initiatorX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
-        initiatorX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorX509TokenSecurityEvent);
 
         X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        recipientX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
-        recipientX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -177,21 +127,23 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent initiatorX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        initiatorX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V1Token));
-        initiatorX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V1Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorX509TokenSecurityEvent);
 
         X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        recipientX509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
-        recipientX509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -223,7 +175,9 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingToken);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -250,7 +204,9 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V1Token));
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V1Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingToken);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();

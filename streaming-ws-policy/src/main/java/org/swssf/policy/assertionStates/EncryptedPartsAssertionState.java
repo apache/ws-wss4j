@@ -24,9 +24,14 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.EncryptedParts;
 import org.apache.ws.secpolicy.model.Header;
 import org.swssf.policy.Assertable;
-import org.swssf.policy.PolicyConstants;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
+
+import javax.xml.namespace.QName;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -53,28 +58,33 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
         EncryptedParts encryptedParts = (EncryptedParts) getAssertion();
 
-        if (encryptedParts.isBody() && (encryptedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap11_Body)
-                || encryptedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap12_Body))) {
+        if (encryptedParts.isBody()
+                && (WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, encryptedPartSecurityEvent.getElementPath(), true, false))) {
             if (encryptedPartSecurityEvent.isEncrypted()) {
                 setAsserted(true);
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + encryptedPartSecurityEvent.getElement() + " must be encrypted");
+                setErrorMessage("Element " + WSSUtils.pathAsString(encryptedPartSecurityEvent.getElementPath()) + " must be encrypted");
                 return false;
             }
         }
         //body processed above. so this must be a header element
         for (int i = 0; i < encryptedParts.getHeaders().size(); i++) {
             Header header = encryptedParts.getHeaders().get(i);
-            if (header.getNamespace().equals(encryptedPartSecurityEvent.getElement().getNamespaceURI())
-                    && (header.getName() == null //== wildcard
-                    || header.getName().equals(encryptedPartSecurityEvent.getElement().getLocalPart()))) {
+            QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
+
+            List<QName> header11Path = new LinkedList<QName>();
+            header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+            header11Path.add(headerQName);
+
+            if (WSSUtils.pathMatches(header11Path, encryptedPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
                 if (encryptedPartSecurityEvent.isEncrypted()) {
                     setAsserted(true);
                     return true;
                 } else {
-                    setErrorMessage("Element " + encryptedPartSecurityEvent.getElement() + " must be encrypted");
+                    setAsserted(false);
+                    setErrorMessage("Element " + WSSUtils.pathAsString(encryptedPartSecurityEvent.getElementPath()) + " must be encrypted");
                     return false;
                 }
             }

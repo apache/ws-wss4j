@@ -19,16 +19,16 @@
 
 package org.swssf.xmlsec.crypto;
 
-import java.math.BigInteger;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
+import java.math.BigInteger;
+
 /**
  * Provides the means to navigate through a DER-encoded byte array, to help
  * in decoding the contents.
- * <p>
+ * <p/>
  * It maintains a "current position" in the array that advances with each
  * operation, providing a simple means to handle the type-length-value
  * encoding of DER. For example
@@ -41,11 +41,17 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 public class DERDecoder {
     private static Log log = LogFactory.getLog(DERDecoder.class);
 
-    /** DER type identifier for a bit string value */
+    /**
+     * DER type identifier for a bit string value
+     */
     public static final byte TYPE_BIT_STRING = 0x03;
-    /** DER type identifier for a octet string value */
+    /**
+     * DER type identifier for a octet string value
+     */
     public static final byte TYPE_OCTET_STRING = 0x04;
-    /** DER type identifier for a sequence value */
+    /**
+     * DER type identifier for a sequence value
+     */
     public static final byte TYPE_SEQUENCE = 0x30;
 
     private byte[] arr;
@@ -62,7 +68,7 @@ public class DERDecoder {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid DER string" }
+                    new Object[]{"Invalid DER string"}
             );
         }
         arr = derEncoded;
@@ -88,7 +94,7 @@ public class DERDecoder {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Unsupported DER format" }
+                    new Object[]{"Unsupported DER format"}
             );
         }
         pos += length;
@@ -98,21 +104,19 @@ public class DERDecoder {
      * Confirm that the byte at the current position matches the given value.
      *
      * @param val the expected next byte.
-     * @throws XMLSecurityException
-     *         if the current position is at the end of the array, or if the
-     *         byte at the current position doesn't match the expected value.
+     * @throws XMLSecurityException if the current position is at the end of the array, or if the
+     *                              byte at the current position doesn't match the expected value.
      */
     public void expect(int val) throws XMLSecurityException {
-        expect((byte)(val & 0xFF));
+        expect((byte) (val & 0xFF));
     }
 
     /**
      * Confirm that the byte at the current position matches the given value.
      *
      * @param val the expected next byte.
-     * @throws XMLSecurityException
-     *         if the current position is at the end of the array, or if the
-     *         byte at the current position doesn't match the expected value.
+     * @throws XMLSecurityException if the current position is at the end of the array, or if the
+     *                              byte at the current position doesn't match the expected value.
      */
     public void expect(byte val) throws XMLSecurityException {
         if (!test(val)) {
@@ -120,7 +124,7 @@ public class DERDecoder {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid DER format" }
+                    new Object[]{"Invalid DER format"}
             );
         }
         pos++;
@@ -132,14 +136,14 @@ public class DERDecoder {
      * @param val the value to test for a match with the current byte.
      * @return true if the byte at the current position matches the given value.
      * @throws XMLSecurityException if the current position is at the end of
-     *                             the array.
+     *                              the array.
      */
     public boolean test(byte val) throws XMLSecurityException {
         if (pos >= arr.length) {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid DER format" }
+                    new Object[]{"Invalid DER format"}
             );
         }
         return (arr[pos] == val);
@@ -147,7 +151,7 @@ public class DERDecoder {
 
     /**
      * Get the DER length at the current position.
-     * <p>
+     * <p/>
      * DER length is encoded as
      * <ul>
      * <li>If the first byte is 0x00 to 0x7F, it describes the actual length.
@@ -158,16 +162,15 @@ public class DERDecoder {
      * </ul>
      *
      * @return the length, -1 for indefinite length.
-     * @throws XMLSecurityException
-     *         if the current position is at the end of the array or there is
-     *         an incomplete length specification.
+     * @throws XMLSecurityException if the current position is at the end of the array or there is
+     *                              an incomplete length specification.
      */
     public int getLength() throws XMLSecurityException {
         if (pos >= arr.length) {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid DER format" }
+                    new Object[]{"Invalid DER format"}
             );
         }
         int len;
@@ -182,7 +185,7 @@ public class DERDecoder {
                 throw new XMLSecurityException(
                         XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                         "noSKIHandling",
-                        new Object[] { "Invalid DER format" }
+                        new Object[]{"Invalid DER format"}
                 );
             }
             byte[] lenBytes = new byte[nbytes];
@@ -199,22 +202,21 @@ public class DERDecoder {
      * @param length the number of bytes to return.
      * @return an array of the requested number of bytes from the current
      *         position.
-     * @throws XMLSecurityException
-     *         if the current position is at the end of the array, or the
-     *         length is negative.
+     * @throws XMLSecurityException if the current position is at the end of the array, or the
+     *                              length is negative.
      */
     public byte[] getBytes(int length) throws XMLSecurityException {
         if (pos + length > arr.length) {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid DER format" }
-             );
+                    new Object[]{"Invalid DER format"}
+            );
         } else if (length < 0) {
             throw new XMLSecurityException(
                     XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Unsupported DER format" }
+                    new Object[]{"Unsupported DER format"}
             );
         }
         byte[] value = new byte[length];
@@ -222,5 +224,5 @@ public class DERDecoder {
         pos += length;
         return value;
     }
-    
+
 }

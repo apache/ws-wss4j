@@ -31,8 +31,8 @@ import java.security.PrivilegedAction;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Loader {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(Loader.class);
+    private static org.apache.commons.logging.Log log =
+            org.apache.commons.logging.LogFactory.getLog(Loader.class);
 
     /**
      * This method will search for <code>resource</code> in different
@@ -65,7 +65,7 @@ public class Loader {
         } catch (Throwable t) {
             log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", t);
         }
-    
+
         // Last ditch attempt: get the resource from the class path. It
         // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
@@ -73,13 +73,13 @@ public class Loader {
         log.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
         return ClassLoader.getSystemResource(resource);
     }
-    
+
 
     /**
      * This method will search for <code>resource</code> in different
      * places. The search order is as follows:
      * <ol>
-     * <p><li>Search for <code>resource</code> using the supplied class loader. 
+     * <p><li>Search for <code>resource</code> using the supplied class loader.
      * If that fails, search for <code>resource</code> using the thread context
      * class loader.
      * <p><li>Try one last time with
@@ -117,13 +117,13 @@ public class Loader {
      * @throws InvocationTargetException
      */
     public static ClassLoader getTCL() throws IllegalAccessException, InvocationTargetException {
-         return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
             public ClassLoader run() {
                 return Thread.currentThread().getContextClassLoader();
             }
-         });
+        });
     }
-    
+
     /**
      * Get the class loader of the class argument
      * <p/>
@@ -135,7 +135,7 @@ public class Loader {
             public ClassLoader run() {
                 return clazz.getClassLoader();
             }
-         });
+        });
     }
 
     /**
@@ -171,9 +171,9 @@ public class Loader {
      * @return Class
      * @throws ClassNotFoundException
      */
-    public static <T> Class<? extends T> loadClass(ClassLoader loader, 
-                                      String clazz,
-                                      Class<T> type) throws ClassNotFoundException {
+    public static <T> Class<? extends T> loadClass(ClassLoader loader,
+                                                   String clazz,
+                                                   Class<T> type) throws ClassNotFoundException {
         try {
             if (loader != null) {
                 Class<?> c = loader.loadClass(clazz);
@@ -186,6 +186,7 @@ public class Loader {
         }
         return loadClass(clazz, true, type);
     }
+
     /**
      * If running under JDK 1.2 load the specified class using the
      * <code>Thread</code> <code>contextClassLoader</code> if that
@@ -199,6 +200,7 @@ public class Loader {
     public static Class<?> loadClass(String clazz) throws ClassNotFoundException {
         return loadClass(clazz, true);
     }
+
     /**
      * If running under JDK 1.2 load the specified class using the
      * <code>Thread</code> <code>contextClassLoader</code> if that
@@ -211,19 +213,20 @@ public class Loader {
      * @throws ClassNotFoundException
      */
     public static <T> Class<? extends T> loadClass(String clazz, Class<T> type)
-        throws ClassNotFoundException {
+            throws ClassNotFoundException {
         return loadClass(clazz, true, type);
     }
-    
-    public static <T> Class<? extends T> loadClass(String clazz, 
+
+    public static <T> Class<? extends T> loadClass(String clazz,
                                                    boolean warn,
                                                    Class<T> type) throws ClassNotFoundException {
         return loadClass(clazz, warn).asSubclass(type);
     }
+
     public static Class<?> loadClass(String clazz, boolean warn) throws ClassNotFoundException {
         try {
-            ClassLoader tcl = getTCL(); 
-            
+            ClassLoader tcl = getTCL();
+
             if (tcl != null) {
                 Class<?> c = tcl.loadClass(clazz);
                 if (c != null) {

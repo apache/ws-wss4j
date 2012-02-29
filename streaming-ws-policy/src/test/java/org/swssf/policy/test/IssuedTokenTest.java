@@ -16,13 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.impl.securityToken.X509SecurityToken;
-import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.IssuedTokenSecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -62,32 +65,25 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
         IssuedTokenSecurityEvent initiatorTokenSecurityEvent = new IssuedTokenSecurityEvent();
-        initiatorTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
-        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         IssuedTokenSecurityEvent recipientTokenSecurityEvent = new IssuedTokenSecurityEvent();
-        recipientTokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
-        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();

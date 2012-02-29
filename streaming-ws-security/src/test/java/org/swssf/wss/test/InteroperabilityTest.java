@@ -71,7 +71,8 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -87,10 +88,12 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(securityProperties,
                 xmlInputFactory.createXMLStreamReader(
-                        new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                        new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -102,6 +105,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+        securityEventListener.compare();
     }
 
     @Test(invocationCount = 1)
@@ -124,7 +128,8 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -140,10 +145,12 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
                 securityProperties,
-                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -155,6 +162,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+        securityEventListener.compare();
     }
 
     @Test(invocationCount = 1)
@@ -178,9 +186,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
+                SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.AlgorithmSuite,
-                SecurityEvent.Event.EncryptedKeyToken,
-                SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.EncryptedElement,
                 SecurityEvent.Event.X509Token,
@@ -198,9 +208,10 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
                 securityProperties,
-                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -212,6 +223,8 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+
+        securityEventListener.compare();
     }
 
     //Not supported ATM: Timestamp encrypted and then Signed
@@ -270,10 +283,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.Timestamp,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
-                SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.EncryptedKeyToken,
@@ -283,10 +297,12 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
                 securityProperties,
-                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -298,6 +314,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+        securityEventListener.compare();
     }
 
     @Test
@@ -388,13 +405,15 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.EncryptedKeyToken,
+                SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.EncryptedElement,
                 SecurityEvent.Event.Timestamp,
@@ -408,8 +427,9 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
-                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -421,6 +441,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+        securityEventListener.compare();
     }
 
     @Test
@@ -601,7 +622,8 @@ public class InteroperabilityTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.Operation,
+                    SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.EncryptedKeyToken,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.SignatureValue,
@@ -612,8 +634,6 @@ public class InteroperabilityTest extends AbstractTestBase {
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.SignedElement,
-                    SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.SignedElement,
                     SecurityEvent.Event.AlgorithmSuite,
@@ -687,9 +707,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                     SecurityEvent.Event.SignedElement,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
             };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
-                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, new TestSecurityEventListener(expectedSecurityEvents));
+                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -697,6 +719,8 @@ public class InteroperabilityTest extends AbstractTestBase {
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            securityEventListener.compare();
         }
     }
 
@@ -722,7 +746,8 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -738,9 +763,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
-                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -752,6 +779,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+        securityEventListener.compare();
     }
 
     @Test(invocationCount = 1)
@@ -816,7 +844,8 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
+                SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -832,9 +861,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedKeyToken,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.AlgorithmSuite,
         };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
-                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), new TestSecurityEventListener(expectedSecurityEvents));
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
         transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -846,6 +877,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     }
                 }
         ));
+        securityEventListener.compare();
     }
 
     @Test(invocationCount = 1)

@@ -24,10 +24,13 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.SecureConversationSecurityToken;
 import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -52,20 +55,37 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
-        SecureConversationTokenSecurityEvent secureConversationTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        secureConversationTokenSecurityEvent.setSecurityToken(new SecureConversationSecurityToken(null, null, null, "1", null, null));
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityToken securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
+
+        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -73,7 +93,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -91,13 +111,17 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        SecureConversationTokenSecurityEvent secureConversationTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        secureConversationTokenSecurityEvent.setSecurityToken(new SecureConversationSecurityToken(null, null, null, "1", null, null));
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityToken securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
@@ -142,6 +166,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
     }
     */
 
+
     @Test
     public void testPolicySignatureNotEncrypted() throws Exception {
         String policyString =
@@ -158,16 +183,23 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
-        SecureConversationTokenSecurityEvent secureConversationTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        secureConversationTokenSecurityEvent.setSecurityToken(new SecureConversationSecurityToken(null, null, null, "1", null, null));
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityToken securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -196,20 +228,30 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
-        SecureConversationTokenSecurityEvent secureConversationTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        secureConversationTokenSecurityEvent.setSecurityToken(new SecureConversationSecurityToken(null, null, null, "1", null, null));
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityToken securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        secureConversationTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        securityToken = new SecureConversationSecurityToken(null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -217,7 +259,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
             Assert.fail("Exception expected");

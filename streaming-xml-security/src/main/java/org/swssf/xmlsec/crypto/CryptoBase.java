@@ -19,24 +19,16 @@
 
 package org.swssf.xmlsec.crypto;
 
+import org.swssf.xmlsec.ext.XMLSecurityException;
+
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.security.MessageDigest;
 import java.security.NoSuchProviderException;
-import java.security.cert.CertPath;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.security.auth.x500.X500Principal;
-
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import java.security.cert.*;
+import java.util.*;
 
 /**
  * This Abstract Base Class implements the accessor and keystore-independent methods and
@@ -46,56 +38,58 @@ public abstract class CryptoBase implements Crypto {
     public static final String SKI_OID = "2.5.29.14";
     /**
      * OID For the NameConstraints Extension to X.509
-     *
+     * <p/>
      * http://java.sun.com/j2se/1.4.2/docs/api/
      * http://www.ietf.org/rfc/rfc3280.txt (s. 4.2.1.11)
      */
     public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
-    
+
     private static final Constructor<?> BC_509CLASS_CONS;
 
-    protected Map<String, CertificateFactory> certFactMap = 
-        new HashMap<String, CertificateFactory>();
+    protected Map<String, CertificateFactory> certFactMap =
+            new HashMap<String, CertificateFactory>();
     protected String defaultAlias = null;
     protected String cryptoProvider = null;
-    
+
     static {
         Constructor<?> cons = null;
         try {
             Class<?> c = Class.forName("org.bouncycastle.asn1.x509.X509Name");
-            cons = c.getConstructor(new Class[] {String.class});
+            cons = c.getConstructor(new Class[]{String.class});
         } catch (Exception e) {
             //ignore
         }
         BC_509CLASS_CONS = cons;
     }
-    
+
     /**
      * Constructor
      */
     protected CryptoBase() {
     }
-    
+
     /**
      * Get the crypto provider associated with this implementation
+     *
      * @return the crypto provider
      */
     public String getCryptoProvider() {
         return cryptoProvider;
     }
-    
+
     /**
      * Set the crypto provider associated with this implementation
+     *
      * @param provider the crypto provider to set
      */
     public void setCryptoProvider(String provider) {
         cryptoProvider = provider;
     }
-    
+
     /**
-     * Retrieves the identifier name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This identifier corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * Retrieves the identifier name of the default certificate. This should be the certificate
+     * that is used for signature and encryption. This identifier corresponds to the certificate
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted
      * message. May return null. The identifier is implementation specific, e.g. it could be the
      * KeyStore alias.
      *
@@ -104,11 +98,11 @@ public abstract class CryptoBase implements Crypto {
     public String getDefaultX509Identifier() throws XMLSecurityException {
         return defaultAlias;
     }
-    
+
     /**
-     * Sets the identifier name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This identifier corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * Sets the identifier name of the default certificate. This should be the certificate
+     * that is used for signature and encryption. This identifier corresponds to the certificate
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted
      * message. The identifier is implementation specific, e.g. it could be the KeyStore alias.
      *
      * @param identifier name of the default X509 certificate.
@@ -116,11 +110,11 @@ public abstract class CryptoBase implements Crypto {
     public void setDefaultX509Identifier(String identifier) {
         defaultAlias = identifier;
     }
-    
+
     /**
      * Sets the CertificateFactory instance on this Crypto instance
      *
-     * @param provider the CertificateFactory provider name
+     * @param provider    the CertificateFactory provider name
      * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
     public void setCertificateFactory(String provider, CertificateFactory certFactory) {
@@ -130,13 +124,14 @@ public abstract class CryptoBase implements Crypto {
             certFactMap.put(provider, certFactory);
         }
     }
-    
+
     /**
      * Get the CertificateFactory instance on this Crypto instance
      *
      * @return Returns a <code>CertificateFactory</code> to construct
      *         X509 certificates
      * @throws org.apache.ws.security.XMLSecurityException
+     *
      */
     public CertificateFactory getCertificateFactory() throws XMLSecurityException {
         String provider = getCryptoProvider();
@@ -161,13 +156,13 @@ public abstract class CryptoBase implements Crypto {
                 certFactMap.put(factory.getProvider().getName(), factory);
             } catch (CertificateException e) {
                 throw new XMLSecurityException(
-                    XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType",
-                    null, e
+                        XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType",
+                        null, e
                 );
             } catch (NoSuchProviderException e) {
                 throw new XMLSecurityException(
-                    XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider",
-                    null, e
+                        XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider",
+                        null, e
                 );
             }
         }
@@ -180,6 +175,7 @@ public abstract class CryptoBase implements Crypto {
      * @param in The <code>InputStream</code> containing the X509Certificate
      * @return An X509 certificate
      * @throws org.apache.ws.security.XMLSecurityException
+     *
      */
     public X509Certificate loadCertificate(InputStream in) throws XMLSecurityException {
         try {
@@ -187,8 +183,8 @@ public abstract class CryptoBase implements Crypto {
             return (X509Certificate) certFactory.generateCertificate(in);
         } catch (CertificateException e) {
             throw new XMLSecurityException(
-                XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError",
-                null, e
+                    XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError",
+                    null, e
             );
         }
     }
@@ -221,9 +217,9 @@ public abstract class CryptoBase implements Crypto {
                 return digest.digest(value);
             } catch (Exception ex) {
                 throw new XMLSecurityException(
-                    XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "noSKIHandling",
-                    new Object[]{"No SKI certificate extension and no SHA1 message digest available"},
-                    ex
+                        XMLSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "noSKIHandling",
+                        new Object[]{"No SKI certificate extension and no SHA1 message digest available"},
+                        ex
                 );
             }
         }
@@ -249,19 +245,19 @@ public abstract class CryptoBase implements Crypto {
      * @throws XMLSecurityException
      */
     public byte[] getBytesFromCertificates(X509Certificate[] certs)
-        throws XMLSecurityException {
+            throws XMLSecurityException {
         try {
             CertPath path = getCertificateFactory().generateCertPath(Arrays.asList(certs));
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new XMLSecurityException(
-                XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
-                null, e
+                    XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
+                    null, e
             );
         } catch (CertificateException e) {
             throw new XMLSecurityException(
-                XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError",
-                null, e
+                    XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError",
+                    null, e
             );
         }
     }
@@ -275,15 +271,15 @@ public abstract class CryptoBase implements Crypto {
      * @throws XMLSecurityException
      */
     public X509Certificate[] getCertificatesFromBytes(byte[] data)
-        throws XMLSecurityException {
+            throws XMLSecurityException {
         InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
         try {
             path = getCertificateFactory().generateCertPath(in);
         } catch (CertificateException e) {
             throw new XMLSecurityException(
-                XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError",
-                null, e
+                    XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError",
+                    null, e
             );
         }
         List<?> l = path.getCertificates();
@@ -297,13 +293,13 @@ public abstract class CryptoBase implements Crypto {
 
     protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
-             try {
-                 return BC_509CLASS_CONS.newInstance(new Object[] {s});
-             } catch (Exception e) {
-                 //ignore
-             }
+            try {
+                return BC_509CLASS_CONS.newInstance(new Object[]{s});
+            } catch (Exception e) {
+                //ignore
+            }
         }
         return new X500Principal(s);
     }
-    
+
 }

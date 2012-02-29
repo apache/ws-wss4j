@@ -50,7 +50,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
                                  WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, null, null, id, keyIdentifierType, null);
+        super(wsSecurityContext, null, null, id, keyIdentifierType);
         this.username = username;
         this.password = password;
         this.created = created;
@@ -60,8 +60,8 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
     }
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
-                                 String id, Object processor) {
-        super(null, null, null, id, null, processor);
+                                 String id) {
+        super(null, null, null, id, null);
         this.username = username;
         this.password = password;
         this.created = created;
@@ -244,10 +244,6 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
     }
 
     public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
-    public String getKeyWrappingTokenAlgorithm() {
         return null;
     }
 

@@ -46,13 +46,13 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
     }
 
     public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext) throws WSSecurityException {
-        super(wsSecurityContext, null, null, UUID.randomUUID().toString(), null, null);
+        super(wsSecurityContext, null, null, UUID.randomUUID().toString(), null);
         this.x509Certificate = x509Certificate;
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
     public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext) throws WSSecurityException {
-        super(wsSecurityContext, null, null, UUID.randomUUID().toString(), null, null);
+        super(wsSecurityContext, null, null, UUID.randomUUID().toString(), null);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;
         } else {
@@ -81,10 +81,6 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
     }
 
     public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
-    public String getKeyWrappingTokenAlgorithm() {
         return null;
     }
 

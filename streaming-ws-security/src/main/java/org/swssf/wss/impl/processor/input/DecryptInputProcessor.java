@@ -56,18 +56,18 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     protected void handleEncryptedContent(
             InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException {
 
-        QName parentElement = inputProcessorChain.getDocumentContext().getParentElement(xmlEvent.getEventType());
+        List<QName> parentElementPath = inputProcessorChain.getDocumentContext().getParentElementPath(xmlEvent.getEventType());
         if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
             //soap:body content encryption counts as EncryptedPart
             EncryptedPartSecurityEvent encryptedPartSecurityEvent =
                     new EncryptedPartSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
-            encryptedPartSecurityEvent.setElement(parentElement);
+            encryptedPartSecurityEvent.setElementPath(parentElementPath);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
         } else {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
                     new ContentEncryptedElementSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
-            contentEncryptedElementSecurityEvent.setElement(parentElement);
+            contentEncryptedElementSecurityEvent.setElementPath(parentElementPath);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
     }
@@ -83,21 +83,13 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 securityToken);
     }
 
+    //todo remove me?
     @Override
-    protected void handleSecurityToken(
-            SecurityToken securityToken, SecurityContext securityContext, EncryptedDataType encryptedDataType) throws XMLSecurityException {
+    protected void handleSecurityToken(SecurityToken securityToken, SecurityContext securityContext,
+                                       EncryptedDataType encryptedDataType) throws XMLSecurityException {
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);
         TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
-        tokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
         ((WSSecurityContext) securityContext).registerSecurityEvent(tokenSecurityEvent);
-
-        /*AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
-       algorithmSuiteSecurityEvent.setAlgorithmURI(encryptedDataType.getEncryptionMethod().getAlgorithm());
-       if (securityToken.isAsymmetric()) {
-           algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Asym_Key_Wrap);
-       } else {
-           algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Sym_Key_Wrap);
-       }
-       ((WSSecurityContext) securityContext).registerSecurityEvent(algorithmSuiteSecurityEvent);*/
     }
 
     /*
@@ -138,12 +130,12 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                     && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent =
                         new EncryptedPartSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
-                encryptedPartSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                encryptedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
             } else {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent =
                         new EncryptedElementSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
-                encryptedElementSecurityEvent.setElement(xmlEvent.asStartElement().getName());
+                encryptedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedElementSecurityEvent);
             }
         }

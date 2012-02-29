@@ -21,6 +21,8 @@ package org.swssf.wss.securityEvent;
 import org.swssf.xmlsec.ext.SecurityToken;
 
 import javax.xml.namespace.QName;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -28,8 +30,7 @@ import javax.xml.namespace.QName;
  */
 public class ContentEncryptedElementSecurityEvent extends SecurityEvent {
 
-    //todo xpath or something unique
-    private QName element; //parent element
+    private List<QName> pathElements; //parent element
     private boolean encrypted;
     private SecurityToken securityToken;
     private boolean signedContent;
@@ -41,12 +42,12 @@ public class ContentEncryptedElementSecurityEvent extends SecurityEvent {
         this.signedContent = signedContent;
     }
 
-    public QName getElement() {
-        return element;
+    public List<QName> getElementPath() {
+        return pathElements;
     }
 
-    public void setElement(QName element) {
-        this.element = element;
+    public void setElementPath(List<QName> elementPath) {
+        this.pathElements = new LinkedList<QName>(elementPath);
     }
 
     public boolean isEncrypted() {

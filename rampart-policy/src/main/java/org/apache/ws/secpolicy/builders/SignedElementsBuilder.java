@@ -66,7 +66,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
                     && spVersion.getSPConstants().getXPathExpression().getNamespaceURI().equals(child.getNamespaceURI())) {
                 Map<String, String> declaredNamespaces = new HashMap<String, String>();
                 addDeclaredNamespaces(child, declaredNamespaces);
-                xPaths.add(new XPath(child.getTextContent(), XPath.Version.V1, null, declaredNamespaces));
+                xPaths.add(new XPath(child.getTextContent().trim(), XPath.Version.V1, null, declaredNamespaces));
             }
             child = SPUtils.getNextSiblingElement(child);
         }
@@ -86,7 +86,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
                 if (StringUtils.isEmpty(filter)) {
                     throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                 }
-                xPaths.add(new XPath(child.getTextContent(), XPath.Version.V2, filter, declaredNamespaces));
+                xPaths.add(new XPath(child.getTextContent().trim(), XPath.Version.V2, filter, declaredNamespaces));
             }
             child = SPUtils.getNextSiblingElement(child);
         }

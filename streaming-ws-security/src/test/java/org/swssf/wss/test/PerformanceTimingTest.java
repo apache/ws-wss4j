@@ -175,7 +175,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
     @Test(groups = "timing-out")
     public void testStreamingOutTimePerformance() throws Exception {
 
-        FileWriter samples = new FileWriter("timing-out-samples.txt");
+        FileWriter samples = new FileWriter("target/timing-out-samples.txt");
 
         for (int i = 1; i <= 15; i++) {
             System.out.println("Run " + i);

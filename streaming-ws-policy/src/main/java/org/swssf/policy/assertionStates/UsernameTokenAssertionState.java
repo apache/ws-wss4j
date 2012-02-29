@@ -27,6 +27,7 @@ import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 
 /**
  * @author $Author$
@@ -47,7 +48,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException {
         if (!(tokenSecurityEvent instanceof UsernameTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a UsernameSecurityTokenEvent but got " + tokenSecurityEvent.getClass().getName());
         }

@@ -24,9 +24,14 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.Header;
 import org.apache.ws.secpolicy.model.SignedParts;
 import org.swssf.policy.Assertable;
-import org.swssf.policy.PolicyConstants;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+
+import javax.xml.namespace.QName;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -53,14 +58,14 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
         SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
         SignedParts signedParts = (SignedParts) getAssertion();
 
-        if (signedParts.isBody() && (signedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap11_Body)
-                || signedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap12_Body))) {
+        if (signedParts.isBody()
+                && (WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, signedPartSecurityEvent.getElementPath(), true, false))) {
             if (signedPartSecurityEvent.isSigned()) {
                 setAsserted(true);
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + signedPartSecurityEvent.getElement() + " must be signed");
+                setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
                 return false;
             }
         }
@@ -71,21 +76,25 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + signedPartSecurityEvent.getElement() + " must be signed");
+                setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
                 return false;
             }
         } else {
             for (int i = 0; i < signedParts.getHeaders().size(); i++) {
                 Header header = signedParts.getHeaders().get(i);
-                if (header.getNamespace().equals(signedPartSecurityEvent.getElement().getNamespaceURI())
-                        && (header.getName() == null //== wildcard
-                        || header.getName().equals(signedPartSecurityEvent.getElement().getLocalPart()))) {
+                QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
+
+                List<QName> header11Path = new LinkedList<QName>();
+                header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+                header11Path.add(headerQName);
+
+                if (WSSUtils.pathMatches(header11Path, signedPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
                     if (signedPartSecurityEvent.isSigned()) {
                         setAsserted(true);
                         return true;
                     } else {
                         setAsserted(false);
-                        setErrorMessage("Element " + signedPartSecurityEvent.getElement() + " must be signed");
+                        setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
                         return false;
                     }
                 }

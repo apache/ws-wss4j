@@ -30,13 +30,13 @@ import org.swssf.binding.wsu10.AttributedDateTime;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.util.*;
 
@@ -179,19 +179,21 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
 
         final String password = passwordType.getValue();
+
+        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+            private WSSecurityToken securityToken = null;
 
-            public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
+            public SecurityToken getSecurityToken() throws WSSecurityException {
+                if (this.securityToken != null) {
+                    return this.securityToken;
                 }
-                securityToken = SecurityTokenFactoryImpl.getSecurityToken(username.getValue(), password,
+                this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(username.getValue(), password,
                         created, nonceVal, salt, iteration, (WSSecurityContext) inputProcessorChain.getSecurityContext(), usernameTokenType.getId());
-                securityTokens.put(crypto, securityToken);
-                return securityToken;
+                this.securityToken.setElementPath(elementPath);
+                return this.securityToken;
             }
 
             public String getId() {
@@ -200,11 +202,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(usernameTokenType.getId(), securityTokenProvider);
 
-        //todo remove me?
-        //atm used for verification of the supplied username
+        //fire a tokenSecurityEvent
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
-        usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken(null));
+        usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(usernameTokenSecurityEvent);
     }

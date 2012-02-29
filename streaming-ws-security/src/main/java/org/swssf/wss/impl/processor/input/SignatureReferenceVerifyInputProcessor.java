@@ -106,12 +106,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                         && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                     SignedPartSecurityEvent signedPartSecurityEvent =
                             new SignedPartSecurityEvent(getSecurityToken(), true);
-                    signedPartSecurityEvent.setElement(startElement.getName());
+                    signedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
                 } else {
                     SignedElementSecurityEvent signedElementSecurityEvent =
                             new SignedElementSecurityEvent(getSecurityToken(), true);
-                    signedElementSecurityEvent.setElement(startElement.getName());
+                    signedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
                 }
             }
@@ -224,7 +224,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                 if (securityTokenProvider == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noReference");
                 }
-                SecurityToken securityToken = securityTokenProvider.getSecurityToken(getSecurityProperties().getSignatureVerificationCrypto());
+                SecurityToken securityToken = securityTokenProvider.getSecurityToken();
                 if (!(securityToken instanceof SecurityTokenReference)) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
                 }

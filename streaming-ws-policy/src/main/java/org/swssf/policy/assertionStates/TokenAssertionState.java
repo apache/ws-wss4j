@@ -23,8 +23,11 @@ import org.apache.ws.secpolicy.SPConstants;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.*;
 import org.swssf.policy.Assertable;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 
 /**
  * @author $Author$
@@ -44,13 +47,15 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     }
 
     @Override
-    public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
+    public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException {
 
         TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
         AbstractToken abstractToken = (AbstractToken) getAssertion();
 
         final AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
-        switch (tokenSecurityEvent.getTokenUsage()) {
+        //todo what todo with the other usages if there are any? What when a sig and enc derives from the same source token?
+        SecurityToken.TokenUsage tokenUsage = tokenSecurityEvent.getSecurityToken().getTokenUsages().get(0);
+        switch (tokenUsage) {
             case MainSignature:
                 if (!(parentAssertion instanceof InitiatorToken)
                         && !(parentAssertion instanceof InitiatorSignatureToken)
@@ -81,6 +86,12 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 if (!(parentAssertion instanceof SupportingTokens)) {
                     return true;
                 }
+                SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
+                if (supportingTokens.getSupportingTokenType().getName().getLocalPart().equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
+                        && !tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedSupportingTokens)) {
+                    return true;
+                }
+                //todo the supporting token types...
                 break;
         }
 
@@ -91,8 +102,48 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             return false;
         }
 
+        boolean hasDerivedKeys = false;
+        hasDerivedKeys = hasDerivedKeys(tokenSecurityEvent.getSecurityToken());
+        if (abstractToken.getDerivedKeys() != null) {
+            AbstractToken.DerivedKeys derivedKeys = abstractToken.getDerivedKeys();
+            switch (derivedKeys) {
+                case RequireDerivedKeys:
+                case RequireExplicitDerivedKeys:
+                case RequireImpliedDerivedKeys:
+                    if (!hasDerivedKeys) {
+                        setAsserted(false);
+                        setErrorMessage("Derived key must be used");
+                    }
+            }
+        } else {
+            if (hasDerivedKeys) {
+                setAsserted(false);
+                setErrorMessage("Derived key must not be used");
+            }
+        }
+
         return assertToken(tokenSecurityEvent, abstractToken);
     }
 
-    public abstract boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException;
+    public abstract boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException;
+
+    protected boolean hasDerivedKeys(SecurityToken securityToken) throws XMLSecurityException {
+        if (securityToken == null) {
+            return false;
+        } else if (securityToken.getTokenType() == WSSConstants.DerivedKeyToken) {
+            return true;
+        }
+
+        if (securityToken.getWrappedTokens().size() == 0) {
+            return false;
+        }
+
+        //all wrapped tokens must be derived!:
+        boolean hasDerivedKeys = true;
+        for (int i = 0; i < securityToken.getWrappedTokens().size(); i++) {
+            SecurityToken wrappedSecurityToken = securityToken.getWrappedTokens().get(i);
+            hasDerivedKeys &= hasDerivedKeys(wrappedSecurityToken);
+        }
+        return hasDerivedKeys;
+    }
 }

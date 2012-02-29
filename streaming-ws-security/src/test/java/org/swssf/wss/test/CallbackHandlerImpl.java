@@ -64,7 +64,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
     private byte[] ephemeralKey = null;
     private String issuer = null;
     private SAMLVersion samlVersion = SAMLVersion.VERSION_11;
-    
+
     private String subjectNameIDFormat = null;
     private String subjectLocalityIpAddress = null;
     private String subjectLocalityDnsAddress = null;
@@ -115,17 +115,17 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 samlCallback.setIssuerKeyPassword("default");
                 samlCallback.setSignAssertion(this.signAssertion);
                 samlCallback.setIssuer(issuer);
-                
+
                 if (conditions != null) {
                     samlCallback.setConditions(conditions);
                 }
-                
+
                 SubjectBean subjectBean =
                         new SubjectBean(subjectName, subjectQualifier, confirmationMethod);
                 if (subjectNameIDFormat != null) {
                     subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
                 }
-                
+
                 if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)
                         || SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
                     try {
@@ -178,7 +178,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 attributeBean.setQualifiedName("role");
             }
             if (customAttributeValues != null) {
-                attributeBean.setCustomAttributeValues(customAttributeValues);   
+                attributeBean.setCustomAttributeValues(customAttributeValues);
             } else {
                 attributeBean.setAttributeValues(Collections.singletonList("user"));
             }
@@ -330,24 +330,24 @@ public class CallbackHandlerImpl implements CallbackHandler {
     public void setSecret(byte[] secret) {
         this.secret = secret;
     }
-    
+
     public void setConditions(ConditionsBean conditionsBean) {
         this.conditions = conditionsBean;
     }
-    
+
     public void setSubjectNameIDFormat(String subjectNameIDFormat) {
         this.subjectNameIDFormat = subjectNameIDFormat;
     }
-    
+
     public void setSubjectLocality(String ipAddress, String dnsAddress) {
         this.subjectLocalityIpAddress = ipAddress;
         this.subjectLocalityDnsAddress = dnsAddress;
     }
-    
+
     public void setResource(String resource) {
         this.resource = resource;
     }
-    
+
     public void setCustomAttributeValues(List<?> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
     }

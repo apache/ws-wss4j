@@ -152,21 +152,27 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.Operation,
+                    SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.DerivedKeyToken,
                     SecurityEvent.Event.DerivedKeyToken,
                     SecurityEvent.Event.EncryptedPart,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
             };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
                     xmlInputFactory.createXMLStreamReader(
-                            new ByteArrayInputStream(baos.toByteArray())), null, new TestSecurityEventListener(expectedSecurityEvents));
+                            new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
         }
     }
 
@@ -219,7 +225,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             //EncryptedKey
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
             encrKeyBuilder.setUserInfo("receiver");
-            encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+            encrKeyBuilder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             encrKeyBuilder.prepare(doc, crypto);
 
             //Key information from the EncryptedKey
@@ -242,7 +248,6 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
-
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());

@@ -16,27 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.swssf.wss.securityEvent;
+package org.swssf.wss.ext;
 
 import org.swssf.xmlsec.ext.SecurityToken;
 
+import javax.xml.namespace.QName;
+import java.util.List;
+
 /**
- * @author $Author$
- * @version $Revision$ $Date$
+ * @author $Author: giger $
+ * @version $Revision: 1228829 $ $Date: 2012-01-08 12:44:13 +0100 (Sun, 08 Jan 2012) $
  */
-public abstract class TokenSecurityEvent extends SecurityEvent {
+public interface WSSecurityToken extends SecurityToken {
 
-    private SecurityToken securityToken;
+    List<QName> getElementPath();
 
-    public TokenSecurityEvent(Event securityEventType) {
-        super(securityEventType);
-    }
-
-    public SecurityToken getSecurityToken() {
-        return securityToken;
-    }
-
-    public void setSecurityToken(SecurityToken securityToken) {
-        this.securityToken = securityToken;
-    }
+    void setElementPath(List<QName> elementPath);
 }

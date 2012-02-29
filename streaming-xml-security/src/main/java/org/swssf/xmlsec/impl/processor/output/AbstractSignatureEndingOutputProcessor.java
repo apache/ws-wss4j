@@ -111,7 +111,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         if (wrappingSecurityTokenProvider == null) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
-        final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken(null);
+        final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
         if (wrappingSecurityToken == null) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE);
         }

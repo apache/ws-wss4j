@@ -35,6 +35,7 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public abstract class SecurityTokenFactory {
 
+    //todo caching?
     public static SecurityTokenFactory newInstance() throws XMLSecurityException {
 
         String stf = ConfigurationProperties.getProperty("securityTokenFactory");
@@ -57,5 +58,5 @@ public abstract class SecurityTokenFactory {
 
     public abstract SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto,
                                                    final CallbackHandler callbackHandler,
-                                                   SecurityContext securityContext, Object processor) throws XMLSecurityException;
+                                                   SecurityContext securityContext) throws XMLSecurityException;
 }

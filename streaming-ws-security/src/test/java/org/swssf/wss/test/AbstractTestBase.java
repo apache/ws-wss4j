@@ -89,12 +89,21 @@ public abstract class AbstractTestBase {
         //xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(5 * 8192));
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream)
+            throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream, SecurityEventListener securityEventListener) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream,
+                                      SecurityEventListener securityEventListener)
+            throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
+    }
+
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream,
+                                      List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener)
+            throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+        return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventList, securityEventListener);
     }
 
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
@@ -102,8 +111,12 @@ public abstract class AbstractTestBase {
     }
 
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, XMLStreamException, ParserConfigurationException {
+        return doInboundSecurity(securityProperties, xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
+    }
+
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener) throws WSSecurityException, XMLStreamException, ParserConfigurationException {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
+        XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventList, securityEventListener);
         return StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
     }
 
@@ -123,13 +136,13 @@ public abstract class AbstractTestBase {
     }
 
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
-        InputStream sourceDocument, String action, final Properties properties
+            InputStream sourceDocument, String action, final Properties properties
     ) throws org.apache.ws.security.WSSecurityException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);
         messageContext.put(WSHandlerConstants.USER, "transmitter");
-        
+
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
         sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
@@ -161,7 +174,7 @@ public abstract class AbstractTestBase {
         requestData.setMsgContext(messageContext);
         requestData.setNoSerialization(true);
         requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
-        
+
         wss4JHandler.doSender(messageContext, requestData, true);
 
         return messageContext;
@@ -177,7 +190,7 @@ public abstract class AbstractTestBase {
     }
 
     protected Map<String, Object> doInboundSecurityWithWSS4J_1(
-        Document document, String action, Properties properties, boolean client
+            Document document, String action, Properties properties, boolean client
     ) throws Exception {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         Map<String, Object> messageContext = getMessageContext(document);
@@ -187,7 +200,7 @@ public abstract class AbstractTestBase {
         } else {
             messageContext.put(WSHandlerConstants.USER, "receiver");
         }
-        
+
         //handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTOR, "receiver");
         Properties sigProperties = new Properties();
         sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
@@ -200,7 +213,7 @@ public abstract class AbstractTestBase {
         sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
         wss4JHandler.setPassword(messageContext, "default");
-        
+
         messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.put("" + sigProperties.hashCode(), sigProperties);
         if (properties.get(WSHandlerConstants.PW_CALLBACK_REF) != null) {
@@ -305,8 +318,8 @@ public abstract class AbstractTestBase {
         /**
          * Handles incoming web service requests and outgoing responses
          */
-        public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest) 
-            throws org.apache.ws.security.WSSecurityException {
+        public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
+                throws org.apache.ws.security.WSSecurityException {
 
             reqData.getSignatureParts().clear();
             reqData.getEncryptParts().clear();
@@ -344,7 +357,7 @@ public abstract class AbstractTestBase {
                  * there is a specific parameter to get a username.
                  */
                 throw new org.apache.ws.security.WSSecurityException(
-                    "WSS4JHandler: Empty username for specified action"
+                        "WSS4JHandler: Empty username for specified action"
                 );
             }
             if (doDebug) {
@@ -360,7 +373,7 @@ public abstract class AbstractTestBase {
             Document doc = (Document) mc.get(SECURED_DOCUMENT);
             if (doc == null) {
                 throw new org.apache.ws.security.WSSecurityException(
-                    "WSS4JHandler: cannot get SOAP envlope from message"
+                        "WSS4JHandler: cannot get SOAP envlope from message"
                 );
             }
             if (doDebug) {
@@ -370,13 +383,13 @@ public abstract class AbstractTestBase {
             doSenderAction(doAction, doc, reqData, actions, isRequest);
 
             mc.put(SECURED_DOCUMENT, doc);
-            
+
             return true;
         }
 
         @SuppressWarnings("unchecked")
-        public boolean doReceiver(Map<String, Object> mc, RequestData reqData, boolean isRequest) 
-            throws org.apache.ws.security.WSSecurityException {
+        public boolean doReceiver(Map<String, Object> mc, RequestData reqData, boolean isRequest)
+                throws org.apache.ws.security.WSSecurityException {
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
                 throw new org.apache.ws.security.WSSecurityException("WSS4JHandler: No action defined");
@@ -392,10 +405,10 @@ public abstract class AbstractTestBase {
              * Check if it's a fault. Don't process faults.
              */
             org.apache.ws.security.SOAPConstants soapConstants =
-                WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+                    WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             if (WSSecurityUtil.findElement(
-                doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
-            ) {
+                    doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
+                    ) {
                 return false;
             }
 
@@ -422,7 +435,7 @@ public abstract class AbstractTestBase {
                     log.debug(ex.getMessage(), ex);
                 }
                 throw new org.apache.ws.security.WSSecurityException(
-                    "WSS4JHandler: security processing failed", ex
+                        "WSS4JHandler: security processing failed", ex
                 );
             }
             if (wsResult == null || wsResult.size() == 0) {
@@ -431,7 +444,7 @@ public abstract class AbstractTestBase {
                     return true;
                 } else {
                     throw new org.apache.ws.security.WSSecurityException(
-                        "WSS4JHandler: Request does not contain required Security header"
+                            "WSS4JHandler: Request does not contain required Security header"
                     );
                 }
             }
@@ -448,7 +461,7 @@ public abstract class AbstractTestBase {
              */
             if (!checkReceiverResults(wsResult, actions)) {
                 throw new org.apache.ws.security.WSSecurityException(
-                    "WSS4JHandler: security processing failed (actions mismatch)"
+                        "WSS4JHandler: security processing failed (actions mismatch)"
                 );
             }
 
@@ -472,7 +485,7 @@ public abstract class AbstractTestBase {
         }
 
         protected boolean checkReceiverResults(
-            List<WSSecurityEngineResult> wsResult, List<Integer> actions
+                List<WSSecurityEngineResult> wsResult, List<Integer> actions
         ) {
             List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<WSSecurityEngineResult>();
             for (WSSecurityEngineResult result : wsResult) {
@@ -534,8 +547,8 @@ public abstract class AbstractTestBase {
     }
 
     protected class TestSecurityEventListener implements SecurityEventListener {
-        private int eventNr = 0;
         private SecurityEvent.Event[] expectedEvents;
+        private List<SecurityEvent> receivedSecurityEvents = new ArrayList<SecurityEvent>();
 
         public TestSecurityEventListener(SecurityEvent.Event[] expectedEvents) {
             this.expectedEvents = expectedEvents;
@@ -543,7 +556,38 @@ public abstract class AbstractTestBase {
 
         @Override
         public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-            Assert.assertEquals(securityEvent.getSecurityEventType(), expectedEvents[eventNr++]);
+            receivedSecurityEvents.add(securityEvent);
+        }
+
+        public void compare() {
+            if (expectedEvents.length != receivedSecurityEvents.size()) {
+                printEvents();
+                Assert.fail("event count mismatch");
+            }
+            boolean asserted = true;
+            for (int i = 0; i < expectedEvents.length; i++) {
+                if (!expectedEvents[i].equals(receivedSecurityEvents.get(i).getSecurityEventType())) {
+                    asserted = false;
+                    break;
+                }
+            }
+            if (!asserted) {
+                printEvents();
+                Assert.fail("event mismatch");
+            }
+        }
+
+        private void printEvents() {
+            System.out.println("expected events:");
+            for (int i = 0; i < expectedEvents.length; i++) {
+                SecurityEvent.Event expectedEvent = expectedEvents[i];
+                System.out.println("SecurityEvent.Event." + expectedEvent + ",");
+            }
+            System.out.println("received events:");
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                System.out.println("SecurityEvent.Event." + securityEvent.getSecurityEventType() + ",");
+            }
         }
     }
 }

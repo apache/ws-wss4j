@@ -100,7 +100,7 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
         }
     }
-    
+
     public void engineInitVerify(Key verificationKey) throws XMLSecurityException {
         try {
             signature.initVerify((PublicKey) verificationKey);

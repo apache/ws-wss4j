@@ -40,7 +40,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     @Override
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto,
                                           final CallbackHandler callbackHandler,
-                                          SecurityContext securityContext, Object processor) throws XMLSecurityException {
+                                          SecurityContext securityContext) throws XMLSecurityException {
 
         throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
     }

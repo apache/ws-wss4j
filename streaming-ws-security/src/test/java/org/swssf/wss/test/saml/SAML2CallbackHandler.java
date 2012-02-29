@@ -37,7 +37,7 @@ import java.io.IOException;
  * authentication assertion using Sender Vouches.
  */
 public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
-    
+
     public SAML2CallbackHandler() throws Exception {
         if (certs == null) {
             Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
@@ -45,14 +45,14 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
             cryptoType.setAlias("transmitter");
             certs = crypto.getX509Certificates(cryptoType);
         }
-        
+
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     }
-    
+
     public void handle(Callback[] callbacks)
-        throws IOException, UnsupportedCallbackException {
+            throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
@@ -61,11 +61,11 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 if (conditions != null) {
                     callback.setConditions(conditions);
                 }
-                
-                SubjectBean subjectBean = 
-                    new SubjectBean(
-                        subjectName, subjectQualifier, confirmationMethod
-                    );
+
+                SubjectBean subjectBean =
+                        new SubjectBean(
+                                subjectName, subjectQualifier, confirmationMethod
+                        );
                 if (subjectNameIDFormat != null) {
                     subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
                 }
@@ -74,7 +74,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                         KeyInfoBean keyInfo = createKeyInfo();
                         subjectBean.setKeyInfo(keyInfo);
                     } catch (Exception ex) {
-                        throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
+                        throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
                     }
                 }
                 callback.setSubject(subjectBean);
@@ -84,5 +84,5 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
             }
         }
     }
-    
+
 }

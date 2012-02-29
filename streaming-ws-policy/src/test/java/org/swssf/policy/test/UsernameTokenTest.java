@@ -24,7 +24,11 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
-import org.swssf.wss.securityEvent.*;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -71,27 +75,29 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         UsernameTokenSecurityEvent initiatorTokenSecurityEvent = new UsernameTokenSecurityEvent();
         initiatorTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         initiatorTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
-        initiatorTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+        SecurityToken securityToken = new UsernameSecurityToken(
                 "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null));
-        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+                (WSSecurityContext) null, null, null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         UsernameTokenSecurityEvent recipientTokenSecurityEvent = new UsernameTokenSecurityEvent();
         recipientTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
-        recipientTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+        securityToken = new UsernameSecurityToken(
                 "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null));
-        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+                (WSSecurityContext) null, null, null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -135,27 +141,29 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
-        usernameTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+        SecurityToken securityToken = new UsernameSecurityToken(
                 "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null));
-        usernameTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+                (WSSecurityContext) null, null, null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        usernameTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
 
         UsernameTokenSecurityEvent recipientTokenSecurityEvent = new UsernameTokenSecurityEvent();
         recipientTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
-        recipientTokenSecurityEvent.setSecurityToken(new UsernameSecurityToken(
+        securityToken = new UsernameSecurityToken(
                 "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null));
-        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+                (WSSecurityContext) null, null, null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();

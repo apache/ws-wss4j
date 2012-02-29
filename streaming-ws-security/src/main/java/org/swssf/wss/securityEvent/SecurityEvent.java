@@ -60,8 +60,4 @@ public abstract class SecurityEvent {
     public Event getSecurityEventType() {
         return securityEventType;
     }
-
-    public void setSecurityEventType(Event securityEventType) {
-        this.securityEventType = securityEventType;
-    }
 }

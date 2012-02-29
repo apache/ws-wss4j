@@ -81,7 +81,7 @@ public class SAMLCallback implements Callback {
      * A list of <code>AuthDecisionStatementBean</code> values
      */
     private List<AuthDecisionStatementBean> authDecisionStatementData;
-    
+
     /**
      * A DOM Element representation of this SAML Assertion
      */
@@ -275,17 +275,19 @@ public class SAMLCallback implements Callback {
     public SAMLVersion getSamlVersion() {
         return samlVersion;
     }
-    
+
     /**
      * Set the DOM representation of this SAML Assertion
+     *
      * @param assertionElement the DOM representation of this SAML Assertion
      */
     public void setAssertionElement(Element assertionElement) {
         this.assertionElement = assertionElement;
     }
-    
+
     /**
      * Get the DOM representation of this SAML Assertion
+     *
      * @return the DOM representation of this SAML Assertion
      */
     public Element getAssertionElement() {

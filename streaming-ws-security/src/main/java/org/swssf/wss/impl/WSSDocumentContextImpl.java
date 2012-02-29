@@ -20,6 +20,7 @@ package org.swssf.wss.impl;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
+import org.swssf.xmlsec.impl.DocumentContextImpl;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import java.util.List;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class WSSDocumentContextImpl extends org.swssf.xmlsec.impl.DocumentContextImpl implements WSSDocumentContext {
+public class WSSDocumentContextImpl extends DocumentContextImpl implements WSSDocumentContext {
 
     public String getSOAPMessageVersionNamespace() {
         if (getPath().size() >= 1 && getPath().get(0).equals(WSSConstants.TAG_soap11_Envelope)) {

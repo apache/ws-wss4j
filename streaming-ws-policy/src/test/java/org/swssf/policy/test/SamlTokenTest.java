@@ -24,7 +24,11 @@ import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
-import org.swssf.wss.securityEvent.*;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
+import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -66,21 +70,23 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         SamlTokenSecurityEvent initiatorTokenSecurityEvent = new SamlTokenSecurityEvent();
-        initiatorTokenSecurityEvent.setSecurityToken(new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null));
-        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        recipientTokenSecurityEvent.setSecurityToken(new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null));
-        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -120,21 +126,23 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         SamlTokenSecurityEvent initiatorTokenSecurityEvent = new SamlTokenSecurityEvent();
-        initiatorTokenSecurityEvent.setSecurityToken(new SAMLSecurityToken(SAMLVersion.VERSION_11, null, "xs:anyURI", null, null, null, "1", null));
-        initiatorTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        recipientTokenSecurityEvent.setSecurityToken(new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null));
-        recipientTokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:otherURI", null, null, null, "1", null);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
-        contentEncryptedElementSecurityEvent.setElement(WSSConstants.TAG_soap11_Body);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();

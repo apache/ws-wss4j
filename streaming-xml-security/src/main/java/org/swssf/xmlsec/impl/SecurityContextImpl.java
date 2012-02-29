@@ -31,7 +31,7 @@ import java.util.*;
  */
 public class SecurityContextImpl implements SecurityContext {
 
-    private Map<String, SecurityTokenProvider> secretTokenProviders = new HashMap<String, SecurityTokenProvider>();
+    private Map<String, SecurityTokenProvider> securityTokenProviders = new HashMap<String, SecurityTokenProvider>();
 
     @SuppressWarnings("unchecked")
     private Map content = Collections.synchronizedMap(new HashMap());
@@ -83,10 +83,10 @@ public class SecurityContextImpl implements SecurityContext {
         if (id == null) {
             throw new IllegalArgumentException("Id must not be null");
         }
-        secretTokenProviders.put(id, securityTokenProvider);
+        securityTokenProviders.put(id, securityTokenProvider);
     }
 
     public SecurityTokenProvider getSecurityTokenProvider(String id) {
-        return secretTokenProviders.get(id);
+        return securityTokenProviders.get(id);
     }
 }

@@ -20,6 +20,7 @@ package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
@@ -27,6 +28,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -47,12 +50,16 @@ public class ContentEncryptedElementsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, true, false);
-        contentEncryptedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
-        contentEncryptedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.add(new QName("http://example.org", "a"));
+        contentEncryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         //additional ContentEncryptedElements are also allowed!
-        contentEncryptedElementSecurityEvent.setElement(new QName("http://example.com", "b"));
+        headerPath = new ArrayList<QName>();
+        headerPath.add(new QName("http://example.org", "b"));
+        contentEncryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -70,10 +77,12 @@ public class ContentEncryptedElementsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, true, false);
-        contentEncryptedElementSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, false, false);
-        contentEncryptedElementSecurityEvent.setElement(new QName("http://example.org", "a"));
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.add(new QName("http://example.org", "a"));
+        contentEncryptedElementSecurityEvent.setElementPath(headerPath);
         try {
             policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
             Assert.fail("Exception expected");

@@ -18,12 +18,14 @@
  */
 package org.swssf.wss.impl;
 
-
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Concrete security context implementation
@@ -33,16 +35,22 @@ import org.swssf.xmlsec.impl.SecurityContextImpl;
  */
 public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
 
-    private SecurityEventListener securityEventListener;
+    private List<SecurityEventListener> securityEventListeners = new LinkedList<SecurityEventListener>();
 
-    public void setSecurityEventListener(SecurityEventListener securityEventListener) {
-        this.securityEventListener = securityEventListener;
+    public void addSecurityEventListener(SecurityEventListener securityEventListener) {
+        if (securityEventListener != null) {
+            this.securityEventListeners.add(securityEventListener);
+        }
     }
 
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-        if (securityEventListener == null) {
-            return;
+        forwardSecurityEvent(securityEvent);
+    }
+
+    protected void forwardSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+        for (int i = 0; i < securityEventListeners.size(); i++) {
+            SecurityEventListener securityEventListener = securityEventListeners.get(i);
+            securityEventListener.registerSecurityEvent(securityEvent);
         }
-        securityEventListener.registerSecurityEvent(securityEvent);
     }
 }

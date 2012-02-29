@@ -36,7 +36,7 @@ public interface WSSecurityContext extends SecurityContext {
      *
      * @param securityEventListener The SecurityEventListener
      */
-    public void setSecurityEventListener(SecurityEventListener securityEventListener);
+    public void addSecurityEventListener(SecurityEventListener securityEventListener);
 
     /**
      * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener

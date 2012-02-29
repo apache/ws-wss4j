@@ -86,12 +86,12 @@ public class SAMLAssertionWrapper {
      * Typed SAML v2.0 assertion
      */
     private org.opensaml.saml2.core.Assertion saml2 = null;
-    
+
     /**
      * The Assertion as a DOM element
      */
     private Element assertionElement;
-    
+
     /**
      * Default Canonicalization algorithm used for signing.
      */
@@ -115,7 +115,7 @@ public class SAMLAssertionWrapper {
      */
     public SAMLAssertionWrapper(Element element) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
-        
+
         parseElement(element);
     }
 
@@ -125,7 +125,7 @@ public class SAMLAssertionWrapper {
      * @param saml2 of type Assertion
      */
     public SAMLAssertionWrapper(org.opensaml.saml2.core.Assertion saml2) throws XMLSecurityException {
-        this((XMLObject)saml2);
+        this((XMLObject) saml2);
     }
 
     /**
@@ -134,9 +134,9 @@ public class SAMLAssertionWrapper {
      * @param saml1 of type Assertion
      */
     public SAMLAssertionWrapper(org.opensaml.saml1.core.Assertion saml1) throws XMLSecurityException {
-        this((XMLObject)saml1);
+        this((XMLObject) saml1);
     }
-    
+
     /**
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
      * This is the primary constructor.  All other constructor calls should
@@ -147,7 +147,7 @@ public class SAMLAssertionWrapper {
      */
     public SAMLAssertionWrapper(XMLObject xmlObject) {
         OpenSAMLUtil.initSamlEngine();
-        
+
         this.xmlObject = xmlObject;
         if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
             this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
@@ -155,8 +155,8 @@ public class SAMLAssertionWrapper {
             this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
         } else {
             logger.error(
-                "AssertionWrapper: found unexpected type " 
-                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
+                    "AssertionWrapper: found unexpected type "
+                            + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
             );
         }
     }
@@ -164,7 +164,7 @@ public class SAMLAssertionWrapper {
 
     public SAMLAssertionWrapper(SAMLCallback samlCallback) throws XMLSecurityException {
         OpenSAMLUtil.initSamlEngine();
-        
+
         if (samlCallback.getAssertionElement() != null) {
             parseElement(samlCallback.getAssertionElement());
         } else {
@@ -236,7 +236,7 @@ public class SAMLAssertionWrapper {
         );
         return null;
     }
-    
+
     /**
      * Method setSignature sets the signature of this AssertionWrapper object.
      *
@@ -255,36 +255,36 @@ public class SAMLAssertionWrapper {
 
     /**
      * Create an enveloped signature on the assertion that has been created.
-     * 
-     * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
+     *
+     * @param issuerKeyName     the Issuer KeyName to use with the issuerCrypto argument
      * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
-     * @param issuerCrypto the Issuer Crypto instance
-     * @param sendKeyValue whether to send the key value or not
+     * @param issuerCrypto      the Issuer Crypto instance
+     * @param sendKeyValue      whether to send the key value or not
      * @throws WSSecurityException
      */
     public void signAssertion(String issuerKeyName, String issuerKeyPassword,
-            Crypto issuerCrypto, boolean sendKeyValue)
+                              Crypto issuerCrypto, boolean sendKeyValue)
             throws XMLSecurityException {
 
         signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto,
                 sendKeyValue, defaultCanonicalizationAlgorithm,
                 defaultRSASignatureAlgorithm);
     }
-    
+
     /**
      * Create an enveloped signature on the assertion that has been created.
-     * 
-     * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
-     * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
-     * @param issuerCrypto the Issuer Crypto instance
-     * @param sendKeyValue whether to send the key value or not
+     *
+     * @param issuerKeyName             the Issuer KeyName to use with the issuerCrypto argument
+     * @param issuerKeyPassword         the Issuer Password to use with the issuerCrypto argument
+     * @param issuerCrypto              the Issuer Crypto instance
+     * @param sendKeyValue              whether to send the key value or not
      * @param canonicalizationAlgorithm the canonicalization algorithm to be used for signing
-     * @param signatureAlgorithm the signature algorithm to be used for signing
+     * @param signatureAlgorithm        the signature algorithm to be used for signing
      * @throws WSSecurityException
      */
     public void signAssertion(String issuerKeyName, String issuerKeyPassword,
-            Crypto issuerCrypto, boolean sendKeyValue,
-            String canonicalizationAlgorithm, String signatureAlgorithm)
+                              Crypto issuerCrypto, boolean sendKeyValue,
+                              String canonicalizationAlgorithm, String signatureAlgorithm)
             throws XMLSecurityException {
         //
         // Create the signature
@@ -344,7 +344,7 @@ public class SAMLAssertionWrapper {
         // add the signature to the assertion
         setSignature(signature);
     }
-    
+
     /**
      * Verify the signature of this assertion
      *
@@ -896,7 +896,7 @@ public class SAMLAssertionWrapper {
     protected boolean validatePublicKey(PublicKey publicKey, Crypto crypto) throws XMLSecurityException {
         return crypto.verifyTrust(publicKey);
     }
-    
+
     /**
      * Parse the DOM Element into Opensaml objects.
      */
@@ -908,22 +908,22 @@ public class SAMLAssertionWrapper {
             this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
         } else {
             logger.error(
-                "AssertionWrapper: found unexpected type " 
-                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
+                    "AssertionWrapper: found unexpected type "
+                            + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
             );
         }
-        
+
         assertionElement = element;
     }
-    
+
     /**
      * Parse a SAMLCallback object to create a SAML Assertion
      */
     private void parseCallback(
-        SAMLCallback samlCallback
+            SAMLCallback samlCallback
     ) throws WSSecurityException, XMLSecurityException {
         SAMLVersion samlVersion = samlCallback.getSamlVersion();
-        
+
         String issuer = samlCallback.getIssuer();
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
@@ -931,33 +931,33 @@ public class SAMLAssertionWrapper {
 
             try {
                 // Process the SAML authentication statement(s)
-                List<AuthenticationStatement> authenticationStatements = 
-                    SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
-                        samlCallback.getAuthenticationStatementData()
-                    );
+                List<AuthenticationStatement> authenticationStatements =
+                        SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
+                                samlCallback.getAuthenticationStatementData()
+                        );
                 saml1.getAuthenticationStatements().addAll(authenticationStatements);
-    
+
                 // Process the SAML attribute statement(s)            
                 List<AttributeStatement> attributeStatements =
                         SAML1ComponentBuilder.createSamlv1AttributeStatement(
-                            samlCallback.getAttributeStatementData()
+                                samlCallback.getAttributeStatementData()
                         );
                 saml1.getAttributeStatements().addAll(attributeStatements);
-    
+
                 // Process the SAML authorization decision statement(s)
                 List<AuthorizationDecisionStatement> authDecisionStatements =
                         SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
-                            samlCallback.getAuthDecisionStatementData()
+                                samlCallback.getAuthDecisionStatementData()
                         );
                 saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
-    
+
                 // Build the complete assertion
-                org.opensaml.saml1.core.Conditions conditions = 
-                    SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
+                org.opensaml.saml1.core.Conditions conditions =
+                        SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
                 saml1.setConditions(conditions);
             } catch (org.opensaml.xml.security.SecurityException ex) {
                 throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
+                        "Error generating KeyInfo from signing credential", ex
                 );
             }
 
@@ -970,41 +970,41 @@ public class SAMLAssertionWrapper {
             Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
 
             // Authn Statement(s)
-            List<AuthnStatement> authnStatements = 
-                SAML2ComponentBuilder.createAuthnStatement(
-                    samlCallback.getAuthenticationStatementData()
-                );
+            List<AuthnStatement> authnStatements =
+                    SAML2ComponentBuilder.createAuthnStatement(
+                            samlCallback.getAuthenticationStatementData()
+                    );
             saml2.getAuthnStatements().addAll(authnStatements);
 
             // Attribute statement(s)
-            List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
-                SAML2ComponentBuilder.createAttributeStatement(
-                    samlCallback.getAttributeStatementData()
-                );
+            List<org.opensaml.saml2.core.AttributeStatement> attributeStatements =
+                    SAML2ComponentBuilder.createAttributeStatement(
+                            samlCallback.getAttributeStatementData()
+                    );
             saml2.getAttributeStatements().addAll(attributeStatements);
 
             // AuthzDecisionStatement(s)
             List<AuthzDecisionStatement> authDecisionStatements =
                     SAML2ComponentBuilder.createAuthorizationDecisionStatement(
-                        samlCallback.getAuthDecisionStatementData()
+                            samlCallback.getAuthDecisionStatementData()
                     );
             saml2.getAuthzDecisionStatements().addAll(authDecisionStatements);
 
             // Build the SAML v2.0 assertion
             saml2.setIssuer(samlIssuer);
-            
+
             try {
-                org.opensaml.saml2.core.Subject subject = 
-                    SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
+                org.opensaml.saml2.core.Subject subject =
+                        SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
                 saml2.setSubject(subject);
             } catch (org.opensaml.xml.security.SecurityException ex) {
                 throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
+                        "Error generating KeyInfo from signing credential", ex
                 );
             }
-            
-            org.opensaml.saml2.core.Conditions conditions = 
-                SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
+
+            org.opensaml.saml2.core.Conditions conditions =
+                    SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
             saml2.setConditions(conditions);
 
             // Set the OpenSaml2 XMLObject instance

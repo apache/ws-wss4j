@@ -26,9 +26,8 @@ import org.swssf.wss.impl.saml.SAMLCallback;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.wss.impl.saml.bean.KeyInfoBean;
 import org.swssf.wss.impl.saml.bean.SubjectBean;
-import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
 import org.w3c.dom.*;
@@ -63,14 +62,14 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             final SAMLCallback samlCallback = new SAMLCallback();
             WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), samlCallback);
             SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlCallback);
-            
+
             // todo support setting signature and c14n algorithms
             if (samlCallback.isSignAssertion()) {
                 samlAssertionWrapper.signAssertion(
-                    samlCallback.getIssuerKeyName(), 
-                    samlCallback.getIssuerKeyPassword(), 
-                    samlCallback.getIssuerCrypto(), 
-                    samlCallback.isSendKeyValue()
+                        samlCallback.getIssuerKeyName(),
+                        samlCallback.getIssuerKeyPassword(),
+                        samlCallback.getIssuerCrypto(),
+                        samlCallback.isSendKeyValue()
                 );
             }
 
@@ -141,34 +140,20 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
             final PrivateKey secretKey = privateKey;
 
-            final SecurityToken securityToken;
+            final AbstractSecurityToken securityToken;
             SecurityTokenProvider securityTokenProvider;
             if (senderVouches) {
-                securityToken = new ProcessorInfoSecurityToken() {
-
-                    private OutputProcessor outputProcessor;
-
-                    public void setProcessor(OutputProcessor outputProcessor) {
-                        this.outputProcessor = outputProcessor;
-                    }
-
-                    public String getId() {
-                        return binarySecurityTokenId;
-                    }
-
-                    public Object getProcessor() {
-                        return outputProcessor;
-                    }
+                securityToken = new AbstractSecurityToken(binarySecurityTokenId) {
 
                     public boolean isAsymmetric() {
                         return true;
                     }
 
-                    public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                         return secretKey;
                     }
 
-                    public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                         return x509Certificates[0].getPublicKey();
                     }
 
@@ -176,14 +161,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return x509Certificates;
                     }
 
-                    public void verify() throws WSSecurityException {
-                    }
-
                     public SecurityToken getKeyWrappingToken() {
-                        return null;
-                    }
-
-                    public String getKeyWrappingTokenAlgorithm() {
                         return null;
                     }
 
@@ -201,10 +179,13 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             if (senderVouches) {
 
                 securityTokenProvider = new SecurityTokenProvider() {
-                    public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+
+                    @Override
+                    public SecurityToken getSecurityToken() throws WSSecurityException {
                         return securityToken;
                     }
 
+                    @Override
                     public String getId() {
                         return binarySecurityTokenId;
                     }
@@ -215,12 +196,22 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, securityTokenReferenceId);
             } else {
                 securityTokenProvider = new SecurityTokenProvider() {
-                    public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
-                        return new SAMLSecurityToken(
+
+                    private SAMLSecurityToken samlSecurityToken;
+
+                    @Override
+                    public SecurityToken getSecurityToken() throws XMLSecurityException {
+                        if (this.samlSecurityToken != null) {
+                            return this.samlSecurityToken;
+                        }
+                        this.samlSecurityToken = new SAMLSecurityToken(
                                 samlCallback.getSamlVersion(), samlKeyInfo, (WSSecurityContext) outputProcessorChain.getSecurityContext(),
-                                crypto, getSecurityProperties().getCallbackHandler(), tokenId, finalSAMLTokenOutputProcessor);
+                                getSecurityProperties().getSignatureCrypto(), getSecurityProperties().getCallbackHandler(), tokenId);
+                        this.samlSecurityToken.setProcessor(finalSAMLTokenOutputProcessor);
+                        return this.samlSecurityToken;
                     }
 
+                    @Override
                     public String getId() {
                         return tokenId;
                     }

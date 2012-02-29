@@ -18,21 +18,15 @@
  */
 package org.swssf.policy.assertionStates;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.swssf.policy.Assertable;
-import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
-import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
-import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
-import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.wss.securityEvent.*;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -41,8 +35,8 @@ import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 
 public class ProtectionOrderAssertionState extends AssertionState implements Assertable {
 
-    private List<QName> signedElements = new ArrayList<QName>();
-    private List<QName> encryptedElements = new ArrayList<QName>();
+    private List<List<QName>> signedElements = new ArrayList<List<QName>>();
+    private List<List<QName>> encryptedElements = new ArrayList<List<QName>>();
 
     public ProtectionOrderAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
@@ -69,40 +63,35 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
                 if (!signedElementSecurityEvent.isSigned()) {
                     return true;
                 }
-                if (!encryptedElements.contains(signedElementSecurityEvent.getElement())) {
-                    signedElements.add(signedElementSecurityEvent.getElement());
+                if (!encryptedElements.contains(signedElementSecurityEvent.getElementPath())) {
+                    signedElements.add(signedElementSecurityEvent.getElementPath());
                 } else {
 
                 }
-                System.out.println("Sig: " + signedElementSecurityEvent.getElement());
                 break;
             case SignedPart:
                 SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
                 if (!signedPartSecurityEvent.isSigned()) {
                     return true;
                 }
-                System.out.println("Sig: " + signedPartSecurityEvent.getElement());
                 break;
             case EncryptedElement:
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
                 if (!encryptedElementSecurityEvent.isEncrypted()) {
                     return true;
                 }
-                System.out.println("Enc: " + encryptedElementSecurityEvent.getElement() + " signed: " + encryptedElementSecurityEvent.isSignedContent());
                 break;
             case EncryptedPart:
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                 if (!encryptedPartSecurityEvent.isEncrypted()) {
                     return true;
                 }
-                System.out.println("Enc: " + encryptedPartSecurityEvent.getElement() + " signed: " + encryptedPartSecurityEvent.isSignedContent());
                 break;
             case ContentEncrypted:
                 ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
                 if (!contentEncryptedElementSecurityEvent.isEncrypted()) {
                     return true;
                 }
-                System.out.println("Enc: " + contentEncryptedElementSecurityEvent.getElement() + " signed: " + contentEncryptedElementSecurityEvent.isSignedContent());
                 break;
         }
 

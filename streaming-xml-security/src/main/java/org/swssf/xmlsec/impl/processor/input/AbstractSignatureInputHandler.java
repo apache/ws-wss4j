@@ -137,7 +137,6 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
     </ds:Signature>
      */
 
-    //todo can this class be made abstract somehow?
     public class SignatureVerifier {
 
         private SignatureType signatureType;
@@ -155,7 +154,7 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
             SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType,
                     securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(),
-                    securityContext, this);
+                    securityContext);
             securityToken.verify();
 
             try {

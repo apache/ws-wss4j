@@ -18,14 +18,14 @@
  */
 package org.swssf.xmlsec.crypto;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.swssf.xmlsec.config.ConfigurationProperties;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.swssf.xmlsec.config.ConfigurationProperties;
 
 public class Merlin extends MerlinBase {
 
@@ -38,7 +38,7 @@ public class Merlin extends MerlinBase {
      */
     public Merlin() {
         super();
-        
+
         if (truststore == null) {
             InputStream cacertsIs = null;
 

@@ -19,15 +19,18 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss10.BinarySecurityTokenType;
+import org.swssf.wss.ext.WSSecurityContext;
+import org.swssf.wss.ext.WSSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
+import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -49,23 +52,32 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             binarySecurityTokenType.setId(UUID.randomUUID().toString());
         }
 
+        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+            private WSSecurityToken binarySecurityToken = null;
 
-            public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
+                if (this.binarySecurityToken != null) {
+                    return this.binarySecurityToken;
                 }
-                securityToken = SecurityTokenFactoryImpl.getSecurityToken(
+                Crypto crypto = null;
+                try {
+                    crypto = securityProperties.getSignatureVerificationCrypto();
+                } catch (XMLSecurityConfigurationException e) {
+                    //ignore
+                }
+                if (crypto == null) {
+                    crypto = securityProperties.getDecryptionCrypto();
+                }
+                this.binarySecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
                         binarySecurityTokenType,
                         inputProcessorChain.getSecurityContext(),
                         crypto,
-                        securityProperties.getCallbackHandler(),
-                        null);
-                securityTokens.put(crypto, securityToken);
-                return securityToken;
+                        securityProperties.getCallbackHandler());
+                this.binarySecurityToken.setElementPath(elementPath);
+                return this.binarySecurityToken;
             }
 
             public String getId() {
@@ -74,5 +86,10 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         };
 
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
+
+        //fire a tokenSecurityEvent
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(x509TokenSecurityEvent);
     }
 }

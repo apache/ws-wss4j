@@ -110,7 +110,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
             //Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");
-            Assert.assertEquals(throwable.getMessage(), "Referenced security token could not be retrieved (Reference \"2\")");
+            Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");
         }
     }
 

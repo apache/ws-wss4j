@@ -26,6 +26,7 @@ import org.swssf.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
+import org.swssf.wss.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
@@ -38,6 +39,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.security.*;
 import java.util.*;
@@ -60,74 +62,21 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
             encryptedKeyType.setId(UUID.randomUUID().toString());
         }
 
+        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private Map<Crypto, SecurityToken> securityTokens = new HashMap<Crypto, SecurityToken>();
+            private WSSecurityToken securityToken = null;
 
-            public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException {
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
 
-                SecurityToken securityToken = securityTokens.get(crypto);
-                if (securityToken != null) {
-                    return securityToken;
+                if (this.securityToken != null) {
+                    return this.securityToken;
                 }
 
-                //decrypt the containing token and register it as a new SecurityToken:
-                String algorithmURI = null;
-                final SecurityToken wrappingSecurityToken;
-                final byte[] secretToken;
-                try {
-                    algorithmURI = encryptedKeyType.getEncryptionMethod().getAlgorithm();
-                    if (algorithmURI == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
-                    }
-                    AlgorithmType asyncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
-                    Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
-
-                    KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
-                    wrappingSecurityToken = SecurityTokenFactoryImpl.newInstance().getSecurityToken(
-                            keyInfoType,
-                            crypto,
-                            securityProperties.getCallbackHandler(),
-                            inputProcessorChain.getSecurityContext(),
-                            this
-                    );
-                    WSSConstants.KeyUsage keyUsage;
-                    if (wrappingSecurityToken.isAsymmetric()) {
-                        keyUsage = WSSConstants.Asym_Key_Wrap;
-                    } else {
-                        keyUsage = WSSConstants.Sym_Key_Wrap;
-                    }
-                    cipher.init(Cipher.DECRYPT_MODE,
-                            wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage)
-                    );
-
-                    secretToken = cipher.doFinal(encryptedKeyType.getCipherData().getCipherValue());
-
-                } catch (NoSuchPaddingException e) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                            e, "No such padding: " + algorithmURI
-                    );
-                } catch (NoSuchAlgorithmException e) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                            e, "No such algorithm: " + algorithmURI
-                    );
-                } catch (BadPaddingException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-                } catch (IllegalBlockSizeException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-                } catch (InvalidKeyException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-                } catch (NoSuchProviderException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
-                }
-
-                final String algorithm = algorithmURI;
-
-                securityToken = new AbstractSecurityToken(
+                this.securityToken = new AbstractSecurityToken(
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(), null, null,
-                        encryptedKeyType.getId(), null, null) {
+                        encryptedKeyType.getId(), null) {
 
                     private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
@@ -140,7 +89,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             return keyTable.get(algorithmURI);
                         } else {
                             String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
-                            Key key = new SecretKeySpec(secretToken, algoFamily);
+                            Key key = new SecretKeySpec(getSecret(securityProperties.getDecryptionCrypto(), this), algoFamily);
                             keyTable.put(algorithmURI, key);
                             return key;
                         }
@@ -151,34 +100,93 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         return null;
                     }
 
-                    public SecurityToken getKeyWrappingToken() {
-                        return wrappingSecurityToken;
-                    }
-
-                    public String getKeyWrappingTokenAlgorithm() {
-                        return algorithm;
+                    public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
+                        return getWrappingSecurityToken(securityProperties.getDecryptionCrypto(), this);
                     }
 
                     public WSSConstants.TokenType getTokenType() {
                         return WSSConstants.EncryptedKeyToken;
                     }
+
+                    private SecurityToken wrappingSecurityToken = null;
+
+                    private SecurityToken getWrappingSecurityToken(Crypto crypto, SecurityToken wrappedSecurityToken) throws XMLSecurityException {
+                        if (wrappingSecurityToken != null) {
+                            return this.wrappingSecurityToken;
+                        }
+                        KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
+                        this.wrappingSecurityToken = SecurityTokenFactoryImpl.newInstance().getSecurityToken(
+                                keyInfoType,
+                                crypto,
+                                securityProperties.getCallbackHandler(),
+                                inputProcessorChain.getSecurityContext()
+                        );
+                        this.wrappingSecurityToken.addWrappedToken(wrappedSecurityToken);
+                        return this.wrappingSecurityToken;
+                    }
+
+                    private byte[] getSecret(Crypto crypto, SecurityToken wrappedSecurityToken) throws XMLSecurityException {
+
+                        String algorithmURI = encryptedKeyType.getEncryptionMethod().getAlgorithm();
+                        if (algorithmURI == null) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
+                        }
+                        AlgorithmType asyncEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
+                        if (asyncEncAlgo == null) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
+                        }
+
+                        final SecurityToken wrappingSecurityToken = getWrappingSecurityToken(crypto, wrappedSecurityToken);
+                        try {
+                            WSSConstants.KeyUsage keyUsage;
+                            if (wrappingSecurityToken.isAsymmetric()) {
+                                keyUsage = WSSConstants.Asym_Key_Wrap;
+                            } else {
+                                keyUsage = WSSConstants.Sym_Key_Wrap;
+                            }
+
+                            Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
+                            cipher.init(Cipher.DECRYPT_MODE, wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage));
+                            return cipher.doFinal(encryptedKeyType.getCipherData().getCipherValue());
+
+                        } catch (NoSuchPaddingException e) {
+                            throw new WSSecurityException(
+                                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                    e, "No such padding: " + algorithmURI
+                            );
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new WSSecurityException(
+                                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                    e, "No such algorithm: " + algorithmURI
+                            );
+                        } catch (BadPaddingException e) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+                        } catch (IllegalBlockSizeException e) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+                        } catch (InvalidKeyException e) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+                        } catch (NoSuchProviderException e) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
+                        }
+                    }
                 };
-                securityTokens.put(crypto, securityToken);
-                return securityToken;
+                this.securityToken.setElementPath(elementPath);
+                return this.securityToken;
             }
 
+            @Override
             public String getId() {
                 return encryptedKeyType.getId();
             }
         };
 
-        final SecurityToken securityToken = securityTokenProvider.getSecurityToken(securityProperties.getDecryptionCrypto());
-        //fire a securityTokenEvent
-        TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(tokenSecurityEvent);
-
         //register the key token for decryption:
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(encryptedKeyType.getId(), securityTokenProvider);
+
+        //fire a tokenSecurityEvent
+        TokenSecurityEvent tokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
+        tokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(tokenSecurityEvent);
 
         //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
         //and add it to the chain

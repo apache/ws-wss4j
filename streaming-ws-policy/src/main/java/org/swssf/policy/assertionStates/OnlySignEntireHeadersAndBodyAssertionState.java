@@ -23,8 +23,8 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
-import org.swssf.policy.PolicyConstants;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 
@@ -54,14 +54,13 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
             return true;
         }
         if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()
-                && (signedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap11_Body)
-                || signedPartSecurityEvent.getElement().equals(PolicyConstants.TAG_soap12_Body))) {
+                && WSSUtils.pathMatches(signedPartSecurityEvent.getElementPath(), WSSConstants.SOAP_11_BODY_PATH, true, false)) {
             if (signedPartSecurityEvent.isSigned()) {
                 setAsserted(true);
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + signedPartSecurityEvent.getElement() + " must be signed");
+                setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
                 return false;
             }
         }
@@ -72,12 +71,12 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
                     //for a rewriting attack! If the Security Header is not signed then all child
                     //elements must be signed!
                     // @see http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.3/os/ws-securitypolicy-1.3-spec-os.html#_Toc212617840
-                    || signedPartSecurityEvent.getElement().equals(WSSConstants.TAG_wsse_Security)) {
+                    || WSSUtils.pathMatches(signedPartSecurityEvent.getElementPath(), WSSConstants.WSSE_SECURITY_HEADER_PATH, true, false)) {
                 setAsserted(true);
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + signedPartSecurityEvent.getElement() + " must be signed");
+                setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
                 return false;
             }
         }

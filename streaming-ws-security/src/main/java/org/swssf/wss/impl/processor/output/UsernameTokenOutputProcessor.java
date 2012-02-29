@@ -21,7 +21,6 @@ package org.swssf.wss.impl.processor.output;
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -74,15 +73,18 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                             nonceValue,
                             null,
                             null,
-                            wsuId,
-                            outputProcessor
+                            wsuId
                     );
+            usernameSecurityToken.setProcessor(outputProcessor);
 
             SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
-                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+
+                @Override
+                public SecurityToken getSecurityToken() throws WSSecurityException {
                     return usernameSecurityToken;
                 }
 
+                @Override
                 public String getId() {
                     return wsuId;
                 }

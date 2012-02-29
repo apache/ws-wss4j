@@ -22,13 +22,14 @@ import org.swssf.policy.PolicyEnforcer;
 import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.X509SecurityToken;
 import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -51,23 +52,36 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+
+        x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -75,7 +89,7 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -92,16 +106,17 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+
+        x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
@@ -167,19 +182,24 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+
+        x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -207,25 +227,34 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken(new X509SecurityToken(WSSConstants.X509V3Token, null, null, null, "1", null, null) {
-            @Override
-            protected String getAlias() throws XMLSecurityException {
-                return null;
-            }
-        });
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Signature);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
-        x509TokenSecurityEvent.setTokenUsage(TokenSecurityEvent.TokenUsage.Encryption);
+
+        x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
+
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_dsig_Signature);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
+
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, false);
-        encryptedElementSecurityEvent.setElement(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
-        signedPartSecurityEvent.setElement(WSSConstants.TAG_soap12_Body);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();

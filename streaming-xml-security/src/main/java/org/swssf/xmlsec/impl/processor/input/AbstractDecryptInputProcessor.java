@@ -228,7 +228,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                     //retrieve the securityToken which must be used for decryption
                     SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(
                             keyInfoType, getSecurityProperties().getDecryptionCrypto(),
-                            getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext(), this);
+                            getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
 
                     handleSecurityToken(securityToken, inputProcessorChain.getSecurityContext(), encryptedDataType);
                     //only fire here ContentEncryptedElementEvents

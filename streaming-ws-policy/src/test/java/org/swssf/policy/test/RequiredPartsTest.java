@@ -20,12 +20,15 @@ package org.swssf.policy.test;
 
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.policy.PolicyEnforcer;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.RequiredPartSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -48,12 +51,18 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         RequiredPartSecurityEvent RequiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        RequiredPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+        RequiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
-        RequiredPartSecurityEvent.setElement(new QName("http://example.org", "a"));
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+        headerPath.add(new QName("http://example.org", "a"));
+        RequiredPartSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
         //additional encryptedParts are also allowed!
-        RequiredPartSecurityEvent.setElement(new QName("http://example.com", "b"));
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+        headerPath.add(new QName("http://example.org", "b"));
+        RequiredPartSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -71,7 +80,7 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         RequiredPartSecurityEvent RequiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        RequiredPartSecurityEvent.setElement(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+        RequiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
         try {
             policyEnforcer.doFinal();

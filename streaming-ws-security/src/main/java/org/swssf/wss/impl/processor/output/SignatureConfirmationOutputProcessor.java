@@ -65,11 +65,11 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                     SecurityEvent securityEvent = requestSecurityEvents.get(i);
                     if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureValue) {
                         aSignatureFound = true;
-                        SignatureValueSecurityEvent signatureTokenSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
+                        SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 
                         Map<QName, String> attributes = new HashMap<QName, String>();
                         attributes.put(WSSConstants.ATT_wsu_Id, "SigConf-" + UUID.randomUUID().toString());
-                        attributes.put(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureTokenSecurityEvent.getSignatureValue()));
+                        attributes.put(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue()));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
                     }

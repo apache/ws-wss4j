@@ -25,7 +25,7 @@ import org.joda.time.DateTime;
 /**
  * Class ConditionsBean represents a SAML Conditions object (can be used to create
  * both SAML v1.1 and v2.0 statements)
- *
+ * <p/>
  * Created on May 20, 2009
  */
 public class ConditionsBean {
@@ -44,27 +44,27 @@ public class ConditionsBean {
      * Constructor ConditionsBean creates a new ConditionsBean instance.
      *
      * @param notBefore The notBefore instance
-     * @param notAfter The notAfter instance
+     * @param notAfter  The notAfter instance
      */
     public ConditionsBean(
-        DateTime notBefore, 
-        DateTime notAfter
+            DateTime notBefore,
+            DateTime notAfter
     ) {
         this.notBefore = notBefore;
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
      *
      * @param tokenPeriodMinutes how long the token is valid for in minutes
      */
     public ConditionsBean(
-        int tokenPeriodMinutes
+            int tokenPeriodMinutes
     ) {
         this.tokenPeriodMinutes = tokenPeriodMinutes;
     }
-    
+
     /**
      * Get the notBefore instance
      *
@@ -82,7 +82,7 @@ public class ConditionsBean {
     public void setNotBefore(DateTime notBefore) {
         this.notBefore = notBefore;
     }
-    
+
     /**
      * Get the notAfter instance
      *
@@ -100,7 +100,7 @@ public class ConditionsBean {
     public void setNotAfter(DateTime notAfter) {
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Get the tokenPeriodMinutes of this object.
      *
@@ -118,7 +118,7 @@ public class ConditionsBean {
     public void setTokenPeriodMinutes(int tokenPeriodMinutes) {
         this.tokenPeriodMinutes = tokenPeriodMinutes;
     }
-    
+
     /**
      * Get the audienceURI instance
      *
@@ -151,23 +151,23 @@ public class ConditionsBean {
         ConditionsBean that = (ConditionsBean) o;
 
         if (tokenPeriodMinutes != that.tokenPeriodMinutes) return false;
-        
+
         if (notBefore == null && that.notBefore != null) {
             return false;
         } else if (notBefore != null && !notBefore.equals(that.notBefore)) {
             return false;
         }
-        
+
         if (notAfter == null && that.notAfter != null) {
             return false;
         } else if (notAfter != null && !notAfter.equals(that.notAfter)) {
-            return false; 
+            return false;
         }
-        
+
         if (audienceURI == null && that.audienceURI != null) {
             return false;
         } else if (audienceURI != null && !audienceURI.equals(that.audienceURI)) {
-            return false; 
+            return false;
         }
 
         return true;

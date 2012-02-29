@@ -139,7 +139,6 @@ public class Canonicalizer11Test {
      */
     @Test
     public void test34subtree() throws Exception {
-        //todo enable validation
 
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_input_validatingParser.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/34_c14n_validatingParser.xml");
@@ -154,7 +153,6 @@ public class Canonicalizer11Test {
      */
     @Test
     public void test35subtree() throws Exception {
-        //todo enable validation
 
         URL fileIn = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_input.xml");
         URL fileRef = this.getClass().getClassLoader().getResource("testdata/c14n/in/35_c14n.xml");

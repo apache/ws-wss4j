@@ -28,17 +28,17 @@ import java.util.List;
  */
 public interface SecurityContext {
 
-    public <T> void put(String key, T value);
+    <T> void put(String key, T value);
 
-    public <T> T get(String key);
+    <T> T get(String key);
 
-    public <T> T remove(String key);
+    <T> T remove(String key);
 
-    public <T extends List> void putList(Class key, T value);
+    <T extends List> void putList(Class key, T value);
 
-    public <T> void putAsList(Class key, T value);
+    <T> void putAsList(Class key, T value);
 
-    public <T> List<T> getAsList(Class key);
+    <T> List<T> getAsList(Class key);
 
     /**
      * Register a new SecurityTokenProvider.
@@ -46,7 +46,7 @@ public interface SecurityContext {
      * @param id                    A unique id
      * @param securityTokenProvider The actual SecurityTokenProvider to register.
      */
-    public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider);
+    void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider);
 
     /**
      * Returns a registered SecurityTokenProvider with the given id or null if not found
@@ -54,6 +54,5 @@ public interface SecurityContext {
      * @param id The SecurityTokenProvider's id
      * @return The SecurityTokenProvider
      */
-    public SecurityTokenProvider getSecurityTokenProvider(String id);
-
+    SecurityTokenProvider getSecurityTokenProvider(String id);
 }

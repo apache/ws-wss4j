@@ -25,8 +25,10 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.HttpsSecurityToken;
 import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.test.CallbackHandlerImpl;
 import org.swssf.xmlsec.ext.SecurePart;
+import org.swssf.xmlsec.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -37,12 +39,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
+
+    //todo revisit _ALL_ policy tests an check for violated policy message in exception
 
     @Test
     public void testIncludeTimestampPolicy() throws Exception {
@@ -122,10 +128,14 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -218,11 +228,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -332,10 +346,14 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -439,11 +457,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -546,10 +568,14 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -602,7 +628,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
                         "                </sp:SignedParts>\n" +
                         "                <sp:SignedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                    <sp:XPath xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                        "                       xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
+                        "                       xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+                        "                       /soap:Envelope/soap:Header/wsse:Security/wsu:Timestamp/wsu:Created" +
+                        "                    </sp:XPath>\n" +
                         "                </sp:SignedElements>\n" +
                         "                <sp:EncryptedParts>\n" +
                         "                    <sp:Body/>\n" +
@@ -610,10 +640,18 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
                         "                </sp:EncryptedParts>\n" +
                         "                <sp:EncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                    <sp:XPath xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                        "                       xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
+                        "                       xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+                        "                       /soap:Envelope/soap:Header/wsse:Security/wsu:Timestamp/wsu:Created" +
+                        "                    </sp:XPath>\n" +
                         "                </sp:EncryptedElements>\n" +
                         "                <sp:ContentEncryptedElements>\n" +
-                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                    <sp:XPath xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+                        "                       xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
+                        "                       xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+                        "                       /soap:Envelope/soap:Header/wsse:Security/wsu:Timestamp/wsu:Expires" +
+                        "                    </sp:XPath>\n" +
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
@@ -658,10 +696,14 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "CN=transmitter,OU=swssf,C=CH", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "CN=transmitter,OU=swssf,C=CH", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
+
+        Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
         //read the whole stream:
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -770,11 +812,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("CN=example,OU=swssf,C=CH");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "CN=example,OU=swssf,C=CH", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "CN=example,OU=swssf,C=CH", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -879,11 +925,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -904,7 +954,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
     }
 
     @Test
-    public void testC14NAlgorithmSuiteNegative() throws Exception {
+    public void atestC14NAlgorithmSuiteNegative() throws Exception {
 
         String policyString =
                 "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
@@ -988,11 +1038,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -1097,11 +1151,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -1206,11 +1264,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -1314,11 +1376,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
-        httpsTokenSecurityEvent.setSecurityToken(new HttpsSecurityToken(true, "transmitter", null));
-        policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
+        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
             Transformer transformer = TransformerFactory.newInstance().newTransformer();

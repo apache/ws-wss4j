@@ -24,7 +24,6 @@ import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertPath;
@@ -44,9 +43,9 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
     private X509Certificate[] x509Certificates;
 
     X509PKIPathv1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                               byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) throws XMLSecurityException {
-        super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
-        
+                               byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
+        super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
+
         InputStream in = new ByteArrayInputStream(binaryContent);
         try {
             CertPath certPath = getCrypto().getCertificateFactory().generateCertPath(in);

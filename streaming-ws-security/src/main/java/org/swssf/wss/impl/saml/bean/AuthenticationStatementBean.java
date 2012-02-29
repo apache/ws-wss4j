@@ -25,7 +25,7 @@ import org.joda.time.DateTime;
 /**
  * Class AuthenticationStatementBean represents the raw data required to create
  * a SAML v1.1 or v2.0 authentication statement.
- *
+ * <p/>
  * Created on May 20, 2009
  */
 public class AuthenticationStatementBean {
@@ -43,15 +43,15 @@ public class AuthenticationStatementBean {
 
     /**
      * Construct a new AuthenticationStatementBean
-     * 
-     * @param subject the Subject to set 
-     * @param authenticationMethod the Authentication Method to set
+     *
+     * @param subject               the Subject to set
+     * @param authenticationMethod  the Authentication Method to set
      * @param authenticationInstant the Authentication Instant to set
      */
     public AuthenticationStatementBean(
-        SubjectBean subject, 
-        String authenticationMethod,
-        DateTime authenticationInstant
+            SubjectBean subject,
+            String authenticationMethod,
+            DateTime authenticationInstant
     ) {
         this.subject = subject;
         this.authenticationMethod = authenticationMethod;
@@ -60,6 +60,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Get the Subject
+     *
      * @return the subject
      */
     public SubjectBean getSubject() {
@@ -68,6 +69,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Set the subject
+     *
      * @param subject the SubjectBean instance to set
      */
     public void setSubject(SubjectBean subject) {
@@ -76,6 +78,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Get the authentication method
+     *
      * @return the authentication method
      */
     public String getAuthenticationMethod() {
@@ -84,6 +87,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Set the authentication method
+     *
      * @param authenticationMethod the authentication method
      */
     public void setAuthenticationMethod(String authenticationMethod) {
@@ -92,6 +96,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Get the authentication instant
+     *
      * @return the authentication instant
      */
     public DateTime getAuthenticationInstant() {
@@ -100,15 +105,16 @@ public class AuthenticationStatementBean {
 
     /**
      * Set the authentication instant
+     *
      * @param authenticationInstant the authentication instant
      */
     public void setAuthenticationInstant(DateTime authenticationInstant) {
         this.authenticationInstant = authenticationInstant;
     }
-    
+
     /**
      * Get Subject Locality.
-     * 
+     *
      * @return the subjectLocality
      */
     public final SubjectLocalityBean getSubjectLocality() {
@@ -117,16 +123,16 @@ public class AuthenticationStatementBean {
 
     /**
      * Set Subject Locality.
-     * 
+     *
      * @param subjectLocality the subjectLocality to set
      */
     public final void setSubjectLocality(final SubjectLocalityBean subjectLocality) {
         this.subjectLocality = subjectLocality;
     }
-    
+
     /**
      * Get the session index.
-     * 
+     *
      * @return the sessionIndex
      */
     public final String getSessionIndex() {
@@ -135,7 +141,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Set the session index.
-     * 
+     *
      * @param sessionIndex the sessionIndex to set
      */
     public final void setSessionIndex(final String sessionIndex) {
@@ -151,25 +157,25 @@ public class AuthenticationStatementBean {
 
         if (authenticationInstant == null && that.authenticationInstant != null) {
             return false;
-        } else if (authenticationInstant != null 
-            && !authenticationInstant.equals(that.authenticationInstant)) {
+        } else if (authenticationInstant != null
+                && !authenticationInstant.equals(that.authenticationInstant)) {
             return false;
         }
-        
+
         if (authenticationMethod == null && that.authenticationMethod != null) {
             return false;
-        } else if (authenticationMethod != null 
-            && !authenticationMethod.equals(that.authenticationMethod)) {
+        } else if (authenticationMethod != null
+                && !authenticationMethod.equals(that.authenticationMethod)) {
             return false;
         }
-        
+
         if (subject == null && that.subject != null) {
             return false;
-        } else if (subject != null 
-            && !subject.equals(that.subject)) {
+        } else if (subject != null
+                && !subject.equals(that.subject)) {
             return false;
         }
-        
+
         if (subjectLocality == null && that.subjectLocality != null) {
             return false;
         } else if (subjectLocality != null && !subjectLocality.equals(that.subjectLocality)) {

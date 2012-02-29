@@ -19,8 +19,6 @@
 
 package org.swssf.wss.impl.saml;
 
-import javax.xml.namespace.QName;
-
 import org.opensaml.xml.*;
 import org.opensaml.xml.io.*;
 import org.opensaml.xml.signature.Signature;
@@ -31,14 +29,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
+import javax.xml.namespace.QName;
+
 /**
  * Class OpenSAMLUtil provides static helper methods for the OpenSaml library
  * <p/>
  * Created on May 18, 2009
  */
 public class OpenSAMLUtil {
-    private static final org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
+    private static final org.apache.commons.logging.Log log =
+            org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
 
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;
@@ -64,8 +64,8 @@ public class OpenSAMLUtil {
                 }
             } catch (ConfigurationException e) {
                 log.error(
-                    "Unable to bootstrap the opensaml2 library - all SAML operations will fail", 
-                    e
+                        "Unable to bootstrap the opensaml2 library - all SAML operations will fail",
+                        e
                 );
             }
         }
@@ -91,14 +91,14 @@ public class OpenSAMLUtil {
      * Convert a SAML Assertion from a XMLObject to a DOM Element
      *
      * @param xmlObject of type XMLObject
-     * @param doc  of type Document
+     * @param doc       of type Document
      * @return Element
      * @throws MarshallingException
      * @throws SignatureException
      */
     public static Element toDom(
-        XMLObject xmlObject, 
-        Document doc
+            XMLObject xmlObject,
+            Document doc
     ) throws WSSecurityException {
         Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
         Element element = null;
@@ -114,15 +114,15 @@ public class OpenSAMLUtil {
                     element = marshaller.marshall(xmlObject);
                 } else {
                     element = marshaller.marshall(xmlObject, doc);
-                } 
+                }
             } catch (MarshallingException ex) {
                 throw new WSSecurityException("Error marshalling a SAML assertion", ex);
             }
-    
+
             // Sign the assertion if the signature element is present.
             if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
-                org.opensaml.saml2.core.Assertion saml2 = 
-                    (org.opensaml.saml2.core.Assertion) xmlObject;
+                org.opensaml.saml2.core.Assertion saml2 =
+                        (org.opensaml.saml2.core.Assertion) xmlObject;
                 // if there is a signature, but it hasn't already been signed
                 if (saml2.getSignature() != null) {
                     if (log.isDebugEnabled()) {
@@ -135,8 +135,8 @@ public class OpenSAMLUtil {
                     }
                 }
             } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
-                org.opensaml.saml1.core.Assertion saml1 = 
-                    (org.opensaml.saml1.core.Assertion) xmlObject;
+                org.opensaml.saml1.core.Assertion saml1 =
+                        (org.opensaml.saml1.core.Assertion) xmlObject;
                 // if there is a signature, but it hasn't already been signed
                 if (saml1.getSignature() != null) {
                     if (log.isDebugEnabled()) {
@@ -159,7 +159,7 @@ public class OpenSAMLUtil {
         }
         return element;
     }
-    
+
     /**
      * Method buildSignature ...
      *
@@ -171,17 +171,17 @@ public class OpenSAMLUtil {
         XMLObjectBuilder<Signature> builder = builderFactory.getBuilder(qName);
         if (builder == null) {
             log.error(
-                "Unable to retrieve builder for object QName " 
-                + qName
+                    "Unable to retrieve builder for object QName "
+                            + qName
             );
             return null;
         }
-        return 
-            (Signature)builder.buildObject(
-                 qName.getNamespaceURI(), qName.getLocalPart(), qName.getPrefix()
-             );
+        return
+                (Signature) builder.buildObject(
+                        qName.getNamespaceURI(), qName.getLocalPart(), qName.getPrefix()
+                );
     }
-    
+
     /**
      * Method isMethodSenderVouches ...
      *
@@ -189,11 +189,11 @@ public class OpenSAMLUtil {
      * @return boolean
      */
     public static boolean isMethodSenderVouches(String confirmMethod) {
-        return 
-            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
-                && confirmMethod.endsWith(":cm:sender-vouches");
+        return
+                confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:")
+                        && confirmMethod.endsWith(":cm:sender-vouches");
     }
-    
+
     /**
      * Method isMethodHolderOfKey ...
      *
@@ -201,9 +201,9 @@ public class OpenSAMLUtil {
      * @return boolean
      */
     public static boolean isMethodHolderOfKey(String confirmMethod) {
-        return 
-            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
-                && confirmMethod.endsWith(":cm:holder-of-key");
+        return
+                confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:")
+                        && confirmMethod.endsWith(":cm:holder-of-key");
     }
 
 }

@@ -18,8 +18,6 @@
  */
 package org.swssf.xmlsec.ext;
 
-import org.swssf.xmlsec.crypto.Crypto;
-
 /**
  * A SecurityTokenProvider is a object which provides a Token for cryptographic operations
  *
@@ -31,11 +29,10 @@ public interface SecurityTokenProvider {
     /**
      * Returns the represented SecurityToken of this object
      *
-     * @param crypto The Crypto to use to restore the Token
      * @return The SecurityToken
      * @throws XMLSecurityException if the token couldn't be loaded
      */
-    public SecurityToken getSecurityToken(Crypto crypto) throws XMLSecurityException;
+    public SecurityToken getSecurityToken() throws XMLSecurityException;
 
     public String getId();
 }

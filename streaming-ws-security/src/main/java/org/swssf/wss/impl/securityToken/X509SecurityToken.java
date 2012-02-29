@@ -45,8 +45,8 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
 
     protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
                                 Crypto crypto, CallbackHandler callbackHandler, String id,
-                                WSSConstants.KeyIdentifierType keyIdentifierType, Object processor) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, processor);
+                                WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.tokenType = tokenType;
     }
 
@@ -98,11 +98,6 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
 
     @Override
     public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
-    @Override
-    public String getKeyWrappingTokenAlgorithm() {
         return null;
     }
 

@@ -19,10 +19,9 @@
 package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.*;
-import org.swssf.wss.impl.securityToken.ProcessorInfoSecurityToken;
+import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
-import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
 
@@ -74,7 +73,10 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             } else if (action.equals(WSSConstants.ENCRYPT) ||
                     action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
                 X509Certificate x509Certificate = getReqSigCert(outputProcessorChain.getSecurityContext());
-                if (x509Certificate != null && ((WSSSecurityProperties) getSecurityProperties()).isUseReqSigCertForEncryption()) {
+                if (((WSSSecurityProperties) getSecurityProperties()).isUseReqSigCertForEncryption()) {
+                    if (x509Certificate == null) {
+                        throw new WSSecurityException("noCert");
+                    }
                     x509Certificates = new X509Certificate[1];
                     x509Certificates[0] = x509Certificate;
                 } else if (getSecurityProperties().getEncryptionUseThisCertificate() != null) {
@@ -95,59 +97,48 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 key = null;
             }
 
-            final ProcessorInfoSecurityToken binarySecurityToken = new ProcessorInfoSecurityToken() {
+            //todo use the abstractSecurityToken class and make setProcessor method?
+            final AbstractSecurityToken binarySecurityToken = new AbstractSecurityToken(bstId) {
 
-                private OutputProcessor outputProcessor;
-
-                public String getId() {
-                    return bstId;
-                }
-
-                public void setProcessor(OutputProcessor outputProcessor) {
-                    this.outputProcessor = outputProcessor;
-                }
-
-                public Object getProcessor() {
-                    return outputProcessor;
-                }
-
+                @Override
                 public boolean isAsymmetric() {
                     return true;
                 }
 
-                public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                @Override
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                     return key;
                 }
 
-                public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                @Override
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
                     return x509Certificates[0].getPublicKey();
                 }
 
+                @Override
                 public X509Certificate[] getX509Certificates() throws WSSecurityException {
                     return x509Certificates;
                 }
 
-                public void verify() throws WSSecurityException {
-                }
-
+                @Override
                 public SecurityToken getKeyWrappingToken() {
                     return null;
                 }
 
-                public String getKeyWrappingTokenAlgorithm() {
-                    return null;
-                }
-
+                @Override
                 public WSSConstants.TokenType getTokenType() {
                     return null;
                 }
             };
 
             final SecurityTokenProvider binarySecurityTokenProvider = new SecurityTokenProvider() {
-                public SecurityToken getSecurityToken(Crypto crypto) throws WSSecurityException {
+
+                @Override
+                public SecurityToken getSecurityToken() throws WSSecurityException {
                     return binarySecurityToken;
                 }
 
+                @Override
                 public String getId() {
                     return bstId;
                 }
@@ -204,7 +195,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 SecurityEvent securityEvent = securityEventList.get(i);
                 if (securityEvent instanceof TokenSecurityEvent) {
                     TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
-                    if (tokenSecurityEvent.getTokenUsage() != TokenSecurityEvent.TokenUsage.Signature) {
+                    if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature)) {
                         continue;
                     }
                     X509Certificate[] x509Certificates = tokenSecurityEvent.getSecurityToken().getX509Certificates();
