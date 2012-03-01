@@ -5,6 +5,31 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.5
+=============
+
+Bug
+
+    [WSS-316] - Tests failing with: The signature or decryption was invalid
+    [WSS-331] - Insufficient checking of SAML Condition NotBefore/NotOnOrAfter validation dates (?)
+    [WSS-333] - MerlinDevice tries to load truststore of type "trustStorePassword"
+    [WSS-335] - SAML NotOnOrAfter Conditions not set correctly in certain circumstances
+    [WSS-341] - the "FIRST step" check in SignatureTrustValidator.verifyTrustInCert ignore the enableRevocation status
+
+Improvement
+
+    [WSS-187] - Support Nonce Caching in Username Token Processing
+    [WSS-325] - Add support for GCM algorithms via BouncyCastle
+    [WSS-326] - Upgrade to Santuario 1.5.0
+    [WSS-329] - Support validating Conditions in the SAMLAssertionValidator.
+    [WSS-332] - Make Spnego Client and Service Actions pluggable
+    [WSS-337] - Validate SAML Assertions against schema/specs
+    [WSS-340] - support Certificates revocation check before encrypt on sender side
+
+New Feature
+
+    [WSS-336] - Option for checking EncryptedData elements are covered by signature
+
 Release 1.6.4
 =============
 
