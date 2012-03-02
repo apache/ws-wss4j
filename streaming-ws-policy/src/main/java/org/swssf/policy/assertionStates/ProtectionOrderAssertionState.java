@@ -21,11 +21,13 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
+import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.*;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,9 +36,6 @@ import java.util.List;
  */
 
 public class ProtectionOrderAssertionState extends AssertionState implements Assertable {
-
-    private List<List<QName>> signedElements = new ArrayList<List<QName>>();
-    private List<List<QName>> encryptedElements = new ArrayList<List<QName>>();
 
     public ProtectionOrderAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
@@ -55,65 +54,77 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
-        // AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
-        setAsserted(true);
+        AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
         switch (securityEvent.getSecurityEventType()) {
-            case SignedElement:
+            case SignedElement: {
                 SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
                 if (!signedElementSecurityEvent.isSigned()) {
                     return true;
                 }
-                if (!encryptedElements.contains(signedElementSecurityEvent.getElementPath())) {
-                    signedElements.add(signedElementSecurityEvent.getElementPath());
-                } else {
-
-                }
+                List<XMLSecurityConstants.ContentType> contentTypes = signedElementSecurityEvent.getProtectionOrder();
+                testProtectionOrder(protectionOrder, contentTypes, signedElementSecurityEvent.getElementPath());
                 break;
-            case SignedPart:
+            }
+            case SignedPart: {
                 SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
                 if (!signedPartSecurityEvent.isSigned()) {
                     return true;
                 }
+                List<XMLSecurityConstants.ContentType> contentTypes = signedPartSecurityEvent.getProtectionOrder();
+                testProtectionOrder(protectionOrder, contentTypes, signedPartSecurityEvent.getElementPath());
                 break;
-            case EncryptedElement:
+            }
+            case EncryptedElement: {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
                 if (!encryptedElementSecurityEvent.isEncrypted()) {
                     return true;
                 }
+                List<XMLSecurityConstants.ContentType> contentTypes = encryptedElementSecurityEvent.getProtectionOrder();
+                testProtectionOrder(protectionOrder, contentTypes, encryptedElementSecurityEvent.getElementPath());
                 break;
-            case EncryptedPart:
+            }
+            case EncryptedPart: {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                 if (!encryptedPartSecurityEvent.isEncrypted()) {
                     return true;
                 }
+                List<XMLSecurityConstants.ContentType> contentTypes = encryptedPartSecurityEvent.getProtectionOrder();
+                testProtectionOrder(protectionOrder, contentTypes, encryptedPartSecurityEvent.getElementPath());
                 break;
-            case ContentEncrypted:
+            }
+            case ContentEncrypted: {
                 ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
                 if (!contentEncryptedElementSecurityEvent.isEncrypted()) {
                     return true;
                 }
+                List<XMLSecurityConstants.ContentType> contentTypes = contentEncryptedElementSecurityEvent.getProtectionOrder();
+                testProtectionOrder(protectionOrder, contentTypes, contentEncryptedElementSecurityEvent.getElementPath());
                 break;
-        }
-
-
-/*
-        if (firstEvent) {
-            firstEvent = false;
-            //we have to invert the logic. When SignBeforeEncrypt is set then the Encryption token appears as first
-            //in contrary if EncryptBeforeSign is set then the SignatureToken appears as first. So...:
-            if (protectionOrder.equals(AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting)
-                    && (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Signature ||
-                        tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.MainSignature)) {
-                //setAsserted(false);
-                setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.SignBeforeEncrypting + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
-            } else if (protectionOrder.equals(AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning)
-                    && (tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.Encryption ||
-                        tokenSecurityEvent.getTokenUsage() == TokenSecurityEvent.TokenUsage.MainEncryption)) {
-                //setAsserted(false);
-                setErrorMessage("ProtectionOrder is " + AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning + " but we got " + tokenSecurityEvent.getTokenUsage() + " first");
             }
         }
-*/
         return isAsserted();
+    }
+
+    private void testProtectionOrder(AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder, List<XMLSecurityConstants.ContentType> contentTypes, List<QName> elementPath) {
+        switch (protectionOrder) {
+            case SignBeforeEncrypting: {
+                int lastSignature = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.SIGNATURE);
+                int firstEncryption = contentTypes.indexOf(XMLSecurityConstants.ContentType.ENCRYPTION);
+                if (firstEncryption >= 0 && firstEncryption < lastSignature) {
+                    setAsserted(false);
+                    setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was encrypted and then signed");
+                }
+                break;
+            }
+            case EncryptBeforeSigning: {
+                int lastEncytpion = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.ENCRYPTION);
+                int firstSignature = contentTypes.indexOf(XMLSecurityConstants.ContentType.SIGNATURE);
+                if (firstSignature >= 0 && firstSignature < lastEncytpion) {
+                    setAsserted(false);
+                    setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was encrypted and then signed");
+                }
+                break;
+            }
+        }
     }
 }

@@ -61,12 +61,12 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
             //soap:body content encryption counts as EncryptedPart
             EncryptedPartSecurityEvent encryptedPartSecurityEvent =
-                    new EncryptedPartSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
+                    new EncryptedPartSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
             encryptedPartSecurityEvent.setElementPath(parentElementPath);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
         } else {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
-                    new ContentEncryptedElementSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
+                    new ContentEncryptedElementSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
             contentEncryptedElementSecurityEvent.setElementPath(parentElementPath);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
@@ -83,7 +83,6 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 securityToken);
     }
 
-    //todo remove me?
     @Override
     protected void handleSecurityToken(SecurityToken securityToken, SecurityContext securityContext,
                                        EncryptedDataType encryptedDataType) throws XMLSecurityException {
@@ -129,22 +128,15 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                     && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent =
-                        new EncryptedPartSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
+                        new EncryptedPartSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                 encryptedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
             } else {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent =
-                        new EncryptedElementSecurityEvent(securityToken, true, isInSignedContent(inputProcessorChain));
+                        new EncryptedElementSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                 encryptedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedElementSecurityEvent);
             }
         }
-    }
-
-    public static boolean isInSignedContent(InputProcessorChain inputProcessorChain) {
-        //todo. Also todo: ProtectionOrderAssertionState
-        //how can we find out if a signature is done over plaintext or over ciphertext.
-        //problem contentEncryptedElements, the signature occurs always firstly...
-        return false;
     }
 }

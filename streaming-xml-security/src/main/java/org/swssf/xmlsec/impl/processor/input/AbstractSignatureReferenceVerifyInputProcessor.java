@@ -97,7 +97,8 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
                     inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                 }
                 processedReferences.add(referenceType);
-                inputProcessorChain.getDocumentContext().setIsInSignedContent();
+                inputProcessorChain.getDocumentContext().setIsInSignedContent(
+                        inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
             }
         }
         return xmlEvent;
@@ -132,7 +133,6 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
     public class InternalSignatureReferenceVerifier extends AbstractInputProcessor {
         private ReferenceType referenceType;
-
         private Transformer transformer;
         private DigestOutputStream digestOutputStream;
         private OutputStream bufferedDigestOutputStream;
@@ -140,7 +140,10 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
         private int elementCounter = 0;
         private boolean finished = false;
 
-        public InternalSignatureReferenceVerifier(XMLSecurityProperties securityProperties, InputProcessorChain inputProcessorChain, ReferenceType referenceType, QName startElement) throws XMLSecurityException {
+        public InternalSignatureReferenceVerifier(
+                XMLSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
+                ReferenceType referenceType, QName startElement) throws XMLSecurityException {
+
             super(securityProperties);
             this.setStartElement(startElement);
             this.setReferenceType(referenceType);
@@ -221,7 +224,7 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
                         throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "digestVerificationFailed", getReferenceType().getURI());
                     }
                     inputProcessorChain.removeProcessor(this);
-                    inputProcessorChain.getDocumentContext().unsetIsInSignedContent();
+                    inputProcessorChain.getDocumentContext().unsetIsInSignedContent(this);
                     setFinished(true);
                 }
             }

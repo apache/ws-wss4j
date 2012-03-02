@@ -24,11 +24,13 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -54,7 +56,10 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         List<QName> headerPath = new ArrayList<QName>();
@@ -88,10 +93,13 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
+        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, null);
         List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "a"));
@@ -115,7 +123,10 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         List<QName> headerPath = new ArrayList<QName>();
@@ -142,14 +153,14 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, null);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
         }
-        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
+        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, null);
         List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "a"));
@@ -179,7 +190,10 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         List<QName> headerPath = new ArrayList<QName>();
@@ -213,10 +227,13 @@ public class SignedPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
-        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false);
+        signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, null);
         List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "a"));

@@ -22,10 +22,7 @@ import org.swssf.xmlsec.ext.DocumentContext;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 import javax.xml.namespace.QName;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A concrete DocumentContext Implementation
@@ -35,9 +32,10 @@ import java.util.List;
  */
 public class DocumentContextImpl implements DocumentContext, Cloneable {
 
-    private static final QName nullElement = new QName("", "");
     private List<QName> path = new LinkedList<QName>();
     private String encoding;
+    private Map<Integer, XMLSecurityConstants.ContentType> contentTypeMap = new TreeMap<Integer, XMLSecurityConstants.ContentType>();
+    private Map<Object, Integer> processorToIndexMap = new HashMap<Object, Integer>();
 
     public String getEncoding() {
         return encoding;
@@ -75,53 +73,55 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
         return this.path.size();
     }
 
-    Deque<XMLSecurityConstants.ContentType> contentTypeDeque = new LinkedList<XMLSecurityConstants.ContentType>();
-
-    public synchronized void setIsInEncryptedContent() {
-        contentTypeDeque.push(XMLSecurityConstants.ContentType.ENCRYPTION);
+    public synchronized void setIsInEncryptedContent(int index, Object key) {
+        contentTypeMap.put(index, XMLSecurityConstants.ContentType.ENCRYPTION);
+        processorToIndexMap.put(key, index);
     }
 
-    public synchronized void unsetIsInEncryptedContent() {
-        if (!contentTypeDeque.isEmpty()) {
-            contentTypeDeque.pop();
-        }
+    public synchronized void unsetIsInEncryptedContent(Object key) {
+        Integer index = processorToIndexMap.remove(key);
+        contentTypeMap.remove(index);
     }
 
     public boolean isInEncryptedContent() {
-        return contentTypeDeque.contains(XMLSecurityConstants.ContentType.ENCRYPTION);
+        return contentTypeMap.containsValue(XMLSecurityConstants.ContentType.ENCRYPTION);
     }
 
-    public synchronized void setIsInSignedContent() {
-        contentTypeDeque.push(XMLSecurityConstants.ContentType.SIGNATURE);
+    public synchronized void setIsInSignedContent(int index, Object key) {
+        contentTypeMap.put(index, XMLSecurityConstants.ContentType.SIGNATURE);
+        processorToIndexMap.put(key, index);
     }
 
-    public synchronized void unsetIsInSignedContent() {
-        if (!contentTypeDeque.isEmpty()) {
-            contentTypeDeque.pop();
-        }
+    public synchronized void unsetIsInSignedContent(Object key) {
+        Integer index = processorToIndexMap.remove(key);
+        contentTypeMap.remove(index);
     }
 
     public boolean isInSignedContent() {
-        return contentTypeDeque.contains(XMLSecurityConstants.ContentType.SIGNATURE);
+        return contentTypeMap.containsValue(XMLSecurityConstants.ContentType.SIGNATURE);
     }
 
-    public Deque<XMLSecurityConstants.ContentType> getContentTypeDeque() {
-        return contentTypeDeque;
+    @Override
+    public List<XMLSecurityConstants.ContentType> getProtectionOrder() {
+        return new LinkedList<XMLSecurityConstants.ContentType>(contentTypeMap.values());
     }
 
-    protected void setContentTypeDeque(Deque<XMLSecurityConstants.ContentType> contentTypeDeque) {
-        this.contentTypeDeque.addAll(contentTypeDeque);
+    public Map<Integer, XMLSecurityConstants.ContentType> getContentTypeMap() {
+        return Collections.unmodifiableMap(contentTypeMap);
+    }
+
+    protected void setContentTypeMap(Map<Integer, XMLSecurityConstants.ContentType> contentTypeMap) {
+        this.contentTypeMap.putAll(contentTypeMap);
     }
 
     @Override
     protected DocumentContextImpl clone() throws CloneNotSupportedException {
-        super.clone();
         DocumentContextImpl documentContext = new DocumentContextImpl();
         List<QName> subPath = new LinkedList<QName>();
         subPath.addAll(this.path);
         documentContext.setEncoding(this.encoding);
         documentContext.setPath(subPath);
-        documentContext.setContentTypeDeque(getContentTypeDeque());
+        documentContext.setContentTypeMap(getContentTypeMap());
         return documentContext;
     }
 }

@@ -19,6 +19,7 @@
 package org.swssf.wss.securityEvent;
 
 import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 import javax.xml.namespace.QName;
 import java.util.LinkedList;
@@ -31,13 +32,15 @@ import java.util.List;
 public class SignedElementSecurityEvent extends SecurityEvent {
 
     private List<QName> elementPath;
-    private SecurityToken securityToken;
     private boolean signed;
+    private SecurityToken securityToken;
+    private List<XMLSecurityConstants.ContentType> protectionOrder;
 
-    public SignedElementSecurityEvent(SecurityToken securityToken, boolean signed) {
+    public SignedElementSecurityEvent(SecurityToken securityToken, boolean signed, List<XMLSecurityConstants.ContentType> protectionOrder) {
         super(Event.SignedElement);
-        this.securityToken = securityToken;
         this.signed = signed;
+        this.securityToken = securityToken;
+        this.protectionOrder = protectionOrder;
     }
 
     public List<QName> getElementPath() {
@@ -62,5 +65,13 @@ public class SignedElementSecurityEvent extends SecurityEvent {
 
     public void setSigned(boolean signed) {
         this.signed = signed;
+    }
+
+    public List<XMLSecurityConstants.ContentType> getProtectionOrder() {
+        return protectionOrder;
+    }
+
+    public void setProtectionOrder(List<XMLSecurityConstants.ContentType> protectionOrder) {
+        this.protectionOrder = protectionOrder;
     }
 }

@@ -99,18 +99,18 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                 }
                 getProcessedReferences().add(referenceType);
-                inputProcessorChain.getDocumentContext().setIsInSignedContent();
+                inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
 
                 //fire a SecurityEvent:
                 if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                         && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                     SignedPartSecurityEvent signedPartSecurityEvent =
-                            new SignedPartSecurityEvent(getSecurityToken(), true);
+                            new SignedPartSecurityEvent(getSecurityToken(), true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                     signedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
                 } else {
                     SignedElementSecurityEvent signedElementSecurityEvent =
-                            new SignedElementSecurityEvent(getSecurityToken(), true);
+                            new SignedElementSecurityEvent(getSecurityToken(), true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                     signedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
                 }
@@ -229,8 +229,8 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
                 }
                 SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
-                //todo analyse and fix me: the following statement is problematic
-                //todo a workaround is implemented in DocumentContext().unsetIsInSignedContent();
+                //todo analyse and fix me: the following statement could be problematic
+                inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(this), this);
                 this.setStartElement(securityTokenReference.getXmlEvents().getLast().asStartElement().getName());
                 Iterator<XMLEvent> xmlEventIterator = securityTokenReference.getXmlEvents().descendingIterator();
                 while (xmlEventIterator.hasNext()) {

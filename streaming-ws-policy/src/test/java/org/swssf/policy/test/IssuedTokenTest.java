@@ -26,9 +26,12 @@ import org.swssf.wss.securityEvent.IssuedTokenSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -78,11 +81,14 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, true);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 

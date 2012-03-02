@@ -26,10 +26,13 @@ import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
 import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -80,11 +83,14 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, true);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
@@ -138,11 +144,14 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true);
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, true);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 

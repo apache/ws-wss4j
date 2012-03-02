@@ -174,7 +174,6 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                     }
 
                     processedReferences.add(referenceType);
-                    inputProcessorChain.getDocumentContext().setIsInEncryptedContent();
 
                     //the following logic reads the encryptedData structure and doesn't pass them further
                     //through the chain
@@ -270,6 +269,8 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
                     //add the new created EventReader processor to the chain.
                     inputProcessorChain.addProcessor(decryptedEventReaderInputProcessor);
+
+                    inputProcessorChain.getDocumentContext().setIsInEncryptedContent(inputProcessorChain.getProcessors().indexOf(decryptedEventReaderInputProcessor), decryptedEventReaderInputProcessor);
 
                     //when an exception in the decryption thread occurs, we want to forward them:
                     receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
@@ -381,11 +382,11 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                 XMLSecurityProperties securityProperties, SecurePart.Modifier encryptionModifier,
                 boolean encryptedHeader, List<ComparableNamespace>[] namespaceList,
                 List<ComparableAttribute>[] attributeList,
-                AbstractDecryptInputProcessor decryptInputProcessor,
+                AbstractDecryptInputProcessor abstractDecryptInputProcessor,
                 SecurityToken securityToken
         ) {
             super(securityProperties);
-            getAfterProcessors().add(decryptInputProcessor);
+            getAfterProcessors().add(abstractDecryptInputProcessor);
             this.encryptionModifier = encryptionModifier;
             rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
             this.encryptedHeader = encryptedHeader;
@@ -460,7 +461,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                     }
                     while (!(endEvent.isEndElement() && endEvent.asEndElement().getName().equals(endElement)));
 
-                    inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent();
+                    inputProcessorChain.getDocumentContext().unsetIsInEncryptedContent(this);
 
                     //...fetch the next (unencrypted) event
                     if (headerEvent) {

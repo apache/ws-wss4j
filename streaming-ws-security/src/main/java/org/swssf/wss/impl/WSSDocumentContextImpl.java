@@ -23,7 +23,7 @@ import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.xmlsec.impl.DocumentContextImpl;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -67,14 +67,13 @@ public class WSSDocumentContextImpl extends DocumentContextImpl implements WSSDo
 
     @Override
     protected WSSDocumentContextImpl clone() throws CloneNotSupportedException {
-        super.clone();
         WSSDocumentContextImpl documentContext = new WSSDocumentContextImpl();
-        List<QName> subPath = new ArrayList<QName>();
+        List<QName> subPath = new LinkedList<QName>();
         subPath.addAll(this.getPath());
         documentContext.setEncoding(this.getEncoding());
         documentContext.setPath(subPath);
         documentContext.setInSecurityHeader(isInSecurityHeader());
-        documentContext.setContentTypeDeque(getContentTypeDeque());
+        documentContext.setContentTypeMap(getContentTypeMap());
         return documentContext;
     }
 }

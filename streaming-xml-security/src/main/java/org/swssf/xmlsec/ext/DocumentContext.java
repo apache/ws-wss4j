@@ -19,8 +19,8 @@
 package org.swssf.xmlsec.ext;
 
 import javax.xml.namespace.QName;
-import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class holds per document, context informations
@@ -33,26 +33,26 @@ public interface DocumentContext {
     /**
      * @return The Encoding of the Document
      */
-    public String getEncoding();
+    String getEncoding();
 
     /**
      * Adds a Element to the path
      *
      * @param qName The QName of the path element
      */
-    public void addPathElement(QName qName);
+    void addPathElement(QName qName);
 
     /**
      * Removes a element from the path
      *
      * @return the removed element
      */
-    public QName removePathElement();
+    QName removePathElement();
 
     /**
      * @return The actual path in the xml
      */
-    public List<QName> getPath();
+    List<QName> getPath();
 
     /**
      * Returns the parent element of the actual eventtype
@@ -60,43 +60,44 @@ public interface DocumentContext {
      * @param eventType current event type
      * @return the name of the parent element
      */
-    public List<QName> getParentElementPath(int eventType);
+    List<QName> getParentElementPath(int eventType);
 
     /**
      * @return The current level in the document
      */
-    public int getDocumentLevel();
+    int getDocumentLevel();
 
     /**
      * Indicates if we currently stay in an encrypted content
      */
-    public void setIsInEncryptedContent();
+    void setIsInEncryptedContent(int index, Object object);
 
     /**
      * unset when we leave the encrypted content
      */
-    public void unsetIsInEncryptedContent();
+    void unsetIsInEncryptedContent(Object object);
 
     /**
      * @return true if we currently stay in encrypted content
      */
-    public boolean isInEncryptedContent();
+    boolean isInEncryptedContent();
 
     /**
      * Indicates if we currently stay in a signed content
      */
-    public void setIsInSignedContent();
+    void setIsInSignedContent(int index, Object object);
 
     /**
      * unset when we leave the signed content
      */
-    public void unsetIsInSignedContent();
+    void unsetIsInSignedContent(Object object);
 
     /**
      * @return true if we currently stay in signed content
      */
-    public boolean isInSignedContent();
+    boolean isInSignedContent();
 
+    List<XMLSecurityConstants.ContentType> getProtectionOrder();
 
-    public Deque<XMLSecurityConstants.ContentType> getContentTypeDeque();
+    Map<Integer, XMLSecurityConstants.ContentType> getContentTypeMap();
 }

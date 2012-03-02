@@ -52,7 +52,6 @@ public class PolicyEnforcer implements SecurityEventListener {
     // Token Protection
     // finishing Layout
     // HttpsToken Algorithms
-    //ProtectionOrder
     //unused tokens must be checked (algorithms etc)
 
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcer.class);
@@ -224,10 +223,9 @@ public class PolicyEnforcer implements SecurityEventListener {
             AbstractBinding abstractBinding = (AbstractBinding) abstractSecurityAssertion;
             if (abstractBinding instanceof AbstractSymmetricAsymmetricBinding) {
                 AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) abstractSecurityAssertion;
-                //todo:
-                //assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, false));
+                assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, true));
                 assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, true));
-                assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, false));
+                assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, true));
                 //todo token protection
             }
 
