@@ -83,6 +83,8 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Digest algorithm http://www.w3.org/2001/04/xmlenc#sha256 does not meet policy");
         }
     }
 
@@ -109,6 +111,9 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes128-cbc does not meet policy\n" +
+                    "Symmetric encryption algorithm key length 128 does not meet policy");
         }
     }
 
@@ -163,6 +168,9 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes128-cbc does not meet policy\n" +
+                    "Symmetric encryption algorithm key length 128 does not meet policy");
         }
     }
 }

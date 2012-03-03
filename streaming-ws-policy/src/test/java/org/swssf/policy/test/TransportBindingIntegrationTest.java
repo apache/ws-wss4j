@@ -48,8 +48,6 @@ import java.util.List;
  */
 public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
 
-    //todo revisit _ALL_ policy tests an check for violated policy message in exception
-
     @Test
     public void testIncludeTimestampPolicy() throws Exception {
 
@@ -252,7 +250,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.secpolicy.WSSPolicyException: No policy alternative could be satisfied");
+                    "\torg.apache.ws.secpolicy.WSSPolicyException: \n" +
+                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present");
         }
     }
 
@@ -481,7 +480,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.secpolicy.WSSPolicyException: No policy alternative could be satisfied");
+                    "\torg.apache.ws.secpolicy.WSSPolicyException: Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied");
         }
     }
 
@@ -836,7 +835,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "IssuerName in Policy (CN=transmitter,OU=swssf,C=CH) didn't match with the one in the HttpsToken (CN=example,OU=swssf,C=CH)");
         }
     }
 
@@ -949,12 +949,13 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "Asymmetric algorithm http://www.w3.org/2001/04/xmldsig-more#rsa-sha512 does not meet policy");
         }
     }
 
     @Test
-    public void atestC14NAlgorithmSuiteNegative() throws Exception {
+    public void testC14NAlgorithmSuiteNegative() throws Exception {
 
         String policyString =
                 "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
@@ -1062,7 +1063,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "C14N algorithm http://www.w3.org/2006/12/xml-c14n11 does not meet policy");
         }
     }
 
@@ -1175,7 +1177,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "Digest algorithm http://www.w3.org/2001/04/xmldsig-more#md5 does not meet policy");
         }
     }
 
@@ -1288,7 +1291,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "Encryption algorithm http://www.w3.org/2001/04/xmlenc#tripledes-cbc does not meet policy\n" +
+                    "Symmetric encryption algorithm key length 192 does not meet policy");
         }
     }
 
@@ -1400,7 +1405,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "Policy enforces LaxTsFirst but X509Token occured first");
         }
     }
 }

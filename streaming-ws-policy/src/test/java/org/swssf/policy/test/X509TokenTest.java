@@ -163,7 +163,8 @@ public class X509TokenTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "X509Certificate Version 3 mismatch; Policy enforces WssX509V3Token11");
         }
     }
 
@@ -225,7 +226,8 @@ public class X509TokenTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "X509Certificate Version 3 mismatch; Policy enforces WssX509V3Token11");
         }
     }
 }

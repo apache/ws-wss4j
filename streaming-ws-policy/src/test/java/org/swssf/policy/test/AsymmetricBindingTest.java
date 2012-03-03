@@ -132,6 +132,8 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Timestamp must not be present");
         }
     }
 
@@ -168,6 +170,8 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Policy enforces EncryptBeforeSigning but the /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body was signed and then encrypted");
         }
     }
 
@@ -215,6 +219,8 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://www.w3.org/2000/09/xmldsig#}Signature must be encrypted");
         }
     }
 
@@ -273,6 +279,8 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
         }
     }
 }

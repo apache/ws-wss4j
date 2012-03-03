@@ -119,6 +119,8 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Timestamp must not be present");
         }
     }
 

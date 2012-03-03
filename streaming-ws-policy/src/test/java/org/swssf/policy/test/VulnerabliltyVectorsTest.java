@@ -139,7 +139,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof WSSecurityException);
             Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: No policy alternative could be satisfied");
+                    "\torg.swssf.policy.PolicyViolationException: \n" +
+                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
         }
     }
 }

@@ -121,7 +121,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
                 int firstSignature = contentTypes.indexOf(XMLSecurityConstants.ContentType.SIGNATURE);
                 if (firstSignature >= 0 && firstSignature < lastEncytpion) {
                     setAsserted(false);
-                    setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was encrypted and then signed");
+                    setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was signed and then encrypted");
                 }
                 break;
             }

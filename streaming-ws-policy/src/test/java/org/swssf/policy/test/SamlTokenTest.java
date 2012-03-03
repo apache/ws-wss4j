@@ -162,6 +162,8 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "IssuerName in Policy (xs:anyURI) didn't match with the one in the SamlToken (xs:otherURI)");
         }
     }
 }

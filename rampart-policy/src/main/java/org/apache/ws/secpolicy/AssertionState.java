@@ -33,6 +33,7 @@ public class AssertionState {
 
     private State state = State.INIT;
     private boolean asserted;
+    private boolean logged;
     private Assertion assertion;
     private StringBuilder errorMessage = new StringBuilder();
 
@@ -70,5 +71,13 @@ public class AssertionState {
         } else {
             return errorMessage.toString();
         }
+    }
+
+    public boolean isLogged() {
+        return logged;
+    }
+
+    public void setLogged(boolean logged) {
+        this.logged = logged;
     }
 }

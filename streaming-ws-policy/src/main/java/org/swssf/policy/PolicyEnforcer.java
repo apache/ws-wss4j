@@ -273,35 +273,7 @@ public class PolicyEnforcer implements SecurityEventListener {
      */
     private void verifyPolicy(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException {
         {
-            //first check the remaining alternatives...
-            Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
-            alternative:
-            while (assertionStateMapIterator.hasNext()) {
-                Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
-                //every list entry counts as an alternative...
-                Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
-                if (assertionListMap != null && assertionListMap.size() > 0) {
-                    Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = assertionListMap.entrySet().iterator();
-                    while (assertionStateIterator.hasNext()) {
-                        Map.Entry<Assertion, List<Assertable>> assertionStateEntry = assertionStateIterator.next();
-                        List<Assertable> assertionStates = assertionStateEntry.getValue();
-                        Iterator<Assertable> assertableIterator = assertionStates.iterator();
-                        while (assertableIterator.hasNext()) {
-                            Assertable assertable = assertableIterator.next();
-                            boolean asserted = assertable.assertEvent(securityEvent);
-                            //...so if one fails, continue with the next map entry and increment the notAssertedCount
-                            if (!asserted) {
-                                failedAssertionStateMap.add(map);
-                                assertionStateMapIterator.remove();
-                                continue alternative;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        {
-            //...then also we have to check the failed assertions for logging purposes!
+            //We have to check the failed assertions for logging purposes firstly...
             Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
             alternative:
             while (assertionStateMapIterator.hasNext()) {
@@ -326,11 +298,42 @@ public class PolicyEnforcer implements SecurityEventListener {
                 }
             }
         }
+
+        String assertionMessage = null;
+        {
+            //...and then check the remaining alternatives
+            Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
+            //every map entry counts as an alternative...
+            alternative:
+            while (assertionStateMapIterator.hasNext()) {
+                Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+                Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
+                if (assertionListMap != null && assertionListMap.size() > 0) {
+                    Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = assertionListMap.entrySet().iterator();
+                    while (assertionStateIterator.hasNext()) {
+                        Map.Entry<Assertion, List<Assertable>> assertionStateEntry = assertionStateIterator.next();
+                        List<Assertable> assertionStates = assertionStateEntry.getValue();
+                        Iterator<Assertable> assertableIterator = assertionStates.iterator();
+                        while (assertableIterator.hasNext()) {
+                            Assertable assertable = assertableIterator.next();
+                            boolean asserted = assertable.assertEvent(securityEvent);
+                            //...so if one fails, continue with the next map entry and increment the notAssertedCount
+                            if (!asserted) {
+                                assertionMessage = assertable.getErrorMessage();
+                                failedAssertionStateMap.add(map);
+                                assertionStateMapIterator.remove();
+                                continue alternative;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         //if the assertionStateMap is empty (the size of the list is equal to the alternatives)
         //then we could not satisfy any alternative
         if (assertionStateMap.isEmpty()) {
             logFailedAssertions();
-            throw new PolicyViolationException("No policy alternative could be satisfied");
+            throw new PolicyViolationException(assertionMessage);
         }
     }
 
@@ -341,6 +344,7 @@ public class PolicyEnforcer implements SecurityEventListener {
      * @throws PolicyViolationException thrown when no alternative could be satisifed
      */
     private void verifyPolicy() throws WSSPolicyException {
+        String assertionMessage = null;
         Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
         alternative:
         while (assertionStateMapIterator.hasNext()) {
@@ -356,6 +360,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                     while (assertableIterator.hasNext()) {
                         Assertable assertable = assertableIterator.next();
                         if (!assertable.isAsserted()) {
+                            assertionMessage = assertable.getErrorMessage();
                             failedAssertionStateMap.add(map);
                             assertionStateMapIterator.remove();
                             continue alternative;
@@ -366,7 +371,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
         if (assertionStateMap.isEmpty()) {
             logFailedAssertions();
-            throw new WSSPolicyException("No policy alternative could be satisfied");
+            throw new WSSPolicyException(assertionMessage);
         }
     }
 
@@ -386,8 +391,9 @@ public class PolicyEnforcer implements SecurityEventListener {
                     Iterator<Assertable> assertableIterator = assertionStates.iterator();
                     while (assertableIterator.hasNext()) {
                         Assertable assertable = assertableIterator.next();
-                        if (!assertable.isAsserted()) {
+                        if (!assertable.isAsserted() && !assertable.isLogged()) {
                             log.error(entry.getKey().getName() + " not satisfied: " + assertable.getErrorMessage());
+                            assertable.setLogged(true);
                         }
                     }
                 }

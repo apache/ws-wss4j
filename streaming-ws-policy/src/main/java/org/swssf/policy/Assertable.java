@@ -36,4 +36,7 @@ public interface Assertable {
 
     String getErrorMessage();
 
+    boolean isLogged();
+
+    void setLogged(boolean logged);
 }

@@ -96,6 +96,8 @@ public class ContentEncryptedElementsTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Content of element /{http://example.org}a must be encrypted");
         }
     }
 }
