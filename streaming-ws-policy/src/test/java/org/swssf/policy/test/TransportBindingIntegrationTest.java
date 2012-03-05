@@ -1297,7 +1297,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         }
     }
 
-    @Test
+    /*@Test
     public void testLayoutLaxTimestampFirstNegative() throws Exception {
 
         String policyString =
@@ -1408,5 +1408,5 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                     "\torg.swssf.policy.PolicyViolationException: \n" +
                     "Policy enforces LaxTsFirst but X509Token occured first");
         }
-    }
+    }*/
 }

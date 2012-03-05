@@ -49,10 +49,6 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
         AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
-        if (!abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
-            setAsserted(true);
-            return true;
-        }
         if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()
                 && WSSUtils.pathMatches(signedPartSecurityEvent.getElementPath(), WSSConstants.SOAP_11_BODY_PATH, true, false)) {
             if (signedPartSecurityEvent.isSigned()) {

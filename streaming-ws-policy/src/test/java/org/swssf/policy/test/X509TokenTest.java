@@ -186,7 +186,7 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingToken);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -215,7 +215,7 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSConstants.X509V1Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingToken);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 

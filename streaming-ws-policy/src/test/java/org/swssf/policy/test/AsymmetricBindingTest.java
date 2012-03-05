@@ -46,7 +46,6 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptSignature/>\n" +
-                        "<sp:ProtectTokens/>\n" +
                         "<sp:OnlySignEntireHeadersAndBody/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
@@ -70,6 +69,7 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         x509TokenSecurityEvent = new X509TokenSecurityEvent();
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();

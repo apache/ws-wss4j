@@ -47,7 +47,6 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptSignature/>\n" +
-                        "<sp:ProtectTokens/>\n" +
                         "<sp:OnlySignEntireHeadersAndBody/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
@@ -235,7 +234,6 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptSignature/>\n" +
-                        "<sp:ProtectTokens/>\n" +
                         "<sp:OnlySignEntireHeadersAndBody/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";

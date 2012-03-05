@@ -65,10 +65,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 }
                 break;
             case Signature:
-                if (!(parentAssertion instanceof SupportingTokens)) {
-                    return true;
-                }
-                break;
+                throw new WSSPolicyException("Illegal token usage!");
             case MainEncryption:
                 if (!(parentAssertion instanceof RecipientToken)
                         && !(parentAssertion instanceof RecipientEncryptionToken)
@@ -78,20 +75,24 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 }
                 break;
             case Encryption:
+                throw new WSSPolicyException("Illegal token usage!");
+            case SupportingTokens:
+            case SignedSupportingTokens:
+            case EndorsingSupportingTokens:
+            case SignedEndorsingSupportingTokens:
+            case SignedEncryptedSupportingTokens:
+            case EncryptedSupportingTokens:
+            case EndorsingEncryptedSupportingTokens:
+            case SignedEndorsingEncryptedSupportingTokens:
                 if (!(parentAssertion instanceof SupportingTokens)) {
                     return true;
                 }
-                break;
-            case SupportingToken:
-                if (!(parentAssertion instanceof SupportingTokens)) {
-                    return true;
-                }
+
                 SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
-                if (supportingTokens.getSupportingTokenType().getName().getLocalPart().equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
-                        && !tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedSupportingTokens)) {
+                SecurityToken.TokenUsage expectedTokenUsage = SecurityToken.TokenUsage.valueOf(supportingTokens.getName().getLocalPart());
+                if (expectedTokenUsage != tokenUsage) {
                     return true;
                 }
-                //todo the supporting token types...
                 break;
         }
 

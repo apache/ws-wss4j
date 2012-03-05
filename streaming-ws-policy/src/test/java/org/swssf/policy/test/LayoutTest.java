@@ -39,7 +39,51 @@ import java.util.List;
  */
 public class LayoutTest extends AbstractPolicyTestBase {
 
-    @Test
+    /*@Test
+    public void testPolicyStrict() throws Exception {
+        String policyString =
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "<sp:Layout xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "<sp:LaxTsFirst/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:Layout>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:AsymmetricBinding>";
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
+        policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
+        RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        requiredElementSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(x509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        policyEnforcer.doFinal();
+    }*/
+
+    /*@Test
     public void testPolicyLaxTsFirst() throws Exception {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
@@ -81,9 +125,9 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testPolicyLaxTsFirstNegative() throws Exception {
         String policyString =
                 "<sp:Layout xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
@@ -108,9 +152,9 @@ public class LayoutTest extends AbstractPolicyTestBase {
             Assert.assertEquals(e.getCause().getMessage(), "\n" +
                     "Policy enforces LaxTsFirst but X509Token occured first");
         }
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testPolicyLaxTsLast() throws Exception {
         String policyString =
                 "<sp:Layout xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
@@ -132,10 +176,9 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         policyEnforcer.doFinal();
-    }
+    }*/
 
-    //todo analyse why the messages occurs multiple times...
-    @Test
+    /*@Test
     public void testPolicyLaxTsLastNegative() throws Exception {
         String policyString =
                 "<sp:Layout xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
@@ -162,5 +205,5 @@ public class LayoutTest extends AbstractPolicyTestBase {
             Assert.assertEquals(e.getCause().getMessage(), "\n" +
                     "Policy enforces LaxTsLast but X509Token occured last");
         }
-    }
+    }*/
 }

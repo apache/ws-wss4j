@@ -49,8 +49,8 @@ public class PolicyEnforcer implements SecurityEventListener {
     // AlgorithmSuite STR Trans
     // AlgorithmSuite XPath
     // AlgorithmSuite Comp Key
-    // Token Protection
-    // finishing Layout
+    // Layout? I don't know if it is that relevant and worth. We need security header element numbering
+    //to implement it.
     // HttpsToken Algorithms
     //unused tokens must be checked (algorithms etc)
 
@@ -215,9 +215,9 @@ public class PolicyEnforcer implements SecurityEventListener {
         } else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof SymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof TransportBinding) {
-        } else if (abstractSecurityAssertion instanceof Layout) {
+        } /*else if (abstractSecurityAssertion instanceof Layout) {
             assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
-        }
+        }*/
 
         if (abstractSecurityAssertion instanceof AbstractBinding) {
             AbstractBinding abstractBinding = (AbstractBinding) abstractSecurityAssertion;
@@ -225,8 +225,10 @@ public class PolicyEnforcer implements SecurityEventListener {
                 AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) abstractSecurityAssertion;
                 assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, true));
                 assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, true));
-                assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, true));
-                //todo token protection
+                if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
+                    assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, false));
+                }
+                assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, true));
             }
 
             assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, true));
@@ -241,24 +243,6 @@ public class PolicyEnforcer implements SecurityEventListener {
                 SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(abstractSecurityAssertion, true);
                 signedElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(signedElementsAssertionState);
-            }
-        } else if (abstractSecurityAssertion instanceof AbstractToken) {
-            AbstractToken abstractToken = (AbstractToken) abstractSecurityAssertion;
-            AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
-            if (parentAssertion instanceof SupportingTokens) {
-                SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
-                SupportingTokenType supportingTokenType = supportingTokens.getSupportingTokenType();
-                if (supportingTokenType.getName().getLocalPart().startsWith("Signed")) {
-                    SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(abstractSecurityAssertion, true);
-                    assertableList.add(signedElementsAssertionState);
-                    //todo the other tokens?
-                    if (abstractToken instanceof UsernameToken) {
-                        List<QName> usernameTokenElementPath = new LinkedList<QName>();
-                        usernameTokenElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-                        usernameTokenElementPath.add(WSSConstants.TAG_wsse_UsernameToken);
-                        signedElementsAssertionState.addElement(usernameTokenElementPath);
-                    }
-                }
             }
         }
 
@@ -435,17 +419,17 @@ public class PolicyEnforcer implements SecurityEventListener {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
             }
-
-            Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
-            while (securityEventIterator.hasNext()) {
-                SecurityEvent prevSecurityEvent = securityEventIterator.next();
-                try {
+            try {
+                Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
+                while (securityEventIterator.hasNext()) {
+                    SecurityEvent prevSecurityEvent = securityEventIterator.next();
                     verifyPolicy(prevSecurityEvent);
-                } catch (WSSPolicyException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-                } catch (XMLSecurityException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
+                verifyPolicy(securityEvent);
+            } catch (WSSPolicyException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             securityEventQueue.clear();
 

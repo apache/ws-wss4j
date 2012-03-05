@@ -254,7 +254,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
         setTokenUsage(messageSignatureTokens, SecurityToken.TokenUsage.MainSignature);
         setTokenUsage(messageEncryptionTokens, SecurityToken.TokenUsage.MainEncryption);
-        setTokenUsage(supportingTokens, SecurityToken.TokenUsage.SupportingToken);
+        setTokenUsage(supportingTokens, SecurityToken.TokenUsage.SupportingTokens);
         setTokenUsage(signedSupportingTokens, SecurityToken.TokenUsage.SignedSupportingTokens);
         setTokenUsage(endorsingSupportingTokens, SecurityToken.TokenUsage.EndorsingSupportingTokens);
         setTokenUsage(signedEndorsingSupportingTokens, SecurityToken.TokenUsage.SignedEndorsingSupportingTokens);
@@ -349,10 +349,10 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     private void setTokenUsage(TokenSecurityEvent tokenSecurityEvent, SecurityToken.TokenUsage tokenUsage) throws XMLSecurityException {
         if (tokenUsage == SecurityToken.TokenUsage.MainSignature) {
-            tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(SecurityToken.TokenUsage.SupportingToken);
+            tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(SecurityToken.TokenUsage.SupportingTokens);
             tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(SecurityToken.TokenUsage.Signature);
         } else if (tokenUsage == SecurityToken.TokenUsage.MainEncryption) {
-            tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(SecurityToken.TokenUsage.SupportingToken);
+            tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(SecurityToken.TokenUsage.SupportingTokens);
             tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(SecurityToken.TokenUsage.Encryption);
         }
         tokenSecurityEvent.getSecurityToken().addTokenUsage(tokenUsage);

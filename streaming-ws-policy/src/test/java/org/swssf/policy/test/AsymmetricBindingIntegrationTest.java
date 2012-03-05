@@ -87,7 +87,6 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                            </wsp:Policy>\n" +
                         "                        </sp:Layout>\n" +
                         "                        <sp:IncludeTimestamp/>\n" +
-                        "                        <sp:ProtectTokens/>\n" +
                         "                    </wsp:Policy>\n" +
                         "                </sp:AsymmetricBinding>\n" +
                         "                <sp:SignedParts>\n" +
@@ -193,7 +192,6 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                                <sp:Lax/>\n" +
                         "                            </wsp:Policy>\n" +
                         "                        </sp:Layout>\n" +
-                        "                        <sp:ProtectTokens/>\n" +
                         "                       </wsp:All>\n" +
                         "                       <wsp:All>\n" +
                         "                        <sp:InitiatorToken>\n" +
@@ -227,7 +225,6 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                            </wsp:Policy>\n" +
                         "                        </sp:Layout>\n" +
                         "                        <sp:IncludeTimestamp/>\n" +
-                        "                        <sp:ProtectTokens/>\n" +
                         "                       </wsp:All>\n" +
                         "                       </wsp:ExactlyOne>\n" +
                         "                    </wsp:Policy>\n" +
@@ -333,7 +330,6 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                                <sp:Lax/>\n" +
                         "                            </wsp:Policy>\n" +
                         "                        </sp:Layout>\n" +
-                        "                        <sp:ProtectTokens/>\n" +
                         "                    </wsp:Policy>\n" +
                         "                </sp:AsymmetricBinding>\n" +
                         "                <sp:SignedParts>\n" +
@@ -768,8 +764,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.swssf.policy.PolicyViolationException: \n" +
-                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken must be signed");
+                    "\torg.apache.ws.secpolicy.WSSPolicyException: Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied");
         }
     }
 
@@ -1903,7 +1898,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         }
     }
 
-    @Test
+    /*@Test
     public void testLayoutLaxTimestampFirstNegative() throws Exception {
 
         String policyString =
@@ -2013,7 +2008,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                     "\torg.swssf.policy.PolicyViolationException: \n" +
                     "Policy enforces LaxTsFirst but X509Token occured first");
         }
-    }
+    }*/
 
     @Test
     public void testTokenScenario() throws Exception {

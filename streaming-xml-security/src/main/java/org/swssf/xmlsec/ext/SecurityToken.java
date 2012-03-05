@@ -40,11 +40,12 @@ public interface SecurityToken {
         MainSignature,
         Encryption,
         MainEncryption,
-        SupportingToken,
+        SupportingTokens,
         SignedSupportingTokens,
         EndorsingSupportingTokens,
         SignedEndorsingSupportingTokens,
         SignedEncryptedSupportingTokens,
+        EncryptedSupportingTokens,
         EndorsingEncryptedSupportingTokens,
         SignedEndorsingEncryptedSupportingTokens,
     }
