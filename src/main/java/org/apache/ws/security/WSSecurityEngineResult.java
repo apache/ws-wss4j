@@ -146,6 +146,13 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      * The value under this tag is of type java.security.cert.X509Certificate[].
      */
     public static final String TAG_X509_CERTIFICATES = "x509-certificates";
+    
+    /**
+     * Tag denoting how the X.509 certificate (chain) was referenced, if applicable.
+     * 
+     * The value under this tag is of type STRParser.REFERENCE_TYPE.
+     */
+    public static final String TAG_X509_REFERENCE_TYPE  = "x509-reference-type";
 
     /**
      * Tag denoting the encrypted key bytes

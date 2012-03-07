@@ -83,6 +83,8 @@ public class SignatureSTRParser implements STRParser {
     
     private boolean trustedCredential;
     
+    private REFERENCE_TYPE referenceType;
+    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -115,8 +117,14 @@ public class SignatureSTRParser implements STRParser {
             if (uri.charAt(0) == '#') {
                 uri = uri.substring(1);
             }
+            referenceType = REFERENCE_TYPE.DIRECT_REF;
         } else if (secRef.containsKeyIdentifier()) {
             uri = secRef.getKeyIdentifierValue();
+            if (SecurityTokenReference.THUMB_URI.equals(secRef.getKeyIdentifierValueType())) {
+                referenceType = REFERENCE_TYPE.THUMBPRINT_SHA1;
+            } else {
+                referenceType = REFERENCE_TYPE.KEY_IDENTIFIER;
+            }
         }
         
         WSSecurityEngineResult result = wsDocInfo.getResult(uri);
@@ -190,6 +198,7 @@ public class SignatureSTRParser implements STRParser {
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
+            referenceType = REFERENCE_TYPE.ISSUER_SERIAL;
             X509Certificate[] foundCerts = secRef.getX509IssuerSerial(crypto);
             if (foundCerts != null && foundCerts.length > 0) {
                 certs = new X509Certificate[]{foundCerts[0]};
@@ -279,6 +288,14 @@ public class SignatureSTRParser implements STRParser {
      */
     public boolean isTrustedCredential() {
         return trustedCredential;
+    }
+    
+    /**
+     * Get how the certificates were referenced
+     * @return how the certificates were referenced
+     */
+    public REFERENCE_TYPE getCertificatesReferenceType() {
+        return referenceType;
     }
     
     /**

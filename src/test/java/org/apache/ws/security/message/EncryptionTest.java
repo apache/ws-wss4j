@@ -35,6 +35,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.str.STRParser.REFERENCE_TYPE;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -45,6 +46,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests.
@@ -147,7 +149,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
-        verify(
+        List<WSSecurityEngineResult> results = verify(
             encryptedDoc,
             keystoreCallbackHandler,
             new javax.xml.namespace.QName(
@@ -155,6 +157,14 @@ public class EncryptionTest extends org.junit.Assert {
                 "add"
             )
         );
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+        REFERENCE_TYPE referenceType = 
+            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+        assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
     }
 
     /**
@@ -191,7 +201,16 @@ public class EncryptionTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         config.setWsiBSPCompliant(false);
         newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+        REFERENCE_TYPE referenceType = 
+            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+        assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
         
         // Now turn on BSP spec compliance
         config.setWsiBSPCompliant(true);
@@ -274,7 +293,15 @@ public class EncryptionTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
     
         LOG.info("After Encrypting ThumbprintSHA1....");
-        verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+        REFERENCE_TYPE referenceType = 
+            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+        assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
     }
     
     /**
@@ -487,12 +514,20 @@ public class EncryptionTest extends org.junit.Assert {
         }
         assertTrue(outputString.indexOf("counter_port_type") == -1 ? true
                 : false);
-        verify(encryptedDoc, crypto, keystoreCallbackHandler);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true
                 : false);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+        REFERENCE_TYPE referenceType = 
+            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+        assertTrue(referenceType == REFERENCE_TYPE.DIRECT_REF);
     }
     
     
@@ -609,15 +644,17 @@ public class EncryptionTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private void verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc, Crypto decCrypto, CallbackHandler handler
     ) throws Exception {
-        secEngine.processSecurityHeader(doc, null, handler, decCrypto);
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        return results;
     }
     
     /**
@@ -628,7 +665,7 @@ public class EncryptionTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
-    private void verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc,
         CallbackHandler handler,
         javax.xml.namespace.QName expectedEncryptedElement
@@ -678,6 +715,7 @@ public class EncryptionTest extends org.junit.Assert {
             }
         }
         assertTrue(encrypted);
+        return results;
     }
 
 }

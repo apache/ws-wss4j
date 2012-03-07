@@ -196,6 +196,14 @@ public class DerivedKeyTokenSTRParser implements STRParser {
     public boolean isTrustedCredential() {
         return false;
     }
+    
+    /**
+     * Get how the certificates were referenced
+     * @return how the certificates were referenced
+     */
+    public REFERENCE_TYPE getCertificatesReferenceType() {
+        return null;
+    }
 
     /**
      * Get the Secret Key from a CallbackHandler

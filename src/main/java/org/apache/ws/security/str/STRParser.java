@@ -37,6 +37,18 @@ import java.util.Map;
 public interface STRParser {
     
     /**
+     * ISSUER_SERIAL - A certificate (chain) is located by the issuer name and serial number of the 
+     * (root) cert
+     * THUMBPRINT_SHA1 - A certificate (chain) is located by the SHA1 thumbprint of the (root) cert
+     * KEY_IDENTIFIER - A certificate (chain) is located via a Key Identifier Element
+     * DIRECT_REF - A certificate (chain) is located directly via an Id to another security token
+     * Note that a Thumbprint reference is also a KeyIdentifier, but takes precedence over it.
+     */
+    public enum REFERENCE_TYPE {
+        ISSUER_SERIAL, THUMBPRINT_SHA1, KEY_IDENTIFIER, DIRECT_REF
+    };
+    
+    /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
      * @param strElement The SecurityTokenReference element
@@ -84,5 +96,11 @@ public interface STRParser {
      * @return true if trust has already been verified on the returned Credential
      */
     public boolean isTrustedCredential();
+
+    /**
+     * Get how the certificates were referenced
+     * @return how the certificates were referenced
+     */
+    public REFERENCE_TYPE getCertificatesReferenceType();
     
 }

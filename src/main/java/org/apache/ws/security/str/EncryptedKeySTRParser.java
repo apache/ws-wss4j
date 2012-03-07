@@ -53,6 +53,8 @@ public class EncryptedKeySTRParser implements STRParser {
     
     private X509Certificate[] certs;
     
+    private REFERENCE_TYPE referenceType;
+    
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
@@ -83,8 +85,14 @@ public class EncryptedKeySTRParser implements STRParser {
             if (uri.charAt(0) == '#') {
                 uri = uri.substring(1);
             }
+            referenceType = REFERENCE_TYPE.DIRECT_REF;
         } else if (secRef.containsKeyIdentifier()) {
             uri = secRef.getKeyIdentifierValue();
+            if (SecurityTokenReference.THUMB_URI.equals(secRef.getKeyIdentifierValueType())) {
+                referenceType = REFERENCE_TYPE.THUMBPRINT_SHA1;
+            } else {
+                referenceType = REFERENCE_TYPE.KEY_IDENTIFIER;
+            }
         }
         
         WSSecurityEngineResult result = wsDocInfo.getResult(uri);
@@ -111,6 +119,7 @@ public class EncryptedKeySTRParser implements STRParser {
                 certs = secRef.getKeyIdentifier(crypto);
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
+            referenceType = REFERENCE_TYPE.ISSUER_SERIAL;
             certs = secRef.getX509IssuerSerial(crypto);
         } else if (secRef.containsReference()) {
             Element bstElement = 
@@ -179,6 +188,14 @@ public class EncryptedKeySTRParser implements STRParser {
      */
     public boolean isTrustedCredential() {
         return false;
+    }
+    
+    /**
+     * Get how the certificates were referenced
+     * @return how the certificates were referenced
+     */
+    public REFERENCE_TYPE getCertificatesReferenceType() {
+        return referenceType;
     }
     
     /**

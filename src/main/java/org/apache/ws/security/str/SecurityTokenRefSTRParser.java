@@ -214,6 +214,14 @@ public class SecurityTokenRefSTRParser implements STRParser {
     }
     
     /**
+     * Get how the certificates were referenced
+     * @return how the certificates were referenced
+     */
+    public REFERENCE_TYPE getCertificatesReferenceType() {
+        return null;
+    }
+    
+    /**
      * Get whether the returned credential is already trusted or not. This is currently
      * applicable in the case of a credential extracted from a trusted HOK SAML Assertion,
      * and a BinarySecurityToken that has been processed by a Validator. In these cases,

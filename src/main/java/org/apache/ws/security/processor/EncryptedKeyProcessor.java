@@ -99,8 +99,9 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
         }
         
+        STRParser strParser = new EncryptedKeySTRParser();
         X509Certificate[] certs = 
-            getCertificatesFromEncryptedKey(elem, data, data.getDecCrypto(), wsDocInfo);
+            getCertificatesFromEncryptedKey(elem, data, data.getDecCrypto(), wsDocInfo, strParser);
 
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
@@ -148,6 +149,7 @@ public class EncryptedKeyProcessor implements Processor {
             encryptedKeyTransportMethod
         );
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, strParser.getCertificatesReferenceType());
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
@@ -211,7 +213,8 @@ public class EncryptedKeyProcessor implements Processor {
         Element xencEncryptedKey,
         RequestData data,
         Crypto crypto,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        STRParser strParser
     ) throws WSSecurityException {
         Element keyInfo = 
             WSSecurityUtil.getDirectChildElement(
@@ -242,12 +245,11 @@ public class EncryptedKeyProcessor implements Processor {
                         WSConstants.WSSE_NS
                     );
             }
-            if (strElement == null) {
+            if (strElement == null || strParser == null) {
                 throw new WSSecurityException(
                     WSSecurityException.INVALID_SECURITY, "noSecTokRef"
                 );
             }
-            STRParser strParser = new EncryptedKeySTRParser();
             strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
             
             X509Certificate[] certs = strParser.getCertificates();

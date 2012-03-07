@@ -37,6 +37,7 @@ import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.str.STRParser;
+import org.apache.ws.security.str.STRParser.REFERENCE_TYPE;
 import org.apache.ws.security.str.SignatureSTRParser;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.transform.STRTransformUtil;
@@ -119,6 +120,7 @@ public class SignatureProcessor implements Processor {
         PublicKey publicKey = null;
         byte[] secretKey = null;
         String signatureMethod = getSignatureMethod(elem);
+        REFERENCE_TYPE referenceType = null;
 
         Validator validator = data.getValidator(WSSecurityEngine.SIGNATURE);
         if (keyInfoElement == null) {
@@ -166,6 +168,7 @@ public class SignatureProcessor implements Processor {
                 certs = strParser.getCertificates();
                 publicKey = strParser.getPublicKey();
                 secretKey = strParser.getSecretKey();
+                referenceType = strParser.getCertificatesReferenceType();
                 
                 boolean trusted = strParser.isTrustedCredential();
                 if (trusted && LOG.isDebugEnabled()) {
@@ -223,6 +226,7 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttribute("Id"));
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
         result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
+        result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }
