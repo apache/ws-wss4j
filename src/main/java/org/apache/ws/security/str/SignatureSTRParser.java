@@ -41,11 +41,13 @@ import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
 import java.security.Principal;
 import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
@@ -371,6 +373,47 @@ public class SignatureSTRParser implements STRParser {
             }
         } else {
             X509Certificate[] foundCerts = secRef.getKeyIdentifier(crypto);
+            if (foundCerts == null) {
+                // The reference may be to a BST in the security header rather than in the keystore
+                if (SecurityTokenReference.SKI_URI.equals(valueType)) {
+                    byte[] skiBytes = secRef.getSKIBytes();
+                    List<WSSecurityEngineResult> resultsList = 
+                        wsDocInfo.getResultsByTag(WSConstants.BST);
+                    for (WSSecurityEngineResult bstResult : resultsList) {
+                        X509Certificate[] certs = 
+                            (X509Certificate[])bstResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+                        if (certs != null
+                            && Arrays.equals(skiBytes, crypto.getSKIBytesFromCert(certs[0]))) {
+                            principal = (Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                            foundCerts = certs;
+                            break;
+                        }
+                    }
+                } else if (SecurityTokenReference.THUMB_URI.equals(valueType)) {
+                    String kiValue = secRef.getKeyIdentifierValue();
+                    List<WSSecurityEngineResult> resultsList = 
+                        wsDocInfo.getResultsByTag(WSConstants.BST);
+                    for (WSSecurityEngineResult bstResult : resultsList) {
+                        X509Certificate[] certs = 
+                            (X509Certificate[])bstResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+                        if (certs != null) {
+                            try {
+                                byte[] digest = WSSecurityUtil.generateDigest(certs[0].getEncoded());
+                                if (Arrays.equals(Base64.decode(kiValue), digest)) {
+                                    principal = (Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                                    foundCerts = certs;
+                                    break;
+                                }
+                            } catch (CertificateEncodingException ex) {
+                                throw new WSSecurityException(
+                                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
+                                    null, ex
+                                );
+                            }
+                        }
+                    }
+                }
+            }
             if (foundCerts != null) {
                 certs = new X509Certificate[]{foundCerts[0]};
             }
