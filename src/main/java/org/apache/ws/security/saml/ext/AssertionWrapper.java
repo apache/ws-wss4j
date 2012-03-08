@@ -294,8 +294,11 @@ public class AssertionWrapper {
      * @return String
      */
     public String assertionToString() throws WSSecurityException {
-        Element element = toDOM(null);
-        return DOM2Writer.nodeToString(element);
+        if (assertionElement == null) {
+            Element element = toDOM(null);
+            return DOM2Writer.nodeToString(element);
+        }
+        return DOM2Writer.nodeToString(assertionElement);
     }
 
     /**

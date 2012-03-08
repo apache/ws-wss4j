@@ -94,6 +94,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
         assertTrue(receivedAssertion.isSigned());
+        assertNotNull(receivedAssertion.assertionToString());
     }
     
     /**
