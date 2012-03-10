@@ -18,8 +18,6 @@
  */
 package org.swssf.wss.ext;
 
-
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.ext.SecurityContext;
 
@@ -29,7 +27,7 @@ import org.swssf.xmlsec.ext.SecurityContext;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public interface WSSecurityContext extends SecurityContext {
+public interface WSSecurityContext extends SecurityContext, SecurityEventListener {
 
     /**
      * Registers a SecurityEventListener to receive Security-Events
@@ -37,12 +35,4 @@ public interface WSSecurityContext extends SecurityContext {
      * @param securityEventListener The SecurityEventListener
      */
     public void addSecurityEventListener(SecurityEventListener securityEventListener);
-
-    /**
-     * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener
-     *
-     * @param securityEvent The security event for the SecurityEventListener
-     * @throws WSSecurityException when the event will not be accepted (e.g. policy-violation)
-     */
-    public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException;
 }
