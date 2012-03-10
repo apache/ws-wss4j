@@ -18,27 +18,13 @@
  */
 package org.swssf.wss.securityEvent;
 
-import javax.xml.namespace.QName;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class RequiredPartSecurityEvent extends SecurityEvent {
-
-    private List<QName> elementPath;
+public class RequiredPartSecurityEvent extends AbstractElementSecurityEvent {
 
     public RequiredPartSecurityEvent() {
         super(Event.RequiredPart);
-    }
-
-    public List<QName> getElementPath() {
-        return elementPath;
-    }
-
-    public void setElementPath(List<QName> elementPath) {
-        this.elementPath = new LinkedList<QName>(elementPath);
     }
 }

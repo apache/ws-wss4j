@@ -68,6 +68,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     private final QName wrapperElementName = new QName("http://dummy", "dummy", uuid);
 
     private ArrayDeque<XMLEvent> tmpXmlEventList = new ArrayDeque<XMLEvent>();
+    private XMLEvent parentStartXMLEvent;
 
     public AbstractDecryptInputProcessor(ReferenceList referenceList, XMLSecurityProperties securityProperties) {
         super(securityProperties);
@@ -233,7 +234,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                     //only fire here ContentEncryptedElementEvents
                     //the other ones will be fired later, because we don't know the encrypted element name yet
                     if (SecurePart.Modifier.Content.getModifier().equals(encryptedDataType.getType())) {
-                        handleEncryptedContent(inputProcessorChain, xmlEvent, securityToken);
+                        handleEncryptedContent(inputProcessorChain, parentStartXMLEvent, xmlEvent, securityToken);
                     }
 
                     Cipher symCipher = null;
@@ -316,7 +317,9 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             }
             return xmlEvent;
         }
-
+        if (xmlEvent.isStartElement()) {
+            parentStartXMLEvent = xmlEvent;
+        }
         return xmlEvent;
     }
 
@@ -328,7 +331,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             SecurityToken securityToken, SecurityContext securityContext, EncryptedDataType encryptedDataType) throws XMLSecurityException;
 
     protected abstract void handleEncryptedContent(
-            InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException;
+            InputProcessorChain inputProcessorChain, XMLEvent parentXMLEvent, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException;
 
     protected ReferenceType matchesReferenceId(StartElement startElement) {
 

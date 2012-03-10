@@ -18,18 +18,37 @@
  */
 package org.swssf.wss.securityEvent;
 
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-
+import javax.xml.namespace.QName;
+import javax.xml.stream.events.XMLEvent;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author $Author$
- * @version $Revision$ $Date$
+ * @author $Author: giger $
+ * @version $Revision: 1296293 $ $Date: 2012-03-02 17:33:09 +0100 (Fri, 02 Mar 2012) $
  */
-public class SignedElementSecurityEvent extends AbstractSecuredElementSecurityEvent {
+public abstract class AbstractElementSecurityEvent extends SecurityEvent {
 
-    public SignedElementSecurityEvent(SecurityToken securityToken, boolean signed, List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(Event.SignedElement, securityToken, protectionOrder, signed, false);
+    private List<QName> elementPath;
+    private XMLEvent xmlEvent;
+
+    public AbstractElementSecurityEvent(Event securityEventType) {
+        super(securityEventType);
+    }
+
+    public List<QName> getElementPath() {
+        return elementPath;
+    }
+
+    public void setElementPath(List<QName> elementPath) {
+        this.elementPath = new LinkedList<QName>(elementPath);
+    }
+
+    public XMLEvent getXmlEvent() {
+        return xmlEvent;
+    }
+
+    public void setXmlEvent(XMLEvent xmlEvent) {
+        this.xmlEvent = xmlEvent;
     }
 }

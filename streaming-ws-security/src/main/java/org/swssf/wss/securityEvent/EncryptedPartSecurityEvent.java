@@ -21,57 +21,15 @@ package org.swssf.wss.securityEvent;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
-import javax.xml.namespace.QName;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class EncryptedPartSecurityEvent extends SecurityEvent {
-
-    private List<QName> elementPath;
-    private boolean encrypted;
-    private SecurityToken securityToken;
-    private List<XMLSecurityConstants.ContentType> protectionOrder;
+public class EncryptedPartSecurityEvent extends AbstractSecuredElementSecurityEvent {
 
     public EncryptedPartSecurityEvent(SecurityToken securityToken, boolean encrypted, List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(Event.EncryptedPart);
-        this.securityToken = securityToken;
-        this.encrypted = encrypted;
-        this.protectionOrder = protectionOrder;
-    }
-
-    public List<QName> getElementPath() {
-        return elementPath;
-    }
-
-    public void setElementPath(List<QName> elementPath) {
-        this.elementPath = new LinkedList<QName>(elementPath);
-    }
-
-    public boolean isEncrypted() {
-        return encrypted;
-    }
-
-    public void setEncrypted(boolean encrypted) {
-        this.encrypted = encrypted;
-    }
-
-    public SecurityToken getSecurityToken() {
-        return securityToken;
-    }
-
-    public void setSecurityToken(SecurityToken securityToken) {
-        this.securityToken = securityToken;
-    }
-
-    public List<XMLSecurityConstants.ContentType> getProtectionOrder() {
-        return protectionOrder;
-    }
-
-    public void setProtectionOrder(List<XMLSecurityConstants.ContentType> protectionOrder) {
-        this.protectionOrder = protectionOrder;
+        super(Event.EncryptedPart, securityToken, protectionOrder, false, encrypted);
     }
 }

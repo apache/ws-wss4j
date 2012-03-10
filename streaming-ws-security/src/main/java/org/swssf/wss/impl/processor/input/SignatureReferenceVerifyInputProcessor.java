@@ -107,11 +107,13 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     SignedPartSecurityEvent signedPartSecurityEvent =
                             new SignedPartSecurityEvent(getSecurityToken(), true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                     signedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
+                    signedPartSecurityEvent.setXmlEvent(xmlEvent);
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
                 } else {
                     SignedElementSecurityEvent signedElementSecurityEvent =
                             new SignedElementSecurityEvent(getSecurityToken(), true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                     signedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
+                    signedElementSecurityEvent.setXmlEvent(xmlEvent);
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
                 }
             }

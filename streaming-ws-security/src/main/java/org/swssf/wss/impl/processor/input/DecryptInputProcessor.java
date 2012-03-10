@@ -53,8 +53,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         super(keyInfoType, referenceList, securityProperties);
     }
 
-    protected void handleEncryptedContent(
-            InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException {
+    protected void handleEncryptedContent(InputProcessorChain inputProcessorChain, XMLEvent parentXMLEvent, XMLEvent xmlEvent,
+                                          SecurityToken securityToken) throws XMLSecurityException {
 
         List<QName> parentElementPath = inputProcessorChain.getDocumentContext().getParentElementPath(xmlEvent.getEventType());
         if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
@@ -63,11 +63,13 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             EncryptedPartSecurityEvent encryptedPartSecurityEvent =
                     new EncryptedPartSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
             encryptedPartSecurityEvent.setElementPath(parentElementPath);
+            encryptedPartSecurityEvent.setXmlEvent(parentXMLEvent);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
         } else {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
                     new ContentEncryptedElementSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
             contentEncryptedElementSecurityEvent.setElementPath(parentElementPath);
+            contentEncryptedElementSecurityEvent.setXmlEvent(parentXMLEvent);
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
     }
@@ -124,17 +126,20 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
 
         protected void handleEncryptedElement(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException {
+            //todo Document-Context-Path seems to be wrong! Test with EnDecryptionTest#testEncDecryptionPartsHeaderInbound
             //fire a SecurityEvent:
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                     && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                 EncryptedPartSecurityEvent encryptedPartSecurityEvent =
                         new EncryptedPartSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                 encryptedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
+                encryptedPartSecurityEvent.setXmlEvent(xmlEvent);
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
             } else {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent =
                         new EncryptedElementSecurityEvent(securityToken, true, inputProcessorChain.getDocumentContext().getProtectionOrder());
                 encryptedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
+                encryptedElementSecurityEvent.setXmlEvent(xmlEvent);
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedElementSecurityEvent);
             }
         }
