@@ -59,6 +59,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                 new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(), WSSConstants.TAG_wsc0502_Identifier.getLocalPart()));
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         final WSSecurityToken securityContextToken =
                 new AbstractSecurityToken(
@@ -94,6 +95,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                     }
                 };
         securityContextToken.setElementPath(elementPath);
+        securityContextToken.setXMLEvent(responsibleStartXMLEvent);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 

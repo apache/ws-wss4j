@@ -181,6 +181,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         final String password = passwordType.getValue();
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -193,6 +194,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(username.getValue(), password,
                         created, nonceVal, salt, iteration, (WSSecurityContext) inputProcessorChain.getSecurityContext(), usernameTokenType.getId());
                 this.securityToken.setElementPath(elementPath);
+                this.securityToken.setXMLEvent(responsibleStartXMLEvent);
                 return this.securityToken;
             }
 

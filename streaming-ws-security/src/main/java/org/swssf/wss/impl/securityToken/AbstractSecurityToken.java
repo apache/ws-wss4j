@@ -31,6 +31,7 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -57,6 +58,7 @@ public abstract class AbstractSecurityToken implements WSSecurityToken {
     private String id;
     private Object processor;
     private List<QName> elementPath;
+    private XMLEvent xmlEvent;
     private WSSConstants.KeyIdentifierType keyIdentifierType;
     private List<SecurityToken> wrappedTokens;
     private List<TokenUsage> tokenUsages = new ArrayList<TokenUsage>();
@@ -110,6 +112,16 @@ public abstract class AbstractSecurityToken implements WSSecurityToken {
 
     public void setElementPath(List<QName> elementPath) {
         this.elementPath = Collections.unmodifiableList(elementPath);
+    }
+
+    @Override
+    public XMLEvent getXMLEvent() {
+        return xmlEvent;
+    }
+
+    @Override
+    public void setXMLEvent(XMLEvent xmlEvent) {
+        this.xmlEvent = xmlEvent;
     }
 
     public Crypto getCrypto() {

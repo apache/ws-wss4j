@@ -64,6 +64,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
         }
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -151,6 +152,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
                 };
                 this.derivedKeySecurityToken.setElementPath(elementPath);
+                this.derivedKeySecurityToken.setXMLEvent(responsibleStartXMLEvent);
                 return this.derivedKeySecurityToken;
             }
 

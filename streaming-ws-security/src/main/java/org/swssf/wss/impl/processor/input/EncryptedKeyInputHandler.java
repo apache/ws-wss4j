@@ -63,6 +63,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         }
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -171,6 +172,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     }
                 };
                 this.securityToken.setElementPath(elementPath);
+                this.securityToken.setXMLEvent(responsibleStartXMLEvent);
                 return this.securityToken;
             }
 

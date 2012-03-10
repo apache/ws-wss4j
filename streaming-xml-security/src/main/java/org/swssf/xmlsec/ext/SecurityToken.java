@@ -19,6 +19,7 @@
 package org.swssf.xmlsec.ext;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -71,6 +72,13 @@ public interface SecurityToken {
      * @return A list containing full qualified element names
      */
     List<QName> getElementPath();
+
+    /**
+     * Returns the first XMLEvent for this token
+     *
+     * @return
+     */
+    XMLEvent getXMLEvent();
 
     /**
      * Returns the token type

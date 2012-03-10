@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -62,5 +63,14 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
         }
         return elementPath;
+    }
+
+    protected XMLEvent getResponsibleStartXMLEvent(Deque<XMLEvent> eventDeque, int index) {
+        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        int curIdx = 0;
+        while (curIdx++ < index) {
+            xmlEventIterator.next();
+        }
+        return xmlEventIterator.next();
     }
 }

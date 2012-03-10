@@ -53,6 +53,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         }
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
+        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -77,6 +78,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                         crypto,
                         securityProperties.getCallbackHandler());
                 this.binarySecurityToken.setElementPath(elementPath);
+                this.binarySecurityToken.setXMLEvent(responsibleStartXMLEvent);
                 return this.binarySecurityToken;
             }
 
