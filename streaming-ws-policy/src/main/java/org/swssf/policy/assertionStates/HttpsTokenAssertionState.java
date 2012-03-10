@@ -57,25 +57,27 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
             setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + httpsToken.getIssuerName() + ") didn't match with the one in the HttpsToken (" + httpsTokenSecurityEvent.getIssuerName() + ")");
         }
-        switch (httpsToken.getAuthenticationType()) {
-            case HttpBasicAuthentication:
-                if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
-                    setAsserted(false);
-                    setErrorMessage("Policy enforces HttpBasicAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
-                }
-                break;
-            case HttpDigestAuthentication:
-                if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication) {
-                    setAsserted(false);
-                    setErrorMessage("Policy enforces HttpDigestAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
-                }
-                break;
-            case RequireClientCertificate:
-                if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
-                    setAsserted(false);
-                    setErrorMessage("Policy enforces HttClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
-                }
-                break;
+        if (httpsToken.getAuthenticationType() != null) {
+            switch (httpsToken.getAuthenticationType()) {
+                case HttpBasicAuthentication:
+                    if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces HttpBasicAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                    }
+                    break;
+                case HttpDigestAuthentication:
+                    if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces HttpDigestAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                    }
+                    break;
+                case RequireClientCertificate:
+                    if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces HttClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                    }
+                    break;
+            }
         }
         return isAsserted();
     }
