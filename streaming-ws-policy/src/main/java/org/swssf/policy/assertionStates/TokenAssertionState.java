@@ -60,6 +60,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 if (!(parentAssertion instanceof InitiatorToken)
                         && !(parentAssertion instanceof InitiatorSignatureToken)
                         && !(parentAssertion instanceof SignatureToken)
+                        && !(parentAssertion instanceof ProtectionToken)
                         && !(parentAssertion instanceof TransportToken)) {
                     return true;
                 }
@@ -70,6 +71,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 if (!(parentAssertion instanceof RecipientToken)
                         && !(parentAssertion instanceof RecipientEncryptionToken)
                         && !(parentAssertion instanceof EncryptionToken)
+                        && !(parentAssertion instanceof ProtectionToken)
                         && !(parentAssertion instanceof TransportToken)) {
                     return true;
                 }
