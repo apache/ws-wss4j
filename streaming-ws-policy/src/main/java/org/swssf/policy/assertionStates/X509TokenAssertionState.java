@@ -93,32 +93,34 @@ public class X509TokenAssertionState extends TokenAssertionState {
                 setAsserted(false);
                 setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " not supported");
             }
-            switch (x509Token.getTokenType()) {
-                case WssX509V3Token10:
-                case WssX509V3Token11:
-                    if (WSSConstants.X509V3Token != securityToken.getTokenType() || x509Certificate.getVersion() != 3) {
+            if (x509Token.getTokenType() != null) {
+                switch (x509Token.getTokenType()) {
+                    case WssX509V3Token10:
+                    case WssX509V3Token11:
+                        if (WSSConstants.X509V3Token != securityToken.getTokenType() || x509Certificate.getVersion() != 3) {
+                            setAsserted(false);
+                            setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
+                        }
+                        break;
+                    case WssX509V1Token11:
+                        if (WSSConstants.X509V1Token != securityToken.getTokenType() || x509Certificate.getVersion() != 1) {
+                            setAsserted(false);
+                            setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
+                        }
+                        break;
+                    case WssX509PkiPathV1Token10:
+                    case WssX509PkiPathV1Token11:
+                        if (securityToken.getTokenType() != WSSConstants.X509PkiPathV1Token) {
+                            setAsserted(false);
+                            setErrorMessage("Policy enforces " + x509Token.getTokenType() + " but we got " + securityToken.getTokenType());
+                        }
+                        break;
+                    case WssX509Pkcs7Token10:
+                    case WssX509Pkcs7Token11:
                         setAsserted(false);
-                        setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
-                    }
-                    break;
-                case WssX509V1Token11:
-                    if (WSSConstants.X509V1Token != securityToken.getTokenType() || x509Certificate.getVersion() != 1) {
-                        setAsserted(false);
-                        setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
-                    }
-                    break;
-                case WssX509PkiPathV1Token10:
-                case WssX509PkiPathV1Token11:
-                    if (securityToken.getTokenType() != WSSConstants.X509PkiPathV1Token) {
-                        setAsserted(false);
-                        setErrorMessage("Policy enforces " + x509Token.getTokenType() + " but we got " + securityToken.getTokenType());
-                    }
-                    break;
-                case WssX509Pkcs7Token10:
-                case WssX509Pkcs7Token11:
-                    setAsserted(false);
-                    setErrorMessage("Unsupported token type: " + securityToken.getTokenType());
-                    break;
+                        setErrorMessage("Unsupported token type: " + securityToken.getTokenType());
+                        break;
+                }
             }
         } catch (XMLSecurityException e) {
             setAsserted(false);
