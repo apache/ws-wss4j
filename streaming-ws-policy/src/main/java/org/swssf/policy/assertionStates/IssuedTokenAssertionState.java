@@ -21,9 +21,7 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
-import org.swssf.wss.securityEvent.IssuedTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.*;
 
 /**
  * @author $Author$
@@ -42,13 +40,17 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEvent.Event[] getSecurityEventType() {
         return new SecurityEvent.Event[]{
-                SecurityEvent.Event.IssuedToken
+                SecurityEvent.Event.SecurityContextToken,
+                SecurityEvent.Event.SamlToken,
+                SecurityEvent.Event.RelToken,
         };
     }
 
     @Override
     public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
-        if (!(tokenSecurityEvent instanceof IssuedTokenSecurityEvent)) {
+        if (!(tokenSecurityEvent instanceof SamlTokenSecurityEvent)
+                && !(tokenSecurityEvent instanceof SecurityContextTokenSecurityEvent)
+                && !(tokenSecurityEvent instanceof RelTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a IssuedTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
         setAsserted(true);

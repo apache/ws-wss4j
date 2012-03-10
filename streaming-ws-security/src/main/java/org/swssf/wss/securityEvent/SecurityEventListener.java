@@ -27,5 +27,11 @@ import org.swssf.wss.ext.WSSecurityException;
  */
 public interface SecurityEventListener {
 
+    /**
+     * Registers a SecurityEvent which will be forwarded to the registered SecurityEventListener
+     *
+     * @param securityEvent The security event for the SecurityEventListener
+     * @throws WSSecurityException when the event will not be accepted (e.g. policy-violation)
+     */
     public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException;
 }

@@ -154,9 +154,6 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
                     SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.DerivedKeyToken,
-                    SecurityEvent.Event.DerivedKeyToken,
                     SecurityEvent.Event.EncryptedPart,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,

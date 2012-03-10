@@ -46,6 +46,7 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
         SignatureVerifier signatureVerifier = new SignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
             @Override
             protected void handleSecurityToken(SecurityToken securityToken) throws XMLSecurityException {
+                //we have to emit a TokenSecurityEvent here too since it could be an embedded token
                 securityToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
                 TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
                 securityContext.registerSecurityEvent(tokenSecurityEvent);

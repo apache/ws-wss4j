@@ -38,6 +38,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PublicKey;
@@ -51,6 +53,10 @@ import java.security.cert.X509Certificate;
 public class AbstractPolicyTestBase extends AbstractTestBase {
 
     protected PolicyEnforcer buildAndStartPolicyEngine(String policyString) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
+        return this.buildAndStartPolicyEngine(policyString, false);
+    }
+    
+    protected PolicyEnforcer buildAndStartPolicyEngine(String policyString, boolean replacePolicyElement) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setValidating(false);
@@ -61,7 +67,11 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         Document policyDocument = documentBuilder.parse(new ByteArrayInputStream(policyString.getBytes("UTF-8")));
         Node policyNode = document.importNode(policyDocument.getDocumentElement(), true);
         Element element = (Element) nodeList.item(0);
-        element.appendChild(policyNode);
+        if (replacePolicyElement) {
+            element.getParentNode().replaceChild(element, policyNode);
+        } else {
+            element.appendChild(policyNode);
+        }
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(document);
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("");
 
@@ -114,5 +124,16 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
                 return x509Certificates;
             }
         };
+    }
+    
+    protected String loadResourceAsString(String resource, String encoding) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(resource), encoding);
+        StringBuilder stringBuilder = new StringBuilder();
+        int read = 0;
+        char[] buffer = new char[1024];
+        while ((read = inputStreamReader.read(buffer)) != -1) {
+            stringBuilder.append(buffer, 0, read);
+        }
+        return stringBuilder.toString();
     }
 }

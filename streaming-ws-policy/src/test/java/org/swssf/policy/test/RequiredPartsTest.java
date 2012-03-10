@@ -50,20 +50,20 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        RequiredPartSecurityEvent RequiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        RequiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
-        policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
+        RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
+        requiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
         List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "a"));
-        RequiredPartSecurityEvent.setElementPath(headerPath);
-        policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
+        requiredPartSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
         //additional encryptedParts are also allowed!
         headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "b"));
-        RequiredPartSecurityEvent.setElementPath(headerPath);
-        policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
+        requiredPartSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
         policyEnforcer.doFinal();
     }
 
@@ -79,9 +79,9 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        RequiredPartSecurityEvent RequiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        RequiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
-        policyEnforcer.registerSecurityEvent(RequiredPartSecurityEvent);
+        RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
+        requiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
         try {
             policyEnforcer.doFinal();
             Assert.fail("Exception expected");

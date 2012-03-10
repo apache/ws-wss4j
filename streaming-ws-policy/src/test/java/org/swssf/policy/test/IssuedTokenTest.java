@@ -19,12 +19,11 @@
 
 package org.swssf.policy.test;
 
+import org.opensaml.common.SAMLVersion;
 import org.swssf.policy.PolicyEnforcer;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
-import org.swssf.wss.securityEvent.IssuedTokenSecurityEvent;
-import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
+import org.swssf.wss.securityEvent.*;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.testng.annotations.Test;
@@ -69,14 +68,14 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        IssuedTokenSecurityEvent initiatorTokenSecurityEvent = new IssuedTokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        SamlTokenSecurityEvent initiatorTokenSecurityEvent = new SamlTokenSecurityEvent();
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        IssuedTokenSecurityEvent recipientTokenSecurityEvent = new IssuedTokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
+        SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
