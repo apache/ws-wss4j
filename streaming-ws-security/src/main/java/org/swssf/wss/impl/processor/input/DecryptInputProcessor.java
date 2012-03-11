@@ -126,7 +126,6 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
 
         protected void handleEncryptedElement(InputProcessorChain inputProcessorChain, XMLEvent xmlEvent, SecurityToken securityToken) throws XMLSecurityException {
-            //todo Document-Context-Path seems to be wrong! Test with EnDecryptionTest#testEncDecryptionPartsHeaderInbound
             //fire a SecurityEvent:
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                     && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
