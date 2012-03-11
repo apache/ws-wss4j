@@ -158,7 +158,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
     /**
      * Since we don't support (yet) external URI refs this shouldn't be a problem.
      * <p/>
-     * todo this test modifies signed content. test with encryption uri's or so
      *
      * @throws Exception
      */
@@ -194,7 +193,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertNotNull(throwable);
             //todo exception should be a WSSecurityException
             Assert.assertTrue(throwable instanceof XMLSecurityException);
-            Assert.assertTrue(throwable.getMessage().startsWith("The signature or decryption was invalid (Digest verification failed"));
+            Assert.assertEquals(throwable.getMessage(), "The signature or decryption was invalid (Some encryption references were not processed... Probably security header ordering problem?)");
         }
     }
 

@@ -21,6 +21,7 @@ package org.swssf.wss.test;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.securityEvent.*;
 import org.swssf.xmlsec.ext.SecurePart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -28,6 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -40,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -124,7 +127,17 @@ public class EncDecryptionTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.Operation,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.EncryptedPart,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -134,6 +147,26 @@ public class EncDecryptionTest extends AbstractTestBase {
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                    OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
+                    EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                }
+            }
         }
     }
 
@@ -210,7 +243,67 @@ public class EncDecryptionTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.Operation,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.ContentEncrypted,
+                    SecurityEvent.Event.AlgorithmSuite,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -220,6 +313,26 @@ public class EncDecryptionTest extends AbstractTestBase {
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                    OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.ContentEncrypted) {
+                    ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
+                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getSecurityToken());
+                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getElementPath());
+                    final QName expectedElementName = new QName("http://www.w3.org/1999/XMLSchema", "simpleType");
+                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().size(), 6);
+                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().get(contentEncryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                }
+            }
         }
     }
 
@@ -323,7 +436,67 @@ public class EncDecryptionTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.wss.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.Operation,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+                    SecurityEvent.Event.EncryptedKeyToken,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedElement,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -333,6 +506,26 @@ public class EncDecryptionTest extends AbstractTestBase {
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                    OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedElement) {
+                    EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
+                    Assert.assertNotNull(encryptedElementSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedElementSecurityEvent.getSecurityToken());
+                    Assert.assertNotNull(encryptedElementSecurityEvent.getElementPath());
+                    final QName expectedElementName = new QName("http://www.w3.org/1999/XMLSchema", "simpleType");
+                    Assert.assertEquals(encryptedElementSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedElementSecurityEvent.getElementPath().size(), 6);
+                    Assert.assertEquals(encryptedElementSecurityEvent.getElementPath().get(encryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                }
+            }
         }
     }
 
@@ -361,7 +554,17 @@ public class EncDecryptionTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.wss.test.CallbackHandlerImpl());
-            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.Operation,
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.EncryptedPart,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
@@ -371,6 +574,26 @@ public class EncDecryptionTest extends AbstractTestBase {
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse11_EncryptedHeader.getNamespaceURI(), WSSConstants.TAG_wsse11_EncryptedHeader.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+
+            securityEventListener.compare();
+
+            List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                    OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
+                    EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    final QName expectedElementName = new QName("http://www.example.com", "testEncryptedHeader");
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 3);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                }
+            }
         }
     }
 

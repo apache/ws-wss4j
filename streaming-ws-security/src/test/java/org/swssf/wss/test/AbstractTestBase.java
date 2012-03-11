@@ -554,6 +554,10 @@ public abstract class AbstractTestBase {
             this.expectedEvents = expectedEvents;
         }
 
+        public List<SecurityEvent> getReceivedSecurityEvents() {
+            return receivedSecurityEvents;
+        }
+
         @Override
         public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
             receivedSecurityEvents.add(securityEvent);
