@@ -348,8 +348,6 @@ public class WSSUtils extends XMLSecurityUtils {
             tokenSecurityEvent = new X509TokenSecurityEvent();
         } else if (tokenType == WSSConstants.UsernameToken) {
             tokenSecurityEvent = new UsernameTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.IssuedToken) {
-            tokenSecurityEvent = new IssuedTokenSecurityEvent();
         } else if (tokenType == WSSConstants.KerberosToken) {
             tokenSecurityEvent = new KerberosTokenSecurityEvent();
         } else if (tokenType == WSSConstants.SpnegoContextToken) {
