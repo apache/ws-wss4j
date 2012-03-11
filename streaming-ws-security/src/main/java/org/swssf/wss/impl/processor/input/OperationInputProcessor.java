@@ -20,7 +20,6 @@ package org.swssf.wss.impl.processor.input;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractInputProcessor;
@@ -56,8 +55,6 @@ public class OperationInputProcessor extends AbstractInputProcessor {
         if (xmlEvent.isStartElement()) {
             if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
                 OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-                operationSecurityEvent.setWsSecurityContext((WSSecurityContext) inputProcessorChain.getSecurityContext());
-                operationSecurityEvent.setWssSecurityProperties((WSSSecurityProperties) getSecurityProperties());
                 operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(operationSecurityEvent);
                 inputProcessorChain.removeProcessor(this);

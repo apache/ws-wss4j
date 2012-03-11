@@ -18,9 +18,6 @@
  */
 package org.swssf.wss.securityEvent;
 
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSecurityContext;
-
 import javax.xml.namespace.QName;
 
 /**
@@ -30,8 +27,6 @@ import javax.xml.namespace.QName;
 public class OperationSecurityEvent extends SecurityEvent {
 
     private QName operation;
-    private WSSecurityContext wsSecurityContext;
-    private WSSSecurityProperties wssSecurityProperties;
 
     public OperationSecurityEvent() {
         super(Event.Operation);
@@ -43,21 +38,5 @@ public class OperationSecurityEvent extends SecurityEvent {
 
     public void setOperation(QName operation) {
         this.operation = operation;
-    }
-
-    public WSSecurityContext getWsSecurityContext() {
-        return wsSecurityContext;
-    }
-
-    public void setWsSecurityContext(WSSecurityContext wsSecurityContext) {
-        this.wsSecurityContext = wsSecurityContext;
-    }
-
-    public WSSSecurityProperties getWssSecurityProperties() {
-        return wssSecurityProperties;
-    }
-
-    public void setWssSecurityProperties(WSSSecurityProperties wssSecurityProperties) {
-        this.wssSecurityProperties = wssSecurityProperties;
     }
 }
