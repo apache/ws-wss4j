@@ -25,11 +25,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A simple in-memory HashSet based cache to prevent against replay attacks.
+ * A simple in-memory HashSet based cache to prevent against replay attacks. The default TTL is 5 minutes
+ * and the max TTL is 60 minutes.
  */
 public class MemoryReplayCache implements ReplayCache {
     
     public static final long DEFAULT_TTL = 60L * 5L;
+    public static final long MAX_TTL = DEFAULT_TTL * 12L;
     private Set<ReplayCacheIdentifier> cache = 
         Collections.synchronizedSet(new HashSet<ReplayCacheIdentifier>());
     
@@ -53,9 +55,14 @@ public class MemoryReplayCache implements ReplayCache {
         ReplayCacheIdentifier cacheIdentifier = new ReplayCacheIdentifier();
         cacheIdentifier.setIdentifier(identifier);
         
+        long ttl = timeToLive;
+        if (ttl < 0 || ttl > MAX_TTL) {
+            ttl = DEFAULT_TTL;
+        }
+        
         Date expires = new Date();
         long currentTime = expires.getTime();
-        expires.setTime(currentTime + (timeToLive * 1000L));
+        expires.setTime(currentTime + (ttl * 1000L));
         cacheIdentifier.setExpiry(expires);
         
         cache.add(cacheIdentifier);
