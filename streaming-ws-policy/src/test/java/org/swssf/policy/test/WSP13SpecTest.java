@@ -20,6 +20,7 @@ package org.swssf.policy.test;
 
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.policy.PolicyEnforcer;
+import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.test.InboundWSSecurityContextImplTest;
 import org.testng.Assert;
@@ -36,8 +37,8 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
 
     private InboundWSSecurityContextImplTest inboundWSSecurityContextImplTest = new InboundWSSecurityContextImplTest();
 
-    @DataProvider(name = "ignoreEventsTransportBinding")
-    public Object[][] ignoreEventsTransportBinding() {
+    @DataProvider(name = "ignoreEventsTransportBindingC11a")
+    public Object[][] ignoreEventsTransportBindingC11a() {
         return new Object[][]{
                 {null, null, null},
                 {SecurityEvent.Event.HttpsToken, 1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}HttpsToken not satisfied"},
@@ -47,40 +48,18 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
         };
     }
 
-    @Test(dataProvider = "ignoreEventsTransportBinding")
-    public void testTransportBindingC11(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
+    @Test(dataProvider = "ignoreEventsTransportBindingC11a")
+    public void testTransportBindingC11a(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
         String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
-        for (int i = 0; i < securityEventList.size(); i++) {
-            SecurityEvent securityEvent = securityEventList.get(i);
-            if (eventIndex != null && i == eventIndex && securityEvent.getSecurityEventType() != ignoreEvent) {
-                for (int j = 0; j < securityEventList.size(); j++) {
-                    System.out.println(j + " " + securityEventList.get(j));
-                }
-                Assert.fail("Event at index " + eventIndex + " is not of type " + ignoreEvent);
-            }
-            if (ignoreEvent == null || i != eventIndex) {
-                policyEnforcer.registerSecurityEvent(securityEvent);
-            }
-        }
-        try {
-            policyEnforcer.doFinal();
-            if (ignoreEvent != null) {
-                Assert.fail("Expected WSSPolicyException");
-            }
-        } catch (WSSPolicyException e) {
-            if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException");
-            }
-            Assert.assertEquals(e.getMessage(), expectedErrorMessage);
-        }
+        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
     }
 
-    @DataProvider(name = "ignoreEventsAsymmetricBinding")
-    public Object[][] ignoreEventsAsymmetricBinding() {
+    @DataProvider(name = "ignoreEventsAsymmetricBindingC31a")
+    public Object[][] ignoreEventsAsymmetricBindingC31a() {
         return new Object[][]{
                 {null, null, null},
                 {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
@@ -89,57 +68,64 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
         };
     }
 
-    @Test(dataProvider = "ignoreEventsAsymmetricBinding")
-    public void testAsymmetricBindingC31(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
+    @Test(dataProvider = "ignoreEventsAsymmetricBindingC31a")
+    public void testAsymmetricBindingC31a(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
         String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateAsymmetricBindingSecurityEvents();
-        for (int i = 0; i < securityEventList.size(); i++) {
-            SecurityEvent securityEvent = securityEventList.get(i);
-            if (eventIndex != null && i == eventIndex && securityEvent.getSecurityEventType() != ignoreEvent) {
-                for (int j = 0; j < securityEventList.size(); j++) {
-                    System.out.println(j + " " + securityEventList.get(j));
-                }
-                Assert.fail("Event at index " + eventIndex + " is not of type " + ignoreEvent);
-            }
-            if (ignoreEvent == null || i != eventIndex) {
-                policyEnforcer.registerSecurityEvent(securityEvent);
-            }
-        }
-        try {
-            policyEnforcer.doFinal();
-            if (ignoreEvent != null) {
-                Assert.fail("Expected WSSPolicyException");
-            }
-        } catch (WSSPolicyException e) {
-            if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException");
-            }
-            Assert.assertEquals(e.getMessage(), expectedErrorMessage);
-        }
+        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
     }
 
-    @DataProvider(name = "ignoreEventsSymmetricBinding")
-    public Object[][] ignoreEventsSymmetricBinding() {
+    @DataProvider(name = "ignoreEventsSymmetricBindingC21a")
+    public Object[][] ignoreEventsSymmetricBindingC21a() {
         return new Object[][]{
                 {null, null, null},
                 {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
+                {SecurityEvent.Event.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied"},
                 {SecurityEvent.Event.UsernameToken, 5, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
                 {SecurityEvent.Event.X509Token, 16, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
         };
     }
 
-    @Test(dataProvider = "ignoreEventsSymmetricBinding")
-    public void testSymmetricBindingC31(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
-        String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21.xml", "UTF-8");
+    @Test(dataProvider = "ignoreEventsSymmetricBindingC21a")
+    public void testSymmetricBindingC21a(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
+        String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
+    }
+
+    @DataProvider(name = "ignoreEventsSymmetricBindingC21b")
+    public Object[][] ignoreEventsSymmetricBindingC21b() {
+        return new Object[][]{
+                {null, null, null},
+                {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
+                {SecurityEvent.Event.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied"},
+                {SecurityEvent.Event.UsernameToken, 5, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
+                {SecurityEvent.Event.X509Token, 16, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
+        };
+    }
+
+    @Test(dataProvider = "ignoreEventsSymmetricBindingC21b")
+    public void testSymmetricBindingC21b(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
+        String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
+    }
+
+    private void applyPolicy(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage, PolicyEnforcer policyEnforcer, List<SecurityEvent> securityEventList) throws WSSecurityException {
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
+            if (eventIndex != null && eventIndex == -1 && securityEvent.getSecurityEventType() == ignoreEvent) {
+                continue;
+            }
             if (eventIndex != null && i == eventIndex && securityEvent.getSecurityEventType() != ignoreEvent) {
                 for (int j = 0; j < securityEventList.size(); j++) {
                     System.out.println(j + " " + securityEventList.get(j));

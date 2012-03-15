@@ -29,17 +29,18 @@ import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
+import java.util.Iterator;
+
 /**
+ * WSP1.3, 5 Token Assertions
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
-
 public abstract class TokenAssertionState extends AssertionState implements Assertable {
 
-    //todo how to verify the issuer of the UsernameToken??
-    //todo <sp:Issuer>wsa:EndpointReferenceType</sp:Issuer>
-    //todo issuerName
-    //todo claims
+    //todo WSP1.3, 5.2.1 Token Issuer: <sp:Issuer>wsa:EndpointReferenceType</sp:Issuer>
+    //todo? WSP1.3 5.2.3 Required Claims
     //todo derived keys?
 
     public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
@@ -51,53 +52,66 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
 
         TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
         AbstractToken abstractToken = (AbstractToken) getAssertion();
-
         final AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
-        //todo what todo with the other usages if there are any? What when a sig and enc derives from the same source token?
-        SecurityToken.TokenUsage tokenUsage = tokenSecurityEvent.getSecurityToken().getTokenUsages().get(0);
-        switch (tokenUsage) {
-            case MainSignature:
-                if (!(parentAssertion instanceof InitiatorToken)
-                        && !(parentAssertion instanceof InitiatorSignatureToken)
-                        && !(parentAssertion instanceof SignatureToken)
-                        && !(parentAssertion instanceof ProtectionToken)
-                        && !(parentAssertion instanceof TransportToken)) {
-                    return true;
-                }
-                break;
-            case Signature:
-                throw new WSSPolicyException("Illegal token usage!");
-            case MainEncryption:
-                if (!(parentAssertion instanceof RecipientToken)
-                        && !(parentAssertion instanceof RecipientEncryptionToken)
-                        && !(parentAssertion instanceof EncryptionToken)
-                        && !(parentAssertion instanceof ProtectionToken)
-                        && !(parentAssertion instanceof TransportToken)) {
-                    return true;
-                }
-                break;
-            case Encryption:
-                throw new WSSPolicyException("Illegal token usage!");
-            case SupportingTokens:
-            case SignedSupportingTokens:
-            case EndorsingSupportingTokens:
-            case SignedEndorsingSupportingTokens:
-            case SignedEncryptedSupportingTokens:
-            case EncryptedSupportingTokens:
-            case EndorsingEncryptedSupportingTokens:
-            case SignedEndorsingEncryptedSupportingTokens:
-                if (!(parentAssertion instanceof SupportingTokens)) {
-                    return true;
-                }
 
-                SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
-                SecurityToken.TokenUsage expectedTokenUsage = SecurityToken.TokenUsage.valueOf(supportingTokens.getName().getLocalPart());
-                if (expectedTokenUsage != tokenUsage) {
-                    return true;
-                }
-                break;
+        int ignoreToken = 0;
+        Iterator<SecurityToken.TokenUsage> tokenUsageIterator = tokenSecurityEvent.getSecurityToken().getTokenUsages().iterator();
+        while (tokenUsageIterator.hasNext()) {
+            SecurityToken.TokenUsage tokenUsage = tokenUsageIterator.next();
+            switch (tokenUsage) {
+                case MainSignature:
+                    if (!(parentAssertion instanceof InitiatorToken)
+                            && !(parentAssertion instanceof InitiatorSignatureToken)
+                            && !(parentAssertion instanceof SignatureToken)
+                            && !(parentAssertion instanceof ProtectionToken)
+                            && !(parentAssertion instanceof TransportToken)) {
+                        ignoreToken++;
+                        break;
+                    }
+                    break;
+                case Signature:
+                    throw new WSSPolicyException("Illegal token usage!");
+                case MainEncryption:
+                    if (!(parentAssertion instanceof RecipientToken)
+                            && !(parentAssertion instanceof RecipientEncryptionToken)
+                            && !(parentAssertion instanceof EncryptionToken)
+                            && !(parentAssertion instanceof ProtectionToken)
+                            && !(parentAssertion instanceof TransportToken)) {
+                        ignoreToken++;
+                        break;
+                    }
+                    break;
+                case Encryption:
+                    throw new WSSPolicyException("Illegal token usage!");
+                case SupportingTokens:
+                case SignedSupportingTokens:
+                case EndorsingSupportingTokens:
+                case SignedEndorsingSupportingTokens:
+                case SignedEncryptedSupportingTokens:
+                case EncryptedSupportingTokens:
+                case EndorsingEncryptedSupportingTokens:
+                case SignedEndorsingEncryptedSupportingTokens:
+                    if (!(parentAssertion instanceof SupportingTokens)) {
+                        ignoreToken++;
+                        break;
+                    }
+
+                    SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
+                    SecurityToken.TokenUsage expectedTokenUsage = SecurityToken.TokenUsage.valueOf(supportingTokens.getName().getLocalPart());
+                    if (expectedTokenUsage != tokenUsage) {
+                        ignoreToken++;
+                        break;
+                    }
+                    break;
+            }
+        }
+        if (ignoreToken >= tokenSecurityEvent.getSecurityToken().getTokenUsages().size()) {
+            //token is not for us, so return true to prevent false alarm
+            return true;
         }
 
+        //WSP1.3, 5.1 Token Inclusion
+        //todo do we need a global token cache to fullfill ".../IncludeToken/Once" ?
         SPConstants.IncludeTokenType includeTokenType = abstractToken.getIncludeTokenType();
         if (includeTokenType == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             setAsserted(false);
