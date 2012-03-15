@@ -25,7 +25,7 @@ import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SamlTokenSecurityEvent extends TokenSecurityEvent {
+public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     public SamlTokenSecurityEvent() {
         super(Event.SamlToken);
@@ -35,6 +35,7 @@ public class SamlTokenSecurityEvent extends TokenSecurityEvent {
         return ((SAMLSecurityToken) getSecurityToken()).getSamlVersion();
     }
 
+    @Override
     public String getIssuerName() {
         return ((SAMLSecurityToken) getSecurityToken()).getIssuer();
     }

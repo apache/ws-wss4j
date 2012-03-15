@@ -22,11 +22,21 @@ package org.swssf.wss.securityEvent;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class RelTokenSecurityEvent extends TokenSecurityEvent {
+public class RelTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     //todo implement
+    private String issuerName;
 
     public RelTokenSecurityEvent() {
         super(Event.RelToken);
+    }
+
+    @Override
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
     }
 }

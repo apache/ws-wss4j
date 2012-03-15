@@ -21,17 +21,19 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
-import org.swssf.wss.securityEvent.*;
+import org.apache.ws.secpolicy.model.IssuedToken;
+import org.swssf.wss.securityEvent.IssuedTokenSecurityEvent;
+import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.2 IssuedToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
 
 public class IssuedTokenAssertionState extends TokenAssertionState {
-
-    //todo RequestSecurityTokenTemplate
-    //todo sowieso
 
     public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
@@ -48,13 +50,22 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
 
     @Override
     public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
-        if (!(tokenSecurityEvent instanceof SamlTokenSecurityEvent)
-                && !(tokenSecurityEvent instanceof SecurityContextTokenSecurityEvent)
-                && !(tokenSecurityEvent instanceof RelTokenSecurityEvent)) {
+        if (!(tokenSecurityEvent instanceof IssuedTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a IssuedTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
+
         setAsserted(true);
-        //todo
+
+        IssuedToken issuedToken = (IssuedToken) abstractToken;
+        IssuedTokenSecurityEvent issuedTokenSecurityEvent = (IssuedTokenSecurityEvent) tokenSecurityEvent;
+        if (issuedToken.getIssuerName() != null) {
+            if (!issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
+                setAsserted(false);
+                setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
+            }
+        }
+        //todo internal/external reference?
+
         return isAsserted();
     }
 }

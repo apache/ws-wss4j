@@ -22,28 +22,10 @@ package org.swssf.wss.securityEvent;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SecurityContextTokenSecurityEvent extends IssuedTokenSecurityEvent {
-
-    private boolean externalUriRef;
-    private String issuerName;
-
-    public SecurityContextTokenSecurityEvent() {
-        super(Event.SecurityContextToken);
+public abstract class IssuedTokenSecurityEvent extends TokenSecurityEvent {
+    public IssuedTokenSecurityEvent(Event securityEventType) {
+        super(securityEventType);
     }
 
-    public boolean isExternalUriRef() {
-        return externalUriRef;
-    }
-
-    public void setExternalUriRef(boolean externalUriRef) {
-        this.externalUriRef = externalUriRef;
-    }
-
-    public String getIssuerName() {
-        return issuerName;
-    }
-
-    public void setIssuerName(String issuerName) {
-        this.issuerName = issuerName;
-    }
+    public abstract String getIssuerName();
 }
