@@ -24,9 +24,12 @@ package org.swssf.wss.securityEvent;
  */
 public class KeyValueTokenSecurityEvent extends TokenSecurityEvent {
 
-    //todo implement
-
     public KeyValueTokenSecurityEvent() {
         super(Event.KeyValueToken);
+    }
+
+    public boolean hasRsaKeyValue() {
+        //todo
+        return true;
     }
 }

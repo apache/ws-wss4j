@@ -27,6 +27,8 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.10 HttpsToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -49,6 +51,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
         if (!(tokenSecurityEvent instanceof HttpsTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a HttpsTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
+
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = (HttpsTokenSecurityEvent) tokenSecurityEvent;
         HttpsToken httpsToken = (HttpsToken) abstractToken;
 

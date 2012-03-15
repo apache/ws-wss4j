@@ -54,6 +54,8 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
         //test if non encrypted element have to be encrypted per policy
         boolean transportSecurityActive = Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
+        //if transport security is active, every element is encrypted/signed
+        //WSP1.3, 4.2.1 EncryptedParts Assertion
         if (!transportSecurityActive
                 && !inputProcessorChain.getDocumentContext().isInEncryptedContent()
                 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSecurityHeader()) {
@@ -98,7 +100,8 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         }
 
         boolean transportSecurityActive = Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
-
+        //if transport security is active, every element is encrypted/signed
+        //WSP1.3, 4.2.1 EncryptedParts Assertion
         //test if non encrypted element have to be encrypted per policy
         if (!transportSecurityActive
                 && !inputProcessorChain.getDocumentContext().isInEncryptedContent()
@@ -106,6 +109,8 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             testEncryptionPolicy(xmlEvent, inputProcessorChain);
         }
 
+        //if transport security is active, every element is encrypted/signed
+        //WSP1.3, 4.1.1 SignedParts Assertion
         //test if non signed element have to be signed per policy
         if (!transportSecurityActive
                 && !inputProcessorChain.getDocumentContext().isInSignedContent()) {

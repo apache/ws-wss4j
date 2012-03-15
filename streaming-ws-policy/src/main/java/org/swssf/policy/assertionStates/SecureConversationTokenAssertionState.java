@@ -27,6 +27,8 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.7 SecureConversationToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -53,7 +55,7 @@ public class SecureConversationTokenAssertionState extends TokenAssertionState {
         SecureConversationToken secureConversationToken = (SecureConversationToken) abstractToken;
 
         setAsserted(true);
-        //todo move to super-class?
+
         if (secureConversationToken.getIssuerName() != null && !secureConversationToken.getIssuerName().equals(secureConversationSecurityEvent.getIssuerName())) {
             setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + secureConversationToken.getIssuerName() + ") didn't match with the one in the SecureConversationToken (" + secureConversationSecurityEvent.getIssuerName() + ")");

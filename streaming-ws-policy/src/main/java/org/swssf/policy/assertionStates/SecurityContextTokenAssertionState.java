@@ -27,6 +27,8 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.6 SecurityContextToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -53,7 +55,7 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
         SecurityContextToken securityContextToken = (SecurityContextToken) abstractToken;
 
         setAsserted(true);
-        //todo move issuerName to superClass?
+
         if (securityContextToken.getIssuerName() != null && !securityContextToken.getIssuerName().equals(securityContextTokenSecurityEvent.getIssuerName())) {
             setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + securityContextToken.getIssuerName() + ") didn't match with the one in the SecurityContextToken (" + securityContextTokenSecurityEvent.getIssuerName() + ")");

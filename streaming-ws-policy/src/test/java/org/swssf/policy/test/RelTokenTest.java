@@ -68,12 +68,14 @@ public class RelTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         RelTokenSecurityEvent initiatorTokenSecurityEvent = new RelTokenSecurityEvent();
+        initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         RelTokenSecurityEvent recipientTokenSecurityEvent = new RelTokenSecurityEvent();
+        recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);

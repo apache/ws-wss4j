@@ -33,6 +33,8 @@ import javax.xml.namespace.QName;
 import java.util.*;
 
 /**
+ * WSP1.3, 4.3.2 RequiredParts Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

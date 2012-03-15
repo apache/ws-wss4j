@@ -30,6 +30,8 @@ import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 /**
+ * WSP1.3, 5.4.1 UsernameToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

@@ -175,14 +175,21 @@ public class PolicyEnforcer implements SecurityEventListener {
     protected List<Assertable> getAssertableForAssertion(AbstractSecurityAssertion abstractSecurityAssertion) throws WSSPolicyException {
         List<Assertable> assertableList = new LinkedList<Assertable>();
         if (abstractSecurityAssertion instanceof ContentEncryptedElements) {
+            //initialized with asserted=true because it could be that parent elements are encrypted and therefore these element are also encrypted
+            //the test if it is really encrypted is done via the PolicyInputProcessor which emits EncryptedElementEvents for unencrypted elements with the unencrypted flag
             assertableList.add(new ContentEncryptedElementsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof EncryptedParts) {
+            //initialized with asserted=true with the same reason as by the EncryptedParts above
             assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof EncryptedElements) {
+            //initialized with asserted=true with the same reason as by the EncryptedParts above
             assertableList.add(new EncryptedElementsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof SignedParts) {
+            //initialized with asserted=true because it could be that parent elements are signed and therefore these element are also signed
+            //the test if it is really signed is done via the PolicyInputProcessor which emits SignedElementEvents for unsigned elements with the unsigned flag
             assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof SignedElements) {
+            //initialized with asserted=true with the same reason as by the SignedParts above
             assertableList.add(new SignedElementsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof RequiredElements) {
             assertableList.add(new RequiredElementsAssertionState(abstractSecurityAssertion, false));
@@ -211,6 +218,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         } else if (abstractSecurityAssertion instanceof KeyValueToken) {
             assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false));
         } else if (abstractSecurityAssertion instanceof AlgorithmSuite) {
+            //initialized with asserted=true because we do negative matching
             assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof SymmetricBinding) {

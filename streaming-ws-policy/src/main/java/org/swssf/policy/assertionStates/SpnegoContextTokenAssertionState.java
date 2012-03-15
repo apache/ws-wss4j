@@ -21,11 +21,14 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
+import org.apache.ws.secpolicy.model.SpnegoContextToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SpnegoContextTokenSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.5 SpnegoContextToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -49,7 +52,10 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
             throw new WSSPolicyException("Expected a SpnegoContextTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
         setAsserted(true);
-        //todo
+
+        SpnegoContextToken spnegoContextToken = (SpnegoContextToken) abstractToken;
+        SpnegoContextTokenSecurityEvent spnegoContextTokenSecurityEvent = (SpnegoContextTokenSecurityEvent) tokenSecurityEvent;
+        //todo MustNotSend*
         return isAsserted();
     }
 }

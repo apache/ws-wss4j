@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * WSP1.3, 4.3.1 RequiredElements Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

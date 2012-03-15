@@ -37,4 +37,14 @@ public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
     public void setIssuerName(String issuerName) {
         this.issuerName = issuerName;
     }
+
+    public boolean isKerberosV5ApReqToken11() {
+        //todo
+        return true;
+    }
+
+    public boolean isGssKerberosV5ApReqToken11() {
+        //todo
+        return false;
+    }
 }

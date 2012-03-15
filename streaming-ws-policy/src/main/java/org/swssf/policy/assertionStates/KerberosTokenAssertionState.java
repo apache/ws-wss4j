@@ -21,11 +21,14 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
+import org.apache.ws.secpolicy.model.KerberosToken;
 import org.swssf.wss.securityEvent.KerberosTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.4 KerberosToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -50,6 +53,31 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
         }
 
         setAsserted(true);
+
+        KerberosToken kerberosToken = (KerberosToken) abstractToken;
+        KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) tokenSecurityEvent;
+        if (kerberosToken.getIssuerName() != null) {
+            if (!kerberosToken.getIssuerName().equals(kerberosTokenSecurityEvent.getIssuerName())) {
+                setAsserted(false);
+                setErrorMessage("IssuerName in Policy (" + kerberosToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + kerberosTokenSecurityEvent.getIssuerName() + ")");
+            }
+        }
+        if (kerberosToken.getApReqTokenType() != null) {
+            switch (kerberosToken.getApReqTokenType()) {
+                case WssKerberosV5ApReqToken11:
+                    if (!kerberosTokenSecurityEvent.isKerberosV5ApReqToken11()) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces " + kerberosToken.getApReqTokenType());
+                    }
+                    break;
+                case WssGssKerberosV5ApReqToken11:
+                    if (!kerberosTokenSecurityEvent.isGssKerberosV5ApReqToken11()) {
+                        setAsserted(false);
+                        setErrorMessage("Policy enforces " + kerberosToken.getApReqTokenType());
+                    }
+                    break;
+            }
+        }
         //todo
         return isAsserted();
     }

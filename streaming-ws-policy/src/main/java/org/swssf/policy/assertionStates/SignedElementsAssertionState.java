@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * WSP1.3, 4.1.2 SignedElements Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

@@ -21,11 +21,14 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
+import org.apache.ws.secpolicy.model.KeyValueToken;
 import org.swssf.wss.securityEvent.KeyValueTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.11 KeyValueToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -49,7 +52,14 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
             throw new WSSPolicyException("Expected a KeyValueTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
         setAsserted(true);
-        //todo
+
+        KeyValueTokenSecurityEvent keyValueTokenSecurityEvent = (KeyValueTokenSecurityEvent) tokenSecurityEvent;
+        KeyValueToken keyValueToken = (KeyValueToken) abstractToken;
+        if (keyValueToken.isRsaKeyValue() && !keyValueTokenSecurityEvent.hasRsaKeyValue()) {
+            setAsserted(false);
+            setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken");
+        }
+
         return isAsserted();
     }
 }

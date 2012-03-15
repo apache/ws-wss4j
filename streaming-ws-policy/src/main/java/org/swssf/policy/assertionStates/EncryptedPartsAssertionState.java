@@ -34,6 +34,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * WSP1.3, 4.2.1 EncryptedParts Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

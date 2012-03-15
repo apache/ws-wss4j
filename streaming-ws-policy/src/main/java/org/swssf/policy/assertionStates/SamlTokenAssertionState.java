@@ -31,6 +31,8 @@ import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 /**
+ * WSP1.3, 5.4.8 SamlToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

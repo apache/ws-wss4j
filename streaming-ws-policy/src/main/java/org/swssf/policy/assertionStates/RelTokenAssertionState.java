@@ -21,11 +21,14 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
+import org.apache.ws.secpolicy.model.RelToken;
 import org.swssf.wss.securityEvent.RelTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 
 /**
+ * WSP1.3, 5.4.9 RelToken Assertion
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
@@ -49,8 +52,19 @@ public class RelTokenAssertionState extends TokenAssertionState {
             throw new WSSPolicyException("Expected a RelTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
 
+        RelTokenSecurityEvent relTokenSecurityEvent = (RelTokenSecurityEvent) tokenSecurityEvent;
+        RelToken relToken = (RelToken) abstractToken;
+
         setAsserted(true);
-        //todo
+
+        if (relToken.getIssuerName() != null && !relToken.getIssuerName().equals(relTokenSecurityEvent.getIssuerName())) {
+            setAsserted(false);
+            setErrorMessage("IssuerName in Policy (" + relToken.getIssuerName() + ") didn't match with the one in the RelToken (" + relTokenSecurityEvent.getIssuerName() + ")");
+        }
+
+        //todo RequireKeyIdentifierReference
+        //todo WssRelV*
+
         return isAsserted();
     }
 }

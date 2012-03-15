@@ -75,6 +75,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         KerberosTokenSecurityEvent recipientTokenSecurityEvent = new KerberosTokenSecurityEvent();
+        recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
