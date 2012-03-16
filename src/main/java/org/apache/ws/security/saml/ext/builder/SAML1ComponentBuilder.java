@@ -374,7 +374,6 @@ public class SAML1ComponentBuilder {
     /**
      * Method transformAuthenticationMethod transforms the user-supplied authentication method 
      * value into one of the supported specification-compliant values.
-     * NOTE: Only "Password" is supported at this time.
      *
      * @param sourceMethod of type String
      * @return String
@@ -384,6 +383,8 @@ public class SAML1ComponentBuilder {
 
         if ("Password".equals(sourceMethod)) {
             transformedMethod = SAML1Constants.AUTH_METHOD_PASSWORD;
+        } else if (sourceMethod != null && !"".equals(sourceMethod)) {
+            return sourceMethod;
         }
 
         return transformedMethod;
