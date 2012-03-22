@@ -212,14 +212,17 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
 
     private boolean signsSignedSupportingTokens(SecurityToken securityToken) throws XMLSecurityException {
 
-        int numberOfSignedEndorsingSupportingTokens = 0;
+        List<SecurityToken> signedSupportingTokens = new LinkedList<SecurityToken>();
         List<SignedElementSecurityEvent> signedElements = new LinkedList<SignedElementSecurityEvent>();
         Iterator<TokenSecurityEvent> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
         while (tokenSecurityEventIterator.hasNext()) {
             TokenSecurityEvent tokenSecurityEvent = tokenSecurityEventIterator.next();
             SecurityToken supportingToken = tokenSecurityEvent.getSecurityToken();
             if (isSignedSupportingToken(supportingToken)) {
-                numberOfSignedEndorsingSupportingTokens++;
+                if (signedSupportingTokens.contains(supportingToken)) {
+                    continue;
+                }
+                signedSupportingTokens.add(supportingToken);
                 List<QName> elementPath = supportingToken.getElementPath();
 
                 boolean found = false;
@@ -244,7 +247,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 }
             }
         }
-        if (numberOfSignedEndorsingSupportingTokens > signedElements.size()) {
+        if (signedSupportingTokens.size() > signedElements.size()) {
             return false;
         }
 

@@ -51,11 +51,20 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
         if (!(tokenSecurityEvent instanceof SpnegoContextTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a SpnegoContextTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
-        setAsserted(true);
 
         SpnegoContextToken spnegoContextToken = (SpnegoContextToken) abstractToken;
         SpnegoContextTokenSecurityEvent spnegoContextTokenSecurityEvent = (SpnegoContextTokenSecurityEvent) tokenSecurityEvent;
+        if (spnegoContextToken.getIssuerName() != null) {
+            if (!spnegoContextToken.getIssuerName().equals(spnegoContextTokenSecurityEvent.getIssuerName())) {
+                setErrorMessage("IssuerName in Policy (" + spnegoContextToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + spnegoContextTokenSecurityEvent.getIssuerName() + ")");
+                return false;
+            }
+        }
         //todo MustNotSend*
-        return isAsserted();
+
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

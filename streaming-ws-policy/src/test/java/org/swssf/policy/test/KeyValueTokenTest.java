@@ -67,12 +67,14 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         KeyValueTokenSecurityEvent initiatorTokenSecurityEvent = new KeyValueTokenSecurityEvent();
+        initiatorTokenSecurityEvent.setRsaKeyValue(true);
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         KeyValueTokenSecurityEvent recipientTokenSecurityEvent = new KeyValueTokenSecurityEvent();
+        recipientTokenSecurityEvent.setRsaKeyValue(true);
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);

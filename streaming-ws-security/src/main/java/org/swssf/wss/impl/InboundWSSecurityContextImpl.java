@@ -81,14 +81,14 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                 throw new WSSecurityException(e.getMessage(), e);
             }
 
-            //forward operation security event
-            forwardSecurityEvent(securityEvent);
-
             Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
             while (securityEventIterator.hasNext()) {
                 SecurityEvent prevSecurityEvent = securityEventIterator.next();
                 forwardSecurityEvent(prevSecurityEvent);
             }
+            //forward operation security event
+            forwardSecurityEvent(securityEvent);
+
             securityEventQueue.clear();
             return;
         }

@@ -367,6 +367,58 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
     }
 
+    /**
+     * verifies the policy after the OperationSecurityEvent occured. This allows to
+     * stop further processing after the header is processed when the policy is not fulfilled.
+     *
+     * @throws WSSPolicyException       throws when the policy is invalid
+     * @throws PolicyViolationException thrown when no alternative could be satisifed
+     */
+    private void verifyPolicyAfterOperationSecurityEvent() throws WSSPolicyException {
+        String assertionMessage = null;
+        Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
+        alternative:
+        while (assertionStateMapIterator.hasNext()) {
+            Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+            Iterator<Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> iterator = map.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>> mapEntry = iterator.next();
+                Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = mapEntry.getValue().entrySet().iterator();
+                while (assertionStateIterator.hasNext()) {
+                    Map.Entry<Assertion, List<Assertable>> assertionListEntry = assertionStateIterator.next();
+                    List<Assertable> assertableList = assertionListEntry.getValue();
+                    Iterator<Assertable> assertableIterator = assertableList.iterator();
+                    while (assertableIterator.hasNext()) {
+                        Assertable assertable = assertableIterator.next();
+
+                        boolean doAssert = false;
+                        if (assertable instanceof TokenAssertionState) {
+                            TokenAssertionState tokenAssertionState = (TokenAssertionState) assertable;
+                            AbstractToken abstractToken = (AbstractToken) tokenAssertionState.getAssertion();
+                            AbstractSecurityAssertion assertion = abstractToken.getParentAssertion();
+                            if (assertion instanceof SupportingTokens) {
+                                doAssert = true;
+                            }
+                        } else if (assertable instanceof TokenProtectionAssertionState) {
+                            doAssert = true;
+                        }
+
+                        if (doAssert && !assertable.isAsserted()) {
+                            assertionMessage = assertable.getErrorMessage();
+                            failedAssertionStateMap.add(map);
+                            assertionStateMapIterator.remove();
+                            continue alternative;
+                        }
+                    }
+                }
+            }
+        }
+        if (assertionStateMap.isEmpty()) {
+            logFailedAssertions();
+            throw new WSSPolicyException(assertionMessage);
+        }
+    }
+
     private void logFailedAssertions() {
         Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
         while (assertionStateMapIterator.hasNext()) {
@@ -433,7 +485,10 @@ public class PolicyEnforcer implements SecurityEventListener {
                     SecurityEvent prevSecurityEvent = securityEventIterator.next();
                     verifyPolicy(prevSecurityEvent);
                 }
+
                 verifyPolicy(securityEvent);
+
+                verifyPolicyAfterOperationSecurityEvent();
             } catch (WSSPolicyException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             } catch (XMLSecurityException e) {

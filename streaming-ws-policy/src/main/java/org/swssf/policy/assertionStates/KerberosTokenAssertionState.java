@@ -52,33 +52,35 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
             throw new WSSPolicyException("Expected a KerberosTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
 
-        setAsserted(true);
-
         KerberosToken kerberosToken = (KerberosToken) abstractToken;
         KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) tokenSecurityEvent;
         if (kerberosToken.getIssuerName() != null) {
             if (!kerberosToken.getIssuerName().equals(kerberosTokenSecurityEvent.getIssuerName())) {
-                setAsserted(false);
                 setErrorMessage("IssuerName in Policy (" + kerberosToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + kerberosTokenSecurityEvent.getIssuerName() + ")");
+                return false;
             }
         }
         if (kerberosToken.getApReqTokenType() != null) {
             switch (kerberosToken.getApReqTokenType()) {
                 case WssKerberosV5ApReqToken11:
                     if (!kerberosTokenSecurityEvent.isKerberosV5ApReqToken11()) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces " + kerberosToken.getApReqTokenType());
+                        return false;
                     }
                     break;
                 case WssGssKerberosV5ApReqToken11:
                     if (!kerberosTokenSecurityEvent.isGssKerberosV5ApReqToken11()) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces " + kerberosToken.getApReqTokenType());
+                        return false;
                     }
                     break;
             }
         }
         //todo
-        return isAsserted();
+
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

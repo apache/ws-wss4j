@@ -41,10 +41,10 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     public Object[][] ignoreEventsTransportBindingC11a() {
         return new Object[][]{
                 {null, null, null},
-                {SecurityEvent.Event.HttpsToken, 1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}HttpsToken not satisfied"},
-                {SecurityEvent.Event.RequiredElement, 3, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
-                {SecurityEvent.Event.UsernameToken, 4, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-                {SecurityEvent.Event.X509Token, 5, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
+                {SecurityEvent.Event.HttpsToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}HttpsToken not satisfied"},
+                {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
+                {SecurityEvent.Event.UsernameToken, 3, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
+                {SecurityEvent.Event.X509Token, 4, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
         };
     }
 
@@ -62,9 +62,9 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     public Object[][] ignoreEventsAsymmetricBindingC31a() {
         return new Object[][]{
                 {null, null, null},
-                {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
-                {SecurityEvent.Event.X509Token, 3, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
-                {SecurityEvent.Event.UsernameToken, 8, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
+                {SecurityEvent.Event.RequiredElement, 1, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
+                {SecurityEvent.Event.X509Token, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
+                {SecurityEvent.Event.UsernameToken, 7, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
         };
     }
 
@@ -82,10 +82,10 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     public Object[][] ignoreEventsSymmetricBindingC21a() {
         return new Object[][]{
                 {null, null, null},
-                {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
+                {SecurityEvent.Event.RequiredElement, 1, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
                 {SecurityEvent.Event.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied"},
-                {SecurityEvent.Event.UsernameToken, 5, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-                {SecurityEvent.Event.X509Token, 16, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
+                {SecurityEvent.Event.UsernameToken, 4, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
+                {SecurityEvent.Event.X509Token, 15, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
         };
     }
 
@@ -103,10 +103,10 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     public Object[][] ignoreEventsSymmetricBindingC21b() {
         return new Object[][]{
                 {null, null, null},
-                {SecurityEvent.Event.RequiredElement, 2, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
+                {SecurityEvent.Event.RequiredElement, 1, "\nElement /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
                 {SecurityEvent.Event.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied"},
-                {SecurityEvent.Event.UsernameToken, 5, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-                {SecurityEvent.Event.X509Token, 16, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
+                {SecurityEvent.Event.UsernameToken, 4, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
+                {SecurityEvent.Event.X509Token, 15, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
         };
     }
 
@@ -121,31 +121,40 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     }
 
     private void applyPolicy(SecurityEvent.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage, PolicyEnforcer policyEnforcer, List<SecurityEvent> securityEventList) throws WSSecurityException {
-        for (int i = 0; i < securityEventList.size(); i++) {
-            SecurityEvent securityEvent = securityEventList.get(i);
-            if (eventIndex != null && eventIndex == -1 && securityEvent.getSecurityEventType() == ignoreEvent) {
-                continue;
-            }
-            if (eventIndex != null && i == eventIndex && securityEvent.getSecurityEventType() != ignoreEvent) {
-                for (int j = 0; j < securityEventList.size(); j++) {
-                    System.out.println(j + " " + securityEventList.get(j));
-                }
-                Assert.fail("Event at index " + eventIndex + " is not of type " + ignoreEvent);
-            }
-            if (ignoreEvent == null || i != eventIndex) {
-                policyEnforcer.registerSecurityEvent(securityEvent);
-            }
-        }
         try {
+            for (int i = 0; i < securityEventList.size(); i++) {
+                SecurityEvent securityEvent = securityEventList.get(i);
+                if (eventIndex != null && eventIndex == -1 && securityEvent.getSecurityEventType() == ignoreEvent) {
+                    continue;
+                }
+                if (eventIndex != null && i == eventIndex && securityEvent.getSecurityEventType() != ignoreEvent) {
+                    for (int j = 0; j < securityEventList.size(); j++) {
+                        System.out.println(j + " " + securityEventList.get(j));
+                    }
+                    Assert.fail("Event at index " + eventIndex + " is not of type " + ignoreEvent);
+                }
+                if (ignoreEvent == null || i != eventIndex) {
+                    policyEnforcer.registerSecurityEvent(securityEvent);
+                }
+            }
+
             policyEnforcer.doFinal();
             if (ignoreEvent != null) {
                 Assert.fail("Expected WSSPolicyException");
             }
         } catch (WSSPolicyException e) {
+            //Exception for policyEnforcer.doFinal();
             if (ignoreEvent == null) {
                 Assert.fail("Unexpected WSSPolicyException");
             }
             Assert.assertEquals(e.getMessage(), expectedErrorMessage);
+        } catch (WSSecurityException e) {
+            //Exception for policyEnforcer.registerSecurityEvent(securityEvent);
+            if (ignoreEvent == null) {
+                Assert.fail("Unexpected WSSPolicyException");
+            }
+            Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
+            Assert.assertEquals(e.getCause().getMessage(), expectedErrorMessage);
         }
     }
 }

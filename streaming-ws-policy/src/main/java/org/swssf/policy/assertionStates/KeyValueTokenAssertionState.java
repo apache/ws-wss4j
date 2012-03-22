@@ -51,15 +51,17 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
         if (!(tokenSecurityEvent instanceof KeyValueTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a KeyValueTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
-        setAsserted(true);
 
         KeyValueTokenSecurityEvent keyValueTokenSecurityEvent = (KeyValueTokenSecurityEvent) tokenSecurityEvent;
         KeyValueToken keyValueToken = (KeyValueToken) abstractToken;
-        if (keyValueToken.isRsaKeyValue() && !keyValueTokenSecurityEvent.hasRsaKeyValue()) {
-            setAsserted(false);
+        if (keyValueToken.isRsaKeyValue() && !keyValueTokenSecurityEvent.isRsaKeyValue()) {
             setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken");
+            return false;
         }
 
-        return isAsserted();
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

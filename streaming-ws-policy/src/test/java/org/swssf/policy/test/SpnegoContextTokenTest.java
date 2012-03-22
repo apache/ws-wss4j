@@ -75,6 +75,7 @@ public class SpnegoContextTokenTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SpnegoContextTokenSecurityEvent recipientTokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
+        recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);

@@ -54,18 +54,19 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
         SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = (SecurityContextTokenSecurityEvent) tokenSecurityEvent;
         SecurityContextToken securityContextToken = (SecurityContextToken) abstractToken;
 
-        setAsserted(true);
-
         if (securityContextToken.getIssuerName() != null && !securityContextToken.getIssuerName().equals(securityContextTokenSecurityEvent.getIssuerName())) {
-            setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + securityContextToken.getIssuerName() + ") didn't match with the one in the SecurityContextToken (" + securityContextTokenSecurityEvent.getIssuerName() + ")");
+            return false;
         }
         if (securityContextToken.isRequireExternalUriReference() && !securityContextTokenSecurityEvent.isExternalUriRef()) {
-            setAsserted(false);
             setErrorMessage("Policy enforces externalUriRef but we didn't got one");
+            return false;
         }
         //todo sp:SC13SecurityContextToken:
-        //if (securityContextToken.isSc10SecurityContextToken() && )
-        return isAsserted();
+
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

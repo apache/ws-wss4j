@@ -58,42 +58,43 @@ public class SamlTokenAssertionState extends TokenAssertionState {
         SamlTokenSecurityEvent samlTokenSecurityEvent = (SamlTokenSecurityEvent) tokenSecurityEvent;
         SamlToken samlToken = (SamlToken) abstractToken;
 
-        setAsserted(true);
         if (samlToken.getIssuerName() != null && !samlToken.getIssuerName().equals(samlTokenSecurityEvent.getIssuerName())) {
-            setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
+            return false;
         }
         if (samlToken.isRequireKeyIdentifierReference() && ((AbstractSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
-            setAsserted(false);
             setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
+            return false;
         }
         if (samlToken.getSamlTokenType() != null) {
             switch (samlToken.getSamlTokenType()) {
                 case WssSamlV11Token10:
                     if (samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_10) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces SamlVersion11Profile10 but we got " + samlTokenSecurityEvent.getSamlVersion());
+                        return false;
                     }
                     break;
                 case WssSamlV11Token11:
                     if (samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_11) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces SamlVersion11Profile11 but we got " + samlTokenSecurityEvent.getSamlVersion());
+                        return false;
                     }
                     break;
                 case WssSamlV20Token11:
                     if (samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_20) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces SamlVersion20Profile11 but we got " + samlTokenSecurityEvent.getSamlVersion());
+                        return false;
                     }
                     break;
                 case WssSamlV10Token10:
                 case WssSamlV10Token11:
-                    setAsserted(false);
                     setErrorMessage("Unsupported token type: " + samlToken.getSamlTokenType());
-                    break;
+                    return false;
             }
         }
-        return isAsserted();
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

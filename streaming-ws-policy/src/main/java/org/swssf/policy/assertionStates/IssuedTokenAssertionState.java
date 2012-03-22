@@ -54,18 +54,19 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
             throw new WSSPolicyException("Expected a IssuedTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
 
-        setAsserted(true);
-
         IssuedToken issuedToken = (IssuedToken) abstractToken;
         IssuedTokenSecurityEvent issuedTokenSecurityEvent = (IssuedTokenSecurityEvent) tokenSecurityEvent;
         if (issuedToken.getIssuerName() != null) {
             if (!issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
-                setAsserted(false);
                 setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
+                return false;
             }
         }
         //todo internal/external reference?
 
-        return isAsserted();
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

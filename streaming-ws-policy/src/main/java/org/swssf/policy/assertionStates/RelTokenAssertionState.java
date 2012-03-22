@@ -55,16 +55,17 @@ public class RelTokenAssertionState extends TokenAssertionState {
         RelTokenSecurityEvent relTokenSecurityEvent = (RelTokenSecurityEvent) tokenSecurityEvent;
         RelToken relToken = (RelToken) abstractToken;
 
-        setAsserted(true);
-
         if (relToken.getIssuerName() != null && !relToken.getIssuerName().equals(relTokenSecurityEvent.getIssuerName())) {
-            setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + relToken.getIssuerName() + ") didn't match with the one in the RelToken (" + relTokenSecurityEvent.getIssuerName() + ")");
+            return false;
         }
 
         //todo RequireKeyIdentifierReference
         //todo WssRelV*
 
-        return isAsserted();
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

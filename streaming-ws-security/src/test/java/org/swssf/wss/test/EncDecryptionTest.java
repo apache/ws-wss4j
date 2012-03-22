@@ -129,11 +129,11 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.EncryptedPart,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -245,8 +245,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.EncryptedKeyToken,
                     SecurityEvent.Event.ContentEncrypted,
@@ -438,8 +438,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.wss.test.CallbackHandlerImpl());
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.EncryptedKeyToken,
                     SecurityEvent.Event.AlgorithmSuite,
@@ -556,11 +556,11 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.swssf.wss.test.CallbackHandlerImpl());
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.EncryptedPart,
+                    SecurityEvent.Event.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 

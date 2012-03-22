@@ -24,12 +24,17 @@ package org.swssf.wss.securityEvent;
  */
 public class KeyValueTokenSecurityEvent extends TokenSecurityEvent {
 
+    private boolean rsaKeyValue = false;
+
     public KeyValueTokenSecurityEvent() {
         super(Event.KeyValueToken);
     }
 
-    public boolean hasRsaKeyValue() {
-        //todo
-        return true;
+    public boolean isRsaKeyValue() {
+        return rsaKeyValue;
+    }
+
+    public void setRsaKeyValue(boolean rsaKeyValue) {
+        this.rsaKeyValue = rsaKeyValue;
     }
 }

@@ -71,7 +71,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -87,6 +86,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(securityProperties,
@@ -126,7 +126,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -142,6 +141,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -182,7 +182,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
@@ -200,6 +199,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.SignedElement,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -276,7 +276,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.Timestamp,
                 SecurityEvent.Event.X509Token,
@@ -289,6 +288,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -396,7 +396,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -414,9 +413,10 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.SignedElement,
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
-        Document document = doInboundSecurity(
+                Document document = doInboundSecurity(
                 securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
         //read the whole stream:
@@ -610,7 +610,6 @@ public class InteroperabilityTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.X509Token,
                     SecurityEvent.Event.SignatureValue,
@@ -619,6 +618,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     SecurityEvent.Event.EncryptedPart,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.Operation,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.AlgorithmSuite,
                     SecurityEvent.Event.SignedElement,
@@ -732,7 +732,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -748,6 +747,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -828,7 +828,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                SecurityEvent.Event.Operation,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.X509Token,
                 SecurityEvent.Event.SignatureValue,
@@ -844,6 +843,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 SecurityEvent.Event.EncryptedPart,
                 SecurityEvent.Event.AlgorithmSuite,
                 SecurityEvent.Event.AlgorithmSuite,
+                SecurityEvent.Event.Operation,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(

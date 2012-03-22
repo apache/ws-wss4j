@@ -378,10 +378,10 @@ public class WSSUtils extends XMLSecurityUtils {
     }
 
     public static boolean pathMatches(List<QName> path1, List<QName> path2, boolean matchAnySoapNS, boolean lastElementWildCard) {
-        if (path1 == null || path2 == null) {
+        if (path1 == null) {
             throw new IllegalArgumentException("Internal error");
         }
-        if (path1.size() != path2.size()) {
+        if (path2 == null || path1.size() != path2.size()) {
             return false;
         }
         Iterator<QName> path1Iterator = path1.iterator();

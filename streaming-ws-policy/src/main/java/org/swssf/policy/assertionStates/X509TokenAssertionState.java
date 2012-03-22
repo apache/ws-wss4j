@@ -68,66 +68,69 @@ public class X509TokenAssertionState extends TokenAssertionState {
                 || WSSConstants.X509PkiPathV1Token.equals(tokenType))) {
             throw new WSSPolicyException("Invalid Token for this assertion");
         }
-        setAsserted(true);
+
         try {
             X509Certificate x509Certificate = securityToken.getX509Certificates()[0];
             if (x509Token.getIssuerName() != null) {
                 final String certificateIssuerName = x509Certificate.getIssuerX500Principal().getName();
                 if (!x509Token.getIssuerName().equals(certificateIssuerName)) {
-                    setAsserted(false);
                     setErrorMessage("IssuerName in Policy (" + x509Token.getIssuerName() + ") didn't match with the one in the certificate (" + certificateIssuerName + ")");
+                    return false;
                 }
             }
             if (x509Token.isRequireKeyIdentifierReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
-                setAsserted(false);
                 setErrorMessage("Policy enforces KeyIdentifierReference but we got " + securityToken.getKeyIdentifierType());
+                return false;
             } else if (x509Token.isRequireIssuerSerialReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
-                setAsserted(false);
                 setErrorMessage("Policy enforces IssuerSerialReference but we got " + securityToken.getKeyIdentifierType());
+                return false;
             } else if (x509Token.isRequireEmbeddedTokenReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
-                setAsserted(false);
                 setErrorMessage("Policy enforces EmbeddedTokenReference but we got " + securityToken.getKeyIdentifierType());
+                return false;
             } else if (x509Token.isRequireThumbprintReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
-                setAsserted(false);
                 setErrorMessage("Policy enforces ThumbprintReference but we got " + securityToken.getKeyIdentifierType());
+                return false;
             }
             if (x509Certificate.getVersion() == 2) {
-                setAsserted(false);
                 setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " not supported");
+                return false;
             }
             if (x509Token.getTokenType() != null) {
                 switch (x509Token.getTokenType()) {
                     case WssX509V3Token10:
                     case WssX509V3Token11:
                         if (WSSConstants.X509V3Token != securityToken.getTokenType() || x509Certificate.getVersion() != 3) {
-                            setAsserted(false);
                             setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
+                            return false;
                         }
                         break;
                     case WssX509V1Token11:
                         if (WSSConstants.X509V1Token != securityToken.getTokenType() || x509Certificate.getVersion() != 1) {
-                            setAsserted(false);
                             setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() + " mismatch; Policy enforces " + x509Token.getTokenType());
+                            return false;
                         }
                         break;
                     case WssX509PkiPathV1Token10:
                     case WssX509PkiPathV1Token11:
                         if (securityToken.getTokenType() != WSSConstants.X509PkiPathV1Token) {
-                            setAsserted(false);
                             setErrorMessage("Policy enforces " + x509Token.getTokenType() + " but we got " + securityToken.getTokenType());
+                            return false;
                         }
                         break;
                     case WssX509Pkcs7Token10:
                     case WssX509Pkcs7Token11:
-                        setAsserted(false);
                         setErrorMessage("Unsupported token type: " + securityToken.getTokenType());
-                        break;
+                        return false;
                 }
             }
         } catch (XMLSecurityException e) {
-            setAsserted(false);
             setErrorMessage(e.getMessage());
+            return false;
         }
-        return isAsserted();
+
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

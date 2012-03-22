@@ -47,7 +47,7 @@ public class AssertionState {
     }
 
     public synchronized void setAsserted(boolean asserted) {
-        //don't allow to toogle back once the assertion is explicitly marked as failed;
+        //don't allow to toggle back once the assertion is explicitly marked as failed;
         if (this.state == State.HARD_FAILURE) {
             return;
         }

@@ -54,19 +54,19 @@ public class SecureConversationTokenAssertionState extends TokenAssertionState {
         SecureConversationTokenSecurityEvent secureConversationSecurityEvent = (SecureConversationTokenSecurityEvent) tokenSecurityEvent;
         SecureConversationToken secureConversationToken = (SecureConversationToken) abstractToken;
 
-        setAsserted(true);
-
         if (secureConversationToken.getIssuerName() != null && !secureConversationToken.getIssuerName().equals(secureConversationSecurityEvent.getIssuerName())) {
-            setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + secureConversationToken.getIssuerName() + ") didn't match with the one in the SecureConversationToken (" + secureConversationSecurityEvent.getIssuerName() + ")");
+            return false;
         }
         if (secureConversationToken.isRequireExternalUriReference() && !secureConversationSecurityEvent.isExternalUriRef()) {
-            setAsserted(false);
             setErrorMessage("Policy enforces externalUriRef but we didn't got one");
+            return false;
         }
         //todo sp:SC13SecurityContextToken:
-        //if (securityContextToken.isSc10SecurityContextToken() && )
         //todo MustNotSendCancel etc...
-        return isAsserted();
+        setAsserted(true);
+        //always return true to prevent false alarm in case additional tokens with the same usage
+        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        return true;
     }
 }

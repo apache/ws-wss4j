@@ -30,6 +30,7 @@ import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * WSP1.3, 5 Token Assertions
@@ -50,12 +51,18 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException {
 
+        if (isAsserted()) {
+            //just return true when this token assertion is already fulfilled.
+            return true;
+        }
+
         TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
         AbstractToken abstractToken = (AbstractToken) getAssertion();
         final AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
 
         int ignoreToken = 0;
-        Iterator<SecurityToken.TokenUsage> tokenUsageIterator = tokenSecurityEvent.getSecurityToken().getTokenUsages().iterator();
+        final List<SecurityToken.TokenUsage> tokenUsages = tokenSecurityEvent.getSecurityToken().getTokenUsages();
+        Iterator<SecurityToken.TokenUsage> tokenUsageIterator = tokenUsages.iterator();
         while (tokenUsageIterator.hasNext()) {
             SecurityToken.TokenUsage tokenUsage = tokenUsageIterator.next();
             switch (tokenUsage) {
@@ -105,7 +112,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                     break;
             }
         }
-        if (ignoreToken >= tokenSecurityEvent.getSecurityToken().getTokenUsages().size()) {
+        if (ignoreToken >= tokenUsages.size()) {
             //token is not for us, so return true to prevent false alarm
             return true;
         }
@@ -139,7 +146,15 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             }
         }
 
-        return assertToken(tokenSecurityEvent, abstractToken);
+        boolean asserted = assertToken(tokenSecurityEvent, abstractToken);
+        if (!asserted && (tokenUsages.contains(SecurityToken.TokenUsage.MainSignature)
+                || tokenUsages.contains(SecurityToken.TokenUsage.MainEncryption))) {
+            //return false if not asserted for the main signature and encryption tokens
+            return false;
+        } else {
+            //always return true for supporting tokens.
+            return true;
+        }
     }
 
     public abstract boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException;
