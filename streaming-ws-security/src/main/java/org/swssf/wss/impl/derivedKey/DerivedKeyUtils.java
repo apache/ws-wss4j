@@ -37,9 +37,6 @@ public class DerivedKeyUtils {
      */
     public static byte[] deriveKey(String algorithm, String label, int length, byte[] secret, byte[] nonce, int offset) throws WSSecurityException {
         try {
-            if (algorithm == null || algorithm.equals("")) {
-                algorithm = WSSConstants.P_SHA_1;
-            }
             DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
             byte[] labelBytes;
             if (label == null || label.length() == 0) {

@@ -35,8 +35,7 @@ public class AlgoFactory {
      * @throws ConversationException If the specified algorithm is not available
      *                               in default implementations
      */
-    public static DerivationAlgorithm getInstance(String algorithm) throws
-            ConversationException {
+    public static DerivationAlgorithm getInstance(String algorithm) throws ConversationException {
         if ((WSSConstants.P_SHA_1_2005_12).equals(algorithm) || (WSSConstants.P_SHA_1).equals(algorithm)) {
             return new P_SHA1();
         } else {

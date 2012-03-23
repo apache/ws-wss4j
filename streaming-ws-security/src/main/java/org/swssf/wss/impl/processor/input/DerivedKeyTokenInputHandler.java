@@ -27,6 +27,7 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
+import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
@@ -125,15 +126,30 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         if (nonce == null || nonce.length == 0) {
                             throw new WSSecurityException("Missing wsc:Nonce value");
                         }
+                        String derivedKeyAlgorithm = derivedKeyTokenType.getAlgorithm();
+                        if (derivedKeyAlgorithm == null) {
+                            derivedKeyAlgorithm = WSSConstants.P_SHA_1;
+                        }
                         byte[] keyBytes = DerivedKeyUtils.deriveKey(
-                                derivedKeyTokenType.getAlgorithm(),
+                                derivedKeyAlgorithm,
                                 derivedKeyTokenType.getLabel(),
                                 derivedKeyTokenType.getLength().intValue(),
                                 secret,
                                 nonce,
                                 derivedKeyTokenType.getOffset().intValue()
                         );
-                        //todo algo sec event here!
+                        XMLSecurityConstants.KeyUsage derivedKeyUsage;
+                        if (WSSConstants.Enc.equals(keyUsage)) {
+                            derivedKeyUsage = WSSConstants.Enc_KD;
+                        } else {
+                            derivedKeyUsage = WSSConstants.Sig_KD;
+                        }
+                        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
+                        algorithmSuiteSecurityEvent.setAlgorithmURI(derivedKeyAlgorithm);
+                        algorithmSuiteSecurityEvent.setKeyUsage(derivedKeyUsage);
+                        algorithmSuiteSecurityEvent.setKeyLength(keyBytes.length * 8);
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
+
                         String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
                         return new SecretKeySpec(keyBytes, algo);
                     }
