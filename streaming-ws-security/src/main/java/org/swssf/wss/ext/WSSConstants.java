@@ -36,7 +36,7 @@ public class WSSConstants extends XMLSecurityConstants {
     static {
         try {
             //todo schema validation?
-            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.wss10:org.swssf.binding.wss11:org.swssf.binding.wsu10:org.swssf.binding.wssc13:org.swssf.binding.wssc200502:org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.excc14n"));
+            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.wss10:org.swssf.binding.wss11:org.swssf.binding.wsu10:org.swssf.binding.wssc13:org.swssf.binding.wssc200502:org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.xmldsig11:org.swssf.binding.excc14n"));
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
@@ -261,6 +261,7 @@ public class WSSConstants extends XMLSecurityConstants {
         THUMBPRINT_IDENTIFIER,
         EMBEDDED_KEYIDENTIFIER_REF,
         USERNAMETOKEN_REFERENCE,
+        KEY_VALUE,
     }
 
     public enum DerivedKeyTokenReference {

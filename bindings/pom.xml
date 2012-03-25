@@ -35,6 +35,7 @@
 
     <modules>
         <module>xmldsig-binding</module>
+        <module>xmldsig11-binding</module>
         <module>c14n-binding</module>
         <module>xmlenc-binding</module>
         <module>wsu10-binding</module>

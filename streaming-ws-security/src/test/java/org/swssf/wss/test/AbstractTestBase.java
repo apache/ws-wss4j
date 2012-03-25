@@ -53,6 +53,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.security.Security;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -76,6 +77,8 @@ public abstract class AbstractTestBase {
     static {
         LogManager.getLogManager().addLogger(Logger.getLogger("org.jcp.xml.dsig.internal.dom"));
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
+
+        Security.addProvider(new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
     }
 
     public AbstractTestBase() {

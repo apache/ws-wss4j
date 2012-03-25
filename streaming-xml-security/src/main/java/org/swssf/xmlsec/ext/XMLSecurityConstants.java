@@ -46,7 +46,7 @@ public class XMLSecurityConstants {
 
         try {
             //todo schema validation?
-            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.excc14n"));
+            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.xmldsig11:org.swssf.binding.excc14n"));
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
@@ -75,6 +75,7 @@ public class XMLSecurityConstants {
     public static final String NS_XML = "http://www.w3.org/2000/xmlns/";
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
     public static final String NS_DSIG = "http://www.w3.org/2000/09/xmldsig#";
+    public static final String NS_DSIG11 = "http://www.w3.org/2009/xmldsig11#";
     public static final String NS_WSSE11 = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";
 
     public static final String PREFIX_XENC = "xenc";
@@ -117,6 +118,26 @@ public class XMLSecurityConstants {
     public static final QName TAG_dsig_X509IssuerSerial = new QName(NS_DSIG, "X509IssuerSerial", PREFIX_DSIG);
     public static final QName TAG_dsig_X509IssuerName = new QName(NS_DSIG, "X509IssuerName", PREFIX_DSIG);
     public static final QName TAG_dsig_X509SerialNumber = new QName(NS_DSIG, "X509SerialNumber", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_KeyValue = new QName(NS_DSIG, "KeyValue", PREFIX_DSIG);
+    public static final QName TAG_dsig_RSAKeyValue = new QName(NS_DSIG, "RSAKeyValue", PREFIX_DSIG);
+    public static final QName TAG_dsig_Modulus = new QName(NS_DSIG, "Modulus", PREFIX_DSIG);
+    public static final QName TAG_dsig_Exponent = new QName(NS_DSIG, "Exponent", PREFIX_DSIG);
+
+    public static final QName TAG_dsig_DSAKeyValue = new QName(NS_DSIG, "DSAKeyValue", PREFIX_DSIG);
+    public static final QName TAG_dsig_P = new QName(NS_DSIG, "P", PREFIX_DSIG);
+    public static final QName TAG_dsig_Q = new QName(NS_DSIG, "Q", PREFIX_DSIG);
+    public static final QName TAG_dsig_G = new QName(NS_DSIG, "G", PREFIX_DSIG);
+    public static final QName TAG_dsig_Y = new QName(NS_DSIG, "Y", PREFIX_DSIG);
+    public static final QName TAG_dsig_J = new QName(NS_DSIG, "J", PREFIX_DSIG);
+    public static final QName TAG_dsig_Seed = new QName(NS_DSIG, "Seed", PREFIX_DSIG);
+    public static final QName TAG_dsig_PgenCounter = new QName(NS_DSIG, "PgenCounter", PREFIX_DSIG);
+
+    public static final String PREFIX_DSIG11 = "dsig11";
+    public static final QName TAG_dsig11_ECKeyValue = new QName(NS_DSIG11, "ECKeyValue", PREFIX_DSIG11);
+    public static final QName TAG_dsig11_ECParameters = new QName(NS_DSIG11, "ECParameters", PREFIX_DSIG11);
+    public static final QName TAG_dsig11_NamedCurve = new QName(NS_DSIG11, "NamedCurve", PREFIX_DSIG11);
+    public static final QName TAG_dsig11_PublicKey = new QName(NS_DSIG11, "PublicKey", PREFIX_DSIG11);
 
     public static final String NS_C14N_EXCL = "http://www.w3.org/2001/10/xml-exc-c14n#";
     public static final String PREFIX_C14N_EXCL = "c14nEx";

@@ -98,6 +98,7 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         }
     }
 
+    //todo move to super class?
     public SecurityToken getKeyWrappingToken() {
         return null;
     }

@@ -23,8 +23,8 @@ import org.swssf.binding.wss10.BinarySecurityTokenType;
 import org.swssf.binding.wss10.KeyIdentifierType;
 import org.swssf.binding.wss10.ReferenceType;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
-import org.swssf.binding.xmldsig.KeyInfoType;
-import org.swssf.binding.xmldsig.X509DataType;
+import org.swssf.binding.xmldsig.*;
+import org.swssf.binding.xmldsig11.ECKeyValueType;
 import org.swssf.wss.ext.*;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
@@ -51,7 +51,15 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         if (keyInfoType != null) {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
-            return getSecurityToken(securityTokenReferenceType, crypto, callbackHandler, securityContext);
+            if (securityTokenReferenceType != null) {
+                return getSecurityToken(securityTokenReferenceType, crypto, callbackHandler, securityContext);
+            }
+            final KeyValueType keyValueType
+                    = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
+            if (keyValueType != null) {
+                return getSecurityToken(keyValueType, crypto, callbackHandler, securityContext);
+            }
+
         } else if (crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityToken(
                     (WSSecurityContext) securityContext, crypto, callbackHandler, crypto.getDefaultX509Identifier(),
@@ -143,6 +151,31 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         } finally {
             securityContext.remove("" + Thread.currentThread().hashCode());
         }
+    }
+
+    public static SecurityToken getSecurityToken(KeyValueType keyValueType, Crypto crypto,
+                                                 final CallbackHandler callbackHandler, SecurityContext securityContext)
+            throws XMLSecurityException {
+
+        final RSAKeyValueType rsaKeyValueType
+                = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
+        if (rsaKeyValueType != null) {
+            return new RsaKeyValueSecurityToken(rsaKeyValueType, (WSSecurityContext) securityContext,
+                    crypto, callbackHandler, WSSConstants.KeyIdentifierType.KEY_VALUE);
+        }
+        final DSAKeyValueType dsaKeyValueType
+                = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
+        if (dsaKeyValueType != null) {
+            return new DsaKeyValueSecurityToken(dsaKeyValueType, (WSSecurityContext) securityContext,
+                    crypto, callbackHandler, WSSConstants.KeyIdentifierType.KEY_VALUE);
+        }
+        final ECKeyValueType ecKeyValueType
+                = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
+        if (ecKeyValueType != null) {
+            return new ECKeyValueSecurityToken(ecKeyValueType, (WSSecurityContext) securityContext,
+                    crypto, callbackHandler, WSSConstants.KeyIdentifierType.KEY_VALUE);
+        }
+        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
     }
 
     public static WSSecurityToken getSecurityToken(

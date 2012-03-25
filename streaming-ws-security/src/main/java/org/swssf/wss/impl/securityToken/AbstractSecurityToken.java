@@ -35,6 +35,8 @@ import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAKey;
+import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -167,8 +169,12 @@ public abstract class AbstractSecurityToken implements WSSecurityToken {
             algorithmSuiteSecurityEvent.setKeyUsage(keyUsage);
             if (publicKey instanceof RSAKey) {
                 algorithmSuiteSecurityEvent.setKeyLength(((RSAKey) publicKey).getModulus().bitLength());
+            } else if (publicKey instanceof DSAKey) {
+                algorithmSuiteSecurityEvent.setKeyLength(((DSAKey) publicKey).getParams().getP().bitLength());
+            } else if (publicKey instanceof ECKey) {
+                algorithmSuiteSecurityEvent.setKeyLength(((ECKey) publicKey).getParams().getOrder().bitLength());
             } else {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "invalidKeySize");
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
             }
             wsSecurityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
         }

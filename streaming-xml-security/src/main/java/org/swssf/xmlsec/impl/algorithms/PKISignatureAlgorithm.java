@@ -92,6 +92,8 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
             byte[] jcebytes = signature.sign();
             if (algorithmType.getJCEName().contains("ECDSA")) {
                 return ECDSAUtils.convertASN1toXMLDSIG(jcebytes);
+            } else if (algorithmType.getJCEName().contains("DSA")) {
+                return DSAUtils.convertASN1toXMLDSIG(jcebytes);
             }
             return jcebytes;
         } catch (SignatureException e) {
@@ -114,6 +116,8 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
             byte[] jcebytes = signature;
             if (algorithmType.getJCEName().contains("ECDSA")) {
                 jcebytes = ECDSAUtils.convertXMLDSIGtoASN1(jcebytes);
+            } else if (algorithmType.getJCEName().contains("DSA")) {
+                jcebytes = DSAUtils.convertXMLDSIGtoASN1(jcebytes);
             }
             return this.signature.verify(jcebytes);
         } catch (SignatureException e) {
