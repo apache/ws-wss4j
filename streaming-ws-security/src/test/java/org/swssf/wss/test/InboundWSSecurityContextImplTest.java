@@ -164,6 +164,9 @@ public class InboundWSSecurityContextImplTest {
 
         boolean mainSignatureTokenOccured = false;
         boolean signedEndorsingSupportingTokenOccured = false;
+        boolean signedEndorsingEncryptedSupportingTokenOccured = false;
+        boolean supportingTokensOccured = false;
+        boolean encryptedSupportingTokensOccured = false;
         boolean mainEncryptionTokenOccured = false;
         boolean usernameTokenOccured = false;
         Assert.assertEquals(securityEventList.size(), 34);
@@ -187,19 +190,19 @@ public class InboundWSSecurityContextImplTest {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
                 Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.EncryptedSupportingTokens));
-                mainSignatureTokenOccured = true;
+                encryptedSupportingTokensOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 3) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
                 Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SupportingTokens));
-                mainSignatureTokenOccured = true;
+                supportingTokensOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 4) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
                 Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEndorsingEncryptedSupportingTokens));
-                mainSignatureTokenOccured = true;
+                signedEndorsingEncryptedSupportingTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 5) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
@@ -217,6 +220,9 @@ public class InboundWSSecurityContextImplTest {
         Assert.assertTrue(mainSignatureTokenOccured);
         Assert.assertTrue(mainEncryptionTokenOccured);
         Assert.assertTrue(signedEndorsingSupportingTokenOccured);
+        Assert.assertTrue(signedEndorsingEncryptedSupportingTokenOccured);
+        Assert.assertTrue(supportingTokensOccured);
+        Assert.assertTrue(encryptedSupportingTokensOccured);
         Assert.assertTrue(usernameTokenOccured);
     }
 
