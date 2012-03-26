@@ -117,15 +117,17 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             return true;
         }
 
+        boolean asserted = true;
+
         //WSP1.3, 5.1 Token Inclusion
         //todo do we need a global token cache to fullfill ".../IncludeToken/Once" ?
         SPConstants.IncludeTokenType includeTokenType = abstractToken.getIncludeTokenType();
         if (includeTokenType == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-            setAsserted(false);
             setErrorMessage("Token must not be included");
-            return false;
+            asserted = false;
         }
 
+        //WSP1.3, 5.3 Token Properties
         boolean hasDerivedKeys = false;
         hasDerivedKeys = hasDerivedKeys(tokenSecurityEvent.getSecurityToken());
         if (abstractToken.getDerivedKeys() != null) {
@@ -135,18 +137,21 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 case RequireExplicitDerivedKeys:
                 case RequireImpliedDerivedKeys:
                     if (!hasDerivedKeys) {
-                        setAsserted(false);
                         setErrorMessage("Derived key must be used");
+                        asserted = false;
                     }
             }
         } else {
             if (hasDerivedKeys) {
-                setAsserted(false);
                 setErrorMessage("Derived key must not be used");
+                asserted = false;
             }
         }
 
-        boolean asserted = assertToken(tokenSecurityEvent, abstractToken);
+        asserted &= assertToken(tokenSecurityEvent, abstractToken);
+        if (asserted) {
+            setAsserted(true);
+        }
         if (!asserted && (tokenUsages.contains(SecurityToken.TokenUsage.MainSignature)
                 || tokenUsages.contains(SecurityToken.TokenUsage.MainEncryption))) {
             //return false if not asserted for the main signature and encryption tokens

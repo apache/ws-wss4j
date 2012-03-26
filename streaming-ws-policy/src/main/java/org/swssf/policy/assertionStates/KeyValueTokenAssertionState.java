@@ -58,8 +58,6 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
             setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " + keyValueTokenSecurityEvent.getKeyValueTokenType() + "KeyValue");
             return false;
         }
-
-        setAsserted(true);
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
         return true;

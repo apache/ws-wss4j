@@ -55,33 +55,32 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = (HttpsTokenSecurityEvent) tokenSecurityEvent;
         HttpsToken httpsToken = (HttpsToken) abstractToken;
 
-        setAsserted(true);
         if (httpsToken.getIssuerName() != null && !httpsToken.getIssuerName().equals(httpsTokenSecurityEvent.getIssuerName())) {
-            setAsserted(false);
             setErrorMessage("IssuerName in Policy (" + httpsToken.getIssuerName() + ") didn't match with the one in the HttpsToken (" + httpsTokenSecurityEvent.getIssuerName() + ")");
+            return false;
         }
         if (httpsToken.getAuthenticationType() != null) {
             switch (httpsToken.getAuthenticationType()) {
                 case HttpBasicAuthentication:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces HttpBasicAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        return false;
                     }
                     break;
                 case HttpDigestAuthentication:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces HttpDigestAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        return false;
                     }
                     break;
                 case RequireClientCertificate:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
-                        setAsserted(false);
                         setErrorMessage("Policy enforces HttClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        return false;
                     }
                     break;
             }
         }
-        return isAsserted();
+        return true;
     }
 }

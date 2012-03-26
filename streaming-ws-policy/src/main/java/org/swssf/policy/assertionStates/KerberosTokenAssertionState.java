@@ -77,8 +77,6 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
             }
         }
         //todo
-
-        setAsserted(true);
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
         return true;
