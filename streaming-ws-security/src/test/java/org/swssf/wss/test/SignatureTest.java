@@ -921,9 +921,22 @@ public class SignatureTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.KeyValueToken,
+                    SecurityEvent.Event.SignatureValue,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.SignedElement,
+                    SecurityEvent.Event.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
         }
     }
 
