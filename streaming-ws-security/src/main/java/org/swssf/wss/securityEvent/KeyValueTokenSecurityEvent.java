@@ -18,23 +18,32 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.swssf.xmlsec.ext.XMLSecurityException;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class KeyValueTokenSecurityEvent extends TokenSecurityEvent {
 
-    private boolean rsaKeyValue = false;
+    public enum KeyValueTokenType {
+        RSA,
+        DSA,
+        EC
+    }
 
     public KeyValueTokenSecurityEvent() {
         super(Event.KeyValueToken);
     }
 
-    public boolean isRsaKeyValue() {
-        return rsaKeyValue;
-    }
-
-    public void setRsaKeyValue(boolean rsaKeyValue) {
-        this.rsaKeyValue = rsaKeyValue;
+    public KeyValueTokenType getKeyValueTokenType() {
+        try {
+            String algo = getSecurityToken().getPublicKey(null, null).getAlgorithm();
+            return KeyValueTokenType.valueOf(algo);
+        } catch (IllegalArgumentException e) {
+            return null;
+        } catch (XMLSecurityException e) {
+            return null;
+        }
     }
 }

@@ -79,6 +79,10 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     }
 
     public X509SecurityToken getX509Token(WSSConstants.TokenType tokenType) throws Exception {
+        return getX509Token(tokenType, "transmitter");
+    }
+
+    public X509SecurityToken getX509Token(WSSConstants.TokenType tokenType, final String keyAlias) throws Exception {
 
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
@@ -86,13 +90,13 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
             @Override
             protected String getAlias() throws XMLSecurityException {
-                return "transmitter";
+                return keyAlias;
             }
 
             @Override
             public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                 try {
-                    return keyStore.getKey("transmitter", "default".toCharArray());
+                    return keyStore.getKey(keyAlias, "default".toCharArray());
                 } catch (Exception e) {
                     throw new XMLSecurityException(e.getMessage(), e);
                 }
@@ -101,7 +105,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             @Override
             public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                 try {
-                    return keyStore.getCertificate("transmitter").getPublicKey();
+                    return keyStore.getCertificate(keyAlias).getPublicKey();
                 } catch (Exception e) {
                     throw new XMLSecurityException(e.getMessage(), e);
                 }
@@ -111,7 +115,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             public X509Certificate[] getX509Certificates() throws XMLSecurityException {
                 Certificate[] certificates;
                 try {
-                    certificates = keyStore.getCertificateChain("transmitter");
+                    certificates = keyStore.getCertificateChain(keyAlias);
                 } catch (Exception e) {
                     throw new XMLSecurityException(e.getMessage(), e);
                 }

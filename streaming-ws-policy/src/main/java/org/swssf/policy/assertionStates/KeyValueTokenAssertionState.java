@@ -54,8 +54,8 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
 
         KeyValueTokenSecurityEvent keyValueTokenSecurityEvent = (KeyValueTokenSecurityEvent) tokenSecurityEvent;
         KeyValueToken keyValueToken = (KeyValueToken) abstractToken;
-        if (keyValueToken.isRsaKeyValue() && !keyValueTokenSecurityEvent.isRsaKeyValue()) {
-            setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken");
+        if (keyValueToken.isRsaKeyValue() && keyValueTokenSecurityEvent.getKeyValueTokenType() != KeyValueTokenSecurityEvent.KeyValueTokenType.RSA) {
+            setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " + keyValueTokenSecurityEvent.getKeyValueTokenType() + "KeyValue");
             return false;
         }
 

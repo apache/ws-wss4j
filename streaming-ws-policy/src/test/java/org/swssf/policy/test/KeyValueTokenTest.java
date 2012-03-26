@@ -19,13 +19,16 @@
 package org.swssf.policy.test;
 
 import org.swssf.policy.PolicyEnforcer;
+import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.KeyValueTokenSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -67,14 +70,12 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         KeyValueTokenSecurityEvent initiatorTokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        initiatorTokenSecurityEvent.setRsaKeyValue(true);
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         KeyValueTokenSecurityEvent recipientTokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        recipientTokenSecurityEvent.setRsaKeyValue(true);
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
@@ -98,5 +99,66 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
         policyEnforcer.doFinal();
     }
 
-    //todo more tests
+    @Test
+    public void testPolicyNegative() throws Exception {
+        String policyString =
+
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "<sp:InitiatorToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:KeyValueToken>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RsaKeyValue/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:KeyValueToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:InitiatorToken>\n" +
+                        "<sp:RecipientToken>\n" +
+                        "   <wsp:Policy>\n" +
+                        "       <sp:KeyValueToken>\n" +
+                        "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "               <sp:RsaKeyValue/>\n" +
+                        "           </wsp:Policy>\n" +
+                        "       </sp:KeyValueToken>\n" +
+                        "   </wsp:Policy>\n" +
+                        "</sp:RecipientToken>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:AsymmetricBinding>";
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        KeyValueTokenSecurityEvent initiatorTokenSecurityEvent = new KeyValueTokenSecurityEvent();
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token, "transmitter-ecdsa");
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        initiatorTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
+
+        KeyValueTokenSecurityEvent recipientTokenSecurityEvent = new KeyValueTokenSecurityEvent();
+        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        recipientTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
+
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+        policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        try {
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            Assert.fail("Exception expected");
+        } catch (WSSecurityException e) {
+            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+                    "Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a ECKeyValue");
+        }
+    }
 }

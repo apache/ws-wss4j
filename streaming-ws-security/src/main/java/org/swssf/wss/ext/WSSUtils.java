@@ -428,7 +428,7 @@ public class WSSUtils extends XMLSecurityUtils {
         } else if (tokenType == WSSConstants.HttpsToken) {
             tokenSecurityEvent = new HttpsTokenSecurityEvent();
         } else if (tokenType == WSSConstants.KeyValueToken) {
-            tokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
+            tokenSecurityEvent = new KeyValueTokenSecurityEvent();
         } else if (tokenType == WSSConstants.DerivedKeyToken) {
             tokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
         } else if (tokenType == WSSConstants.EncryptedKeyToken) {

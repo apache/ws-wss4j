@@ -1412,14 +1412,12 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         KeyValueTokenSecurityEvent tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(true);
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(true);
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
@@ -1448,15 +1446,13 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         KeyValueTokenSecurityEvent tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(false);
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token, "transmitter-dsa");
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(false);
-        securityToken = getX509Token(WSSConstants.X509V3Token);
+        securityToken = getX509Token(WSSConstants.X509V3Token, "transmitter-dsa");
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1488,14 +1484,12 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         KeyValueTokenSecurityEvent tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(true);
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(false);
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
@@ -1524,14 +1518,12 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         KeyValueTokenSecurityEvent tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(false);
         SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        tokenSecurityEvent.setRsaKeyValue(true);
         securityToken = getX509Token(WSSConstants.X509V3Token);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
