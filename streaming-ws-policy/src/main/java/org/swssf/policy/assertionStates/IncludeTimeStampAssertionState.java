@@ -25,6 +25,8 @@ import org.swssf.policy.Assertable;
 import org.swssf.wss.securityEvent.SecurityEvent;
 
 /**
+ * WSP1.3, 6.2 Timestamp Property
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

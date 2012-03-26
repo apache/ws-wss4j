@@ -29,6 +29,8 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 
 /**
+ * WSP1.3, 6.6 Entire Header and Body Signatures Property
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

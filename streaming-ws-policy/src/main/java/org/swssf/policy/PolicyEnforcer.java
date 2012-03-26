@@ -239,6 +239,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, true));
             }
 
+            //WSP1.3, 6.2 Timestamp Property
             assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, true));
             if (abstractBinding.isIncludeTimestamp()) {
                 RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(abstractBinding, false);

@@ -37,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * WSP1.3, 6.5 Token Protection Property
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */

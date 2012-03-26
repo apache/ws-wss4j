@@ -29,6 +29,8 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 
 /**
+ * WSP1.3, 6.1 Algorithm Suite Property
+ *
  * @author $Author$
  * @version $Revision$ $Date$
  */
