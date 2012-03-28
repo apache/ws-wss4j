@@ -45,3 +45,14 @@ The master link to WSS4J: http://ws.apache.org/wss4j/
    Apache WSS4J     : http://ws.apache.org/wss4j/
    Bouncycastle     : http://www.bouncycastle.org/
 
+* Test Requirements *
+
+The WSS4J unit tests use STRONG encryption. The default encryption algorithms
+included in a JRE is not adequate for these samples. The Java Cryptography
+Extension (JCE) Unlimited Strength Jurisdiction Policy Files available on
+Oracle's JDK download page[1] *must* be installed for the tests to work. If
+you get errors about invalid key lengths, the Unlimited Strength files are not
+installed.
+
+[1] http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
