@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration debug="false" xmlns:log4j="http://jakarta.apache.org/log4j/">
-    <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+    <appender name="FILE" class="org.apache.log4j.FileAppender">
         <param name="File" value="target/logging.log"/>
-        <param name="DatePattern" value="yyyy-MM-dd"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
@@ -13,12 +12,6 @@
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
     </appender>
-    <logger name="org.swssf">
-        <level value="INFO"/>
-    </logger>
-    <logger name="org.swssf.policy.PolicyEnforcer">
-        <level value="INFO"/>
-    </logger>
     <logger name="org.swssf.xmlsec.impl.util.SignerOutputStream">
         <level value="INFO"/>
     </logger>
@@ -35,9 +28,6 @@
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.xml.security.encryption.XMLCipher">
-        <level value="INFO"/>
-    </logger>
-    <logger name="org.apache.xml">
         <level value="INFO"/>
     </logger>
     <logger name="org.swssf.xmlsec.impl.InputProcessorChainImpl">
