@@ -66,6 +66,11 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
                         "       </sp:SecureConversationToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SignatureToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
 
@@ -129,6 +134,11 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
                         "       </sp:SecureConversationToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SignatureToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);

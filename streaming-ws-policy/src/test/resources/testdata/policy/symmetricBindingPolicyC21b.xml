@@ -10,6 +10,8 @@
                         <sp:RequestSecurityTokenTemplate>
                             ...
                         </sp:RequestSecurityTokenTemplate>
+                        <wsp:Policy>
+                        </wsp:Policy>
                     </sp:IssuedToken>
                 </wsp:Policy>
             </sp:EncryptionToken>
@@ -20,6 +22,8 @@
                         <sp:RequestSecurityTokenTemplate>
                             ...
                         </sp:RequestSecurityTokenTemplate>
+                        <wsp:Policy>
+                        </wsp:Policy>
                     </sp:IssuedToken>
                 </wsp:Policy>
             </sp:SignatureToken>
@@ -41,7 +45,10 @@
     </sp:SymmetricBinding>
     <sp:SignedEncryptedSupportingTokens>
         <wsp:Policy>
-            <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once" />
+            <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:UsernameToken>
         </wsp:Policy>
     </sp:SignedEncryptedSupportingTokens>
     <sp:SignedEndorsingSupportingTokens>

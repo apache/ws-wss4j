@@ -96,6 +96,9 @@ public abstract class AbstractBinding extends AbstractSecurityAssertion implemen
                 }
             }
         }
+        if (binding.getAlgorithmSuite() == null) {
+            throw new IllegalArgumentException("sp:" + getName().getLocalPart() + " must have an inner sp:AlgorithmSuite element");
+        }
     }
 
     public AlgorithmSuite getAlgorithmSuite() {

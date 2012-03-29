@@ -431,6 +431,8 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:IssuedToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <sp:RequestSecurityTokenTemplate/>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:IssuedToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -465,6 +467,8 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:IssuedToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <sp:RequestSecurityTokenTemplate/>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:IssuedToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -503,6 +507,8 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:IssuedToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <sp:RequestSecurityTokenTemplate/>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:IssuedToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -537,6 +543,8 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:IssuedToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <sp:RequestSecurityTokenTemplate/>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:IssuedToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -571,6 +579,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:KerberosToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:KerberosToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -605,6 +614,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:KerberosToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:KerberosToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -643,6 +653,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:KerberosToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:KerberosToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -677,6 +688,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:KerberosToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:KerberosToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -711,6 +723,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SpnegoContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SpnegoContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -745,6 +758,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SpnegoContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SpnegoContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -783,6 +797,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SpnegoContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SpnegoContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -817,6 +832,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SpnegoContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SpnegoContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -851,6 +867,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecurityContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecurityContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -885,6 +902,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecurityContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecurityContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -923,6 +941,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecurityContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecurityContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -957,6 +976,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecurityContextToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecurityContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -991,6 +1011,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecureConversationToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecureConversationToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1025,6 +1046,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecureConversationToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecureConversationToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1063,6 +1085,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecureConversationToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecureConversationToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1097,6 +1120,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SecureConversationToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SecureConversationToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1131,6 +1155,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SamlToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SamlToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1163,6 +1188,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SamlToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SamlToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1199,6 +1225,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SamlToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SamlToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";
@@ -1231,6 +1258,7 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "       <sp:SamlToken>\n" +
                         "           <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "           <wsp:Policy/>\n" +
                         "       </sp:SamlToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SupportingTokens>";

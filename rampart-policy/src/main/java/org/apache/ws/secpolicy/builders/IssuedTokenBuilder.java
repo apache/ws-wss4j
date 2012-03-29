@@ -48,13 +48,20 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
         }
         final Element claims = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getClaims());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
+        if (nestedPolicyElement == null) {
+            throw new IllegalArgumentException("sp:IssuedToken must have an inner wsp:Policy element");
+        }
+        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
+        final Element requestSecurityTokenTemplate = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getRequestSecurityTokenTemplate());
+        if (requestSecurityTokenTemplate == null) {
+            throw new IllegalArgumentException("sp:IssuedToken must have a sp:RequestSecurityTokenTemplate element");
+        }
         IssuedToken issuedToken = new IssuedToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),
                 issuer,
                 issuerName,
-                SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getRequestSecurityTokenTemplate()),
+                requestSecurityTokenTemplate,
                 claims,
                 nestedPolicy
         );

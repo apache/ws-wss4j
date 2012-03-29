@@ -43,21 +43,25 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
 
-        final List<Header> headers = getHeaders(element, spVersion);
+        final List<Header> headers = getHeaders(element, false, spVersion);
         RequiredParts requiredParts = new RequiredParts(spVersion, headers);
         requiredParts.setOptional(SPUtils.isOptional(element));
         requiredParts.setIgnorable(SPUtils.isIgnorable(element));
         return requiredParts;
     }
 
-    protected List<Header> getHeaders(Element element, SPConstants.SPVersion spVersion) {
+    protected List<Header> getHeaders(Element element, boolean ignoreNameElement, SPConstants.SPVersion spVersion) {
         List<Header> headers = new ArrayList<Header>();
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
             if (SPConstants.HEADER.equals(child.getLocalName()) && spVersion.getNamespace().equals(child.getNamespaceURI())) {
                 String headerName = child.getAttribute(SPConstants.NAME);
                 if ("".equals(headerName)) {
-                    headerName = null;
+                    if (ignoreNameElement) {
+                        headerName = null;
+                    } else {
+                        throw new IllegalArgumentException("sp:" + element.getLocalName() + "/sp:" + child.getLocalName() + " must have a Name attribute");
+                    }
                 }
                 String headerNamespace = child.getAttribute(SPConstants.NAMESPACE);
                 if (StringUtils.isEmpty(headerNamespace)) {

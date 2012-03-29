@@ -67,6 +67,11 @@ public class SecurityContextTokenTest extends AbstractPolicyTestBase {
                         "       </sp:SecurityContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SignatureToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
 
@@ -131,6 +136,11 @@ public class SecurityContextTokenTest extends AbstractPolicyTestBase {
                         "       </sp:SecurityContextToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SignatureToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
 

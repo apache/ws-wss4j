@@ -44,6 +44,11 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptSignature/>\n" +
                         "<sp:OnlySignEntireHeadersAndBody/>\n" +
@@ -103,6 +108,11 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:EncryptSignature/>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "<sp:OnlySignEntireHeadersAndBody/>\n" +
@@ -142,6 +152,11 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptBeforeSigning/>\n" +
                         "<sp:EncryptSignature/>\n" +
@@ -180,6 +195,11 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptSignature/>\n" +
                         "<sp:ProtectTokens/>\n" +
@@ -229,6 +249,11 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:IncludeTimestamp/>\n" +
                         "<sp:EncryptSignature/>\n" +
                         "<sp:ProtectTokens/>\n" +

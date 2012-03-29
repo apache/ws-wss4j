@@ -45,6 +45,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
@@ -118,6 +123,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
@@ -188,6 +198,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
@@ -228,6 +243,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
@@ -268,6 +288,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
@@ -309,6 +334,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
@@ -381,6 +411,11 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
                         "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "<sp:ProtectTokens/>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";

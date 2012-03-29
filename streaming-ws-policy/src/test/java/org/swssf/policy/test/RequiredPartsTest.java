@@ -36,8 +36,6 @@ import java.util.List;
  */
 public class RequiredPartsTest extends AbstractPolicyTestBase {
 
-    //todo in RequiredPartsBuilder Name attribute is manadory!
-
     @Test
     public void testPolicy() throws Exception {
         String policyString =

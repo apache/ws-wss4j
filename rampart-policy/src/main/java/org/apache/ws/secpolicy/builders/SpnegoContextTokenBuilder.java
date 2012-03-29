@@ -48,7 +48,10 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
         }
         final Element claims = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getClaims());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
+        if (nestedPolicyElement == null) {
+            throw new IllegalArgumentException("sp:SpnegoContextToken must have an inner wsp:Policy element");
+        }
+        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         SpnegoContextToken spnegoContextToken = new SpnegoContextToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),

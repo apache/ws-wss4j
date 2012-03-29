@@ -157,7 +157,7 @@ public class SPUtils {
         } else {
             attr = element.getAttributeNodeNS(attName.getNamespaceURI(), attName.getLocalPart());
         }
-        return attr == null ? null : attr.getValue();
+        return attr == null ? null : attr.getValue().trim();
     }
 
     public static QName getElementQName(Element element) {

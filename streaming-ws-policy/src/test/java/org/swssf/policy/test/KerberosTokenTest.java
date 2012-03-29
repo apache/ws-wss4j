@@ -63,6 +63,11 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
                         "       </sp:KerberosToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:SignatureToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
 

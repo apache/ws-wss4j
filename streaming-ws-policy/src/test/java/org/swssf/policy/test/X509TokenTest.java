@@ -67,6 +67,11 @@ public class X509TokenTest extends AbstractPolicyTestBase {
                         "       </sp:X509Token>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:RecipientToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
 
@@ -128,6 +133,11 @@ public class X509TokenTest extends AbstractPolicyTestBase {
                         "       </sp:X509Token>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:RecipientToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
 

@@ -2050,7 +2050,10 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:AsymmetricBinding>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                   <wsp:Policy>\n" +
-                        "                     <sp:UsernameToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\"/>\n" +
+                        "                     <sp:UsernameToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                       <wsp:Policy>\n" +
+                        "                       </wsp:Policy>\n" +
+                        "                     </sp:UsernameToken>\n" +
                         "                   </wsp:Policy>\n" +
                         "                </sp:SignedSupportingTokens>\n" +
                         "                <sp:SignedParts>\n" +
@@ -2183,7 +2186,10 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:AsymmetricBinding>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                   <wsp:Policy>\n" +
-                        "                     <sp:UsernameToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\"/>\n" +
+                        "                     <sp:UsernameToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                       <wsp:Policy>\n" +
+                        "                       </wsp:Policy>\n" +
+                        "                     </sp:UsernameToken>\n" +
                         "                   </wsp:Policy>\n" +
                         "                </sp:SignedSupportingTokens>\n" +
                         "                <sp:SignedParts>\n" +

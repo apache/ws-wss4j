@@ -41,7 +41,10 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
+        if (nestedPolicyElement == null) {
+            throw new IllegalArgumentException("sp:SymmetricBinding must have an inner wsp:Policy element");
+        }
+        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         SymmetricBinding symmetricBinding = new SymmetricBinding(
                 spVersion,
                 nestedPolicy

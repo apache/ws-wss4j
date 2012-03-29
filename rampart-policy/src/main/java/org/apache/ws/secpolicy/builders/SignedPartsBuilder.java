@@ -42,7 +42,7 @@ public class SignedPartsBuilder extends RequiredPartsBuilder {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         boolean body = SPUtils.hasChildElementWithName(element, spVersion.getSPConstants().getBody());
-        final List<Header> headers = getHeaders(element, spVersion);
+        final List<Header> headers = getHeaders(element, true, spVersion);
         final Attachments attachments = getAttachments(element, spVersion);
         final boolean signAllHeaders = !SPUtils.hasChildElements(element);
         body |= signAllHeaders;

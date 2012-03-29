@@ -5,7 +5,10 @@
         <wsp:Policy>
             <sp:TransportToken>
                 <wsp:Policy>
-                    <sp:HttpsToken />
+                    <sp:HttpsToken>
+                        <wsp:Policy>
+                        </wsp:Policy>
+                    </sp:HttpsToken>
                 </wsp:Policy>
             </sp:TransportToken>
             <sp:AlgorithmSuite>
@@ -23,7 +26,10 @@
     </sp:TransportBinding>
     <sp:SignedSupportingTokens>
         <wsp:Policy>
-            <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once" />
+            <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:UsernameToken>
         </wsp:Policy>
     </sp:SignedSupportingTokens>
     <sp:SignedEndorsingSupportingTokens>

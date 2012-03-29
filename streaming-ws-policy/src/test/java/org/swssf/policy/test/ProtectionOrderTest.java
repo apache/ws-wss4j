@@ -42,6 +42,11 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding  xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
                         "   <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>\n";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
@@ -82,6 +87,11 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding  xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
                         "   <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>\n";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
@@ -103,6 +113,11 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding  xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
                         "   <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>\n";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
@@ -131,6 +146,11 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding  xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
                         "   <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "       <sp:EncryptBeforeSigning/>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>\n";
@@ -172,6 +192,11 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding  xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
                         "   <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "       <sp:EncryptBeforeSigning/>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>\n";
@@ -194,6 +219,11 @@ public class ProtectionOrderTest extends AbstractPolicyTestBase {
         String policyString =
                 "<sp:AsymmetricBinding  xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
                         "   <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "       <sp:EncryptBeforeSigning/>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>\n";

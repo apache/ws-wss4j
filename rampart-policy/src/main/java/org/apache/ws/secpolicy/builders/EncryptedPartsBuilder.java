@@ -42,7 +42,7 @@ public class EncryptedPartsBuilder extends SignedPartsBuilder {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         boolean body = SPUtils.hasChildElementWithName(element, spVersion.getSPConstants().getBody());
-        final List<Header> headers = getHeaders(element, spVersion);
+        final List<Header> headers = getHeaders(element, true, spVersion);
         final Attachments attachments = getAttachments(element, spVersion);
         body |= !SPUtils.hasChildElements(element);
 

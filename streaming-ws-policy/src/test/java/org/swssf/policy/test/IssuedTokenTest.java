@@ -47,6 +47,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
                         "   <wsp:Policy>\n" +
                         "       <sp:IssuedToken>\n" +
                         "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <sp:RequestSecurityTokenTemplate/>\n" +
                         "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "               <sp:RequireExternalReference/>\n" +
                         "           </wsp:Policy>\n" +
@@ -57,12 +58,18 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
                         "   <wsp:Policy>\n" +
                         "       <sp:IssuedToken>\n" +
                         "           <sp:IssuerName>xs:anyURI</sp:IssuerName>\n" +
+                        "           <sp:RequestSecurityTokenTemplate/>\n" +
                         "           <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "               <sp:RequireExternalReference/>\n" +
                         "           </wsp:Policy>\n" +
                         "       </sp:IssuedToken>\n" +
                         "   </wsp:Policy>\n" +
                         "</sp:RecipientToken>\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
                         "</wsp:Policy>\n" +
                         "</sp:AsymmetricBinding>";
 
