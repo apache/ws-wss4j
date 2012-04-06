@@ -21,7 +21,6 @@ package org.swssf.wss.impl.securityToken;
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.binding.wss10.BinarySecurityTokenType;
 import org.swssf.binding.wss10.KeyIdentifierType;
-import org.swssf.binding.wss10.ReferenceType;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.binding.xmldsig.*;
 import org.swssf.binding.xmldsig11.ECKeyValueType;
@@ -72,11 +71,21 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     public static SecurityToken getSecurityToken(SecurityTokenReferenceType securityTokenReferenceType, Crypto crypto,
                                                  final CallbackHandler callbackHandler, SecurityContext securityContext)
             throws XMLSecurityException {
+
+        //BSP.R5205 is a joke. In real life we have a lot of cases which prevents a one pass processing.
+        //Say encrypted Tokens, SignedTokens, Signed-Timestamp first...
+
         try {
             if (securityTokenReferenceType == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef");
             }
 
+            if (securityTokenReferenceType.getAny().size() > 1) {
+                ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3061);
+            }
+
+            //todo BSP.R3027 KeyName? not supported ATM
+            //todo BSP.R3060,BSP.R3025,BSP.R3056 only one Embedded element? Not supported ATM
             final X509DataType x509DataType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
             final KeyIdentifierType keyIdentifierType
@@ -87,16 +96,22 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 return new X509DataSecurityToken((WSSecurityContext) securityContext, crypto, callbackHandler,
                         x509DataType, securityTokenReferenceType.getId(),
                         WSSConstants.KeyIdentifierType.ISSUER_SERIAL);
-            }
-            //todo this is not supported by outputProcessor but can be implemented.
-            // We'll have a look at the spec if this is allowed
-            else if (keyIdentifierType != null) {
+            } else if (keyIdentifierType != null) {
                 String valueType = keyIdentifierType.getValueType();
+                if (valueType == null) {
+                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3054);
+                }
                 String encodingType = keyIdentifierType.getEncodingType();
 
                 byte[] binaryContent = null;
                 if (WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
                     binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
+                } else if (!WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
+                    if (encodingType == null) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3070);
+                    } else {
+                        ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3071);
+                    }
                 }
 
                 if (WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
@@ -118,12 +133,21 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
                     }
                     return securityTokenProvider.getSecurityToken();
+                } else {
+                    //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
+                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3063);
                 }
             } else if (referenceType != null) {
+                //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3058, BSP.R3059
 
                 String uri = referenceType.getURI();
                 if (uri == null) {
+                    //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
+                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3062);
                     throw new WSSecurityException("badReferenceURI");
+                }
+                if (!uri.startsWith("#")) {
+                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R5204);
                 }
                 uri = WSSUtils.dropReferenceMarker(uri);
                 //referenced BST:*/
@@ -144,6 +168,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(uri);
                 if (securityTokenProvider == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
+                }
+                if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
+                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3057);
                 }
                 return securityTokenProvider.getSecurityToken();
             }
@@ -216,6 +243,6 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         return new SecurityTokenReference(
                 securityContext.getSecurityTokenProvider(referencedTokenId).
                         getSecurityToken(), xmlEvents,
-                (WSSecurityContext) securityContext, callbackHandler, id, null);
+                (WSSecurityContext) securityContext, callbackHandler, id, WSSConstants.KeyIdentifierType.SECURITY_TOKEN_REFERENCE);
     }
 }

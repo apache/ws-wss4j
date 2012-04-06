@@ -64,6 +64,9 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final UsernameTokenType usernameTokenType = ((JAXBElement<UsernameTokenType>) parseStructure(eventQueue, index)).getValue();
+
+        checkBSPCompliance(inputProcessorChain, usernameTokenType, eventQueue, index);
+
         if (usernameTokenType.getId() == null) {
             usernameTokenType.setId(UUID.randomUUID().toString());
         }
@@ -210,5 +213,62 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(usernameTokenSecurityEvent);
+    }
+
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, UsernameTokenType usernameTokenType,
+                                    Deque<XMLEvent> eventDeque, int index) throws WSSecurityException {
+
+        if (usernameTokenType.getAny() == null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3031);
+        }
+
+        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        int curIdx = 0;
+        //forward to first Usernametoken child element
+        while (curIdx++ <= index) {
+            xmlEventIterator.next();
+        }
+        int passwordIndex = -1;
+        int createdIndex = -1;
+        int nonceIndex = -1;
+        while (xmlEventIterator.hasNext()) {
+            XMLEvent xmlEvent = xmlEventIterator.next();
+            if (xmlEvent.isStartElement()) {
+                if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Password)) {
+                    if (passwordIndex != -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4222);
+                    }
+                    passwordIndex = curIdx;
+                } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
+                    if (createdIndex != -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4223);
+                    }
+                    createdIndex = curIdx;
+                } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Nonce)) {
+                    if (nonceIndex != -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4225);
+                    }
+                    nonceIndex = curIdx;
+                }
+            }
+            curIdx++;
+        }
+
+        PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
+        if (passwordType != null) {
+            if (passwordType.getType() == null) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4201);
+            }
+        }
+
+        EncodedString encodedNonce = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+        if (encodedNonce != null) {
+            if (encodedNonce.getEncodingType() == null) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4220);
+            } else if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4221);
+            }
+        }
+
     }
 }

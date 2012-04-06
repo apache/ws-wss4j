@@ -19,7 +19,9 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss10.BinarySecurityTokenType;
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
+import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.ext.WSSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
@@ -47,6 +49,8 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
         final BinarySecurityTokenType binarySecurityTokenType =
                 ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index)).getValue();
+
+        checkBSPCompliance(inputProcessorChain, binarySecurityTokenType);
 
         if (binarySecurityTokenType.getId() == null) {
             binarySecurityTokenType.setId(UUID.randomUUID().toString());
@@ -93,5 +97,17 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         x509TokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(x509TokenSecurityEvent);
+    }
+
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, BinarySecurityTokenType binarySecurityTokenType) throws WSSecurityException {
+        if (binarySecurityTokenType.getEncodingType() == null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3029);
+        }
+        if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3030);
+        }
+        if (binarySecurityTokenType.getValueType() == null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3031);
+        }
     }
 }

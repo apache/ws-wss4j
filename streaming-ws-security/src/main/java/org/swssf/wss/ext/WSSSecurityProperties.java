@@ -20,6 +20,10 @@ package org.swssf.wss.ext;
 
 import org.swssf.xmlsec.ext.XMLSecurityProperties;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Main configuration class to supply keys etc.
  * This class is subject to change in the future.
@@ -146,5 +150,15 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference) {
         this.derivedKeyTokenReference = derivedKeyTokenReference;
+    }
+
+    private List<WSSConstants.BSPRule> ignoredBSPRules = new LinkedList<WSSConstants.BSPRule>();
+
+    public void addIgnoreBSPRule(WSSConstants.BSPRule bspRule) {
+        ignoredBSPRules.add(bspRule);
+    }
+
+    public List<WSSConstants.BSPRule> getIgnoredBSPRules() {
+        return Collections.unmodifiableList(ignoredBSPRules);
     }
 }

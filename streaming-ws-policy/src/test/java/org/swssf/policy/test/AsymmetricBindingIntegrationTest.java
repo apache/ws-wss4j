@@ -966,6 +966,8 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5421);
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5420);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
@@ -1080,6 +1082,9 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5404);
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5423);
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5412);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
@@ -1194,6 +1199,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5420);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));

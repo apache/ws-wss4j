@@ -58,6 +58,9 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
         @SuppressWarnings("unchecked")
         final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index)).getValue();
+
+        checkBSPCompliance(inputProcessorChain, encryptedKeyType);
+
         if (encryptedKeyType.getId() == null) {
             encryptedKeyType.setId(UUID.randomUUID().toString());
         }
@@ -201,8 +204,27 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
             securityTokenReferenceType.getAny().add(objectFactory.createReference(referenceType));
             keyInfoType.getContent().add(objectFactory.createSecurityTokenReference(securityTokenReferenceType));
             inputProcessorChain.addProcessor(
-                    new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(), (WSSSecurityProperties) securityProperties)
+                    new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(),
+                            (WSSSecurityProperties) securityProperties, (WSSecurityContext) inputProcessorChain.getSecurityContext())
             );
+        }
+    }
+
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType) throws WSSecurityException {
+        if (encryptedKeyType.getType() != null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3209);
+        }
+        if (encryptedKeyType.getMimeType() != null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5622);
+        }
+        if (encryptedKeyType.getEncoding() != null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5623);
+        }
+        if (encryptedKeyType.getRecipient() != null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5602);
+        }
+        if (encryptedKeyType.getEncryptionMethod() == null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5603);
         }
     }
 

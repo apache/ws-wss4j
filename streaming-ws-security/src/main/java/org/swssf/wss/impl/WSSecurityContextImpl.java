@@ -18,6 +18,7 @@
  */
 package org.swssf.wss.impl;
 
+import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.SecurityEvent;
@@ -52,5 +53,11 @@ public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecu
             SecurityEventListener securityEventListener = securityEventListeners.get(i);
             securityEventListener.registerSecurityEvent(securityEvent);
         }
+    }
+
+    public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException {
+    }
+
+    public void ignoredBSPRules(List<WSSConstants.BSPRule> bspRules) {
     }
 }

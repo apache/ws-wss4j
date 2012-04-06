@@ -107,6 +107,7 @@ public class InboundWSSec {
         final InboundWSSecurityContextImpl securityContextImpl = new InboundWSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.addSecurityEventListener(securityEventListener);
+        securityContextImpl.ignoredBSPRules(this.securityProperties.getIgnoredBSPRules());
 
         for (int i = 0; i < requestSecurityEvents.size(); i++) {
             SecurityEvent securityEvent = requestSecurityEvents.get(i);

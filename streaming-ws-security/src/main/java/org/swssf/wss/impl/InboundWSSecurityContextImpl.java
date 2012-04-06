@@ -19,6 +19,8 @@
 package org.swssf.wss.impl;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
@@ -40,9 +42,13 @@ import java.util.List;
  */
 public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
+    private static final transient Log logger = LogFactory.getLog(WSSecurityContextImpl.class);
+
     private Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
     private boolean messageEncryptionTokenOccured = false;
+
+    private List<WSSConstants.BSPRule> ignoredBSPRules = new LinkedList<WSSConstants.BSPRule>();
 
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
@@ -417,9 +423,9 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                         && tokenSecurityEvent.getSecurityToken() != null
                         && signedElementSecurityEvent.getXmlEvent() != null
                         && signedElementSecurityEvent.getXmlEvent() == tokenSecurityEvent.getSecurityToken().getXMLEvent()
-                        /*&& WSSUtils.pathMatches(
-                        tokenSecurityEvent.getSecurityToken().getElementPath(),
-                        signedElementSecurityEvent.getElementPath(), false, false)*/) {
+                    /*&& WSSUtils.pathMatches(
+                  tokenSecurityEvent.getSecurityToken().getElementPath(),
+                  signedElementSecurityEvent.getElementPath(), false, false)*/) {
 
                     if (!securityTokenList.contains(signedElementSecurityEvent.getSecurityToken())) {
                         securityTokenList.add(signedElementSecurityEvent.getSecurityToken());
@@ -442,9 +448,9 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                         && tokenSecurityEvent.getSecurityToken() != null
                         && encryptedElementSecurityEvent.getXmlEvent() != null
                         && encryptedElementSecurityEvent.getXmlEvent() == tokenSecurityEvent.getSecurityToken().getXMLEvent()
-                        /*&& WSSUtils.pathMatches(
-                        tokenSecurityEvent.getSecurityToken().getElementPath(),
-                        encryptedElementSecurityEvent.getElementPath(), false, false)*/) {
+                    /*&& WSSUtils.pathMatches(
+                  tokenSecurityEvent.getSecurityToken().getElementPath(),
+                  encryptedElementSecurityEvent.getElementPath(), false, false)*/) {
 
                     if (!securityTokenList.contains(encryptedElementSecurityEvent.getSecurityToken())) {
                         securityTokenList.add(encryptedElementSecurityEvent.getSecurityToken());
@@ -493,5 +499,17 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
             }
         }
         return false;
+    }
+
+    public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException {
+        if (!ignoredBSPRules.contains(bspRule)) {
+            throw new WSSecurityException("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
+        } else {
+            logger.warn("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
+        }
+    }
+
+    public void ignoredBSPRules(List<WSSConstants.BSPRule> bspRules) {
+        ignoredBSPRules.addAll(bspRules);
     }
 }

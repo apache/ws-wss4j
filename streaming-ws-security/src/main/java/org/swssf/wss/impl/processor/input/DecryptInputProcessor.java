@@ -18,13 +18,12 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.binding.xmlenc.EncryptedDataType;
 import org.swssf.binding.xmlenc.ReferenceList;
-import org.swssf.wss.ext.WSSDocumentContext;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.ext.WSSecurityContext;
+import org.swssf.binding.xmlenc.ReferenceType;
+import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
@@ -32,8 +31,10 @@ import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.processor.input.AbstractDecryptInputProcessor;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,13 +45,40 @@ import java.util.List;
  */
 public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
-    public DecryptInputProcessor(ReferenceList referenceList, WSSSecurityProperties securityProperties) {
+    public DecryptInputProcessor(ReferenceList referenceList, WSSSecurityProperties securityProperties,
+                                 WSSecurityContext securityContext) throws WSSecurityException {
         super(referenceList, securityProperties);
+        checkBSPCompliance(referenceList, securityContext, WSSConstants.BSPRule.R5608);
     }
 
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
-                                 WSSSecurityProperties securityProperties) {
+                                 WSSSecurityProperties securityProperties, WSSecurityContext securityContext)
+            throws WSSecurityException {
+
         super(keyInfoType, referenceList, securityProperties);
+
+        if (keyInfoType.getContent().size() != 1) {
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5424);
+        }
+        SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoType.getContent(),
+                WSSConstants.TAG_wsse_SecurityTokenReference);
+        if (securityTokenReferenceType == null) {
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5426);
+        }
+        checkBSPCompliance(referenceList, securityContext, WSSConstants.BSPRule.R3006);
+    }
+
+    private void checkBSPCompliance(ReferenceList referenceList, WSSecurityContext securityContext, WSSConstants.BSPRule bspRule) throws WSSecurityException {
+        if (referenceList != null) {
+            List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
+            Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();
+            while (referenceTypeIterator.hasNext()) {
+                ReferenceType referenceType = referenceTypeIterator.next().getValue();
+                if (!referenceType.getURI().startsWith("#")) {
+                    securityContext.handleBSPRule(bspRule);
+                }
+            }
+        }
     }
 
     protected void handleEncryptedContent(InputProcessorChain inputProcessorChain, XMLEvent parentXMLEvent, XMLEvent xmlEvent,
@@ -77,7 +105,16 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     @Override
     protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
             boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
-            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType, SecurityToken securityToken) {
+            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType,
+            SecurityToken securityToken, SecurityContext securityContext) throws WSSecurityException {
+
+        String encryptionAlgorithm = currentEncryptedDataType.getEncryptionMethod().getAlgorithm();
+        if (!WSSConstants.NS_XENC_TRIBLE_DES.equals(encryptionAlgorithm)
+                && !WSSConstants.NS_XENC_AES128.equals(encryptionAlgorithm)
+                && !WSSConstants.NS_XENC_AES256.equals(encryptionAlgorithm)) {
+            ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R5620);
+        }
+
         return new DecryptedEventReaderInputProcessor(getSecurityProperties(),
                 SecurePart.Modifier.getModifier(currentEncryptedDataType.getType()),
                 encryptedHeader, comparableNamespaceList, comparableAttributeList,

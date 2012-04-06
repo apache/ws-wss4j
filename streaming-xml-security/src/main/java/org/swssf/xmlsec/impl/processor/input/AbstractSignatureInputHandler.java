@@ -60,9 +60,9 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
         addSignatureReferenceInputProcessorToChain(inputProcessorChain, securityProperties, signatureType, securityToken);
     }
 
-    protected abstract void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain,
-                                                                       XMLSecurityProperties securityProperties,
-                                                                       SignatureType signatureType, SecurityToken securityToken);
+    protected abstract void addSignatureReferenceInputProcessorToChain(
+            InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
+            SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException;
 
     protected SecurityToken verifySignedInfo(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
                                              SignatureType signatureType, Deque<XMLEvent> eventDeque, int index)

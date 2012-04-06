@@ -107,12 +107,14 @@ public class XMLSecurityConstants {
     public static final QName TAG_dsig_SignedInfo = new QName(NS_DSIG, "SignedInfo", PREFIX_DSIG);
     public static final QName TAG_dsig_CanonicalizationMethod = new QName(NS_DSIG, "CanonicalizationMethod", PREFIX_DSIG);
     public static final QName TAG_dsig_SignatureMethod = new QName(NS_DSIG, "SignatureMethod", PREFIX_DSIG);
+    public static final QName TAG_dsig_HMACOutputLength = new QName(NS_DSIG, "HMACOutputLength", PREFIX_DSIG);
     public static final QName TAG_dsig_Reference = new QName(NS_DSIG, "Reference", PREFIX_DSIG);
     public static final QName TAG_dsig_Transforms = new QName(NS_DSIG, "Transforms", PREFIX_DSIG);
     public static final QName TAG_dsig_Transform = new QName(NS_DSIG, "Transform", PREFIX_DSIG);
     public static final QName TAG_dsig_DigestMethod = new QName(NS_DSIG, "DigestMethod", PREFIX_DSIG);
     public static final QName TAG_dsig_DigestValue = new QName(NS_DSIG, "DigestValue", PREFIX_DSIG);
     public static final QName TAG_dsig_SignatureValue = new QName(NS_DSIG, "SignatureValue", PREFIX_DSIG);
+    public static final QName TAG_dsig_Manifest = new QName(NS_DSIG, "Manifest", PREFIX_DSIG);
 
     public static final QName TAG_dsig_X509Data = new QName(NS_DSIG, "X509Data", PREFIX_DSIG);
     public static final QName TAG_dsig_X509IssuerSerial = new QName(NS_DSIG, "X509IssuerSerial", PREFIX_DSIG);
@@ -140,6 +142,16 @@ public class XMLSecurityConstants {
     public static final QName TAG_dsig11_PublicKey = new QName(NS_DSIG11, "PublicKey", PREFIX_DSIG11);
 
     public static final String NS_C14N_EXCL = "http://www.w3.org/2001/10/xml-exc-c14n#";
+    public static final String NS_XMLDSIG_FILTER2 = "http://www.w3.org/2002/06/xmldsig-filter2";
+    public static final String NS_XMLDSIG_ENVELOPED_SIGNATURE = NS_DSIG + "enveloped-signature";
+    public static final String NS_XMLDSIG_SHA1 = NS_DSIG + "sha1";
+    public static final String NS_XMLDSIG_HMACSHA1 = NS_DSIG + "hmac-sha1";
+    public static final String NS_XMLDSIG_RSASHA1 = NS_DSIG + "rsa-sha1";
+
+    public static final String NS_XENC_TRIBLE_DES = NS_XMLENC + "tripledes-cbc";
+    public static final String NS_XENC_AES128 = NS_XMLENC + "aes128-cbc";
+    public static final String NS_XENC_AES256 = NS_XMLENC + "aes256-cbc";
+
     public static final String PREFIX_C14N_EXCL = "c14nEx";
     public static final QName ATT_NULL_PrefixList = new QName(null, "PrefixList");
     public static final QName TAG_c14nExcl_InclusiveNamespaces = new QName(NS_C14N_EXCL, "InclusiveNamespaces", PREFIX_C14N_EXCL);

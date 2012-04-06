@@ -134,6 +134,8 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final QName TAG_wst_BinarySecret = new QName(NS_WST, "BinarySecret");
 
     public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
+    public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS = "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
+    public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS = "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform";
 
     public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
     public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");
@@ -262,6 +264,7 @@ public class WSSConstants extends XMLSecurityConstants {
         EMBEDDED_KEYIDENTIFIER_REF,
         USERNAMETOKEN_REFERENCE,
         KEY_VALUE,
+        SECURITY_TOKEN_REFERENCE,
     }
 
     public enum DerivedKeyTokenReference {
@@ -479,6 +482,10 @@ public class WSSConstants extends XMLSecurityConstants {
 
         private BSPRule(String msg) {
             this.msg = msg;
+        }
+
+        public String getMsg() {
+            return msg;
         }
     }
 

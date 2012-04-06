@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author $Author$
@@ -246,6 +243,17 @@ public class XMLSecurityUtils {
                 if (jaxbElement.getName().equals(qName)) {
                     return (T) jaxbElement.getValue();
                 }
+            }
+        }
+        return null;
+    }
+
+    public static String getQNameAttribute(Map<QName, String> attributes, QName qName) {
+        Iterator<Map.Entry<QName, String>> attributeIterator = attributes.entrySet().iterator();
+        while (attributeIterator.hasNext()) {
+            Map.Entry<QName, String> entry = attributeIterator.next();
+            if (entry.getKey().equals(qName)) {
+                return entry.getValue();
             }
         }
         return null;

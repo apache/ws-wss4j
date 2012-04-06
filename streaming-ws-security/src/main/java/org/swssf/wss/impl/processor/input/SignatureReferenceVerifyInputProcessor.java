@@ -66,9 +66,73 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
 
     private boolean replayChecked = false;
 
-    public SignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityToken securityToken, XMLSecurityProperties securityProperties) {
+    public SignatureReferenceVerifyInputProcessor(
+            SignatureType signatureType, SecurityToken securityToken,
+            XMLSecurityProperties securityProperties, WSSecurityContext securityContext) throws WSSecurityException {
         super(signatureType, securityToken, securityProperties);
         this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
+
+        checkBSPCompliance(securityContext);
+    }
+
+    private void checkBSPCompliance(WSSecurityContext securityContext) throws WSSecurityException {
+        List<ReferenceType> references = getSignatureType().getSignedInfo().getReference();
+        for (int i = 0; i < references.size(); i++) {
+            ReferenceType referenceType = references.get(i);
+            if (referenceType.getTransforms() == null) {
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R5416);
+            } else if (referenceType.getTransforms().getTransform().size() == 0) {
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R5411);
+            } else {
+                List<TransformType> transformTypes = referenceType.getTransforms().getTransform();
+                for (int j = 0; j < transformTypes.size(); j++) {
+                    TransformType transformType = transformTypes.get(j);
+                    final String algorithm = transformType.getAlgorithm();
+                    if (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
+                            && !WSSConstants.NS_XMLDSIG_FILTER2.equals(algorithm)
+                            && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
+                            && !WSSConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE.equals(algorithm)
+                            && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
+                            && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
+                        securityContext.handleBSPRule(WSSConstants.BSPRule.R5423);
+                        if (j == transformTypes.size() - 1) {
+                            if (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
+                                    && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
+                                    && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
+                                    && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
+                                securityContext.handleBSPRule(WSSConstants.BSPRule.R5412);
+                            }
+                        }
+                        InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                        if (WSSConstants.NS_C14N_EXCL.equals(algorithm)
+                                && inclusiveNamespacesType != null
+                                && inclusiveNamespacesType.getPrefixList().size() == 0) {
+                            securityContext.handleBSPRule(WSSConstants.BSPRule.R5407);
+                        }
+                        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
+                            if (inclusiveNamespacesType != null
+                                    && inclusiveNamespacesType.getPrefixList().size() == 0) {
+                                securityContext.handleBSPRule(WSSConstants.BSPRule.R5413);
+                            }
+                            TransformationParametersType transformationParametersType =
+                                    XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_wsse_TransformationParameters);
+                            if (transformationParametersType == null) {
+                                securityContext.handleBSPRule(WSSConstants.BSPRule.R3065);
+                            } else {
+                                CanonicalizationMethodType canonicalizationMethodType =
+                                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), WSSConstants.TAG_dsig_CanonicalizationMethod);
+                                if (canonicalizationMethodType == null) {
+                                    securityContext.handleBSPRule(WSSConstants.BSPRule.R3065);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!WSSConstants.NS_XMLDSIG_SHA1.equals(referenceType.getDigestMethod().getAlgorithm())) {
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R5420);
+            }
+        }
     }
 
     @Override
@@ -176,6 +240,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
         protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain)
                 throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 
+            //todo Transforms can be null
             List<TransformType> transformTypeList = (List<TransformType>) (List<?>) referenceType.getTransforms().getTransform();
 
             String algorithm = null;

@@ -184,6 +184,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R3006);
 
         try {
             doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));

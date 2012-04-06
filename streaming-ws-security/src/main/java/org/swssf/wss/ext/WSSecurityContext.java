@@ -21,6 +21,8 @@ package org.swssf.wss.ext;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.ext.SecurityContext;
 
+import java.util.List;
+
 /**
  * The document security context
  *
@@ -35,4 +37,8 @@ public interface WSSecurityContext extends SecurityContext, SecurityEventListene
      * @param securityEventListener The SecurityEventListener
      */
     public void addSecurityEventListener(SecurityEventListener securityEventListener);
+
+    public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException;
+
+    public void ignoredBSPRules(List<WSSConstants.BSPRule> bspRules);
 }

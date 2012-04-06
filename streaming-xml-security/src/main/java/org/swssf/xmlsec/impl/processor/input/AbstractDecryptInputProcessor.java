@@ -270,7 +270,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                 receiverThread.setName("decrypting thread");
 
                 AbstractDecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = newDecryptedEventReaderInputProccessor(
-                        encryptedHeader, comparableNamespaceList, comparableAttributeList, encryptedDataType, securityToken
+                        encryptedHeader, comparableNamespaceList, comparableAttributeList, encryptedDataType, securityToken, inputProcessorChain.getSecurityContext()
                 );
 
                 //add the new created EventReader processor to the chain.
@@ -320,7 +320,8 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
     protected abstract AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
             boolean encryptedHeader, List<ComparableNamespace>[] comparableNamespaceList,
-            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType, SecurityToken securityToken);
+            List<ComparableAttribute>[] comparableAttributeList, EncryptedDataType currentEncryptedDataType,
+            SecurityToken securityToken, SecurityContext securityContext) throws XMLSecurityException;
 
     protected abstract void handleSecurityToken(
             SecurityToken securityToken, SecurityContext securityContext, EncryptedDataType encryptedDataType) throws XMLSecurityException;

@@ -24,19 +24,18 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
-import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
-import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.swssf.xmlsec.ext.*;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Calendar;
 import java.util.Deque;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 
 /**
  * @author $Author$
@@ -57,6 +56,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         inputProcessorChain.getSecurityContext().put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
         final TimestampType timestampType = ((JAXBElement<TimestampType>) parseStructure(eventQueue, index)).getValue();
+
+        checkBSPCompliance(inputProcessorChain, timestampType, eventQueue, index);
 
         if (timestampType.getCreated() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "missingCreated");
@@ -113,6 +114,85 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (IllegalArgumentException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+    }
+
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, TimestampType timestampType, Deque<XMLEvent> eventDeque, int index) throws WSSecurityException {
+        if (timestampType.getCreated() == null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3203);
+        }
+
+        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        int curIdx = 0;
+        //forward to first timestamp child element
+        while (curIdx++ <= index) {
+            xmlEventIterator.next();
+        }
+        int createdIndex = -1;
+        int expiresIndex = -1;
+        while (xmlEventIterator.hasNext()) {
+            XMLEvent xmlEvent = xmlEventIterator.next();
+            if (xmlEvent.isStartElement()) {
+                if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
+                    if (createdIndex != -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3203);
+                    }
+                    if (expiresIndex != -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3221);
+                    }
+                    createdIndex = curIdx;
+                } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Expires)) {
+                    if (expiresIndex != -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3224);
+                    }
+                    if (createdIndex == -1) {
+                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3221);
+                    }
+                    expiresIndex = curIdx;
+                } else {
+                    ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3222);
+                }
+            }
+            curIdx++;
+        }
+
+        DatatypeFactory datatypeFactory = null;
+        try {
+            datatypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+        if (timestampType.getCreated() != null) {
+            XMLGregorianCalendar createdCalendar = datatypeFactory.newXMLGregorianCalendar(timestampType.getCreated().getValue());
+            if (createdCalendar.getFractionalSecond().scale() > 3) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3220);
+            }
+            if (createdCalendar.getSecond() > 59) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3213);
+            }
+            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(), WSSConstants.ATT_NULL_ValueType);
+            if (valueType != null) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3225);
+            }
+            if (createdCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3217);
+            }
+        }
+        if (timestampType.getExpires() != null) {
+            XMLGregorianCalendar expiresCalendar = datatypeFactory.newXMLGregorianCalendar(timestampType.getExpires().getValue());
+            if (expiresCalendar.getFractionalSecond().scale() > 3) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3229);
+            }
+            if (expiresCalendar.getSecond() > 59) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3215);
+            }
+            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(), WSSConstants.ATT_NULL_ValueType);
+            if (valueType != null) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3226);
+            }
+            if (expiresCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3223);
+            }
         }
     }
 

@@ -20,6 +20,7 @@ package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.xmlenc.ReferenceList;
 import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -43,6 +44,7 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
         final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index);
 
         //instantiate a new DecryptInputProcessor and add it to the chain
-        inputProcessorChain.addProcessor(new DecryptInputProcessor(referenceList, (WSSSecurityProperties) securityProperties));
+        inputProcessorChain.addProcessor(
+                new DecryptInputProcessor(referenceList, (WSSSecurityProperties) securityProperties, (WSSecurityContext) inputProcessorChain.getSecurityContext()));
     }
 }

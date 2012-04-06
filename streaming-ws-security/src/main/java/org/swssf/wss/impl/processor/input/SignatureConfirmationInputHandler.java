@@ -19,6 +19,9 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss11.SignatureConfirmationType;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
+import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
@@ -43,6 +46,15 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
         @SuppressWarnings("unchecked")
         final SignatureConfirmationType signatureConfirmationType =
                 ((JAXBElement<SignatureConfirmationType>) parseStructure(eventQueue, index)).getValue();
+
+        checkBSPCompliance(inputProcessorChain, signatureConfirmationType);
+
         inputProcessorChain.getSecurityContext().putAsList(SignatureConfirmationType.class, signatureConfirmationType);
+    }
+
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureConfirmationType signatureConfirmationType) throws WSSecurityException {
+        if (signatureConfirmationType.getId() == null) {
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5441);
+        }
     }
 }
