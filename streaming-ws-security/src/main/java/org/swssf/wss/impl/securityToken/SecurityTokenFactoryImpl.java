@@ -21,6 +21,7 @@ package org.swssf.wss.impl.securityToken;
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.binding.wss10.BinarySecurityTokenType;
 import org.swssf.binding.wss10.KeyIdentifierType;
+import org.swssf.binding.wss10.ReferenceType;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.binding.xmldsig.*;
 import org.swssf.binding.xmldsig11.ECKeyValueType;
