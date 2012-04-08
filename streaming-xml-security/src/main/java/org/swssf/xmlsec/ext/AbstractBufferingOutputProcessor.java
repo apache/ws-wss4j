@@ -34,8 +34,8 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
     private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
     private String appendAfterThisTokenId;
 
-    protected AbstractBufferingOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    protected AbstractBufferingOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     public Deque<XMLEvent> getXmlEventBuffer() {

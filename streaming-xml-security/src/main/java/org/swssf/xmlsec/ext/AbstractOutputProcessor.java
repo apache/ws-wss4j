@@ -49,9 +49,23 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     private Set<Object> beforeProcessors = new HashSet<Object>();
     private Set<Object> afterProcessors = new HashSet<Object>();
 
-    protected AbstractOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        this.securityProperties = securityProperties;
+    protected AbstractOutputProcessor() throws XMLSecurityException {
+        super();
+    }
+
+    @Override
+    public void setXMLSecurityProperties(XMLSecurityProperties xmlSecurityProperties) {
+        this.securityProperties = xmlSecurityProperties;
+    }
+
+    @Override
+    public void setAction(XMLSecurityConstants.Action action) {
         this.action = action;
+    }
+
+    @Override
+    public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        outputProcessorChain.addProcessor(this);
     }
 
     public XMLSecurityConstants.Phase getPhase() {

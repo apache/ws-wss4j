@@ -44,8 +44,8 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
     private List<SignaturePartDef> signaturePartDefList;
 
-    public AbstractSignatureEndingOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, AbstractSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
-        super(securityProperties, action);
+    public AbstractSignatureEndingOutputProcessor(AbstractSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
+        super();
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
     }
 
@@ -118,8 +118,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
         signatureAlgorithm.engineInitSign(wrappingSecurityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm(), null));
 
-        SignedInfoProcessor signedInfoProcessor = newSignedInfoProcessor(signatureAlgorithm);
-        subOutputProcessorChain.addProcessor(signedInfoProcessor);
+        SignedInfoProcessor signedInfoProcessor = newSignedInfoProcessor(signatureAlgorithm, subOutputProcessorChain);
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignedInfo, null);
 
@@ -169,9 +168,12 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature);
     }
 
-    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm) throws XMLSecurityException {
-        SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), getAction(), signatureAlgorithm);
+    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm, OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm);
+        signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
+        signedInfoProcessor.setAction(getAction());
         signedInfoProcessor.getAfterProcessors().add(AbstractSignatureEndingOutputProcessor.class.getName());
+        signedInfoProcessor.init(outputProcessorChain);
         return signedInfoProcessor;
     }
 
@@ -191,15 +193,21 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         private OutputStream bufferedSignerOutputStream;
         private Transformer transformer;
         private byte[] signatureValue = null;
+        private SignatureAlgorithm signatureAlgorithm;
 
-        public SignedInfoProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, SignatureAlgorithm signatureAlgorithm) throws XMLSecurityException {
-            super(securityProperties, action);
+        public SignedInfoProcessor(SignatureAlgorithm signatureAlgorithm) throws XMLSecurityException {
+            super();
+            this.signatureAlgorithm = signatureAlgorithm;
+        }
 
-            signerOutputStream = new SignerOutputStream(signatureAlgorithm);
-            bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
+        @Override
+        public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+
+            this.signerOutputStream = new SignerOutputStream(this.signatureAlgorithm);
+            this.bufferedSignerOutputStream = new BufferedOutputStream(this.signerOutputStream);
 
             try {
-                transformer = XMLSecurityUtils.getTransformer(null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+                this.transformer = XMLSecurityUtils.getTransformer(null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InstantiationException e) {
@@ -209,6 +217,8 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
             } catch (InvocationTargetException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             }
+
+            super.init(outputProcessorChain);
         }
 
         public byte[] getSignatureValue() throws XMLSecurityException {

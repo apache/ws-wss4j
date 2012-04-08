@@ -31,6 +31,25 @@ import java.util.Set;
 public interface OutputProcessor {
 
     /**
+     * setter for the XMLSecurityProperties after instantiation of the processor
+     *
+     * @param xmlSecurityProperties
+     */
+    void setXMLSecurityProperties(XMLSecurityProperties xmlSecurityProperties);
+
+    /**
+     * setter for the Action after instantiation of the processor
+     *
+     * @param action
+     */
+    void setAction(XMLSecurityConstants.Action action);
+
+    /**
+     * Method will be called after setting the properties
+     */
+    void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException;
+
+    /**
      * This OutputProcessor will be added before the processors in this set
      *
      * @return The set with the named OutputProcessor

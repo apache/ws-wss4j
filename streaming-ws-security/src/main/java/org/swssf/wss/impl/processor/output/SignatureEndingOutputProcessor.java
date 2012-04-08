@@ -25,7 +25,6 @@ import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
@@ -46,9 +45,9 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
 
     private SignedInfoProcessor signedInfoProcessor = null;
 
-    public SignatureEndingOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action, org.swssf.wss.impl.processor.output.SignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
-        super(securityProperties, action, signatureOutputProcessor);
-        this.getAfterProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
+    public SignatureEndingOutputProcessor(SignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
+        super(signatureOutputProcessor);
+        this.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
         this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
     }
 
@@ -64,9 +63,12 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
     }
 
     @Override
-    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm) throws XMLSecurityException {
-        this.signedInfoProcessor = new SignedInfoProcessor(getSecurityProperties(), getAction(), signatureAlgorithm);
+    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm, OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm);
+        this.signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
+        this.signedInfoProcessor.setAction(getAction());
         this.signedInfoProcessor.getAfterProcessors().add(SignatureEndingOutputProcessor.class.getName());
+        this.signedInfoProcessor.init(outputProcessorChain);
         return this.signedInfoProcessor;
     }
 

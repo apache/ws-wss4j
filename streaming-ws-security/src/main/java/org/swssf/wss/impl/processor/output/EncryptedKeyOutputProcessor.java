@@ -47,8 +47,8 @@ import java.util.UUID;
  */
 public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
-    public EncryptedKeyOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public EncryptedKeyOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -124,7 +124,9 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 }
             };
 
-            FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(getSecurityProperties(), getAction(), encryptedKeySecurityToken);
+            FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
+            finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalEncryptedKeyOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
             if (action.equals(WSSConstants.ENCRYPT)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, ekId);
@@ -148,9 +150,9 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
                 }
             }
+            finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(ekId, encryptedKeySecurityTokenProvider);
             encryptedKeySecurityToken.setProcessor(finalEncryptedKeyOutputProcessor);
-            outputProcessorChain.addProcessor(finalEncryptedKeyOutputProcessor);
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
@@ -161,8 +163,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
         private SecurityToken securityToken;
 
-        FinalEncryptedKeyOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, SecurityToken securityToken) throws XMLSecurityException {
-            super(securityProperties, action);
+        FinalEncryptedKeyOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
+            super();
             this.getAfterProcessors().add(FinalEncryptedKeyOutputProcessor.class.getName());
             this.securityToken = securityToken;
         }

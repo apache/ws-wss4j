@@ -19,10 +19,8 @@
 package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.processor.output.AbstractEncryptEndingOutputProcessor;
 
@@ -36,8 +34,8 @@ import javax.xml.stream.XMLStreamException;
  */
 public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputProcessor {
 
-    public EncryptEndingOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public EncryptEndingOutputProcessor() throws XMLSecurityException {
+        super();
         this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
         this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
     }

@@ -21,12 +21,10 @@ package org.swssf.wss.impl.processor.output;
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.namespace.QName;
@@ -44,10 +42,10 @@ import java.util.UUID;
  */
 public class SignatureConfirmationOutputProcessor extends AbstractOutputProcessor {
 
-    public SignatureConfirmationOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
-        getBeforeProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
-        getBeforeProcessors().add(org.swssf.wss.impl.processor.output.EncryptOutputProcessor.class.getName());
+    public SignatureConfirmationOutputProcessor() throws XMLSecurityException {
+        super();
+        getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
+        getBeforeProcessors().add(EncryptOutputProcessor.class.getName());
     }
 
     @Override

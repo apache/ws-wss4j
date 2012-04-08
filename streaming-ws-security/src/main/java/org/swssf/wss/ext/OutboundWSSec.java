@@ -23,6 +23,7 @@ import org.swssf.wss.impl.WSSecurityContextImpl;
 import org.swssf.wss.impl.processor.output.*;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
+import org.swssf.xmlsec.ext.OutputProcessor;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.OutputProcessorChainImpl;
@@ -103,89 +104,121 @@ public class OutboundWSSec {
         final WSSDocumentContextImpl documentContext = new WSSDocumentContextImpl();
         documentContext.setEncoding(encoding);
 
-        OutputProcessorChainImpl processorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
+        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
 
         try {
-            processorChain.addProcessor(new SecurityHeaderOutputProcessor(securityProperties, null));
+            final SecurityHeaderOutputProcessor securityHeaderOutputProcessor = new SecurityHeaderOutputProcessor();
+            initializeOutputProcessor(outputProcessorChain, securityHeaderOutputProcessor, null);
             //todo some combinations are not possible atm: eg Action.SIGNATURE and Action.USERNAMETOKEN_SIGNED
             //todo they use the same signaure parts
             for (int i = 0; i < securityProperties.getOutAction().length; i++) {
                 XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
                 if (action.equals(WSSConstants.TIMESTAMP)) {
-                    processorChain.addProcessor(new TimestampOutputProcessor(securityProperties, action));
+                    final TimestampOutputProcessor timestampOutputProcessor = new TimestampOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, timestampOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.SIGNATURE)) {
-                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
-                    processorChain.addProcessor(signatureOutputProcessor);
-                    SignatureEndingOutputProcessor signatureEndingOutputProcessor = new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor);
-                    signatureEndingOutputProcessor.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-                    processorChain.addProcessor(signatureEndingOutputProcessor);
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.ENCRYPT)) {
-                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
-                    processorChain.addProcessor(new EncryptedKeyOutputProcessor(securityProperties, action));
-                    processorChain.addProcessor(new EncryptOutputProcessor(securityProperties, action));
-                    org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor encryptEndingOutputProcessor = new org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor(securityProperties, action);
-                    encryptEndingOutputProcessor.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-                    processorChain.addProcessor(encryptEndingOutputProcessor);
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
+                    final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+
+                    final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.USERNAMETOKEN)) {
-                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor(securityProperties, action);
-                    processorChain.addProcessor(usernameTokenOutputProcessor);
+                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.USERNAMETOKEN_SIGNED)) {
-                    processorChain.addProcessor(new UsernameTokenOutputProcessor(securityProperties, action));
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
-                    processorChain.addProcessor(signatureOutputProcessor);
-                    SignatureEndingOutputProcessor signatureEndingOutputProcessor = new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor);
-                    signatureEndingOutputProcessor.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-                    processorChain.addProcessor(signatureEndingOutputProcessor);
+                    final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
+
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
-                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor = new SignatureConfirmationOutputProcessor(securityProperties, action);
-                    processorChain.addProcessor(signatureConfirmationOutputProcessor);
+                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor = new SignatureConfirmationOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
-                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
                     if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                        processorChain.addProcessor(new EncryptedKeyOutputProcessor(securityProperties, action));
+                        final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                        initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+
                     } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
-                        processorChain.addProcessor(new SecurityContextTokenOutputProcessor(securityProperties, action));
+                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor = new SecurityContextTokenOutputProcessor();
+                        initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
+
                     }
-                    processorChain.addProcessor(new DerivedKeyTokenOutputProcessor(securityProperties, action));
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
-                    processorChain.addProcessor(signatureOutputProcessor);
-                    SignatureEndingOutputProcessor signatureEndingOutputProcessor = new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor);
-                    signatureEndingOutputProcessor.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-                    processorChain.addProcessor(signatureEndingOutputProcessor);
+                    final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
+
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
-                    processorChain.addProcessor(new BinarySecurityTokenOutputProcessor(securityProperties, action));
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
                     if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                        processorChain.addProcessor(new EncryptedKeyOutputProcessor(securityProperties, action));
+                        final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                        initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+
                     } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
-                        processorChain.addProcessor(new SecurityContextTokenOutputProcessor(securityProperties, action));
+                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor = new SecurityContextTokenOutputProcessor();
+                        initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
+
                     }
-                    processorChain.addProcessor(new DerivedKeyTokenOutputProcessor(securityProperties, action));
-                    processorChain.addProcessor(new EncryptOutputProcessor(securityProperties, action));
-                    org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor encryptEndingOutputProcessor = new org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor(securityProperties, action);
-                    encryptEndingOutputProcessor.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-                    processorChain.addProcessor(encryptEndingOutputProcessor);
+                    final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
+
+                    final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
-                    processorChain.addProcessor(new SAMLTokenOutputProcessor(securityProperties, action));
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor(securityProperties, action);
-                    processorChain.addProcessor(signatureOutputProcessor);
-                    SignatureEndingOutputProcessor signatureEndingOutputProcessor = new SignatureEndingOutputProcessor(securityProperties, action, signatureOutputProcessor);
-                    signatureEndingOutputProcessor.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-                    processorChain.addProcessor(signatureEndingOutputProcessor);
+                    final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
+
+                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
                 } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED)) {
-                    processorChain.addProcessor(new SAMLTokenOutputProcessor(securityProperties, action));
+                    final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
                 }
             }
             if (output instanceof OutputStream) {
-                processorChain.addProcessor(new FinalOutputProcessor((OutputStream) output, encoding, securityProperties, null));
+                final FinalOutputProcessor finalOutputProcessor = new FinalOutputProcessor((OutputStream) output, encoding);
+                initializeOutputProcessor(outputProcessorChain, finalOutputProcessor, null);
+
             } else if (output instanceof XMLStreamWriter) {
-                processorChain.addProcessor(new FinalOutputProcessor((XMLStreamWriter) output, securityProperties, null));
+                final FinalOutputProcessor finalOutputProcessor = new FinalOutputProcessor((XMLStreamWriter) output);
+                initializeOutputProcessor(outputProcessorChain, finalOutputProcessor, null);
+
             } else {
                 throw new IllegalArgumentException(output + " is not supported as output");
             }
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(e.getMessage(), e);
         }
-        return new XMLSecurityStreamWriter(processorChain);
+        return new XMLSecurityStreamWriter(outputProcessorChain);
+    }
+
+    private void initializeOutputProcessor(OutputProcessorChainImpl outputProcessorChain, OutputProcessor outputProcessor, XMLSecurityConstants.Action action) throws XMLSecurityException {
+        outputProcessor.setXMLSecurityProperties(securityProperties);
+        outputProcessor.setAction(action);
+        outputProcessor.init(outputProcessorChain);
     }
 }

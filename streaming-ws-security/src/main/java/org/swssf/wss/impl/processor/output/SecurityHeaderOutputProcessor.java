@@ -41,8 +41,8 @@ import java.util.Map;
  */
 public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 
-    public SecurityHeaderOutputProcessor(WSSSecurityProperties securityProperties, WSSConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public SecurityHeaderOutputProcessor() throws XMLSecurityException {
+        super();
         setPhase(WSSConstants.Phase.PREPROCESSING);
     }
 

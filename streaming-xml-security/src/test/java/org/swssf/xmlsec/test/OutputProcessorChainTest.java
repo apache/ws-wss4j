@@ -18,10 +18,7 @@
  */
 package org.swssf.xmlsec.test;
 
-import org.swssf.xmlsec.ext.OutputProcessor;
-import org.swssf.xmlsec.ext.OutputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.OutputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.testng.Assert;
@@ -43,6 +40,15 @@ public class OutputProcessorChainTest {
         private XMLSecurityConstants.Phase phase = XMLSecurityConstants.Phase.PROCESSING;
         private Set<Object> beforeProcessors = new HashSet<Object>();
         private Set<Object> afterProcessors = new HashSet<Object>();
+
+        public void setXMLSecurityProperties(XMLSecurityProperties xmlSecurityProperties) {
+        }
+
+        public void setAction(XMLSecurityConstants.Action action) {
+        }
+
+        public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        }
 
         public Set<Object> getBeforeProcessors() {
             return beforeProcessors;

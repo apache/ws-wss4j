@@ -19,10 +19,7 @@
 package org.swssf.xmlsec.test;
 
 import org.custommonkey.xmlunit.XMLAssert;
-import org.swssf.xmlsec.ext.OutputProcessor;
-import org.swssf.xmlsec.ext.OutputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.OutputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.swssf.xmlsec.impl.XMLSecurityStreamWriter;
@@ -184,6 +181,18 @@ public class XMLSecurityStreamWriterTest {
         EventWriterProcessor(Writer writer) throws Exception {
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
             xmlEventWriter = xmlOutputFactory.createXMLEventWriter(writer);
+        }
+
+        @Override
+        public void setXMLSecurityProperties(XMLSecurityProperties xmlSecurityProperties) {
+        }
+
+        @Override
+        public void setAction(XMLSecurityConstants.Action action) {
+        }
+
+        @Override
+        public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
         }
 
         @Override

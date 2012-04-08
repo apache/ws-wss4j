@@ -47,8 +47,8 @@ import java.util.UUID;
  */
 public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public DerivedKeyTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public DerivedKeyTokenOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -185,12 +185,12 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             }
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);
             FinalDerivedKeyTokenOutputProcessor finalDerivedKeyTokenOutputProcessor =
-                    new FinalDerivedKeyTokenOutputProcessor(
-                            getSecurityProperties(), getAction(), derivedKeySecurityToken,
-                            offset, length, new String(Base64.encodeBase64(nonce)));
+                    new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length, new String(Base64.encodeBase64(nonce)));
+            finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalDerivedKeyTokenOutputProcessor.setAction(getAction());
             finalDerivedKeyTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+            finalDerivedKeyTokenOutputProcessor.init(outputProcessorChain);
             derivedKeySecurityToken.setProcessor(finalDerivedKeyTokenOutputProcessor);
-            outputProcessorChain.addProcessor(finalDerivedKeyTokenOutputProcessor);
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
@@ -204,11 +204,9 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         private int length;
         private String nonce;
 
-        FinalDerivedKeyTokenOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action,
-                                            SecurityToken securityToken, int offset, int length, String nonce)
-                throws XMLSecurityException {
+        FinalDerivedKeyTokenOutputProcessor(SecurityToken securityToken, int offset, int length, String nonce) throws XMLSecurityException {
 
-            super(securityProperties, action);
+            super();
             this.securityToken = securityToken;
             this.offset = offset;
             this.length = length;

@@ -53,8 +53,8 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
 
     private AbstractInternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
 
-    public AbstractEncryptOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public AbstractEncryptOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
     }
 
     /**
-     * Processor which handles the effective enryption of the data
+     * Processor which handles the effective encryption of the data
      */
     public abstract class AbstractInternalEncryptionOutputProcessor extends AbstractOutputProcessor {
 
@@ -77,45 +77,64 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
         private CharacterEventGeneratorOutputStream characterEventGeneratorOutputStream;
         private XMLEventWriter xmlEventWriter;
         private OutputStream cipherOutputStream;
+        private String encoding;
 
         private StartElement startElement;
         private int elementCounter = 0;
         private OutputProcessorChain subOutputProcessorChain;
 
-        public AbstractInternalEncryptionOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, EncryptionPartDef encryptionPartDef,
+        public AbstractInternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef,
                                                          StartElement startElement, String encoding)
                 throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
-            super(securityProperties, action);
+            super();
             this.getBeforeProcessors().add(AbstractEncryptEndingOutputProcessor.class.getName());
             this.getBeforeProcessors().add(AbstractInternalEncryptionOutputProcessor.class.getName());
             this.getAfterProcessors().add(AbstractEncryptOutputProcessor.class.getName());
             this.setEncryptionPartDef(encryptionPartDef);
             this.setStartElement(startElement);
+            this.setEncoding(encoding);
+        }
 
-            //initialize the cipher
-            String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(securityProperties.getEncryptionSymAlgorithm());
-            Cipher symmetricCipher = Cipher.getInstance(jceAlgorithm);
+        @Override
+        public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+            try {
+                //initialize the cipher
+                String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(securityProperties.getEncryptionSymAlgorithm());
+                Cipher symmetricCipher = Cipher.getInstance(jceAlgorithm);
 
-            //Should internally generate an IV
-            symmetricCipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
-            byte[] iv = symmetricCipher.getIV();
+                //Should internally generate an IV
+                symmetricCipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
+                byte[] iv = symmetricCipher.getIV();
 
-            characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(encoding);
-            //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
-            Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
-            base64EncoderStream.write(iv);
+                characterEventGeneratorOutputStream = new CharacterEventGeneratorOutputStream(getEncoding());
+                //Base64EncoderStream calls write every 78byte (line breaks). So we have to buffer again to get optimal performance
+                Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
+                base64EncoderStream.write(iv);
 
-            //the trimmer output stream is needed to strip away the dummy wrapping element which must be added 
-            cipherOutputStream = new TrimmerOutputStream(new CipherOutputStream(base64EncoderStream, symmetricCipher), 8192, 3, 4);
+                //the trimmer output stream is needed to strip away the dummy wrapping element which must be added
+                cipherOutputStream = new TrimmerOutputStream(new CipherOutputStream(base64EncoderStream, symmetricCipher), 8192, 3, 4);
 
-            //we create a new StAX writer for optimized namespace writing.
-            XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-            xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-            //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
-            xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream, "UTF-8");
-            //we have to output a fake element to workaround text-only encryption:
-            xmlEventWriter.add(XMLEventFactory.newInstance().createStartElement(new QName("a"), null, null));
+                //we create a new StAX writer for optimized namespace writing.
+                XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+                xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+                //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
+                xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream, "UTF-8");
+                //we have to output a fake element to workaround text-only encryption:
+                xmlEventWriter.add(XMLEventFactory.newInstance().createStartElement(new QName("a"), null, null));
+            } catch (NoSuchPaddingException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            } catch (IOException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            } catch (XMLStreamException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            } catch (InvalidKeyException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            }
+
+            super.init(outputProcessorChain);
         }
 
         @Override
@@ -276,6 +295,14 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
 
         protected void setElementCounter(int elementCounter) {
             this.elementCounter = elementCounter;
+        }
+
+        public String getEncoding() {
+            return encoding;
+        }
+
+        public void setEncoding(String encoding) {
+            this.encoding = encoding;
         }
     }
 

@@ -38,8 +38,8 @@ import java.util.*;
  */
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public UsernameTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public UsernameTokenOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -94,7 +94,10 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);
             }
-            outputProcessorChain.addProcessor(new FinalUsernameTokenOutputProcessor(((WSSSecurityProperties) getSecurityProperties()), getAction(), wsuId, nonceValue, password, created));
+            final FinalUsernameTokenOutputProcessor finalUsernameTokenOutputProcessor = new FinalUsernameTokenOutputProcessor(wsuId, nonceValue, password, created);
+            finalUsernameTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalUsernameTokenOutputProcessor.setAction(getAction());
+            finalUsernameTokenOutputProcessor.init(outputProcessorChain);
 
         } catch (DatatypeConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
@@ -111,10 +114,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         private String password = null;
         private XMLGregorianCalendar created = null;
 
-        FinalUsernameTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action, String wsuId,
-                                          byte[] nonceValue, String password, XMLGregorianCalendar created)
+        FinalUsernameTokenOutputProcessor(String wsuId, byte[] nonceValue, String password, XMLGregorianCalendar created)
                 throws XMLSecurityException {
-            super(securityProperties, action);
+            super();
             this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.wsuId = wsuId;

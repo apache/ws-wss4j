@@ -24,7 +24,6 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -42,8 +41,8 @@ import java.util.GregorianCalendar;
  */
 public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
-    public TimestampOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public TimestampOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     /*

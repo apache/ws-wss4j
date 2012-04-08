@@ -40,8 +40,8 @@ import java.util.UUID;
  */
 public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public BinarySecurityTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public BinarySecurityTokenOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -149,17 +149,21 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
                 if (((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                     outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, bstId);
-                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
-                    finalBinarySecurityTokenOutputProcessor.getBeforeProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
-                    outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
+                    finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }
             } else if (action.equals(WSSConstants.ENCRYPT)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY, bstId);
                 if (((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType() == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
-                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(getSecurityProperties(), getAction(), binarySecurityToken);
-                    finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
-                    outputProcessorChain.addProcessor(finalBinarySecurityTokenOutputProcessor);
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
+                    finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(EncryptEndingOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }
             } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)
@@ -212,8 +216,8 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
         private SecurityToken securityToken;
 
-        FinalBinarySecurityTokenOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, SecurityToken securityToken) throws XMLSecurityException {
-            super(securityProperties, action);
+        FinalBinarySecurityTokenOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
+            super();
             this.getAfterProcessors().add(BinarySecurityTokenOutputProcessor.class.getName());
             this.securityToken = securityToken;
         }

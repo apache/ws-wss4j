@@ -20,7 +20,6 @@ package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.ext.*;
@@ -42,8 +41,8 @@ import java.util.UUID;
  */
 public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public SecurityContextTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public SecurityContextTokenOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -117,7 +116,9 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 }
             };
 
-            FinalSecurityContextTokenOutputProcessor finalSecurityContextTokenOutputProcessor = new FinalSecurityContextTokenOutputProcessor(getSecurityProperties(), getAction(), securityContextSecurityToken, identifier);
+            FinalSecurityContextTokenOutputProcessor finalSecurityContextTokenOutputProcessor = new FinalSecurityContextTokenOutputProcessor(securityContextSecurityToken, identifier);
+            finalSecurityContextTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalSecurityContextTokenOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
             if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
@@ -135,9 +136,9 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 }
             }
 
+            finalSecurityContextTokenOutputProcessor.init(outputProcessorChain);
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityContextSecurityTokenProvider);
             securityContextSecurityToken.setProcessor(finalSecurityContextTokenOutputProcessor);
-            outputProcessorChain.addProcessor(finalSecurityContextTokenOutputProcessor);
 
         } finally {
             outputProcessorChain.removeProcessor(this);
@@ -150,8 +151,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         private SecurityToken securityToken;
         private String identifier;
 
-        FinalSecurityContextTokenOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, SecurityToken securityToken, String identifier) throws XMLSecurityException {
-            super(securityProperties, action);
+        FinalSecurityContextTokenOutputProcessor(SecurityToken securityToken, String identifier) throws XMLSecurityException {
+            super();
             this.securityToken = securityToken;
             this.identifier = identifier;
         }

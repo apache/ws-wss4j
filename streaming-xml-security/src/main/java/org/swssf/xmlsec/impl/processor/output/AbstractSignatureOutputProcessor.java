@@ -50,8 +50,8 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
 
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
-    public AbstractSignatureOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public AbstractSignatureOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     public List<SignaturePartDef> getSignaturePartDefList() {
@@ -79,18 +79,21 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
         private DigestOutputStream digestOutputStream;
         private Transformer transformer;
 
-        public InternalSignatureOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action, SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
-            super(securityProperties, action);
+        public InternalSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+            super();
             this.getBeforeProcessors().add(InternalSignatureOutputProcessor.class.getName());
             this.signaturePartDef = signaturePartDef;
             this.startElement = startElement;
+        }
 
-            AlgorithmType algorithmID = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureDigestAlgorithm());
-            MessageDigest messageDigest = MessageDigest.getInstance(algorithmID.getJCEName(), algorithmID.getJCEProvider());
-            this.digestOutputStream = new DigestOutputStream(messageDigest);
-            this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
-
+        @Override
+        public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
             try {
+                AlgorithmType algorithmID = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureDigestAlgorithm());
+                MessageDigest messageDigest = MessageDigest.getInstance(algorithmID.getJCEName(), algorithmID.getJCEProvider());
+                this.digestOutputStream = new DigestOutputStream(messageDigest);
+                this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
+
                 if (signaturePartDef.getTransformAlgo() != null) {
                     List<String> inclusiveNamespaces = new ArrayList<String>();
                     inclusiveNamespaces.add("#default");
@@ -107,7 +110,13 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InvocationTargetException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            } catch (NoSuchProviderException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             }
+
+            super.init(outputProcessorChain);
         }
 
         @Override

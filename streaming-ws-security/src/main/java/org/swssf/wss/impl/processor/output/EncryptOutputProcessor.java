@@ -20,8 +20,10 @@ package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.OutputProcessorChain;
+import org.swssf.xmlsec.ext.SecurePart;
+import org.swssf.xmlsec.ext.SecurityTokenProvider;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.EncryptionPartDef;
 import org.swssf.xmlsec.impl.processor.output.AbstractEncryptOutputProcessor;
 
@@ -47,8 +49,17 @@ import java.util.UUID;
  */
 public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
-    public EncryptOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public EncryptOutputProcessor() throws XMLSecurityException {
+        super();
+    }
+
+    @Override
+    public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        super.init(outputProcessorChain);
+        EncryptEndingOutputProcessor encryptEndingOutputProcessor = new EncryptEndingOutputProcessor();
+        encryptEndingOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+        encryptEndingOutputProcessor.setAction(getAction());
+        encryptEndingOutputProcessor.init(outputProcessorChain);
     }
 
     @Override
@@ -74,12 +85,13 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
                         internalEncryptionOutputProcessor =
                                 new InternalEncryptionOutputProcessor(
-                                        ((WSSSecurityProperties) getSecurityProperties()),
-                                        getAction(),
                                         encryptionPartDef,
                                         startElement,
                                         outputProcessorChain.getDocumentContext().getEncoding()
                                 );
+                        internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                        internalEncryptionOutputProcessor.setAction(getAction());
+                        internalEncryptionOutputProcessor.init(outputProcessorChain);
                     } catch (NoSuchAlgorithmException e) {
                         throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                     } catch (NoSuchPaddingException e) {
@@ -91,7 +103,6 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     }
 
                     setActiveInternalEncryptionOutputProcessor(internalEncryptionOutputProcessor);
-                    outputProcessorChain.addProcessor(internalEncryptionOutputProcessor);
                 }
             }
         }
@@ -106,12 +117,11 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         private boolean doEncryptedHeader = false;
 
-        InternalEncryptionOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action, EncryptionPartDef encryptionPartDef,
-                                          StartElement startElement, String encoding)
+        InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, StartElement startElement, String encoding)
                 throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
-            super(securityProperties, action, encryptionPartDef, startElement, encoding);
-            this.getBeforeProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
+            super(encryptionPartDef, startElement, encoding);
+            this.getBeforeProcessors().add(EncryptEndingOutputProcessor.class.getName());
             this.getBeforeProcessors().add(InternalEncryptionOutputProcessor.class.getName());
             this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
         }

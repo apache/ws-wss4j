@@ -19,11 +19,9 @@
 package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.SecurePart;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.processor.output.AbstractSignatureOutputProcessor;
@@ -46,8 +44,17 @@ import java.util.UUID;
  */
 public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
 
-    public SignatureOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public SignatureOutputProcessor() throws XMLSecurityException {
+        super();
+    }
+
+    @Override
+    public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        super.init(outputProcessorChain);
+        SignatureEndingOutputProcessor signatureEndingOutputProcessor = new SignatureEndingOutputProcessor(this);
+        signatureEndingOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+        signatureEndingOutputProcessor.setAction(getAction());
+        signatureEndingOutputProcessor.init(outputProcessorChain);
     }
 
     @Override
@@ -95,9 +102,12 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                         }
 
                         getSignaturePartDefList().add(signaturePartDef);
-                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(getSecurityProperties(), getAction(), signaturePartDef, startElement.getName());
+                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(signaturePartDef, startElement.getName());
+                        internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                        internalSignatureOutputProcessor.setAction(getAction());
                         internalSignatureOutputProcessor.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
                         internalSignatureOutputProcessor.getBeforeProcessors().add(SignatureEndingOutputProcessor.class.getName());
+                        internalSignatureOutputProcessor.init(outputProcessorChain);
 
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(
@@ -109,7 +119,6 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                     }
 
                     setActiveInternalSignatureOutputProcessor(internalSignatureOutputProcessor);
-                    outputProcessorChain.addProcessor(internalSignatureOutputProcessor);
                 }
             }
         }

@@ -51,8 +51,8 @@ import java.util.UUID;
  */
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
-    public SAMLTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public SAMLTokenOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
@@ -174,7 +174,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 securityToken = null;
             }
 
-            final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(((WSSSecurityProperties) getSecurityProperties()), getAction(), securityToken, samlAssertionWrapper, securityTokenReferenceId, binarySecurityTokenId, senderVouches);
+            final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper, securityTokenReferenceId, binarySecurityTokenId, senderVouches);
+            finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalSAMLTokenOutputProcessor.setAction(getAction());
+            finalSAMLTokenOutputProcessor.init(outputProcessorChain);
 
             if (senderVouches) {
 
@@ -229,7 +232,6 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     outputProcessorChain.getSecurityContext().putAsList(SecurePart.class, securePart);
                 }
             }
-            outputProcessorChain.addProcessor(finalSAMLTokenOutputProcessor);
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
@@ -244,12 +246,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private String binarySecurityTokenReferenceId;
         private boolean senderVouches = false;
 
-        FinalSAMLTokenOutputProcessor(WSSSecurityProperties securityProperties, XMLSecurityConstants.Action action,
-                                      SecurityToken securityToken, SAMLAssertionWrapper samlAssertionWrapper,
+        FinalSAMLTokenOutputProcessor(SecurityToken securityToken, SAMLAssertionWrapper samlAssertionWrapper,
                                       String securityTokenReferenceId, String binarySecurityTokenReferenceId,
-                                      boolean senderVouches)
-                throws XMLSecurityException {
-            super(securityProperties, action);
+                                      boolean senderVouches) throws XMLSecurityException {
+            super();
             this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
             this.getAfterProcessors().add(SAMLTokenOutputProcessor.class.getName());
             this.samlAssertionWrapper = samlAssertionWrapper;

@@ -18,7 +18,9 @@
  */
 package org.swssf.xmlsec.impl.processor.output;
 
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.AbstractBufferingOutputProcessor;
+import org.swssf.xmlsec.ext.OutputProcessorChain;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -30,8 +32,8 @@ import javax.xml.stream.XMLStreamException;
  */
 public abstract class AbstractEncryptEndingOutputProcessor extends AbstractBufferingOutputProcessor {
 
-    public AbstractEncryptEndingOutputProcessor(XMLSecurityProperties securityProperties, XMLSecurityConstants.Action action) throws XMLSecurityException {
-        super(securityProperties, action);
+    public AbstractEncryptEndingOutputProcessor() throws XMLSecurityException {
+        super();
     }
 
     @Override
