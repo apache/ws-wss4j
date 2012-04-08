@@ -43,6 +43,16 @@ import java.util.Iterator;
  */
 public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
+    private static final DatatypeFactory datatypeFactory;
+
+    static {
+        try {
+            datatypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
@@ -64,20 +74,28 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         try {
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-
             // Validate whether the security semantics have expired
             //created and expires is optional per spec. But we enforce the created element in the validation
             Calendar crea = null;
             if (timestampType.getCreated() != null) {
-                XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(timestampType.getCreated().getValue());
+                XMLGregorianCalendar created;
+                try {
+                    created = datatypeFactory.newXMLGregorianCalendar(timestampType.getCreated().getValue());
+                } catch (IllegalArgumentException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+                }
                 logger.debug("Timestamp created: " + created);
                 crea = created.toGregorianCalendar();
             }
 
             Calendar exp = null;
             if (timestampType.getExpires() != null) {
-                XMLGregorianCalendar expires = datatypeFactory.newXMLGregorianCalendar(timestampType.getExpires().getValue());
+                XMLGregorianCalendar expires;
+                try {
+                    expires = datatypeFactory.newXMLGregorianCalendar(timestampType.getExpires().getValue());
+                } catch (IllegalArgumentException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+                }
                 logger.debug("Timestamp expires: " + expires);
                 exp = expires.toGregorianCalendar();
             }
@@ -110,8 +128,6 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(timestampSecurityEvent);
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
 
-        } catch (DatatypeConfigurationException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (IllegalArgumentException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
@@ -156,14 +172,13 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             curIdx++;
         }
 
-        DatatypeFactory datatypeFactory = null;
-        try {
-            datatypeFactory = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
         if (timestampType.getCreated() != null) {
-            XMLGregorianCalendar createdCalendar = datatypeFactory.newXMLGregorianCalendar(timestampType.getCreated().getValue());
+            XMLGregorianCalendar createdCalendar;
+            try {
+                createdCalendar = datatypeFactory.newXMLGregorianCalendar(timestampType.getCreated().getValue());
+            } catch (IllegalArgumentException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
             if (createdCalendar.getFractionalSecond().scale() > 3) {
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3220);
             }
@@ -179,7 +194,12 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             }
         }
         if (timestampType.getExpires() != null) {
-            XMLGregorianCalendar expiresCalendar = datatypeFactory.newXMLGregorianCalendar(timestampType.getExpires().getValue());
+            XMLGregorianCalendar expiresCalendar;
+            try {
+                expiresCalendar = datatypeFactory.newXMLGregorianCalendar(timestampType.getExpires().getValue());
+            } catch (IllegalArgumentException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
             if (expiresCalendar.getFractionalSecond().scale() > 3) {
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3229);
             }

@@ -59,6 +59,10 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         @SuppressWarnings("unchecked")
         final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index)).getValue();
 
+        if (encryptedKeyType.getEncryptionMethod() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
+        }
+
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
 
         if (encryptedKeyType.getId() == null) {
@@ -151,6 +155,10 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
                             Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
                             cipher.init(Cipher.DECRYPT_MODE, wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage));
+                            if (encryptedKeyType.getCipherData() == null
+                                    || encryptedKeyType.getCipherData().getCipherValue() == null) {
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
+                            }
                             return cipher.doFinal(encryptedKeyType.getCipherData().getCipherValue());
 
                         } catch (NoSuchPaddingException e) {

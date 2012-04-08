@@ -70,15 +70,22 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     private ArrayDeque<XMLEvent> tmpXmlEventList = new ArrayDeque<XMLEvent>();
     private XMLEvent parentStartXMLEvent;
 
-    public AbstractDecryptInputProcessor(ReferenceList referenceList, XMLSecurityProperties securityProperties) {
-        super(securityProperties);
-        this.referenceList = referenceList;
-    }
-
-    public AbstractDecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList, XMLSecurityProperties securityProperties) {
+    public AbstractDecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
+                                         XMLSecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
         this.keyInfoType = keyInfoType;
         this.referenceList = referenceList;
+
+        if (referenceList != null) {
+            List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
+            Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();
+            while (referenceTypeIterator.hasNext()) {
+                ReferenceType referenceType = referenceTypeIterator.next().getValue();
+                if (referenceType.getURI() == null) {
+                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK);
+                }
+            }
+        }
     }
 
     /*

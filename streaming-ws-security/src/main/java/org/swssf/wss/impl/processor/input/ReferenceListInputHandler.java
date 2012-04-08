@@ -45,6 +45,7 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
 
         //instantiate a new DecryptInputProcessor and add it to the chain
         inputProcessorChain.addProcessor(
-                new DecryptInputProcessor(referenceList, (WSSSecurityProperties) securityProperties, (WSSecurityContext) inputProcessorChain.getSecurityContext()));
+                new DecryptInputProcessor(null, referenceList, (WSSSecurityProperties) securityProperties,
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext()));
     }
 }

@@ -28,9 +28,7 @@ import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -40,10 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author $Author$
@@ -1001,5 +996,127 @@ public class InteroperabilityTest extends AbstractTestBase {
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ACTOR, "test");
         doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
+    }
+
+    @Test(invocationCount = 1)
+    public void testInvalidXML() throws Exception {
+
+        int i = 0;
+        int e = 10000;
+
+        while (i < e) {
+
+            String action = WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            if (i == 0) {
+                i = indexOfNode(securedDocument.getDocumentElement(), new NodeIndex(), WSSConstants.TAG_wsse_Security.getLocalPart()).index;
+                e = indexOfNode(securedDocument.getDocumentElement(), new NodeIndex(), "definitions").index;
+            }
+            i++;
+            Node nodeToRemove = nodeOnIndex(securedDocument.getDocumentElement(), new NodeIndex(), i).node;
+            if (nodeToRemove.getNodeType() == Node.ATTRIBUTE_NODE) {
+                ((Attr) nodeToRemove).getOwnerElement().removeAttributeNode((Attr) nodeToRemove);
+            } else {
+                Node parentNode = nodeToRemove.getParentNode();
+                parentNode.removeChild(nodeToRemove);
+            }
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            Iterator<WSSConstants.BSPRule> bspRules = EnumSet.allOf(WSSConstants.BSPRule.class).iterator();
+            while (bspRules.hasNext()) {
+                securityProperties.addIgnoreBSPRule(bspRules.next());
+            }
+
+            try {
+                Document document = doInboundSecurity(securityProperties,
+                        xmlInputFactory.createXMLStreamReader(
+                                new ByteArrayInputStream(baos.toByteArray())));
+
+                //read the whole stream:
+                transformer = TRANSFORMER_FACTORY.newTransformer();
+                transformer.transform(new DOMSource(document), new StreamResult(
+                        new OutputStream() {
+                            @Override
+                            public void write(int b) throws IOException {
+                                // > /dev/null
+                            }
+                        }
+                ));
+            } catch (XMLStreamException ex) {
+                int k = 0;
+                Throwable t = ex.getCause();
+                while (t != null && k < 100) {
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter pw = new PrintWriter(stringWriter);
+                    ex.printStackTrace(pw);
+                    Assert.assertTrue(!(t instanceof NullPointerException), stringWriter.toString());
+                    t = t.getCause();
+                }
+            }
+        }
+    }
+
+    private NodeIndex indexOfNode(Node node, NodeIndex index, String name) {
+        if (node.getLocalName() != null && node.getLocalName().equals(name)) {
+            return index;
+        }
+        index.index++;
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            NamedNodeMap namedNodeMap = node.getAttributes();
+            for (int i = 0; i < namedNodeMap.getLength(); i++) {
+                NodeIndex n = indexOfNode(namedNodeMap.item(i), index, name);
+                if (n != null) {
+                    return n;
+                }
+            }
+        }
+        NodeList nodeList = node.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            NodeIndex n = indexOfNode(nodeList.item(i), index, name);
+            if (n != null) {
+                return n;
+            }
+        }
+        return null;
+    }
+
+    private NodeIndex nodeOnIndex(Node node, NodeIndex index, int indexToFind) {
+        if (index.index == indexToFind) {
+            index.node = node;
+            return index;
+        }
+        index.index++;
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            NamedNodeMap namedNodeMap = node.getAttributes();
+            for (int i = 0; i < namedNodeMap.getLength(); i++) {
+                NodeIndex n = nodeOnIndex(namedNodeMap.item(i), index, indexToFind);
+                if (n != null) {
+                    return n;
+                }
+            }
+        }
+        NodeList nodeList = node.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            NodeIndex n = nodeOnIndex(nodeList.item(i), index, indexToFind);
+            if (n != null) {
+                return n;
+            }
+        }
+        return null;
+    }
+
+    class NodeIndex {
+        Node node;
+        int index;
     }
 }

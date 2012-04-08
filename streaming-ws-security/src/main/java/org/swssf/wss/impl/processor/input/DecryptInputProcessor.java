@@ -45,30 +45,26 @@ import java.util.List;
  */
 public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
-    public DecryptInputProcessor(ReferenceList referenceList, WSSSecurityProperties securityProperties,
-                                 WSSecurityContext securityContext) throws WSSecurityException {
-        super(referenceList, securityProperties);
-        checkBSPCompliance(referenceList, securityContext, WSSConstants.BSPRule.R5608);
-    }
-
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties, WSSecurityContext securityContext)
-            throws WSSecurityException {
+            throws XMLSecurityException {
 
         super(keyInfoType, referenceList, securityProperties);
-
-        if (keyInfoType.getContent().size() != 1) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5424);
-        }
-        SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoType.getContent(),
-                WSSConstants.TAG_wsse_SecurityTokenReference);
-        if (securityTokenReferenceType == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5426);
-        }
-        checkBSPCompliance(referenceList, securityContext, WSSConstants.BSPRule.R3006);
+        checkBSPCompliance(keyInfoType, referenceList, securityContext, WSSConstants.BSPRule.R3006);
     }
 
-    private void checkBSPCompliance(ReferenceList referenceList, WSSecurityContext securityContext, WSSConstants.BSPRule bspRule) throws WSSecurityException {
+    private void checkBSPCompliance(KeyInfoType keyInfoType, ReferenceList referenceList, WSSecurityContext securityContext, WSSConstants.BSPRule bspRule) throws WSSecurityException {
+        if (keyInfoType != null) {
+            if (keyInfoType.getContent().size() != 1) {
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R5424);
+            }
+            SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoType.getContent(),
+                    WSSConstants.TAG_wsse_SecurityTokenReference);
+            if (securityTokenReferenceType == null) {
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R5426);
+            }
+        }
+
         if (referenceList != null) {
             List<JAXBElement<ReferenceType>> references = referenceList.getDataReferenceOrKeyReference();
             Iterator<JAXBElement<ReferenceType>> referenceTypeIterator = references.iterator();

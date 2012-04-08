@@ -50,11 +50,15 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
     private static final String cacheRegionName = "usernameToken";
     private static JCS cache;
+    private static final DatatypeFactory datatypeFactory;
 
     static {
         try {
             cache = JCS.getInstance(cacheRegionName);
+            datatypeFactory = DatatypeFactory.newInstance();
         } catch (CacheException e) {
+            throw new RuntimeException(e);
+        } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -90,6 +94,9 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
 
         final AttributedString username = usernameTokenType.getUsername();
+        if (username == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
+        }
         final EncodedString encodedNonce = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
         final AttributedDateTime attributedDateTimeCreated = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
 
@@ -121,13 +128,12 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
 
-            DatatypeFactory datatypeFactory = null;
+            XMLGregorianCalendar xmlGregorianCalendar;
             try {
-                datatypeFactory = DatatypeFactory.newInstance();
-            } catch (DatatypeConfigurationException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar(created);
+            } catch (IllegalArgumentException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
             }
-            XMLGregorianCalendar xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar(created);
             GregorianCalendar createdCal = xmlGregorianCalendar.toGregorianCalendar();
             GregorianCalendar now = new GregorianCalendar();
             if (createdCal.after(now)) {
