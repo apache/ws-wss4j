@@ -25,12 +25,12 @@ import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
-import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.BadPaddingException;
@@ -123,7 +123,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             return this.wrappingSecurityToken;
                         }
                         KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
-                        this.wrappingSecurityToken = SecurityTokenFactoryImpl.newInstance().getSecurityToken(
+                        this.wrappingSecurityToken = SecurityTokenFactory.getInstance().getSecurityToken(
                                 keyInfoType,
                                 crypto,
                                 securityProperties.getCallbackHandler(),

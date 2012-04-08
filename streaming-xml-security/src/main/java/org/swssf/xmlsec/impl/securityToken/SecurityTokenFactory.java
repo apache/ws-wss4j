@@ -35,25 +35,28 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public abstract class SecurityTokenFactory {
 
-    //todo caching?
-    public static SecurityTokenFactory newInstance() throws XMLSecurityException {
+    private static SecurityTokenFactory securityTokenFactory = null;
 
-        String stf = ConfigurationProperties.getProperty("securityTokenFactory");
-        if (stf == null) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory");
-        }
+    public static synchronized SecurityTokenFactory getInstance() throws XMLSecurityException {
+        if (securityTokenFactory == null) {
+            String stf = ConfigurationProperties.getProperty("securityTokenFactory");
+            if (stf == null) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory");
+            }
 
-        try {
-            @SuppressWarnings("unchecked")
-            Class<SecurityTokenFactory> securityTokenFactoryClass = (Class<SecurityTokenFactory>) SecurityTokenFactory.class.getClassLoader().loadClass(stf);
-            return securityTokenFactoryClass.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory", e);
-        } catch (InstantiationException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory", e);
-        } catch (IllegalAccessException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory", e);
+            try {
+                @SuppressWarnings("unchecked")
+                Class<SecurityTokenFactory> securityTokenFactoryClass = (Class<SecurityTokenFactory>) SecurityTokenFactory.class.getClassLoader().loadClass(stf);
+                securityTokenFactory = securityTokenFactoryClass.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory", e);
+            } catch (InstantiationException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory", e);
+            } catch (IllegalAccessException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityTokenFactory", e);
+            }
         }
+        return securityTokenFactory;
     }
 
     public abstract SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto,

@@ -152,7 +152,7 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             this.signatureType = signatureType;
 
             KeyInfoType keyInfoType = signatureType.getKeyInfo();
-            SecurityToken securityToken = SecurityTokenFactory.newInstance().getSecurityToken(keyInfoType,
+            SecurityToken securityToken = SecurityTokenFactory.getInstance().getSecurityToken(keyInfoType,
                     securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(),
                     securityContext);
             securityToken.verify();
