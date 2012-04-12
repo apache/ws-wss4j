@@ -114,17 +114,10 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         return processEvent(inputProcessorChain, false);
     }
 
-    //todo split this methods in smaller ones...
     private XMLEvent processEvent(InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent) throws XMLStreamException, XMLSecurityException {
 
         if (!tmpXmlEventList.isEmpty()) {
-            XMLEvent xmlEvent = tmpXmlEventList.pollLast();
-            if (xmlEvent.isStartElement()) {
-                inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
-            } else if (xmlEvent.isEndElement()) {
-                inputProcessorChain.getDocumentContext().removePathElement();
-            }
-            return xmlEvent;
+            return getLastBufferedXMLEvent(inputProcessorChain);
         }
 
         XMLEvent xmlEvent = isSecurityHeaderEvent ? inputProcessorChain.processHeaderEvent() : inputProcessorChain.processEvent();
@@ -137,23 +130,8 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             //buffer the events until the EncryptedData Element appears and discard it if we found the reference inside it
             //otherwise replay it
             if (startElement.getName().equals(XMLSecurityConstants.TAG_wsse11_EncryptedHeader)) {
-
-                InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
-                do {
-                    tmpXmlEventList.push(xmlEvent);
-
-                    subInputProcessorChain.reset();
-                    if (isSecurityHeaderEvent) {
-                        xmlEvent = subInputProcessorChain.processHeaderEvent();
-                    } else {
-                        xmlEvent = subInputProcessorChain.processEvent();
-                    }
-                }
-                while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_xenc_EncryptedData)));
-
-                tmpXmlEventList.push(xmlEvent);
+                xmlEvent = readAndBufferEncryptedHeader(inputProcessorChain, isSecurityHeaderEvent, xmlEvent);
                 startElement = xmlEvent.asStartElement();
-
                 encryptedHeader = true;
             }
 
@@ -172,109 +150,33 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                 }
 
                 XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
-                List<ComparableNamespace>[] comparableNamespaceList;
-                List<ComparableAttribute>[] comparableAttributeList;
-
-                if (encryptedHeader) {
-                    tmpXmlEventList.clear();
-                    //inputProcessorChain.getDocumentContext().removePathElement();
-
-                    comparableNamespaceList = Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 2, xmlEventNS.getNamespaceList().length);
-                    comparableAttributeList = Arrays.copyOfRange(xmlEventNS.getAttributeList(), 2, xmlEventNS.getNamespaceList().length);
-                } else {
-                    comparableNamespaceList = Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 1, xmlEventNS.getNamespaceList().length);
-                    comparableAttributeList = Arrays.copyOfRange(xmlEventNS.getAttributeList(), 1, xmlEventNS.getNamespaceList().length);
-                }
-
+                List<ComparableNamespace>[] comparableNamespaceList = getNamespacesInScope(xmlEvent, encryptedHeader);
+                List<ComparableAttribute>[] comparableAttributeList = getAttributesInScope(xmlEvent, encryptedHeader);
+                tmpXmlEventList.clear();
                 processedReferences.add(referenceType);
 
                 //the following logic reads the encryptedData structure and doesn't pass them further
                 //through the chain
                 InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
 
-                Deque<XMLEvent> xmlEvents = new LinkedList<XMLEvent>();
-                xmlEvents.push(xmlEvent);
-                XMLEvent encryptedDataXMLEvent;
-                int count = 0;
-                do {
-                    subInputProcessorChain.reset();
-                    if (isSecurityHeaderEvent) {
-                        encryptedDataXMLEvent = subInputProcessorChain.processHeaderEvent();
-                    } else {
-                        encryptedDataXMLEvent = subInputProcessorChain.processEvent();
-                    }
+                EncryptedDataType encryptedDataType = parseEncryptedDataStructure(isSecurityHeaderEvent, xmlEvent, subInputProcessorChain);
 
-                    xmlEvents.push(encryptedDataXMLEvent);
-                    if (++count >= 50) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
-                    }
-                }
-                while (!(encryptedDataXMLEvent.isStartElement()
-                        && encryptedDataXMLEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_xenc_CipherValue)));
-
-                xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_CipherValue, null));
-                xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_CipherData, null));
-                xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_EncryptedData, null));
-
-                EncryptedDataType encryptedDataType;
-
-                try {
-                    Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbContext().createUnmarshaller();
-                    JAXBElement<EncryptedDataType> encryptedDataTypeJAXBElement =
-                            (JAXBElement<EncryptedDataType>) unmarshaller.unmarshal(new XMLSecurityEventReader(xmlEvents, 0));
-                    encryptedDataType = encryptedDataTypeJAXBElement.getValue();
-
-                } catch (JAXBException e) {
-                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
-                }
-
-                KeyInfoType keyInfoType;
-                if (this.keyInfoType != null) {
-                    keyInfoType = this.keyInfoType;
-                } else {
-                    keyInfoType = encryptedDataType.getKeyInfo();
-                }
-
-                final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
-
-                //retrieve the securityToken which must be used for decryption
-                SecurityToken securityToken = SecurityTokenFactory.getInstance().getSecurityToken(
-                        keyInfoType, getSecurityProperties().getDecryptionCrypto(),
-                        getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
-
+                SecurityToken securityToken = getSecurityToken(inputProcessorChain, encryptedDataType);
                 handleSecurityToken(securityToken, inputProcessorChain.getSecurityContext(), encryptedDataType);
+
                 //only fire here ContentEncryptedElementEvents
                 //the other ones will be fired later, because we don't know the encrypted element name yet
                 if (SecurePart.Modifier.Content.getModifier().equals(encryptedDataType.getType())) {
                     handleEncryptedContent(inputProcessorChain, parentStartXMLEvent, xmlEvent, securityToken);
                 }
 
-                Cipher symCipher = null;
-                try {
-                    AlgorithmType symEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
-                    symCipher = Cipher.getInstance(symEncAlgo.getJCEName(), symEncAlgo.getJCEProvider());
-                    //we have to defer the initialization of the cipher until we can extract the IV...
-                } catch (NoSuchAlgorithmException e) {
-                    throw new XMLSecurityException(
-                            XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                            e, "No such algorithm: " + algorithmURI
-                    );
-                } catch (NoSuchPaddingException e) {
-                    throw new XMLSecurityException(
-                            XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                            e, "No such padding: " + algorithmURI
-                    );
-                } catch (NoSuchProviderException e) {
-                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
-                }
+                final String algorithmURI = encryptedDataType.getEncryptionMethod().getAlgorithm();
+                Cipher symCipher = getCipher(algorithmURI);
 
                 //create a new Thread for streaming decryption
                 DecryptionThread decryptionThread = new DecryptionThread(subInputProcessorChain, isSecurityHeaderEvent, xmlEventNS);
                 decryptionThread.setSecretKey(securityToken.getSecretKey(algorithmURI, XMLSecurityConstants.Enc));
                 decryptionThread.setSymmetricCipher(symCipher);
-
-                Thread receiverThread = new Thread(decryptionThread);
-                receiverThread.setName("decrypting thread");
 
                 AbstractDecryptedEventReaderInputProcessor decryptedEventReaderInputProcessor = newDecryptedEventReaderInputProccessor(
                         encryptedHeader, comparableNamespaceList, comparableAttributeList, encryptedDataType, securityToken, inputProcessorChain.getSecurityContext()
@@ -285,14 +187,16 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
                 inputProcessorChain.getDocumentContext().setIsInEncryptedContent(inputProcessorChain.getProcessors().indexOf(decryptedEventReaderInputProcessor), decryptedEventReaderInputProcessor);
 
+                Thread thread = new Thread(decryptionThread);
+                thread.setName("decrypting thread");
                 //when an exception in the decryption thread occurs, we want to forward them:
-                receiverThread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
+                thread.setUncaughtExceptionHandler(decryptedEventReaderInputProcessor);
 
                 //we have to start the thread before we call decryptionThread.getPipedInputStream().
                 //Otherwise we will end in a deadlock, because the StAX reader expects already data.
                 //@See some lines below:
                 logger.debug("Starting decryption thread");
-                receiverThread.start();
+                thread.start();
 
                 inputProcessorChain.getDocumentContext().removePathElement();
 
@@ -303,11 +207,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                                 "UTF-8");
 
                 //forward to wrapper element
-                XMLEvent tmpXmlEvent;
-                do {
-                    tmpXmlEvent = xmlEventReader.nextEvent();
-                }
-                while (!(tmpXmlEvent.isStartElement() && tmpXmlEvent.asStartElement().getName().equals(wrapperElementName)));
+                forwardToWrapperElement(xmlEventReader);
 
                 decryptedEventReaderInputProcessor.setXmlEventReader(xmlEventReader);
 
@@ -323,6 +223,135 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             parentStartXMLEvent = xmlEvent;
         }
         return xmlEvent;
+    }
+
+    private void forwardToWrapperElement(XMLEventReader xmlEventReader) throws XMLStreamException {
+        XMLEvent tmpXmlEvent;
+        do {
+            tmpXmlEvent = xmlEventReader.nextEvent();
+        }
+        while (!(tmpXmlEvent.isStartElement() && tmpXmlEvent.asStartElement().getName().equals(wrapperElementName)));
+    }
+
+    private Cipher getCipher(String algorithmURI) throws XMLSecurityException {
+        Cipher symCipher;
+        try {
+            AlgorithmType symEncAlgo = JCEAlgorithmMapper.getAlgorithmMapping(algorithmURI);
+            symCipher = Cipher.getInstance(symEncAlgo.getJCEName(), symEncAlgo.getJCEProvider());
+            //we have to defer the initialization of the cipher until we can extract the IV...
+        } catch (NoSuchAlgorithmException e) {
+            throw new XMLSecurityException(
+                    XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    e, "No such algorithm: " + algorithmURI
+            );
+        } catch (NoSuchPaddingException e) {
+            throw new XMLSecurityException(
+                    XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    e, "No such padding: " + algorithmURI
+            );
+        } catch (NoSuchProviderException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
+        }
+        return symCipher;
+    }
+
+    private SecurityToken getSecurityToken(InputProcessorChain inputProcessorChain, EncryptedDataType encryptedDataType) throws XMLSecurityException {
+        KeyInfoType keyInfoType;
+        if (this.keyInfoType != null) {
+            keyInfoType = this.keyInfoType;
+        } else {
+            keyInfoType = encryptedDataType.getKeyInfo();
+        }
+
+        //retrieve the securityToken which must be used for decryption
+        return SecurityTokenFactory.getInstance().getSecurityToken(
+                keyInfoType, getSecurityProperties().getDecryptionCrypto(),
+                getSecurityProperties().getCallbackHandler(), inputProcessorChain.getSecurityContext());
+    }
+
+    private EncryptedDataType parseEncryptedDataStructure(boolean isSecurityHeaderEvent, XMLEvent xmlEvent, InputProcessorChain subInputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        Deque<XMLEvent> xmlEvents = new LinkedList<XMLEvent>();
+        xmlEvents.push(xmlEvent);
+        XMLEvent encryptedDataXMLEvent;
+        int count = 0;
+        do {
+            subInputProcessorChain.reset();
+            if (isSecurityHeaderEvent) {
+                encryptedDataXMLEvent = subInputProcessorChain.processHeaderEvent();
+            } else {
+                encryptedDataXMLEvent = subInputProcessorChain.processEvent();
+            }
+
+            xmlEvents.push(encryptedDataXMLEvent);
+            if (++count >= 50) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
+            }
+        }
+        while (!(encryptedDataXMLEvent.isStartElement()
+                && encryptedDataXMLEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_xenc_CipherValue)));
+
+        xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_CipherValue, null));
+        xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_CipherData, null));
+        xmlEvents.push(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(XMLSecurityConstants.TAG_xenc_EncryptedData, null));
+
+        EncryptedDataType encryptedDataType;
+
+        try {
+            Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbUnmarshaller(getSecurityProperties().isDisableSchemaValidation());
+            JAXBElement<EncryptedDataType> encryptedDataTypeJAXBElement =
+                    (JAXBElement<EncryptedDataType>) unmarshaller.unmarshal(new XMLSecurityEventReader(xmlEvents, 0));
+            encryptedDataType = encryptedDataTypeJAXBElement.getValue();
+
+        } catch (JAXBException e) {
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY, e);
+        }
+        return encryptedDataType;
+    }
+
+    private XMLEvent getLastBufferedXMLEvent(InputProcessorChain inputProcessorChain) {
+        XMLEvent xmlEvent = tmpXmlEventList.pollLast();
+        if (xmlEvent.isStartElement()) {
+            inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
+        } else if (xmlEvent.isEndElement()) {
+            inputProcessorChain.getDocumentContext().removePathElement();
+        }
+        return xmlEvent;
+    }
+
+    private XMLEvent readAndBufferEncryptedHeader(InputProcessorChain inputProcessorChain, boolean isSecurityHeaderEvent, XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+        InputProcessorChain subInputProcessorChain = inputProcessorChain.createSubChain(this);
+        do {
+            tmpXmlEventList.push(xmlEvent);
+
+            subInputProcessorChain.reset();
+            if (isSecurityHeaderEvent) {
+                xmlEvent = subInputProcessorChain.processHeaderEvent();
+            } else {
+                xmlEvent = subInputProcessorChain.processEvent();
+            }
+        }
+        while (!(xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_xenc_EncryptedData)));
+
+        tmpXmlEventList.push(xmlEvent);
+        return xmlEvent;
+    }
+
+    private List<ComparableNamespace>[] getNamespacesInScope(XMLEvent xmlEvent, boolean encryptedHeader) {
+        XMLEventNS xmlEventNS = (XMLEventNS)xmlEvent;
+        if (encryptedHeader) {
+            return Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 2, xmlEventNS.getNamespaceList().length);
+        } else {
+            return Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 1, xmlEventNS.getNamespaceList().length);
+        }
+    }
+
+    private List<ComparableAttribute>[] getAttributesInScope(XMLEvent xmlEvent, boolean encryptedHeader) {
+        XMLEventNS xmlEventNS = (XMLEventNS)xmlEvent;
+        if (encryptedHeader) {
+            return Arrays.copyOfRange(xmlEventNS.getAttributeList(), 2, xmlEventNS.getNamespaceList().length);
+        } else {
+            return Arrays.copyOfRange(xmlEventNS.getAttributeList(), 1, xmlEventNS.getNamespaceList().length);
+        }
     }
 
     protected abstract AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
@@ -394,16 +423,16 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             super(securityProperties);
             getAfterProcessors().add(abstractDecryptInputProcessor);
             this.encryptionModifier = encryptionModifier;
-            rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
+            this.rootElementProcessed = encryptionModifier != SecurePart.Modifier.Element;
             this.encryptedHeader = encryptedHeader;
             this.securityToken = securityToken;
             for (int i = 0; i < namespaceList.length; i++) {
                 List<ComparableNamespace> namespaces = namespaceList[i];
-                nsStack.push(namespaces);
+                this.nsStack.push(namespaces);
             }
             for (int i = 0; i < attributeList.length; i++) {
                 List<ComparableAttribute> attributes = attributeList[i];
-                attrStack.push(attributes);
+                this.attrStack.push(attributes);
             }
         }
 
@@ -534,9 +563,9 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
             //prepare the piped streams and connect them:
             //5 * 8192 seems to be a fine value
-            pipedInputStream = new PipedInputStream(40960);
+            this.pipedInputStream = new PipedInputStream(40960);
             try {
-                pipedOutputStream = new PipedOutputStream(pipedInputStream);
+                this.pipedOutputStream = new PipedOutputStream(pipedInputStream);
             } catch (IOException e) {
                 throw new XMLStreamException(e);
             }
@@ -567,38 +596,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                         )
                 );
 
-                tempBufferedWriter.write('<');
-                tempBufferedWriter.write(wrapperElementName.getPrefix());
-                tempBufferedWriter.write(':');
-                tempBufferedWriter.write(wrapperElementName.getLocalPart());
-                tempBufferedWriter.write(' ');
-                tempBufferedWriter.write("xmlns:");
-                tempBufferedWriter.write(wrapperElementName.getPrefix());
-                tempBufferedWriter.write("=\"");
-                tempBufferedWriter.write(wrapperElementName.getNamespaceURI());
-                tempBufferedWriter.write('\"');
-
-                //apply all namespaces from current scope to get a valid documentfragment:
-                List<ComparableNamespace> comparableNamespacesToApply = new LinkedList<ComparableNamespace>();
-                List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
-                for (int i = 0; i < comparableNamespaceList.length; i++) {
-                    List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
-                    Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespaces.iterator();
-                    while (comparableNamespaceIterator.hasNext()) {
-                        ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
-                        if (!comparableNamespacesToApply.contains(comparableNamespace)) {
-                            comparableNamespacesToApply.add(comparableNamespace);
-                        }
-                    }
-                }
-                Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespacesToApply.iterator();
-                while (comparableNamespaceIterator.hasNext()) {
-                    ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
-                    tempBufferedWriter.write(' ');
-                    tempBufferedWriter.write(comparableNamespace.toString());
-                }
-
-                tempBufferedWriter.write('>');
+                writeWrapperStartElement(tempBufferedWriter);
                 //calling flush after every piece to prevent data salad...
                 tempBufferedWriter.flush();
 
@@ -657,14 +655,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
                 //close to get Cipher.doFinal() called
                 decryptOutputStream.close();
-
-                //close the dummy wrapper element:
-                tempBufferedWriter.write("</");
-                tempBufferedWriter.write(wrapperElementName.getPrefix());
-                tempBufferedWriter.write(':');
-                tempBufferedWriter.write(wrapperElementName.getLocalPart());
-                tempBufferedWriter.write('>');
-                //real close of the stream
+                writeWrapperEndElement(tempBufferedWriter);
                 tempBufferedWriter.close();
 
                 logger.debug("Decryption thread finished");
@@ -672,6 +663,51 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             } catch (Exception e) {
                 throw new UncheckedXMLSecurityException(e);
             }
+        }
+
+        private void writeWrapperStartElement(BufferedWriter tempBufferedWriter) throws IOException {
+            tempBufferedWriter.write('<');
+            tempBufferedWriter.write(wrapperElementName.getPrefix());
+            tempBufferedWriter.write(':');
+            tempBufferedWriter.write(wrapperElementName.getLocalPart());
+            tempBufferedWriter.write(' ');
+            tempBufferedWriter.write("xmlns:");
+            tempBufferedWriter.write(wrapperElementName.getPrefix());
+            tempBufferedWriter.write("=\"");
+            tempBufferedWriter.write(wrapperElementName.getNamespaceURI());
+            tempBufferedWriter.write('\"');
+
+            //apply all namespaces from current scope to get a valid documentfragment:
+            List<ComparableNamespace> comparableNamespacesToApply = new LinkedList<ComparableNamespace>();
+            List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
+            for (int i = 0; i < comparableNamespaceList.length; i++) {
+                List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
+                Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespaces.iterator();
+                while (comparableNamespaceIterator.hasNext()) {
+                    ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
+                    if (!comparableNamespacesToApply.contains(comparableNamespace)) {
+                        comparableNamespacesToApply.add(comparableNamespace);
+                    }
+                }
+            }
+            Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespacesToApply.iterator();
+            while (comparableNamespaceIterator.hasNext()) {
+                ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
+                tempBufferedWriter.write(' ');
+                tempBufferedWriter.write(comparableNamespace.toString());
+            }
+
+            tempBufferedWriter.write('>');
+        }
+
+        private void writeWrapperEndElement(BufferedWriter tempBufferedWriter) throws IOException {
+            //close the dummy wrapper element:
+            tempBufferedWriter.write("</");
+            tempBufferedWriter.write(wrapperElementName.getPrefix());
+            tempBufferedWriter.write(':');
+            tempBufferedWriter.write(wrapperElementName.getLocalPart());
+            tempBufferedWriter.write('>');
+            //real close of the stream
         }
 
         protected Cipher getSymmetricCipher() {
