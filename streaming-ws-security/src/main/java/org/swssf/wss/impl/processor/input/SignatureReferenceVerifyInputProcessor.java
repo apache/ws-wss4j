@@ -240,7 +240,9 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
         protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain)
                 throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 
-            //todo Transforms can be null
+            if (referenceType.getTransforms() == null || referenceType.getTransforms().getTransform().size() == 0) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+            }
             List<TransformType> transformTypeList = (List<TransformType>) (List<?>) referenceType.getTransforms().getTransform();
 
             String algorithm = null;
@@ -268,7 +270,6 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     }
                 }
                 algorithm = transformType.getAlgorithm();
-                //todo can algorithm be null? this means we have incl. C14N!
                 AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
                 algorithmSuiteSecurityEvent.setAlgorithmURI(algorithm);
                 algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
