@@ -34,7 +34,7 @@ import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.processor.input.AbstractSignatureInputHandler;
 
-import javax.xml.bind.JAXBElement;
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 
@@ -95,7 +95,7 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5421);
         }
         //todo test:
-        JAXBElement hmacOutputLength = XMLSecurityUtils.getQNameType(
+        BigInteger hmacOutputLength = XMLSecurityUtils.getQNameType(
                 signatureType.getSignedInfo().getSignatureMethod().getContent(),
                 WSSConstants.TAG_dsig_HMACOutputLength);
         if (hmacOutputLength != null) {
