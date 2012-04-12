@@ -27,13 +27,13 @@ import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Processor for the BinarySecurityToken XML Structure
@@ -48,12 +48,12 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final BinarySecurityTokenType binarySecurityTokenType =
-                ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index)).getValue();
+                ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         checkBSPCompliance(inputProcessorChain, binarySecurityTokenType);
 
         if (binarySecurityTokenType.getId() == null) {
-            binarySecurityTokenType.setId(UUID.randomUUID().toString());
+            binarySecurityTokenType.setId(IDGenerator.generateID(null));
         }
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);

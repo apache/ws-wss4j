@@ -515,4 +515,14 @@ public class XMLSecurityProperties {
     public void setSkipDocumentEvents(boolean skipDocumentEvents) {
         this.skipDocumentEvents = skipDocumentEvents;
     }
+
+    private boolean disableSchemaValidation = false;
+
+    public boolean isDisableSchemaValidation() {
+        return disableSchemaValidation;
+    }
+
+    public void setDisableSchemaValidation(boolean disableSchemaValidation) {
+        this.disableSchemaValidation = disableSchemaValidation;
+    }
 }

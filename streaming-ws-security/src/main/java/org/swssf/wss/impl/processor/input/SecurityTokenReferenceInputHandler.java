@@ -51,7 +51,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
         @SuppressWarnings("unchecked")
         final SecurityTokenReferenceType securityTokenReferenceType =
-                ((JAXBElement<SecurityTokenReferenceType>) parseStructure(eventQueue, index)).getValue();
+                ((JAXBElement<SecurityTokenReferenceType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(
                 securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);

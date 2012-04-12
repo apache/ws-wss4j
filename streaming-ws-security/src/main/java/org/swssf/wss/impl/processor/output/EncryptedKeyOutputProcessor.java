@@ -23,6 +23,7 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -39,7 +40,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -81,7 +81,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             final Key symmetricKey = keyGen.generateKey();
 
-            final String ekId = "EK-" + UUID.randomUUID().toString();
+            final String ekId = IDGenerator.generateID(null);
 
             final AbstractSecurityToken encryptedKeySecurityToken = new AbstractSecurityToken(ekId) {
 
@@ -264,7 +264,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 throws XMLStreamException, XMLSecurityException {
 
             Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+            attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1);
             }

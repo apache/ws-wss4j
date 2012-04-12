@@ -23,6 +23,7 @@ import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithmFactory;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.swssf.xmlsec.impl.util.SignerOutputStream;
 
 import javax.xml.namespace.QName;
@@ -90,7 +91,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
         Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(XMLSecurityConstants.ATT_NULL_Id, "Signature-" + UUID.randomUUID().toString());
+        attributes.put(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null));
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature, attributes);
 
         SignatureAlgorithm signatureAlgorithm;
@@ -161,7 +162,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureValue);
 
         attributes = new HashMap<QName, String>();
-        attributes.put(XMLSecurityConstants.ATT_NULL_Id, "KeyId-" + UUID.randomUUID().toString());
+        attributes.put(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null));
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, attributes);
         createKeyInfoStructureForSignature(subOutputProcessorChain, wrappingSecurityToken, getSecurityProperties().isUseSingleCert());
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);

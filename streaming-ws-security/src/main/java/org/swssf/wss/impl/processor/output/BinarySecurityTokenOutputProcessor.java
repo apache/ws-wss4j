@@ -24,6 +24,7 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -32,7 +33,6 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -47,7 +47,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
     @Override
     public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         try {
-            final String bstId = "BST-" + UUID.randomUUID().toString();
+            final String bstId = IDGenerator.generateID(null);
             final X509Certificate[] x509Certificates;
             final Key key;
 
@@ -97,7 +97,6 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 key = null;
             }
 
-            //todo use the abstractSecurityToken class and make setProcessor method?
             final AbstractSecurityToken binarySecurityToken = new AbstractSecurityToken(bstId) {
 
                 @Override

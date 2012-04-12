@@ -65,7 +65,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
         inputProcessorChain.getSecurityContext().put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
-        final TimestampType timestampType = ((JAXBElement<TimestampType>) parseStructure(eventQueue, index)).getValue();
+        final TimestampType timestampType = ((JAXBElement<TimestampType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         checkBSPCompliance(inputProcessorChain, timestampType, eventQueue, index);
 

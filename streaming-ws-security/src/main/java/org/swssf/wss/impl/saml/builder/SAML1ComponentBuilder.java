@@ -34,10 +34,10 @@ import org.opensaml.xml.signature.KeyInfo;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.saml.OpenSAMLUtil;
 import org.swssf.wss.impl.saml.bean.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Class SAML1ComponentBuilder provides builder methods that can be used
@@ -108,7 +108,7 @@ public class SAML1ComponentBuilder {
         assertion.setVersion(SAMLVersion.VERSION_11);
         assertion.setIssuer(issuer);
         assertion.setIssueInstant(new DateTime()); // now
-        assertion.setID("_" + UUID.randomUUID().toString());
+        assertion.setID(IDGenerator.generateID(null));
         return assertion;
     }
 

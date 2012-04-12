@@ -30,6 +30,7 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.w3c.dom.*;
 
 import javax.xml.namespace.QName;
@@ -43,7 +44,6 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -82,8 +82,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
             }
 
-            final String securityTokenReferenceId = "STRSAMLId-" + UUID.randomUUID().toString();
-            final String binarySecurityTokenId = "BST-" + UUID.randomUUID().toString();
+            final String securityTokenReferenceId = IDGenerator.generateID(null);
+            final String binarySecurityTokenId = IDGenerator.generateID(null);
             final String tokenId = samlAssertionWrapper.getId();
 
             PrivateKey privateKey = null;

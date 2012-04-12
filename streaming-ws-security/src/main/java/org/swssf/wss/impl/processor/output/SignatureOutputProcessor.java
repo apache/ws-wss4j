@@ -25,6 +25,7 @@ import org.swssf.xmlsec.ext.SecurePart;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.processor.output.AbstractSignatureOutputProcessor;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -36,7 +37,6 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -72,7 +72,7 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                     try {
                         SignaturePartDef signaturePartDef = new SignaturePartDef();
                         if (securePart.getIdToSign() == null) {
-                            signaturePartDef.setSigRefId("id-" + UUID.randomUUID().toString());
+                            signaturePartDef.setSigRefId(IDGenerator.generateID(null));
                             signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
 
                             boolean found = false;

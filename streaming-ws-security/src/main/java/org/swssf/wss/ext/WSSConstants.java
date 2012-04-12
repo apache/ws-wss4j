@@ -19,10 +19,19 @@
 package org.swssf.wss.ext;
 
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.swssf.xmlsec.impl.util.ConcreteLSInput;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.util.*;
 
 /**
@@ -35,9 +44,55 @@ public class WSSConstants extends XMLSecurityConstants {
 
     static {
         try {
-            //todo schema validation?
             setJaxbContext(JAXBContext.newInstance("org.swssf.binding.wss10:org.swssf.binding.wss11:org.swssf.binding.wsu10:org.swssf.binding.wssc13:org.swssf.binding.wssc200502:org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.xmldsig11:org.swssf.binding.excc14n"));
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schemaFactory.setResourceResolver(new LSResourceResolver() {
+                @Override
+                public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
+                    if ("http://www.w3.org/2001/XMLSchema.dtd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/XMLSchema.dtd"));
+                        return concreteLSInput;
+                    } else if ("XMLSchema.dtd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/XMLSchema.dtd"));
+                        return concreteLSInput;
+                    } else if ("datatypes.dtd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/datatypes.dtd"));
+                        return concreteLSInput;
+                    } else if ("http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig-core-schema.xsd"));
+                        return concreteLSInput;
+                    } else if ("http://www.w3.org/2001/xml.xsd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xml.xsd"));
+                        return concreteLSInput;
+                    }
+                    return null;
+                }
+            });
+            Schema schema = schemaFactory.newSchema(
+                    new Source[]{
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/soap-1.1.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/soap-1.2.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/exc-c14n.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xenc-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig11-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig-core-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig1-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-wss-wssecurity-secext-1.1.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/ws-secureconversation-200502.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/ws-secureconversation-1.3.xsd")),
+                    }
+            );
+            setJaxbSchemas(schema);
         } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
             throw new RuntimeException(e);
         }
     }

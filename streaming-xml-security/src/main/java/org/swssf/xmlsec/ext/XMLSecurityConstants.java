@@ -18,10 +18,21 @@
  */
 package org.swssf.xmlsec.ext;
 
+import org.swssf.xmlsec.impl.util.ConcreteLSInput;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -34,8 +45,8 @@ import java.security.SecureRandom;
 public class XMLSecurityConstants {
 
     public static final SecureRandom secureRandom;
-    //todo jaxbContext pool?
     private static JAXBContext jaxbContext;
+    private static Schema schema;
 
     static {
         try {
@@ -45,9 +56,49 @@ public class XMLSecurityConstants {
         }
 
         try {
-            //todo schema validation?
             setJaxbContext(JAXBContext.newInstance("org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.xmldsig11:org.swssf.binding.excc14n"));
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schemaFactory.setResourceResolver(new LSResourceResolver() {
+                @Override
+                public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
+                    if ("http://www.w3.org/2001/XMLSchema.dtd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/XMLSchema.dtd"));
+                        return concreteLSInput;
+                    } else if ("XMLSchema.dtd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/XMLSchema.dtd"));
+                        return concreteLSInput;
+                    } else if ("datatypes.dtd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/datatypes.dtd"));
+                        return concreteLSInput;
+                    } else if ("http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig-core-schema.xsd"));
+                        return concreteLSInput;
+                    } else if ("http://www.w3.org/2001/xml.xsd".equals(systemId)) {
+                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
+                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xml.xsd"));
+                        return concreteLSInput;
+                    }
+                    return null;
+                }
+            });
+            Schema schema = schemaFactory.newSchema(
+                    new Source[]{
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/exc-c14n.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xenc-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig11-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig-core-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig1-schema.xsd")),
+                    }
+            );
+            setJaxbSchemas(schema);
+
         } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
             throw new RuntimeException(e);
         }
     }
@@ -59,8 +110,16 @@ public class XMLSecurityConstants {
         XMLSecurityConstants.jaxbContext = jaxbContext;
     }
 
-    public static JAXBContext getJaxbContext() {
-        return jaxbContext;
+    public static synchronized void setJaxbSchemas(Schema schema) {
+        XMLSecurityConstants.schema = schema;
+    }
+
+    public static Unmarshaller getJaxbUnmarshaller(boolean disableSchemaValidation) throws JAXBException {
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        if (!disableSchemaValidation) {
+            unmarshaller.setSchema(schema);
+        }
+        return unmarshaller;
     }
 
     public enum Phase {

@@ -23,6 +23,7 @@ import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -33,7 +34,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -61,8 +61,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
 
-            final String wsuId = "SCT-" + UUID.randomUUID().toString();
-            final String identifier = UUID.randomUUID().toString();
+            final String wsuId = IDGenerator.generateID(null);
+            final String identifier = IDGenerator.generateID(null);
 
             final AbstractSecurityToken securityContextSecurityToken = new AbstractSecurityToken(wsuId) {
 

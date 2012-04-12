@@ -24,6 +24,7 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SecurityContextTokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
@@ -33,7 +34,6 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.util.Deque;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Processor for the SecurityContextToken XML Structure
@@ -49,10 +49,10 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
 
         @SuppressWarnings("unchecked")
         JAXBElement<AbstractSecurityContextTokenType> securityContextTokenTypeJAXBElement =
-                ((JAXBElement<AbstractSecurityContextTokenType>) parseStructure(eventQueue, index));
+                ((JAXBElement<AbstractSecurityContextTokenType>) parseStructure(eventQueue, index, securityProperties));
         final AbstractSecurityContextTokenType securityContextTokenType = securityContextTokenTypeJAXBElement.getValue();
         if (securityContextTokenType.getId() == null) {
-            securityContextTokenType.setId(UUID.randomUUID().toString());
+            securityContextTokenType.setId(IDGenerator.generateID(null));
         }
 
         final String identifier = (String) XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),

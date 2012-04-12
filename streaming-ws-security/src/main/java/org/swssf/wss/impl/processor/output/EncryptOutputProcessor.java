@@ -26,6 +26,7 @@ import org.swssf.xmlsec.ext.SecurityTokenProvider;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.EncryptionPartDef;
 import org.swssf.xmlsec.impl.processor.output.AbstractEncryptOutputProcessor;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
@@ -39,7 +40,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Processor to encrypt XML structures
@@ -79,7 +79,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         SecurityTokenProvider securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
                         EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
                         encryptionPartDef.setModifier(securePart.getModifier());
-                        encryptionPartDef.setEncRefId("ED-" + UUID.randomUUID().toString());
+                        encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
                         encryptionPartDef.setKeyId(securityTokenProvider.getId());
                         encryptionPartDef.setSymmetricKey(securityTokenProvider.getSecurityToken().getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm(), null));
                         outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);

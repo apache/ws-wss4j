@@ -21,11 +21,14 @@ package org.swssf.wss.test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WsuIdAllocator;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.*;
@@ -53,6 +56,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.security.Security;
 import java.util.*;
 import java.util.logging.Level;
@@ -79,6 +83,17 @@ public abstract class AbstractTestBase {
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
 
         Security.addProvider(new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
+    }
+
+    //we have to set a custom baseUUID until WSS4J-DOM is fixed. WSS4J generates invalid id's. (wsu:id's must start with a letter)
+    static {
+        try {
+            Field field = UUIDGenerator.class.getDeclaredField("baseUUID");
+            field.setAccessible(true);
+            field.set(null, "G" + UUID.randomUUID().toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AbstractTestBase() {
@@ -177,6 +192,24 @@ public abstract class AbstractTestBase {
         requestData.setMsgContext(messageContext);
         requestData.setNoSerialization(true);
         requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
+        //we have to set a custom IDAllocator until WSS4J-DOM is fixed. WSS4J generates invalid id's. (wsu:id's must start with a letter)
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.getWssConfig().setIdAllocator(new WsuIdAllocator() {
+            @Override
+            public String createId(String prefix, Object o) {
+                return createSecureId(prefix, o);
+            }
+
+            @Override
+            public String createSecureId(String prefix, Object o) {
+                String id = UUID.randomUUID().toString();
+                if (prefix != null) {
+                    return prefix + id;
+                } else {
+                    return "G" + id;
+                }
+            }
+        });
 
         wss4JHandler.doSender(messageContext, requestData, true);
 

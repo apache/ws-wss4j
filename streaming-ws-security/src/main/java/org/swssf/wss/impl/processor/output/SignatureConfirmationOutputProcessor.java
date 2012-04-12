@@ -26,6 +26,7 @@ import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -34,7 +35,6 @@ import javax.xml.stream.events.XMLEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -66,7 +66,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                         SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 
                         Map<QName, String> attributes = new HashMap<QName, String>();
-                        attributes.put(WSSConstants.ATT_wsu_Id, "SigConf-" + UUID.randomUUID().toString());
+                        attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
                         attributes.put(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue()));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
@@ -75,7 +75,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
                 if (!aSignatureFound) {
                     Map<QName, String> attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_wsu_Id, "SigConf-" + UUID.randomUUID().toString());
+                    attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
                 }

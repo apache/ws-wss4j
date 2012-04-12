@@ -31,10 +31,10 @@ import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xml.signature.KeyInfo;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.saml.bean.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
 /**
@@ -103,7 +103,7 @@ public class SAML2ComponentBuilder {
         }
         Assertion assertion =
                 assertionBuilder.buildObject(Assertion.DEFAULT_ELEMENT_NAME, Assertion.TYPE_NAME);
-        assertion.setID("_" + UUID.randomUUID().toString());
+        assertion.setID(IDGenerator.generateID(null));
         assertion.setVersion(SAMLVersion.VERSION_20);
         assertion.setIssueInstant(new DateTime());
         return assertion;

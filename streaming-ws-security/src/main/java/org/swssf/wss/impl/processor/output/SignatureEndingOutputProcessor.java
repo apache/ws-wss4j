@@ -29,13 +29,13 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
 import org.swssf.xmlsec.impl.processor.output.AbstractSignatureEndingOutputProcessor;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -96,7 +96,7 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
             Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+            attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1);
             } else if (WSSConstants.Saml10Token.equals(securityToken.getTokenType())

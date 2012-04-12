@@ -41,7 +41,7 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index);
+        final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index, securityProperties);
 
         //instantiate a new DecryptInputProcessor and add it to the chain
         inputProcessorChain.addProcessor(

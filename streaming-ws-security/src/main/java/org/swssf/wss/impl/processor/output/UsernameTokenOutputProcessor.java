@@ -22,6 +22,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -30,7 +31,10 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.*;
+import java.util.Arrays;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author $Author$
@@ -61,7 +65,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
             XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
 
-            final String wsuId = "UsernameToken-" + UUID.randomUUID().toString();
+            final String wsuId = IDGenerator.generateID(null);
 
             final OutputProcessor outputProcessor = this;
 

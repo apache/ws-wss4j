@@ -31,6 +31,7 @@ import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.BadPaddingException;
@@ -42,7 +43,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
 import java.security.*;
-import java.util.*;
+import java.util.Deque;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Processor for the EncryptedKey XML Structure
@@ -57,7 +61,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
-        final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index)).getValue();
+        final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         if (encryptedKeyType.getEncryptionMethod() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
@@ -66,7 +70,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
 
         if (encryptedKeyType.getId() == null) {
-            encryptedKeyType.setId(UUID.randomUUID().toString());
+            encryptedKeyType.setId(IDGenerator.generateID(null));
         }
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);

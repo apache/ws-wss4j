@@ -43,6 +43,7 @@ import org.swssf.wss.impl.saml.builder.SAML2ComponentBuilder;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,7 +64,6 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -201,7 +201,7 @@ public class SAMLAssertionWrapper {
         }
         if (id == null || id.length() == 0) {
             logger.error("AssertionWrapper: ID was null, seeting a new ID value");
-            id = "_" + UUID.randomUUID().toString();
+            id = IDGenerator.generateID(null);
             if (saml2 != null) {
                 saml2.setID(id);
             } else if (saml1 != null) {

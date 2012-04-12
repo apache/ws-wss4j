@@ -31,6 +31,7 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -67,12 +68,12 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final UsernameTokenType usernameTokenType = ((JAXBElement<UsernameTokenType>) parseStructure(eventQueue, index)).getValue();
+        final UsernameTokenType usernameTokenType = ((JAXBElement<UsernameTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         checkBSPCompliance(inputProcessorChain, usernameTokenType, eventQueue, index);
 
         if (usernameTokenType.getId() == null) {
-            usernameTokenType.setId(UUID.randomUUID().toString());
+            usernameTokenType.setId(IDGenerator.generateID(null));
         }
 
         // If the UsernameToken is to be used for key derivation, the (1.1)

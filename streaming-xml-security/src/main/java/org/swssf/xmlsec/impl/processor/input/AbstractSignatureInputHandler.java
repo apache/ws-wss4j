@@ -55,7 +55,7 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
-        final SignatureType signatureType = ((JAXBElement<SignatureType>) parseStructure(eventQueue, index)).getValue();
+        final SignatureType signatureType = ((JAXBElement<SignatureType>) parseStructure(eventQueue, index, securityProperties)).getValue();
         SecurityToken securityToken = verifySignedInfo(inputProcessorChain, securityProperties, signatureType, eventQueue, index);
         addSignatureReferenceInputProcessorToChain(inputProcessorChain, securityProperties, signatureType, securityToken);
     }

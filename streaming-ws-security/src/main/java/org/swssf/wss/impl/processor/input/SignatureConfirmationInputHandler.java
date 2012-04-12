@@ -45,7 +45,7 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
 
         @SuppressWarnings("unchecked")
         final SignatureConfirmationType signatureConfirmationType =
-                ((JAXBElement<SignatureConfirmationType>) parseStructure(eventQueue, index)).getValue();
+                ((JAXBElement<SignatureConfirmationType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         checkBSPCompliance(inputProcessorChain, signatureConfirmationType);
 

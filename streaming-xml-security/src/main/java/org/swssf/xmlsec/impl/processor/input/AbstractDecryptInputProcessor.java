@@ -27,6 +27,7 @@ import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.swssf.xmlsec.impl.util.IVSplittingOutputStream;
 import org.swssf.xmlsec.impl.util.ReplaceableOuputStream;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
@@ -63,8 +64,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     private KeyInfoType keyInfoType;
     private List<ReferenceType> processedReferences = new ArrayList<ReferenceType>();
 
-    //the prefix must start with a letter by spec!:
-    private final String uuid = "a" + UUID.randomUUID().toString().replaceAll("-", "");
+    private final String uuid = IDGenerator.generateID(null);
     private final QName wrapperElementName = new QName("http://dummy", "dummy", uuid);
 
     private ArrayDeque<XMLEvent> tmpXmlEventList = new ArrayDeque<XMLEvent>();

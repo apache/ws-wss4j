@@ -41,9 +41,9 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException {
+    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index, XMLSecurityProperties securityProperties) throws XMLSecurityException {
         try {
-            Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbContext().createUnmarshaller();
+            Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbUnmarshaller(securityProperties.isDisableSchemaValidation());
             return (T) unmarshaller.unmarshal(new XMLSecurityEventReader(eventDeque, index));
 
         } catch (JAXBException e) {

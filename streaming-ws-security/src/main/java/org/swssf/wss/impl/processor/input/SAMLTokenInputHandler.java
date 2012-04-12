@@ -55,7 +55,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final Document samlTokenDocument = (Document) parseStructure(eventQueue, index);
+        final Document samlTokenDocument = (Document) parseStructure(eventQueue, index, securityProperties);
 
         final SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlTokenDocument.getDocumentElement());
 
@@ -109,7 +109,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index) throws XMLSecurityException {
+    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index, XMLSecurityProperties securityProperties) throws XMLSecurityException {
         Document document = null;
         try {
             document = documentBuilderFactory.newDocumentBuilder().newDocument();

@@ -31,6 +31,7 @@ import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
@@ -40,7 +41,6 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.util.Deque;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Processor for the SecurityContextToken XML Structure
@@ -56,9 +56,9 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         @SuppressWarnings("unchecked")
         final AbstractDerivedKeyTokenType derivedKeyTokenType =
-                ((JAXBElement<AbstractDerivedKeyTokenType>) parseStructure(eventQueue, index)).getValue();
+                ((JAXBElement<AbstractDerivedKeyTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
         if (derivedKeyTokenType.getId() == null) {
-            derivedKeyTokenType.setId(UUID.randomUUID().toString());
+            derivedKeyTokenType.setId(IDGenerator.generateID(null));
         }
         if (derivedKeyTokenType.getSecurityTokenReference() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");

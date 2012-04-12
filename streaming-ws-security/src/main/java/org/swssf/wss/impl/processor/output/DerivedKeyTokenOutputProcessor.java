@@ -26,6 +26,7 @@ import org.swssf.wss.impl.derivedKey.DerivationAlgorithm;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
@@ -39,7 +40,6 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author $Author$
@@ -68,7 +68,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
 
-            final String wsuIdDKT = "DK-" + UUID.randomUUID().toString();
+            final String wsuIdDKT = IDGenerator.generateID(null);
 
             int offset = 0;
             int length = 0;
@@ -253,7 +253,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 throws XMLStreamException, XMLSecurityException {
 
             Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_wsu_Id, "STRId-" + UUID.randomUUID().toString());
+            attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1);
             } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {

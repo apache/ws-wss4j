@@ -311,7 +311,7 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
      */
     public class CharacterEventGeneratorOutputStream extends OutputStream {
 
-        private List<Characters> charactersBuffer = new Vector<Characters>();
+        private List<Characters> charactersBuffer = new LinkedList<Characters>();
         private String encoding;
 
         public CharacterEventGeneratorOutputStream(String encoding) {
