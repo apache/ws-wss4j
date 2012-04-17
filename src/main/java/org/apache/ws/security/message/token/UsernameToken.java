@@ -590,10 +590,21 @@ public class UsernameToken {
      */
     private String nodeString(Element e) {
         if (e != null) {
-            Text node = getFirstNode(e);
-            if (node != null) {
-                return node.getData();
+            Node node = e.getFirstChild();
+            StringBuilder builder = new StringBuilder();
+            boolean found = false;
+            while (node != null) {
+                if (Node.TEXT_NODE == node.getNodeType()) {
+                    found = true;
+                    builder.append(((Text)node).getData());
+                }
+                node = node.getNextSibling();
             }
+            
+            if (!found) {
+                return null;
+            }
+            return builder.toString();
         }
         return null;
     }
