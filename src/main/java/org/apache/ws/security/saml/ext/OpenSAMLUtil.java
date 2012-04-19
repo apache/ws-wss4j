@@ -51,7 +51,7 @@ public class OpenSAMLUtil {
     public synchronized static void initSamlEngine() {
         if (!samlEngineInitialized) {
             if (log.isDebugEnabled()) {
-                log.debug("Initilizing the opensaml2 library...");
+                log.debug("Initializing the opensaml2 library...");
             }
             try {
                 OpenSAMLBootstrap.bootstrap();
