@@ -1227,4 +1227,99 @@ public class EncDecryptionTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
+
+    @Test
+    public void testCompressedEncDecryption() throws Exception {
+
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionCompressionAlgorithm("http://www.apache.org/2012/04/xmlsec/gzip");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeType() == Node.TEXT_NODE) {
+                    Assert.assertEquals(child.getTextContent().trim(), "");
+                } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    Assert.assertEquals(child, nodeList.item(0));
+                } else {
+                    Assert.fail("Unexpected Node encountered");
+                }
+            }
+        }
+
+        //done encryption; now test decryption:
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+
+            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
+                    SecurityEvent.Event.X509Token,
+                    SecurityEvent.Event.EncryptedPart,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.AlgorithmSuite,
+                    SecurityEvent.Event.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                    OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
+                    EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                }
+            }
+        }
+    }
 }

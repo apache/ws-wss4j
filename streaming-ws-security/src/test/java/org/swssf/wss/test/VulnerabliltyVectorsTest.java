@@ -198,7 +198,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertNotNull(throwable);
             //todo exception should be a WSSecurityException
             Assert.assertTrue(throwable instanceof XMLSecurityException);
-            Assert.assertEquals(throwable.getMessage(), "The signature or decryption was invalid (Some encryption references were not processed... Probably security header ordering problem?)");
+            Assert.assertTrue(throwable.getMessage().contains("The signature or decryption was invalid (Digest verification failed for URI"));
         }
     }
 

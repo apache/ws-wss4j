@@ -20,15 +20,19 @@ package org.swssf.xmlsec.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.swssf.binding.xmldsig.KeyInfoType;
+import org.swssf.binding.xmldsig.TransformType;
+import org.swssf.binding.xmldsig.TransformsType;
 import org.swssf.binding.xmlenc.EncryptedDataType;
 import org.swssf.binding.xmlenc.ReferenceList;
 import org.swssf.binding.xmlenc.ReferenceType;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
+import org.swssf.xmlsec.config.TransformerAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.swssf.xmlsec.impl.util.IVSplittingOutputStream;
+import org.swssf.xmlsec.impl.util.MultiInputStream;
 import org.swssf.xmlsec.impl.util.ReplaceableOuputStream;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
@@ -47,6 +51,8 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -143,6 +149,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
                     if (!tmpXmlEventList.isEmpty()) {
                         return tmpXmlEventList.pollLast();
                     }
+                    return xmlEvent;
                 }
                 //duplicate id's are forbidden
                 if (processedReferences.contains(referenceType)) {
@@ -200,11 +207,46 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
                 inputProcessorChain.getDocumentContext().removePathElement();
 
+                InputStream prologInputStream;
+                InputStream epilogInputStream;
+                try {
+                    prologInputStream = writeWrapperStartElement(xmlEventNS);
+                    epilogInputStream = writeWrapperEndElement();
+                } catch (UnsupportedEncodingException e) {
+                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+                } catch (IOException e) {
+                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+                }
+
+                InputStream decryptInputStream = decryptionThread.getPipedInputStream();
+
+                TransformsType transformsType = XMLSecurityUtils.getQNameType(referenceType.getAny(), XMLSecurityConstants.TAG_dsig_Transforms);
+                if (transformsType != null) {
+                    List<TransformType> transformTypes = transformsType.getTransform();
+                    if (transformTypes.size() > 1) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
+                    }
+                    TransformType transformType = transformTypes.get(0);
+                    Class<InputStream> transformerClass = (Class<InputStream>) TransformerAlgorithmMapper.getTransformerClass(transformType.getAlgorithm(), "IN");
+                    try {
+                        Constructor<InputStream> constructor = transformerClass.getConstructor(InputStream.class);
+                        decryptInputStream = constructor.newInstance(decryptInputStream);
+                    } catch (InvocationTargetException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+                    } catch (NoSuchMethodException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+                    } catch (InstantiationException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+                    } catch (IllegalAccessException e) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+                    }
+                }
+
                 //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
                 XMLEventReader xmlEventReader =
                         inputProcessorChain.getSecurityContext().<XMLInputFactory>get(
-                                XMLSecurityConstants.XMLINPUTFACTORY).createXMLEventReader(decryptionThread.getPipedInputStream(),
-                                "UTF-8");
+                                XMLSecurityConstants.XMLINPUTFACTORY).createXMLEventReader(
+                                new MultiInputStream(prologInputStream, decryptInputStream, epilogInputStream), "UTF-8");
 
                 //forward to wrapper element
                 forwardToWrapperElement(xmlEventReader);
@@ -223,6 +265,65 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
             parentStartXMLEvent = xmlEvent;
         }
         return xmlEvent;
+    }
+
+    private InputStream writeWrapperStartElement(XMLEventNS startXMLElement) throws IOException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        //temporary writer to write the dummy wrapper element with all namespaces in the current scope
+        //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
+        Writer writer = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+
+        writer.write('<');
+        writer.write(wrapperElementName.getPrefix());
+        writer.write(':');
+        writer.write(wrapperElementName.getLocalPart());
+        writer.write(' ');
+        writer.write("xmlns:");
+        writer.write(wrapperElementName.getPrefix());
+        writer.write("=\"");
+        writer.write(wrapperElementName.getNamespaceURI());
+        writer.write('\"');
+
+        //apply all namespaces from current scope to get a valid documentfragment:
+        List<ComparableNamespace> comparableNamespacesToApply = new LinkedList<ComparableNamespace>();
+        List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
+        for (int i = 0; i < comparableNamespaceList.length; i++) {
+            List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
+            Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespaces.iterator();
+            while (comparableNamespaceIterator.hasNext()) {
+                ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
+                if (!comparableNamespacesToApply.contains(comparableNamespace)) {
+                    comparableNamespacesToApply.add(comparableNamespace);
+                }
+            }
+        }
+        Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespacesToApply.iterator();
+        while (comparableNamespaceIterator.hasNext()) {
+            ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
+            writer.write(' ');
+            //todo write namespace ourself
+            writer.write(comparableNamespace.toString());
+        }
+
+        writer.write('>');
+        writer.close();
+        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    }
+
+    private InputStream writeWrapperEndElement() throws IOException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Writer writer = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+
+        //close the dummy wrapper element:
+        writer.write("</");
+        writer.write(wrapperElementName.getPrefix());
+        writer.write(':');
+        writer.write(wrapperElementName.getLocalPart());
+        writer.write('>');
+        writer.close();
+        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
     }
 
     private void forwardToWrapperElement(XMLEventReader xmlEventReader) throws XMLStreamException {
@@ -337,7 +438,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     }
 
     private List<ComparableNamespace>[] getNamespacesInScope(XMLEvent xmlEvent, boolean encryptedHeader) {
-        XMLEventNS xmlEventNS = (XMLEventNS)xmlEvent;
+        XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
         if (encryptedHeader) {
             return Arrays.copyOfRange(xmlEventNS.getNamespaceList(), 2, xmlEventNS.getNamespaceList().length);
         } else {
@@ -346,7 +447,7 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
     }
 
     private List<ComparableAttribute>[] getAttributesInScope(XMLEvent xmlEvent, boolean encryptedHeader) {
-        XMLEventNS xmlEventNS = (XMLEventNS)xmlEvent;
+        XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
         if (encryptedHeader) {
             return Arrays.copyOfRange(xmlEventNS.getAttributeList(), 2, xmlEventNS.getNamespaceList().length);
         } else {
@@ -587,46 +688,8 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
         public void run() {
 
             try {
-                //temporary writer to write the dummy wrapper element with all namespaces in the current scope
-                //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
-                BufferedWriter tempBufferedWriter = new BufferedWriter(
-                        new OutputStreamWriter(
-                                pipedOutputStream,
-                                "UTF-8"
-                        )
-                );
-
-                writeWrapperStartElement(tempBufferedWriter);
-                //calling flush after every piece to prevent data salad...
-                tempBufferedWriter.flush();
-
                 IVSplittingOutputStream ivSplittingOutputStream = new IVSplittingOutputStream(
-                        new CipherOutputStream(new FilterOutputStream(pipedOutputStream) {
-
-                            @Override
-                            public void write(int b) throws IOException {
-                                out.write(b);
-                            }
-
-                            @Override
-                            public void write(byte[] b) throws IOException {
-                                out.write(b);
-                            }
-
-                            @Override
-                            public void write(byte[] b, int off, int len) throws IOException {
-                                out.write(b, off, len);
-                            }
-
-                            @Override
-                            public void close() throws IOException {
-                                //we overwrite the close method and don't delegate close. Close must be done separately.
-                                //The reason behind this is the Base64DecoderStream which does the final on close() but after
-                                //that we have to write our dummy end tag
-                                //just calling flush here, seems to be fine
-                                out.flush();
-                            }
-                        }, getSymmetricCipher()),
+                        new CipherOutputStream(pipedOutputStream, getSymmetricCipher()),
                         getSymmetricCipher(), getSecretKey());
                 //buffering seems not to help
                 //bufferedOutputStream = new BufferedOutputStream(new Base64OutputStream(ivSplittingOutputStream, false), 8192 * 5);
@@ -655,59 +718,11 @@ public abstract class AbstractDecryptInputProcessor extends AbstractInputProcess
 
                 //close to get Cipher.doFinal() called
                 decryptOutputStream.close();
-                writeWrapperEndElement(tempBufferedWriter);
-                tempBufferedWriter.close();
-
                 logger.debug("Decryption thread finished");
 
             } catch (Exception e) {
                 throw new UncheckedXMLSecurityException(e);
             }
-        }
-
-        private void writeWrapperStartElement(BufferedWriter tempBufferedWriter) throws IOException {
-            tempBufferedWriter.write('<');
-            tempBufferedWriter.write(wrapperElementName.getPrefix());
-            tempBufferedWriter.write(':');
-            tempBufferedWriter.write(wrapperElementName.getLocalPart());
-            tempBufferedWriter.write(' ');
-            tempBufferedWriter.write("xmlns:");
-            tempBufferedWriter.write(wrapperElementName.getPrefix());
-            tempBufferedWriter.write("=\"");
-            tempBufferedWriter.write(wrapperElementName.getNamespaceURI());
-            tempBufferedWriter.write('\"');
-
-            //apply all namespaces from current scope to get a valid documentfragment:
-            List<ComparableNamespace> comparableNamespacesToApply = new LinkedList<ComparableNamespace>();
-            List<ComparableNamespace>[] comparableNamespaceList = startXMLElement.getNamespaceList();
-            for (int i = 0; i < comparableNamespaceList.length; i++) {
-                List<ComparableNamespace> comparableNamespaces = comparableNamespaceList[i];
-                Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespaces.iterator();
-                while (comparableNamespaceIterator.hasNext()) {
-                    ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
-                    if (!comparableNamespacesToApply.contains(comparableNamespace)) {
-                        comparableNamespacesToApply.add(comparableNamespace);
-                    }
-                }
-            }
-            Iterator<ComparableNamespace> comparableNamespaceIterator = comparableNamespacesToApply.iterator();
-            while (comparableNamespaceIterator.hasNext()) {
-                ComparableNamespace comparableNamespace = comparableNamespaceIterator.next();
-                tempBufferedWriter.write(' ');
-                tempBufferedWriter.write(comparableNamespace.toString());
-            }
-
-            tempBufferedWriter.write('>');
-        }
-
-        private void writeWrapperEndElement(BufferedWriter tempBufferedWriter) throws IOException {
-            //close the dummy wrapper element:
-            tempBufferedWriter.write("</");
-            tempBufferedWriter.write(wrapperElementName.getPrefix());
-            tempBufferedWriter.write(':');
-            tempBufferedWriter.write(wrapperElementName.getLocalPart());
-            tempBufferedWriter.write('>');
-            //real close of the stream
         }
 
         protected Cipher getSymmetricCipher() {

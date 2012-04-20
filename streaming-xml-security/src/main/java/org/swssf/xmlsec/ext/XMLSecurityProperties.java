@@ -162,6 +162,7 @@ public class XMLSecurityProperties {
     private String encryptionUser;
     private X509Certificate encryptionUseThisCertificate;
     private String encryptionSymAlgorithm;
+    private String encryptionCompressionAlgorithm;
     private String encryptionKeyTransportAlgorithm;
     private List<SecurePart> encryptionParts = new LinkedList<SecurePart>();
 
@@ -320,6 +321,14 @@ public class XMLSecurityProperties {
      */
     public void setEncryptionUser(String encryptionUser) {
         this.encryptionUser = encryptionUser;
+    }
+
+    public String getEncryptionCompressionAlgorithm() {
+        return encryptionCompressionAlgorithm;
+    }
+
+    public void setEncryptionCompressionAlgorithm(String encryptionCompressionAlgorithm) {
+        this.encryptionCompressionAlgorithm = encryptionCompressionAlgorithm;
     }
 
     private List<SecurePart> signatureParts = new LinkedList<SecurePart>();

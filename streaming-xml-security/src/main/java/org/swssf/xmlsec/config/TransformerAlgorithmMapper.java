@@ -20,7 +20,6 @@ package org.swssf.xmlsec.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.swssf.xmlsec.ext.Transformer;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityUtils;
 import org.xmlsecurity.ns.configuration.TransformAlgorithmType;
@@ -41,8 +40,9 @@ public class TransformerAlgorithmMapper {
 
     private static final transient Log logger = LogFactory.getLog(TransformerAlgorithmMapper.class);
 
-    private static Map<String, TransformAlgorithmType> algorithmsMap;
-    private static Map<String, Class<Transformer>> algorithmsClassMap;
+    private static Map<String, Class> algorithmsClassMapInOut;
+    private static Map<String, Class> algorithmsClassMapIn;
+    private static Map<String, Class> algorithmsClassMapOut;
 
     private TransformerAlgorithmMapper() {
     }
@@ -50,25 +50,36 @@ public class TransformerAlgorithmMapper {
     @SuppressWarnings("unchecked")
     protected synchronized static void init(TransformAlgorithmsType transformAlgorithms) throws Exception {
         List<TransformAlgorithmType> algorithms = transformAlgorithms.getTransformAlgorithm();
-        algorithmsMap = new HashMap<String, TransformAlgorithmType>(algorithms.size());
-        algorithmsClassMap = new HashMap<String, Class<Transformer>>();
+        algorithmsClassMapInOut = new HashMap<String, Class>();
+        algorithmsClassMapIn = new HashMap<String, Class>();
+        algorithmsClassMapOut = new HashMap<String, Class>();
 
         for (int i = 0; i < algorithms.size(); i++) {
             TransformAlgorithmType algorithmType = algorithms.get(i);
-            algorithmsMap.put(algorithmType.getURI(), algorithmType);
-            algorithmsClassMap.put(algorithmType.getURI(), XMLSecurityUtils.loadClass(algorithmType.getJAVACLASS()));
+            if (algorithmType.getINOUT() == null) {
+                algorithmsClassMapInOut.put(algorithmType.getURI(), XMLSecurityUtils.loadClass(algorithmType.getJAVACLASS()));
+            } else if ("IN".equals(algorithmType.getINOUT().value())) {
+                algorithmsClassMapIn.put(algorithmType.getURI(), XMLSecurityUtils.loadClass(algorithmType.getJAVACLASS()));
+            } else if ("OUT".equals(algorithmType.getINOUT().value())) {
+                algorithmsClassMapOut.put(algorithmType.getURI(), XMLSecurityUtils.loadClass(algorithmType.getJAVACLASS()));
+            } else {
+                throw new IllegalArgumentException("INOUT parameter " + algorithmType.getINOUT().value() + " unsupported");
+            }
         }
     }
 
-    public static Class<Transformer> getTransformerClass(String algoURI) throws XMLSecurityException {
-        Class<Transformer> clazz = algorithmsClassMap.get(algoURI);
+    public static Class<?> getTransformerClass(String algoURI, String inOut) throws XMLSecurityException {
+        Class clazz;
+        if ("IN".equals(inOut)) {
+            clazz = algorithmsClassMapIn.get(algoURI);
+        } else if ("OUT".equals(inOut)) {
+            clazz = algorithmsClassMapOut.get(algoURI);
+        } else {
+            clazz = algorithmsClassMapInOut.get(algoURI);
+        }
         if (clazz == null) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK);
         }
         return clazz;
-    }
-
-    public static TransformAlgorithmType getAlgorithmMapping(String algoURI) {
-        return algorithmsMap.get(algoURI);
     }
 }

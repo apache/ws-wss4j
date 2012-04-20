@@ -262,6 +262,15 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
             attributes = new HashMap<QName, String>();
             attributes.put(XMLSecurityConstants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId());
             createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference, attributes);
+            final String compressionAlgorithm = getSecurityProperties().getEncryptionCompressionAlgorithm();
+            if (compressionAlgorithm != null) {
+                createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, null);
+                attributes = new HashMap<QName, String>();
+                attributes.put(XMLSecurityConstants.ATT_NULL_Algorithm, compressionAlgorithm);
+                createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform, attributes);
+                createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform);
+                createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms);
+            }
             createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference);
         }
         createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList);

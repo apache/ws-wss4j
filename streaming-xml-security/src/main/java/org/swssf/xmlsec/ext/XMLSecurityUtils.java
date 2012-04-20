@@ -209,8 +209,9 @@ public class XMLSecurityUtils {
         return xmlEvent;
     }
 
+    //todo optimize?
     public static Transformer getTransformer(Object methodParameter1, Object methodParameter2, String algorithm) throws XMLSecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Class<Transformer> transformerClass = TransformerAlgorithmMapper.getTransformerClass(algorithm);
+        Class<Transformer> transformerClass = (Class<Transformer>) TransformerAlgorithmMapper.getTransformerClass(algorithm, null);
         Transformer childTransformer;
         try {
             Constructor<Transformer> constructor = transformerClass.getConstructor(Transformer.class);

@@ -20,6 +20,7 @@ package org.swssf.xmlsec.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
+import org.swssf.xmlsec.config.TransformerAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.EncryptionPartDef;
 import org.swssf.xmlsec.impl.util.TrimmerOutputStream;
@@ -39,6 +40,8 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -112,8 +115,16 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
                 Base64OutputStream base64EncoderStream = new Base64OutputStream(new BufferedOutputStream(characterEventGeneratorOutputStream), true, 76, new byte[]{'\n'});
                 base64EncoderStream.write(iv);
 
+                OutputStream outputStream = new CipherOutputStream(base64EncoderStream, symmetricCipher);
+
+                String compressionAlgorithm = getSecurityProperties().getEncryptionCompressionAlgorithm();
+                if (compressionAlgorithm != null) {
+                    Class<OutputStream> transformerClass = (Class<OutputStream>) TransformerAlgorithmMapper.getTransformerClass(compressionAlgorithm, "OUT");
+                    Constructor<OutputStream> constructor = transformerClass.getConstructor(OutputStream.class);
+                    outputStream = constructor.newInstance(outputStream);
+                }
                 //the trimmer output stream is needed to strip away the dummy wrapping element which must be added
-                cipherOutputStream = new TrimmerOutputStream(new CipherOutputStream(base64EncoderStream, symmetricCipher), 8192, 3, 4);
+                cipherOutputStream = new TrimmerOutputStream(outputStream, 8192, 3, 4);
 
                 //we create a new StAX writer for optimized namespace writing.
                 XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -132,6 +143,14 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             } catch (InvalidKeyException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            } catch (InvocationTargetException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+            } catch (NoSuchMethodException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+            } catch (InstantiationException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
+            } catch (IllegalAccessException e) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
             }
 
             super.init(outputProcessorChain);
