@@ -119,36 +119,7 @@ public class OpenSAMLUtil {
                 throw new WSSecurityException("Error marshalling a SAML assertion", ex);
             }
     
-            // Sign the assertion if the signature element is present.
-            if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
-                org.opensaml.saml2.core.Assertion saml2 = 
-                    (org.opensaml.saml2.core.Assertion) xmlObject;
-                // if there is a signature, but it hasn't already been signed
-                if (saml2.getSignature() != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Signing SAML v2.0 assertion...");
-                    }
-                    try {
-                        Signer.signObject(saml2.getSignature());
-                    } catch (SignatureException ex) {
-                        throw new WSSecurityException("Error signing a SAML assertion", ex);
-                    }
-                }
-            } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
-                org.opensaml.saml1.core.Assertion saml1 = 
-                    (org.opensaml.saml1.core.Assertion) xmlObject;
-                // if there is a signature, but it hasn't already been signed
-                if (saml1.getSignature() != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Signing SAML v1.1 assertion...");
-                    }
-                    try {
-                        Signer.signObject(saml1.getSignature());
-                    } catch (SignatureException ex) {
-                        throw new WSSecurityException("Error signing a SAML assertion", ex);
-                    }
-                }
-            }
+            signXMLObject(xmlObject);
         } finally {
             if (frag != null) {
                 while (doc.getFirstChild() != null) {
@@ -158,6 +129,65 @@ public class OpenSAMLUtil {
             }
         }
         return element;
+    }
+    
+    private static void signXMLObject(XMLObject xmlObject) throws WSSecurityException {
+        if (xmlObject instanceof org.opensaml.saml1.core.Response) {
+            org.opensaml.saml1.core.Response response = 
+                    (org.opensaml.saml1.core.Response)xmlObject;
+            
+            // Sign any Assertions
+            if (response.getAssertions() != null) {
+                for (org.opensaml.saml1.core.Assertion assertion : response.getAssertions()) {
+                    signObject(assertion.getSignature());
+                }
+            }
+            
+            signObject(response.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Response) {
+            org.opensaml.saml2.core.Response response = 
+                    (org.opensaml.saml2.core.Response)xmlObject;
+            
+            // Sign any Assertions
+            if (response.getAssertions() != null) {
+                for (org.opensaml.saml2.core.Assertion assertion : response.getAssertions()) {
+                    signObject(assertion.getSignature());
+                }
+            }
+            
+            signObject(response.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+            org.opensaml.saml2.core.Assertion saml2 = 
+                    (org.opensaml.saml2.core.Assertion) xmlObject;
+            
+            signObject(saml2.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+            org.opensaml.saml1.core.Assertion saml1 = 
+                    (org.opensaml.saml1.core.Assertion) xmlObject;
+            
+            signObject(saml1.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml2.core.RequestAbstractType) {
+            org.opensaml.saml2.core.RequestAbstractType request = 
+                    (org.opensaml.saml2.core.RequestAbstractType) xmlObject;
+            
+            
+            signObject(request.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml1.core.Request) {
+            org.opensaml.saml1.core.Request request = 
+                    (org.opensaml.saml1.core.Request) xmlObject;
+            
+            signObject(request.getSignature());
+        }
+    }
+    
+    private static void signObject(Signature signature) throws WSSecurityException {
+        if (signature != null) {
+            try {
+                Signer.signObject(signature);
+            } catch (SignatureException ex) {
+                throw new WSSecurityException("Error signing a SAML assertion", ex);
+            }
+        }
     }
     
     /**
