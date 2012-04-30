@@ -186,6 +186,44 @@ public class SamlConditionsTest extends org.junit.Assert {
     }
     
     /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with a Conditions statement that has a NotBefore "in the future".
+     */
+    @org.junit.Test
+    public void testSAML2FutureTTLConditions() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        DateTime notBefore = new DateTime();
+        conditions.setNotBefore(notBefore.plusSeconds(30));
+        conditions.setNotAfter(notBefore.plusMinutes(5));
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
      * Verifies the soap envelope
      * <p/>
      * 

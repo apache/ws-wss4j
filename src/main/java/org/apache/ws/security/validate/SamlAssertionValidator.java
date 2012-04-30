@@ -44,6 +44,20 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         org.apache.commons.logging.LogFactory.getLog(SamlAssertionValidator.class);
     
     /**
+     * The time in seconds in the future within which the NotBefore time of an incoming 
+     * Assertion is valid. The default is 60 seconds.
+     */
+    private int futureTTL = 60;
+    
+    /**
+     * Set the time in seconds in the future within which the NotBefore time of an incoming 
+     * Assertion is valid. The default is 60 seconds.
+     */
+    public void setFutureTTL(int newFutureTTL) {
+        futureTTL = newFutureTTL;
+    }
+    
+    /**
      * Validate the credential argument. It must contain a non-null AssertionWrapper. 
      * A Crypto and a CallbackHandler implementation is also required to be set.
      * 
@@ -123,9 +137,13 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
         }
         
-        if (validFrom != null && validFrom.isAfterNow()) {
-            LOG.debug("SAML Token condition (Not Before) not met");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        if (validFrom != null) {
+            DateTime currentTime = new DateTime();
+            currentTime = currentTime.plusSeconds(futureTTL);
+            if (validFrom.isAfter(currentTime)) {
+                LOG.debug("SAML Token condition (Not Before) not met");
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
         }
 
         if (validTill != null && validTill.isBeforeNow()) {

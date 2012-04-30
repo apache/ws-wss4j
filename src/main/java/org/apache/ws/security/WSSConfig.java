@@ -557,8 +557,7 @@ public class WSSConfig {
     }
 
     /**
-     * @param timeStampTTL
-     *            The new value for timeStampTTL
+     * @param timeStampTTL The new value for timeStampTTL
      */
     public void setTimeStampTTL(int timeStampTTL) {
         this.timeStampTTL = timeStampTTL;
@@ -572,7 +571,7 @@ public class WSSConfig {
     }
 
     /**
-     * @param timeStampFutureTTL he new value for timeStampFutureTTL
+     * @param timeStampFutureTTL the new value for timeStampFutureTTL
      */
     public void setTimeStampFutureTTL(int timeStampFutureTTL) {
         this.timeStampFutureTTL = timeStampFutureTTL;
