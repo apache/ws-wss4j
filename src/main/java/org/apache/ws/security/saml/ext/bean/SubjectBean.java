@@ -33,6 +33,7 @@ public class SubjectBean {
     private String subjectNameQualifier;
     private String subjectConfirmationMethod;
     private KeyInfoBean keyInfo;
+    private SubjectConfirmationDataBean subjectConfirmationData;
 
     /**
      * Constructor SubjectBean creates a new SubjectBean instance.
@@ -171,6 +172,24 @@ public class SubjectBean {
     }
     
     /**
+     * Set the SubjectConfirmationData of this SubjectBean object
+     * @return the SubjectConfirmationData of this SubjectBean object
+     */
+    public SubjectConfirmationDataBean getSubjectConfirmationData() {
+        return subjectConfirmationData;
+    }
+
+    /**
+     * Get the SubjectConfirmationData of this SubjectBean object
+     * @param subjectConfirmationData the SubjectConfirmationData of this SubjectBean object
+     */
+    public void setSubjectConfirmationData(
+        SubjectConfirmationDataBean subjectConfirmationData
+    ) {
+        this.subjectConfirmationData = subjectConfirmationData;
+    }
+    
+    /**
      * Method equals ...
      *
      * @param o of type Object
@@ -215,6 +234,13 @@ public class SubjectBean {
         } else if (keyInfo != null && !keyInfo.equals(that.keyInfo)) {
             return false;
         }
+        
+        if (subjectConfirmationData == null && that.subjectConfirmationData != null) {
+            return false;
+        } else if (subjectConfirmationData != null 
+            && !subjectConfirmationData.equals(that.subjectConfirmationData)) {
+            return false;
+        }
 
         return true;
     }
@@ -240,6 +266,10 @@ public class SubjectBean {
         if (keyInfo != null) {
             result = 31 * result + keyInfo.hashCode();
         }
+        if (subjectConfirmationData != null) {
+            result = 31 * result + subjectConfirmationData.hashCode();
+        }
         return result;
     }
+
 }

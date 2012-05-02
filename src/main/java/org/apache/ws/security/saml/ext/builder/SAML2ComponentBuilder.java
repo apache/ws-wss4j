@@ -28,6 +28,7 @@ import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 import org.apache.ws.security.util.UUIDGenerator;
 
@@ -385,12 +386,10 @@ public class SAML2ComponentBuilder {
         subject.setNameID(nameID);
         
         SubjectConfirmationData subjectConfData = null;
-        if (subjectBean.getKeyInfo() != null) {
+        if (subjectBean.getKeyInfo() != null || subjectBean.getSubjectConfirmationData() != null) {
             subjectConfData = 
                 SAML2ComponentBuilder.createSubjectConfirmationData(
-                    null, 
-                    null, 
-                    null, 
+                    subjectBean.getSubjectConfirmationData(), 
                     subjectBean.getKeyInfo() 
                 );
         }
@@ -417,11 +416,31 @@ public class SAML2ComponentBuilder {
      * @param keyInfoBean of type KeyInfoBean
      * @return a SubjectConfirmationData object
      */
-    @SuppressWarnings("unchecked")
+    @Deprecated
     public static SubjectConfirmationData createSubjectConfirmationData(
         String inResponseTo, 
         String recipient, 
         DateTime notOnOrAfter,
+        KeyInfoBean keyInfoBean
+    ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+        SubjectConfirmationDataBean subjectConfirmationDataBean = 
+            new SubjectConfirmationDataBean();
+        subjectConfirmationDataBean.setInResponseTo(inResponseTo);
+        subjectConfirmationDataBean.setRecipient(recipient);
+        subjectConfirmationDataBean.setNotAfter(notOnOrAfter);
+        return createSubjectConfirmationData(subjectConfirmationDataBean, keyInfoBean);
+    }
+    
+    /**
+     * Create a SubjectConfirmationData object
+     *
+     * @param subjectConfirmationDataBean of type SubjectConfirmationDataBean
+     * @param keyInfoBean of type KeyInfoBean
+     * @return a SubjectConfirmationData object
+     */
+    @SuppressWarnings("unchecked")
+    public static SubjectConfirmationData createSubjectConfirmationData(
+        SubjectConfirmationDataBean subjectConfirmationDataBean,
         KeyInfoBean keyInfoBean
     ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
         SubjectConfirmationData subjectConfirmationData = null;
@@ -442,14 +461,22 @@ public class SAML2ComponentBuilder {
             ((KeyInfoConfirmationDataType)subjectConfirmationData).getKeyInfos().add(keyInfo);
         }
         
-        if (inResponseTo != null) {
-            subjectConfirmationData.setInResponseTo(inResponseTo);
-        }
-        if (recipient != null) {
-            subjectConfirmationData.setRecipient(recipient);
-        }
-        if (notOnOrAfter != null) {
-            subjectConfirmationData.setNotOnOrAfter(notOnOrAfter);
+        if (subjectConfirmationDataBean != null) {
+            if (subjectConfirmationDataBean.getInResponseTo() != null) {
+                subjectConfirmationData.setInResponseTo(subjectConfirmationDataBean.getInResponseTo());
+            }
+            if (subjectConfirmationDataBean.getRecipient() != null) {
+                subjectConfirmationData.setRecipient(subjectConfirmationDataBean.getRecipient());
+            }
+            if (subjectConfirmationDataBean.getAddress() != null) {
+                subjectConfirmationData.setAddress(subjectConfirmationDataBean.getAddress());
+            }
+            if (subjectConfirmationDataBean.getNotAfter() != null) {
+                subjectConfirmationData.setNotOnOrAfter(subjectConfirmationDataBean.getNotAfter());
+            }
+            if (subjectConfirmationDataBean.getNotBefore() != null) {
+                subjectConfirmationData.setNotBefore(subjectConfirmationDataBean.getNotBefore());
+            }
         }
         
         return subjectConfirmationData;
