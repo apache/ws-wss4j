@@ -896,31 +896,31 @@ public class WSSecurityUtil {
                 return doAction;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 doAction |= WSConstants.UT;
-                actions.add(new Integer(WSConstants.UT));
+                actions.add(Integer.valueOf(WSConstants.UT));
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_NO_PASSWORD)) {
                 doAction |= WSConstants.UT_NOPASSWORD;
-                actions.add(new Integer(WSConstants.UT_NOPASSWORD));
+                actions.add(Integer.valueOf(WSConstants.UT_NOPASSWORD));
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 doAction |= WSConstants.SIGN;
-                actions.add(new Integer(WSConstants.SIGN));
+                actions.add(Integer.valueOf(WSConstants.SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 doAction |= WSConstants.ENCR;
-                actions.add(new Integer(WSConstants.ENCR));
+                actions.add(Integer.valueOf(WSConstants.ENCR));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 doAction |= WSConstants.ST_UNSIGNED;
-                actions.add(new Integer(WSConstants.ST_UNSIGNED));
+                actions.add(Integer.valueOf(WSConstants.ST_UNSIGNED));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
                 doAction |= WSConstants.ST_SIGNED;
-                actions.add(new Integer(WSConstants.ST_SIGNED));
+                actions.add(Integer.valueOf(WSConstants.ST_SIGNED));
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
-                actions.add(new Integer(WSConstants.TS));
+                actions.add(Integer.valueOf(WSConstants.TS));
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
-                actions.add(new Integer(WSConstants.UT_SIGN));
+                actions.add(Integer.valueOf(WSConstants.UT_SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
                 doAction |= WSConstants.SC;
-                actions.add(new Integer(WSConstants.SC));
+                actions.add(Integer.valueOf(WSConstants.SC));
             } else {
                 throw new WSSecurityException(
                     "Unknown action defined: " + single[i]
@@ -956,28 +956,28 @@ public class WSSecurityUtil {
                 return doAction;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 doAction |= WSConstants.UT;
-                actions.add(new Integer(WSConstants.UT));
+                actions.add(Integer.valueOf(WSConstants.UT));
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 doAction |= WSConstants.SIGN;
-                actions.add(new Integer(WSConstants.SIGN));
+                actions.add(Integer.valueOf(WSConstants.SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 doAction |= WSConstants.ENCR;
-                actions.add(new Integer(WSConstants.ENCR));
+                actions.add(Integer.valueOf(WSConstants.ENCR));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 doAction |= WSConstants.ST_UNSIGNED;
-                actions.add(new Integer(WSConstants.ST_UNSIGNED));
+                actions.add(Integer.valueOf(WSConstants.ST_UNSIGNED));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
                 doAction |= WSConstants.ST_SIGNED;
-                actions.add(new Integer(WSConstants.ST_SIGNED));
+                actions.add(Integer.valueOf(WSConstants.ST_SIGNED));
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
-                actions.add(new Integer(WSConstants.TS));
+                actions.add(Integer.valueOf(WSConstants.TS));
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
-                actions.add(new Integer(WSConstants.UT_SIGN));
+                actions.add(Integer.valueOf(WSConstants.UT_SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
                 doAction |= WSConstants.SC;
-                actions.add(new Integer(WSConstants.SC));
+                actions.add(Integer.valueOf(WSConstants.SC));
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
@@ -986,7 +986,7 @@ public class WSSecurityUtil {
                             "Unknown action defined: " + single[i]
                         );
                     }
-                    actions.add(new Integer(parsedAction));
+                    actions.add(Integer.valueOf(parsedAction));
                 } catch (NumberFormatException ex) {
                     throw new WSSecurityException(
                         "Unknown action defined: " + single[i]

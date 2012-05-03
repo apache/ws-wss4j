@@ -495,7 +495,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(action));
+        actions.add(Integer.valueOf(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

@@ -378,7 +378,7 @@ public class SecurityTokenReference {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
                 "invalidCertForSKI",
-                new Object[]{new Integer(cert.getVersion())}
+                new Object[]{Integer.valueOf(cert.getVersion())}
             );
         }
         

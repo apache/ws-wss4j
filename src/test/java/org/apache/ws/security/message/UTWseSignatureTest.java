@@ -161,7 +161,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT_SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT_SIGN));
         
         handler.send(WSConstants.UT_SIGN, doc, reqData, actions, true);
         

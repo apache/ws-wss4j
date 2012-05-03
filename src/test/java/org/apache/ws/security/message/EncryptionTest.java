@@ -428,7 +428,7 @@ public class EncryptionTest extends org.junit.Assert {
         reqData.setUsername("");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.ENCR));
+        actions.add(Integer.valueOf(WSConstants.ENCR));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

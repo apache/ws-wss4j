@@ -65,35 +65,35 @@ public class WSSecurityException extends Exception {
         }
         
         FAULT_CODE_MAP.put(
-            new Integer(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN), 
+            Integer.valueOf(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN), 
             WSConstants.UNSUPPORTED_SECURITY_TOKEN
         );
         FAULT_CODE_MAP.put(
-            new Integer(UNSUPPORTED_ALGORITHM), 
+            Integer.valueOf(UNSUPPORTED_ALGORITHM), 
             WSConstants.UNSUPPORTED_ALGORITHM
         );
         FAULT_CODE_MAP.put(
-            new Integer(INVALID_SECURITY), 
+            Integer.valueOf(INVALID_SECURITY), 
             WSConstants.INVALID_SECURITY
         );
         FAULT_CODE_MAP.put(
-            new Integer(INVALID_SECURITY_TOKEN), 
+            Integer.valueOf(INVALID_SECURITY_TOKEN), 
             WSConstants.INVALID_SECURITY_TOKEN
         );
         FAULT_CODE_MAP.put(
-            new Integer(FAILED_AUTHENTICATION), 
+            Integer.valueOf(FAILED_AUTHENTICATION), 
             WSConstants.FAILED_AUTHENTICATION
          );
         FAULT_CODE_MAP.put(
-            new Integer(FAILED_CHECK), 
+            Integer.valueOf(FAILED_CHECK), 
             WSConstants.FAILED_CHECK
          );
         FAULT_CODE_MAP.put(
-            new Integer(SECURITY_TOKEN_UNAVAILABLE),
+            Integer.valueOf(SECURITY_TOKEN_UNAVAILABLE),
             WSConstants.SECURITY_TOKEN_UNAVAILABLE
          );
         FAULT_CODE_MAP.put(
-            new Integer(MESSAGE_EXPIRED), 
+            Integer.valueOf(MESSAGE_EXPIRED), 
             WSConstants.MESSAGE_EXPIRED
         );
     }
@@ -185,7 +185,7 @@ public class WSSecurityException extends Exception {
      * @return the fault code QName of this exception
      */
     public javax.xml.namespace.QName getFaultCode() {
-        Object ret = FAULT_CODE_MAP.get(new Integer(this.errorCode));
+        Object ret = FAULT_CODE_MAP.get(Integer.valueOf(this.errorCode));
         if (ret != null) {
             return (javax.xml.namespace.QName)ret;
         }

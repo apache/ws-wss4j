@@ -81,7 +81,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -122,7 +122,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.UT));
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

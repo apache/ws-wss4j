@@ -156,7 +156,7 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setUsername("bob");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT_SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
@@ -203,7 +203,7 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setUsername("bob");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT_SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT_SIGN));
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();

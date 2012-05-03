@@ -134,9 +134,9 @@ public class WSConstants {
      */
     public static final String WST_NS_08_02 = "http://docs.oasis-open.org/ws-sx/ws-trust/200802";
     
-    public final static String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
+    public static final String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
     
-    public final static String WSC_SCT_05_12 = 
+    public static final String WSC_SCT_05_12 = 
         "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/sct";
 
     //

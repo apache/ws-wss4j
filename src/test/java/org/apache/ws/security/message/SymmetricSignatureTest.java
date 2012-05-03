@@ -213,7 +213,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         reqData.setUsername("");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

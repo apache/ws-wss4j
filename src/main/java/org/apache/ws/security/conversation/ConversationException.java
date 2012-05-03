@@ -27,11 +27,11 @@ public class ConversationException extends Exception {
     
     private static final long serialVersionUID = 970894530660804319L;
     
-    public final static String BAD_CONTEXT_TOKEN = "BadContextToken";
-    public final static String UNSUPPORTED_CONTEXT_TOKEN = "UnsupportedContextToken";
-    public final static String UNKNOWN_DERIVATION_SOURCE = "UnknownDerivationSource";
-    public final static String RENEW_NEEDED = "RenewNeeded";
-    public final static String UNABLE_TO_REVIEW = "UnableToRenew";
+    public static final String BAD_CONTEXT_TOKEN = "BadContextToken";
+    public static final String UNSUPPORTED_CONTEXT_TOKEN = "UnsupportedContextToken";
+    public static final String UNKNOWN_DERIVATION_SOURCE = "UnknownDerivationSource";
+    public static final String RENEW_NEEDED = "RenewNeeded";
+    public static final String UNABLE_TO_REVIEW = "UnableToRenew";
     
     private static ResourceBundle resources;
 

@@ -45,7 +45,7 @@ import java.util.TimeZone;
  */
 public class Timestamp {
     
-    private final static org.apache.commons.logging.Log LOG = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(Timestamp.class);
 
     protected Element element = null;

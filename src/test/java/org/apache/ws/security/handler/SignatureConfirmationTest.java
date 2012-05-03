@@ -71,7 +71,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -110,7 +110,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -147,7 +147,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -208,7 +208,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

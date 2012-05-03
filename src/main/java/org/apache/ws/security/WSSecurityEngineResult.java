@@ -223,14 +223,14 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     public static final String TAG_ID = "id";
     
     public WSSecurityEngineResult(int act) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
     }
     
     public WSSecurityEngineResult(
         int act, 
         AssertionWrapper ass
     ) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_SAML_ASSERTION, ass);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
         put(TAG_TOKEN_ELEMENT, ass.getElement());
@@ -242,7 +242,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         X509Certificate[] certs, 
         byte[] sv
     ) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_PRINCIPAL, princ);
         put(TAG_X509_CERTIFICATES, certs);
         put(TAG_SIGNATURE_VALUE, sv);
@@ -270,7 +270,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         byte[] encryptedKeyBytes,
         List<WSDataRef> dataRefUris
     ) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_SECRET, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_DATA_REF_URIS, dataRefUris);
@@ -284,7 +284,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
         List<WSDataRef> dataRefUris,
         X509Certificate[] certs
     ) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_SECRET, decryptedKey);
         put(TAG_ENCRYPTED_EPHEMERAL_KEY, encryptedKeyBytes);
         put(TAG_DATA_REF_URIS, dataRefUris);
@@ -296,27 +296,27 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     }
     
     public WSSecurityEngineResult(int act, List<WSDataRef> dataRefUris) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_DATA_REF_URIS, dataRefUris);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
     }
     
     public WSSecurityEngineResult(int act, Timestamp tstamp) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_TIMESTAMP, tstamp);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
         put(TAG_TOKEN_ELEMENT, tstamp.getElement());
     }
     
     public WSSecurityEngineResult(int act, SecurityContextToken sct) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_SECURITY_CONTEXT_TOKEN, sct);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
         put(TAG_TOKEN_ELEMENT, sct.getElement());
     }
     
     public WSSecurityEngineResult(int act, SignatureConfirmation sc) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_SIGNATURE_CONFIRMATION, sc);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
         put(TAG_TOKEN_ELEMENT, sc.getElement());
@@ -327,7 +327,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     }
     
     public WSSecurityEngineResult(int act, UsernameToken usernameToken, Principal principal) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_USERNAME_TOKEN, usernameToken);
         put(TAG_PRINCIPAL, principal);
         put(TAG_VALIDATED_TOKEN, Boolean.FALSE);
@@ -335,7 +335,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     }
 
     public WSSecurityEngineResult(int act, BinarySecurity token, X509Certificate[] certs) {
-        put(TAG_ACTION, new Integer(act));
+        put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_BINARY_SECURITY_TOKEN, token);
         put(TAG_X509_CERTIFICATES, certs);
         if (certs != null) {

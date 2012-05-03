@@ -271,7 +271,7 @@ public class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      */
-    public final static String SIG_PROP_REF_ID = "signaturePropRefId";
+    public static final String SIG_PROP_REF_ID = "signaturePropRefId";
     
     /**
      * The path of the crypto property file to use for Decryption. The classloader loads this 
@@ -294,7 +294,7 @@ public class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #DEC_PROP_FILE}.
      */
-    public final static String DEC_PROP_REF_ID = "decryptionPropRefId";
+    public static final String DEC_PROP_REF_ID = "decryptionPropRefId";
     
     /**
      * The path of the crypto property file to use for Encryption. The classloader loads this 
@@ -317,7 +317,7 @@ public class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #ENC_PROP_FILE}.
      */
-    public final static String ENC_PROP_REF_ID = "encryptionPropRefId";
+    public static final String ENC_PROP_REF_ID = "encryptionPropRefId";
     
     /**
      * The name of the SAML Issuer factory property file.
@@ -717,19 +717,19 @@ public class WSHandlerConstants {
 
     static {
         keyIdentifier.put("DirectReference",
-                new Integer(WSConstants.BST_DIRECT_REFERENCE));
+                Integer.valueOf(WSConstants.BST_DIRECT_REFERENCE));
         keyIdentifier.put("IssuerSerial",
-                new Integer(WSConstants.ISSUER_SERIAL));
+                Integer.valueOf(WSConstants.ISSUER_SERIAL));
         keyIdentifier.put("X509KeyIdentifier",
-                new Integer(WSConstants.X509_KEY_IDENTIFIER));
+                Integer.valueOf(WSConstants.X509_KEY_IDENTIFIER));
         keyIdentifier.put("SKIKeyIdentifier",
-                new Integer(WSConstants.SKI_KEY_IDENTIFIER));
+                Integer.valueOf(WSConstants.SKI_KEY_IDENTIFIER));
         keyIdentifier.put("EmbeddedKeyName",
-                new Integer(WSConstants.EMBEDDED_KEYNAME));
+                Integer.valueOf(WSConstants.EMBEDDED_KEYNAME));
         keyIdentifier.put("Thumbprint",
-                new Integer(WSConstants.THUMBPRINT_IDENTIFIER));
+                Integer.valueOf(WSConstants.THUMBPRINT_IDENTIFIER));
         keyIdentifier.put("EncryptedKeySHA1",
-                new Integer(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER));
+                Integer.valueOf(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER));
     }
     
     /**

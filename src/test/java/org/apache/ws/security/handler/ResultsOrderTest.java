@@ -53,9 +53,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT));
-        actions.add(new Integer(WSConstants.TS));
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         
         assertTrue (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
@@ -83,9 +83,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT));
-        actions.add(new Integer(WSConstants.TS));
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
@@ -115,9 +115,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.UT));
-        actions.add(new Integer(WSConstants.TS));
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
@@ -147,9 +147,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.SIGN));
-        actions.add(new Integer(WSConstants.UT));
-        actions.add(new Integer(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.TS));
         
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
@@ -175,9 +175,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.TS));
-        actions.add(new Integer(WSConstants.UT));
-        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.SIGN));
         
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
@@ -206,8 +206,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.TS));
-        actions.add(new Integer(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.UT));
         
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
@@ -224,7 +224,7 @@ public class ResultsOrderTest extends org.junit.Assert {
             new java.util.ArrayList<WSSecurityEngineResult>();
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.TS));
+        actions.add(Integer.valueOf(WSConstants.TS));
         
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
@@ -269,9 +269,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         );
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(new Integer(WSConstants.ENCR));
-        actions.add(new Integer(WSConstants.UT));
-        actions.add(new Integer(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.ENCR));
+        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(Integer.valueOf(WSConstants.UT));
         
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));

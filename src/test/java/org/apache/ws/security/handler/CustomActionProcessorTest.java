@@ -162,7 +162,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         
         final List<Integer> actions = new ArrayList<Integer>();
-        actions.add(new Integer(action));
+        actions.add(Integer.valueOf(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
@@ -192,7 +192,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         
         final List<Integer> actions = new ArrayList<Integer>();
-        actions.add(new Integer(action));
+        actions.add(Integer.valueOf(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
@@ -219,7 +219,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         final int customAction = 0xDEADF000;
         
         String actionString = 
-            WSHandlerConstants.TIMESTAMP + " " + new Integer(customAction).toString();
+            WSHandlerConstants.TIMESTAMP + " " + Integer.valueOf(customAction).toString();
         List<Integer> actionList = new ArrayList<Integer>();
         //
         // This parsing will fail as it doesn't know what the custom action is

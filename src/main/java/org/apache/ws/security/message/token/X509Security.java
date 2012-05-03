@@ -102,7 +102,7 @@ public class X509Security extends BinarySecurity {
         byte[] data = getToken();
         if (data == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "invalidCertData", new Object[]{new Integer(0)}
+                WSSecurityException.FAILURE, "invalidCertData", new Object[]{Integer.valueOf(0)}
             );
         }
         InputStream in = new ByteArrayInputStream(data);
