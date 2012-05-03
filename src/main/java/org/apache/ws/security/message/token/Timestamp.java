@@ -201,7 +201,7 @@ public class Timestamp {
         element.appendChild(elementCreated);
         if (ttl != 0) {
             expiresDate = new Date();
-            expiresDate.setTime(createdDate.getTime() + (ttl * 1000));
+            expiresDate.setTime(createdDate.getTime() + ((long)ttl * 1000L));
 
             Element elementExpires =
                 doc.createElementNS(
@@ -316,7 +316,7 @@ public class Timestamp {
         Date validCreation = new Date();
         long currentTime = validCreation.getTime();
         if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + futureTimeToLive * 1000);
+            validCreation.setTime(currentTime + ((long)futureTimeToLive * 1000L));
         }
         // Check to see if the created time is in the future
         if (createdDate != null && createdDate.after(validCreation)) {
@@ -327,7 +327,7 @@ public class Timestamp {
         }
         
         // Calculate the time that is allowed for the message to travel
-        currentTime -= timeToLive * 1000;
+        currentTime -= ((long)timeToLive * 1000L);
         validCreation.setTime(currentTime);
 
         // Validate the time it took the message to travel

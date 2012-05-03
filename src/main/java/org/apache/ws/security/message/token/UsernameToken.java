@@ -170,6 +170,20 @@ public class UsernameToken {
             return;
         }
         
+        // Guard against a malicious user sending a bogus iteration value
+        if (elementIteration != null) {
+            String iter = nodeString(elementIteration);
+            if (iter != null) {
+                int iterInt = Integer.parseInt(iter);
+                if (iterInt < 0 || iterInt > 10000) {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY_TOKEN,
+                        "badUsernameToken"
+                    );
+                }
+            }
+        }
+        
         if (elementPassword != null) {
             if (elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
                 passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
