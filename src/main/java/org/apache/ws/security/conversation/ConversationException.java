@@ -96,7 +96,7 @@ public class ConversationException extends Exception {
         } catch (MissingResourceException e) {
             throw new RuntimeException("Undefined '" + faultCode + "' resource property", e);
         }
-        if(msg != null) {
+        if (msg != null) {
             return msg;
         } else {
             return faultCode;

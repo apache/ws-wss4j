@@ -191,7 +191,7 @@ public class AssertionWrapper {
         } else {
             log.error(
                 "AssertionWrapper: found unexpected type " 
-                + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
+                + (xmlObject != null ? xmlObject.getClass().getName() : null)
             );
         }
     }
@@ -214,12 +214,8 @@ public class AssertionWrapper {
 
         try {
             // Get the SAML source data using the currently configured callback implementation.
-            if (samlCallbackHandler == null) {
-                samlCallbackHandler = parms.getCallbackHandler();
-            }
-
+            samlCallbackHandler = parms.getCallbackHandler();
             samlCallbackHandler.handle(samlCallbacks);
-
         } catch (IOException e) {
             throw new IllegalStateException(
                 "IOException while creating SAML assertion wrapper", e

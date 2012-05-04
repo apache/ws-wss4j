@@ -1349,7 +1349,7 @@ public class Merlin extends CryptoBase {
                 if (!(retrievedCert instanceof X509Certificate)) {
                     continue;
                 }
-                if (retrievedCert != null && retrievedCert.equals(cert)) {
+                if (retrievedCert.equals(cert)) {
                     return alias;
                 }
             }

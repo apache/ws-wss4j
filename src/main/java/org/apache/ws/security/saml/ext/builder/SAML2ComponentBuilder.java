@@ -76,45 +76,45 @@ import java.util.List;
  * Created on May 18, 2009
  */
 public class SAML2ComponentBuilder {
-    private static SAMLObjectBuilder<Assertion> assertionBuilder;
+    private static volatile SAMLObjectBuilder<Assertion> assertionBuilder;
     
-    private static SAMLObjectBuilder<Issuer> issuerBuilder;
+    private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
     
-    private static SAMLObjectBuilder<Subject> subjectBuilder;
+    private static volatile SAMLObjectBuilder<Subject> subjectBuilder;
     
-    private static SAMLObjectBuilder<NameID> nameIdBuilder;
+    private static volatile SAMLObjectBuilder<NameID> nameIdBuilder;
     
-    private static SAMLObjectBuilder<SubjectConfirmation> subjectConfirmationBuilder;
+    private static volatile SAMLObjectBuilder<SubjectConfirmation> subjectConfirmationBuilder;
     
-    private static SAMLObjectBuilder<Conditions> conditionsBuilder;
+    private static volatile SAMLObjectBuilder<Conditions> conditionsBuilder;
     
-    private static SAMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataBuilder;
+    private static volatile SAMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataBuilder;
     
-    private static SAMLObjectBuilder<KeyInfoConfirmationDataType> keyInfoConfirmationDataBuilder;
+    private static volatile SAMLObjectBuilder<KeyInfoConfirmationDataType> keyInfoConfirmationDataBuilder;
     
-    private static SAMLObjectBuilder<AuthnStatement> authnStatementBuilder;
+    private static volatile SAMLObjectBuilder<AuthnStatement> authnStatementBuilder;
     
-    private static SAMLObjectBuilder<AuthnContext> authnContextBuilder;
+    private static volatile SAMLObjectBuilder<AuthnContext> authnContextBuilder;
     
-    private static SAMLObjectBuilder<AuthnContextClassRef> authnContextClassRefBuilder;
+    private static volatile SAMLObjectBuilder<AuthnContextClassRef> authnContextClassRefBuilder;
     
-    private static SAMLObjectBuilder<AttributeStatement> attributeStatementBuilder;
+    private static volatile SAMLObjectBuilder<AttributeStatement> attributeStatementBuilder;
     
-    private static SAMLObjectBuilder<Attribute> attributeBuilder;
+    private static volatile SAMLObjectBuilder<Attribute> attributeBuilder;
     
-    private static XSStringBuilder stringBuilder;
+    private static volatile XSStringBuilder stringBuilder;
     
-    private static SAMLObjectBuilder<AudienceRestriction> audienceRestrictionBuilder;
+    private static volatile SAMLObjectBuilder<AudienceRestriction> audienceRestrictionBuilder;
     
-    private static SAMLObjectBuilder<Audience> audienceBuilder;
+    private static volatile SAMLObjectBuilder<Audience> audienceBuilder;
     
-    private static SAMLObjectBuilder<AuthzDecisionStatement> authorizationDecisionStatementBuilder;
+    private static volatile SAMLObjectBuilder<AuthzDecisionStatement> authorizationDecisionStatementBuilder;
     
-    private static SAMLObjectBuilder<Action> actionElementBuilder;
+    private static volatile SAMLObjectBuilder<Action> actionElementBuilder;
     
-    private static XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     
-    private static SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
+    private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
     /**
      * Create a SAML 2 assertion

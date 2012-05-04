@@ -74,40 +74,40 @@ import java.util.List;
  */
 public class SAML1ComponentBuilder {
     
-    private static SAMLObjectBuilder<Assertion> assertionV1Builder;
+    private static volatile SAMLObjectBuilder<Assertion> assertionV1Builder;
     
-    private static SAMLObjectBuilder<Conditions> conditionsV1Builder;
+    private static volatile SAMLObjectBuilder<Conditions> conditionsV1Builder;
     
-    private static SAMLObjectBuilder<AudienceRestrictionCondition> audienceRestrictionV1Builder;
+    private static volatile SAMLObjectBuilder<AudienceRestrictionCondition> audienceRestrictionV1Builder;
     
-    private static SAMLObjectBuilder<Audience> audienceV1Builder;
+    private static volatile SAMLObjectBuilder<Audience> audienceV1Builder;
     
-    private static SAMLObjectBuilder<AuthenticationStatement> authenticationStatementV1Builder;
+    private static volatile SAMLObjectBuilder<AuthenticationStatement> authenticationStatementV1Builder;
     
-    private static SAMLObjectBuilder<Subject> subjectV1Builder;
+    private static volatile SAMLObjectBuilder<Subject> subjectV1Builder;
     
-    private static SAMLObjectBuilder<NameIdentifier> nameIdentifierV1Builder;
+    private static volatile SAMLObjectBuilder<NameIdentifier> nameIdentifierV1Builder;
     
-    private static SAMLObjectBuilder<SubjectConfirmation> 
+    private static volatile SAMLObjectBuilder<SubjectConfirmation> 
         subjectConfirmationV1Builder;
     
-    private static SAMLObjectBuilder<ConfirmationMethod> confirmationMethodV1Builder;
+    private static volatile SAMLObjectBuilder<ConfirmationMethod> confirmationMethodV1Builder;
     
-    private static SAMLObjectBuilder<AttributeStatement> 
+    private static volatile SAMLObjectBuilder<AttributeStatement> 
         attributeStatementV1Builder;
     
-    private static SAMLObjectBuilder<Attribute> attributeV1Builder;
+    private static volatile SAMLObjectBuilder<Attribute> attributeV1Builder;
     
-    private static XSStringBuilder stringBuilder;
+    private static volatile XSStringBuilder stringBuilder;
     
-    private static SAMLObjectBuilder<AuthorizationDecisionStatement> 
+    private static volatile SAMLObjectBuilder<AuthorizationDecisionStatement> 
         authorizationDecisionStatementV1Builder;
     
-    private static SAMLObjectBuilder<Action> actionElementV1Builder;
+    private static volatile SAMLObjectBuilder<Action> actionElementV1Builder;
     
-    private static XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     
-    private static SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
+    private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
     /**
      * Create a new SAML 1.1 assertion

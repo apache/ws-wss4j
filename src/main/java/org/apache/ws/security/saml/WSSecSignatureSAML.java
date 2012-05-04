@@ -279,6 +279,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 key = certs[0].getPublicKey();
             } else if (publicKey != null) {
                 key = publicKey;
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "unknownSignatureAlgorithm"
+                );
             }
             
             String pubKeyAlgo = key.getAlgorithm();

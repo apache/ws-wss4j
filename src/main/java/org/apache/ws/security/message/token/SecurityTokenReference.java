@@ -65,7 +65,6 @@ public class SecurityTokenReference {
     protected Element element = null;
     private DOMX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
-    private static boolean doDebug = false;
     private Reference reference = null;
 
     /**
@@ -87,7 +86,6 @@ public class SecurityTokenReference {
      * @throws WSSecurityException
      */
     public SecurityTokenReference(Element elem, boolean bspCompliant) throws WSSecurityException {
-        doDebug = log.isDebugEnabled();
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
@@ -116,7 +114,6 @@ public class SecurityTokenReference {
      * @param doc The Document
      */
     public SecurityTokenReference(Document doc) {
-        doDebug = log.isDebugEnabled();
         element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:SecurityTokenReference");
     }
     
@@ -217,7 +214,7 @@ public class SecurityTokenReference {
             uri = getKeyIdentifierValue();
             valueType = getKeyIdentifierValueType();
         }
-        if (doDebug) {
+        if (log.isDebugEnabled()) {
             log.debug("Token reference uri: " + uri);
         }
         
