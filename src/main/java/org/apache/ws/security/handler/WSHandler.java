@@ -1166,7 +1166,7 @@ public abstract class WSHandler {
     public ClassLoader getClassLoader(Object msgCtx) {
         try {
             return Loader.getTCL();
-        } catch (Throwable t) {
+        } catch (Exception ex) {
             return null;
         }
     }

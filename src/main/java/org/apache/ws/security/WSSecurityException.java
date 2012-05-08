@@ -206,7 +206,7 @@ public class WSSecurityException extends Exception {
         try {
             msg = resources.getString(String.valueOf(errorCode));
             if (msgId != null) {
-                return msg += (" (" + MessageFormat.format(resources.getString(msgId), args) + ")");
+                return msg += " (" + MessageFormat.format(resources.getString(msgId), args) + ")";
             }
         } catch (MissingResourceException e) {
             throw new RuntimeException("Undefined '" + msgId + "' resource property", e);

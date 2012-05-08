@@ -41,7 +41,7 @@ import java.io.Writer;
 public class DOM2Writer {
     public static final char NL = '\n';
     public static final String LS = System.getProperty("line.separator",
-            (new Character(NL)).toString());
+            (Character.valueOf(NL)).toString());
 
     /**
      * Return a string containing this node serialized as XML.

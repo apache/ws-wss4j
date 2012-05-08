@@ -94,9 +94,9 @@ public class WSSConfig {
                 Integer.valueOf(WSConstants.SC),
                 org.apache.ws.security.action.SignatureConfirmationAction.class
             );
-        } catch (final Throwable t) {
+        } catch (final Exception ex) {
             if (log.isDebugEnabled()) {
-                log.debug(t.getMessage(), t);
+                log.debug(ex.getMessage(), ex);
             }
         }
         DEFAULT_ACTIONS = java.util.Collections.unmodifiableMap(tmp);
@@ -165,9 +165,9 @@ public class WSSConfig {
                 WSSecurityEngine.ENCRYPTED_DATA,
                 org.apache.ws.security.processor.EncryptedDataProcessor.class
             );
-        } catch (final Throwable t) {
+        } catch (final Exception ex) {
             if (log.isDebugEnabled()) {
-                log.debug(t.getMessage(), t);
+                log.debug(ex.getMessage(), ex);
             }
         }
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
@@ -200,9 +200,9 @@ public class WSSConfig {
                 WSSecurityEngine.USERNAME_TOKEN,
                 org.apache.ws.security.validate.UsernameTokenValidator.class
             );
-        } catch (final Throwable t) {
+        } catch (final Exception ex) {
             if (log.isDebugEnabled()) {
-                log.debug(t.getMessage(), t);
+                log.debug(ex.getMessage(), ex);
             }
         }
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);

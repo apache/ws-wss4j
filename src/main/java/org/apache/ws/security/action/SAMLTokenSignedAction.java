@@ -50,9 +50,9 @@ public class SAMLTokenSignedAction implements Action {
         */
         try {
             crypto = handler.loadSignatureCrypto(reqData);
-        } catch (Throwable t) {
+        } catch (Exception ex) {
             if (log.isDebugEnabled()) {
-                log.debug(t.getMessage(), t);
+                log.debug(ex.getMessage(), ex);
             }
         }
 
