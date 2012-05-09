@@ -775,14 +775,14 @@ public class UsernameToken {
         //
         // Make the first hash round with start value
         //
-        byte[] K = sha.digest(pwSalt);
+        byte[] k = sha.digest(pwSalt);
         //
         // Perform the 1st up to iteration-1 hash rounds
         //
         for (int i = 1; i < iteration; i++) {
-            K = sha.digest(K);
+            k = sha.digest(k);
         }
-        return K;
+        return k;
     }
     
     /**
@@ -984,17 +984,17 @@ public class UsernameToken {
     ) throws Exception {
         byte[] out = new byte[required];
         int offset = 0, tocpy;
-        byte[] A, tmp;
+        byte[] a, tmp;
         //
-        // A(0) is the seed
+        // a(0) is the seed
         //
-        A = seed;
+        a = seed;
         SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
         mac.init(key);
         while (required > 0) {
-            mac.update(A);
-            A = mac.doFinal();
-            mac.update(A);
+            mac.update(a);
+            a = mac.doFinal();
+            mac.update(a);
             mac.update(seed);
             tmp = mac.doFinal();
             tocpy = min(required, tmp.length);

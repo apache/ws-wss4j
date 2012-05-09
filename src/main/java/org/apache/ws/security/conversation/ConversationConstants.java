@@ -164,10 +164,10 @@ public class ConversationConstants {
     public static final String KEY_CONTEXT_MAP = "contextMap";
     
     public interface DerivationAlgorithm {
-        public static final String P_SHA_1 = 
+        String P_SHA_1 = 
             "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
         
-        public static final String P_SHA_1_2005_12 = 
+        String P_SHA_1_2005_12 = 
             "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
     }
     

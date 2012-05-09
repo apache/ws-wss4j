@@ -40,7 +40,7 @@ import org.opensaml.xml.validation.ValidatorSuite;
  */
 public class SamlAssertionValidator extends SignatureTrustValidator {
     
-    private static org.apache.commons.logging.Log LOG = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SamlAssertionValidator.class);
     
     /**

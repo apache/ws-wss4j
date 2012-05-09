@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * Created on May 18, 2009
  */
 public class OpenSAMLUtil {
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
 
     private static XMLObjectBuilderFactory builderFactory;
@@ -48,10 +48,10 @@ public class OpenSAMLUtil {
     /**
      * Initialise the SAML library
      */
-    public synchronized static void initSamlEngine() {
+    public static synchronized void initSamlEngine() {
         if (!samlEngineInitialized) {
-            if (log.isDebugEnabled()) {
-                log.debug("Initializing the opensaml2 library...");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing the opensaml2 library...");
             }
             try {
                 OpenSAMLBootstrap.bootstrap();
@@ -59,11 +59,11 @@ public class OpenSAMLUtil {
                 marshallerFactory = Configuration.getMarshallerFactory();
                 unmarshallerFactory = Configuration.getUnmarshallerFactory();
                 samlEngineInitialized = true;
-                if (log.isDebugEnabled()) {
-                    log.debug("opensaml2 library bootstrap complete");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("opensaml2 library bootstrap complete");
                 }
             } catch (ConfigurationException e) {
-                log.error(
+                LOG.error(
                     "Unable to bootstrap the opensaml2 library - all SAML operations will fail", 
                     e
                 );
@@ -200,7 +200,7 @@ public class OpenSAMLUtil {
         QName qName = Signature.DEFAULT_ELEMENT_NAME;
         XMLObjectBuilder<Signature> builder = builderFactory.getBuilder(qName);
         if (builder == null) {
-            log.error(
+            LOG.error(
                 "Unable to retrieve builder for object QName " 
                 + qName
             );

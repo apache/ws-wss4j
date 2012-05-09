@@ -52,7 +52,7 @@ import org.apache.xml.security.utils.XMLUtils;
  */
 public class WSSConfig {
     
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(WSSConfig.class);
 
     /**
@@ -95,8 +95,8 @@ public class WSSConfig {
                 org.apache.ws.security.action.SignatureConfirmationAction.class
             );
         } catch (final Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
         }
         DEFAULT_ACTIONS = java.util.Collections.unmodifiableMap(tmp);
@@ -166,8 +166,8 @@ public class WSSConfig {
                 org.apache.ws.security.processor.EncryptedDataProcessor.class
             );
         } catch (final Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
         }
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
@@ -201,8 +201,8 @@ public class WSSConfig {
                 org.apache.ws.security.validate.UsernameTokenValidator.class
             );
         } catch (final Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
         }
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
@@ -285,7 +285,7 @@ public class WSSConfig {
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
      * thing that is very fast.
      */
-    public static WsuIdAllocator DEFAULT_ID_ALLOCATOR = new WsuIdAllocator() {
+    public static final WsuIdAllocator DEFAULT_ID_ALLOCATOR = new WsuIdAllocator() {
         int i;
         private synchronized String next() {
             return Integer.toString(++i);
@@ -666,8 +666,8 @@ public class WSSConfig {
             try {
                 return (Action)((Class<?>)actionObject).newInstance();
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug(t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "unableToLoadClass", new Object[] { ((Class<?>)actionObject).getName() }, t);
@@ -758,8 +758,8 @@ public class WSSConfig {
             try {
                 return (Validator)((Class<?>)validatorObject).newInstance();
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug(t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                     "unableToLoadClass", new Object[] { ((Class<?>)validatorObject).getName() }, t);
@@ -784,8 +784,8 @@ public class WSSConfig {
             try {
                 return (Processor)((Class<?>)processorObject).newInstance();
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug(t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.FAILURE,
                         "unableToLoadClass", new Object[] { ((Class<?>)processorObject).getName() }, t);
@@ -819,8 +819,8 @@ public class WSSConfig {
                 Provider provider = clazz.newInstance();
                 return addJceProvider(name, provider);
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
                 }
                 return null;
             }
@@ -864,16 +864,16 @@ public class WSSConfig {
                 if (ret == 0) {
                     ret = Security.insertProviderAt(provider, 2);
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug(
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
                         "The provider " + provider.getName() + " - "
                          + provider.getVersion() + " was added at position: " + ret
                     );
                 }
                 return provider.getName();
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
                 }
                 return null;
             }
@@ -904,16 +904,16 @@ public class WSSConfig {
                 Provider provider = clazz.newInstance();
                 
                 int ret = Security.addProvider(provider);
-                if (log.isDebugEnabled()) {
-                    log.debug(
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
                         "The provider " + provider.getName() 
                         + " was added at position: " + ret
                     );
                 }
                 return provider.getName();
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
                 }
                 return null;
             }
@@ -939,16 +939,16 @@ public class WSSConfig {
         if (currentProvider == null) {
             try {
                 int ret = Security.addProvider(provider);
-                if (log.isDebugEnabled()) {
-                    log.debug(
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
                         "The provider " + provider.getName() 
                         + " was added at position: " + ret
                     );
                 }
                 return provider.getName();
             } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The provider " + name + " could not be added: " + t.getMessage(), t);
                 }
                 return null;
             }

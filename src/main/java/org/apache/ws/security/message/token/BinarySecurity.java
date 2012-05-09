@@ -174,7 +174,7 @@ public class BinarySecurity {
     /**
      * get the encoding type.
      * 
-     * @return TODO
+     * @return the encoding type.
      */
     public String getEncodingType() {
         return element.getAttribute("EncodingType");
@@ -230,7 +230,7 @@ public class BinarySecurity {
     /**
      * return the first text node.
      * 
-     * @return TODO
+     * @return the first text node.
      */
     protected Text getFirstNode() {
         Node node = element.getFirstChild();
@@ -240,7 +240,7 @@ public class BinarySecurity {
     /**
      * return the dom element.
      * 
-     * @return TODO
+     * @return the dom element.
      */
     public Element getElement() {
         return element;

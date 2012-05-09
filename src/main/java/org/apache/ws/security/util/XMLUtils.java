@@ -37,9 +37,9 @@ import java.io.OutputStream;
 
 public class XMLUtils {
     
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(XMLUtils.class);
-    private static final boolean doDebug = log.isDebugEnabled();
+    private static final boolean doDebug = LOG.isDebugEnabled();
     
     public static String PrettyDocumentToString(Document doc) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -56,7 +56,7 @@ public class XMLUtils {
             transformer.transform(source, result);
         } catch (Exception ex) {
             if (doDebug) {
-                log.debug(ex.getMessage(), ex);
+                LOG.debug(ex.getMessage(), ex);
             }
         }
     }

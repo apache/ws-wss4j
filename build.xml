@@ -282,6 +282,7 @@ org.apache.ws.security.util
         <copy todir="${build.classes}">
             <fileset dir="${dir.src.resources}">
                 <include name="**/*.properties"/>
+            	<include name="**/*.xml"/>
             </fileset>
         </copy>
     </target>

@@ -44,7 +44,7 @@ import java.util.List;
  * @author Sam Ruby (rubys@us.ibm.com)
  */
 public class NSStack {
-    protected static org.apache.commons.logging.Log log =
+    protected static final org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(NSStack.class);
 
     private Mapping[] stack;
@@ -121,7 +121,9 @@ public class NSStack {
      * Remove all mappings from the current frame.
      */
     private void clearFrame() {
-        while (stack[top] != null) top--;
+        while (stack[top] != null) {
+            top--;
+        }
     }
 
     /**
@@ -132,7 +134,9 @@ public class NSStack {
      */
     public Mapping topOfFrame() {
         iterator = top;
-        while (stack[iterator] != null) iterator--;
+        while (stack[iterator] != null) {
+            iterator--;
+        }
         iterator++;
         return next();
     }

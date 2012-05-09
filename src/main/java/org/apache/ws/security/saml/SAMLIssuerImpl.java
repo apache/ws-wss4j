@@ -37,7 +37,7 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class SAMLIssuerImpl implements SAMLIssuer {
 
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SAMLIssuerImpl.class);
 
     private Properties properties = null;
@@ -113,8 +113,8 @@ public class SAMLIssuerImpl implements SAMLIssuer {
      * @return a new AssertionWrapper.
      */
     public AssertionWrapper newAssertion() throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug(
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
                 "Entering AssertionWrapper.newAssertion() ... creating SAML token"
             );
         }

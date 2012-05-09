@@ -27,6 +27,6 @@ import org.apache.ws.security.conversation.ConversationException;
  */
 public interface DerivationAlgorithm {
 
-    public byte[] createKey(byte[] secret, byte[] seed, int offset,
+    byte[] createKey(byte[] secret, byte[] seed, int offset,
             long length) throws ConversationException;
 }

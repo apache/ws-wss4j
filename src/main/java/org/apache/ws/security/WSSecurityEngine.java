@@ -23,7 +23,6 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;

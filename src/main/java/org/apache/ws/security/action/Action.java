@@ -29,7 +29,7 @@ import org.apache.ws.security.WSSecurityException;
  */
 public interface Action {
     
-    public void execute(
+    void execute(
         WSHandler handler, 
         int actionToDo, 
         Document doc,

@@ -33,23 +33,23 @@ public interface KerberosTokenDecoder {
      * Set the AP-REQ Kerberos Token
      * @param token the AP-REQ Kerberos Token
      */
-    public void setToken(byte[] token);
+    void setToken(byte[] token);
     
     /**
      * Set the Subject
      * @param subject the Subject
      */
-    public void setSubject(Subject subject);
+    void setSubject(Subject subject);
     
     /**
      * Get the session key from the token
      * @return the session key from the token
      */
-    public byte[] getSessionKey();
+    byte[] getSessionKey();
     
     /**
      * Clear all internal information
      */
-    public void clear();
+    void clear();
     
 }

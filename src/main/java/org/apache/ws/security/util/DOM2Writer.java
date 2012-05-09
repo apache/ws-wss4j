@@ -106,8 +106,9 @@ public class DOM2Writer {
                 {
                     namespaceStack.push();
                     if (pretty) {
-                        for (int i = 0; i < indent; i++)
+                        for (int i = 0; i < indent; i++) {
                             out.print(' ');
+                        }
                     }
                     out.print('<' + node.getNodeName());
                     String elPrefix = node.getPrefix();
@@ -197,8 +198,9 @@ public class DOM2Writer {
                     out.print("<!--");
                     out.print(node.getNodeValue());
                     out.print("-->");
-                    if (pretty)
+                    if (pretty) {
                         out.print(LS);
+                    }
                     break;
                 }
             case Node.PROCESSING_INSTRUCTION_NODE:
@@ -211,21 +213,24 @@ public class DOM2Writer {
                         out.print(data);
                     }
                     out.println("?>");
-                    if (pretty)
+                    if (pretty) {
                         out.print(LS);
+                    }
                     break;
                 }
         }
-        if (type == Node.ELEMENT_NODE && hasChildren == true) {
+        if (type == Node.ELEMENT_NODE && hasChildren) {
             if (pretty) {
-                for (int i = 0; i < indent; i++)
+                for (int i = 0; i < indent; i++) {
                     out.print(' ');
+                }
             }
             out.print("</");
             out.print(node.getNodeName());
             out.print('>');
-            if (pretty)
+            if (pretty) {
                 out.print(LS);
+            }
             hasChildren = false;
         }
     }

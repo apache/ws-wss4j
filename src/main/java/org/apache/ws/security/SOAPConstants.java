@@ -38,41 +38,41 @@ public interface SOAPConstants extends Serializable {
     /**
      * SOAP 1.1 constants - thread-safe and shared
      */
-    public SOAP11Constants SOAP11_CONSTANTS = new SOAP11Constants();
+    SOAP11Constants SOAP11_CONSTANTS = new SOAP11Constants();
     /**
      * SOAP 1.2 constants - thread-safe and shared
      */
-    public SOAP12Constants SOAP12_CONSTANTS = new SOAP12Constants();
+    SOAP12Constants SOAP12_CONSTANTS = new SOAP12Constants();
 
     /**
      * Obtain the envelope namespace for this version of SOAP
      */
-    public String getEnvelopeURI();
+    String getEnvelopeURI();
 
     /**
      * Obtain the QName for the Header element
      */
-    public QName getHeaderQName();
+    QName getHeaderQName();
 
     /**
      * Obtain the QName for the Body element
      */
-    public QName getBodyQName();
+    QName getBodyQName();
 
     /**
      * Obtain the QName for the role attribute (actor/role)
      */
-    public QName getRoleAttributeQName();
+    QName getRoleAttributeQName();
 
     /**
      * Obtain the "next" role/actor URI
      */
-    public String getNextRoleURI();
+    String getNextRoleURI();
 
     /**
      * Obtain the "next" role/actor URI
      */
-    public String getMustUnderstand();
+    String getMustUnderstand();
     
 
 }

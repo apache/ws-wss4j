@@ -32,21 +32,21 @@ public interface SpnegoServiceAction extends PrivilegedAction<byte[]> {
     /**
      * Set the ticket to validate
      */
-    public void setTicket(byte[] ticket);
+    void setTicket(byte[] ticket);
     
     /**
      * The Service Name
      */
-    public void setServiceName(String serviceName);
+    void setServiceName(String serviceName);
     
     /**
      * Validate a service ticket
      */
-    public byte[] run();
+    byte[] run();
     
     /**
      * Get the GSSContext that was created after a service ticket was obtained
      */
-    public GSSContext getContext();
+    GSSContext getContext();
     
 }

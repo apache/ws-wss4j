@@ -40,7 +40,7 @@ public interface CallbackLookup {
      * @return the located element
      * @throws WSSecurityException
      */
-    public Element getElement(
+    Element getElement(
         String id, String valueType, boolean checkMultipleElements
     ) throws WSSecurityException;
     
@@ -51,7 +51,7 @@ public interface CallbackLookup {
      * @return the located element(s)
      * @throws WSSecurityException
      */
-    public List<Element> getElements(
+    List<Element> getElements(
         String localname, String namespace
     ) throws WSSecurityException;
 }

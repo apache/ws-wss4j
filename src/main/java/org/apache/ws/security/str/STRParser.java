@@ -44,7 +44,7 @@ public interface STRParser {
      * DIRECT_REF - A certificate (chain) is located directly via an Id to another security token
      * Note that a Thumbprint reference is also a KeyIdentifier, but takes precedence over it.
      */
-    public enum REFERENCE_TYPE {
+    enum REFERENCE_TYPE {
         ISSUER_SERIAL, THUMBPRINT_SHA1, KEY_IDENTIFIER, DIRECT_REF
     };
     
@@ -57,7 +57,7 @@ public interface STRParser {
      * @param parameters A set of implementation-specific parameters
      * @throws WSSecurityException
      */
-    public void parseSecurityTokenReference(
+    void parseSecurityTokenReference(
         Element strElement,
         RequestData data,
         WSDocInfo wsDocInfo,
@@ -68,25 +68,25 @@ public interface STRParser {
      * Get the X509Certificates associated with this SecurityTokenReference
      * @return the X509Certificates associated with this SecurityTokenReference
      */
-    public X509Certificate[] getCertificates();
+    X509Certificate[] getCertificates();
     
     /**
      * Get the Principal associated with this SecurityTokenReference
      * @return the Principal associated with this SecurityTokenReference
      */
-    public Principal getPrincipal();
+    Principal getPrincipal();
     
     /**
      * Get the PublicKey associated with this SecurityTokenReference
      * @return the PublicKey associated with this SecurityTokenReference
      */
-    public PublicKey getPublicKey();
+    PublicKey getPublicKey();
     
     /**
      * Get the Secret Key associated with this SecurityTokenReference
      * @return the Secret Key associated with this SecurityTokenReference
      */
-    public byte[] getSecretKey();
+    byte[] getSecretKey();
     
     /**
      * Get whether the returned credential is already trusted or not. This is currently
@@ -95,12 +95,12 @@ public interface STRParser {
      * the SignatureProcessor does not need to verify trust on the credential.
      * @return true if trust has already been verified on the returned Credential
      */
-    public boolean isTrustedCredential();
+    boolean isTrustedCredential();
 
     /**
      * Get how the certificates were referenced
      * @return how the certificates were referenced
      */
-    public REFERENCE_TYPE getCertificatesReferenceType();
+    REFERENCE_TYPE getCertificatesReferenceType();
     
 }

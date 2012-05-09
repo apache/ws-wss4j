@@ -227,7 +227,7 @@ public class WSSecSignatureBase extends WSSecBase {
             }
         }
 
-        if (excludeVisible == true) {
+        if (excludeVisible) {
             NamedNodeMap attributes = target.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
                 Node attribute = attributes.item(i);

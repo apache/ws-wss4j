@@ -80,7 +80,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SignatureProcessor implements Processor {
-    private static org.apache.commons.logging.Log LOG = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SignatureProcessor.class);
     
     private XMLSignatureFactory signatureFactory;

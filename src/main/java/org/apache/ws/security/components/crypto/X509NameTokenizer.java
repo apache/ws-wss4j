@@ -35,20 +35,20 @@ public class X509NameTokenizer {
     private int index = 0;
 
     public X509NameTokenizer(String dn) {
-       final String _DN = RFC2253Parser.normalize(dn);
+       final String normalizedDN = RFC2253Parser.normalize(dn);
        int i = 0;
        int l = 0;
        int k;
-       for (int j = 0; (k = _DN.indexOf(",", j)) >= 0; j = k + 1) {
-          l += countQuotes(_DN, j, k);
-          if ((k > 0) && (_DN.charAt(k - 1) != '\\') && (l % 2) == 0) {
-             tokens.add(_DN.substring(i, k).trim());
+       for (int j = 0; (k = normalizedDN.indexOf(',', j)) >= 0; j = k + 1) {
+          l += countQuotes(normalizedDN, j, k);
+          if ((k > 0) && (normalizedDN.charAt(k - 1) != '\\') && (l % 2) == 0) {
+             tokens.add(normalizedDN.substring(i, k).trim());
              i = k + 1;
              l = 0;
           }
        }
-       if (_DN.trim().length() != 0) {
-           tokens.add(trim(_DN.substring(i)));
+       if (normalizedDN.trim().length() != 0) {
+           tokens.add(trim(normalizedDN.substring(i)));
        }
     }
 

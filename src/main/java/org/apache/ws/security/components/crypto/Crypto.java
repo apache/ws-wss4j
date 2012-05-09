@@ -38,13 +38,13 @@ public interface Crypto {
      * Get the crypto provider associated with this implementation
      * @return the crypto provider
      */
-    public String getCryptoProvider();
+    String getCryptoProvider();
     
     /**
      * Set the crypto provider associated with this implementation
      * @param provider the crypto provider to set
      */
-    public void setCryptoProvider(String provider);
+    void setCryptoProvider(String provider);
     
     /**
      * Retrieves the identifier name of the default certificate. This should be the certificate 
@@ -55,7 +55,7 @@ public interface Crypto {
      *
      * @return name of the default X509 certificate.
      */
-    public String getDefaultX509Identifier() throws WSSecurityException;
+    String getDefaultX509Identifier() throws WSSecurityException;
     
     /**
      * Sets the identifier name of the default certificate. This should be the certificate 
@@ -65,7 +65,7 @@ public interface Crypto {
      *
      * @param identifier name of the default X509 certificate.
      */
-    public void setDefaultX509Identifier(String identifier);
+    void setDefaultX509Identifier(String identifier);
     
     /**
      * Sets the CertificateFactory instance on this Crypto instance
@@ -73,7 +73,7 @@ public interface Crypto {
      * @param provider the CertificateFactory provider name
      * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
-    public void setCertificateFactory(String provider, CertificateFactory certFactory);
+    void setCertificateFactory(String provider, CertificateFactory certFactory);
     
     /**
      * Get the CertificateFactory instance on this Crypto instance
@@ -82,7 +82,7 @@ public interface Crypto {
      *         X509 certificates
      * @throws org.apache.ws.security.WSSecurityException
      */
-    public CertificateFactory getCertificateFactory() throws WSSecurityException;
+    CertificateFactory getCertificateFactory() throws WSSecurityException;
     
     //
     // Base Crypto functionality methods
@@ -95,7 +95,7 @@ public interface Crypto {
      * @return An X509 certificate
      * @throws WSSecurityException
      */
-    public X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
+    X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
     
     /**
      * Reads the SubjectKeyIdentifier information from the certificate.
@@ -109,7 +109,7 @@ public interface Crypto {
      * @param cert The certificate to read SKI
      * @return The byte array containing the binary SKI data
      */
-    public byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
+    byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
     
     /**
      * Get a byte array given an array of X509 certificates.
@@ -119,7 +119,7 @@ public interface Crypto {
      * @return The byte array for the certificates
      * @throws WSSecurityException
      */
-    public byte[] getBytesFromCertificates(X509Certificate[] certs) throws WSSecurityException;
+    byte[] getBytesFromCertificates(X509Certificate[] certs) throws WSSecurityException;
 
     /**
      * Construct an array of X509Certificate's from the byte array.
@@ -128,7 +128,7 @@ public interface Crypto {
      * @return An array of X509 certificates
      * @throws WSSecurityException
      */
-    public X509Certificate[] getCertificatesFromBytes(byte[] data) throws WSSecurityException;
+    X509Certificate[] getCertificatesFromBytes(byte[] data) throws WSSecurityException;
     
     //
     // Implementation-specific Crypto functionality methods
@@ -145,7 +145,7 @@ public interface Crypto {
      * TYPE.ALIAS - A certificate (chain) is located by an alias. This alias is implementation
      * specific, for example - it could be a java KeyStore alias.
      */
-    public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException;
+    X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException;
     
     /**
      * Get the implementation-specific identifier corresponding to the cert parameter, e.g. the
@@ -154,7 +154,7 @@ public interface Crypto {
      * @return the identifier corresponding to the cert parameter
      * @throws WSSecurityException
      */
-    public String getX509Identifier(X509Certificate cert) throws WSSecurityException;
+    String getX509Identifier(X509Certificate cert) throws WSSecurityException;
     
     /**
      * Gets the private key corresponding to the certificate.
@@ -163,7 +163,7 @@ public interface Crypto {
      * @param callbackHandler The callbackHandler needed to get the password
      * @return The private key
      */
-    public PrivateKey getPrivateKey(
+    PrivateKey getPrivateKey(
         X509Certificate certificate, CallbackHandler callbackHandler
     ) throws WSSecurityException;
        
@@ -174,7 +174,7 @@ public interface Crypto {
      * @param password The password needed to get the key
      * @return The private key
      */
-    public PrivateKey getPrivateKey(
+    PrivateKey getPrivateKey(
         String identifier, String password
     ) throws WSSecurityException;
     
@@ -186,7 +186,7 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     @Deprecated
-    public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException;
+    boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException;
     
     /**
      * Evaluate whether a given certificate chain should be trusted.
@@ -196,7 +196,7 @@ public interface Crypto {
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
      */
-    public boolean verifyTrust(
+    boolean verifyTrust(
         X509Certificate[] certs, boolean enableRevocation
     ) throws WSSecurityException;
     
@@ -206,6 +206,6 @@ public interface Crypto {
      * @param publicKey The PublicKey to be evaluated
      * @return whether the PublicKey parameter is trusted or not
      */
-    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException;
+    boolean verifyTrust(PublicKey publicKey) throws WSSecurityException;
 
 }

@@ -34,7 +34,7 @@ import java.util.Properties;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class SAMLIssuerFactory {
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SAMLIssuerFactory.class);
     private static final Class<? extends SAMLIssuer> defaultSAMLClass = 
         org.apache.ws.security.saml.SAMLIssuerImpl.class;
@@ -110,8 +110,8 @@ public abstract class SAMLIssuerFactory {
                 // instruct the class loader to load the crypto implementation
                 samlIssuerClass = Loader.loadClass(samlClassName, SAMLIssuer.class);
             } catch (ClassNotFoundException ex) {
-                if (log.isDebugEnabled()) {
-                    log.debug(ex.getMessage(), ex);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(ex.getMessage(), ex);
                 }
                 throw new WSSecurityException(samlClassName + " Not Found", ex);
             }
@@ -125,8 +125,8 @@ public abstract class SAMLIssuerFactory {
         Properties properties
     ) throws WSSecurityException {
         SAMLIssuer samlIssuer = null;
-        if (log.isDebugEnabled()) {
-            log.debug("Using Crypto Engine [" + samlIssuerClass + "]");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Using Crypto Engine [" + samlIssuerClass + "]");
         }
         try {
             Class<?>[] classes = new Class<?>[]{Properties.class};
@@ -134,8 +134,8 @@ public abstract class SAMLIssuerFactory {
             samlIssuer = c.newInstance(new Object[]{properties});
             return samlIssuer;
         } catch (java.lang.Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(samlIssuerClass.getName() + " cannot create instance", ex);
         }
@@ -164,8 +164,8 @@ public abstract class SAMLIssuerFactory {
             }
             properties.load(url.openStream());
         } catch (IOException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot find resource: " + propFilename, e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Cannot find resource: " + propFilename, e);
             }
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 

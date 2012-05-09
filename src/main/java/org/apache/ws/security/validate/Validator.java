@@ -39,7 +39,7 @@ public interface Validator {
      * @return a validated Credential
      * @throws WSSecurityException on a failed validation
      */
-    public Credential validate(Credential credential, RequestData data) throws WSSecurityException;
+    Credential validate(Credential credential, RequestData data) throws WSSecurityException;
     
     
 }

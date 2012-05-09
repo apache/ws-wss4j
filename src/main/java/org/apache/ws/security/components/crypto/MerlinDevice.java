@@ -37,9 +37,9 @@ import java.util.Properties;
  */
 public class MerlinDevice extends Merlin {
     
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(MerlinDevice.class);
-    private static final boolean doDebug = log.isDebugEnabled();
+    private static final boolean doDebug = LOG.isDebugEnabled();
 
     
     @Override
@@ -87,7 +87,7 @@ public class MerlinDevice extends Merlin {
             try {
                 keystore = load(is, keyStorePassword, provider, keyStoreType);
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + keyStoreType 
                         + " has been loaded"
                     );
@@ -124,7 +124,7 @@ public class MerlinDevice extends Merlin {
             try {
                 truststore = load(is, trustStorePassword, provider, trustStoreType);
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "The TrustStore " + trustStoreLocation + " of type " + trustStoreType 
                         + " has been loaded"
                     );
@@ -148,7 +148,7 @@ public class MerlinDevice extends Merlin {
                 }
                 truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
                 if (doDebug) {
-                    log.debug("CA certs have been loaded");
+                    LOG.debug("CA certs have been loaded");
                 }
                 loadCACerts = true;
             } finally {
@@ -186,13 +186,13 @@ public class MerlinDevice extends Merlin {
                         );
                 }
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "The CRL " + crlLocation + " has been loaded"
                     );
                 }
             } catch (Exception e) {
                 if (doDebug) {
-                    log.debug(e.getMessage(), e);
+                    LOG.debug(e.getMessage(), e);
                 }
                 throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
             } finally {

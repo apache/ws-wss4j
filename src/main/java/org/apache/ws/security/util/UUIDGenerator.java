@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public class UUIDGenerator {
 
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(UUIDGenerator.class);
 
     private static String baseUUID = null;
@@ -79,8 +79,8 @@ public class UUIDGenerator {
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(e.getMessage(), e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e.getMessage(), e);
             }
             //todo have to be properly handled
         }

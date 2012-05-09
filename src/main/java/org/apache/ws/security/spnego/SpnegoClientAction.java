@@ -32,21 +32,21 @@ public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
     /**
      * Whether to enable mutual authentication or not.
      */
-    public void setMutualAuth(boolean mutualAuthentication);
+    void setMutualAuth(boolean mutualAuthentication);
     
     /**
      * The Service Name
      */
-    public void setServiceName(String serviceName);
+    void setServiceName(String serviceName);
 
     /**
      * Obtain a service ticket
      */
-    public byte[] run();
+    byte[] run();
     
     /**
      * Get the GSSContext that was created after a service ticket was obtained
      */
-    public GSSContext getContext();
+    GSSContext getContext();
     
 }

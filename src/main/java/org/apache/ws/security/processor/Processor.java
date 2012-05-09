@@ -29,7 +29,7 @@ import java.util.List;
 
 public interface Processor {
     
-    public List<WSSecurityEngineResult> handleToken(
+    List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData request,
         WSDocInfo wsDocInfo

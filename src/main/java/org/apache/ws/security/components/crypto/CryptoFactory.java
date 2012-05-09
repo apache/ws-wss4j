@@ -35,7 +35,7 @@ import java.util.Properties;
  * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class CryptoFactory {
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(CryptoFactory.class);
     private static final Class<? extends Crypto> defaultCryptoClass = 
         org.apache.ws.security.components.crypto.Merlin.class;
@@ -108,8 +108,8 @@ public abstract class CryptoFactory {
                 // instruct the class loader to load the crypto implementation
                 cryptoClass = Loader.loadClass(cryptoClassName, Crypto.class);
             } catch (ClassNotFoundException ex) {
-                if (log.isDebugEnabled()) {
-                    log.debug(ex.getMessage(), ex);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(ex.getMessage(), ex);
                 }
                 throw new WSSecurityException(cryptoClassName + " Not Found", ex);
             }
@@ -182,16 +182,16 @@ public abstract class CryptoFactory {
         Map<Object, Object> map, 
         ClassLoader loader
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Using Crypto Engine [" + cryptoClass + "]");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Using Crypto Engine [" + cryptoClass + "]");
         }
         try {
             Class<?>[] classes = new Class[]{Map.class, ClassLoader.class};
             Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
             return c.newInstance(new Object[] {map, loader});
         } catch (java.lang.Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate: " + cryptoClass.getName(), e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
             throw new WSSecurityException(cryptoClass + " cannot create instance", e);
         }
@@ -210,16 +210,16 @@ public abstract class CryptoFactory {
         Properties map, 
         ClassLoader loader
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Using Crypto Engine [" + cryptoClass + "]");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Using Crypto Engine [" + cryptoClass + "]");
         }
         try {
             Class<?>[] classes = new Class[]{Properties.class, ClassLoader.class};
             Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
             return c.newInstance(new Object[] {map, loader});
         } catch (java.lang.Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate: " + cryptoClass.getName(), e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
             throw new WSSecurityException(cryptoClass + " cannot create instance", e);
         }
@@ -248,8 +248,8 @@ public abstract class CryptoFactory {
             }
             properties.load(url.openStream());
         } catch (IOException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot find resource: " + propFilename, e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Cannot find resource: " + propFilename, e);
             }
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 

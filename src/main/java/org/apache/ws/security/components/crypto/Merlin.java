@@ -114,9 +114,9 @@ public class Merlin extends CryptoBase {
     public static final String X509_CRL_FILE = 
         "org.apache.ws.security.crypto.merlin.x509crl.file";
     
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(Merlin.class);
-    private static final boolean doDebug = log.isDebugEnabled();
+    private static final boolean doDebug = LOG.isDebugEnabled();
 
     protected static CertificateFactory certFact;
     protected Properties properties = null;
@@ -189,7 +189,7 @@ public class Merlin extends CryptoBase {
                 }
                 keystore = load(is, passwd, provider, type);
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + type 
                         + " has been loaded"
                     );
@@ -205,7 +205,7 @@ public class Merlin extends CryptoBase {
             }
         } else {
             if (doDebug) {
-                log.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
+                LOG.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
             }
         }
         
@@ -228,7 +228,7 @@ public class Merlin extends CryptoBase {
                 }
                 truststore = load(is, passwd, provider, type);
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "The TrustStore " + trustStoreLocation + " of type " + type 
                         + " has been loaded"
                     );
@@ -257,7 +257,7 @@ public class Merlin extends CryptoBase {
                     }
                     truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
                     if (doDebug) {
-                        log.debug("CA certs have been loaded");
+                        LOG.debug("CA certs have been loaded");
                     }
                     loadCACerts = true;
                 } finally {
@@ -294,13 +294,13 @@ public class Merlin extends CryptoBase {
                         );
                 }
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "The CRL " + crlLocation + " has been loaded"
                     );
                 }
             } catch (Exception e) {
                 if (doDebug) {
-                    log.debug(e.getMessage(), e);
+                    LOG.debug(e.getMessage(), e);
                 }
                 throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
             } finally {
@@ -332,7 +332,7 @@ public class Merlin extends CryptoBase {
                     is = new FileInputStream(location);
                 } catch (Exception e) {
                     if (doDebug) {
-                        log.debug(e.getMessage(), e);
+                        LOG.debug(e.getMessage(), e);
                     }
                     throw new CredentialException(
                         CredentialException.IO_ERROR, "proxyNotFound", new Object[]{location}, e
@@ -366,17 +366,17 @@ public class Merlin extends CryptoBase {
                 ? new char[0] : storepass.toCharArray());
         } catch (IOException e) {
             if (doDebug) {
-                log.debug(e.getMessage(), e);
+                LOG.debug(e.getMessage(), e);
             }
             throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
         } catch (GeneralSecurityException e) {
             if (doDebug) {
-                log.debug(e.getMessage(), e);
+                LOG.debug(e.getMessage(), e);
             }
             throw new CredentialException(CredentialException.SEC_ERROR, "secError00", e);
         } catch (Exception e) {
             if (doDebug) {
-                log.debug(e.getMessage(), e);
+                LOG.debug(e.getMessage(), e);
             }
             throw new CredentialException(CredentialException.FAILURE, "error00", e);
         }
@@ -487,7 +487,7 @@ public class Merlin extends CryptoBase {
                                 mapKeystoreProviderToCertProvider(keyStoreProvider), factory
                             );
                         } catch (Exception ex) {
-                            log.debug(ex);
+                            LOG.debug(ex);
                             //Ignore, we'll just use the default since they didn't specify one.
                             //Hopefully that will work for them.
                         }
@@ -647,7 +647,7 @@ public class Merlin extends CryptoBase {
             if (identifier == null || !keystore.isKeyEntry(identifier)) {
                 String msg = "Cannot find key for alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
-                log.error(msg + logMsg);
+                LOG.error(msg + logMsg);
                 throw new WSSecurityException(msg);
             }
             String password = getPassword(identifier, callbackHandler);
@@ -662,7 +662,7 @@ public class Merlin extends CryptoBase {
             if (!(keyTmp instanceof PrivateKey)) {
                 String msg = "Key is not a private key, alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
-                log.error(msg + logMsg);
+                LOG.error(msg + logMsg);
                 throw new WSSecurityException(msg);
             }
             return (PrivateKey) keyTmp;
@@ -699,7 +699,7 @@ public class Merlin extends CryptoBase {
             if (identifier == null || !keystore.isKeyEntry(identifier)) {
                 String msg = "Cannot find key for alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
-                log.error(msg + logMsg);
+                LOG.error(msg + logMsg);
                 throw new WSSecurityException(msg);
             }
             if (password == null && privatePasswordSet) {
@@ -713,7 +713,7 @@ public class Merlin extends CryptoBase {
             if (!(keyTmp instanceof PrivateKey)) {
                 String msg = "Key is not a private key, alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
-                log.error(msg + logMsg);
+                LOG.error(msg + logMsg);
                 throw new WSSecurityException(msg);
             }
             return (PrivateKey) keyTmp;

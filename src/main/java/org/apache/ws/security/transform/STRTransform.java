@@ -85,7 +85,7 @@ public class STRTransform extends TransformService {
             throw new ClassCastException
                 ("context must be of type DOMCryptoContext");
         }
-        if (parent == null || !(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
+        if (!(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
             throw new ClassCastException("parent must be of type DOMStructure");
         }
         transformElement = (Element) 
@@ -98,7 +98,7 @@ public class STRTransform extends TransformService {
             throw new ClassCastException
                 ("context must be of type DOMCryptoContext");
         }
-        if (parent == null || !(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
+        if (!(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
             throw new ClassCastException("parent must be of type DOMStructure");
         }
         Element transformElement2 = (Element) 
@@ -245,7 +245,7 @@ public class STRTransform extends TransformService {
             //
             // Find start and end of first element <....>, this is the Apex node
             //
-            int gt = bf1.indexOf(">");
+            int gt = bf1.indexOf('>');
             //
             // Lookup the default namespace
             //
@@ -256,7 +256,7 @@ public class STRTransform extends TransformService {
             // correct place according to c14n specification)
             //
             if (idx < 0 || idx > gt) {
-                idx = bf1.indexOf(" ");
+                idx = bf1.indexOf(' ');
                 bf.insert(idx + 1, "xmlns=\"\" ");
                 bf1 = bf.toString();
             }

@@ -79,7 +79,7 @@ public class AssertionWrapper {
     /**
      * Field log
      */
-    private static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(AssertionWrapper.class);
 
     /**
@@ -189,7 +189,7 @@ public class AssertionWrapper {
             this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_20;
         } else {
-            log.error(
+            LOG.error(
                 "AssertionWrapper: found unexpected type " 
                 + (xmlObject != null ? xmlObject.getClass().getName() : null)
             );
@@ -309,10 +309,10 @@ public class AssertionWrapper {
         } else if (saml1 != null) {
             id = saml1.getID();
         } else {
-            log.error("AssertionWrapper: unable to return ID - no saml assertion object");
+            LOG.error("AssertionWrapper: unable to return ID - no saml assertion object");
         }
         if (id == null || id.length() == 0) {
-            log.error("AssertionWrapper: ID was null, seeting a new ID value");
+            LOG.error("AssertionWrapper: ID was null, seeting a new ID value");
             id = "_" + UUIDGenerator.getUUID();
             if (saml2 != null) {
                 saml2.setID(id);
@@ -334,7 +334,7 @@ public class AssertionWrapper {
         } else if (saml1 != null) {
             return saml1.getIssuer();
         }
-        log.error(
+        LOG.error(
             "AssertionWrapper: unable to return Issuer string - no saml assertion "
             + "object or issuer is null"
         );
@@ -410,7 +410,7 @@ public class AssertionWrapper {
             signableObject.releaseDOM();
             signableObject.releaseChildrenDOM(true);
         } else {
-            log.error("Attempt to sign an unsignable object " + xmlObject.getClass().getName());
+            LOG.error("Attempt to sign an unsignable object " + xmlObject.getClass().getName());
         }
     }
     
@@ -452,7 +452,7 @@ public class AssertionWrapper {
         //
         Signature signature = OpenSAMLUtil.buildSignature();
         signature.setCanonicalizationAlgorithm(canonicalizationAlgorithm);
-        log.debug("Using Canonicalization algorithm " + canonicalizationAlgorithm);
+        LOG.debug("Using Canonicalization algorithm " + canonicalizationAlgorithm);
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
@@ -465,13 +465,13 @@ public class AssertionWrapper {
 
         String sigAlgo = signatureAlgorithm;
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        if (log.isDebugEnabled()) {
-            log.debug("automatic sig algo detection: " + pubKeyAlgo);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
         }
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = defaultDSASignatureAlgorithm;
         }
-        log.debug("Using Signature algorithm " + sigAlgo);
+        LOG.debug("Using Signature algorithm " + sigAlgo);
         PrivateKey privateKey = null;
         try {
             privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
@@ -558,7 +558,7 @@ public class AssertionWrapper {
             }
             signatureKeyInfo = samlKeyInfo;
         } else {
-            log.debug("AssertionWrapper: no signature to validate");
+            LOG.debug("AssertionWrapper: no signature to validate");
         }
     }
     
@@ -598,8 +598,8 @@ public class AssertionWrapper {
     public SAMLVersion getSamlVersion() {
         if (samlVersion == null) {
             // Try to set the version.
-            if (log.isDebugEnabled()) {
-                log.debug(
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
                     "The SAML version was null in getSamlVersion(). Recomputing SAML version..."
                 );
             }
@@ -682,7 +682,7 @@ public class AssertionWrapper {
             this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_20;
         } else {
-            log.error(
+            LOG.error(
                 "AssertionWrapper: found unexpected type " 
                 + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
             );

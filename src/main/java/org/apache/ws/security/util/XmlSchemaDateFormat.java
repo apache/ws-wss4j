@@ -44,7 +44,7 @@ public class XmlSchemaDateFormat extends DateFormat {
     /**
      * Logger.
      */
-    private static org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(XmlSchemaDateFormat.class);
 
     /**
@@ -69,7 +69,7 @@ public class XmlSchemaDateFormat extends DateFormat {
      *
      * @see DateFormat#parse(java.lang.String)
      */
-    public Date parse(String src, ParsePosition parse_pos) {
+    public Date parse(String src, ParsePosition parsePos) {
         Date date;
 
         // validate fixed portion of format
@@ -81,14 +81,14 @@ public class XmlSchemaDateFormat extends DateFormat {
                 }
 
                 if (src.length() < 19) {
-                    parse_pos.setIndex(src.length() - 1);
-                    handleParseError(parse_pos, "TOO_FEW_CHARS");
+                    parsePos.setIndex(src.length() - 1);
+                    handleParseError(parsePos, "TOO_FEW_CHARS");
                 }
-                validateChar(src, parse_pos, index = 4, '-', "EXPECTED_DASH");
-                validateChar(src, parse_pos, index = 7, '-', "EXPECTED_DASH");
-                validateChar(src, parse_pos, index = 10, 'T', "EXPECTED_CAPITAL_T");
-                validateChar(src, parse_pos, index = 13, ':', "EXPECTED_COLON_IN_TIME");
-                validateChar(src, parse_pos, index = 16, ':', "EXPECTED_COLON_IN_TIME");
+                validateChar(src, parsePos, index = 4, '-', "EXPECTED_DASH");
+                validateChar(src, parsePos, index = 7, '-', "EXPECTED_DASH");
+                validateChar(src, parsePos, index = 10, 'T', "EXPECTED_CAPITAL_T");
+                validateChar(src, parsePos, index = 13, ':', "EXPECTED_COLON_IN_TIME");
+                validateChar(src, parsePos, index = 16, ':', "EXPECTED_COLON_IN_TIME");
             }
 
             // convert what we have validated so far
@@ -133,11 +133,11 @@ public class XmlSchemaDateFormat extends DateFormat {
                 // parse optional timezone
                 if (((index + 5) < src.length())
                         && ((src.charAt(index) == '+') || (src.charAt(index) == '-'))) {
-                    validateCharIsDigit(src, parse_pos, index + 1, "EXPECTED_NUMERAL");
-                    validateCharIsDigit(src, parse_pos, index + 2, "EXPECTED_NUMERAL");
-                    validateChar(src, parse_pos, index + 3, ':', "EXPECTED_COLON_IN_TIMEZONE");
-                    validateCharIsDigit(src, parse_pos, index + 4, "EXPECTED_NUMERAL");
-                    validateCharIsDigit(src, parse_pos, index + 5, "EXPECTED_NUMERAL");
+                    validateCharIsDigit(src, parsePos, index + 1, "EXPECTED_NUMERAL");
+                    validateCharIsDigit(src, parsePos, index + 2, "EXPECTED_NUMERAL");
+                    validateChar(src, parsePos, index + 3, ':', "EXPECTED_COLON_IN_TIMEZONE");
+                    validateCharIsDigit(src, parsePos, index + 4, "EXPECTED_NUMERAL");
+                    validateCharIsDigit(src, parsePos, index + 5, "EXPECTED_NUMERAL");
 
                     final int hours = (((src.charAt(index + 1) - '0') * 10) + src
                             .charAt(index + 2)) - '0';
@@ -159,58 +159,58 @@ public class XmlSchemaDateFormat extends DateFormat {
                 }
 
                 if (index < src.length()) {
-                    handleParseError(parse_pos, "TOO_MANY_CHARS");
+                    handleParseError(parsePos, "TOO_MANY_CHARS");
                 }
             }
         } catch (ParseException pe) {
-            log.error(pe.toString(), pe);
+            LOG.error(pe.toString(), pe);
             index = 0; // IMPORTANT: this tells DateFormat.parse() to throw a ParseException
-            parse_pos.setErrorIndex(index);
+            parsePos.setErrorIndex(index);
             date = null;
         }
-        parse_pos.setIndex(index);
-        return (date);
+        parsePos.setIndex(index);
+        return date;
     }
 
     /**
      * @see DateFormat#format(java.util.Date)
      */
-    public StringBuffer format(Date date, StringBuffer append_buf,
-            FieldPosition field_pos) {
+    public StringBuffer format(Date date, StringBuffer appendBuf,
+            FieldPosition fieldPos) {
         String str;
 
         synchronized (DATEFORMAT_XSD_ZULU) {
             str = DATEFORMAT_XSD_ZULU.format(date);
         }
 
-        if (append_buf == null) {
-            append_buf = new StringBuffer();
+        if (appendBuf == null) {
+            appendBuf = new StringBuffer();
         }
 
-        append_buf.append(str);
+        appendBuf.append(str);
 
-        return append_buf;
+        return appendBuf;
     }
 
-    private void validateChar(String str, ParsePosition parse_pos, int index,
-            char expected, String error_reason) throws ParseException {
+    private void validateChar(String str, ParsePosition parsePos, int index,
+            char expected, String errorReason) throws ParseException {
         if (str.charAt(index) != expected) {
-            handleParseError(parse_pos, error_reason);
+            handleParseError(parsePos, errorReason);
         }
     }
 
-    private void validateCharIsDigit(String str, ParsePosition parse_pos,
-            int index, String error_reason) throws ParseException {
+    private void validateCharIsDigit(String str, ParsePosition parsePos,
+            int index, String errorReason) throws ParseException {
         if (!Character.isDigit(str.charAt(index))) {
-            handleParseError(parse_pos, error_reason);
+            handleParseError(parsePos, errorReason);
         }
     }
 
-    private void handleParseError(ParsePosition parse_pos, String error_reason)
+    private void handleParseError(ParsePosition parsePos, String errorReason)
             throws ParseException {
         throw new ParseException(
-            "INVALID_XSD_DATETIME: " + error_reason, 
-            parse_pos.getErrorIndex()
+            "INVALID_XSD_DATETIME: " + errorReason, 
+            parsePos.getErrorIndex()
         );
     }
 

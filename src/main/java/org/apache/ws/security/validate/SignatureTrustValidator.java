@@ -36,7 +36,7 @@ import org.apache.ws.security.handler.RequestData;
  */
 public class SignatureTrustValidator implements Validator {
     
-    private static org.apache.commons.logging.Log LOG = 
+    private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SignatureTrustValidator.class);
     
     /**

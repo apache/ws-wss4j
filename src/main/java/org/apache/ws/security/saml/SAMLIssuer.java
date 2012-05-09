@@ -41,87 +41,87 @@ public interface SAMLIssuer {
      * @return AssertionWrapper
      * @throws WSSecurityException
      */
-    public AssertionWrapper newAssertion() throws WSSecurityException;
+    AssertionWrapper newAssertion() throws WSSecurityException;
     
     /**
      * Set whether to send the key value or whether to include the entire cert.
      * @param sendKeyValue whether to send the key value.
      */
-    public void setSendKeyValue(boolean sendKeyValue);
+    void setSendKeyValue(boolean sendKeyValue);
     
     /**
      * Get whether to send the key value or whether to include the entire cert.
      * @return whether to send the key value
      */
-    public boolean isSendKeyValue();
+    boolean isSendKeyValue();
     
     /**
      * Set whether to sign the assertion or not.
      * @param signAssertion whether to sign the assertion or not.
      */
-    public void setSignAssertion(boolean signAssertion);
+    void setSignAssertion(boolean signAssertion);
     
     /**
      * Get whether to sign the assertion or not
      * @return whether to sign the assertion or not
      */
-    public boolean isSignAssertion();
+    boolean isSignAssertion();
     
     /**
      * Set the CallbackHandler to use
      * @param callbackHandler the CallbackHandler to use
      */
-    public void setCallbackHandler(CallbackHandler callbackHandler);
+    void setCallbackHandler(CallbackHandler callbackHandler);
     
     /**
      * Get the CallbackHandler in use
      * @return the CallbackHandler in use
      */
-    public CallbackHandler getCallbackHandler();
+    CallbackHandler getCallbackHandler();
     
     /**
      * Set the issuer crypto
      * @param issuerCrypto the issuer crypto
      */
-    public void setIssuerCrypto(Crypto issuerCrypto);
+    void setIssuerCrypto(Crypto issuerCrypto);
 
     /**
      * @return Returns the issuerCrypto.
      */
-    public Crypto getIssuerCrypto();
+    Crypto getIssuerCrypto();
     
     /**
      * Set the issuer name
      * @param issuer the issuer name
      */
-    public void setIssuerName(String issuer);
+    void setIssuerName(String issuer);
     
     /**
      * Get the issuer name
      * @return the issuer name
      */
-    public String getIssuerName();
+    String getIssuerName();
     
     /**
      * Set the issuer key name
      * @param issuerKeyName the issuer key name
      */
-    public void setIssuerKeyName(String issuerKeyName);
+    void setIssuerKeyName(String issuerKeyName);
 
     /**
      * @return Returns the issuerKeyName.
      */
-    public String getIssuerKeyName();
+    String getIssuerKeyName();
 
     /**
      * Set the issuer key password
      * @param issuerKeyPassword the issuerKeyPassword.
      */
-    public void setIssuerKeyPassword(String issuerKeyPassword);
+    void setIssuerKeyPassword(String issuerKeyPassword);
     
     /**
      * @return Returns the issuerKeyPassword.
      */
-    public String getIssuerKeyPassword();
+    String getIssuerKeyPassword();
 
 }
