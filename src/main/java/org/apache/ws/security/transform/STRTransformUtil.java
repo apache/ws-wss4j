@@ -36,10 +36,10 @@ import org.w3c.dom.Text;
 /**
  * Utility class exposing the dereferencing logic of the {@link STRTransform} implementation.
  */
-public class STRTransformUtil {
+public final class STRTransformUtil {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(STRTransformUtil.class);
-
+    
     /**
      * Retrieves the element representing the referenced content of a STR.
      * 

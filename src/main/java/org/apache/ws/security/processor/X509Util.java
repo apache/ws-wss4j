@@ -33,9 +33,13 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
-public class X509Util {
+public final class X509Util {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(X509Util.class);
+    
+    private X509Util() {
+        // Complete
+    }
 
     public static boolean isContent(Node encBodyData) {
         if (encBodyData != null) {

@@ -306,7 +306,7 @@ public class SignatureSTRParser implements STRParser {
     private Principal createPrincipalFromSAML(
         AssertionWrapper assertion
     ) {
-        SAMLTokenPrincipal principal = new SAMLTokenPrincipal(assertion);
+        SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
         String confirmMethod = null;
         List<String> methods = assertion.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {
@@ -315,7 +315,7 @@ public class SignatureSTRParser implements STRParser {
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && assertion.isSigned()) {
             trustedCredential = true;
         }
-        return principal;
+        return samlPrincipal;
     }
     
     /**

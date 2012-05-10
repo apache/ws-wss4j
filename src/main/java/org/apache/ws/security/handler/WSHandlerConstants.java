@@ -30,11 +30,15 @@ import java.util.Map;
  *  
  * @author Werner Dittmann (werner@apache.org)
  */
-public class WSHandlerConstants {
+public final class WSHandlerConstants {
     
     //
     // Action configuration tags
     //
+    
+    private WSHandlerConstants() {
+        // Complete
+    }
     
     /**
      * The action parameter. The handlers use the value of this parameter to determine how

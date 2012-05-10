@@ -357,7 +357,8 @@ public class EncryptedKeyProcessor implements Processor {
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedData);
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "badEncAlgo", new Object[]{symEncAlgo}
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
+                new Object[]{symEncAlgo}, ex
             );
         }
 

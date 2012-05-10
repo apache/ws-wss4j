@@ -26,7 +26,11 @@ import org.apache.ws.security.conversation.ConversationException;
  * @author Ruchith Fernando
  */
 
-public class AlgoFactory {
+public final class AlgoFactory {
+    
+    private AlgoFactory() {
+        // Complete
+    }
 
     /**
      * This gives a DerivationAlgorithm instance from the default set of algorithms provided

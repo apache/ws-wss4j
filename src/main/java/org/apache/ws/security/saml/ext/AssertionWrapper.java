@@ -662,9 +662,13 @@ public class AssertionWrapper {
                 XMLSignature xmlSignature = new XMLSignature(signatureElement, "");
                 return xmlSignature.getSignatureValue();
             } catch (XMLSignatureException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+                );
             } catch (XMLSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+                );
             }
         }
         return null;

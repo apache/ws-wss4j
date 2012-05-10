@@ -138,7 +138,8 @@ public class KerberosSecurity extends BinarySecurity {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE,
                 "kerberosLoginError", 
-                new Object[] {ex.getMessage()}
+                new Object[] {ex.getMessage()},
+                ex
             );
         }
         if (log.isDebugEnabled()) {

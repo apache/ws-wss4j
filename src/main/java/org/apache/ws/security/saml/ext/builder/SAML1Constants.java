@@ -26,7 +26,7 @@ package org.apache.ws.security.saml.ext.builder;
  * <p/>
  * Created on May 18, 2009
  */
-public class SAML1Constants {
+public final class SAML1Constants {
     
     //
     // NAME ID FORMAT
@@ -142,4 +142,8 @@ public class SAML1Constants {
      */
     public static final String AUTH_METHOD_UNSPECIFIED = 
         "urn:oasis:names:tc:SAML:1.0:am:unspecified";
+    
+    private SAML1Constants() {
+        // Complete
+    }
 }

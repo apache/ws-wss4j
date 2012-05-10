@@ -116,7 +116,7 @@ public class Merlin extends CryptoBase {
     
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(Merlin.class);
-    private static final boolean doDebug = LOG.isDebugEnabled();
+    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     protected static CertificateFactory certFact;
     protected Properties properties = null;
@@ -188,7 +188,7 @@ public class Merlin extends CryptoBase {
                     type = type.trim();
                 }
                 keystore = load(is, passwd, provider, type);
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + type 
                         + " has been loaded"
@@ -204,7 +204,7 @@ public class Merlin extends CryptoBase {
                 }
             }
         } else {
-            if (doDebug) {
+            if (DO_DEBUG) {
                 LOG.debug("The KeyStore is not loaded as KEYSTORE_FILE is null");
             }
         }
@@ -227,7 +227,7 @@ public class Merlin extends CryptoBase {
                     type = type.trim();
                 }
                 truststore = load(is, passwd, provider, type);
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(
                         "The TrustStore " + trustStoreLocation + " of type " + type 
                         + " has been loaded"
@@ -256,7 +256,7 @@ public class Merlin extends CryptoBase {
                         cacertsPasswd = cacertsPasswd.trim();
                     }
                     truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
-                    if (doDebug) {
+                    if (DO_DEBUG) {
                         LOG.debug("CA certs have been loaded");
                     }
                     loadCACerts = true;
@@ -293,13 +293,13 @@ public class Merlin extends CryptoBase {
                             provider
                         );
                 }
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(
                         "The CRL " + crlLocation + " has been loaded"
                     );
                 }
             } catch (Exception e) {
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
                 throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
@@ -331,7 +331,7 @@ public class Merlin extends CryptoBase {
                 try {
                     is = new FileInputStream(location);
                 } catch (Exception e) {
-                    if (doDebug) {
+                    if (DO_DEBUG) {
                         LOG.debug(e.getMessage(), e);
                     }
                     throw new CredentialException(
@@ -365,17 +365,17 @@ public class Merlin extends CryptoBase {
             ks.load(input, (storepass == null || storepass.length() == 0) 
                 ? new char[0] : storepass.toCharArray());
         } catch (IOException e) {
-            if (doDebug) {
+            if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
             }
             throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);
         } catch (GeneralSecurityException e) {
-            if (doDebug) {
+            if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
             }
             throw new CredentialException(CredentialException.SEC_ERROR, "secError00", e);
         } catch (Exception e) {
-            if (doDebug) {
+            if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
             }
             throw new CredentialException(CredentialException.FAILURE, "error00", e);

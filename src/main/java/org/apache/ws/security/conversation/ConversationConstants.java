@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 /**
  * Class ConversationConstants
  */
-public class ConversationConstants {
+public final class ConversationConstants {
 
     public static final int VERSION_05_02 = 1;
     
@@ -162,6 +162,10 @@ public class ConversationConstants {
      * scope).
      */
     public static final String KEY_CONTEXT_MAP = "contextMap";
+    
+    private ConversationConstants() {
+        // Complete
+    }
     
     public interface DerivationAlgorithm {
         String P_SHA_1 = 

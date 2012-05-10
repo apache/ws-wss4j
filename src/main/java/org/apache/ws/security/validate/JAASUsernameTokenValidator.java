@@ -94,8 +94,8 @@ public class JAASUsernameTokenValidator implements Validator {
         }
         
         if (!(user != null && user.length() > 0 && password != null && password.length() > 0)) {
-        	log.warn("User or password empty");
-        	throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            log.warn("User or password empty");
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
         }
         
         try {
@@ -106,7 +106,9 @@ public class JAASUsernameTokenValidator implements Validator {
 
         } catch (LoginException ex) {
             log.info("Authentication failed", ex);
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_AUTHENTICATION, null, null, ex
+            );
         }
         
         return credential;

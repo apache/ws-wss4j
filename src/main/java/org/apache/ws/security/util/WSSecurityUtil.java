@@ -60,7 +60,7 @@ import java.util.Set;
  * 
  * @author Davanum Srinivas (dims@yahoo.com).
  */
-public class WSSecurityUtil {
+public final class WSSecurityUtil {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecurityUtil.class);
 
@@ -76,6 +76,10 @@ public class WSSecurityUtil {
      * A cached MessageDigest object
      */
     private static MessageDigest digest = null;
+    
+    private WSSecurityUtil() {
+        // Complete
+    }
     
     /**
      * Returns the first WS-Security header element for a given actor. Only one
@@ -542,7 +546,7 @@ public class WSSecurityUtil {
                 Attr a = (Attr) attrs.item(n);
                 String name = a.getName();
                 if (name.startsWith("xmlns:") && a.getNodeValue().equals(uri)) {
-                    return name.substring(6);
+                    return name.substring("xmlns:".length());
                 }
             }
             e = e.getParentNode();

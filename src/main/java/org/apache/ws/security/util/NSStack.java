@@ -71,8 +71,9 @@ public class NSStack {
             System.arraycopy(stack, 0, newstack, 0, stack.length);
             stack = newstack;
         }
-        if (traceEnabled)
+        if (traceEnabled) {
             log.trace("NSPush (" + stack.length + ")");
+        }
         stack[top] = null;
     }
 
@@ -90,14 +91,16 @@ public class NSStack {
             currentDefaultNS = top;
             while (currentDefaultNS > 0) {
                 if (stack[currentDefaultNS] != null &&
-                        stack[currentDefaultNS].getPrefix().length() == 0)
+                        stack[currentDefaultNS].getPrefix().length() == 0) {
                     break;
+                }
                 currentDefaultNS--;
             }
         }
         if (top == 0) {
-            if (traceEnabled)
+            if (traceEnabled) {
                 log.trace("NSPop (empty)");
+            }
             return;
         }
         if (traceEnabled) {
@@ -109,7 +112,9 @@ public class NSStack {
      * Return a copy of the current frame.  Returns null if none are present.
      */
     public List<Mapping> cloneFrame() {
-        if (stack[top] == null) return null;
+        if (stack[top] == null) {
+            return null;
+        }
         List<Mapping> clone = new ArrayList<Mapping>();
         for (Mapping map = topOfFrame(); map != null; map = next()) {
             clone.add(map);
@@ -196,33 +201,44 @@ public class NSStack {
      * find one because "pre" is actually mapped to "otherNamespace"
      */
     public String getPrefix(String namespaceURI, boolean noDefault) {
-        if ((namespaceURI == null) || (namespaceURI.equals("")))
+        if ((namespaceURI == null) || (namespaceURI.equals(""))) {
             return null;
+        }
         int hash = namespaceURI.hashCode();
 
         // If defaults are OK, and the given NS is the current default,
         // return "" as the prefix to favor defaults where possible.
         if (!noDefault && currentDefaultNS > 0 && stack[currentDefaultNS] != null &&
-                namespaceURI.equals(stack[currentDefaultNS].getNamespaceURI()))
+                namespaceURI.equals(stack[currentDefaultNS].getNamespaceURI())) {
             return "";
+        }
         for (int cursor = top; cursor > 0; cursor--) {
             Mapping map = stack[cursor];
-            if (map == null) continue;
+            if (map == null) {
+                continue;
+            }
             if (map.getNamespaceHash() == hash &&
                     map.getNamespaceURI().equals(namespaceURI)) {
                 String possiblePrefix = map.getPrefix();
-                if (noDefault && possiblePrefix.length() == 0) continue;
+                if (noDefault && possiblePrefix.length() == 0) {
+                    continue;
+                }
 
                 // now make sure that this is the first occurance of this 
                 // particular prefix
                 int ppHash = possiblePrefix.hashCode();
                 for (int cursor2 = top; true; cursor2--) {
-                    if (cursor2 == cursor) return possiblePrefix;
+                    if (cursor2 == cursor) {
+                        return possiblePrefix;
+                    }
                     map = stack[cursor2];
-                    if (map == null) continue;
+                    if (map == null) {
+                        continue;
+                    }
                     if (ppHash == map.getPrefixHash() &&
-                            possiblePrefix.equals(map.getPrefix()))
+                            possiblePrefix.equals(map.getPrefix())) {
                         break;
+                    }
                 }
             }
         }
@@ -241,14 +257,18 @@ public class NSStack {
      * Given a prefix, return the associated namespace (if any).
      */
     public String getNamespaceURI(String prefix) {
-        if (prefix == null)
+        if (prefix == null) {
             prefix = "";
+        }
         int hash = prefix.hashCode();
         for (int cursor = top; cursor > 0; cursor--) {
             Mapping map = stack[cursor];
-            if (map == null) continue;
-            if (map.getPrefixHash() == hash && map.getPrefix().equals(prefix))
+            if (map == null) {
+                continue;
+            }
+            if (map.getPrefixHash() == hash && map.getPrefix().equals(prefix)) {
                 return map.getNamespaceURI();
+            }
         }
         return null;
     }

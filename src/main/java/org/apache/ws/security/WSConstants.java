@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 /**
  * Constants in WS-Security spec.
  */
-public class WSConstants {
+public final class WSConstants {
     
     /*
      * Standard constants used in WSS4J
@@ -454,5 +454,9 @@ public class WSConstants {
      */
     public static final int WSE_DERIVED_KEY_LEN = 16;
     public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
+    
+    private WSConstants() {
+        // Complete
+    }
     
 }

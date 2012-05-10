@@ -225,11 +225,12 @@ public final class Base64 {
             if (!isData((d1 = base64Data[dataIndex++]))
                     || !isData((d2 = base64Data[dataIndex++]))
                     || !isData((d3 = base64Data[dataIndex++]))
-                    || !isData((d4 = base64Data[dataIndex++])))
+                    || !isData((d4 = base64Data[dataIndex++]))) {
                 throw new WSSecurityException("decoding.general");// if found
                                                                   // "no data"
                                                                   // just return
                                                                   // null
+            }
 
             b1 = BASE_64_ALPHABET[d1];
             b2 = BASE_64_ALPHABET[d2];
@@ -288,7 +289,6 @@ public final class Base64 {
             decodedData[encodedIndex++] = (byte)(b1 << 2 | b2 >> 4);
             decodedData[encodedIndex++] = (byte)(((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
             decodedData[encodedIndex++] = (byte)(b3 << 6 | b4);
-
         }
 
         return decodedData;

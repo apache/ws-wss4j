@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * <p/>
  * Created on May 18, 2009
  */
-public class OpenSAMLUtil {
+public final class OpenSAMLUtil {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
 
@@ -44,6 +44,10 @@ public class OpenSAMLUtil {
     private static MarshallerFactory marshallerFactory;
     private static UnmarshallerFactory unmarshallerFactory;
     private static boolean samlEngineInitialized = false;
+    
+    private OpenSAMLUtil() {
+        // Complete
+    }
 
     /**
      * Initialise the SAML library

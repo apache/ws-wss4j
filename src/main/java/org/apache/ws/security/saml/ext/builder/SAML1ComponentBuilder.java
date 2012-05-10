@@ -72,7 +72,7 @@ import java.util.List;
  * <p/>
  * Created on May 18, 2009
  */
-public class SAML1ComponentBuilder {
+public final class SAML1ComponentBuilder {
     
     private static volatile SAMLObjectBuilder<Assertion> assertionV1Builder;
     
@@ -109,6 +109,10 @@ public class SAML1ComponentBuilder {
     
     private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
+    private SAML1ComponentBuilder() {
+        // Complete
+    }
+    
     /**
      * Create a new SAML 1.1 assertion
      *

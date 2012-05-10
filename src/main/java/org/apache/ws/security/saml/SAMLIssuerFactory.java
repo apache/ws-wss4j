@@ -36,7 +36,7 @@ import java.util.Properties;
 public abstract class SAMLIssuerFactory {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(SAMLIssuerFactory.class);
-    private static final Class<? extends SAMLIssuer> defaultSAMLClass = 
+    private static final Class<? extends SAMLIssuer> DEFAULT_SAML_CLASS = 
         org.apache.ws.security.saml.SAMLIssuerImpl.class;
 
     /**
@@ -104,7 +104,7 @@ public abstract class SAMLIssuerFactory {
         Class<? extends SAMLIssuer> samlIssuerClass = null;
         if (samlClassName == null 
             || samlClassName.equals("org.apache.ws.security.saml.SAMLIssuerImpl")) {
-            samlIssuerClass = defaultSAMLClass;
+            samlIssuerClass = DEFAULT_SAML_CLASS;
         } else {
             try {
                 // instruct the class loader to load the crypto implementation
@@ -170,7 +170,8 @@ public abstract class SAMLIssuerFactory {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 
                 "resourceNotFound",
-                new Object[]{propFilename}
+                new Object[]{propFilename},
+                e
             );
         }
         return properties;

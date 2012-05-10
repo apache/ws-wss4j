@@ -35,11 +35,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
-public class XMLUtils {
+public final class XMLUtils {
     
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(XMLUtils.class);
-    private static final boolean doDebug = LOG.isDebugEnabled();
+    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
+    
+    private XMLUtils() {
+        // Complete
+    }
     
     public static String PrettyDocumentToString(Document doc) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -55,7 +59,7 @@ public class XMLUtils {
             Transformer transformer = transFactory.newTransformer();
             transformer.transform(source, result);
         } catch (Exception ex) {
-            if (doDebug) {
+            if (DO_DEBUG) {
                 LOG.debug(ex.getMessage(), ex);
             }
         }

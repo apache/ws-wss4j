@@ -22,11 +22,11 @@ package org.apache.ws.security.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringUtil {
-    /**
-     * An empty immutable <code>String</code> array.
-     */
-    public static final String[] EMPTY_STRING_ARRAY = new String[0];
+public final class StringUtil {
+    
+    private StringUtil() {
+        // Complete
+    }
 
     /**
      * Tests if this string starts with the specified prefix (Ignoring whitespaces)
@@ -58,8 +58,9 @@ public class StringUtil {
             index1++;
             index2++;
         }
-        if (index1 < length1 && index2 >= length2)
+        if (index1 < length1 && index2 >= length2) {
             return false;
+        }
         return true;
     }
 
@@ -93,7 +94,7 @@ public class StringUtil {
         }
         int len = str.length();
         if (len == 0) {
-            return EMPTY_STRING_ARRAY;
+            return new String[0];
         }
         List<String> list = new ArrayList<String>();
         int i = 0, start = 0;

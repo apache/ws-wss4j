@@ -46,11 +46,11 @@ public class UsernameTokenAction implements Action {
 
         if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
             for (int j = 0; j < reqData.getUtElements().length; j++) {
-                reqData.getUtElements()[j].trim();
-                if (reqData.getUtElements()[j].equals("Nonce")) {
+                String utElement = reqData.getUtElements()[j].trim();
+                if (utElement.equals("Nonce")) {
                     builder.addNonce();
                 }
-                if (reqData.getUtElements()[j].equals("Created")) {
+                if (utElement.equals("Created")) {
                     builder.addCreated();
                 }
                 reqData.getUtElements()[j] = null;

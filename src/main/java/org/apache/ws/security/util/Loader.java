@@ -30,9 +30,13 @@ import java.security.PrivilegedAction;
  *
  * @author Davanum Srinivas (dims@yahoo.com).
  */
-public class Loader {
+public final class Loader {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(Loader.class);
+    
+    private Loader() {
+        // Complete
+    }
 
     /**
      * This method will search for <code>resource</code> in different

@@ -37,7 +37,7 @@ import java.util.Properties;
 public abstract class CryptoFactory {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(CryptoFactory.class);
-    private static final Class<? extends Crypto> defaultCryptoClass = 
+    private static final Class<? extends Crypto> DEFAULT_CRYPTO_CLASS = 
         org.apache.ws.security.components.crypto.Merlin.class;
 
     /**
@@ -102,7 +102,7 @@ public abstract class CryptoFactory {
         Class<? extends Crypto> cryptoClass = null;
         if (cryptoClassName == null 
             || cryptoClassName.equals("org.apache.ws.security.components.crypto.Merlin")) {
-            cryptoClass = defaultCryptoClass;
+            cryptoClass = DEFAULT_CRYPTO_CLASS;
         } else {
             try {
                 // instruct the class loader to load the crypto implementation
@@ -254,7 +254,8 @@ public abstract class CryptoFactory {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, 
                 "resourceNotFound",
-                new Object[]{propFilename}
+                new Object[]{propFilename},
+                e
             );
         }
         return properties;

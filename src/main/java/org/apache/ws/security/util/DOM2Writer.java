@@ -38,10 +38,14 @@ import java.io.Writer;
  * @author Matthew J. Duftler (duftler@us.ibm.com)
  * @author Joseph Kesselman
  */
-public class DOM2Writer {
+public final class DOM2Writer {
     public static final char NL = '\n';
     public static final String LS = System.getProperty("line.separator",
             (Character.valueOf(NL)).toString());
+    
+    private DOM2Writer() {
+        // Complete
+    }
 
     /**
      * Return a string containing this node serialized as XML.

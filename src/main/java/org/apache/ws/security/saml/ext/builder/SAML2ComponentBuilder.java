@@ -75,7 +75,7 @@ import java.util.List;
  * <p/>
  * Created on May 18, 2009
  */
-public class SAML2ComponentBuilder {
+public final class SAML2ComponentBuilder {
     private static volatile SAMLObjectBuilder<Assertion> assertionBuilder;
     
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
@@ -116,6 +116,10 @@ public class SAML2ComponentBuilder {
     
     private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
+    private SAML2ComponentBuilder() {
+        // Complete
+    }
+    
     /**
      * Create a SAML 2 assertion
      *

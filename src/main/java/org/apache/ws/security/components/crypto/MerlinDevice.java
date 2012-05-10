@@ -39,7 +39,7 @@ public class MerlinDevice extends Merlin {
     
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(MerlinDevice.class);
-    private static final boolean doDebug = LOG.isDebugEnabled();
+    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     
     @Override
@@ -86,7 +86,7 @@ public class MerlinDevice extends Merlin {
 
             try {
                 keystore = load(is, keyStorePassword, provider, keyStoreType);
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + keyStoreType 
                         + " has been loaded"
@@ -123,7 +123,7 @@ public class MerlinDevice extends Merlin {
 
             try {
                 truststore = load(is, trustStorePassword, provider, trustStoreType);
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(
                         "The TrustStore " + trustStoreLocation + " of type " + trustStoreType 
                         + " has been loaded"
@@ -147,7 +147,7 @@ public class MerlinDevice extends Merlin {
                     cacertsPasswd = cacertsPasswd.trim();
                 }
                 truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug("CA certs have been loaded");
                 }
                 loadCACerts = true;
@@ -185,13 +185,13 @@ public class MerlinDevice extends Merlin {
                             provider
                         );
                 }
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(
                         "The CRL " + crlLocation + " has been loaded"
                     );
                 }
             } catch (Exception e) {
-                if (doDebug) {
+                if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
                 throw new CredentialException(CredentialException.IO_ERROR, "ioError00", e);

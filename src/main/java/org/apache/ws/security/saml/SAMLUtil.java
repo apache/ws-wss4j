@@ -57,12 +57,16 @@ import java.util.List;
 /**
  * Utility methods for SAML stuff
  */
-public class SAMLUtil {
+public final class SAMLUtil {
     
     private static final QName BINARY_SECRET = 
         new QName(WSConstants.WST_NS, "BinarySecret");
     private static final QName BINARY_SECRET_05_12 = 
         new QName(WSConstants.WST_NS_05_12, "BinarySecret");
+    
+    private SAMLUtil() {
+        // Complete
+    }
 
     /**
      * Get an AssertionWrapper object from parsing a SecurityTokenReference that uses

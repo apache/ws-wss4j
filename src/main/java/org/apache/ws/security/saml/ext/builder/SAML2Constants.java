@@ -26,7 +26,7 @@ package org.apache.ws.security.saml.ext.builder;
  * <p/>
  * Created on May 18, 2009
  */
-public class SAML2Constants {
+public final class SAML2Constants {
     //
     // NAME ID FORMAT
     //
@@ -159,4 +159,8 @@ public class SAML2Constants {
     
     public static final String ATTRNAME_FORMAT_BASIC = 
         "urn:oasis:names:tc:SAML:2.0:attrname-format:basic";
+    
+    private SAML2Constants() {
+        // Complete
+    }
 }

@@ -28,7 +28,7 @@ import java.util.Random;
 /**
  * UUID generator (taken from Axis2)
  */
-public class UUIDGenerator {
+public final class UUIDGenerator {
 
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(UUIDGenerator.class);
@@ -38,6 +38,10 @@ public class UUIDGenerator {
 
 
     private static Random myRand = null;
+    
+    private UUIDGenerator() {
+        // Complete
+    }
 
     /**
      * MD5 a random string with localhost/date etc will return 128 bits
@@ -50,7 +54,7 @@ public class UUIDGenerator {
             getInitialUUID();
         }
         long i = ++incrementingValue;
-        if(i >= Long.MAX_VALUE || i < 0){
+        if (i >= Long.MAX_VALUE || i < 0) {
             incrementingValue = 0;
             i = 0;
         }
@@ -92,7 +96,9 @@ public class UUIDGenerator {
             sb2.append(Integer.toHexString(b));
         }
         int begin = myRand.nextInt();
-        if (begin < 0) begin = begin * -1;
+        if (begin < 0) {
+            begin = begin * -1;
+        }
         begin = begin % 8;
         baseUUID = sb2.toString().substring(begin, begin + 18).toUpperCase();
     }
