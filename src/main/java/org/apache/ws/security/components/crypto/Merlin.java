@@ -1235,6 +1235,9 @@ public class Merlin extends CryptoBase {
      * Find the Public Key in a keystore. 
      */
     private boolean findPublicKeyInKeyStore(PublicKey publicKey, KeyStore keyStoreToSearch) {
+        if (keyStoreToSearch == null) {
+            return false;
+        }
         try {
             for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
