@@ -183,7 +183,8 @@ public class Canonicalizer11Test {
     public void test38() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer11_OmitCommentsTransformer c = new Canonicalizer11_OmitCommentsTransformer(null, baos);
+        Canonicalizer11_OmitCommentsTransformer c = new Canonicalizer11_OmitCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/in/38_input.xml")
         );
@@ -578,9 +579,11 @@ public class Canonicalizer11Test {
 
         CanonicalizerBase canonicalizerBase;
         if (omitComments) {
-            canonicalizerBase = new Canonicalizer11_OmitCommentsTransformer(null, baos);
+            canonicalizerBase = new Canonicalizer11_OmitCommentsTransformer();
+            canonicalizerBase.setOutputStream(baos);
         } else {
-            canonicalizerBase = new Canonicalizer11_WithCommentsTransformer(null, baos);
+            canonicalizerBase = new Canonicalizer11_WithCommentsTransformer();
+            canonicalizerBase.setOutputStream(baos);
         }
 
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(fileIn.openStream());

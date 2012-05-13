@@ -69,10 +69,23 @@ public abstract class CanonicalizerBase implements Transformer {
     private boolean firstCall = true;
     private SortedSet<String> inclusiveNamespaces = null;
 
-    public CanonicalizerBase(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
+    public CanonicalizerBase(boolean includeComments) {
         this.includeComments = includeComments;
-        this.inclusiveNamespaces = prefixList2Set(inclusiveNamespaces);
+    }
+
+    @Override
+    public void setOutputStream(OutputStream outputStream) throws XMLSecurityException {
         this.outputStream = outputStream;
+    }
+
+    @Override
+    public void setList(List list) throws XMLSecurityException {
+        this.inclusiveNamespaces = prefixList2Set(list);
+    }
+
+    @Override
+    public void setTransformer(Transformer transformer) throws XMLSecurityException {
+        throw new UnsupportedOperationException("Transformer not supported");
     }
 
     public static SortedSet<String> prefixList2Set(List<String> inclusiveNamespaces) {

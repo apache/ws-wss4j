@@ -57,7 +57,8 @@ public class Canonicalizer20010315ExclusiveTest {
     public void test221excl() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null, baos);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
         );
@@ -95,7 +96,8 @@ public class Canonicalizer20010315ExclusiveTest {
     public void test222excl() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null, baos);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
         );
@@ -133,7 +135,8 @@ public class Canonicalizer20010315ExclusiveTest {
     public void test24excl() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null, baos);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_4.xml")
         );
@@ -173,7 +176,8 @@ public class Canonicalizer20010315ExclusiveTest {
         QName TAG_soap11_Body = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body", "env");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer(null, baos);
+        Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml")
         );
@@ -257,7 +261,9 @@ public class Canonicalizer20010315ExclusiveTest {
         inclusiveNamespaces.add("ns0");
         inclusiveNamespaces.add("xsi");
         inclusiveNamespaces.add("wsu");
-        Canonicalizer20010315_ExclOmitCommentsTransformer c = new Canonicalizer20010315_ExclOmitCommentsTransformer(inclusiveNamespaces, baos);
+        Canonicalizer20010315_ExclOmitCommentsTransformer c = new Canonicalizer20010315_ExclOmitCommentsTransformer();
+        c.setList(inclusiveNamespaces);
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(XML)
         );

@@ -20,6 +20,8 @@ package org.swssf.xmlsec.ext;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.OutputStream;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -27,5 +29,11 @@ import javax.xml.stream.events.XMLEvent;
  */
 public interface Transformer {
 
-    public void transform(XMLEvent xmlEvent) throws XMLStreamException;
+    void setOutputStream(OutputStream outputStream) throws XMLSecurityException;
+
+    void setList(List list) throws XMLSecurityException;
+
+    void setTransformer(Transformer transformer) throws XMLSecurityException;
+
+    void transform(XMLEvent xmlEvent) throws XMLStreamException;
 }

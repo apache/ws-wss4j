@@ -18,9 +18,6 @@
  */
 package org.swssf.xmlsec.impl.transformer.canonicalizer;
 
-import java.io.OutputStream;
-import java.util.List;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -30,10 +27,8 @@ public class Canonicalizer11_OmitCommentsTransformer extends Canonicalizer11 {
     /**
      * Canonicalizer not complete. We are missing special handling for xml:base. But since
      * we don't support document subsets we don't need it!
-     *
-     * @param inclusiveNamespaces
      */
-    public Canonicalizer11_OmitCommentsTransformer(List<String> inclusiveNamespaces, OutputStream outputStream) {
-        super(inclusiveNamespaces, false, outputStream);
+    public Canonicalizer11_OmitCommentsTransformer() {
+        super(false);
     }
 }

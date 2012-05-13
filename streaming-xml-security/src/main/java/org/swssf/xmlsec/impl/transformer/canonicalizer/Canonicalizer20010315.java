@@ -18,16 +18,13 @@
  */
 package org.swssf.xmlsec.impl.transformer.canonicalizer;
 
-import java.io.OutputStream;
-import java.util.List;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public abstract class Canonicalizer20010315 extends CanonicalizerBase {
 
-    public Canonicalizer20010315(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
-        super(inclusiveNamespaces, includeComments, outputStream);
+    public Canonicalizer20010315(boolean includeComments) {
+        super(includeComments);
     }
 }

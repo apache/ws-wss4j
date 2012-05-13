@@ -70,7 +70,8 @@ public class Santuario191Test {
         //
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer11_OmitCommentsTransformer c =
-                new Canonicalizer11_OmitCommentsTransformer(null, baos);
+                new Canonicalizer11_OmitCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(INPUT_DATA)
         );

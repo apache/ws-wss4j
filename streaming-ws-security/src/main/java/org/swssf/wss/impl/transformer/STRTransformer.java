@@ -19,9 +19,12 @@
 package org.swssf.wss.impl.transformer;
 
 import org.swssf.xmlsec.ext.Transformer;
+import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.OutputStream;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -31,7 +34,21 @@ public class STRTransformer implements Transformer {
 
     private Transformer transformer;
 
-    public STRTransformer(Transformer transformer) {
+    public STRTransformer() {
+    }
+
+    @Override
+    public void setOutputStream(OutputStream outputStream) throws XMLSecurityException {
+        throw new UnsupportedOperationException("OutputStream not supported");
+    }
+
+    @Override
+    public void setList(List list) throws XMLSecurityException {
+        throw new UnsupportedOperationException("List not supported");
+    }
+
+    @Override
+    public void setTransformer(Transformer transformer) throws XMLSecurityException {
         this.transformer = transformer;
     }
 

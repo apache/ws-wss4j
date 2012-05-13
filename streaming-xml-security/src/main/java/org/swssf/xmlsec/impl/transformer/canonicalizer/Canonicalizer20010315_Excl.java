@@ -24,7 +24,6 @@ import org.swssf.xmlsec.ext.XMLEventNS;
 
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
-import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -35,8 +34,8 @@ import java.util.SortedSet;
  */
 public abstract class Canonicalizer20010315_Excl extends CanonicalizerBase {
 
-    public Canonicalizer20010315_Excl(List<String> inclusiveNamespaces, boolean includeComments, OutputStream outputStream) {
-        super(inclusiveNamespaces, includeComments, outputStream);
+    public Canonicalizer20010315_Excl(boolean includeComments) {
+        super(includeComments);
     }
 
     @Override

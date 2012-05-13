@@ -31,7 +31,6 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -211,19 +210,20 @@ public class XMLSecurityUtils {
         return xmlEvent;
     }
 
-    //todo optimize?
-    public static Transformer getTransformer(Object methodParameter1, Object methodParameter2, String algorithm) throws XMLSecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    //todo transformer factory?
+    public static Transformer getTransformer(Object methodParameter1, Object methodParameter2, String algorithm)
+            throws XMLSecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+
         Class<Transformer> transformerClass = (Class<Transformer>) TransformerAlgorithmMapper.getTransformerClass(algorithm, null);
         if (transformerClass == null) {
-            return null;
+            throw new XMLSecurityException(XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
         }
-        Transformer childTransformer;
-        try {
-            Constructor<Transformer> constructor = transformerClass.getConstructor(Transformer.class);
-            childTransformer = constructor.newInstance(methodParameter1);
-        } catch (NoSuchMethodException e) {
-            Constructor<Transformer> constructor = transformerClass.getConstructor(List.class, OutputStream.class);
-            childTransformer = constructor.newInstance(methodParameter1, methodParameter2);
+        Transformer childTransformer = transformerClass.newInstance();
+        if (methodParameter2 != null) {
+            childTransformer.setList((List) methodParameter1);
+            childTransformer.setOutputStream((OutputStream) methodParameter2);
+        } else {
+            childTransformer.setTransformer((Transformer) methodParameter1);
         }
         return childTransformer;
     }

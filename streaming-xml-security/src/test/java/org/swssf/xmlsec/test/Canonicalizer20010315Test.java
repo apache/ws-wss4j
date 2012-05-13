@@ -60,7 +60,8 @@ public class Canonicalizer20010315Test {
     public void test221() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null, baos);
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
         );
@@ -98,7 +99,8 @@ public class Canonicalizer20010315Test {
     public void test222() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer(null, baos);
+        Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer();
+        c.setOutputStream(baos);
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
         );
@@ -609,9 +611,11 @@ public class Canonicalizer20010315Test {
         CanonicalizerBase canonicalizerBase;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (ommitComments) {
-            canonicalizerBase = new Canonicalizer20010315_OmitCommentsTransformer(null, baos);
+            canonicalizerBase = new Canonicalizer20010315_OmitCommentsTransformer();
+            canonicalizerBase.setOutputStream(baos);
         } else {
-            canonicalizerBase = new Canonicalizer20010315_WithCommentsTransformer(null, baos);
+            canonicalizerBase = new Canonicalizer20010315_WithCommentsTransformer();
+            canonicalizerBase.setOutputStream(baos);
         }
 
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(fileIn.openStream());
