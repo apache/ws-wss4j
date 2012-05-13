@@ -150,7 +150,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         algorithmSuiteSecurityEvent.setKeyLength(keyBytes.length * 8);
                         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
 
-                        String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
+                        String algo = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
                         return new SecretKeySpec(keyBytes, algo);
                     }
 
