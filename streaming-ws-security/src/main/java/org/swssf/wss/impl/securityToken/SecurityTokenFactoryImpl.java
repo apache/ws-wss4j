@@ -89,15 +89,15 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             //todo BSP.R3060,BSP.R3025,BSP.R3056 only one Embedded element? Not supported ATM
             final X509DataType x509DataType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
-            final KeyIdentifierType keyIdentifierType
-                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
-            final ReferenceType referenceType
-                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
             if (x509DataType != null) {
                 return new X509DataSecurityToken((WSSecurityContext) securityContext, crypto, callbackHandler,
                         x509DataType, securityTokenReferenceType.getId(),
                         WSSConstants.KeyIdentifierType.ISSUER_SERIAL);
-            } else if (keyIdentifierType != null) {
+            }
+
+            final KeyIdentifierType keyIdentifierType
+                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
+            if (keyIdentifierType != null) {
                 String valueType = keyIdentifierType.getValueType();
                 if (valueType == null) {
                     ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3054);
@@ -138,7 +138,11 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
                     ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3063);
                 }
-            } else if (referenceType != null) {
+            }
+
+            final ReferenceType referenceType
+                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
+            if (referenceType != null) {
                 //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3058, BSP.R3059
 
                 String uri = referenceType.getURI();

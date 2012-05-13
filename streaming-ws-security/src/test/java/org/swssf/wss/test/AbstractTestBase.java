@@ -38,6 +38,8 @@ import org.swssf.wss.test.utils.SOAPUtil;
 import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -94,6 +96,19 @@ public abstract class AbstractTestBase {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @BeforeClass
+    public void insertBC() {
+        //we need an JCE provider which understands elliptic curve cryptography.
+        //the sun default provider also supports ec but returns a sun.security.x509.X509Key
+        //instead of the java.security.interfaces.ECPublicKey. Bug?
+        Security.insertProviderAt(new org.bouncycastle.jce.provider.BouncyCastleProvider(), 2);
+    }
+
+    @AfterClass
+    public void removeBC() {
+        Security.removeProvider("BC");
     }
 
     public AbstractTestBase() {

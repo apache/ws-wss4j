@@ -34,8 +34,8 @@ import org.swssf.wss.securityEvent.SecurityEventListener;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -66,7 +66,7 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
         XMLStreamReader newXmlStreamReader = null;
 
-        final List<SecurityEvent> incomingSecurityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                 incomingSecurityEventList.add(securityEvent);

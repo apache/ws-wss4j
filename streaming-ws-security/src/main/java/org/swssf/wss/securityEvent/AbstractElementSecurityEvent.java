@@ -20,7 +20,7 @@ package org.swssf.wss.securityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,7 +41,7 @@ public abstract class AbstractElementSecurityEvent extends SecurityEvent {
     }
 
     public void setElementPath(List<QName> elementPath) {
-        this.elementPath = new LinkedList<QName>(elementPath);
+        this.elementPath = new ArrayList<QName>(elementPath);
     }
 
     public XMLEvent getXmlEvent() {

@@ -32,14 +32,15 @@ import java.io.OutputStream;
 public class SignerOutputStream extends OutputStream {
 
     protected static final transient Log log = LogFactory.getLog(SignerOutputStream.class);
+    protected static final transient boolean isDebugEnabled = log.isDebugEnabled();
 
     private final SignatureAlgorithm signatureAlgorithm;
-    private StringBuffer stringBuffer;
+    private StringBuilder stringBuilder;
 
     public SignerOutputStream(SignatureAlgorithm signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
-        if (log.isDebugEnabled()) {
-            stringBuffer = new StringBuffer();
+        if (isDebugEnabled) {
+            stringBuilder = new StringBuilder();
         }
     }
 
@@ -50,8 +51,8 @@ public class SignerOutputStream extends OutputStream {
     public void write(int arg0) {
         try {
             signatureAlgorithm.engineUpdate((byte) arg0);
-            if (log.isDebugEnabled()) {
-                stringBuffer.append(new String(new byte[]{(byte) arg0}));
+            if (isDebugEnabled) {
+                stringBuilder.append(new String(new byte[]{(byte) arg0}));
             }
         } catch (XMLSecurityException e) {
             throw new RuntimeException(e);
@@ -61,8 +62,8 @@ public class SignerOutputStream extends OutputStream {
     public void write(byte[] arg0, int arg1, int arg2) {
         try {
             signatureAlgorithm.engineUpdate(arg0, arg1, arg2);
-            if (log.isDebugEnabled()) {
-                stringBuffer.append(new String(arg0, arg1, arg2));
+            if (isDebugEnabled) {
+                stringBuilder.append(new String(arg0, arg1, arg2));
             }
         } catch (XMLSecurityException e) {
             throw new RuntimeException(e);
@@ -70,21 +71,21 @@ public class SignerOutputStream extends OutputStream {
     }
 
     public boolean verify(byte[] signatureValue) throws XMLSecurityException {
-        if (log.isDebugEnabled()) {
+        if (isDebugEnabled) {
             log.debug("Pre Signed: ");
-            log.debug(stringBuffer.toString());
+            log.debug(stringBuilder.toString());
             log.debug("End pre Signed ");
-            stringBuffer = new StringBuffer();
+            stringBuilder = new StringBuilder();
         }
         return signatureAlgorithm.engineVerify(signatureValue);
     }
 
     public byte[] sign() throws XMLSecurityException {
-        if (log.isDebugEnabled()) {
+        if (isDebugEnabled) {
             log.debug("Pre Signed: ");
-            log.debug(stringBuffer.toString());
+            log.debug(stringBuilder.toString());
             log.debug("End pre Signed ");
-            stringBuffer = new StringBuffer();
+            stringBuilder = new StringBuilder();
         }
         return signatureAlgorithm.engineSign();
     }

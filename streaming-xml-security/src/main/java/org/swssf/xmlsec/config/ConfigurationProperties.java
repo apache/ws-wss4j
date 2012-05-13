@@ -18,8 +18,6 @@
  */
 package org.swssf.xmlsec.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xmlsecurity.ns.configuration.PropertiesType;
 import org.xmlsecurity.ns.configuration.PropertyType;
 
@@ -33,8 +31,6 @@ import java.util.Properties;
  * @version $Revision$ $Date$
  */
 public class ConfigurationProperties {
-
-    private static final transient Log logger = LogFactory.getLog(ConfigurationProperties.class);
 
     private static Properties properties;
 

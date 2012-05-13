@@ -22,7 +22,6 @@ import org.xmlsecurity.ns.configuration.AlgorithmType;
 import org.xmlsecurity.ns.configuration.JCEAlgorithmMappingsType;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +42,8 @@ public class JCEAlgorithmMapper {
 
     protected synchronized static void init(JCEAlgorithmMappingsType jceAlgorithmMappingsType) throws Exception {
         List<AlgorithmType> algorithms = jceAlgorithmMappingsType.getAlgorithm();
-        uriToJCEName = new HashMap<String, String>(algorithms.size());
-        algorithmsMap = new HashMap<String, AlgorithmType>(algorithms.size());
+        uriToJCEName = new HashMap<String, String>(algorithms.size() + 1);
+        algorithmsMap = new HashMap<String, AlgorithmType>(algorithms.size() + 1);
 
         for (int i = 0; i < algorithms.size(); i++) {
             AlgorithmType algorithmType = algorithms.get(i);
@@ -61,26 +60,11 @@ public class JCEAlgorithmMapper {
         return uriToJCEName.get(AlgorithmURI);
     }
 
-    public static String getAlgorithmClassFromURI(String AlgorithmURI) {
-        return algorithmsMap.get(AlgorithmURI).getAlgorithmClass();
-    }
-
     public static int getKeyLengthFromURI(String AlgorithmURI) {
         return algorithmsMap.get(AlgorithmURI).getKeyLength();
     }
 
     public static String getJCERequiredKeyFromURI(String AlgorithmURI) {
         return algorithmsMap.get(AlgorithmURI).getRequiredKey();
-    }
-
-    public static String translateJCEIDToURI(String jceId) {
-        Iterator<Map.Entry<String, String>> mapIterator = uriToJCEName.entrySet().iterator();
-        while (mapIterator.hasNext()) {
-            Map.Entry<String, String> next = mapIterator.next();
-            if (next.getValue().equals(jceId)) {
-                return next.getValue();
-            }
-        }
-        return null;
     }
 }

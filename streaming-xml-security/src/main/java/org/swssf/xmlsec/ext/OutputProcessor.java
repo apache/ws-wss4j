@@ -50,11 +50,25 @@ public interface OutputProcessor {
     void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException;
 
     /**
+     * Add this processor before the given processor
+     *
+     * @param processor
+     */
+    void addBeforeProcessor(Object processor);
+
+    /**
      * This OutputProcessor will be added before the processors in this set
      *
      * @return The set with the named OutputProcessor
      */
     Set<Object> getBeforeProcessors();
+
+    /**
+     * Add this processor after the given processor
+     *
+     * @param processor
+     */
+    void addAfterProcessor(Object processor);
 
     /**
      * This OutputProcessor will be added after the processors in this set

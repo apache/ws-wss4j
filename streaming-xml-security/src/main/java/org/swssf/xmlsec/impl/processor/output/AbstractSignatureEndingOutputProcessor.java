@@ -26,8 +26,8 @@ import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.swssf.xmlsec.impl.util.SignerOutputStream;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -35,7 +35,9 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -90,9 +92,9 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null));
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature, attributes);
+        List<Attribute> attributes = new ArrayList<Attribute>(1);
+        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null)));
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature, true, attributes);
 
         SignatureAlgorithm signatureAlgorithm;
 
@@ -121,33 +123,33 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
         SignedInfoProcessor signedInfoProcessor = newSignedInfoProcessor(signatureAlgorithm, subOutputProcessorChain);
 
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignedInfo, null);
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignedInfo, false, null);
 
-        attributes = new HashMap<QName, String>();
-        attributes.put(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_CanonicalizationMethod, attributes);
+        attributes = new ArrayList<Attribute>(1);
+        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureCanonicalizationAlgorithm()));
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_CanonicalizationMethod, false, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_CanonicalizationMethod);
 
-        attributes = new HashMap<QName, String>();
-        attributes.put(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureAlgorithm());
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureMethod, attributes);
+        attributes = new ArrayList<Attribute>(1);
+        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureAlgorithm()));
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureMethod, false, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureMethod);
 
         Iterator<SignaturePartDef> signaturePartDefIterator = signaturePartDefList.iterator();
         while (signaturePartDefIterator.hasNext()) {
             SignaturePartDef signaturePartDef = signaturePartDefIterator.next();
-            attributes = new HashMap<QName, String>();
-            attributes.put(XMLSecurityConstants.ATT_NULL_URI, "#" + signaturePartDef.getSigRefId());
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Reference, attributes);
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, null);
+            attributes = new ArrayList<Attribute>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_URI, "#" + signaturePartDef.getSigRefId()));
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Reference, false, attributes);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, false, null);
             createTransformsStructureForSignature(subOutputProcessorChain, signaturePartDef);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms);
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureDigestAlgorithm());
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, attributes);
+            attributes = new ArrayList<Attribute>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureDigestAlgorithm()));
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, false, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestValue, null);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestValue, false, null);
             createCharactersAndOutputAsEvent(subOutputProcessorChain, signaturePartDef.getDigestValue());
             createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestValue);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Reference);
@@ -156,14 +158,14 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignedInfo);
         subOutputProcessorChain.removeProcessor(signedInfoProcessor);
 
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureValue, null);
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureValue, false, null);
         final byte[] signatureValue = signedInfoProcessor.getSignatureValue();
         createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValue));
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureValue);
 
-        attributes = new HashMap<QName, String>();
-        attributes.put(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null));
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, attributes);
+        attributes = new ArrayList<Attribute>(1);
+        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null)));
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, false, attributes);
         createKeyInfoStructureForSignature(subOutputProcessorChain, wrappingSecurityToken, getSecurityProperties().isUseSingleCert());
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature);
@@ -173,7 +175,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm);
         signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
         signedInfoProcessor.setAction(getAction());
-        signedInfoProcessor.getAfterProcessors().add(AbstractSignatureEndingOutputProcessor.class.getName());
+        signedInfoProcessor.addAfterProcessor(AbstractSignatureEndingOutputProcessor.class.getName());
         signedInfoProcessor.init(outputProcessorChain);
         return signedInfoProcessor;
     }

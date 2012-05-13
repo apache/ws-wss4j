@@ -151,7 +151,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     finalBinarySecurityTokenOutputProcessor.setAction(getAction());
-                    finalBinarySecurityTokenOutputProcessor.getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(SignatureOutputProcessor.class.getName());
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }
@@ -161,7 +161,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     finalBinarySecurityTokenOutputProcessor.setAction(getAction());
-                    finalBinarySecurityTokenOutputProcessor.getAfterProcessors().add(EncryptEndingOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }
@@ -217,7 +217,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
         FinalBinarySecurityTokenOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
             super();
-            this.getAfterProcessors().add(BinarySecurityTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(BinarySecurityTokenOutputProcessor.class.getName());
             this.securityToken = securityToken;
         }
 

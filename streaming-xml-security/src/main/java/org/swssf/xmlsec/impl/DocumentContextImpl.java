@@ -32,7 +32,7 @@ import java.util.*;
  */
 public class DocumentContextImpl implements DocumentContext, Cloneable {
 
-    private List<QName> path = new LinkedList<QName>();
+    private List<QName> path = new ArrayList<QName>(20);//the default of 10 is not enough
     private String encoding;
     private Map<Integer, XMLSecurityConstants.ContentType> contentTypeMap = new TreeMap<Integer, XMLSecurityConstants.ContentType>();
     private Map<Object, Integer> processorToIndexMap = new HashMap<Object, Integer>();
@@ -62,7 +62,7 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
     }
 
     public List<QName> getParentElementPath(int eventType) {
-        List<QName> parentPath = new LinkedList<QName>();
+        List<QName> parentPath = new ArrayList<QName>(this.path.size());
         if (this.path.size() >= 1) {
             parentPath.addAll(this.path.subList(0, this.path.size() - 1));
         }
@@ -103,7 +103,7 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
 
     @Override
     public List<XMLSecurityConstants.ContentType> getProtectionOrder() {
-        return new LinkedList<XMLSecurityConstants.ContentType>(contentTypeMap.values());
+        return new ArrayList<XMLSecurityConstants.ContentType>(contentTypeMap.values());
     }
 
     public Map<Integer, XMLSecurityConstants.ContentType> getContentTypeMap() {
@@ -117,9 +117,8 @@ public class DocumentContextImpl implements DocumentContext, Cloneable {
     @Override
     protected DocumentContextImpl clone() throws CloneNotSupportedException {
         DocumentContextImpl documentContext = new DocumentContextImpl();
-        List<QName> subPath = new LinkedList<QName>();
-        subPath.addAll(this.path);
         documentContext.setEncoding(this.encoding);
+        List<QName> subPath = new ArrayList<QName>(this.path);
         documentContext.setPath(subPath);
         documentContext.setContentTypeMap(getContentTypeMap());
         return documentContext;

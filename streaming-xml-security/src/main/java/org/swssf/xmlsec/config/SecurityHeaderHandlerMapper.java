@@ -18,8 +18,6 @@
  */
 package org.swssf.xmlsec.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.XMLSecurityUtils;
 import org.xmlsecurity.ns.configuration.HandlerType;
 import org.xmlsecurity.ns.configuration.SecurityHeaderHandlersType;
@@ -37,32 +35,22 @@ import java.util.Map;
  */
 public class SecurityHeaderHandlerMapper {
 
-    private static final transient Log logger = LogFactory.getLog(SecurityHeaderHandlerMapper.class);
-
-    private static Map<QName, HandlerType> handlerMap;
     private static Map<QName, Class> handlerClassMap;
 
     private SecurityHeaderHandlerMapper() {
     }
 
     protected synchronized static void init(SecurityHeaderHandlersType securityHeaderHandlersType) throws Exception {
-        handlerMap = new HashMap<QName, HandlerType>();
-        handlerClassMap = new HashMap<QName, Class>();
         List<HandlerType> handlerList = securityHeaderHandlersType.getHandler();
+        handlerClassMap = new HashMap<QName, Class>(handlerList.size() + 1);
         for (int i = 0; i < handlerList.size(); i++) {
             HandlerType handlerType = handlerList.get(i);
             QName qName = new QName(handlerType.getURI(), handlerType.getNAME());
-            handlerMap.put(qName, handlerType);
             handlerClassMap.put(qName, XMLSecurityUtils.loadClass(handlerType.getJAVACLASS()));
         }
     }
 
     public static Class getSecurityHeaderHandler(QName name) {
-        Class clazz = handlerClassMap.get(name);
-        return clazz;
-    }
-
-    public static HandlerType getHandlerMapping(QName name) {
-        return handlerMap.get(name);
+        return handlerClassMap.get(name);
     }
 }

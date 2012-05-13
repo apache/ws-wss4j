@@ -29,8 +29,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.InvalidKeyException;
@@ -38,8 +38,8 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -70,14 +70,18 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             //prepare the symmetric session key for all encryption parts
             String keyAlgorithm = JCEAlgorithmMapper.getJCERequiredKeyFromURI(securityProperties.getEncryptionSymAlgorithm());
-            int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
             KeyGenerator keyGen = null;
             try {
                 keyGen = KeyGenerator.getInstance(keyAlgorithm);
             } catch (NoSuchAlgorithmException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             }
-            keyGen.init(keyLength);
+            //the sun JCE provider expects the real key size for 3DES (112 or 168 bit)
+            //whereas bouncy castle expects the block size of 128 or 192 bits
+            if (keyAlgorithm.contains("AES")) {
+                int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
+                keyGen.init(keyLength);
+            }
 
             final Key symmetricKey = keyGen.generateKey();
 
@@ -131,23 +135,23 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (action.equals(WSSConstants.ENCRYPT)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, ekId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
-                    finalEncryptedKeyOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
             } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
-                    finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(SignatureOutputProcessor.class.getName());
                 }
             } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalEncryptedKeyOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
-                    finalEncryptedKeyOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
             }
             finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
@@ -165,7 +169,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
         FinalEncryptedKeyOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
             super();
-            this.getAfterProcessors().add(FinalEncryptedKeyOutputProcessor.class.getName());
+            this.addAfterProcessor(FinalEncryptedKeyOutputProcessor.class.getName());
             this.securityToken = securityToken;
         }
 
@@ -200,19 +204,19 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
                     X509Certificate x509Certificate = securityToken.getKeyWrappingToken().getX509Certificates()[0];
 
-                    Map<QName, String> attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_NULL_Id, securityToken.getId());
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptedKey, attributes);
+                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Id, securityToken.getId()));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptedKey, true, attributes);
 
-                    attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_NULL_Algorithm, getSecurityProperties().getEncryptionKeyTransportAlgorithm());
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, attributes);
+                    attributes = new ArrayList<Attribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, getSecurityProperties().getEncryptionKeyTransportAlgorithm()));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
                     createSecurityTokenReferenceStructureForEncryptedKey(subOutputProcessorChain, securityToken, ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType(), getSecurityProperties().isUseSingleCert());
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData, null);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData, false, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue, false, null);
 
                     try {
                         //encrypt the symmetric session key with the public key from the receiver:
@@ -263,12 +267,12 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {
 
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
+            List<Attribute> attributes = new ArrayList<Attribute>(2);
+            attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
-                attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             }
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, attributes);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             String tokenId = securityToken.getKeyWrappingToken().getId();

@@ -110,6 +110,7 @@
                         <exclude>.pmd/**</exclude>
                         <exclude>.externalToolBuilders/**</exclude>
                         <exclude>.checkstyle/**</exclude>
+                        <exclude>.idea/**</exclude>
                         <exclude>src/main/resources/**</exclude>
                         <exclude>src/test/resources/**</exclude>
                         <exclude>**/*.patch</exclude>

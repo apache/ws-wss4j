@@ -31,12 +31,14 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public class HMACSignatureAlgorithm implements SignatureAlgorithm {
 
-    private AlgorithmType algorithmType;
     private Mac mac;
 
     public HMACSignatureAlgorithm(AlgorithmType algorithmType) throws NoSuchProviderException, NoSuchAlgorithmException {
-        this.algorithmType = algorithmType;
-        mac = Mac.getInstance(algorithmType.getJCEName(), algorithmType.getJCEProvider());
+        if (algorithmType.getJCEProvider() != null) {
+            mac = Mac.getInstance(algorithmType.getJCEName(), algorithmType.getJCEProvider());
+        } else {
+            mac = Mac.getInstance(algorithmType.getJCEName());
+        }
     }
 
     public void engineUpdate(byte[] input) throws XMLSecurityException {

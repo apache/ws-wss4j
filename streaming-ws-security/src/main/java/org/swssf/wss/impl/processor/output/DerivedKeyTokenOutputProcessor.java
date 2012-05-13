@@ -29,16 +29,17 @@ import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -188,7 +189,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length, new String(Base64.encodeBase64(nonce)));
             finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalDerivedKeyTokenOutputProcessor.setAction(getAction());
-            finalDerivedKeyTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+            finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
             finalDerivedKeyTokenOutputProcessor.init(outputProcessorChain);
             derivedKeySecurityToken.setProcessor(finalDerivedKeyTokenOutputProcessor);
         } finally {
@@ -221,20 +222,20 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    Map<QName, String> attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_wsu_Id, securityToken.getId());
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_DerivedKeyToken, attributes);
+                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_DerivedKeyToken, true, attributes);
 
                     createSecurityTokenReferenceStructureForDerivedKey(subOutputProcessorChain, securityToken,
                             ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyKeyIdentifierType(),
                             ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyTokenReference(), getSecurityProperties().isUseSingleCert());
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + offset);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + length);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, nonce);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_DerivedKeyToken);
@@ -252,14 +253,14 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {
 
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
+            List<Attribute> attributes = new ArrayList<Attribute>(2);
+            attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
-                attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             }
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, attributes);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             String tokenId = securityToken.getKeyWrappingToken().getId();

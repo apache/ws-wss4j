@@ -39,7 +39,7 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       final Deque<XMLEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
         final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index, securityProperties);
 

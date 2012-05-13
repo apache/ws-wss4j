@@ -137,7 +137,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             case XMLEvent.START_ELEMENT:
                 StartElement startElement = xmlEvent.asStartElement();
                 Element element = document.createElementNS(startElement.getName().getNamespaceURI(), startElement.getName().getLocalPart());
-                if (startElement.getName().getPrefix() != null && !"".equals(startElement.getName().getPrefix())) {
+                if (startElement.getName().getPrefix() != null && !startElement.getName().getPrefix().isEmpty()) {
                     element.setPrefix(startElement.getName().getPrefix());
                 }
                 currentNode = currentNode.appendChild(element);
@@ -197,10 +197,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             case XMLEvent.NAMESPACE:
                 Namespace namespace = (Namespace) xmlEvent;
                 Attr namespaceNode;
-                if ("".equals(namespace.getPrefix())) {
+                String prefix = namespace.getPrefix();
+                if (prefix == null || prefix.isEmpty()) {
                     namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns");
                 } else {
-                    namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns:" + namespace.getPrefix());
+                    namespaceNode = document.createAttributeNS(WSSConstants.NS_XML, "xmlns:" + prefix);
                 }
                 namespaceNode.setValue(namespace.getNamespaceURI());
                 ((Element) currentNode).setAttributeNodeNS(namespaceNode);

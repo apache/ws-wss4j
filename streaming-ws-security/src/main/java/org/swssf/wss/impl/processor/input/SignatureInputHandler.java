@@ -45,8 +45,8 @@ import java.util.List;
 public class SignatureInputHandler extends AbstractSignatureInputHandler {
 
     @Override
-    protected SignatureVerifier newSignatureVerifier(InputProcessorChain inputProcessorChain,
-                                                     XMLSecurityProperties securityProperties,
+    protected SignatureVerifier newSignatureVerifier(final InputProcessorChain inputProcessorChain,
+                                                     final XMLSecurityProperties securityProperties,
                                                      final SignatureType signatureType) throws XMLSecurityException {
         if (signatureType.getSignedInfo() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -66,7 +66,7 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
         checkBSPCompliance(inputProcessorChain, signatureType);
 
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
-        SignatureVerifier signatureVerifier = new SignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
+        final SignatureVerifier signatureVerifier = new SignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
             @Override
             protected void handleSecurityToken(SecurityToken securityToken) throws XMLSecurityException {
                 //we have to emit a TokenSecurityEvent here too since it could be an embedded token
@@ -91,26 +91,27 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureType signatureType) throws WSSecurityException {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
+        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) && !WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5421);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5421);
         }
         //todo test:
         BigInteger hmacOutputLength = XMLSecurityUtils.getQNameType(
                 signatureType.getSignedInfo().getSignatureMethod().getContent(),
                 WSSConstants.TAG_dsig_HMACOutputLength);
         if (hmacOutputLength != null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5401);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5401);
         }
 
         List<Object> keyInfoContent = signatureType.getKeyInfo().getContent();
         if (keyInfoContent.size() != 1) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5402);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5402);
         }
 
         SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoContent,
                 WSSConstants.TAG_wsse_SecurityTokenReference);
         if (securityTokenReferenceType == null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5417);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5417);
         }
 
         Iterator<ObjectType> objectTypeIterator = signatureType.getObject().iterator();
@@ -118,27 +119,26 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
             ObjectType objectType = objectTypeIterator.next();
             ManifestType manifestType = XMLSecurityUtils.getQNameType(objectType.getContent(), WSSConstants.TAG_dsig_Manifest);
             if (manifestType != null) {
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5403);
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R5403);
             }
         }
 
-
         CanonicalizationMethodType canonicalizationMethodType = signatureType.getSignedInfo().getCanonicalizationMethod();
         if (!WSSConstants.NS_C14N_EXCL.equals(canonicalizationMethodType.getAlgorithm())) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5404);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5404);
         }
 
         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(),
                 WSSConstants.TAG_c14nExcl_InclusiveNamespaces);
         if (inclusiveNamespacesType != null && inclusiveNamespacesType.getPrefixList().size() == 0) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5406);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5406);
         }
     }
 
     @Override
     protected void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain,
                                                               XMLSecurityProperties securityProperties,
-                                                              SignatureType signatureType, SecurityToken securityToken) throws WSSecurityException {
+                                                              SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException {
         //add processors to verify references
         inputProcessorChain.addProcessor(
                 new SignatureReferenceVerifyInputProcessor(signatureType, securityToken, securityProperties,

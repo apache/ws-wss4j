@@ -58,10 +58,11 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       final Deque<XMLEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
-        final EncryptedKeyType encryptedKeyType = ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index, securityProperties)).getValue();
+        final EncryptedKeyType encryptedKeyType =
+                ((JAXBElement<EncryptedKeyType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         if (encryptedKeyType.getEncryptionMethod() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
@@ -75,8 +76,9 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
         final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
 
-        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+        final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
             private WSSecurityToken securityToken = null;
 
@@ -87,7 +89,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                 }
 
                 this.securityToken = new AbstractSecurityToken(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null, null,
+                        securityContext, null, null,
                         encryptedKeyType.getId(), null) {
 
                     private Map<String, Key> keyTable = new Hashtable<String, Key>();
@@ -131,7 +133,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                                 keyInfoType,
                                 crypto,
                                 securityProperties.getCallbackHandler(),
-                                inputProcessorChain.getSecurityContext()
+                                securityContext
                         );
                         this.wrappingSecurityToken.addWrappedToken(wrappedSecurityToken);
                         return this.wrappingSecurityToken;
@@ -157,7 +159,12 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                                 keyUsage = WSSConstants.Sym_Key_Wrap;
                             }
 
-                            Cipher cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
+                            Cipher cipher;
+                            if (asyncEncAlgo.getJCEProvider() == null) {
+                                cipher = Cipher.getInstance(asyncEncAlgo.getJCEName());
+                            } else {
+                                cipher = Cipher.getInstance(asyncEncAlgo.getJCEName(), asyncEncAlgo.getJCEProvider());
+                            }
                             cipher.init(Cipher.DECRYPT_MODE, wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage));
                             if (encryptedKeyType.getCipherData() == null
                                     || encryptedKeyType.getCipherData().getCipherValue() == null) {
@@ -198,12 +205,12 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         };
 
         //register the key token for decryption:
-        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(encryptedKeyType.getId(), securityTokenProvider);
+        securityContext.registerSecurityTokenProvider(encryptedKeyType.getId(), securityTokenProvider);
 
         //fire a tokenSecurityEvent
         TokenSecurityEvent tokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
         tokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(tokenSecurityEvent);
+        securityContext.registerSecurityEvent(tokenSecurityEvent);
 
         //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
         //and add it to the chain
@@ -217,26 +224,27 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
             keyInfoType.getContent().add(objectFactory.createSecurityTokenReference(securityTokenReferenceType));
             inputProcessorChain.addProcessor(
                     new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(),
-                            (WSSSecurityProperties) securityProperties, (WSSecurityContext) inputProcessorChain.getSecurityContext())
+                            (WSSSecurityProperties) securityProperties, securityContext)
             );
         }
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType) throws WSSecurityException {
+        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (encryptedKeyType.getType() != null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3209);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R3209);
         }
         if (encryptedKeyType.getMimeType() != null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5622);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5622);
         }
         if (encryptedKeyType.getEncoding() != null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5623);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5623);
         }
         if (encryptedKeyType.getRecipient() != null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5602);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5602);
         }
         if (encryptedKeyType.getEncryptionMethod() == null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R5603);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R5603);
         }
     }
 

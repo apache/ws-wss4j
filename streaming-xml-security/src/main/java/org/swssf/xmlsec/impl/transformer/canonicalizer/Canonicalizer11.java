@@ -21,6 +21,7 @@ package org.swssf.xmlsec.impl.transformer.canonicalizer;
 import org.swssf.xmlsec.ext.ComparableAttribute;
 import org.swssf.xmlsec.ext.XMLEventNS;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import java.io.OutputStream;
@@ -38,16 +39,19 @@ public class Canonicalizer11 extends CanonicalizerBase {
     }
 
     @Override
-    protected void getInitialUtilizedAttributes(XMLEventNS xmlEventNS, SortedSet<ComparableAttribute> utilizedAttributes, C14NStack<List<Comparable>> outputStack) {
-        List<ComparableAttribute>[] visibleAttributeList = xmlEventNS.getAttributeList();
+    protected void getInitialUtilizedAttributes(final XMLEventNS xmlEventNS, final SortedSet<ComparableAttribute> utilizedAttributes,
+                                                final C14NStack<List<Comparable>> outputStack) {
+
+        final List<ComparableAttribute>[] visibleAttributeList = xmlEventNS.getAttributeList();
         for (int i = 0; i < visibleAttributeList.length; i++) {
-            List<ComparableAttribute> comparableAttributes = visibleAttributeList[i];
+            final List<ComparableAttribute> comparableAttributes = visibleAttributeList[i];
             for (int j = 0; j < comparableAttributes.size(); j++) {
-                ComparableAttribute comparableAttribute = comparableAttributes.get(j);
+                final ComparableAttribute comparableAttribute = comparableAttributes.get(j);
                 //xml:id attributes must be handled like other attributes: emit but dont inherit
-                if (XML.equals(comparableAttribute.getName().getPrefix())
-                        && ("id".equals(comparableAttribute.getName().getLocalPart()))
-                        || ("base".equals(comparableAttribute.getName().getLocalPart()))) {
+                final QName comparableAttributeName = comparableAttribute.getName();
+                if (XML.equals(comparableAttributeName.getPrefix())
+                        && ("id".equals(comparableAttributeName.getLocalPart()))
+                        || ("base".equals(comparableAttributeName.getLocalPart()))) {
                     continue;
                 }
                 if (outputStack.containsOnStack(comparableAttribute) != null) {
@@ -58,20 +62,21 @@ public class Canonicalizer11 extends CanonicalizerBase {
             }
         }
 
-        StartElement startElement = xmlEventNS.asStartElement();
+        final StartElement startElement = xmlEventNS.asStartElement();
         @SuppressWarnings("unchecked")
-        Iterator<Attribute> attributesIterator = startElement.getAttributes();
+        final Iterator<Attribute> attributesIterator = startElement.getAttributes();
         while (attributesIterator.hasNext()) {
-            Attribute attribute = attributesIterator.next();
+            final Attribute attribute = attributesIterator.next();
             //attributes with xml prefix are already processed in the for loop above
             //xml:id attributes must be handled like other attributes: emit but dont inherit
-            if (XML.equals(attribute.getName().getPrefix())
-                    && !"id".equals(attribute.getName().getLocalPart())
-                    && !"base".equals(attribute.getName().getLocalPart())) {
+            final QName attributeName = attribute.getName();
+            if (XML.equals(attributeName.getPrefix())
+                    && !"id".equals(attributeName.getLocalPart())
+                    && !"base".equals(attributeName.getLocalPart())) {
                 continue;
             }
 
-            utilizedAttributes.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
+            utilizedAttributes.add(new ComparableAttribute(attributeName, attribute.getValue()));
         }
     }
 }

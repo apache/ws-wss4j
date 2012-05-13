@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.impl.processor.output;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
@@ -29,7 +31,6 @@ import org.swssf.xmlsec.impl.processor.output.AbstractEncryptOutputProcessor;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.NoSuchPaddingException;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
@@ -37,9 +38,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Processor to encrypt XML structures
@@ -48,6 +49,8 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
+
+    private static final transient Log logger = LogFactory.getLog(EncryptOutputProcessor.class);
 
     public EncryptOutputProcessor() throws XMLSecurityException {
         super();
@@ -121,23 +124,22 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
             super(encryptionPartDef, startElement, encoding);
-            this.getBeforeProcessors().add(EncryptEndingOutputProcessor.class.getName());
-            this.getBeforeProcessors().add(InternalEncryptionOutputProcessor.class.getName());
-            this.getAfterProcessors().add(EncryptOutputProcessor.class.getName());
+            this.addBeforeProcessor(EncryptEndingOutputProcessor.class.getName());
+            this.addBeforeProcessor(InternalEncryptionOutputProcessor.class.getName());
+            this.addAfterProcessor(EncryptOutputProcessor.class.getName());
         }
 
         /**
          * Creates the Data structure around the cipher data
          */
         protected void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = null;
 
             //WSS 1.1 EncryptedHeader Element:
             if (outputProcessorChain.getDocumentContext().getDocumentLevel() == 3
                     && ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
                 doEncryptedHeader = true;
 
-                attributes = new HashMap<QName, String>();
+                List<Attribute> attributes = new ArrayList<Attribute>(1);
 
                 @SuppressWarnings("unchecked")
                 Iterator<Attribute> attributeIterator = getStartElement().getAttributes();
@@ -146,27 +148,27 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     if (!attribute.isNamespace() &&
                             (WSSConstants.NS_SOAP11.equals(attribute.getName().getNamespaceURI()) ||
                                     WSSConstants.NS_SOAP12.equals(attribute.getName().getNamespaceURI()))) {
-                        attributes.put(attribute.getName(), attribute.getValue());
+                        attributes.add(createAttribute(attribute.getName(), attribute.getValue()));
                     }
                 }
-                createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse11_EncryptedHeader, attributes);
+                createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse11_EncryptedHeader, true, attributes);
             }
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_Id, getEncryptionPartDef().getEncRefId());
-            attributes.put(WSSConstants.ATT_NULL_Type, getEncryptionPartDef().getModifier().getModifier());
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptedData, attributes);
+            List<Attribute> attributes = new ArrayList<Attribute>(2);
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_Id, getEncryptionPartDef().getEncRefId()));
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_Type, getEncryptionPartDef().getModifier().getModifier()));
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptedData, true, attributes);
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_Algorithm, securityProperties.getEncryptionSymAlgorithm());
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, attributes);
+            attributes = new ArrayList<Attribute>(1);
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, securityProperties.getEncryptionSymAlgorithm()));
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
 
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
             createKeyInfoStructure(outputProcessorChain);
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_CipherData, null);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_CipherValue, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_CipherData, false, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_CipherValue, false, null);
 
             /*
             <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncDataId-1612925417"
@@ -190,12 +192,11 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         @Override
         protected void createKeyInfoStructure(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes;
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_URI, "#" + getEncryptionPartDef().getKeyId());
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
+            List<Attribute> attributes = new ArrayList<Attribute>(1);
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_URI, "#" + getEncryptionPartDef().getKeyId()));
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }

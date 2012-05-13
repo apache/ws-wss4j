@@ -57,10 +57,6 @@ public class XMLSecurityUtils {
         return reference;
     }
 
-    public static Attribute getReferenceIDAttribute(StartElement startElement) {
-        return startElement.getAttributeByName(XMLSecurityConstants.ATT_NULL_Id);
-    }
-
     /**
      * Returns the XMLEvent type in String form
      *
@@ -140,60 +136,68 @@ public class XMLSecurityUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static XMLEvent createXMLEventNS(XMLEvent xmlEvent, Deque<List<ComparableNamespace>> nsStack, Deque<List<ComparableAttribute>> attrStack) {
+    public static final XMLEvent createXMLEventNS(final XMLEvent xmlEvent, final Deque<List<ComparableNamespace>> nsStack, final Deque<List<ComparableAttribute>> attrStack) {
         if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            QName startElementName = startElement.getName();
+            final StartElement startElement = xmlEvent.asStartElement();
+            final QName startElementName = startElement.getName();
+            final String startElementNamePrefix = startElementName.getPrefix();
 
-            List<String> prefixList = new LinkedList<String>();
-            prefixList.add(startElementName.getPrefix());
+            Set<String> prefixSet = new HashSet<String>();
+            prefixSet.add(startElementNamePrefix);
 
-            List<ComparableNamespace> comparableNamespaceList = new LinkedList<ComparableNamespace>();
+            List<ComparableNamespace> comparableNamespaceList = new ArrayList<ComparableNamespace>();
 
-            ComparableNamespace curElementNamespace = new ComparableNamespace(startElementName.getPrefix(), startElementName.getNamespaceURI());
+            ComparableNamespace curElementNamespace = new ComparableNamespace(startElementNamePrefix, startElementName.getNamespaceURI());
             comparableNamespaceList.add(curElementNamespace);
 
             @SuppressWarnings("unchecked")
             Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
             while (namespaceIterator.hasNext()) {
-                Namespace namespace = namespaceIterator.next();
-                String prefix = namespace.getPrefix();
+                final Namespace namespace = namespaceIterator.next();
+                final String prefix = namespace.getPrefix();
+                final String namespaceURI = namespace.getNamespaceURI();
 
-                if ((prefix == null || prefix.length() == 0) && (namespace.getNamespaceURI() == null || namespace.getNamespaceURI().length() == 0)) {
+                if ((prefix == null || prefix.isEmpty())
+                        && (namespaceURI == null || namespaceURI.isEmpty())) {
                     continue;
                 }
 
-                if (!prefixList.contains(prefix)) {
-                    prefixList.add(prefix);
-                    ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, namespace.getNamespaceURI());
-                    comparableNamespaceList.add(tmpNameSpace);
+                if (!prefixSet.contains(prefix)) {
+                    prefixSet.add(prefix);
+                    comparableNamespaceList.add(new ComparableNamespace(prefix, namespaceURI));
                 }
             }
 
-            List<ComparableAttribute> comparableAttributeList = new LinkedList<ComparableAttribute>();
+            List<ComparableAttribute> comparableAttributeList;
 
             @SuppressWarnings("unchecked")
             Iterator<Attribute> attributeIterator = startElement.getAttributes();
-            while (attributeIterator.hasNext()) {
-                Attribute attribute = attributeIterator.next();
-                String prefix = attribute.getName().getPrefix();
+            if (attributeIterator.hasNext()) {
+                comparableAttributeList = new ArrayList<ComparableAttribute>();
+            } else {
+                comparableAttributeList = Collections.emptyList();
+            }
 
-                if (prefix != null && prefix.length() == 0 && attribute.getName().getNamespaceURI().length() == 0) {
+            while (attributeIterator.hasNext()) {
+                final Attribute attribute = attributeIterator.next();
+                final QName attributeName = attribute.getName();
+                final String prefix = attributeName.getPrefix();
+                final String attributeNameNamespaceURI = attributeName.getNamespaceURI();
+
+                if (prefix != null && prefix.isEmpty() && attributeNameNamespaceURI.isEmpty()) {
                     continue;
                 }
                 if (!"xml".equals(prefix)) {
-                    if (!"".equals(prefix)) {
-                        //does an attribute have an namespace?
-                        if (!prefixList.contains(prefix)) {
-                            prefixList.add(prefix);
-                            ComparableNamespace tmpNameSpace = new ComparableNamespace(prefix, attribute.getName().getNamespaceURI());
-                            comparableNamespaceList.add(tmpNameSpace);
+                    if (prefix != null && !prefix.isEmpty()) {
+                        if (!prefixSet.contains(prefix)) {
+                            prefixSet.add(prefix);
+                            comparableNamespaceList.add(new ComparableNamespace(prefix, attributeNameNamespaceURI));
                         }
                         continue;
                     }
                 }
                 //add all attrs with xml - prefix (eg. xml:lang) to attr list:
-                comparableAttributeList.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
+                comparableAttributeList.add(new ComparableAttribute(attributeName, attribute.getValue()));
             }
 
             nsStack.push(comparableNamespaceList);
@@ -201,10 +205,8 @@ public class XMLSecurityUtils {
 
             return new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
         } else if (xmlEvent.isEndElement()) {
-            XMLEventNS xmlEventNS = new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
             nsStack.pop();
             attrStack.pop();
-            return xmlEventNS;
         }
         return xmlEvent;
     }
@@ -212,6 +214,9 @@ public class XMLSecurityUtils {
     //todo optimize?
     public static Transformer getTransformer(Object methodParameter1, Object methodParameter2, String algorithm) throws XMLSecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Class<Transformer> transformerClass = (Class<Transformer>) TransformerAlgorithmMapper.getTransformerClass(algorithm, null);
+        if (transformerClass == null) {
+            return null;
+        }
         Transformer childTransformer;
         try {
             Constructor<Transformer> constructor = transformerClass.getConstructor(Transformer.class);
@@ -250,13 +255,6 @@ public class XMLSecurityUtils {
     }
 
     public static String getQNameAttribute(Map<QName, String> attributes, QName qName) {
-        Iterator<Map.Entry<QName, String>> attributeIterator = attributes.entrySet().iterator();
-        while (attributeIterator.hasNext()) {
-            Map.Entry<QName, String> entry = attributeIterator.next();
-            if (entry.getKey().equals(qName)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return attributes.get(qName);
     }
 }

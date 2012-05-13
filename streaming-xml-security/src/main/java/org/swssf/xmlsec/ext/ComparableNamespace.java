@@ -35,31 +35,24 @@ import java.io.Writer;
  */
 public class ComparableNamespace implements Namespace, Comparable<ComparableNamespace> {
 
-    private String prefix;
+    private String prefix = "";
     private String uri;
 
     public ComparableNamespace(String uri) {
         this.uri = uri;
-        this.prefix = "";
     }
 
     public ComparableNamespace(String prefix, String uri) {
         if (prefix != null) {
             this.prefix = prefix;
-        } else {
-            this.prefix = "";
         }
-        if (uri != null) {
-            this.uri = uri;
-        } else {
-            this.uri = "";
-        }
+        this.uri = uri;
     }
 
     public int compareTo(ComparableNamespace o) {
         //An element's namespace nodes are sorted lexicographically by local name
         //(the default namespace node, if one exists, has no local name and is therefore lexicographically least).
-        return this.getPrefix().compareTo(o.getPrefix());
+        return this.prefix.compareTo(o.getPrefix());
     }
 
     @Override
@@ -69,7 +62,7 @@ public class ComparableNamespace implements Namespace, Comparable<ComparableName
         }
         ComparableNamespace comparableNamespace = (ComparableNamespace) obj;
 
-        if (comparableNamespace.getPrefix().equals(this.getPrefix())) {
+        if (comparableNamespace.getPrefix().equals(this.prefix)) {
             //just test for prefix to get the last prefix definition on the stack and let overwrite it 
             return true;
         }
@@ -117,7 +110,7 @@ public class ComparableNamespace implements Namespace, Comparable<ComparableName
     }
 
     public boolean isAttribute() {
-        return true;
+        return false;
     }
 
     public boolean isNamespace() {
@@ -170,9 +163,9 @@ public class ComparableNamespace implements Namespace, Comparable<ComparableName
 
     @Override
     public String toString() {
-        if (getPrefix() == null || getPrefix().length() == 0) {
-            return "xmlns=\"" + getNamespaceURI() + "\"";
+        if (this.prefix == null || this.prefix.isEmpty()) {
+            return "xmlns=\"" + this.uri + "\"";
         }
-        return "xmlns:" + getPrefix() + "=\"" + getNamespaceURI() + "\"";
+        return "xmlns:" + this.prefix + "=\"" + this.uri + "\"";
     }
 }

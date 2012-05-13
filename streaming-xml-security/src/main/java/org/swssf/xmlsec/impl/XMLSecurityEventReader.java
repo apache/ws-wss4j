@@ -33,7 +33,6 @@ import java.util.NoSuchElementException;
 public class XMLSecurityEventReader implements XMLEventReader {
 
     private Iterator<XMLEvent> xmlEventIterator;
-    private XMLEvent currentXMLEvent;
     private XMLEvent nextXMLEvent;
 
     public XMLSecurityEventReader(Deque<XMLEvent> xmlEvents, int fromIndex) {
@@ -47,16 +46,17 @@ public class XMLSecurityEventReader implements XMLEventReader {
     @Override
     public XMLEvent nextEvent() throws XMLStreamException {
         if (this.nextXMLEvent != null) {
-            this.currentXMLEvent = this.nextXMLEvent;
+            final XMLEvent currentXMLEvent = this.nextXMLEvent;
             this.nextXMLEvent = null;
-            return this.currentXMLEvent;
+            return currentXMLEvent;
         }
+        final XMLEvent currentXMLEvent;
         try {
-            this.currentXMLEvent = xmlEventIterator.next();
+            currentXMLEvent = xmlEventIterator.next();
         } catch (NoSuchElementException e) {
             throw new XMLStreamException(e);
         }
-        return this.currentXMLEvent;
+        return currentXMLEvent;
     }
 
     @Override

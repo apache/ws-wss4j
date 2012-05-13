@@ -31,7 +31,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Class to load the algorithms-mappings from a configuration file.
@@ -42,11 +42,11 @@ import java.net.URL;
  */
 public class Init {
 
-    private static URL initialized = null;
+    private static URI initialized = null;
 
     @SuppressWarnings("unchecked")
-    public synchronized static void init(URL url) throws XMLSecurityException {
-        if (initialized == null || (url != null && !url.equals(initialized))) {
+    public synchronized static void init(URI uri) throws XMLSecurityException {
+        if (initialized == null || (uri != null && !uri.equals(initialized))) {
             try {
                 JAXBContext jaxbContext = JAXBContext.newInstance("org.xmlsecurity.ns.configuration");
                 final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -59,10 +59,10 @@ public class Init {
                 saxParserFactory.setXIncludeAware(false);
                 saxParserFactory.setNamespaceAware(true);
                 SAXParser saxParser = saxParserFactory.newSAXParser();
-                if (url == null) {
-                    url = Init.class.getClassLoader().getResource("security-config.xml");
+                if (uri == null) {
+                    uri = Init.class.getClassLoader().getResource("security-config.xml").toURI();
                 }
-                saxParser.parse(url.toExternalForm(), new XIncludeHandler(unmarshallerHandler));
+                saxParser.parse(uri.toURL().toExternalForm(), new XIncludeHandler(unmarshallerHandler));
                 JAXBElement<ConfigurationType> configurationTypeJAXBElement = (JAXBElement<ConfigurationType>) unmarshallerHandler.getResult();
 
                 ConfigurationProperties.init(configurationTypeJAXBElement.getValue().getProperties());
@@ -73,7 +73,7 @@ public class Init {
             } catch (Exception e) {
                 throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, null, e);
             }
-            initialized = url;
+            initialized = uri;
         }
     }
 }

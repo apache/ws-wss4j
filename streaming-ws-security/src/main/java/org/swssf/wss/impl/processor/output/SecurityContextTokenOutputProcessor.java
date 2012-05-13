@@ -25,15 +25,15 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -123,16 +123,16 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
-                    finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(org.swssf.wss.impl.processor.output.SignatureOutputProcessor.class.getName());
+                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(SignatureOutputProcessor.class.getName());
                 }
             } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
-                    finalSecurityContextTokenOutputProcessor.getBeforeProcessors().add(wrappingSecurityToken.getProcessor());
+                    finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
-                    finalSecurityContextTokenOutputProcessor.getAfterProcessors().add(org.swssf.wss.impl.processor.output.EncryptEndingOutputProcessor.class.getName());
+                    finalSecurityContextTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
             }
 
@@ -165,10 +165,10 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    Map<QName, String> attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_wsu_Id, securityToken.getId());
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_SecurityContextToken, attributes);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier, null);
+                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_SecurityContextToken, true, attributes);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, identifier);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_SecurityContextToken);

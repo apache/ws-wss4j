@@ -18,8 +18,6 @@
  */
 package org.swssf.xmlsec.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityUtils;
 import org.xmlsecurity.ns.configuration.TransformAlgorithmType;
@@ -37,8 +35,6 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 public class TransformerAlgorithmMapper {
-
-    private static final transient Log logger = LogFactory.getLog(TransformerAlgorithmMapper.class);
 
     private static Map<String, Class> algorithmsClassMapInOut;
     private static Map<String, Class> algorithmsClassMapIn;
@@ -69,13 +65,13 @@ public class TransformerAlgorithmMapper {
     }
 
     public static Class<?> getTransformerClass(String algoURI, String inOut) throws XMLSecurityException {
-        Class clazz;
-        if ("IN".equals(inOut)) {
+        Class clazz = null;
+        if (inOut == null) {
+            clazz = algorithmsClassMapInOut.get(algoURI);
+        } else if ("IN".equals(inOut)) {
             clazz = algorithmsClassMapIn.get(algoURI);
         } else if ("OUT".equals(inOut)) {
             clazz = algorithmsClassMapOut.get(algoURI);
-        } else {
-            clazz = algorithmsClassMapInOut.get(algoURI);
         }
         if (clazz == null) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK);

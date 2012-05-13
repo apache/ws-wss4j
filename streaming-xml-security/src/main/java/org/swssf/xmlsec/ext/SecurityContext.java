@@ -19,6 +19,7 @@
 package org.swssf.xmlsec.ext;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * The document security context
@@ -39,6 +40,8 @@ public interface SecurityContext {
     <T> void putAsList(Class key, T value);
 
     <T> List<T> getAsList(Class key);
+
+    <T> Set<T> getAsSet(Class key);
 
     /**
      * Register a new SecurityTokenProvider.

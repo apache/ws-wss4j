@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.impl.processor.output;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
@@ -43,6 +45,8 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
+
+    private static final transient Log logger = LogFactory.getLog(SignatureOutputProcessor.class);
 
     public SignatureOutputProcessor() throws XMLSecurityException {
         super();
@@ -76,7 +80,6 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                             signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
 
                             boolean found = false;
-                            List<Attribute> attributeList = new ArrayList<Attribute>();
                             @SuppressWarnings("unchecked")
                             Iterator<Attribute> attributeIterator = startElement.getAttributes();
                             while (attributeIterator.hasNext()) {
@@ -84,9 +87,11 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                                 if (attribute.getName().equals(WSSConstants.ATT_wsu_Id)) {
                                     signaturePartDef.setSigRefId(attribute.getValue());
                                     found = true;
+                                    break;
                                 }
                             }
                             if (!found) {
+                                List<Attribute> attributeList = new ArrayList<Attribute>(1);
                                 attributeList.add(createAttribute(WSSConstants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
                                 xmlEvent = cloneStartElementEvent(xmlEvent, attributeList);
                             }
@@ -105,8 +110,8 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                         internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(signaturePartDef, startElement.getName());
                         internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                         internalSignatureOutputProcessor.setAction(getAction());
-                        internalSignatureOutputProcessor.getAfterProcessors().add(SignatureOutputProcessor.class.getName());
-                        internalSignatureOutputProcessor.getBeforeProcessors().add(SignatureEndingOutputProcessor.class.getName());
+                        internalSignatureOutputProcessor.addAfterProcessor(SignatureOutputProcessor.class.getName());
+                        internalSignatureOutputProcessor.addBeforeProcessor(SignatureEndingOutputProcessor.class.getName());
                         internalSignatureOutputProcessor.init(outputProcessorChain);
 
                     } catch (NoSuchAlgorithmException e) {

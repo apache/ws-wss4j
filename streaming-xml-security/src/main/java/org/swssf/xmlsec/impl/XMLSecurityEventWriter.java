@@ -67,11 +67,10 @@ public class XMLSecurityEventWriter implements XMLEventWriter {
 
             case XMLStreamConstants.CHARACTERS:
                 Characters characters = event.asCharacters();
-                String text = characters.getData();
                 if (characters.isCData()) {
-                    this.xmlStreamWriter.writeCData(text);
+                    this.xmlStreamWriter.writeCData(characters.getData());
                 } else {
-                    this.xmlStreamWriter.writeCharacters(text);
+                    this.xmlStreamWriter.writeCharacters(characters.getData());
                 }
                 break;
 

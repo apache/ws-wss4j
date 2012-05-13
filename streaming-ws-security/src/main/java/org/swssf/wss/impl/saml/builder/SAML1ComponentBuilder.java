@@ -358,7 +358,7 @@ public class SAML1ComponentBuilder {
 
         if ("Password".equals(sourceMethod)) {
             transformedMethod = SAML1Constants.AUTH_METHOD_PASSWORD;
-        } else if (sourceMethod != null && !"".equals(sourceMethod)) {
+        } else if (sourceMethod != null && !sourceMethod.isEmpty()) {
             return sourceMethod;
         }
 

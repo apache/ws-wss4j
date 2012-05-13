@@ -28,13 +28,12 @@ import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author $Author$
@@ -44,8 +43,8 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
     public SignatureConfirmationOutputProcessor() throws XMLSecurityException {
         super();
-        getBeforeProcessors().add(SignatureOutputProcessor.class.getName());
-        getBeforeProcessors().add(EncryptOutputProcessor.class.getName());
+        addBeforeProcessor(SignatureOutputProcessor.class.getName());
+        addBeforeProcessor(EncryptOutputProcessor.class.getName());
     }
 
     @Override
@@ -65,18 +64,18 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                         aSignatureFound = true;
                         SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 
-                        Map<QName, String> attributes = new HashMap<QName, String>();
-                        attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
-                        attributes.put(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue()));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, attributes);
+                        List<Attribute> attributes = new ArrayList<Attribute>(2);
+                        attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                        attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue())));
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
                     }
                 }
 
                 if (!aSignatureFound) {
-                    Map<QName, String> attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, attributes);
+                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, true, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
                 }
 

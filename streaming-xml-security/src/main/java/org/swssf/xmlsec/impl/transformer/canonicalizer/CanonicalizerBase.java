@@ -20,6 +20,7 @@ package org.swssf.xmlsec.impl.transformer.canonicalizer;
 
 import org.swssf.xmlsec.ext.*;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
@@ -50,6 +51,8 @@ public abstract class CanonicalizerBase implements Transformer {
 
     protected static final String XML = "xml";
     protected static final String XMLNS = "xmlns";
+    protected static final char DOUBLEPOINT = ':';
+    protected static final String XMLNS_DOUBLEPOINT = XMLNS + DOUBLEPOINT;
 
     private enum DocumentLevel {
         NODE_BEFORE_DOCUMENT_ELEMENT,
@@ -59,7 +62,7 @@ public abstract class CanonicalizerBase implements Transformer {
 
     private OutputStream outputStream;
 
-    private Map<String, byte[]> cache = new HashMap<String, byte[]>();
+    private static final Map<String, byte[]> cache = new WeakHashMap<String, byte[]>();
     private C14NStack<List<Comparable>> outputStack = new C14NStack<List<Comparable>>();
     private boolean includeComments = false;
     private DocumentLevel currentDocumentLevel = DocumentLevel.NODE_BEFORE_DOCUMENT_ELEMENT;
@@ -78,10 +81,10 @@ public abstract class CanonicalizerBase implements Transformer {
             return null;
         }
 
-        SortedSet<String> prefixes = new TreeSet<String>();
+        final SortedSet<String> prefixes = new TreeSet<String>();
 
         for (int i = 0; i < inclusiveNamespaces.size(); i++) {
-            String s = inclusiveNamespaces.get(i);
+            final String s = inclusiveNamespaces.get(i).intern();
             if ("#default".equals(s)) {
                 prefixes.add("");
             } else {
@@ -91,10 +94,11 @@ public abstract class CanonicalizerBase implements Transformer {
         return prefixes;
     }
 
-    protected void getCurrentUtilizedNamespaces(XMLEventNS xmlEventNS, SortedSet<ComparableNamespace> utilizedNamespaces, C14NStack<List<Comparable>> outputStack) {
-        List<ComparableNamespace> currentUtilizedNamespace = xmlEventNS.getNamespaceList()[0];
+    protected void getCurrentUtilizedNamespaces(final XMLEventNS xmlEventNS, final SortedSet<ComparableNamespace> utilizedNamespaces,
+                                                final C14NStack<List<Comparable>> outputStack) {
+        final List<ComparableNamespace> currentUtilizedNamespace = xmlEventNS.getNamespaceList()[0];
         for (int j = 0; j < currentUtilizedNamespace.size(); j++) {
-            ComparableNamespace comparableNamespace = currentUtilizedNamespace.get(j);
+            final ComparableNamespace comparableNamespace = currentUtilizedNamespace.get(j);
 
             final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
             //found means the prefix matched. so check the ns further
@@ -107,22 +111,24 @@ public abstract class CanonicalizerBase implements Transformer {
         }
     }
 
-    protected void getCurrentUtilizedAttributes(XMLEventNS xmlEventNS, SortedSet<ComparableAttribute> utilizedAttributes, C14NStack<List<Comparable>> outputStack) {
-        StartElement startElement = xmlEventNS.asStartElement();
+    protected void getCurrentUtilizedAttributes(final XMLEventNS xmlEventNS, final SortedSet<ComparableAttribute> utilizedAttributes,
+                                                final C14NStack<List<Comparable>> outputStack) {
+        final StartElement startElement = xmlEventNS.asStartElement();
         @SuppressWarnings("unchecked")
-        Iterator<Attribute> attributesIterator = startElement.getAttributes();
+        final Iterator<Attribute> attributesIterator = startElement.getAttributes();
         while (attributesIterator.hasNext()) {
-            Attribute attribute = attributesIterator.next();
+            final Attribute attribute = attributesIterator.next();
             utilizedAttributes.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
         }
     }
 
-    protected void getInitialUtilizedNamespaces(XMLEventNS xmlEventNS, SortedSet<ComparableNamespace> utilizedNamespaces, C14NStack<List<Comparable>> outputStack) {
-        List<ComparableNamespace>[] visibleNamespaceList = xmlEventNS.getNamespaceList();
+    protected void getInitialUtilizedNamespaces(final XMLEventNS xmlEventNS, final SortedSet<ComparableNamespace> utilizedNamespaces,
+                                                final C14NStack<List<Comparable>> outputStack) {
+        final List<ComparableNamespace>[] visibleNamespaceList = xmlEventNS.getNamespaceList();
         for (int i = 0; i < visibleNamespaceList.length; i++) {
-            List<ComparableNamespace> initialUtilizedNamespace = visibleNamespaceList[i];
+            final List<ComparableNamespace> initialUtilizedNamespace = visibleNamespaceList[i];
             for (int j = 0; j < initialUtilizedNamespace.size(); j++) {
-                ComparableNamespace comparableNamespace = initialUtilizedNamespace.get(j);
+                final ComparableNamespace comparableNamespace = initialUtilizedNamespace.get(j);
 
                 final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
                 //found means the prefix matched. so check the ns further
@@ -136,12 +142,13 @@ public abstract class CanonicalizerBase implements Transformer {
         }
     }
 
-    protected void getInitialUtilizedAttributes(XMLEventNS xmlEventNS, SortedSet<ComparableAttribute> utilizedAttributes, C14NStack<List<Comparable>> outputStack) {
-        List<ComparableAttribute>[] visibleAttributeList = xmlEventNS.getAttributeList();
+    protected void getInitialUtilizedAttributes(final XMLEventNS xmlEventNS, final SortedSet<ComparableAttribute> utilizedAttributes,
+                                                final C14NStack<List<Comparable>> outputStack) {
+        final List<ComparableAttribute>[] visibleAttributeList = xmlEventNS.getAttributeList();
         for (int i = 0; i < visibleAttributeList.length; i++) {
-            List<ComparableAttribute> comparableAttributes = visibleAttributeList[i];
+            final List<ComparableAttribute> comparableAttributes = visibleAttributeList[i];
             for (int j = 0; j < comparableAttributes.size(); j++) {
-                ComparableAttribute comparableAttribute = comparableAttributes.get(j);
+                final ComparableAttribute comparableAttribute = comparableAttributes.get(j);
                 if (outputStack.containsOnStack(comparableAttribute) != null) {
                     continue;
                 }
@@ -149,11 +156,11 @@ public abstract class CanonicalizerBase implements Transformer {
                 outputStack.peek().add(comparableAttribute);
             }
         }
-        StartElement startElement = xmlEventNS.asStartElement();
+        final StartElement startElement = xmlEventNS.asStartElement();
         @SuppressWarnings("unchecked")
-        Iterator<Attribute> attributesIterator = startElement.getAttributes();
+        final Iterator<Attribute> attributesIterator = startElement.getAttributes();
         while (attributesIterator.hasNext()) {
-            Attribute attribute = attributesIterator.next();
+            final Attribute attribute = attributesIterator.next();
             //attributes with xml prefix are already processed in the for loop above
             if (XML.equals(attribute.getName().getPrefix())) {
                 continue;
@@ -163,39 +170,38 @@ public abstract class CanonicalizerBase implements Transformer {
         }
     }
 
-    public void transform(XMLEvent xmlEvent) throws XMLStreamException {
+    public void transform(final XMLEvent xmlEvent) throws XMLStreamException {
         try {
             switch (xmlEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
 
-                    StartElement startElement = xmlEvent.asStartElement();
+                    final StartElement startElement = xmlEvent.asStartElement();
 
                     currentDocumentLevel = DocumentLevel.NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT;
-                    outputStack.push(new ArrayList<Comparable>());
+                    outputStack.push(Collections.<Comparable>emptyList());
 
-                    XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
+                    final XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
 
-                    SortedSet<ComparableNamespace> utilizedNamespaces = new TreeSet<ComparableNamespace>();
-                    SortedSet<ComparableAttribute> utilizedAttributes = new TreeSet<ComparableAttribute>();
+                    final SortedSet<ComparableNamespace> utilizedNamespaces = new TreeSet<ComparableNamespace>();
+                    final SortedSet<ComparableAttribute> utilizedAttributes = new TreeSet<ComparableAttribute>();
 
                     if (firstCall) {
                         outputStack.peek().add(new ComparableNamespace(""));
-                        outputStack.push(new ArrayList<Comparable>());
+                        outputStack.push(Collections.<Comparable>emptyList());
                         firstCall = false;
 
                         if (this.inclusiveNamespaces != null) {
-
-                            Iterator<String> iterator = this.inclusiveNamespaces.iterator();
+                            final Iterator<String> iterator = this.inclusiveNamespaces.iterator();
                             while (iterator.hasNext()) {
-                                String next = iterator.next();
-                                String ns = startElement.getNamespaceURI(next);
+                                final String next = iterator.next();
+                                final String ns = startElement.getNamespaceURI(next);
                                 //add default ns:
-                                if (ns == null && "".equals(next)) {
-                                    ComparableNamespace comparableNamespace = new ComparableNamespace(next, "");
+                                if (ns == null && next != null && next.isEmpty()) {
+                                    final ComparableNamespace comparableNamespace = new ComparableNamespace(next, "");
                                     utilizedNamespaces.add(comparableNamespace);
                                     outputStack.peek().add(comparableNamespace);
                                 } else if (ns != null) {
-                                    ComparableNamespace comparableNamespace = new ComparableNamespace(next, ns);
+                                    final ComparableNamespace comparableNamespace = new ComparableNamespace(next, ns);
                                     utilizedNamespaces.add(comparableNamespace);
                                     outputStack.peek().add(comparableNamespace);
                                 }
@@ -210,17 +216,17 @@ public abstract class CanonicalizerBase implements Transformer {
                     }
 
                     outputStream.write('<');
-                    String prefix = startElement.getName().getPrefix();
-                    if (prefix != null && prefix.length() > 0) {
+                    final String prefix = startElement.getName().getPrefix();
+                    if (prefix != null && !prefix.isEmpty()) {
                         UtfHelpper.writeByte(prefix, outputStream, cache);
-                        outputStream.write(':');
+                        outputStream.write(DOUBLEPOINT);
                     }
-                    String name = startElement.getName().getLocalPart();
+                    final String name = startElement.getName().getLocalPart();
                     UtfHelpper.writeByte(name, outputStream, cache);
 
-                    Iterator<ComparableNamespace> namespaceIterator = utilizedNamespaces.iterator();
+                    final Iterator<ComparableNamespace> namespaceIterator = utilizedNamespaces.iterator();
                     while (namespaceIterator.hasNext()) {
-                        ComparableNamespace namespace = namespaceIterator.next();
+                        final ComparableNamespace namespace = namespaceIterator.next();
 
                         if (!namespaceIsAbsolute(namespace.getNamespaceURI())) {
                             throw new XMLStreamException("namespace is relative encountered: " + namespace.getNamespaceURI());
@@ -229,36 +235,34 @@ public abstract class CanonicalizerBase implements Transformer {
                         if (namespace.isDefaultNamespaceDeclaration()) {
                             outputAttrToWriter(XMLNS, namespace.getNamespaceURI(), outputStream, cache);
                         } else {
-                            outputAttrToWriter(XMLNS + ":" + namespace.getPrefix(), namespace.getNamespaceURI(), outputStream, cache);
+                            outputAttrToWriter(XMLNS_DOUBLEPOINT + namespace.getPrefix(), namespace.getNamespaceURI(), outputStream, cache);
                         }
                     }
 
-                    Iterator<ComparableAttribute> attributeIterator = utilizedAttributes.iterator();
+                    final Iterator<ComparableAttribute> attributeIterator = utilizedAttributes.iterator();
                     while (attributeIterator.hasNext()) {
-                        ComparableAttribute attribute = attributeIterator.next();
+                        final ComparableAttribute attribute = attributeIterator.next();
 
-                        String localPart = "";
-                        if (attribute.getName().getPrefix() != null && attribute.getName().getPrefix().length() > 0) {
-                            localPart += attribute.getName().getPrefix() + ":";
+                        final QName attributeName = attribute.getName();
+                        if (attributeName.getPrefix() != null && !attributeName.getPrefix().isEmpty()) {
+                            final String localPart = attributeName.getPrefix() + DOUBLEPOINT + attributeName.getLocalPart();
+                            outputAttrToWriter(localPart, attribute.getValue(), outputStream, cache);
+                        } else {
+                            outputAttrToWriter(attributeName.getLocalPart(), attribute.getValue(), outputStream, cache);
                         }
-                        localPart += attribute.getName().getLocalPart();
-                        outputAttrToWriter(localPart,
-                                attribute.getValue(),
-                                outputStream, cache);
                     }
 
                     outputStream.write('>');
                     break;
                 case XMLStreamConstants.END_ELEMENT:
-                    EndElement endElement = xmlEvent.asEndElement();
-                    String localName = endElement.getName().getLocalPart();
-                    String localPrefix = endElement.getName().getPrefix();
+                    final EndElement endElement = xmlEvent.asEndElement();
+                    final String localPrefix = endElement.getName().getPrefix();
                     outputStream.write(_END_TAG);
-                    if (localPrefix != null && localPrefix.length() > 0) {
+                    if (localPrefix != null && !localPrefix.isEmpty()) {
                         UtfHelpper.writeByte(localPrefix, outputStream, cache);
-                        outputStream.write(':');
+                        outputStream.write(DOUBLEPOINT);
                     }
-                    UtfHelpper.writeStringToUtf8(localName, outputStream);
+                    UtfHelpper.writeStringToUtf8(endElement.getName().getLocalPart(), outputStream);
                     outputStream.write('>');
 
                     //We finished with this level, pop to the previous definitions.
@@ -321,7 +325,7 @@ public abstract class CanonicalizerBase implements Transformer {
         final int length = value.length();
         int i = 0;
         while (i < length) {
-            char c = value.charAt(i++);
+            final char c = value.charAt(i++);
 
             switch (c) {
 
@@ -374,7 +378,7 @@ public abstract class CanonicalizerBase implements Transformer {
         final int length = text.length();
         byte[] toWrite;
         for (int i = 0; i < length; i++) {
-            char c = text.charAt(i);
+            final char c = text.charAt(i);
 
             switch (c) {
 
@@ -423,7 +427,7 @@ public abstract class CanonicalizerBase implements Transformer {
         int length = target.length();
 
         for (int i = 0; i < length; i++) {
-            char c = target.charAt(i);
+            final char c = target.charAt(i);
             if (c == 0x0D) {
                 writer.write(__XD_);
             } else {
@@ -475,7 +479,7 @@ public abstract class CanonicalizerBase implements Transformer {
         final int length = data.length();
 
         for (int i = 0; i < length; i++) {
-            char c = data.charAt(i);
+            final char c = data.charAt(i);
             if (c == 0x0D) {
                 writer.write(__XD_);
             } else {
@@ -493,30 +497,47 @@ public abstract class CanonicalizerBase implements Transformer {
         }
     }
 
-    private boolean namespaceIsAbsolute(String namespaceValue) {
+    private boolean namespaceIsAbsolute(final String namespaceValue) {
         // assume empty namespaces are absolute
-        if (namespaceValue.length() == 0) {
+        if (namespaceValue.isEmpty()) {
             return true;
         }
-        return namespaceValue.indexOf(':') > 0;
+        return namespaceValue.indexOf(DOUBLEPOINT) > 0;
     }
 
 
     public static class C14NStack<E> extends ArrayDeque<List<Comparable>> {
 
-        public Object containsOnStack(Object o) {
-            if (o == null) {
-                return null;
-            }
+        public Object containsOnStack(final Object o) {
             //Important: iteration order from head to tail!
-            Iterator<List<Comparable>> elementIterator = super.iterator();
+            final Iterator<List<Comparable>> elementIterator = super.iterator();
             while (elementIterator.hasNext()) {
-                List list = elementIterator.next();
-                if (list.contains(o)) {
-                    return list.get(list.indexOf(o));
+                final List list = elementIterator.next();
+                if (list.size() == 0) {
+                    continue;
+                }
+                final int idx = list.indexOf(o);
+                if (idx != -1) {
+                    return list.get(idx);
                 }
             }
             return null;
+        }
+
+        @Override
+        public List<Comparable> peek() {
+            List<Comparable> list = super.peekFirst();
+            if (list == Collections.<Comparable>emptyList()) {
+                super.removeFirst();
+                list = new ArrayList<Comparable>();
+                super.addFirst(list);
+            }
+            return list;
+        }
+
+        @Override
+        public List<Comparable> peekFirst() {
+            throw new UnsupportedOperationException("Use peek()");
         }
     }
 }

@@ -45,8 +45,9 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       final Deque<XMLEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
+        @SuppressWarnings("unchecked")
         final BinarySecurityTokenType binarySecurityTokenType =
                 ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
@@ -58,8 +59,9 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
         final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
         final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
 
-        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+        final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
             private WSSecurityToken binarySecurityToken = null;
 
@@ -78,7 +80,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 }
                 this.binarySecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
                         binarySecurityTokenType,
-                        inputProcessorChain.getSecurityContext(),
+                        securityContext,
                         crypto,
                         securityProperties.getCallbackHandler());
                 this.binarySecurityToken.setElementPath(elementPath);
@@ -91,23 +93,24 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             }
         };
 
-        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
+        securityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
 
         //fire a tokenSecurityEvent
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         x509TokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(x509TokenSecurityEvent);
+        securityContext.registerSecurityEvent(x509TokenSecurityEvent);
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, BinarySecurityTokenType binarySecurityTokenType) throws WSSecurityException {
+        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (binarySecurityTokenType.getEncodingType() == null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3029);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R3029);
         }
         if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3030);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R3030);
         }
         if (binarySecurityTokenType.getValueType() == null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3031);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R3031);
         }
     }
 }

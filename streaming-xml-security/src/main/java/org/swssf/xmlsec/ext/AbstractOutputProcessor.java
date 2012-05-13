@@ -18,14 +18,11 @@
  */
 package org.swssf.xmlsec.ext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.impl.EncryptionPartDef;
 import org.swssf.xmlsec.impl.util.RFC2253Parser;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import java.security.cert.X509Certificate;
@@ -39,15 +36,12 @@ import java.util.*;
  */
 public abstract class AbstractOutputProcessor implements OutputProcessor {
 
-    protected final transient Log logger = LogFactory.getLog(this.getClass());
-
-    protected static final XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
     protected XMLSecurityProperties securityProperties;
     protected XMLSecurityConstants.Action action;
 
     private XMLSecurityConstants.Phase phase = XMLSecurityConstants.Phase.PROCESSING;
-    private Set<Object> beforeProcessors = new HashSet<Object>();
-    private Set<Object> afterProcessors = new HashSet<Object>();
+    private Set<Object> beforeProcessors;
+    private Set<Object> afterProcessors;
 
     protected AbstractOutputProcessor() throws XMLSecurityException {
         super();
@@ -76,12 +70,32 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         this.phase = phase;
     }
 
+    public void addBeforeProcessor(Object processor) {
+        if (this.beforeProcessors == null) {
+            this.beforeProcessors = new HashSet<Object>();
+        }
+        this.beforeProcessors.add(processor);
+    }
+
     public Set<Object> getBeforeProcessors() {
-        return beforeProcessors;
+        if (this.beforeProcessors == null) {
+            return Collections.emptySet();
+        }
+        return this.beforeProcessors;
+    }
+
+    public void addAfterProcessor(Object processor) {
+        if (this.afterProcessors == null) {
+            this.afterProcessors = new HashSet<Object>();
+        }
+        this.afterProcessors.add(processor);
     }
 
     public Set<Object> getAfterProcessors() {
-        return afterProcessors;
+        if (this.afterProcessors == null) {
+            return Collections.emptySet();
+        }
+        return this.afterProcessors;
     }
 
     public XMLSecurityProperties getSecurityProperties() {
@@ -109,104 +123,111 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
             return xmlEventNS;
         }
 
+        StartElement startElement = xmlEvent.asStartElement();
+
         List<ComparableNamespace>[] xmlEventNSNamespaces = xmlEventNS.getNamespaceList();
         List<ComparableAttribute>[] xmlEventNsAttributes = xmlEventNS.getAttributeList();
 
         List<ComparableNamespace> currentXmlEventNamespaces = xmlEventNSNamespaces[0];
-        currentXmlEventNamespaces.add(new ComparableNamespace(xmlEvent.asStartElement().getName().getPrefix(), xmlEvent.asStartElement().getName().getNamespaceURI()));
+        currentXmlEventNamespaces.add(new ComparableNamespace(startElement.getName().getPrefix(), startElement.getName().getNamespaceURI()));
 
         List<Namespace> namespaceList = new ArrayList<Namespace>();
         @SuppressWarnings("unchecked")
-        Iterator<Namespace> namespaceIterator = xmlEvent.asStartElement().getNamespaces();
+        Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
         while (namespaceIterator.hasNext()) {
             Namespace namespace = namespaceIterator.next();
             namespaceList.add(createNamespace(namespace.getPrefix(), namespace.getNamespaceURI()));
         }
 
-        for (int i = 0; i < attributeList.size(); i++) {
-            Attribute attribute = attributeList.get(i);
-            if (XMLConstants.NULL_NS_URI.equals(attribute.getName().getNamespaceURI())) {
-                continue;
-            }
-            boolean found = false;
-            for (int j = 0; j < namespaceList.size(); j++) {
-                Namespace namespace = namespaceList.get(j);
-                if (namespace.getPrefix() != null && attribute.getName().getPrefix() != null && namespace.getPrefix().equals(attribute.getName().getPrefix())) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                namespaceList.add(createNamespace(attribute.getName().getPrefix(), attribute.getName().getNamespaceURI()));
-                currentXmlEventNamespaces.add(new ComparableNamespace(attribute.getName().getPrefix(), attribute.getName().getNamespaceURI()));
-            }
-        }
-
-        StartElement startElement = xmlEventFactory.createStartElement(xmlEvent.asStartElement().getName(), attributeList.iterator(), namespaceList.iterator());
-
-        return new XMLEventNS(startElement, xmlEventNSNamespaces, xmlEventNsAttributes);
-    }
-
-    protected void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> namespaces, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributeList = new LinkedList<Attribute>();
-        if (attributes != null) {
-            Iterator<Map.Entry<QName, String>> attributeIterator = attributes.entrySet().iterator();
+        if (attributeList.size() > 0) {
+            Iterator<Attribute> attributeIterator = attributeList.iterator();
             while (attributeIterator.hasNext()) {
-                Map.Entry<QName, String> qNameStringEntry = attributeIterator.next();
-                Attribute attribute = xmlEventFactory.createAttribute(qNameStringEntry.getKey(), qNameStringEntry.getValue());
-                attributeList.add(attribute);
-            }
-        }
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
-        if (namespaces != null) {
-            Iterator<Map.Entry<QName, String>> namespaceIterator = namespaces.entrySet().iterator();
-            while (namespaceIterator.hasNext()) {
-                Map.Entry<QName, String> qNameStringEntry = namespaceIterator.next();
-                namespaceList.add(xmlEventFactory.createNamespace(qNameStringEntry.getKey().getLocalPart(), qNameStringEntry.getValue()));
-            }
-        }
-        StartElement startElement = xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator());
-        outputAsEvent(outputProcessorChain, startElement);
-    }
-
-    public void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, Map<QName, String> attributes) throws XMLStreamException, XMLSecurityException {
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
-        namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
-
-        List<Attribute> attributeList = new LinkedList<Attribute>();
-        if (attributes != null) {
-            Iterator<Map.Entry<QName, String>> attributeIterator = attributes.entrySet().iterator();
-            while (attributeIterator.hasNext()) {
-                Map.Entry<QName, String> qNameStringEntry = attributeIterator.next();
-                Attribute attribute = xmlEventFactory.createAttribute(qNameStringEntry.getKey(), qNameStringEntry.getValue());
-                attributeList.add(attribute);
-
-                if ("".equals(attribute.getName().getPrefix())) {
+                Attribute attribute = attributeIterator.next();
+                QName attributeName = attribute.getName();
+                String attributeNameNamespaceURI = attributeName.getNamespaceURI();
+                if (XMLConstants.NULL_NS_URI.equals(attributeNameNamespaceURI)) {
                     continue;
                 }
-
                 boolean found = false;
-                for (int i = 0; i < namespaceList.size(); i++) {
-                    Namespace namespace = namespaceList.get(i);
-                    if (namespace.getPrefix() != null && attribute.getName().getPrefix() != null && namespace.getPrefix().equals(attribute.getName().getPrefix())) {
+                String prefix = attributeName.getPrefix();
+                for (int j = 0; j < namespaceList.size(); j++) {
+                    Namespace namespace = namespaceList.get(j);
+                    if (namespace.getPrefix() != null && prefix != null && namespace.getPrefix().equals(prefix)) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    namespaceList.add(xmlEventFactory.createNamespace(attribute.getName().getPrefix(), attribute.getName().getNamespaceURI()));
+                    namespaceList.add(createNamespace(prefix, attributeNameNamespaceURI));
+                    currentXmlEventNamespaces.add(new ComparableNamespace(prefix, attributeNameNamespaceURI));
                 }
             }
         }
 
-        StartElement startElement = xmlEventFactory.createStartElement(element, attributeList.iterator(), namespaceList.iterator());
+        startElement = XMLSecurityConstants.XMLEVENTFACTORY.createStartElement(startElement.getName(), attributeList.iterator(), namespaceList.iterator());
+        return new XMLEventNS(startElement, xmlEventNSNamespaces, xmlEventNsAttributes);
+    }
+
+    protected void createStartElementAndOutputAsEvent(
+            OutputProcessorChain outputProcessorChain, QName element, List<Namespace> namespaces, List<Attribute> attributes)
+            throws XMLStreamException, XMLSecurityException {
+
+        Iterator<Attribute> attributeListIterator = null;
+        if (attributes != null) {
+            attributeListIterator = attributes.iterator();
+        }
+        Iterator<Namespace> namespaceListIterator = null;
+        if (namespaces != null) {
+            namespaceListIterator = namespaces.iterator();
+        }
+        StartElement startElement = XMLSecurityConstants.XMLEVENTFACTORY.createStartElement(element, attributeListIterator, namespaceListIterator);
+        outputAsEvent(outputProcessorChain, startElement);
+    }
+
+    public void createStartElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element, boolean outputLocalNs,
+                                                   List<Attribute> attributes) throws XMLStreamException, XMLSecurityException {
+
+        List<Namespace> namespaceList;
+        if (outputLocalNs) {
+            namespaceList = new ArrayList<Namespace>(1);
+            namespaceList.add(XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(element.getPrefix(), element.getNamespaceURI()));
+        } else if (attributes == null) {
+            namespaceList = Collections.emptyList();
+        } else {
+            namespaceList = new ArrayList<Namespace>(1);
+        }
+
+        Iterator<Attribute> attributeListIterator = null;
+        if (attributes != null) {
+            for (int i = 0; i < attributes.size(); i++) {
+                Attribute attribute = attributes.get(i);
+                QName attributeName = attribute.getName();
+                String attributeNamePrefix = attributeName.getPrefix();
+
+                if (attributeNamePrefix != null && attributeNamePrefix.isEmpty()) {
+                    continue;
+                }
+
+                boolean found = false;
+                for (int j = 0; j < namespaceList.size(); j++) {
+                    Namespace namespace = namespaceList.get(j);
+                    if (namespace.getPrefix() != null && attributeNamePrefix != null && namespace.getPrefix().equals(attributeNamePrefix)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    namespaceList.add(XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(attributeNamePrefix, attributeName.getNamespaceURI()));
+                }
+            }
+            attributeListIterator = attributes.iterator();
+        }
+        final StartElement startElement = XMLSecurityConstants.XMLEVENTFACTORY.createStartElement(element, attributeListIterator, namespaceList.iterator());
         outputAsEvent(outputProcessorChain, startElement);
     }
 
     protected EndElement createEndElement(QName element) {
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
-        namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
-        return xmlEventFactory.createEndElement(element, namespaceList.iterator());
+        return XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(element, null);
     }
 
     public void createEndElementAndOutputAsEvent(OutputProcessorChain outputProcessorChain, QName element) throws XMLStreamException, XMLSecurityException {
@@ -218,15 +239,15 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     }
 
     protected Characters createCharacters(String characters) {
-        return xmlEventFactory.createCharacters(characters);
+        return XMLSecurityConstants.XMLEVENTFACTORY.createCharacters(characters);
     }
 
     protected Attribute createAttribute(QName attribute, String attributeValue) {
-        return xmlEventFactory.createAttribute(attribute, attributeValue);
+        return XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(attribute, attributeValue);
     }
 
     protected Namespace createNamespace(String prefix, String uri) {
-        return xmlEventFactory.createNamespace(prefix, uri);
+        return XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(prefix, uri);
     }
 
     protected void outputAsEvent(OutputProcessorChain outputProcessorChain, XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
@@ -235,12 +256,12 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
     }
 
     protected void createX509IssuerSerialStructure(OutputProcessorChain outputProcessorChain, X509Certificate[] x509Certificates) throws XMLStreamException, XMLSecurityException {
-        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509Data, null);
-        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509IssuerSerial, null);
-        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509IssuerName, null);
+        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509Data, true, null);
+        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509IssuerSerial, false, null);
+        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509IssuerName, false, null);
         createCharactersAndOutputAsEvent(outputProcessorChain, RFC2253Parser.normalize(x509Certificates[0].getIssuerDN().getName(), true));
         createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509IssuerName);
-        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509SerialNumber, null);
+        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509SerialNumber, false, null);
         createCharactersAndOutputAsEvent(outputProcessorChain, x509Certificates[0].getSerialNumber().toString());
         createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509SerialNumber);
         createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_X509IssuerSerial);
@@ -252,22 +273,22 @@ public abstract class AbstractOutputProcessor implements OutputProcessor {
         if (encryptionPartDefs == null) {
             return;
         }
-        Map<QName, String> attributes;
-        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList, null);
+        List<Attribute> attributes;
+        createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList, true, null);
         //output the references to the encrypted data:
         Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefs.iterator();
         while (encryptionPartDefIterator.hasNext()) {
             EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(XMLSecurityConstants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId());
-            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference, attributes);
+            attributes = new ArrayList<Attribute>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId()));
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference, false, attributes);
             final String compressionAlgorithm = getSecurityProperties().getEncryptionCompressionAlgorithm();
             if (compressionAlgorithm != null) {
-                createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, null);
-                attributes = new HashMap<QName, String>();
-                attributes.put(XMLSecurityConstants.ATT_NULL_Algorithm, compressionAlgorithm);
-                createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform, attributes);
+                createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, true, null);
+                attributes = new ArrayList<Attribute>(1);
+                attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, compressionAlgorithm));
+                createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform, false, attributes);
                 createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform);
                 createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms);
             }

@@ -26,12 +26,12 @@ import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Processor to build the Security Header structure
@@ -91,7 +91,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 //create subchain and output soap-header and securityHeader
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain,
-                        new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV), null);
+                        new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV), true, null);
                 buildSecurityHeader(soapMessageVersion, subOutputProcessorChain);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain,
                         new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV));
@@ -126,17 +126,17 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
     }
 
     private void buildSecurityHeader(String soapMessageVersion, OutputProcessorChain subOutputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
+        List<Attribute> attributes = new ArrayList<Attribute>(1);
         final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
-        if (actor != null && !"".equals(actor)) {
+        if (actor != null && !actor.isEmpty()) {
             if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {
-                attributes.put(WSSConstants.ATT_soap11_Actor, actor);
+                attributes.add(createAttribute(WSSConstants.ATT_soap11_Actor, actor));
             } else {
-                attributes.put(WSSConstants.ATT_soap12_Role, actor);
+                attributes.add(createAttribute(WSSConstants.ATT_soap12_Role, actor));
             }
         }
         ((WSSDocumentContext) subOutputProcessorChain.getDocumentContext()).setInSecurityHeader(true);
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security, attributes);
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security, true, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security);
         ((WSSDocumentContext) subOutputProcessorChain.getDocumentContext()).setInSecurityHeader(false);
     }

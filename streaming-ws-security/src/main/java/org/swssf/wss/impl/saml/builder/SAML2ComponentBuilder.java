@@ -284,7 +284,7 @@ public class SAML2ComponentBuilder {
 
         if ("Password".equalsIgnoreCase(sourceMethod)) {
             transformedMethod = SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD;
-        } else if (sourceMethod != null && !"".equals(sourceMethod)) {
+        } else if (sourceMethod != null && !sourceMethod.isEmpty()) {
             return sourceMethod;
         }
 

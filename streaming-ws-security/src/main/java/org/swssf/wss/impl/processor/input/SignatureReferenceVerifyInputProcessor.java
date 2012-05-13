@@ -45,7 +45,10 @@ import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -68,9 +71,9 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
 
     public SignatureReferenceVerifyInputProcessor(
             SignatureType signatureType, SecurityToken securityToken,
-            XMLSecurityProperties securityProperties, WSSecurityContext securityContext) throws WSSecurityException {
+            XMLSecurityProperties securityProperties, WSSecurityContext securityContext) throws XMLSecurityException {
         super(signatureType, securityToken, securityProperties);
-        this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
+        this.addAfterProcessor(SignatureReferenceVerifyInputProcessor.class.getName());
 
         checkBSPCompliance(securityContext);
     }
@@ -147,6 +150,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
         XMLEvent xmlEvent = inputProcessorChain.processEvent();
 
         if (xmlEvent.isStartElement()) {
+            final WSSDocumentContext documentContext = (WSSDocumentContext) inputProcessorChain.getDocumentContext();
             StartElement startElement = xmlEvent.asStartElement();
             ReferenceType referenceType = matchesReferenceId(startElement);
             if (referenceType != null) {
@@ -163,20 +167,20 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                     inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                 }
                 getProcessedReferences().add(referenceType);
-                inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
+                documentContext.setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
 
                 //fire a SecurityEvent:
-                if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3
-                        && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPHeader()) {
+                if (documentContext.getDocumentLevel() == 3
+                        && documentContext.isInSOAPHeader()) {
                     SignedPartSecurityEvent signedPartSecurityEvent =
-                            new SignedPartSecurityEvent(getSecurityToken(), true, inputProcessorChain.getDocumentContext().getProtectionOrder());
-                    signedPartSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
+                            new SignedPartSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
+                    signedPartSecurityEvent.setElementPath(documentContext.getPath());
                     signedPartSecurityEvent.setXmlEvent(xmlEvent);
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
                 } else {
                     SignedElementSecurityEvent signedElementSecurityEvent =
-                            new SignedElementSecurityEvent(getSecurityToken(), true, inputProcessorChain.getDocumentContext().getProtectionOrder());
-                    signedElementSecurityEvent.setElementPath(inputProcessorChain.getDocumentContext().getPath());
+                            new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
+                    signedElementSecurityEvent.setElementPath(documentContext.getPath());
                     signedElementSecurityEvent.setXmlEvent(xmlEvent);
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
                 }
@@ -196,7 +200,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
             }
             ElementAttributes elementAttributes = new ElementAttributes();
             if (timestampSecurityEvent.getExpires() != null) {
-                long lifeTime = timestampSecurityEvent.getExpires().getTime().getTime() - new Date().getTime();
+                long lifeTime = timestampSecurityEvent.getExpires().getTimeInMillis() - System.currentTimeMillis();
                 elementAttributes.setMaxLifeSeconds(lifeTime / 1000);
             } else {
                 elementAttributes.setMaxLifeSeconds(300);
@@ -223,7 +227,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
         InternalSignatureReferenceVerifier(WSSSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
                                            ReferenceType referenceType, QName startElement) throws XMLSecurityException {
             super(securityProperties, inputProcessorChain, referenceType, startElement);
-            this.getAfterProcessors().add(SignatureReferenceVerifyInputProcessor.class.getName());
+            this.addAfterProcessor(SignatureReferenceVerifyInputProcessor.class.getName());
         }
 
         protected AlgorithmType createMessageDigest(SecurityContext securityContext)
@@ -243,7 +247,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
             if (referenceType.getTransforms() == null || referenceType.getTransforms().getTransform().size() == 0) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
-            List<TransformType> transformTypeList = (List<TransformType>) (List<?>) referenceType.getTransforms().getTransform();
+            List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
 
             String algorithm = null;
             Transformer parentTransformer = null;
@@ -261,7 +265,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                         List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
                         if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transformType.getAlgorithm())) {
                             if (inclusiveNamespaces == null) {
-                                inclusiveNamespaces = new ArrayList<String>();
+                                inclusiveNamespaces = new ArrayList<String>(1);
                             }
                             inclusiveNamespaces.add("#default");
                         }

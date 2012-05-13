@@ -45,7 +45,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     public PolicyInputProcessor(PolicyEnforcer policyEnforcer, XMLSecurityProperties securityProperties) {
         super(securityProperties);
         this.setPhase(WSSConstants.Phase.POSTPROCESSING);
-        this.getBeforeProcessors().add(SecurityHeaderInputProcessor.class.getName());
+        this.addBeforeProcessor(SecurityHeaderInputProcessor.class.getName());
         this.policyEnforcer = policyEnforcer;
     }
 

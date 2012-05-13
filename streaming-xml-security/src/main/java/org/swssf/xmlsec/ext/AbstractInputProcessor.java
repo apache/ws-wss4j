@@ -18,13 +18,11 @@
  */
 package org.swssf.xmlsec.ext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,13 +34,11 @@ import java.util.Set;
  */
 public abstract class AbstractInputProcessor implements InputProcessor {
 
-    protected final transient Log logger = LogFactory.getLog(this.getClass());
-
     private XMLSecurityProperties securityProperties;
 
     private XMLSecurityConstants.Phase phase = XMLSecurityConstants.Phase.PROCESSING;
-    private Set<Object> beforeProcessors = new HashSet<Object>();
-    private Set<Object> afterProcessors = new HashSet<Object>();
+    private Set<Object> beforeProcessors;
+    private Set<Object> afterProcessors;
 
     public AbstractInputProcessor(XMLSecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
@@ -56,12 +52,28 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         this.phase = phase;
     }
 
+    public void addBeforeProcessor(Object processor) {
+        this.beforeProcessors = new HashSet<Object>();
+        this.beforeProcessors.add(processor);
+    }
+
     public Set<Object> getBeforeProcessors() {
-        return beforeProcessors;
+        if (this.beforeProcessors == null) {
+            return Collections.emptySet();
+        }
+        return this.beforeProcessors;
+    }
+
+    public void addAfterProcessor(Object processor) {
+        this.afterProcessors = new HashSet<Object>();
+        this.afterProcessors.add(processor);
     }
 
     public Set<Object> getAfterProcessors() {
-        return afterProcessors;
+        if (this.afterProcessors == null) {
+            return Collections.emptySet();
+        }
+        return this.afterProcessors;
     }
 
     public abstract XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;

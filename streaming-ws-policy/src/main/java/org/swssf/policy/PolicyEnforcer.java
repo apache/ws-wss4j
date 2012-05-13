@@ -69,7 +69,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         assertionStateMap = new LinkedList<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>>();
         failedAssertionStateMap = new LinkedList<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>>();
 
-        if (soapAction != null && !soapAction.equals("")) {
+        if (soapAction != null && !soapAction.isEmpty()) {
             effectivePolicy = findPolicyBySOAPAction(operationPolicies, soapAction);
             if (effectivePolicy != null) {
                 buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);

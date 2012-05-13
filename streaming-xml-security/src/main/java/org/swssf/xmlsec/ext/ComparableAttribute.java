@@ -46,11 +46,11 @@ public class ComparableAttribute implements Attribute, Comparable<ComparableAttr
     public int compareTo(ComparableAttribute o) {
         //An element's attribute nodes are sorted lexicographically with namespace URI as the primary
         //key and local name as the secondary key (an empty namespace URI is lexicographically least).
-        int namespacePartCompare = this.getName().getNamespaceURI().compareTo(o.getName().getNamespaceURI());
+        int namespacePartCompare = this.name.getNamespaceURI().compareTo(o.getName().getNamespaceURI());
         if (namespacePartCompare != 0) {
             return namespacePartCompare;
         } else {
-            return this.getName().getLocalPart().compareTo(o.getName().getLocalPart());
+            return this.name.getLocalPart().compareTo(o.getName().getLocalPart());
         }
     }
 
@@ -60,7 +60,7 @@ public class ComparableAttribute implements Attribute, Comparable<ComparableAttr
             return false;
         }
         ComparableAttribute comparableAttribute = (ComparableAttribute) obj;
-        if (comparableAttribute.getName().getLocalPart().equals(this.getName().getLocalPart())) {
+        if (comparableAttribute.getName().getLocalPart().equals(this.name.getLocalPart())) {
             //&& comparableNamespace.getNamespace().getNamespaceURI().equals(this.attribute.getNamespaceURI())) {
             return true;
         }

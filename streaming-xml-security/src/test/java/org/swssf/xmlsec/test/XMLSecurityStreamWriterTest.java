@@ -196,8 +196,16 @@ public class XMLSecurityStreamWriterTest {
         }
 
         @Override
+        public void addBeforeProcessor(Object processor) {
+        }
+
+        @Override
         public Set<Object> getBeforeProcessors() {
             return new HashSet<Object>();
+        }
+
+        @Override
+        public void addAfterProcessor(Object processor) {
         }
 
         @Override

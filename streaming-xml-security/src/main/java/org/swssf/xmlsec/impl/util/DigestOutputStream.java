@@ -33,14 +33,15 @@ import java.security.MessageDigest;
 public class DigestOutputStream extends OutputStream {
 
     protected static final transient Log log = LogFactory.getLog(DigestOutputStream.class);
+    protected static final transient boolean isDebugEnabled = log.isDebugEnabled();
 
     private MessageDigest messageDigest;
-    private StringBuffer stringBuffer;
+    private StringBuilder stringBuilder;
 
     public DigestOutputStream(MessageDigest messageDigest) {
         this.messageDigest = messageDigest;
-        if (log.isDebugEnabled()) {
-            stringBuffer = new StringBuffer();
+        if (isDebugEnabled) {
+            stringBuilder = new StringBuilder();
         }
     }
 
@@ -50,24 +51,24 @@ public class DigestOutputStream extends OutputStream {
 
     public void write(int arg0) {
         messageDigest.update((byte) arg0);
-        if (log.isDebugEnabled()) {
-            stringBuffer.append(new String(new byte[]{(byte) arg0}));
+        if (isDebugEnabled) {
+            stringBuilder.append(new String(new byte[]{(byte) arg0}));
         }
     }
 
     public void write(byte[] arg0, int arg1, int arg2) {
         messageDigest.update(arg0, arg1, arg2);
-        if (log.isDebugEnabled()) {
-            stringBuffer.append(new String(arg0, arg1, arg2));
+        if (isDebugEnabled) {
+            stringBuilder.append(new String(arg0, arg1, arg2));
         }
     }
 
     public byte[] getDigestValue() {
-        if (log.isDebugEnabled()) {
+        if (isDebugEnabled) {
             log.debug("Pre Digest: ");
-            log.debug(stringBuffer.toString());
+            log.debug(stringBuilder.toString());
             log.debug("End pre Digest ");
-            stringBuffer = new StringBuffer();
+            stringBuilder = new StringBuilder();
         }
         return messageDigest.digest();
     }

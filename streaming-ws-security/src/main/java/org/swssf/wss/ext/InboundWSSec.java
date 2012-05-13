@@ -38,7 +38,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,6 +52,20 @@ import java.util.List;
 public class InboundWSSec {
 
     protected static final transient Log log = LogFactory.getLog(InboundWSSec.class);
+
+    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+
+    static {
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        try {
+            xmlInputFactory.setProperty("org.codehaus.stax2.internNames", true);
+            xmlInputFactory.setProperty("org.codehaus.stax2.internNsUris", true);
+            xmlInputFactory.setProperty("org.codehaus.stax2.preserveLocation", false);
+        } catch (IllegalArgumentException e) {
+            //ignore
+        }
+    }
 
     private WSSSecurityProperties securityProperties;
 
@@ -77,7 +91,7 @@ public class InboundWSSec {
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
-        return this.processInMessage(xmlStreamReader, new ArrayList<SecurityEvent>(), null);
+        return this.processInMessage(xmlStreamReader, null, null);
     }
 
     /**
@@ -101,7 +115,7 @@ public class InboundWSSec {
     public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
 
         if (requestSecurityEvents == null) {
-            requestSecurityEvents = new ArrayList<SecurityEvent>();
+            requestSecurityEvents = Collections.emptyList();
         }
 
         final InboundWSSecurityContextImpl securityContextImpl = new InboundWSSecurityContextImpl();
@@ -109,18 +123,18 @@ public class InboundWSSec {
         securityContextImpl.addSecurityEventListener(securityEventListener);
         securityContextImpl.ignoredBSPRules(this.securityProperties.getIgnoredBSPRules());
 
-        for (int i = 0; i < requestSecurityEvents.size(); i++) {
-            SecurityEvent securityEvent = requestSecurityEvents.get(i);
-            if (securityEvent instanceof HttpsTokenSecurityEvent) {
-                securityContextImpl.registerSecurityEvent(securityEvent);
-                securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
-                break;
+        if (!requestSecurityEvents.isEmpty()) {
+            Iterator<SecurityEvent> securityEventIterator = requestSecurityEvents.iterator();
+            while (securityEventIterator.hasNext()) {
+                SecurityEvent securityEvent = securityEventIterator.next();
+                if (securityEvent instanceof HttpsTokenSecurityEvent) {
+                    securityContextImpl.registerSecurityEvent(securityEvent);
+                    securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
+                    break;
+                }
             }
         }
 
-        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         securityContextImpl.put(WSSConstants.XMLINPUTFACTORY, xmlInputFactory);
         final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);
 
@@ -137,15 +151,17 @@ public class InboundWSSec {
 
         if (log.isTraceEnabled()) {
             LogInputProcessor logInputProcessor = new LogInputProcessor(securityProperties);
-            logInputProcessor.getAfterProcessors().add(SecurityHeaderInputProcessor.class.getName());
+            logInputProcessor.addAfterProcessor(SecurityHeaderInputProcessor.class.getName());
             inputProcessorChain.addProcessor(logInputProcessor);
         }
 
         List<InputProcessor> additionalInputProcessors = securityProperties.getInputProcessorList();
-        Iterator<InputProcessor> inputProcessorIterator = additionalInputProcessors.iterator();
-        while (inputProcessorIterator.hasNext()) {
-            InputProcessor inputProcessor = inputProcessorIterator.next();
-            inputProcessorChain.addProcessor(inputProcessor);
+        if (!additionalInputProcessors.isEmpty()) {
+            Iterator<InputProcessor> inputProcessorIterator = additionalInputProcessors.iterator();
+            while (inputProcessorIterator.hasNext()) {
+                InputProcessor inputProcessor = inputProcessorIterator.next();
+                inputProcessorChain.addProcessor(inputProcessor);
+            }
         }
 
         return new XMLSecurityStreamReader(inputProcessorChain, securityProperties);

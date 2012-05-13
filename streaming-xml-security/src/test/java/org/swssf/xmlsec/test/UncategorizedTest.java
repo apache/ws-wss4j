@@ -35,7 +35,7 @@ public class UncategorizedTest {
     public void testConfigurationLoadFromUrl() throws Exception {
         URL url = this.getClass().getClassLoader().getResource("testdata/c14n/in/31_input.xml");
         try {
-            Init.init(url);
+            Init.init(url.toURI());
             Assert.fail();
         } catch (XMLSecurityException e) {
             Assert.assertEquals(e.getMessage(), "General security error; nested exception is: \n" +

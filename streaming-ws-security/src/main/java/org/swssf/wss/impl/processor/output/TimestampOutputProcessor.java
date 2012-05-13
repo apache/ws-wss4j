@@ -21,13 +21,10 @@ package org.swssf.wss.impl.processor.output;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -63,27 +60,22 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
         if (xmlEvent.isStartElement()) {
             StartElement startElement = xmlEvent.asStartElement();
             if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
-                try {
-                    DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-                    XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
+                XMLGregorianCalendar created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
 
-                    GregorianCalendar expiresCalendar = new GregorianCalendar();
-                    expiresCalendar.add(Calendar.SECOND, ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL());
-                    XMLGregorianCalendar expires = datatypeFactory.newXMLGregorianCalendar(expiresCalendar);
+                GregorianCalendar expiresCalendar = new GregorianCalendar();
+                expiresCalendar.add(Calendar.SECOND, ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL());
+                XMLGregorianCalendar expires = WSSConstants.datatypeFactory.newXMLGregorianCalendar(expiresCalendar);
 
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                    //wsu:id is optional and will be added when signing...
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Timestamp, null);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.toXMLFormat());
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Timestamp);
-                } catch (DatatypeConfigurationException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                }
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                //wsu:id is optional and will be added when signing...
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Timestamp, true, null);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.toXMLFormat());
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Timestamp);
 
                 outputProcessorChain.removeProcessor(this);
             }

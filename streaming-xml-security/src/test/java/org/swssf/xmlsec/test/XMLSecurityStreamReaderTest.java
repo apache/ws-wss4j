@@ -255,9 +255,16 @@ public class XMLSecurityStreamReaderTest {
             xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         }
 
+        public void addBeforeProcessor(Object processor) {
+        }
+
         @Override
         public Set<Object> getBeforeProcessors() {
             return new HashSet<Object>();
+        }
+
+        @Override
+        public void addAfterProcessor(Object processor) {
         }
 
         @Override

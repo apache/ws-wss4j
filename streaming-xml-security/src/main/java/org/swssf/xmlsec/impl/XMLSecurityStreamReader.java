@@ -37,9 +37,9 @@ import java.util.Iterator;
  */
 public class XMLSecurityStreamReader implements XMLStreamReader {
 
-    private XMLSecurityProperties securityProperties;
     private InputProcessorChain inputProcessorChain;
     private XMLEvent currentEvent;
+    private boolean skipDocumentEvents = false;
 
     private static final String ERR_STATE_NOT_ELEM = "Current state not START_ELEMENT or END_ELEMENT";
     private static final String ERR_STATE_NOT_STELEM = "Current state not START_ELEMENT";
@@ -47,7 +47,7 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
 
     public XMLSecurityStreamReader(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties) {
         this.inputProcessorChain = inputProcessorChain;
-        this.securityProperties = securityProperties;
+        this.skipDocumentEvents = securityProperties.isSkipDocumentEvents();
     }
 
     public Object getProperty(String name) throws IllegalArgumentException {
@@ -58,20 +58,23 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     }
 
     public int next() throws XMLStreamException {
+        int eventType;
         try {
             inputProcessorChain.reset();
             currentEvent = inputProcessorChain.processEvent();
-            if ((currentEvent.getEventType() == START_DOCUMENT)
-                    && securityProperties.isSkipDocumentEvents()) {
+            eventType = currentEvent.getEventType();
+            if (eventType == START_DOCUMENT && this.skipDocumentEvents) {
                 currentEvent = inputProcessorChain.processEvent();
+                eventType = currentEvent.getEventType();
             }
         } catch (XMLSecurityException e) {
             throw new XMLStreamException(e);
         }
-        if (currentEvent.isCharacters() && currentEvent.asCharacters().isIgnorableWhiteSpace()) {
+        /*todo why was this needed? Because of the Sun Stax impl?
+         if (currentEvent.isCharacters() && currentEvent.asCharacters().isIgnorableWhiteSpace()) {
             return XMLStreamConstants.SPACE;
-        }
-        return currentEvent.getEventType();
+        }*/
+        return eventType;
     }
 
     private XMLEvent getCurrentEvent() {
@@ -186,31 +189,26 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     public String getNamespaceURI(String prefix) {
         XMLEvent xmlEvent = getCurrentEvent();
 
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
-
-        if (xmlEvent.isStartElement()) {
+        if (xmlEvent.getEventType() == START_ELEMENT) {
             return xmlEvent.asStartElement().getNamespaceURI(prefix);
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             //todo somehow...
             return null;
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
     }
 
     public boolean isStartElement() {
-        XMLEvent xmlEvent = getCurrentEvent();
-        return xmlEvent.isStartElement();
+        return getCurrentEvent().isStartElement();
     }
 
     public boolean isEndElement() {
-        XMLEvent xmlEvent = getCurrentEvent();
-        return xmlEvent.isEndElement();
+        return getCurrentEvent().isEndElement();
     }
 
     public boolean isCharacters() {
-        XMLEvent xmlEvent = getCurrentEvent();
-        return xmlEvent.isCharacters();
+        return getCurrentEvent().isCharacters();
     }
 
     public boolean isWhiteSpace() {
@@ -374,15 +372,15 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     @SuppressWarnings("unchecked")
     public int getNamespaceCount() {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
+
         int count = 0;
         Iterator<Namespace> namespaceIterator;
         if (xmlEvent.getEventType() == START_ELEMENT) {
             namespaceIterator = xmlEvent.asStartElement().getNamespaces();
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             namespaceIterator = xmlEvent.asEndElement().getNamespaces();
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         while (namespaceIterator.hasNext()) {
             namespaceIterator.next();
@@ -394,15 +392,15 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
     @SuppressWarnings("unchecked")
     public String getNamespacePrefix(int index) {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
+
         int count = 0;
         Iterator<Namespace> namespaceIterator;
         if (xmlEvent.getEventType() == START_ELEMENT) {
             namespaceIterator = xmlEvent.asStartElement().getNamespaces();
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             namespaceIterator = xmlEvent.asEndElement().getNamespaces();
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
         while (namespaceIterator.hasNext()) {
             Namespace namespace = namespaceIterator.next();
@@ -577,25 +575,25 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
 
     public QName getName() {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
-        if (xmlEvent.isStartElement()) {
+
+        if (xmlEvent.getEventType() == START_ELEMENT) {
             return xmlEvent.asStartElement().getName();
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             return xmlEvent.asEndElement().getName();
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
     }
 
     public String getLocalName() {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
-        if (xmlEvent.isStartElement()) {
+
+        if (xmlEvent.getEventType() == START_ELEMENT) {
             return xmlEvent.asStartElement().getName().getLocalPart();
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             return xmlEvent.asEndElement().getName().getLocalPart();
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
     }
 
@@ -609,25 +607,25 @@ public class XMLSecurityStreamReader implements XMLStreamReader {
 
     public String getNamespaceURI() {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
-        if (xmlEvent.isStartElement()) {
+
+        if (xmlEvent.getEventType() == START_ELEMENT) {
             return xmlEvent.asStartElement().getName().getNamespaceURI();
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             return xmlEvent.asEndElement().getName().getNamespaceURI();
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
     }
 
     public String getPrefix() {
         XMLEvent xmlEvent = getCurrentEvent();
-        if (xmlEvent.getEventType() != START_ELEMENT && xmlEvent.getEventType() != END_ELEMENT) {
-            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
-        }
-        if (xmlEvent.isStartElement()) {
+
+        if (xmlEvent.getEventType() == START_ELEMENT) {
             return xmlEvent.asStartElement().getName().getPrefix();
-        } else {
+        } else if (xmlEvent.getEventType() == END_ELEMENT) {
             return xmlEvent.asEndElement().getName().getPrefix();
+        } else {
+            throw new IllegalStateException(ERR_STATE_NOT_ELEM);
         }
     }
 

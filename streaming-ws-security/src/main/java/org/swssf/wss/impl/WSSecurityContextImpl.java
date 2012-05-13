@@ -25,7 +25,7 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
 
-    private List<SecurityEventListener> securityEventListeners = new LinkedList<SecurityEventListener>();
+    private List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
 
     public void addSecurityEventListener(SecurityEventListener securityEventListener) {
         if (securityEventListener != null) {

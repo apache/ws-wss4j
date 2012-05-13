@@ -25,8 +25,8 @@ import org.testng.annotations.Test;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 /**
  * @author $Author$
@@ -39,7 +39,7 @@ public class XMLSecurityEventReaderTest {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
 
-        Deque<XMLEvent> xmlEventDeque = new LinkedList<XMLEvent>();
+        Deque<XMLEvent> xmlEventDeque = new ArrayDeque<XMLEvent>();
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             xmlEventDeque.push(xmlEvent);
@@ -72,7 +72,7 @@ public class XMLSecurityEventReaderTest {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
 
-        Deque<XMLEvent> xmlEventDeque = new LinkedList<XMLEvent>();
+        Deque<XMLEvent> xmlEventDeque = new ArrayDeque<XMLEvent>();
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             xmlEventDeque.push(xmlEvent);

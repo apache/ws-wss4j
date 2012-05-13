@@ -50,8 +50,16 @@ public class OutputProcessorChainTest {
         public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
         }
 
+        public void addBeforeProcessor(Object processor) {
+            this.beforeProcessors.add(processor);
+        }
+
         public Set<Object> getBeforeProcessors() {
             return beforeProcessors;
+        }
+
+        public void addAfterProcessor(Object processor) {
+            this.afterProcessors.add(processor);
         }
 
         public Set<Object> getAfterProcessors() {
@@ -155,18 +163,18 @@ public class OutputProcessorChainTest {
         AbstractOutputProcessor outputProcessor4 = new AbstractOutputProcessor() {
         };
         outputProcessor4.setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
-        outputProcessor4.getBeforeProcessors().add(outputProcessor3.getClass().getName());
+        outputProcessor4.addBeforeProcessor(outputProcessor3.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor4);
 
         AbstractOutputProcessor outputProcessor5 = new AbstractOutputProcessor() {
         };
         outputProcessor5.setPhase(XMLSecurityConstants.Phase.PREPROCESSING);
-        outputProcessor5.getBeforeProcessors().add(outputProcessor2.getClass().getName());
+        outputProcessor5.addBeforeProcessor(outputProcessor2.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor5);
 
         AbstractOutputProcessor outputProcessor6 = new AbstractOutputProcessor() {
         };
-        outputProcessor6.getBeforeProcessors().add(outputProcessor1.getClass().getName());
+        outputProcessor6.addBeforeProcessor(outputProcessor1.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor6);
 
         Assert.assertEquals(outputProcessorChain.getProcessors().get(0), outputProcessor5);
@@ -198,18 +206,18 @@ public class OutputProcessorChainTest {
         AbstractOutputProcessor outputProcessor4 = new AbstractOutputProcessor() {
         };
         outputProcessor4.setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
-        outputProcessor4.getAfterProcessors().add(outputProcessor3.getClass().getName());
+        outputProcessor4.addAfterProcessor(outputProcessor3.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor4);
 
         AbstractOutputProcessor outputProcessor5 = new AbstractOutputProcessor() {
         };
         outputProcessor5.setPhase(XMLSecurityConstants.Phase.PREPROCESSING);
-        outputProcessor5.getAfterProcessors().add(outputProcessor2.getClass().getName());
+        outputProcessor5.addAfterProcessor(outputProcessor2.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor5);
 
         AbstractOutputProcessor outputProcessor6 = new AbstractOutputProcessor() {
         };
-        outputProcessor6.getAfterProcessors().add(outputProcessor1.getClass().getName());
+        outputProcessor6.addAfterProcessor(outputProcessor1.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor6);
 
         Assert.assertEquals(outputProcessorChain.getProcessors().get(0), outputProcessor2);
@@ -242,14 +250,14 @@ public class OutputProcessorChainTest {
 
         AbstractOutputProcessor outputProcessor5 = new AbstractOutputProcessor() {
         };
-        outputProcessor5.getBeforeProcessors().add("");
-        outputProcessor5.getAfterProcessors().add(outputProcessor3.getClass().getName());
+        outputProcessor5.addBeforeProcessor("");
+        outputProcessor5.addAfterProcessor(outputProcessor3.getClass().getName());
         outputProcessorChain.addProcessor(outputProcessor5);
 
         AbstractOutputProcessor outputProcessor6 = new AbstractOutputProcessor() {
         };
-        outputProcessor6.getBeforeProcessors().add(outputProcessor5.getClass().getName());
-        outputProcessor6.getAfterProcessors().add("");
+        outputProcessor6.addBeforeProcessor(outputProcessor5.getClass().getName());
+        outputProcessor6.addAfterProcessor("");
         outputProcessorChain.addProcessor(outputProcessor6);
 
         Assert.assertEquals(outputProcessorChain.getProcessors().get(0), outputProcessor1);

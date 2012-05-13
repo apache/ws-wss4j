@@ -42,7 +42,6 @@ import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -51,13 +50,6 @@ import java.util.Properties;
  * @version $Revision$ $Date$
  */
 public class SignatureTest extends AbstractTestBase {
-
-    static {
-        //we need an JCE provider which understands elliptic curve cryptography.
-        //the sun default provider also supports ec but returns a sun.security.x509.X509Key
-        //instead of the java.security.interfaces.ECPublicKey. Bug?
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-    }
 
     @Test
     public void testSignatureDefaultConfigurationOutbound() throws Exception {

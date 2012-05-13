@@ -57,7 +57,7 @@ public class P_SHA1
 
             byte[] key = new byte[length];
 
-            System.arraycopy(tempBytes, 0 + offset, key, 0, key.length);
+            System.arraycopy(tempBytes, offset, key, 0, key.length);
 
             return key;
         } catch (Exception ex) {

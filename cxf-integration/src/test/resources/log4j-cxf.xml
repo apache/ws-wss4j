@@ -17,7 +17,7 @@
         <level value="INFO"/>
     </logger>
     <root>
-        <level value="INFO"/>
+        <priority value="INFO"/>
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </root>

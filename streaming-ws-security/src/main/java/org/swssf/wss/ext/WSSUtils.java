@@ -111,6 +111,8 @@ public class WSSUtils extends XMLSecurityUtils {
                                                           Deque<XMLEvent> xmlEventDeque)
             throws XMLStreamException, XMLSecurityException {
 
+        final String actor = ((WSSSecurityProperties) abstractBufferingOutputProcessor.getSecurityProperties()).getActor();
+
         //loop until we reach our security header and set flag
         Iterator<XMLEvent> xmlEventIterator = xmlEventDeque.descendingIterator();
         while (xmlEventIterator.hasNext()) {
@@ -121,7 +123,7 @@ public class WSSUtils extends XMLSecurityUtils {
                         && isResponsibleActorOrRole(
                         startElement,
                         ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).getSOAPMessageVersionNamespace(),
-                        ((WSSSecurityProperties) abstractBufferingOutputProcessor.getSecurityProperties()).getActor())) {
+                        actor)) {
                     ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).setInSecurityHeader(true);
                     outputProcessorChain.reset();
                     outputProcessorChain.processEvent(xmlEvent);
@@ -139,7 +141,7 @@ public class WSSUtils extends XMLSecurityUtils {
         } else {
             //we have a dependent token. so we have to append the current header after the token
             boolean found = false;
-            while (xmlEventIterator.hasNext() && !found) {
+            while (!found && xmlEventIterator.hasNext()) {
                 XMLEvent xmlEvent = xmlEventIterator.next();
 
                 outputProcessorChain.reset();
@@ -152,7 +154,7 @@ public class WSSUtils extends XMLSecurityUtils {
 
                     @SuppressWarnings("unchecked")
                     Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                    while (attributeIterator.hasNext() && !found) {
+                    while (!found && attributeIterator.hasNext()) {
                         Attribute attribute = attributeIterator.next();
                         final QName attributeName = attribute.getName();
                         final String attributeValue = attribute.getValue();
@@ -163,7 +165,7 @@ public class WSSUtils extends XMLSecurityUtils {
                             matchingElementName = startElement.getName();
                             //we found the token and...
                             int level = 0;
-                            while (xmlEventIterator.hasNext() && !found) {
+                            while (!found && xmlEventIterator.hasNext()) {
                                 xmlEvent = xmlEventIterator.next();
 
                                 outputProcessorChain.reset();
@@ -216,17 +218,17 @@ public class WSSUtils extends XMLSecurityUtils {
                                                           String referenceId, X509Certificate[] x509Certificates,
                                                           boolean useSingleCertificate)
             throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
+        List<Attribute> attributes = new ArrayList<Attribute>(3);
         String valueType;
         if (useSingleCertificate) {
             valueType = WSSConstants.NS_X509_V3_TYPE;
         } else {
             valueType = WSSConstants.NS_X509PKIPathv1;
         }
-        attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-        attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
-        attributes.put(WSSConstants.ATT_wsu_Id, referenceId);
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, attributes);
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, false, attributes);
         try {
             if (useSingleCertificate) {
                 abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
@@ -256,10 +258,10 @@ public class WSSUtils extends XMLSecurityUtils {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "invalidCertForSKI");
         }
 
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-        attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier);
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
+        List<Attribute> attributes = new ArrayList<Attribute>(2);
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         byte data[] = new Merlin().getSKIBytesFromCert(x509Certificates[0]);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
@@ -269,10 +271,10 @@ public class WSSUtils extends XMLSecurityUtils {
                                                         OutputProcessorChain outputProcessorChain,
                                                         X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-        attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE);
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
+        List<Attribute> attributes = new ArrayList<Attribute>(2);
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         try {
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
         } catch (CertificateEncodingException e) {
@@ -285,10 +287,10 @@ public class WSSUtils extends XMLSecurityUtils {
                                                               OutputProcessorChain outputProcessorChain,
                                                               X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-        attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT);
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
+        List<Attribute> attributes = new ArrayList<Attribute>(2);
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         try {
             MessageDigest sha;
             sha = MessageDigest.getInstance("SHA-1");
@@ -309,12 +311,12 @@ public class WSSUtils extends XMLSecurityUtils {
                                                    OutputProcessorChain outputProcessorChain, String referenceId,
                                                    String valueType)
             throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(WSSConstants.ATT_NULL_URI, "#" + referenceId);
+        List<Attribute> attributes = new ArrayList<Attribute>(2);
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_URI, "#" + referenceId));
         if (valueType != null) {
-            attributes.put(WSSConstants.ATT_NULL_ValueType, valueType);
+            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
         }
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
     }
 
@@ -322,13 +324,13 @@ public class WSSUtils extends XMLSecurityUtils {
                                                             OutputProcessorChain outputProcessorChain,
                                                             XMLSecurityConstants.TokenType tokenType, String referenceId)
             throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
+        List<Attribute> attributes = new ArrayList<Attribute>(1);
         if (tokenType.equals(WSSConstants.Saml10Token) || tokenType.equals(WSSConstants.Saml11Token)) {
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE);
+            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else if (tokenType.equals(WSSConstants.Saml20Token)) {
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE);
+            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
         }
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
@@ -336,10 +338,10 @@ public class WSSUtils extends XMLSecurityUtils {
     public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                              OutputProcessorChain outputProcessorChain, String tokenId)
             throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        attributes.put(WSSConstants.ATT_NULL_URI, "#" + tokenId);
-        attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken);
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, attributes);
+        List<Attribute> attributes = new ArrayList<Attribute>(2);
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_URI, "#" + tokenId));
+        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
     }
 
@@ -351,47 +353,47 @@ public class WSSUtils extends XMLSecurityUtils {
         PublicKey publicKey = x509Certificate.getPublicKey();
         String algorithm = publicKey.getAlgorithm();
 
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyValue, null);
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyValue, true, null);
 
         if ("RSA".equals(algorithm)) {
             RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_RSAKeyValue, null);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Modulus, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_RSAKeyValue, false, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Modulus, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(rsaPublicKey.getModulus().toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Modulus);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Exponent, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Exponent, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(rsaPublicKey.getPublicExponent().toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Exponent);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_RSAKeyValue);
         } else if ("DSA".equals(algorithm)) {
             DSAPublicKey dsaPublicKey = (DSAPublicKey) publicKey;
             BigInteger j = dsaPublicKey.getParams().getP().subtract(BigInteger.ONE).divide(dsaPublicKey.getParams().getQ());
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_DSAKeyValue, null);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_P, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_DSAKeyValue, false, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_P, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(dsaPublicKey.getParams().getP().toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_P);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Q, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Q, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(dsaPublicKey.getParams().getQ().toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Q);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_G, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_G, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(dsaPublicKey.getParams().getG().toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_G);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Y, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Y, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(dsaPublicKey.getY().toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_Y);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_J, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_J, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(j.toByteArray()));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_J);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_DSAKeyValue);
         } else if ("EC".equals(algorithm)) {
             ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
 
-            Map<QName, String> attributes = new HashMap<QName, String>();
-            attributes.put(WSSConstants.ATT_NULL_URI, "urn:oid:" + ECDSAUtils.getOIDFromPublicKey(ecPublicKey));
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_ECKeyValue, null);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_NamedCurve, attributes);
+            List<Attribute> attributes = new ArrayList<Attribute>(1);
+            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_URI, "urn:oid:" + ECDSAUtils.getOIDFromPublicKey(ecPublicKey)));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_ECKeyValue, true, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_NamedCurve, false, attributes);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_NamedCurve);
-            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_PublicKey, null);
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_PublicKey, false, null);
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(ECDSAUtils.encodePoint(ecPublicKey.getW(), ecPublicKey.getParams().getCurve())));
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_PublicKey);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_ECKeyValue);

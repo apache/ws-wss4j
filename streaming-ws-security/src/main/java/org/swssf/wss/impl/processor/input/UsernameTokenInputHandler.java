@@ -34,8 +34,6 @@ import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.XMLEvent;
@@ -51,15 +49,11 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
     private static final String cacheRegionName = "usernameToken";
     private static JCS cache;
-    private static final DatatypeFactory datatypeFactory;
 
     static {
         try {
             cache = JCS.getInstance(cacheRegionName);
-            datatypeFactory = DatatypeFactory.newInstance();
         } catch (CacheException e) {
-            throw new RuntimeException(e);
-        } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -131,7 +125,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
             XMLGregorianCalendar xmlGregorianCalendar;
             try {
-                xmlGregorianCalendar = datatypeFactory.newXMLGregorianCalendar(created);
+                xmlGregorianCalendar = WSSConstants.datatypeFactory.newXMLGregorianCalendar(created);
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
             }
@@ -225,8 +219,9 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, UsernameTokenType usernameTokenType,
                                     Deque<XMLEvent> eventDeque, int index) throws WSSecurityException {
 
+        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (usernameTokenType.getAny() == null) {
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R3031);
+            securityContext.handleBSPRule(WSSConstants.BSPRule.R3031);
         }
 
         Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
@@ -243,17 +238,17 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             if (xmlEvent.isStartElement()) {
                 if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Password)) {
                     if (passwordIndex != -1) {
-                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4222);
+                        securityContext.handleBSPRule(WSSConstants.BSPRule.R4222);
                     }
                     passwordIndex = curIdx;
                 } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
                     if (createdIndex != -1) {
-                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4223);
+                        securityContext.handleBSPRule(WSSConstants.BSPRule.R4223);
                     }
                     createdIndex = curIdx;
                 } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Nonce)) {
                     if (nonceIndex != -1) {
-                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4225);
+                        securityContext.handleBSPRule(WSSConstants.BSPRule.R4225);
                     }
                     nonceIndex = curIdx;
                 }
@@ -264,16 +259,16 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
         if (passwordType != null) {
             if (passwordType.getType() == null) {
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4201);
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R4201);
             }
         }
 
         EncodedString encodedNonce = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
         if (encodedNonce != null) {
             if (encodedNonce.getEncodingType() == null) {
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4220);
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R4220);
             } else if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).handleBSPRule(WSSConstants.BSPRule.R4221);
+                securityContext.handleBSPRule(WSSConstants.BSPRule.R4221);
             }
         }
 

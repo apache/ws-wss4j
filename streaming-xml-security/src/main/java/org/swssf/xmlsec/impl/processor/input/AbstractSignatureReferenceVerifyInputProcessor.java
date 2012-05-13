@@ -19,6 +19,8 @@
 package org.swssf.xmlsec.impl.processor.input;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.binding.excc14n.InclusiveNamespaces;
 import org.swssf.binding.xmldsig.ReferenceType;
 import org.swssf.binding.xmldsig.SignatureType;
@@ -41,8 +43,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author $Author$
@@ -50,14 +51,33 @@ import java.util.List;
  */
 public abstract class AbstractSignatureReferenceVerifyInputProcessor extends AbstractInputProcessor {
 
+    private static final transient Log logger = LogFactory.getLog(AbstractSignatureReferenceVerifyInputProcessor.class);
+
     private SignatureType signatureType;
     private SecurityToken securityToken;
-    private List<ReferenceType> processedReferences = new ArrayList<ReferenceType>();
+    private Map<String, ReferenceType> references;
+    private List<ReferenceType> processedReferences;
 
-    public AbstractSignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityToken securityToken, XMLSecurityProperties securityProperties) {
+    public AbstractSignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityToken securityToken,
+                                                          XMLSecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
         this.signatureType = signatureType;
         this.securityToken = securityToken;
+
+        List<ReferenceType> referencesTypeList = signatureType.getSignedInfo().getReference();
+        references = new HashMap<String, ReferenceType>(referencesTypeList.size() + 1);
+        processedReferences = new ArrayList<ReferenceType>(referencesTypeList.size());
+
+        //if (referenceList != null) {
+        Iterator<ReferenceType> referenceTypeIterator = referencesTypeList.iterator();
+        while (referenceTypeIterator.hasNext()) {
+            ReferenceType referenceType = referenceTypeIterator.next();
+            if (referenceType.getURI() == null) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK);
+            }
+            references.put(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()), referenceType);
+        }
+        //}
     }
 
     public SignatureType getSignatureType() {
@@ -107,25 +127,18 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
     protected ReferenceType matchesReferenceId(StartElement startElement) {
         Attribute refId = getReferenceIDAttribute(startElement);
         if (refId != null) {
-            List<ReferenceType> references = getSignatureType().getSignedInfo().getReference();
-            for (int i = 0; i < references.size(); i++) {
-                ReferenceType referenceType = references.get(i);
-                if (refId.getValue().equals(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()))) {
-                    logger.debug("Found signature reference: " + refId.getValue() + " on element" + startElement.getName());
-                    return referenceType;
-                }
-            }
+            return references.get(refId.getValue());
         }
         return null;
     }
 
     @Override
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        List<ReferenceType> references = getSignatureType().getSignedInfo().getReference();
-        for (int i = 0; i < references.size(); i++) {
-            ReferenceType referenceType = references.get(i);
-            if (!processedReferences.contains(referenceType)) {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "unprocessedSignatureReferences");
+        Iterator<Map.Entry<String, ReferenceType>> refEntryIterator = this.references.entrySet().iterator();
+        while (refEntryIterator.hasNext()) {
+            Map.Entry<String, ReferenceType> referenceTypeEntry = refEntryIterator.next();
+            if (!processedReferences.contains(referenceTypeEntry.getValue())) {
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "unprocessedEncryptionReferences");
             }
         }
         inputProcessorChain.doFinal();
@@ -158,7 +171,12 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
         protected AlgorithmType createMessageDigest(SecurityContext securityContext) throws XMLSecurityException, NoSuchAlgorithmException, NoSuchProviderException {
             AlgorithmType digestAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(getReferenceType().getDigestMethod().getAlgorithm());
 
-            MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithm.getJCEName(), digestAlgorithm.getJCEProvider());
+            MessageDigest messageDigest;
+            if (digestAlgorithm.getJCEProvider() != null) {
+                messageDigest = MessageDigest.getInstance(digestAlgorithm.getJCEName(), digestAlgorithm.getJCEProvider());
+            } else {
+                messageDigest = MessageDigest.getInstance(digestAlgorithm.getJCEName());
+            }
             this.setDigestOutputStream(new DigestOutputStream(messageDigest));
             this.setBufferedDigestOutputStream(new BufferedOutputStream(this.getDigestOutputStream()));
             return digestAlgorithm;
@@ -200,12 +218,12 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
             getTransformer().transform(xmlEvent);
 
             if (xmlEvent.isStartElement()) {
-                setElementCounter(getElementCounter() + 1);
+                this.elementCounter++;
             } else if (xmlEvent.isEndElement()) {
                 EndElement endElement = xmlEvent.asEndElement();
-                setElementCounter(getElementCounter() - 1);
+                this.elementCounter--;
 
-                if (endElement.getName().equals(getStartElement()) && getElementCounter() == 0) {
+                if (this.elementCounter == 0 && endElement.getName().equals(getStartElement())) {
                     try {
                         getBufferedDigestOutputStream().close();
                     } catch (IOException e) {
@@ -232,6 +250,10 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
         public boolean isFinished() {
             return finished;
+        }
+
+        protected void setFinished(boolean finished) {
+            this.finished = finished;
         }
 
         protected ReferenceType getReferenceType() {
@@ -272,18 +294,6 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
         protected void setStartElement(QName startElement) {
             this.startElement = startElement;
-        }
-
-        protected int getElementCounter() {
-            return elementCounter;
-        }
-
-        protected void setElementCounter(int elementCounter) {
-            this.elementCounter = elementCounter;
-        }
-
-        protected void setFinished(boolean finished) {
-            this.finished = finished;
         }
     }
 }

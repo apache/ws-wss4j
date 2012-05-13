@@ -24,6 +24,7 @@ import org.swssf.xmlsec.ext.SecurePart;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
+import java.net.URISyntaxException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
@@ -52,6 +53,14 @@ public class WSSec {
         } catch (Throwable e) {
             throw new RuntimeException("Adding BouncyCastle provider failed", e);
         }
+
+        try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+        } catch (XMLSecurityException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -67,12 +76,6 @@ public class WSSec {
     public static OutboundWSSec getOutboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
         if (securityProperties == null) {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
-        }
-
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml"));
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(e.getMessage(), e);
         }
 
         securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
@@ -92,12 +95,6 @@ public class WSSec {
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
         if (securityProperties == null) {
             throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
-        }
-
-        try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml"));
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(e.getMessage(), e);
         }
 
         securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);

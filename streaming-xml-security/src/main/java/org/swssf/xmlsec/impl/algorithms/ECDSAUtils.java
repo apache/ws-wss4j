@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.*;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -158,7 +158,7 @@ public final class ECDSAUtils {
         return asn1Bytes;
     }
 
-    private static List<ECCurveDefinition> ecCurveDefinitions = new LinkedList<ECCurveDefinition>();
+    private static List<ECCurveDefinition> ecCurveDefinitions = new ArrayList<ECCurveDefinition>();
 
     static {
         ecCurveDefinitions.add(

@@ -37,8 +37,8 @@ import java.util.List;
 public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
 
     private XMLEventReader xmlEventReader;
-    private Deque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
-    private Deque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
+    private Deque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>();
+    private Deque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>();
 
     public XMLEventReaderInputProcessor(XMLSecurityProperties securityProperties, XMLEventReader xmlEventReader) {
         super(securityProperties);
@@ -57,10 +57,13 @@ public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
     }
 
     private XMLEvent processNextEventInternal(InputProcessorChain inputProcessorChain) throws XMLStreamException {
-        XMLEvent xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEventReader.nextEvent(), nsStack, attrStack);
+        XMLEvent xmlEvent = xmlEventReader.nextEvent();
         if (xmlEvent.isStartElement()) {
+            xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
             inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
         } else if (xmlEvent.isEndElement()) {
+            nsStack.pop();
+            attrStack.pop();
             inputProcessorChain.getDocumentContext().removePathElement();
         }
         return xmlEvent;

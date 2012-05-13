@@ -40,27 +40,31 @@ public abstract class Canonicalizer20010315_Excl extends CanonicalizerBase {
     }
 
     @Override
-    protected void getCurrentUtilizedNamespaces(XMLEventNS xmlEventNS, SortedSet<ComparableNamespace> utilizedNamespaces, C14NStack<List<Comparable>> outputStack) {
+    protected void getCurrentUtilizedNamespaces(final XMLEventNS xmlEventNS, final SortedSet<ComparableNamespace> utilizedNamespaces,
+                                                final C14NStack<List<Comparable>> outputStack) {
         getInitialUtilizedNamespaces(xmlEventNS, utilizedNamespaces, outputStack);
     }
 
     @Override
-    protected void getInitialUtilizedNamespaces(XMLEventNS xmlEventNS, SortedSet<ComparableNamespace> utilizedNamespaces, C14NStack<List<Comparable>> outputStack) {
-        List<ComparableNamespace> initialUtilizedNamespace = xmlEventNS.getNamespaceList()[0];
+    protected void getInitialUtilizedNamespaces(final XMLEventNS xmlEventNS, final SortedSet<ComparableNamespace> utilizedNamespaces,
+                                                final C14NStack<List<Comparable>> outputStack) {
+        final List<ComparableNamespace> initialUtilizedNamespace = xmlEventNS.getNamespaceList()[0];
+        //ok, a for loop seems to perform a lot better than creating an iterator. But only with the background knowledge that the
+        //list implementation is an ArrayList!
         for (int j = 0; j < initialUtilizedNamespace.size(); j++) {
-            ComparableNamespace comparableNamespace = initialUtilizedNamespace.get(j);
+            final ComparableNamespace comparableNamespace = initialUtilizedNamespace.get(j);
 
             boolean visibleUtilized = false;
-            StartElement startElement = xmlEventNS.asStartElement();
+            final StartElement startElement = xmlEventNS.asStartElement();
             if (comparableNamespace.getPrefix().equals(startElement.getName().getPrefix())) {
                 visibleUtilized = true;
             }
 
             if (!visibleUtilized) {
                 @SuppressWarnings("unchecked")
-                Iterator<Attribute> attributesIterator = startElement.getAttributes();
+                final Iterator<Attribute> attributesIterator = startElement.getAttributes();
                 while (attributesIterator.hasNext()) {
-                    Attribute attribute = attributesIterator.next();
+                    final Attribute attribute = attributesIterator.next();
                     if (comparableNamespace.getPrefix().equals(attribute.getName().getPrefix())) {
                         visibleUtilized = true;
                     }
@@ -83,12 +87,13 @@ public abstract class Canonicalizer20010315_Excl extends CanonicalizerBase {
     }
 
     @Override
-    protected void getInitialUtilizedAttributes(XMLEventNS xmlEventNS, SortedSet<ComparableAttribute> utilizedAttributes, C14NStack<List<Comparable>> outputStack) {
-        StartElement startElement = xmlEventNS.asStartElement();
+    protected void getInitialUtilizedAttributes(final XMLEventNS xmlEventNS, final SortedSet<ComparableAttribute> utilizedAttributes,
+                                                final C14NStack<List<Comparable>> outputStack) {
+        final StartElement startElement = xmlEventNS.asStartElement();
         @SuppressWarnings("unchecked")
-        Iterator<Attribute> attributesIterator = startElement.getAttributes();
+        final Iterator<Attribute> attributesIterator = startElement.getAttributes();
         while (attributesIterator.hasNext()) {
-            Attribute attribute = attributesIterator.next();
+            final Attribute attribute = attributesIterator.next();
             utilizedAttributes.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
         }
     }

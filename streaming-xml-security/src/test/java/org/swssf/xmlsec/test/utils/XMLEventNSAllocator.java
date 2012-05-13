@@ -111,7 +111,7 @@ public class XMLEventNSAllocator implements XMLEventAllocator {
                 }
 
                 if (!"xml".equals(attrName.getPrefix())) {
-                    if (!"".equals(attrName.getPrefix())) {
+                    if (attrName.getPrefix() != null && !attrName.getPrefix().isEmpty()) {
                         ComparableNamespace comparableNamespace = new ComparableNamespace(attrName.getPrefix(), attrName.getNamespaceURI());
                         comparableNamespaceList.add(comparableNamespace);
                     }

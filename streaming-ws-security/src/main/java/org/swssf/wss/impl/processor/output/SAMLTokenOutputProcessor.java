@@ -35,15 +35,16 @@ import org.w3c.dom.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author $Author$
@@ -250,8 +251,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                       String securityTokenReferenceId, String binarySecurityTokenReferenceId,
                                       boolean senderVouches) throws XMLSecurityException {
             super();
-            this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-            this.getAfterProcessors().add(SAMLTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(SAMLTokenOutputProcessor.class.getName());
             this.samlAssertionWrapper = samlAssertionWrapper;
             this.securityTokenReferenceId = securityTokenReferenceId;
             this.senderVouches = senderVouches;
@@ -280,21 +281,21 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     private void outputSecurityTokenReference(OutputProcessorChain outputProcessorChain, SAMLAssertionWrapper samlAssertionWrapper, String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
-        Map<QName, String> attributes = new HashMap<QName, String>();
+        List<Attribute> attributes = new ArrayList<Attribute>(2);
         if (samlAssertionWrapper.getSAMLVersion() == SAMLVersion.VERSION_11) {
-            attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE);
+            attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
         } else {
-            attributes.put(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE);
+            attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
         }
-        attributes.put(WSSConstants.ATT_wsu_Id, referenceId);
-        createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, attributes);
-        attributes = new HashMap<QName, String>();
+        attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
+        createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+        attributes = new ArrayList<Attribute>(1);
         if (samlAssertionWrapper.getSAMLVersion() == SAMLVersion.VERSION_11) {
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE);
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else {
-            attributes.put(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE);
+            attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
         }
-        createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, attributes);
+        createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         createCharactersAndOutputAsEvent(outputProcessorChain, tokenId);
         createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
         createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
@@ -303,17 +304,17 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     //todo serialize directly from SAML XMLObject?
     private void outputSamlAssertion(Element element, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
-        Map<QName, String> attributes = new HashMap<QName, String>();
-        Map<QName, String> namespaces = new HashMap<QName, String>();
         NamedNodeMap namedNodeMap = element.getAttributes();
+        List<Attribute> attributes = new ArrayList<Attribute>(namedNodeMap.getLength());
+        List<Namespace> namespaces = new ArrayList<Namespace>(namedNodeMap.getLength());
         for (int i = 0; i < namedNodeMap.getLength(); i++) {
             Attr attribute = (Attr) namedNodeMap.item(i);
-            if ("xmlns".equals(attribute.getPrefix()) || "xmlns".equals(attribute.getLocalName())) {
-                namespaces.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix()), attribute.getValue());
-            } else if (attribute.getPrefix() == null) {
-                attributes.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), attribute.getValue());
+            if (attribute.getPrefix() == null) {
+                attributes.add(createAttribute(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), attribute.getValue()));
+            } else if ("xmlns".equals(attribute.getPrefix()) || "xmlns".equals(attribute.getLocalName())) {
+                namespaces.add(createNamespace(attribute.getLocalName(), attribute.getValue()));
             } else {
-                attributes.put(new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix()), attribute.getValue());
+                attributes.add(createAttribute(new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix()), attribute.getValue()));
             }
         }
 

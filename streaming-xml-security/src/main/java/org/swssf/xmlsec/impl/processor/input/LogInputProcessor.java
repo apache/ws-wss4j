@@ -18,6 +18,8 @@
  */
 package org.swssf.xmlsec.impl.processor.input;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.*;
 
 import javax.xml.stream.XMLStreamException;
@@ -29,6 +31,8 @@ import java.io.StringWriter;
  * @version $Revision$ $Date$
  */
 public class LogInputProcessor extends AbstractInputProcessor {
+
+    private static final transient Log logger = LogFactory.getLog(LogInputProcessor.class);
 
     public LogInputProcessor(XMLSecurityProperties securityProperties) {
         super(securityProperties);

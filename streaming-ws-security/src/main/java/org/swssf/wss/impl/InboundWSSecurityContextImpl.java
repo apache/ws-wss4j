@@ -29,10 +29,7 @@ import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.namespace.QName;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Concrete security context implementation
@@ -44,11 +41,11 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     private static final transient Log logger = LogFactory.getLog(WSSecurityContextImpl.class);
 
-    private Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
+    private Deque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
     private boolean messageEncryptionTokenOccured = false;
 
-    private List<WSSConstants.BSPRule> ignoredBSPRules = new LinkedList<WSSConstants.BSPRule>();
+    private List<WSSConstants.BSPRule> ignoredBSPRules = Collections.emptyList();
 
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
@@ -252,7 +249,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
             }
         }
 
-        if (messageSignatureTokens.size() == 0) {
+        if (messageSignatureTokens.isEmpty()) {
             SecurityToken messageSignatureToken = getSupportingTokenSigningToken(
                     signedSupportingTokens,
                     signedEndorsingSupportingTokens,
@@ -274,7 +271,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
             }
         }
 
-        if (messageSignatureTokens.size() == 0) {
+        if (messageSignatureTokens.isEmpty()) {
             for (Iterator<TokenSecurityEvent> iterator = supportingTokens.iterator(); iterator.hasNext(); ) {
                 TokenSecurityEvent supportingToken = iterator.next();
                 if (supportingToken.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.Signature)) {
@@ -285,7 +282,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
             }
         }
 
-        if (messageEncryptionTokens.size() == 0) {
+        if (messageEncryptionTokens.isEmpty()) {
             for (Iterator<TokenSecurityEvent> iterator = supportingTokens.iterator(); iterator.hasNext(); ) {
                 TokenSecurityEvent supportingToken = iterator.next();
                 if (supportingToken.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.Encryption)) {
@@ -296,7 +293,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
             }
         }
 
-        if (messageEncryptionTokens.size() > 0) {
+        if (!messageEncryptionTokens.isEmpty()) {
             this.messageEncryptionTokenOccured = true;
         }
 
@@ -510,6 +507,6 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
     }
 
     public void ignoredBSPRules(List<WSSConstants.BSPRule> bspRules) {
-        ignoredBSPRules.addAll(bspRules);
+        ignoredBSPRules = new ArrayList<WSSConstants.BSPRule>(bspRules);
     }
 }

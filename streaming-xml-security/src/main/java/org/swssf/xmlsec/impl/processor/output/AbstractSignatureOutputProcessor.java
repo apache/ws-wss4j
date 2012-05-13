@@ -19,6 +19,8 @@
 package org.swssf.xmlsec.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.SignaturePartDef;
@@ -27,7 +29,6 @@ import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -37,7 +38,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -46,7 +46,9 @@ import java.util.List;
  */
 public abstract class AbstractSignatureOutputProcessor extends AbstractOutputProcessor {
 
-    private List<SignaturePartDef> signaturePartDefList = new LinkedList<SignaturePartDef>();
+    private static final transient Log logger = LogFactory.getLog(AbstractSignatureOutputProcessor.class);
+
+    private List<SignaturePartDef> signaturePartDefList = new ArrayList<SignaturePartDef>();
 
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
@@ -81,7 +83,7 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
 
         public InternalSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super();
-            this.getBeforeProcessors().add(InternalSignatureOutputProcessor.class.getName());
+            this.addBeforeProcessor(InternalSignatureOutputProcessor.class.getName());
             this.signaturePartDef = signaturePartDef;
             this.startElement = startElement;
         }
@@ -90,12 +92,17 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
         public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
             try {
                 AlgorithmType algorithmID = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureDigestAlgorithm());
-                MessageDigest messageDigest = MessageDigest.getInstance(algorithmID.getJCEName(), algorithmID.getJCEProvider());
+                MessageDigest messageDigest;
+                if (algorithmID.getJCEProvider() != null) {
+                    messageDigest = MessageDigest.getInstance(algorithmID.getJCEName(), algorithmID.getJCEProvider());
+                } else {
+                    messageDigest = MessageDigest.getInstance(algorithmID.getJCEName());
+                }
                 this.digestOutputStream = new DigestOutputStream(messageDigest);
                 this.bufferedDigestOutputStream = new BufferedOutputStream(digestOutputStream);
 
                 if (signaturePartDef.getTransformAlgo() != null) {
-                    List<String> inclusiveNamespaces = new ArrayList<String>();
+                    List<String> inclusiveNamespaces = new ArrayList<String>(1);
                     inclusiveNamespaces.add("#default");
                     Transformer transformer = XMLSecurityUtils.getTransformer(inclusiveNamespaces, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
                     this.transformer = XMLSecurityUtils.getTransformer(transformer, null, signaturePartDef.getTransformAlgo());
@@ -129,9 +136,7 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
             } else if (xmlEvent.isEndElement()) {
                 elementCounter--;
 
-                EndElement endElement = xmlEvent.asEndElement();
-
-                if (endElement.getName().equals(this.startElement) && elementCounter == 0) {
+                if (elementCounter == 0 && xmlEvent.asEndElement().getName().equals(this.startElement)) {
                     try {
                         bufferedDigestOutputStream.close();
                     } catch (IOException e) {

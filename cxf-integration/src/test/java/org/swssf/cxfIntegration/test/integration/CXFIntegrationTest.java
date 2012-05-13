@@ -49,12 +49,12 @@ public class CXFIntegrationTest {
             final Client client = ClientProxy.getClient(greeterStream);
             WSS4JOutInterceptor wss4JOutInterceptor = new WSS4JOutInterceptor();
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ACTION, "Timestamp Signature Encrypt");
-            //wss4JOutInterceptor.setProperty(WSHandlerConstants.ACTION, "Encrypt");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
             wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
             client.getOutInterceptors().add(wss4JOutInterceptor);
 
             WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
@@ -72,13 +72,13 @@ public class CXFIntegrationTest {
             greeterWSS4J = soapService.getSoapPort();
             final Client client = ClientProxy.getClient(greeterWSS4J);
             WSS4JOutInterceptor wss4JOutInterceptor = new WSS4JOutInterceptor();
-            //wss4JOutInterceptor.setProperty(WSHandlerConstants.ACTION, "Timestamp Signature Encrypt");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ACTION, "Timestamp Signature Encrypt");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENCRYPTION_USER, "receiver");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, WSS4JCallbackHandlerImpl.class.getName());
             wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
             client.getOutInterceptors().add(wss4JOutInterceptor);
 
             WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
@@ -97,6 +97,7 @@ public class CXFIntegrationTest {
 
     @Test(alwaysRun = true)
     public void startTiming() {
+        System.gc();
         System.out.println("startTiming");
         starttime = System.currentTimeMillis();
     }
@@ -105,12 +106,12 @@ public class CXFIntegrationTest {
     public void stopTiming() {
         System.out.println("Streaming: 100 invocations took " + (System.currentTimeMillis() - starttime) + " milliseconds");
         System.out.flush();
+        System.gc();
     }
 
-    @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = {"startTiming", "testCXFWSS4J"})
-    //@Test(invocationCount = 1, threadPoolSize = 10)
+    @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = {"startTiming"})
     public void testCXF() throws Exception {
-        String resp = greeterStream.greetMe("Hey Stream Service. It's me, the client. Nice to meet you...");
+        String resp = greeterStream.greetMe("Hey Service. It's me, the client. Nice to meet you...");
         //System.out.println(resp);
     }
 
@@ -118,6 +119,7 @@ public class CXFIntegrationTest {
 
     @Test(alwaysRun = true)
     public void startTimingWSS4J() {
+        System.gc();
         System.out.println("startTiming");
         starttimeWSS4J = System.currentTimeMillis();
     }
@@ -126,11 +128,12 @@ public class CXFIntegrationTest {
     public void stopTimingWSS4J() {
         System.out.println("DOM: 100 invocations took " + (System.currentTimeMillis() - starttimeWSS4J) + " milliseconds");
         System.out.flush();
+        System.gc();
     }
 
     @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = "startTimingWSS4J")
     public void testCXFWSS4J() throws Exception {
-        String resp = greeterWSS4J.greetMe("Hey DOM Service. It's me, the client. Nice to meet you...");
+        String resp = greeterWSS4J.greetMe("Hey Service. It's me, the client. Nice to meet you...");
         //System.out.println(resp);
     }
 }

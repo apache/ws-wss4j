@@ -79,6 +79,11 @@ public class SecurityContextImpl implements SecurityContext {
         return (List<T>) content.get(key);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> Set<T> getAsSet(Class key) {
+        return (Set<T>) content.get(key);
+    }
+
     public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider) {
         if (id == null) {
             throw new IllegalArgumentException("Id must not be null");

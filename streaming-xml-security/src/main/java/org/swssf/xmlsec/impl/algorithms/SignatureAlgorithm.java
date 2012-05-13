@@ -30,23 +30,23 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public interface SignatureAlgorithm {
 
-    public void engineUpdate(byte[] input) throws XMLSecurityException;
+    void engineUpdate(byte[] input) throws XMLSecurityException;
 
-    public void engineUpdate(byte input) throws XMLSecurityException;
+    void engineUpdate(byte input) throws XMLSecurityException;
 
-    public void engineUpdate(byte buf[], int offset, int len) throws XMLSecurityException;
+    void engineUpdate(byte buf[], int offset, int len) throws XMLSecurityException;
 
-    public void engineInitSign(Key signingKey) throws XMLSecurityException;
+    void engineInitSign(Key signingKey) throws XMLSecurityException;
 
-    public void engineInitSign(Key signingKey, SecureRandom secureRandom) throws XMLSecurityException;
+    void engineInitSign(Key signingKey, SecureRandom secureRandom) throws XMLSecurityException;
 
-    public void engineInitSign(Key signingKey, AlgorithmParameterSpec algorithmParameterSpec) throws XMLSecurityException;
+    void engineInitSign(Key signingKey, AlgorithmParameterSpec algorithmParameterSpec) throws XMLSecurityException;
 
-    public byte[] engineSign() throws XMLSecurityException;
+    byte[] engineSign() throws XMLSecurityException;
 
-    public void engineInitVerify(Key verificationKey) throws XMLSecurityException;
+    void engineInitVerify(Key verificationKey) throws XMLSecurityException;
 
-    public boolean engineVerify(byte[] signature) throws XMLSecurityException;
+    boolean engineVerify(byte[] signature) throws XMLSecurityException;
 
-    public void engineSetParameter(AlgorithmParameterSpec params) throws XMLSecurityException;
+    void engineSetParameter(AlgorithmParameterSpec params) throws XMLSecurityException;
 }

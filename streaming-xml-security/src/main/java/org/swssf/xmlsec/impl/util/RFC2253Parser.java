@@ -68,7 +68,7 @@ public class RFC2253Parser {
     public static String normalize(String dn, boolean toXML) {
 
         //if empty string
-        if ((dn == null) || dn.equals("")) {
+        if (dn == null || dn.isEmpty()) {
             return "";
         }
 
@@ -138,7 +138,7 @@ public class RFC2253Parser {
      */
     static String parseATAV(String str, boolean toXML) throws IOException {
 
-        int i = str.indexOf("=");
+        int i = str.indexOf('=');
 
         if ((i == -1) || ((i > 0) && (str.charAt(i - 1) == '\\'))) {
             return str;

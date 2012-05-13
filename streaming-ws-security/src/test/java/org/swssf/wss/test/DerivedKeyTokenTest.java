@@ -79,7 +79,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT_WITH_DERIVED_KEY};
             securityProperties.setOutAction(actions);
-            byte[] secret = new byte[128 / 8];
+            byte[] secret = new byte[192 / 8];
             WSSConstants.secureRandom.nextBytes(secret);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
             securityProperties.setCallbackHandler(callbackHandler);

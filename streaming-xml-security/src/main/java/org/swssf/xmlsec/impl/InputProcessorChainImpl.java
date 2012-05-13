@@ -37,8 +37,9 @@ import java.util.List;
 public class InputProcessorChainImpl implements InputProcessorChain {
 
     protected static final transient Log log = LogFactory.getLog(InputProcessorChainImpl.class);
+    protected static final transient boolean isDebugEnabled = log.isDebugEnabled();
 
-    private List<InputProcessor> inputProcessors = Collections.synchronizedList(new ArrayList<InputProcessor>());
+    private List<InputProcessor> inputProcessors = Collections.synchronizedList(new ArrayList<InputProcessor>(20));//the default of ten entries is not enough
     private int startPos = 0;
     private int curPos = 0;
 
@@ -63,20 +64,8 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         documentContext = documentContextImpl;
     }
 
-    public int getCurPos() {
-        return curPos;
-    }
-
-    public void setCurPos(int curPos) {
-        this.curPos = curPos;
-    }
-
-    public int getPosAndIncrement() {
-        return this.curPos++;
-    }
-
     public void reset() {
-        setCurPos(startPos);
+        this.curPos = startPos;
     }
 
     public SecurityContext getSecurityContext() {
@@ -167,7 +156,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
                 inputProcessors.add(idxToInsert, newInputProcessor);
             }
         }
-        if (log.isDebugEnabled()) {
+        if (isDebugEnabled) {
             log.debug("Added " + newInputProcessor.getClass().getName() + " to input chain: ");
             for (int i = 0; i < inputProcessors.size(); i++) {
                 InputProcessor inputProcessor = inputProcessors.get(i);
@@ -177,8 +166,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public void removeProcessor(InputProcessor inputProcessor) {
-        log.debug("Removing processor " + inputProcessor.getClass().getName() + " from input chain");
-        if (this.inputProcessors.indexOf(inputProcessor) <= getCurPos()) {
+        if (isDebugEnabled) {
+            log.debug("Removing processor " + inputProcessor.getClass().getName() + " from input chain");
+        }
+        if (this.inputProcessors.indexOf(inputProcessor) <= curPos) {
             this.curPos--;
         }
         this.inputProcessors.remove(inputProcessor);
@@ -189,15 +180,15 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public XMLEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException {
-        return inputProcessors.get(getPosAndIncrement()).processNextHeaderEvent(this);
+        return inputProcessors.get(this.curPos++).processNextHeaderEvent(this);
     }
 
     public XMLEvent processEvent() throws XMLStreamException, XMLSecurityException {
-        return inputProcessors.get(getPosAndIncrement()).processNextEvent(this);
+        return inputProcessors.get(this.curPos++).processNextEvent(this);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        inputProcessors.get(getPosAndIncrement()).doFinal(this);
+        inputProcessors.get(this.curPos++).doFinal(this);
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {

@@ -19,11 +19,15 @@
 package org.swssf.xmlsec.impl;
 
 import org.swssf.xmlsec.ext.OutputProcessorChain;
+import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-import javax.xml.stream.*;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.*;
 import java.io.Writer;
 import java.util.*;
@@ -36,11 +40,10 @@ import java.util.*;
  */
 public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
-    private XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
     private OutputProcessorChain outputProcessorChain;
     private Deque<QName> startElementStack = new ArrayDeque<QName>();
     private QName openStartElement = null;
-    private List<Attribute> currentAttributes = new LinkedList<Attribute>();
+    private List<Attribute> currentAttributes = new ArrayList<Attribute>();
     private Deque<Map<String, Namespace>> nsStack;
     private NamespaceContext namespaceContext;
     private final NamespaceContext defaultNamespaceContext;
@@ -48,8 +51,8 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public XMLSecurityStreamWriter(OutputProcessorChain outputProcessorChain) {
         this.outputProcessorChain = outputProcessorChain;
-        nsStack = new LinkedList<Map<String, Namespace>>();
-        nsStack.push(new LinkedHashMap<String, Namespace>());
+        nsStack = new ArrayDeque<Map<String, Namespace>>();
+        nsStack.push(Collections.<String, Namespace>emptyMap());
 
         defaultNamespaceContext = new NamespaceContext() {
             @Override
@@ -57,12 +60,9 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
                 Iterator<Map<String, Namespace>> stackIterator = nsStack.iterator();
                 while (stackIterator.hasNext()) {
                     Map<String, Namespace> next = stackIterator.next();
-                    Iterator<Map.Entry<String, Namespace>> mapIterator = next.entrySet().iterator();
-                    while (mapIterator.hasNext()) {
-                        Map.Entry<String, Namespace> entry = mapIterator.next();
-                        if (prefix.equals(entry.getKey())) {
-                            return entry.getValue().getNamespaceURI();
-                        }
+                    Namespace ns = next.get(prefix);
+                    if (ns != null) {
+                        return ns.getNamespaceURI();
                     }
                 }
                 if (namespaceContext != null) {
@@ -92,7 +92,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
             @Override
             public Iterator getPrefixes(String namespaceURI) {
-                List<String> prefixList = new ArrayList<String>();
+                List<String> prefixList = new ArrayList<String>(1);
                 if (namespaceContext != null) {
                     Iterator<String> iterator = namespaceContext.getPrefixes(namespaceURI);
                     while (iterator.hasNext()) {
@@ -119,6 +119,16 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         };
     }
 
+    private void putNamespaceOntoStack(String prefix, Namespace namespace) {
+        Map<String, Namespace> namespaceMap = nsStack.peek();
+        if (Collections.<String, Namespace>emptyMap() == namespaceMap) {
+            nsStack.pop();
+            namespaceMap = new HashMap<String, Namespace>();
+            nsStack.push(namespaceMap);
+        }
+        namespaceMap.put(prefix, namespace);
+    }
+
     private void chainProcessEvent(XMLEvent xmlEvent) throws XMLStreamException {
         try {
             outputProcessorChain.reset();
@@ -141,7 +151,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     private void outputOpenStartElement() throws XMLStreamException {
         if (openStartElement != null) {
-            chainProcessEvent(xmlEventFactory.createStartElement(openStartElement, currentAttributes.iterator(), nsStack.peek().values().iterator()));
+            chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createStartElement(openStartElement, currentAttributes.iterator(), nsStack.peek().values().iterator()));
             currentAttributes.clear();
             openStartElement = null;
         }
@@ -149,7 +159,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
             haveToWriteEndElement = false;
             writeEndElement();
         }
-        nsStack.push(new LinkedHashMap<String, Namespace>());
+        nsStack.push(Collections.<String, Namespace>emptyMap());
     }
 
     public void writeStartElement(String localName) throws XMLStreamException {
@@ -194,10 +204,10 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
 
     public void writeEndElement() throws XMLStreamException {
         outputOpenStartElement();
-        List<Namespace> namespaceList = new LinkedList<Namespace>();
+        List<Namespace> namespaceList = new ArrayList<Namespace>(1);
         QName element = startElementStack.pop();
-        namespaceList.add(xmlEventFactory.createNamespace(element.getPrefix(), element.getNamespaceURI()));
-        EndElement endElement = xmlEventFactory.createEndElement(element, namespaceList.iterator());
+        namespaceList.add(XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(element.getPrefix(), element.getNamespaceURI()));
+        EndElement endElement = XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(element, namespaceList.iterator());
         chainProcessEvent(endElement);
         nsStack.pop();
     }
@@ -206,9 +216,9 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
         outputOpenStartElement();
         Iterator<QName> startElements = startElementStack.iterator();
         while (startElements.hasNext()) {
-            chainProcessEvent(xmlEventFactory.createEndElement(startElements.next(), null));
+            chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(startElements.next(), null));
         }
-        chainProcessEvent(xmlEventFactory.createEndDocument());
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createEndDocument());
     }
 
     public void close() throws XMLStreamException {
@@ -225,53 +235,53 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String localName, String value) throws XMLStreamException {
-        currentAttributes.add(xmlEventFactory.createAttribute(localName, value));
+        currentAttributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(localName, value));
     }
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
-        currentAttributes.add(xmlEventFactory.createAttribute(prefix, namespaceURI, localName, value));
+        currentAttributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(prefix, namespaceURI, localName, value));
     }
 
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
-        currentAttributes.add(xmlEventFactory.createAttribute(getNamespaceContext().getPrefix(namespaceURI), namespaceURI, localName, value));
+        currentAttributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(getNamespaceContext().getPrefix(namespaceURI), namespaceURI, localName, value));
     }
 
     public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
-        nsStack.peek().put(prefix, xmlEventFactory.createNamespace(prefix, namespaceURI));
+        putNamespaceOntoStack(prefix, XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(prefix, namespaceURI));
     }
 
     public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
-        nsStack.peek().put("", xmlEventFactory.createNamespace(namespaceURI));
+        putNamespaceOntoStack("", XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(namespaceURI));
     }
 
     public void writeComment(String data) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createComment(data));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createComment(data));
     }
 
     public void writeProcessingInstruction(String target) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createProcessingInstruction(target, null));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createProcessingInstruction(target, null));
     }
 
     public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createProcessingInstruction(target, data));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createProcessingInstruction(target, data));
     }
 
     public void writeCData(String data) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createCData(data));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createCData(data));
     }
 
     public void writeDTD(String dtd) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createDTD(dtd));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createDTD(dtd));
     }
 
     public void writeEntityRef(final String name) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createEntityReference(name, new EntityDeclaration() {
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createEntityReference(name, new EntityDeclaration() {
             @Override
             public String getPublicId() {
                 return null;
@@ -384,25 +394,25 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument() throws XMLStreamException {
-        chainProcessEvent(xmlEventFactory.createStartDocument());
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createStartDocument());
     }
 
     public void writeStartDocument(String version) throws XMLStreamException {
-        chainProcessEvent(xmlEventFactory.createStartDocument("utf-8", version));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createStartDocument("utf-8", version));
     }
 
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
-        chainProcessEvent(xmlEventFactory.createStartDocument(encoding, version));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createStartDocument(encoding, version));
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createCharacters(text));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createCharacters(text));
     }
 
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
         outputOpenStartElement();
-        chainProcessEvent(xmlEventFactory.createCharacters(new String(text, start, len)));
+        chainProcessEvent(XMLSecurityConstants.XMLEVENTFACTORY.createCharacters(new String(text, start, len)));
     }
 
     public String getPrefix(String uri) throws XMLStreamException {
@@ -410,7 +420,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void setPrefix(String prefix, String uri) throws XMLStreamException {
-        nsStack.peek().put(prefix, xmlEventFactory.createNamespace(prefix, uri));
+        putNamespaceOntoStack(prefix, XMLSecurityConstants.XMLEVENTFACTORY.createNamespace(prefix, uri));
         if (openStartElement != null) {
             if (openStartElement.getNamespaceURI().equals(uri)) {
                 openStartElement = new QName(openStartElement.getNamespaceURI(), openStartElement.getLocalPart(), prefix);
@@ -419,7 +429,7 @@ public class XMLSecurityStreamWriter implements XMLStreamWriter {
     }
 
     public void setDefaultNamespace(String uri) throws XMLStreamException {
-        nsStack.peek().put("", xmlEventFactory.createNamespace("", uri));
+        putNamespaceOntoStack("", XMLSecurityConstants.XMLEVENTFACTORY.createNamespace("", uri));
     }
 
     public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {

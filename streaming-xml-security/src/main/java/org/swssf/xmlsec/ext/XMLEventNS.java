@@ -38,7 +38,7 @@ public class XMLEventNS implements XMLEvent {
 
     private XMLEvent xmlEvent;
     private List<ComparableNamespace>[] namespaceList;
-    List<ComparableAttribute>[] attributeList;
+    private List<ComparableAttribute>[] attributeList;
 
     public XMLEventNS(XMLEvent xmlEvent, List<ComparableNamespace>[] namespaceList, List<ComparableAttribute>[] attributeList) {
         this.xmlEvent = xmlEvent;

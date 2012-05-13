@@ -25,6 +25,7 @@ import javax.security.auth.callback.CallbackHandler;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import java.util.List;
  */
 public class XMLSecurityProperties {
 
-    private List<InputProcessor> inputProcessorList = new LinkedList<InputProcessor>();
+    private List<InputProcessor> inputProcessorList = new ArrayList<InputProcessor>();
 
     /**
      * Add an additional, non standard, InputProcessor to the chain

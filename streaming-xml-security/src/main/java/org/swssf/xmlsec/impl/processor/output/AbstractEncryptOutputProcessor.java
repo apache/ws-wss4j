@@ -29,14 +29,10 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.events.*;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +40,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Processor to encrypt XML structures
@@ -53,6 +51,17 @@ import java.util.*;
  * @version $Revision$ $Date$
  */
 public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProcessor {
+
+    private static final XMLOutputFactory xmlOutputFactory;
+    private static final StartElement wrapperStartElement;
+    private static final EndElement wrapperEndElement;
+
+    static {
+        xmlOutputFactory = XMLOutputFactory.newInstance();
+        xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        wrapperStartElement = XMLSecurityConstants.XMLEVENTFACTORY.createStartElement(new QName("a"), null, null);
+        wrapperEndElement = XMLSecurityConstants.XMLEVENTFACTORY.createEndElement(new QName("a"), null);
+    }
 
     private AbstractInternalEncryptionOutputProcessor activeInternalEncryptionOutputProcessor = null;
 
@@ -91,9 +100,9 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
                 throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
 
             super();
-            this.getBeforeProcessors().add(AbstractEncryptEndingOutputProcessor.class.getName());
-            this.getBeforeProcessors().add(AbstractInternalEncryptionOutputProcessor.class.getName());
-            this.getAfterProcessors().add(AbstractEncryptOutputProcessor.class.getName());
+            this.addBeforeProcessor(AbstractEncryptEndingOutputProcessor.class.getName());
+            this.addBeforeProcessor(AbstractInternalEncryptionOutputProcessor.class.getName());
+            this.addAfterProcessor(AbstractEncryptOutputProcessor.class.getName());
             this.setEncryptionPartDef(encryptionPartDef);
             this.setStartElement(startElement);
             this.setEncoding(encoding);
@@ -127,12 +136,10 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
                 cipherOutputStream = new TrimmerOutputStream(outputStream, 8192, 3, 4);
 
                 //we create a new StAX writer for optimized namespace writing.
-                XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-                xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
                 //spec says (4.2): "The cleartext octet sequence obtained in step 3 is interpreted as UTF-8 encoded character data."
                 xmlEventWriter = xmlOutputFactory.createXMLEventWriter(cipherOutputStream, "UTF-8");
                 //we have to output a fake element to workaround text-only encryption:
-                xmlEventWriter.add(XMLEventFactory.newInstance().createStartElement(new QName("a"), null, null));
+                xmlEventWriter.add(wrapperStartElement);
             } catch (NoSuchPaddingException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             } catch (NoSuchAlgorithmException e) {
@@ -160,10 +167,9 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
         public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             if (xmlEvent.isStartElement()) {
-
                 StartElement startElement = xmlEvent.asStartElement();
 
-                if (startElement.getName().equals(this.getStartElement().getName()) && getElementCounter() == 0) {
+                if (this.elementCounter == 0 && startElement.getName().equals(this.getStartElement().getName())) {
                     //if the user selected element encryption we have to encrypt the current element-event...
                     if (getEncryptionPartDef().getModifier() == SecurePart.Modifier.Element) {
                         subOutputProcessorChain = outputProcessorChain.createSubChain(this);
@@ -181,14 +187,12 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
                     encryptEvent(xmlEvent);
                 }
 
-                setElementCounter(getElementCounter() + 1);
+                this.elementCounter++;
 
             } else if (xmlEvent.isEndElement()) {
-                setElementCounter(getElementCounter() - 1);
+                this.elementCounter--;
 
-                EndElement endElement = xmlEvent.asEndElement();
-
-                if (endElement.getName().equals(this.getStartElement().getName()) && getElementCounter() == 0) {
+                if (this.elementCounter == 0 && xmlEvent.asEndElement().getName().equals(this.getStartElement().getName())) {
                     if (getEncryptionPartDef().getModifier() == SecurePart.Modifier.Element) {
                         encryptEvent(xmlEvent);
                         doFinalInternal(subOutputProcessorChain);
@@ -227,23 +231,23 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
          * Creates the Data structure around the cipher data
          */
         protected void processEventInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            Map<QName, String> attributes = null;
+            List<Attribute> attributes = null;
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(XMLSecurityConstants.ATT_NULL_Id, getEncryptionPartDef().getEncRefId());
-            attributes.put(XMLSecurityConstants.ATT_NULL_Type, getEncryptionPartDef().getModifier().getModifier());
-            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_EncryptedData, attributes);
+            attributes = new ArrayList<Attribute>(2);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Id, getEncryptionPartDef().getEncRefId()));
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Type, getEncryptionPartDef().getModifier().getModifier()));
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_EncryptedData, true, attributes);
 
-            attributes = new HashMap<QName, String>();
-            attributes.put(XMLSecurityConstants.ATT_NULL_Algorithm, securityProperties.getEncryptionSymAlgorithm());
-            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_EncryptionMethod, attributes);
+            attributes = new ArrayList<Attribute>(1);
+            attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, securityProperties.getEncryptionSymAlgorithm()));
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_EncryptionMethod, false, attributes);
 
             createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_EncryptionMethod);
-            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
             createKeyInfoStructure(outputProcessorChain);
             createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);
-            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_CipherData, null);
-            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_CipherValue, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_CipherData, false, null);
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_xenc_CipherValue, false, null);
 
             /*
             <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncDataId-1612925417"
@@ -270,7 +274,7 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
         protected void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             try {
-                xmlEventWriter.add(XMLEventFactory.newInstance().createEndElement(new QName("a"), null));
+                xmlEventWriter.add(wrapperEndElement);
                 //close the event writer to flush all outstanding events to the encrypt stream
                 xmlEventWriter.close();
                 //call close to force a cipher.doFinal()
@@ -308,14 +312,6 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
             this.startElement = startElement;
         }
 
-        protected int getElementCounter() {
-            return elementCounter;
-        }
-
-        protected void setElementCounter(int elementCounter) {
-            this.elementCounter = elementCounter;
-        }
-
         public String getEncoding() {
             return encoding;
         }
@@ -330,7 +326,7 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
      */
     public class CharacterEventGeneratorOutputStream extends OutputStream {
 
-        private List<Characters> charactersBuffer = new LinkedList<Characters>();
+        private List<Characters> charactersBuffer = new ArrayList<Characters>();
         private String encoding;
 
         public CharacterEventGeneratorOutputStream(String encoding) {
@@ -343,17 +339,17 @@ public abstract class AbstractEncryptOutputProcessor extends AbstractOutputProce
 
         @Override
         public void write(int b) throws IOException {
-            charactersBuffer.add(createCharacters(new String(new byte[]{((byte) b)}, encoding)).asCharacters());
+            charactersBuffer.add(createCharacters(new String(new byte[]{((byte) b)}, encoding)));
         }
 
         @Override
         public void write(byte[] b) throws IOException {
-            charactersBuffer.add(createCharacters(new String(b, encoding)).asCharacters());
+            charactersBuffer.add(createCharacters(new String(b, encoding)));
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            charactersBuffer.add(createCharacters(new String(b, off, len, encoding)).asCharacters());
+            charactersBuffer.add(createCharacters(new String(b, off, len, encoding)));
         }
     }
 }

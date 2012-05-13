@@ -24,17 +24,15 @@ import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
 import org.swssf.xmlsec.ext.*;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -62,8 +60,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             byte[] nonceValue = new byte[16];
             WSSConstants.secureRandom.nextBytes(nonceValue);
 
-            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-            XMLGregorianCalendar created = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
+            XMLGregorianCalendar created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
 
             final String wsuId = IDGenerator.generateID(null);
 
@@ -103,8 +100,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             finalUsernameTokenOutputProcessor.setAction(getAction());
             finalUsernameTokenOutputProcessor.init(outputProcessorChain);
 
-        } catch (DatatypeConfigurationException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
@@ -121,8 +116,8 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         FinalUsernameTokenOutputProcessor(String wsuId, byte[] nonceValue, String password, XMLGregorianCalendar created)
                 throws XMLSecurityException {
             super();
-            this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
-            this.getAfterProcessors().add(UsernameTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+            this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
             this.wsuId = wsuId;
             this.nonceValue = nonceValue;
             this.password = password;
@@ -137,19 +132,19 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    Map<QName, String> attributes = new HashMap<QName, String>();
-                    attributes.put(WSSConstants.ATT_wsu_Id, this.wsuId);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_UsernameToken, attributes);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, null);
+                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, this.wsuId));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_UsernameToken, false, attributes);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, ((WSSSecurityProperties) getSecurityProperties()).getTokenUser());
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username);
                     if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
-                        attributes = new HashMap<QName, String>();
-                        attributes.put(WSSConstants.ATT_NULL_Type,
+                        attributes = new ArrayList<Attribute>(1);
+                        attributes.add(createAttribute(WSSConstants.ATT_NULL_Type,
                                 ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                         ? WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace()
-                                        : WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace());
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password, attributes);
+                                        : WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace()));
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password, false, attributes);
                         createCharactersAndOutputAsEvent(subOutputProcessorChain,
                                 ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                         ? WSSUtils.doPasswordDigest(this.nonceValue, this.created.toXMLFormat(), this.password)
@@ -159,14 +154,14 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
                     if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                             || Arrays.binarySearch(getSecurityProperties().getOutAction(), WSSConstants.USERNAMETOKEN_SIGNED) >= 0) {
-                        attributes = new HashMap<QName, String>();
-                        attributes.put(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING);
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, attributes);
+                        attributes = new ArrayList<Attribute>(1);
+                        attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
 
 
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce);
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, null);
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
 
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, this.created.toXMLFormat());
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);

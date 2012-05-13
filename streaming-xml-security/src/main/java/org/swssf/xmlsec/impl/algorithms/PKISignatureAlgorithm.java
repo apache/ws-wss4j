@@ -31,12 +31,16 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public class PKISignatureAlgorithm implements SignatureAlgorithm {
 
-    private AlgorithmType algorithmType;
+    private String jceName;
     private Signature signature;
 
     public PKISignatureAlgorithm(AlgorithmType algorithmType) throws NoSuchProviderException, NoSuchAlgorithmException {
-        this.algorithmType = algorithmType;
-        signature = Signature.getInstance(algorithmType.getJCEName(), algorithmType.getJCEProvider());
+        this.jceName = algorithmType.getJCEName();
+        if (algorithmType.getJCEProvider() != null) {
+            signature = Signature.getInstance(this.jceName, algorithmType.getJCEProvider());
+        } else {
+            signature = Signature.getInstance(this.jceName);
+        }
     }
 
     public void engineUpdate(byte[] input) throws XMLSecurityException {
@@ -90,9 +94,9 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
     public byte[] engineSign() throws XMLSecurityException {
         try {
             byte[] jcebytes = signature.sign();
-            if (algorithmType.getJCEName().contains("ECDSA")) {
+            if (this.jceName.contains("ECDSA")) {
                 return ECDSAUtils.convertASN1toXMLDSIG(jcebytes);
-            } else if (algorithmType.getJCEName().contains("DSA")) {
+            } else if (this.jceName.contains("DSA")) {
                 return DSAUtils.convertASN1toXMLDSIG(jcebytes);
             }
             return jcebytes;
@@ -114,9 +118,9 @@ public class PKISignatureAlgorithm implements SignatureAlgorithm {
     public boolean engineVerify(byte[] signature) throws XMLSecurityException {
         try {
             byte[] jcebytes = signature;
-            if (algorithmType.getJCEName().contains("ECDSA")) {
+            if (this.jceName.contains("ECDSA")) {
                 jcebytes = ECDSAUtils.convertXMLDSIGtoASN1(jcebytes);
-            } else if (algorithmType.getJCEName().contains("DSA")) {
+            } else if (this.jceName.contains("DSA")) {
                 jcebytes = DSAUtils.convertXMLDSIGtoASN1(jcebytes);
             }
             return this.signature.verify(jcebytes);

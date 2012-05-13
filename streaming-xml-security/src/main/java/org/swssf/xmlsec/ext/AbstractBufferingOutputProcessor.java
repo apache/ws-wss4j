@@ -31,7 +31,7 @@ import java.util.Deque;
  */
 public abstract class AbstractBufferingOutputProcessor extends AbstractOutputProcessor {
 
-    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>();
+    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>(100);
     private String appendAfterThisTokenId;
 
     protected AbstractBufferingOutputProcessor() throws XMLSecurityException {

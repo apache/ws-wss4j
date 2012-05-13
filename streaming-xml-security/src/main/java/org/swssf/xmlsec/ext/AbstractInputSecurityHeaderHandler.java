@@ -41,7 +41,8 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index, XMLSecurityProperties securityProperties) throws XMLSecurityException {
+    protected <T> T parseStructure(final Deque<XMLEvent> eventDeque, final int index,
+                                   final XMLSecurityProperties securityProperties) throws XMLSecurityException {
         try {
             Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbUnmarshaller(securityProperties.isDisableSchemaValidation());
             return (T) unmarshaller.unmarshal(new XMLSecurityEventReader(eventDeque, index));
@@ -52,8 +53,9 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
     }
 
     protected List<QName> getElementPath(DocumentContext documentContext, Deque<XMLEvent> eventDeque) throws XMLSecurityException {
-        List<QName> elementPath = new ArrayList<QName>();
-        elementPath.addAll(documentContext.getPath());
+        final List<QName> path = documentContext.getPath();
+        List<QName> elementPath = new ArrayList<QName>(path.size() + 1);
+        elementPath.addAll(path);
         XMLEvent xmlEvent = eventDeque.peek();
         if (xmlEvent.isStartElement()) {
             elementPath.add(xmlEvent.asStartElement().getName());

@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,13 +37,14 @@ import java.util.List;
 public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     protected static final transient Log log = LogFactory.getLog(OutputProcessorChainImpl.class);
+    protected static final transient boolean isDebugEnabled = log.isDebugEnabled();
 
-    private List<OutputProcessor> outputProcessors = Collections.synchronizedList(new ArrayList<OutputProcessor>());
+    private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>(20); //the default of ten entries is not enough
     private int startPos = 0;
     private int curPos = 0;
 
-    private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>(10);
-    private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>(10);
+    private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>();
+    private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>();
 
     private SecurityContext securityContext;
     private DocumentContextImpl documentContext;
@@ -67,20 +67,8 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         documentContext = documentContextImpl;
     }
 
-    public int getCurPos() {
-        return curPos;
-    }
-
-    public void setCurPos(int curPos) {
-        this.curPos = curPos;
-    }
-
-    public int getPosAndIncrement() {
-        return this.curPos++;
-    }
-
     public void reset() {
-        setCurPos(startPos);
+        this.curPos = startPos;
     }
 
     public SecurityContext getSecurityContext() {
@@ -96,11 +84,11 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     private ArrayDeque<List<ComparableNamespace>> getNsStack() {
-        return nsStack.clone();
+        return nsStack;
     }
 
     private void setNsStack(ArrayDeque<List<ComparableNamespace>> nsStack) {
-        this.nsStack = nsStack;
+        this.nsStack = nsStack.clone();
     }
 
     private ArrayDeque<List<ComparableAttribute>> getAttrStack() {
@@ -190,7 +178,7 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         if (idxToInsert < this.curPos) {
             this.curPos++;
         }
-        if (log.isDebugEnabled()) {
+        if (isDebugEnabled) {
             log.debug("Added " + newOutputProcessor.getClass().getName() + " to output chain: ");
             for (int i = 0; i < outputProcessors.size(); i++) {
                 OutputProcessor outputProcessor = outputProcessors.get(i);
@@ -200,8 +188,10 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public void removeProcessor(OutputProcessor outputProcessor) {
-        log.debug("Removing processor " + outputProcessor.getClass().getName() + " from output chain");
-        if (this.outputProcessors.indexOf(outputProcessor) <= getCurPos()) {
+        if (isDebugEnabled) {
+            log.debug("Removing processor " + outputProcessor.getClass().getName() + " from output chain");
+        }
+        if (this.outputProcessors.indexOf(outputProcessor) <= this.curPos) {
             this.curPos--;
         }
         this.outputProcessors.remove(outputProcessor);
@@ -213,18 +203,19 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
         if (this.curPos == this.startPos) {
-            xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
             if (xmlEvent.isStartElement()) {
+                xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
                 getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
             } else if (xmlEvent.isEndElement()) {
+                xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
                 getDocumentContext().removePathElement();
             }
         }
-        outputProcessors.get(getPosAndIncrement()).processNextEvent(xmlEvent, this);
+        outputProcessors.get(this.curPos++).processNextEvent(xmlEvent, this);
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
-        outputProcessors.get(getPosAndIncrement()).doFinal(this);
+        outputProcessors.get(this.curPos++).doFinal(this);
     }
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException {
