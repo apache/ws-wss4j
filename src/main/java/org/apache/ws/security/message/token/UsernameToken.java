@@ -511,6 +511,11 @@ public class UsernameToken {
                 getName(), getPassword(), getPasswordType(), 
                 WSPasswordCallback.USERNAME_TOKEN, data
             );
+        
+        if (data.getCallbackHandler() == null) {
+            LOG.debug("CallbackHandler is null");
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+        }
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException e) {
