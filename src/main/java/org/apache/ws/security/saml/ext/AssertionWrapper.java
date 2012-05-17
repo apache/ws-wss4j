@@ -141,6 +141,11 @@ public class AssertionWrapper {
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
     
     /**
+     * Whether this object was instantiated with a DOM Element or an XMLObject initially
+     */
+    private final boolean fromDOM;
+    
+    /**
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
      *
      * @param element of type Element
@@ -150,6 +155,7 @@ public class AssertionWrapper {
         OpenSAMLUtil.initSamlEngine();
         
         parseElement(element);
+        fromDOM = true;
     }
 
     /**
@@ -194,6 +200,7 @@ public class AssertionWrapper {
                 + (xmlObject != null ? xmlObject.getClass().getName() : null)
             );
         }
+        fromDOM = false;
     }
 
     /**
@@ -229,9 +236,11 @@ public class AssertionWrapper {
         // See if we already have a DOM element in SAMLCallback
         if (samlCallbacks[0].getAssertionElement() != null) {
             parseElement(samlCallbacks[0].getAssertionElement());
+            fromDOM = true;
         } else {
             // If not then parse the SAMLCallback object
             parseCallback(samlCallbacks[0], parms);
+            fromDOM = false;
         }
     }
 
@@ -280,6 +289,13 @@ public class AssertionWrapper {
      * @return Element
      */
     public Element toDOM(Document doc) throws WSSecurityException {
+        if (fromDOM && assertionElement != null) {
+            parseElement(assertionElement);
+            if (doc != null) {
+                return (Element)doc.importNode(assertionElement, true);
+            }
+            return assertionElement;
+        }
         assertionElement = OpenSAMLUtil.toDom(xmlObject, doc);
         return assertionElement;
     }
