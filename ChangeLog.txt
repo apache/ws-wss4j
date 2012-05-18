@@ -5,6 +5,30 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.6
+=============
+
+Bug
+
+    [WSS-357] - WSS4J can't handle thumbprint/ski references to a token in the security header
+    [WSS-385] - UsernameToken handles long strings badly
+    [WSS-389] - WSS4J TimeToLive value has a maximum of 25 days
+    [WSS-390] - AssertionWrapper always tries to re-marshal when toDOM is called
+
+Improvement
+
+    [WSS-387] - Support future TTL setting when processing SAML Tokens
+    [WSS-388] - Add support for populating SAML2 SubjectConfirmationData attributes when creating a SAML Assertion
+
+New Feature
+
+    [WSS-380] - SAML1 AuthenticationStatement only supports AuthenticationMethod Password
+
+Task
+
+    [WSS-358] - Record how a certificate was referenced for signature or encryption
+
+
 Release 1.6.5
 =============
 
