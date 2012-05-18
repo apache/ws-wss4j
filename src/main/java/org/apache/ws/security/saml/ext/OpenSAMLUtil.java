@@ -83,7 +83,15 @@ public final class OpenSAMLUtil {
      * @throws UnmarshallingException
      */
     public static XMLObject fromDom(Element root) throws WSSecurityException {
+        if (root == null) {
+            LOG.debug("Attempting to unmarshal a null element!");
+            throw new WSSecurityException("Error unmarshalling a SAML assertion");
+        }
         Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(root);
+        if (unmarshaller == null) {
+            LOG.debug("Unable to find an unmarshaller for element: " + root.getLocalName());
+            throw new WSSecurityException("Error unmarshalling a SAML assertion");
+        }
         try {
             return unmarshaller.unmarshall(root);
         } catch (UnmarshallingException ex) {
