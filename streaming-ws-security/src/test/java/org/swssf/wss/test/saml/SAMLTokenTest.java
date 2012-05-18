@@ -217,6 +217,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
+            callbackHandler.setResource("http://resource.org");
             securityProperties.setCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -245,6 +246,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
             callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setResource("http://resource.org");
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
@@ -436,6 +438,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
+            callbackHandler.setResource("http://resource.org");
             securityProperties.setCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -464,6 +467,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
             callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setResource("http://resource.org");
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;

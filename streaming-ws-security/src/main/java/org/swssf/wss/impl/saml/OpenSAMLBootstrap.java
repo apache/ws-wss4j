@@ -54,6 +54,7 @@ public class OpenSAMLBootstrap extends DefaultBootstrap {
             "/saml2-metadata-query-config.xml",
             "/saml2-assertion-delegation-restriction-config.xml",
             "/saml2-ecp-config.xml",
+            "/saml2-xacml2-profile.xml",
             "/xacml10-saml2-profile-config.xml",
             "/xacml11-saml2-profile-config.xml",
             "/xacml20-context-config.xml",

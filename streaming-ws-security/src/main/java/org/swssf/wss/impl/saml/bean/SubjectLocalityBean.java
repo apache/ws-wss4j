@@ -24,14 +24,10 @@ package org.swssf.wss.impl.saml.bean;
  */
 public class SubjectLocalityBean {
 
-    /**
-     * The ipAddress.
-     */
+    /** The ipAddress. */
     private String ipAddress;
 
-    /**
-     * The DNS Address.
-     */
+    /** The DNS Address. */
     private String dnsAddress;
 
     /**
@@ -44,8 +40,8 @@ public class SubjectLocalityBean {
 
     /**
      * Constructor for creating a SubjectLocalityBean with ip and dns addresses.
-     *
-     * @param ipAddress  ip address
+     * 
+     * @param ipAddress ip address
      * @param dnsAddress dns address
      */
     public SubjectLocalityBean(final String ipAddress, final String dnsAddress) {
@@ -55,7 +51,7 @@ public class SubjectLocalityBean {
 
     /**
      * Get the ip address.
-     *
+     * 
      * @return the ipAddress
      */
     public final String getIpAddress() {
@@ -64,7 +60,7 @@ public class SubjectLocalityBean {
 
     /**
      * Set the ip address.
-     *
+     * 
      * @param ipAddress the ipAddress to set
      */
     public final void setIpAddress(final String ipAddress) {
@@ -73,7 +69,7 @@ public class SubjectLocalityBean {
 
     /**
      * Get the dns address.
-     *
+     * 
      * @return the dnsAddress
      */
     public final String getDnsAddress() {
@@ -82,7 +78,7 @@ public class SubjectLocalityBean {
 
     /**
      * Set the dns address.
-     *
+     * 
      * @param dnsAddress the dnsAddress to set
      */
     public final void setDnsAddress(final String dnsAddress) {

@@ -46,7 +46,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <xmlsec.version>1.5.2</xmlsec.version>
-        <wss4j.version>1.6.4</wss4j.version>
+        <wss4j.version>1.6.5</wss4j.version>
+        <neethi.version>3.0.2</neethi.version>
     </properties>
 
     <dependencyManagement>
@@ -69,7 +70,7 @@
             <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
-                <version>3.0.2-SNAPSHOT</version>
+                <version>${neethi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>

@@ -36,22 +36,26 @@ import javax.xml.namespace.QName;
  * <p/>
  * Created on May 18, 2009
  */
-public class OpenSAMLUtil {
-    private static final org.apache.commons.logging.Log log =
+public final class OpenSAMLUtil {
+    private static final org.apache.commons.logging.Log LOG =
             org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
 
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;
     private static UnmarshallerFactory unmarshallerFactory;
     private static boolean samlEngineInitialized = false;
+    
+    private OpenSAMLUtil() {
+        // Complete
+    }
 
     /**
      * Initialise the SAML library
      */
     public synchronized static void initSamlEngine() {
         if (!samlEngineInitialized) {
-            if (log.isDebugEnabled()) {
-                log.debug("Initilizing the opensaml2 library...");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initilizing the opensaml2 library...");
             }
             try {
                 OpenSAMLBootstrap.bootstrap();
@@ -59,11 +63,11 @@ public class OpenSAMLUtil {
                 marshallerFactory = Configuration.getMarshallerFactory();
                 unmarshallerFactory = Configuration.getUnmarshallerFactory();
                 samlEngineInitialized = true;
-                if (log.isDebugEnabled()) {
-                    log.debug("opensaml2 library bootstrap complete");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("opensaml2 library bootstrap complete");
                 }
             } catch (ConfigurationException e) {
-                log.error(
+                LOG.error(
                         "Unable to bootstrap the opensaml2 library - all SAML operations will fail",
                         e
                 );
@@ -79,7 +83,15 @@ public class OpenSAMLUtil {
      * @throws UnmarshallingException
      */
     public static XMLObject fromDom(Element root) throws WSSecurityException {
+        if (root == null) {
+            LOG.debug("Attempting to unmarshal a null element!");
+            throw new WSSecurityException("Error unmarshalling a SAML assertion");
+        }
         Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(root);
+        if (unmarshaller == null) {
+            LOG.debug("Unable to find an unmarshaller for element: " + root.getLocalName());
+            throw new WSSecurityException("Error unmarshalling a SAML assertion");
+        }
         try {
             return unmarshaller.unmarshall(root);
         } catch (UnmarshallingException ex) {
@@ -119,36 +131,7 @@ public class OpenSAMLUtil {
                 throw new WSSecurityException("Error marshalling a SAML assertion", ex);
             }
 
-            // Sign the assertion if the signature element is present.
-            if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
-                org.opensaml.saml2.core.Assertion saml2 =
-                        (org.opensaml.saml2.core.Assertion) xmlObject;
-                // if there is a signature, but it hasn't already been signed
-                if (saml2.getSignature() != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Signing SAML v2.0 assertion...");
-                    }
-                    try {
-                        Signer.signObject(saml2.getSignature());
-                    } catch (SignatureException ex) {
-                        throw new WSSecurityException("Error signing a SAML assertion", ex);
-                    }
-                }
-            } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
-                org.opensaml.saml1.core.Assertion saml1 =
-                        (org.opensaml.saml1.core.Assertion) xmlObject;
-                // if there is a signature, but it hasn't already been signed
-                if (saml1.getSignature() != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Signing SAML v1.1 assertion...");
-                    }
-                    try {
-                        Signer.signObject(saml1.getSignature());
-                    } catch (SignatureException ex) {
-                        throw new WSSecurityException("Error signing a SAML assertion", ex);
-                    }
-                }
-            }
+            signXMLObject(xmlObject);
         } finally {
             if (frag != null) {
                 while (doc.getFirstChild() != null) {
@@ -158,6 +141,65 @@ public class OpenSAMLUtil {
             }
         }
         return element;
+    }
+    
+    private static void signXMLObject(XMLObject xmlObject) throws WSSecurityException {
+        if (xmlObject instanceof org.opensaml.saml1.core.Response) {
+            org.opensaml.saml1.core.Response response = 
+                    (org.opensaml.saml1.core.Response)xmlObject;
+            
+            // Sign any Assertions
+            if (response.getAssertions() != null) {
+                for (org.opensaml.saml1.core.Assertion assertion : response.getAssertions()) {
+                    signObject(assertion.getSignature());
+                }
+            }
+            
+            signObject(response.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Response) {
+            org.opensaml.saml2.core.Response response = 
+                    (org.opensaml.saml2.core.Response)xmlObject;
+            
+            // Sign any Assertions
+            if (response.getAssertions() != null) {
+                for (org.opensaml.saml2.core.Assertion assertion : response.getAssertions()) {
+                    signObject(assertion.getSignature());
+                }
+            }
+            
+            signObject(response.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+            org.opensaml.saml2.core.Assertion saml2 = 
+                    (org.opensaml.saml2.core.Assertion) xmlObject;
+            
+            signObject(saml2.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+            org.opensaml.saml1.core.Assertion saml1 = 
+                    (org.opensaml.saml1.core.Assertion) xmlObject;
+            
+            signObject(saml1.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml2.core.RequestAbstractType) {
+            org.opensaml.saml2.core.RequestAbstractType request = 
+                    (org.opensaml.saml2.core.RequestAbstractType) xmlObject;
+            
+            
+            signObject(request.getSignature());
+        } else if (xmlObject instanceof org.opensaml.saml1.core.Request) {
+            org.opensaml.saml1.core.Request request = 
+                    (org.opensaml.saml1.core.Request) xmlObject;
+            
+            signObject(request.getSignature());
+        }
+    }
+    
+    private static void signObject(Signature signature) throws WSSecurityException {
+        if (signature != null) {
+            try {
+                Signer.signObject(signature);
+            } catch (SignatureException ex) {
+                throw new WSSecurityException("Error signing a SAML assertion", ex);
+            }
+        }
     }
 
     /**
@@ -170,7 +212,7 @@ public class OpenSAMLUtil {
         QName qName = Signature.DEFAULT_ELEMENT_NAME;
         XMLObjectBuilder<Signature> builder = builderFactory.getBuilder(qName);
         if (builder == null) {
-            log.error(
+            LOG.error(
                     "Unable to retrieve builder for object QName "
                             + qName
             );
