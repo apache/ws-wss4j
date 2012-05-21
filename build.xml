@@ -368,7 +368,7 @@ org.apache.ws.security.util
         <zip destfile=
                  "${dir.dist}/${product.shortname}-src-${product.version}.zip">
             <zipfileset prefix="wss4j-${product.version}" dir="."
-                includes="src/** legal/** lib/** endorsed/** ChangeLog.txt LICENSE.txt README.txt NOTICE build.xml pom.xml"/>
+                includes="src/** ChangeLog.txt LICENSE.txt README.txt NOTICE build.xml pom.xml"/>
         </zip>
     </target>
 
