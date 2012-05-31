@@ -112,6 +112,24 @@ public final class OpenSAMLUtil {
         XMLObject xmlObject, 
         Document doc
     ) throws WSSecurityException {
+        return toDom(xmlObject, doc, true);
+    }
+    
+    /**
+     * Convert a SAML Assertion from a XMLObject to a DOM Element
+     *
+     * @param xmlObject of type XMLObject
+     * @param doc  of type Document
+     * @param signObject whether to sign the XMLObject during marshalling
+     * @return Element
+     * @throws MarshallingException
+     * @throws SignatureException
+     */
+    public static Element toDom(
+        XMLObject xmlObject, 
+        Document doc,
+        boolean signObject
+    ) throws WSSecurityException {
         Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
         Element element = null;
         DocumentFragment frag = doc == null ? null : doc.createDocumentFragment();
@@ -131,7 +149,9 @@ public final class OpenSAMLUtil {
                 throw new WSSecurityException("Error marshalling a SAML assertion", ex);
             }
     
-            signXMLObject(xmlObject);
+            if (signObject) {
+                signXMLObject(xmlObject);
+            }
         } finally {
             if (frag != null) {
                 while (doc.getFirstChild() != null) {
