@@ -132,14 +132,18 @@ public class SecurityTokenRefSTRParser implements STRParser {
         } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
-                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) { 
-                AssertionWrapper assertion = 
-                    SAMLUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, 
-                        data, wsDocInfo
-                    );
+                || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
                 secretKey = 
-                    getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
+                    getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
+                if (secretKey == null) {
+                    AssertionWrapper assertion = 
+                        SAMLUtil.getAssertionFromKeyIdentifier(
+                            secRef, strElement, 
+                            data, wsDocInfo
+                        );
+                    secretKey = 
+                        getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo, bspCompliant);
+                }
             } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
                 secretKey = 
                     getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
