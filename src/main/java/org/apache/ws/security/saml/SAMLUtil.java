@@ -103,6 +103,11 @@ public final class SAMLUtil {
                     keyIdentifierValue, type
                 );
             if (token != null) {
+                if (!"Assertion".equals(token.getLocalName())) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "invalidSAMLsecurity"
+                    );
+                }
                 return new AssertionWrapper(token);
             }
             token = 
@@ -111,7 +116,7 @@ public final class SAMLUtil {
                     request.getCallbackHandler(), keyIdentifierValue, type
                 );
             
-            if (token == null) {
+            if (token == null || !"Assertion".equals(token.getLocalName())) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE, "invalidSAMLsecurity"
                 );
