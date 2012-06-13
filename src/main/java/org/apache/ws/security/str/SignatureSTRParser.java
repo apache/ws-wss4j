@@ -214,23 +214,7 @@ public class SignatureSTRParser implements STRParser {
                 principal = new CustomTokenPrincipal(id);
             } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                AssertionWrapper assertion = 
-                    SAMLUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, data, wsDocInfo
-                    );
-                if (bspCompliant) {
-                    BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-                }
-                SAMLKeyInfo samlKi = 
-                    SAMLUtil.getCredentialFromSubject(assertion, data,
-                                                      wsDocInfo, bspCompliant);
-                X509Certificate[] foundCerts = samlKi.getCerts();
-                if (foundCerts != null && foundCerts.length > 0) {
-                    certs = new X509Certificate[]{foundCerts[0]};
-                }
-                secretKey = samlKi.getSecret();
-                publicKey = samlKi.getPublicKey();
-                principal = createPrincipalFromSAML(assertion);
+                parseSAMLKeyIdentifier(secRef, wsDocInfo, data, bspCompliant);
             } else {
                 parseBSTKeyIdentifier(secRef, crypto, wsDocInfo, data, bspCompliant);
             }
@@ -352,6 +336,37 @@ public class SignatureSTRParser implements STRParser {
         }
 
         return null;
+    }
+    
+    /**
+     * Parse the KeyIdentifier for a SAML Assertion
+     */
+    private void parseSAMLKeyIdentifier(
+        SecurityTokenReference secRef,
+        WSDocInfo wsDocInfo,
+        RequestData data,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        String valueType = secRef.getKeyIdentifierValueType();
+        secretKey = getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
+        if (secretKey == null) {
+            AssertionWrapper assertion = 
+                SAMLUtil.getAssertionFromKeyIdentifier(
+                    secRef, secRef.getElement(), data, wsDocInfo
+                );
+            if (bspCompliant) {
+                BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
+            }
+            SAMLKeyInfo samlKi = 
+                SAMLUtil.getCredentialFromSubject(assertion, data, wsDocInfo, bspCompliant);
+            X509Certificate[] foundCerts = samlKi.getCerts();
+            if (foundCerts != null && foundCerts.length > 0) {
+                certs = new X509Certificate[]{foundCerts[0]};
+            }
+            secretKey = samlKi.getSecret();
+            publicKey = samlKi.getPublicKey();
+            principal = createPrincipalFromSAML(assertion);
+        }
     }
     
     /**
