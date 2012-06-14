@@ -31,6 +31,8 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.str.STRParser;
+import org.apache.ws.security.str.SignatureSTRParser;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -52,6 +54,7 @@ import javax.xml.namespace.QName;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -297,7 +300,7 @@ public final class SAMLUtil {
         boolean bspCompliant
     ) throws WSSecurityException {
         //
-        // First try to find an EncryptedKey or a BinarySecret via DOM
+        // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
         //
         Node node = keyInfoElement.getFirstChild();
         while (node != null) {
@@ -315,6 +318,15 @@ public final class SAMLUtil {
                 } else if (el.equals(BINARY_SECRET) || el.equals(BINARY_SECRET_05_12)) {
                     Text txt = (Text)node.getFirstChild();
                     return new SAMLKeyInfo(Base64.decode(txt.getData()));
+                } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
+                    STRParser strParser = new SignatureSTRParser();
+                    strParser.parseSecurityTokenReference(
+                        (Element)node, data, docInfo, new HashMap<String, Object>()
+                    );
+                    SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
+                    samlKeyInfo.setPublicKey(strParser.getPublicKey());
+                    samlKeyInfo.setSecret(strParser.getSecretKey());
+                    return samlKeyInfo;
                 }
             }
             node = node.getNextSibling();
