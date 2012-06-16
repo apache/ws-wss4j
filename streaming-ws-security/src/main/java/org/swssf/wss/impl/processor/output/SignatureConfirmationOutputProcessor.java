@@ -20,18 +20,20 @@ package org.swssf.wss.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSDocumentContext;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +50,12 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        outputProcessorChain.processEvent(xmlEvent);
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        outputProcessorChain.processEvent(xmlSecEvent);
+        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+            if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                    && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 boolean aSignatureFound = false;
@@ -64,7 +67,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                         aSignatureFound = true;
                         SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 
-                        List<Attribute> attributes = new ArrayList<Attribute>(2);
+                        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
                         attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                         attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue())));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, true, attributes);
@@ -73,7 +76,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                 }
 
                 if (!aSignatureFound) {
-                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, true, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);

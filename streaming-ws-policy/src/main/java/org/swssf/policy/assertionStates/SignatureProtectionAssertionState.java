@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class SignatureProtectionAssertionState extends AssertionState implements Assertable {
 
-    private List<List<QName>> elementPaths = new ArrayList<List<QName>>();
+    private final List<List<QName>> elementPaths = new ArrayList<List<QName>>();
 
     public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);

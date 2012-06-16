@@ -21,8 +21,10 @@ package org.swssf.cxfIntegration.test.integration;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.PingMeFault;
 
+import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import javax.xml.ws.WebServiceContext;
 
 /**
  * @author $Author$
@@ -30,6 +32,9 @@ import javax.jws.WebService;
  */
 @WebService(targetNamespace = "http://apache.org/hello_world_soap_http", serviceName = "SOAPService", endpointInterface = "org.apache.hello_world_soap_http.Greeter")
 public class GreeterServiceImpl implements Greeter {
+
+    @Resource
+    WebServiceContext context;
 
     public void pingMe() throws PingMeFault {
     }

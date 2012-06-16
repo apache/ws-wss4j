@@ -51,7 +51,7 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
     public static final SecurityOutInterceptorEndingInterceptor ENDING = new SecurityOutInterceptorEndingInterceptor();
     public static final String OUTPUT_STREAM_HOLDER = SecurityOutInterceptor.class.getName() + ".outputstream";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
-    private OutboundWSSec outboundWSSec;
+    private final OutboundWSSec outboundWSSec;
 
     public SecurityOutInterceptor(String p, WSSSecurityProperties securityProperties) throws Exception {
         super(p);

@@ -40,8 +40,8 @@ import java.security.cert.X509Certificate;
  */
 public class SAMLSecurityToken extends AbstractSecurityToken {
 
-    private SAMLVersion samlVersion;
-    private SAMLKeyInfo samlKeyInfo;
+    private final SAMLVersion samlVersion;
+    private final SAMLKeyInfo samlKeyInfo;
     private String issuer;
     private X509Certificate[] x509Certificate;
 

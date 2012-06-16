@@ -18,8 +18,9 @@
  */
 package org.swssf.xmlsec.ext;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -31,15 +32,15 @@ import java.util.Deque;
  */
 public abstract class AbstractBufferingOutputProcessor extends AbstractOutputProcessor {
 
-    private ArrayDeque<XMLEvent> xmlEventBuffer = new ArrayDeque<XMLEvent>(100);
+    private final ArrayDeque<XMLSecEvent> xmlSecEventBuffer = new ArrayDeque<XMLSecEvent>(100);
     private String appendAfterThisTokenId;
 
     protected AbstractBufferingOutputProcessor() throws XMLSecurityException {
         super();
     }
 
-    public Deque<XMLEvent> getXmlEventBuffer() {
-        return xmlEventBuffer;
+    public Deque<XMLSecEvent> getXmlSecEventBuffer() {
+        return xmlSecEventBuffer;
     }
 
     public String getAppendAfterThisTokenId() {
@@ -51,12 +52,15 @@ public abstract class AbstractBufferingOutputProcessor extends AbstractOutputPro
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        xmlEventBuffer.push(xmlEvent);
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        xmlSecEventBuffer.push(xmlSecEvent);
     }
 
     @Override
-    public abstract void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract void doFinal(OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException;
 
-    public abstract void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract void processHeaderEvent(OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException;
 }

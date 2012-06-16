@@ -41,7 +41,7 @@ import java.security.cert.X509Certificate;
  */
 public abstract class X509SecurityToken extends AbstractSecurityToken {
     private X509Certificate[] x509Certificates = null;
-    private XMLSecurityConstants.TokenType tokenType;
+    private final XMLSecurityConstants.TokenType tokenType;
 
     protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
                                 Crypto crypto, CallbackHandler callbackHandler, String id,

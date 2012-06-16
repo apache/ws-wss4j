@@ -22,14 +22,16 @@ import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.securityEvent.*;
 import org.swssf.xmlsec.crypto.Merlin;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.algorithms.ECDSAUtils;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -81,8 +83,65 @@ public class WSSUtils extends XMLSecurityUtils {
         }
     }
 
-    public static boolean isResponsibleActorOrRole(StartElement startElement, String soapVersionNamespace, String responsibleActor) {
-        QName actorRole;
+    public static String getSOAPMessageVersionNamespace(XMLSecEvent xmlSecEvent) {
+        XMLSecStartElement xmlSecStartElement = xmlSecEvent.getStartElementAtLevel(1);
+        if (xmlSecStartElement != null) {
+            if (WSSConstants.TAG_soap11_Envelope.equals(xmlSecStartElement.getName())) {
+                return WSSConstants.NS_SOAP11;
+            } else if (WSSConstants.TAG_soap12_Envelope.equals(xmlSecStartElement.getName())) {
+                return WSSConstants.NS_SOAP12;
+            }
+        }
+        return null;
+    }
+
+    public static boolean isInSOAPHeader(XMLSecEvent xmlSecEvent) {
+        final List<QName> elementPath = xmlSecEvent.getElementPath();
+        return isInSOAPHeader(elementPath);
+    }
+
+    public static boolean isInSOAPHeader(List<QName> elementPath) {
+        if (elementPath.size() > 1) {
+            final QName secondLevelElementName = elementPath.get(1);
+            return (WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI()));
+        }
+        return false;
+    }
+
+    public static boolean isInSOAPBody(XMLSecEvent xmlSecEvent) {
+        final List<QName> elementPath = xmlSecEvent.getElementPath();
+        return isInSOAPBody(elementPath);
+    }
+
+    public static boolean isInSOAPBody(List<QName> elementPath) {
+        if (elementPath.size() > 1) {
+            final QName secondLevelElementName = elementPath.get(1);
+            return (WSSConstants.TAG_soap_Body_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI()));
+        }
+        return false;
+    }
+
+    public static boolean isInSecurityHeader(XMLSecEvent xmlSecEvent, String actorOrRole) {
+        final List<QName> elementPath = xmlSecEvent.getElementPath();
+        return isInSecurityHeader(xmlSecEvent, elementPath, actorOrRole);
+    }
+
+    public static boolean isInSecurityHeader(XMLSecEvent xmlSecEvent, List<QName> elementPath, String actorOrRole) {
+        if (elementPath.size() > 2) {
+            final QName secondLevelElementName = elementPath.get(1);
+            return WSSConstants.TAG_wsse_Security.equals(elementPath.get(2))
+                    && isResponsibleActorOrRole(xmlSecEvent.getStartElementAtLevel(3), actorOrRole)
+                    && WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
+        }
+        return false;
+    }
+
+    public static boolean isResponsibleActorOrRole(XMLSecStartElement xmlSecStartElement, String responsibleActor) {
+        final QName actorRole;
+        final String soapVersionNamespace = getSOAPMessageVersionNamespace(xmlSecStartElement);
         if (WSSConstants.NS_SOAP11.equals(soapVersionNamespace)) {
             actorRole = WSSConstants.ATT_soap11_Actor;
         } else {
@@ -91,12 +150,9 @@ public class WSSUtils extends XMLSecurityUtils {
 
         String actor = null;
         @SuppressWarnings("unchecked")
-        Iterator<Attribute> attributeIterator = startElement.getAttributes();
-        while (attributeIterator.hasNext()) {
-            Attribute next = attributeIterator.next();
-            if (actorRole.equals(next.getName())) {
-                actor = next.getValue();
-            }
+        Attribute attribute = xmlSecStartElement.getAttributeByName(actorRole);
+        if (attribute != null) {
+            actor = attribute.getValue();
         }
 
         if (responsibleActor == null) {
@@ -108,30 +164,30 @@ public class WSSUtils extends XMLSecurityUtils {
 
     public static void flushBufferAndCallbackAfterTokenID(OutputProcessorChain outputProcessorChain,
                                                           AbstractBufferingOutputProcessor abstractBufferingOutputProcessor,
-                                                          Deque<XMLEvent> xmlEventDeque)
+                                                          Deque<XMLSecEvent> xmlSecEventDeque)
             throws XMLStreamException, XMLSecurityException {
 
         final String actor = ((WSSSecurityProperties) abstractBufferingOutputProcessor.getSecurityProperties()).getActor();
 
         //loop until we reach our security header and set flag
-        Iterator<XMLEvent> xmlEventIterator = xmlEventDeque.descendingIterator();
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (startElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && isResponsibleActorOrRole(
-                        startElement,
-                        ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).getSOAPMessageVersionNamespace(),
-                        actor)) {
-                    ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).setInSecurityHeader(true);
-                    outputProcessorChain.reset();
-                    outputProcessorChain.processEvent(xmlEvent);
+        final Iterator<XMLSecEvent> xmlSecEventIterator = xmlSecEventDeque.descendingIterator();
+        loop:
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                    if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                            && isResponsibleActorOrRole(
+                            xmlSecStartElement, actor)) {
+                        outputProcessorChain.reset();
+                        outputProcessorChain.processEvent(xmlSecEvent);
+                        break loop;
+                    }
                     break;
-                }
             }
             outputProcessorChain.reset();
-            outputProcessorChain.processEvent(xmlEvent);
+            outputProcessorChain.processEvent(xmlSecEvent);
         }
 
         final String appendAfterThisTokenId = abstractBufferingOutputProcessor.getAppendAfterThisTokenId();
@@ -140,75 +196,83 @@ public class WSSUtils extends XMLSecurityUtils {
             abstractBufferingOutputProcessor.processHeaderEvent(outputProcessorChain);
         } else {
             //we have a dependent token. so we have to append the current header after the token
-            boolean found = false;
-            while (!found && xmlEventIterator.hasNext()) {
-                XMLEvent xmlEvent = xmlEventIterator.next();
+            QName matchingElementName = null;
+
+            loop:
+            while (xmlSecEventIterator.hasNext()) {
+                XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
 
                 outputProcessorChain.reset();
-                outputProcessorChain.processEvent(xmlEvent);
-
-                //search for an element with a matching wsu:Id. this is our token
-                if (xmlEvent.isStartElement()) {
-                    StartElement startElement = xmlEvent.asStartElement();
-                    QName matchingElementName;
-
-                    @SuppressWarnings("unchecked")
-                    Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                    while (!found && attributeIterator.hasNext()) {
-                        Attribute attribute = attributeIterator.next();
-                        final QName attributeName = attribute.getName();
-                        final String attributeValue = attribute.getValue();
-                        if ((WSSConstants.ATT_wsu_Id.equals(attributeName) && appendAfterThisTokenId.equals(attributeValue))
-                                || (WSSConstants.ATT_NULL_Id.equals(attributeName) && appendAfterThisTokenId.equals(attributeValue))
-                                || (WSSConstants.ATT_NULL_AssertionID.equals(attributeName) && appendAfterThisTokenId.equals(attributeValue))
-                                || (WSSConstants.ATT_NULL_ID.equals(attributeName) && appendAfterThisTokenId.endsWith(attributeValue))) {
-                            matchingElementName = startElement.getName();
-                            //we found the token and...
-                            int level = 0;
-                            while (!found && xmlEventIterator.hasNext()) {
-                                xmlEvent = xmlEventIterator.next();
-
-                                outputProcessorChain.reset();
-                                outputProcessorChain.processEvent(xmlEvent);
-
-                                //loop until we reach the token end element
-                                if (xmlEvent.isEndElement()) {
-                                    EndElement endElement = xmlEvent.asEndElement();
-                                    if (level == 0 && endElement.getName().equals(matchingElementName)) {
-                                        found = true;
-                                        //output now the current header
-                                        abstractBufferingOutputProcessor.processHeaderEvent(outputProcessorChain);
-                                    }
-                                    level--;
-                                } else if (xmlEvent.isStartElement()) {
-                                    level++;
-                                }
+                outputProcessorChain.processEvent(xmlSecEvent);
+                switch (xmlSecEvent.getEventType()) {
+                    //search for an element with a matching wsu:Id. this is our token
+                    case XMLStreamConstants.START_ELEMENT:
+                        XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                        List<XMLSecAttribute> xmlSecAttributes = xmlSecStartElement.getOnElementDeclaredAttributes();
+                        for (int i = 0; i < xmlSecAttributes.size(); i++) {
+                            XMLSecAttribute xmlSecAttribute = xmlSecAttributes.get(i);
+                            final QName attributeName = xmlSecAttribute.getName();
+                            final String attributeValue = xmlSecAttribute.getValue();
+                            if ((WSSConstants.ATT_wsu_Id.equals(attributeName)
+                                    || WSSConstants.ATT_NULL_Id.equals(attributeName)
+                                    || WSSConstants.ATT_NULL_AssertionID.equals(attributeName)
+                                    || WSSConstants.ATT_NULL_ID.equals(attributeName))
+                                    && appendAfterThisTokenId.equals(attributeValue)) {
+                                matchingElementName = xmlSecStartElement.getName();
+                                break loop;
                             }
                         }
-                    }
+                        break;
+                }
+            }
+            //we found the token and...
+            int level = 0;
+            loop:
+            while (xmlSecEventIterator.hasNext()) {
+                XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+
+                outputProcessorChain.reset();
+                outputProcessorChain.processEvent(xmlSecEvent);
+
+                //...loop until we reach the token end element
+                switch (xmlSecEvent.getEventType()) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        level++;
+                        break;
+                    case XMLStreamConstants.END_ELEMENT:
+                        XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                        if (level == 0 && xmlSecEndElement.getName().equals(matchingElementName)) {
+                            //output now the current header
+                            abstractBufferingOutputProcessor.processHeaderEvent(outputProcessorChain);
+                            break loop;
+                        }
+                        level--;
+                        break;
                 }
             }
         }
         //loop until our security header end element and unset the flag
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
-            if (xmlEvent.isEndElement()) {
-                EndElement endElement = xmlEvent.asEndElement();
-                if (endElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
-                    ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).setInSecurityHeader(false);
-                    outputProcessorChain.reset();
-                    outputProcessorChain.processEvent(xmlEvent);
+        loop:
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.END_ELEMENT:
+                    XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                    if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+                        outputProcessorChain.reset();
+                        outputProcessorChain.processEvent(xmlSecEvent);
+                        break loop;
+                    }
                     break;
-                }
             }
             outputProcessorChain.reset();
-            outputProcessorChain.processEvent(xmlEvent);
+            outputProcessorChain.processEvent(xmlSecEvent);
         }
-        //loop throug the rest of the document
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
+        //loop through the rest of the document
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
             outputProcessorChain.reset();
-            outputProcessorChain.processEvent(xmlEvent);
+            outputProcessorChain.processEvent(xmlSecEvent);
         }
         outputProcessorChain.reset();
     }
@@ -218,16 +282,16 @@ public class WSSUtils extends XMLSecurityUtils {
                                                           String referenceId, X509Certificate[] x509Certificates,
                                                           boolean useSingleCertificate)
             throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(3);
         String valueType;
         if (useSingleCertificate) {
             valueType = WSSConstants.NS_X509_V3_TYPE;
         } else {
             valueType = WSSConstants.NS_X509PKIPathv1;
         }
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(3);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, false, attributes);
         try {
             if (useSingleCertificate) {
@@ -258,9 +322,9 @@ public class WSSUtils extends XMLSecurityUtils {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "invalidCertForSKI");
         }
 
-        List<Attribute> attributes = new ArrayList<Attribute>(2);
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier));
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         byte data[] = new Merlin().getSKIBytesFromCert(x509Certificates[0]);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
@@ -271,9 +335,9 @@ public class WSSUtils extends XMLSecurityUtils {
                                                         OutputProcessorChain outputProcessorChain,
                                                         X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(2);
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE));
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         try {
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
@@ -287,9 +351,9 @@ public class WSSUtils extends XMLSecurityUtils {
                                                               OutputProcessorChain outputProcessorChain,
                                                               X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(2);
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT));
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         try {
             MessageDigest sha;
@@ -311,10 +375,10 @@ public class WSSUtils extends XMLSecurityUtils {
                                                    OutputProcessorChain outputProcessorChain, String referenceId,
                                                    String valueType)
             throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(2);
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_URI, "#" + referenceId));
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, "#" + referenceId));
         if (valueType != null) {
-            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
         }
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
@@ -324,11 +388,11 @@ public class WSSUtils extends XMLSecurityUtils {
                                                             OutputProcessorChain outputProcessorChain,
                                                             XMLSecurityConstants.TokenType tokenType, String referenceId)
             throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(1);
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
         if (tokenType.equals(WSSConstants.Saml10Token) || tokenType.equals(WSSConstants.Saml11Token)) {
-            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else if (tokenType.equals(WSSConstants.Saml20Token)) {
-            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
         }
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
@@ -338,9 +402,9 @@ public class WSSUtils extends XMLSecurityUtils {
     public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                              OutputProcessorChain outputProcessorChain, String tokenId)
             throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(2);
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_URI, "#" + tokenId));
-        attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken));
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, "#" + tokenId));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
     }
@@ -388,8 +452,8 @@ public class WSSUtils extends XMLSecurityUtils {
         } else if ("EC".equals(algorithm)) {
             ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
 
-            List<Attribute> attributes = new ArrayList<Attribute>(1);
-            attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_NULL_URI, "urn:oid:" + ECDSAUtils.getOIDFromPublicKey(ecPublicKey)));
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, "urn:oid:" + ECDSAUtils.getOIDFromPublicKey(ecPublicKey)));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_ECKeyValue, true, null);
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_NamedCurve, false, attributes);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig11_NamedCurve);

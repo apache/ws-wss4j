@@ -18,21 +18,6 @@
  */
 package org.swssf.policy.test;
 
-import org.swssf.policy.PolicyEnforcer;
-import org.swssf.policy.PolicyViolationException;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$

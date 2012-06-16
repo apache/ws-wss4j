@@ -35,7 +35,7 @@ public class DigestOutputStream extends OutputStream {
     protected static final transient Log log = LogFactory.getLog(DigestOutputStream.class);
     protected static final transient boolean isDebugEnabled = log.isDebugEnabled();
 
-    private MessageDigest messageDigest;
+    private final MessageDigest messageDigest;
     private StringBuilder stringBuilder;
 
     public DigestOutputStream(MessageDigest messageDigest) {

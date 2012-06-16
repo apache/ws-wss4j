@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class RequiredElementsAssertionState extends AssertionState implements Assertable {
 
-    private Map<List<QName>, Boolean> pathElements = new HashMap<List<QName>, Boolean>();
+    private final Map<List<QName>, Boolean> pathElements = new HashMap<List<QName>, Boolean>();
 
     public RequiredElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);

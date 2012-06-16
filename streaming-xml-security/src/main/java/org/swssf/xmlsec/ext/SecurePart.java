@@ -18,6 +18,7 @@
  */
 package org.swssf.xmlsec.ext;
 
+import javax.xml.namespace.QName;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +26,8 @@ import java.util.Map;
 /**
  * Class to describe which and how an element must be secured
  *
- * @author $Author$
- * @version $Revision$ $Date$
+ * @author $Author: giger $
+ * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
  */
 public class SecurePart {
 
@@ -34,7 +35,7 @@ public class SecurePart {
         Element("http://www.w3.org/2001/04/xmlenc#Element"),
         Content("http://www.w3.org/2001/04/xmlenc#Content");
 
-        private String modifier;
+        private final String modifier;
 
         Modifier(String modifier) {
             this.modifier = modifier;
@@ -57,31 +58,21 @@ public class SecurePart {
         }
     }
 
-    private String name;
-    private String namespace;
+    private QName name;
     private Modifier modifier;
     private String idToSign;
     private String idToReference;
 
-    public SecurePart(String name, String namespace, Modifier modifier) {
+    public SecurePart(QName name, Modifier modifier) {
         this.name = name;
-        this.namespace = namespace;
         this.modifier = modifier;
     }
 
-    public SecurePart(String name, String namespace, Modifier modifier, String idToSign) {
+    public SecurePart(QName name, String idToSign, String idToReference, Modifier modifier) {
         this.name = name;
-        this.namespace = namespace;
-        this.modifier = modifier;
-        this.idToSign = idToSign;
-    }
-
-    public SecurePart(String name, String namespace, Modifier modifier, String idToSign, String idToReference) {
-        this.name = name;
-        this.namespace = namespace;
-        this.modifier = modifier;
         this.idToSign = idToSign;
         this.idToReference = idToReference;
+        this.modifier = modifier;
     }
 
     /**
@@ -89,32 +80,14 @@ public class SecurePart {
      *
      * @return The Element-Local-Name
      */
-    public String getName() {
+    public QName getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(QName name) {
         this.name = name;
     }
 
-    /**
-     * The namespace of the element to be secured
-     *
-     * @return The Element Namespace
-     */
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    /**
-     * The Modifier: Element or Content
-     *
-     * @return The String "Element" or "Content"
-     */
     public Modifier getModifier() {
         return modifier;
     }

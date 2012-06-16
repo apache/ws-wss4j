@@ -18,7 +18,6 @@
  */
 package org.swssf.xmlsec.ext;
 
-import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Map;
 
@@ -34,38 +33,6 @@ public interface DocumentContext {
      * @return The Encoding of the Document
      */
     String getEncoding();
-
-    /**
-     * Adds a Element to the path
-     *
-     * @param qName The QName of the path element
-     */
-    void addPathElement(QName qName);
-
-    /**
-     * Removes a element from the path
-     *
-     * @return the removed element
-     */
-    QName removePathElement();
-
-    /**
-     * @return The actual path in the xml
-     */
-    List<QName> getPath();
-
-    /**
-     * Returns the parent element of the actual eventtype
-     *
-     * @param eventType current event type
-     * @return the name of the parent element
-     */
-    List<QName> getParentElementPath(int eventType);
-
-    /**
-     * @return The current level in the document
-     */
-    int getDocumentLevel();
 
     /**
      * Indicates if we currently stay in an encrypted content

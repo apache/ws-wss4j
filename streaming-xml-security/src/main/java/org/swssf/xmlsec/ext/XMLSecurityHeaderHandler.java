@@ -18,7 +18,8 @@
  */
 package org.swssf.xmlsec.ext;
 
-import javax.xml.stream.events.XMLEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+
 import java.util.Deque;
 
 /**
@@ -28,6 +29,6 @@ import java.util.Deque;
 public interface XMLSecurityHeaderHandler {
 
     void handle(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
-                Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException;
+                Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException;
 
 }

@@ -158,7 +158,7 @@ public final class ECDSAUtils {
         return asn1Bytes;
     }
 
-    private static List<ECCurveDefinition> ecCurveDefinitions = new ArrayList<ECCurveDefinition>();
+    private static final List<ECCurveDefinition> ecCurveDefinitions = new ArrayList<ECCurveDefinition>();
 
     static {
         ecCurveDefinitions.add(
@@ -803,15 +803,15 @@ public final class ECDSAUtils {
 
     public static class ECCurveDefinition {
 
-        private String name;
-        private String oid;
-        private String field;
-        private String a;
-        private String b;
-        private String x;
-        private String y;
-        private String n;
-        private int h;
+        private final String name;
+        private final String oid;
+        private final String field;
+        private final String a;
+        private final String b;
+        private final String x;
+        private final String y;
+        private final String n;
+        private final int h;
 
         ECCurveDefinition(String name, String oid, String field, String a, String b, String x, String y, String n, int h) {
             this.name = name;

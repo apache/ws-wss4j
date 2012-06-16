@@ -21,14 +21,18 @@ package org.swssf.xmlsec.test;
 import junit.framework.Assert;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecEventFactory;
 import org.swssf.xmlsec.impl.DocumentContextImpl;
 import org.swssf.xmlsec.impl.InputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.swssf.xmlsec.impl.XMLSecurityStreamReader;
 import org.testng.annotations.Test;
 
-import javax.xml.stream.*;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
@@ -246,13 +250,13 @@ public class XMLSecurityStreamReaderTest {
 
     class EventReaderProcessor implements InputProcessor {
 
-        private XMLEventReader xmlEventReader;
+        private XMLStreamReader xmlStreamReader;
 
         EventReaderProcessor() throws Exception {
             XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
             xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
             xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
-            xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         }
 
         public void addBeforeProcessor(Object processor) {
@@ -278,15 +282,18 @@ public class XMLSecurityStreamReaderTest {
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             return null;
         }
 
         @Override
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             inputProcessorChain.reset();
-            XMLEvent xmlEvent = xmlEventReader.nextEvent();
-            return xmlEvent;
+            XMLSecEvent xmlSecEvent = XMLSecEventFactory.allocate(xmlStreamReader, null);
+            if (xmlStreamReader.hasNext()) {
+                xmlStreamReader.next();
+            }
+            return xmlSecEvent;
         }
 
         @Override

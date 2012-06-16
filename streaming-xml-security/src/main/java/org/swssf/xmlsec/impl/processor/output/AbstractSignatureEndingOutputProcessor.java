@@ -20,6 +20,8 @@ package org.swssf.xmlsec.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithmFactory;
@@ -27,8 +29,6 @@ import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.swssf.xmlsec.impl.util.SignerOutputStream;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,7 +47,8 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
     private List<SignaturePartDef> signaturePartDefList;
 
-    public AbstractSignatureEndingOutputProcessor(AbstractSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
+    public AbstractSignatureEndingOutputProcessor(AbstractSignatureOutputProcessor signatureOutputProcessor)
+            throws XMLSecurityException {
         super();
         signaturePartDefList = signatureOutputProcessor.getSignaturePartDefList();
     }
@@ -92,7 +93,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-        List<Attribute> attributes = new ArrayList<Attribute>(1);
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null)));
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature, true, attributes);
 
@@ -125,12 +126,12 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
 
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignedInfo, false, null);
 
-        attributes = new ArrayList<Attribute>(1);
+        attributes = new ArrayList<XMLSecAttribute>(1);
         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureCanonicalizationAlgorithm()));
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_CanonicalizationMethod, false, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_CanonicalizationMethod);
 
-        attributes = new ArrayList<Attribute>(1);
+        attributes = new ArrayList<XMLSecAttribute>(1);
         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureAlgorithm()));
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureMethod, false, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureMethod);
@@ -138,14 +139,14 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         Iterator<SignaturePartDef> signaturePartDefIterator = signaturePartDefList.iterator();
         while (signaturePartDefIterator.hasNext()) {
             SignaturePartDef signaturePartDef = signaturePartDefIterator.next();
-            attributes = new ArrayList<Attribute>(1);
+            attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_URI, "#" + signaturePartDef.getSigRefId()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Reference, false, attributes);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, false, null);
             createTransformsStructureForSignature(subOutputProcessorChain, signaturePartDef);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms);
 
-            attributes = new ArrayList<Attribute>(1);
+            attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, getSecurityProperties().getSignatureDigestAlgorithm()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, false, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
@@ -163,7 +164,7 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValue));
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_SignatureValue);
 
-        attributes = new ArrayList<Attribute>(1);
+        attributes = new ArrayList<XMLSecAttribute>(1);
         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Id, IDGenerator.generateID(null)));
         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, false, attributes);
         createKeyInfoStructureForSignature(subOutputProcessorChain, wrappingSecurityToken, getSecurityProperties().isUseSingleCert());
@@ -171,7 +172,8 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_Signature);
     }
 
-    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm, OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm, OutputProcessorChain outputProcessorChain)
+            throws XMLSecurityException {
         SignedInfoProcessor signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm);
         signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
         signedInfoProcessor.setAction(getAction());
@@ -210,7 +212,8 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
             this.bufferedSignerOutputStream = new BufferedOutputStream(this.signerOutputStream);
 
             try {
-                this.transformer = XMLSecurityUtils.getTransformer(null, this.bufferedSignerOutputStream, getSecurityProperties().getSignatureCanonicalizationAlgorithm());
+                this.transformer = XMLSecurityUtils.getTransformer(null, this.bufferedSignerOutputStream,
+                        getSecurityProperties().getSignatureCanonicalizationAlgorithm());
             } catch (NoSuchMethodException e) {
                 throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
             } catch (InstantiationException e) {
@@ -238,9 +241,10 @@ public abstract class AbstractSignatureEndingOutputProcessor extends AbstractBuf
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            transformer.transform(xmlEvent);
-            outputProcessorChain.processEvent(xmlEvent);
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+            transformer.transform(xmlSecEvent);
+            outputProcessorChain.processEvent(xmlSecEvent);
         }
     }
 }

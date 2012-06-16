@@ -21,20 +21,18 @@ package org.swssf.wss.ext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.impl.InboundWSSecurityContextImpl;
-import org.swssf.wss.impl.WSSDocumentContextImpl;
 import org.swssf.wss.impl.processor.input.OperationInputProcessor;
 import org.swssf.wss.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.wss.impl.processor.input.SignatureConfirmationInputProcessor;
-import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.ext.InputProcessor;
+import org.swssf.xmlsec.impl.DocumentContextImpl;
 import org.swssf.xmlsec.impl.InputProcessorChainImpl;
 import org.swssf.xmlsec.impl.XMLSecurityStreamReader;
 import org.swssf.xmlsec.impl.processor.input.LogInputProcessor;
 import org.swssf.xmlsec.impl.processor.input.XMLEventReaderInputProcessor;
 
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -67,7 +65,7 @@ public class InboundWSSec {
         }
     }
 
-    private WSSSecurityProperties securityProperties;
+    private final WSSSecurityProperties securityProperties;
 
     public InboundWSSec(WSSSecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
@@ -127,7 +125,7 @@ public class InboundWSSec {
             Iterator<SecurityEvent> securityEventIterator = requestSecurityEvents.iterator();
             while (securityEventIterator.hasNext()) {
                 SecurityEvent securityEvent = securityEventIterator.next();
-                if (securityEvent instanceof HttpsTokenSecurityEvent) {
+                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.HttpsToken) {
                     securityContextImpl.registerSecurityEvent(securityEvent);
                     securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
                     break;
@@ -136,12 +134,11 @@ public class InboundWSSec {
         }
 
         securityContextImpl.put(WSSConstants.XMLINPUTFACTORY, xmlInputFactory);
-        final XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(xmlStreamReader);
 
-        WSSDocumentContextImpl documentContext = new WSSDocumentContextImpl();
+        DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(xmlStreamReader.getEncoding() != null ? xmlStreamReader.getEncoding() : "UTF-8");
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContextImpl, documentContext);
-        inputProcessorChain.addProcessor(new XMLEventReaderInputProcessor(securityProperties, xmlEventReader));
+        inputProcessorChain.addProcessor(new XMLEventReaderInputProcessor(securityProperties, xmlStreamReader));
         inputProcessorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
         inputProcessorChain.addProcessor(new OperationInputProcessor(securityProperties));
 

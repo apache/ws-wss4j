@@ -55,7 +55,7 @@ public class WSSecurityException extends XMLSecurityException {
         FAILED_SIGNATURE,
     }
 
-    private static ResourceBundle resources;
+    private static final ResourceBundle resources;
     /*
      * This is an Integer -> QName map. Its function is to map the integer error codes
      * given above to the QName fault codes as defined in the SOAP Message Security 1.1

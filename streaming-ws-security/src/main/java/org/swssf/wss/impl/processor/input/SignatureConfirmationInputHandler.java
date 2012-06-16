@@ -26,9 +26,9 @@ import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 
 /**
@@ -41,7 +41,7 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final SignatureConfirmationType signatureConfirmationType =

@@ -83,7 +83,7 @@ public final class XmlReaderToWriter {
                 break;
             case XMLEvent.SPACE:
             case XMLEvent.CHARACTERS:
-                writer.writeCharacters(xmlr.getTextCharacters(), xmlr.getTextStart(), xmlr.getTextLength());
+                writer.writeCharacters(xmlr.getText());
                 break;
             case XMLEvent.PROCESSING_INSTRUCTION:
                 writer.writeProcessingInstruction(xmlr.getPITarget(), xmlr.getPIData());
@@ -91,7 +91,6 @@ public final class XmlReaderToWriter {
             case XMLEvent.CDATA:
                 writer.writeCData(xmlr.getText());
                 break;
-
             case XMLEvent.COMMENT:
                 writer.writeComment(xmlr.getText());
                 break;

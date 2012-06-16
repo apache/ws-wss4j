@@ -23,14 +23,15 @@ import org.swssf.binding.xmldsig.CanonicalizationMethodType;
 import org.swssf.binding.xmldsig.KeyInfoType;
 import org.swssf.binding.xmldsig.SignatureType;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithmFactory;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 import org.swssf.xmlsec.impl.util.SignerOutputStream;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,7 +53,7 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final SignatureType signatureType = ((JAXBElement<SignatureType>) parseStructure(eventQueue, index, securityProperties)).getValue();
@@ -65,13 +66,13 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException;
 
     protected SecurityToken verifySignedInfo(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
-                                             SignatureType signatureType, Deque<XMLEvent> eventDeque, int index)
+                                             SignatureType signatureType, Deque<XMLSecEvent> eventDeque, int index)
             throws XMLSecurityException {
         //todo reparse SignedInfo when custom canonicalization method is used
         //verify SignedInfo
         SignatureVerifier signatureVerifier = newSignatureVerifier(inputProcessorChain, securityProperties, signatureType);
 
-        Iterator<XMLEvent> iterator = eventDeque.descendingIterator();
+        Iterator<XMLSecEvent> iterator = eventDeque.descendingIterator();
         //skip to <Signature> Element
         int i = 0;
         while (i < index) {
@@ -80,17 +81,28 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
         }
 
         try {
-            boolean verifyElement = false;
+            loop:
             while (iterator.hasNext()) {
-                XMLEvent xmlEvent = iterator.next();
-                if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
-                    verifyElement = true;
-                } else if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
-                    signatureVerifier.processEvent(xmlEvent);
-                    break;
+                XMLSecEvent xmlSecEvent = iterator.next();
+                switch (xmlSecEvent.getEventType()) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        if (xmlSecEvent.asStartElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
+                            signatureVerifier.processEvent(xmlSecEvent);
+                            break loop;
+                        }
+                        break;
                 }
-                if (verifyElement) {
-                    signatureVerifier.processEvent(xmlEvent);
+            }
+            loop:
+            while (iterator.hasNext()) {
+                XMLSecEvent xmlSecEvent = iterator.next();
+                signatureVerifier.processEvent(xmlSecEvent);
+                switch (xmlSecEvent.getEventType()) {
+                    case XMLStreamConstants.END_ELEMENT:
+                        if (xmlSecEvent.asEndElement().getName().equals(XMLSecurityConstants.TAG_dsig_SignedInfo)) {
+                            break loop;
+                        }
+                        break;
                 }
             }
         } catch (XMLStreamException e) {
@@ -130,8 +142,10 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             TwY0Uxja4ZuI6U8m8Tg=
         </ds:SignatureValue>
         <ds:KeyInfo Id="KeyId-1043455692">
-            <wsse:SecurityTokenReference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="STRId-1008354042">
-                <wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#CertId-3458500" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" />
+            <wsse:SecurityTokenReference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+            xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="STRId-1008354042">
+                <wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                URI="#CertId-3458500" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" />
             </wsse:SecurityTokenReference>
         </ds:KeyInfo>
     </ds:Signature>
@@ -139,13 +153,12 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
 
     public class SignatureVerifier {
 
-        private SignatureType signatureType;
-        private SecurityToken securityToken;
+        private final SignatureType signatureType;
+        private final SecurityToken securityToken;
 
         private SignerOutputStream signerOutputStream;
         private OutputStream bufferedSignerOutputStream;
         private Transformer transformer;
-        private XMLSecurityProperties xmlSecurityProperties;
 
         public SignatureVerifier(SignatureType signatureType, SecurityContext securityContext,
                                  XMLSecurityProperties securityProperties) throws XMLSecurityException {
@@ -194,13 +207,16 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             bufferedSignerOutputStream = new BufferedOutputStream(signerOutputStream);
 
             try {
-                final CanonicalizationMethodType canonicalizationMethodType = signatureType.getSignedInfo().getCanonicalizationMethod();
+                final CanonicalizationMethodType canonicalizationMethodType =
+                        signatureType.getSignedInfo().getCanonicalizationMethod();
                 InclusiveNamespaces inclusiveNamespacesType =
                         XMLSecurityUtils.getQNameType(
                                 canonicalizationMethodType.getContent(),
                                 XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces
                         );
-                List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
+                List<String> inclusiveNamespaces = inclusiveNamespacesType != null
+                        ? inclusiveNamespacesType.getPrefixList()
+                        : null;
                 transformer = XMLSecurityUtils.getTransformer(
                         inclusiveNamespaces,
                         this.bufferedSignerOutputStream,
@@ -216,8 +232,8 @@ public abstract class AbstractSignatureInputHandler extends AbstractInputSecurit
             }
         }
 
-        protected void processEvent(XMLEvent xmlEvent) throws XMLStreamException {
-            transformer.transform(xmlEvent);
+        protected void processEvent(XMLSecEvent xmlSecEvent) throws XMLStreamException {
+            transformer.transform(xmlSecEvent);
         }
 
         protected void doFinal() throws XMLSecurityException {

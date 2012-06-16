@@ -50,7 +50,7 @@ public class XMLSecurityException extends RemoteException {
         FAILED_SIGNATURE,
     }
 
-    private static ResourceBundle resources;
+    private static final ResourceBundle resources;
     private ErrorCode errorCode;
 
     static {

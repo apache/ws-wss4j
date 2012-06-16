@@ -27,8 +27,8 @@ import java.io.InputStream;
  */
 public class MultiInputStream extends InputStream {
 
-    private InputStream[] inputStreams;
-    private int inputStreamCount;
+    private final InputStream[] inputStreams;
+    private final int inputStreamCount;
     private int inputStreamIndex = 0;
 
     public MultiInputStream(InputStream... inputStreams) {

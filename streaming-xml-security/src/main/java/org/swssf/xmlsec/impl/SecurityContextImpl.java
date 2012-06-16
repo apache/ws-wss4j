@@ -31,10 +31,10 @@ import java.util.*;
  */
 public class SecurityContextImpl implements SecurityContext {
 
-    private Map<String, SecurityTokenProvider> securityTokenProviders = new HashMap<String, SecurityTokenProvider>();
+    private final Map<String, SecurityTokenProvider> securityTokenProviders = new HashMap<String, SecurityTokenProvider>();
 
     @SuppressWarnings("unchecked")
-    private Map content = Collections.synchronizedMap(new HashMap());
+    private final Map content = Collections.synchronizedMap(new HashMap());
 
     @SuppressWarnings("unchecked")
     public <T> void put(String key, T value) {
@@ -52,7 +52,7 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends List> void putList(Class key, T value) {
+    public <T extends List> void putList(Object key, T value) {
         if (value == null) {
             return;
         }
@@ -65,7 +65,7 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void putAsList(Class key, T value) {
+    public <T> void putAsList(Object key, T value) {
         List<T> entry = (List<T>) content.get(key);
         if (entry == null) {
             entry = new ArrayList<T>();
@@ -75,13 +75,23 @@ public class SecurityContextImpl implements SecurityContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> List<T> getAsList(Class key) {
+    public <T> List<T> getAsList(Object key) {
         return (List<T>) content.get(key);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Set<T> getAsSet(Class key) {
-        return (Set<T>) content.get(key);
+    public <T, U> void putAsMap(Object key, T mapKey, U mapValue) {
+        Map<T, U> entry = (Map<T, U>) content.get(key);
+        if (entry == null) {
+            entry = new HashMap<T, U>();
+            content.put(key, entry);
+        }
+        entry.put(mapKey, mapValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T, U> Map<T, U> getAsMap(Object key) {
+        return (Map<T, U>) content.get(key);
     }
 
     public void registerSecurityTokenProvider(String id, SecurityTokenProvider securityTokenProvider) {

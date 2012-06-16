@@ -21,21 +21,23 @@ package org.swssf.wss.impl.processor.input;
 import org.swssf.binding.wss10.KeyIdentifierType;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSDocumentContext;
 import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * Processor for the SecurityTokenReference XML Structure
@@ -47,7 +49,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final SecurityTokenReferenceType securityTokenReferenceType =
@@ -74,15 +76,15 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
     class InternalSecurityTokenReferenceInputProcessor extends AbstractInputProcessor {
 
-        private String securityTokenReferenceId;
-        private QName attribute;
-        private String attributeValue;
+        private final String securityTokenReferenceId;
+        private final QName attribute;
+        private final String attributeValue;
         private boolean refFound = false;
         private boolean end = false;
         private QName startElementName;
         private int startElementLevel;
 
-        private ArrayDeque<XMLEvent> xmlEventList = new ArrayDeque<XMLEvent>();
+        private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
 
         InternalSecurityTokenReferenceInputProcessor(String securityTokenReferenceId, QName attribute,
                                                      String attributeValue, WSSSecurityProperties securityProperties) {
@@ -93,64 +95,69 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
             return inputProcessorChain.processHeaderEvent();
         }
 
         @Override
-        public XMLEvent processNextEvent(final InputProcessorChain inputProcessorChain)
+        public XMLSecEvent processNextEvent(final InputProcessorChain inputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
-            XMLEvent xmlEvent = inputProcessorChain.processEvent();
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                Attribute attribute = startElement.getAttributeByName(this.attribute);
-                if (attribute != null && this.attributeValue.equals(attribute.getValue())) {
-                    if (refFound) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
+            XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                    Attribute attribute = xmlSecStartElement.getAttributeByName(this.attribute);
+                    if (attribute != null && this.attributeValue.equals(attribute.getValue())) {
+                        if (refFound) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
+                        }
+                        refFound = true;
+                        startElementName = xmlSecStartElement.getName();
+                        List<QName> elementPath = xmlSecStartElement.getElementPath();
+                        startElementLevel = elementPath.size();
                     }
-                    refFound = true;
-                    startElementName = startElement.getName();
-                    startElementLevel = inputProcessorChain.getDocumentContext().getDocumentLevel();
-                }
-            } else if (xmlEvent.isEndElement()) {
-                EndElement endElement = xmlEvent.asEndElement();
-                if (startElementName != null && endElement.getName().equals(startElementName)
-                        && inputProcessorChain.getDocumentContext().getDocumentLevel() == startElementLevel - 1) {
-                    end = true;
-                    xmlEventList.push(xmlEvent);
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                    if (startElementName != null && xmlSecEndElement.getName().equals(startElementName)
+                            && xmlSecEndElement.getDocumentLevel() == startElementLevel) {
+                        end = true;
+                        xmlSecEventList.push(xmlSecEvent);
 
-                    SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+                        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-                        private SecurityToken securityToken = null;
+                            private SecurityToken securityToken = null;
 
-                        public SecurityToken getSecurityToken() throws XMLSecurityException {
-                            if (this.securityToken != null) {
+                            public SecurityToken getSecurityToken() throws XMLSecurityException {
+                                if (this.securityToken != null) {
+                                    return this.securityToken;
+                                }
+                                this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(
+                                        attributeValue, xmlSecEventList, getSecurityProperties().getCallbackHandler(),
+                                        inputProcessorChain.getSecurityContext(), securityTokenReferenceId);
                                 return this.securityToken;
                             }
-                            this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(
-                                    attributeValue, xmlEventList, getSecurityProperties().getCallbackHandler(),
-                                    inputProcessorChain.getSecurityContext(), securityTokenReferenceId);
-                            return this.securityToken;
-                        }
 
-                        public String getId() {
-                            return securityTokenReferenceId;
-                        }
-                    };
-                    inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(securityTokenReferenceId, securityTokenProvider);
+                            public String getId() {
+                                return securityTokenReferenceId;
+                            }
+                        };
+                        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(securityTokenReferenceId, securityTokenProvider);
 
-                    return xmlEvent;
-                } else if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 1
-                        && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSecurityHeader()) {
-                    //we can now remove this processor from the chain
-                    inputProcessorChain.removeProcessor(this);
-                }
+                        return xmlSecEvent;
+                    } else if (xmlSecEndElement.getDocumentLevel() == 3
+                            && xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                            && WSSUtils.isInSecurityHeader(xmlSecEndElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+                        //we can now remove this processor from the chain
+                        inputProcessorChain.removeProcessor(this);
+                    }
+                    break;
             }
             if (refFound && !end) {
-                xmlEventList.push(xmlEvent);
+                xmlSecEventList.push(xmlSecEvent);
             }
-            return xmlEvent;
+            return xmlSecEvent;
         }
     }
 }

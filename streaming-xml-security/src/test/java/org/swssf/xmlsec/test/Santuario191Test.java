@@ -18,15 +18,15 @@
  */
 package org.swssf.xmlsec.test;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer11_OmitCommentsTransformer;
-import org.swssf.xmlsec.test.utils.XMLEventNSAllocator;
+import org.swssf.xmlsec.test.utils.XMLSecEventAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 
@@ -60,7 +60,7 @@ public class Santuario191Test {
     @BeforeMethod
     public void setUp() throws Exception {
         this.xmlInputFactory = XMLInputFactory.newInstance();
-        this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
+        this.xmlInputFactory.setEventAllocator(new XMLSecEventAllocator());
     }
 
     @Test
@@ -72,24 +72,24 @@ public class Santuario191Test {
         Canonicalizer11_OmitCommentsTransformer c =
                 new Canonicalizer11_OmitCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(INPUT_DATA)
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName(null, "data"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName(null, "data"))) {
                 break;
             }
         }
 
-        while (xmlEventReader.hasNext()) {
-            c.transform(xmlEvent);
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName(null, "data"))) {
+        while (xmlSecEventReader.hasNext()) {
+            c.transform(xmlSecEvent);
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName(null, "data"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         assertEquals(new String(baos.toByteArray()), EXPECTED_RESULT);

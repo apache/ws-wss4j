@@ -52,7 +52,7 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         HEADERS.add(WSSConstants.TAG_xenc_EncryptedData);
     }
 
-    private InboundWSSec inboundWSSec;
+    private final InboundWSSec inboundWSSec;
 
     public SecurityInInterceptor(String p, WSSSecurityProperties securityProperties) throws Exception {
         super(p);
@@ -64,7 +64,7 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
     public void handleMessage(SoapMessage soapMessage) throws Fault {
 
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
-        XMLStreamReader newXmlStreamReader = null;
+        XMLStreamReader newXmlStreamReader;
 
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {

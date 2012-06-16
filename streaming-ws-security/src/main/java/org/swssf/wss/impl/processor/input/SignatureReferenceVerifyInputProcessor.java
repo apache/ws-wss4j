@@ -34,14 +34,15 @@ import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -57,7 +58,7 @@ import java.util.List;
 public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
     private static final String cacheRegionName = "timestamp";
-    private static JCS cache;
+    private static final JCS cache;
 
     static {
         try {
@@ -139,7 +140,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         //this is the earliest possible point to check for an replay attack
         if (!replayChecked) {
@@ -147,12 +148,12 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
             detectReplayAttack(inputProcessorChain);
         }
 
-        XMLEvent xmlEvent = inputProcessorChain.processEvent();
+        XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
 
-        if (xmlEvent.isStartElement()) {
-            final WSSDocumentContext documentContext = (WSSDocumentContext) inputProcessorChain.getDocumentContext();
-            StartElement startElement = xmlEvent.asStartElement();
-            ReferenceType referenceType = matchesReferenceId(startElement);
+        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+            final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
+            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+            ReferenceType referenceType = matchesReferenceId(xmlSecStartElement);
             if (referenceType != null) {
 
                 if (getProcessedReferences().contains(referenceType)) {
@@ -161,32 +162,33 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                 InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
                         new InternalSignatureReferenceVerifier(
                                 ((WSSSecurityProperties) getSecurityProperties()), inputProcessorChain,
-                                referenceType, startElement.getName());
+                                referenceType, xmlSecStartElement.getName());
                 if (!internalSignatureReferenceVerifier.isFinished()) {
-                    internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
+                    internalSignatureReferenceVerifier.processEvent(xmlSecEvent, inputProcessorChain);
                     inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
                 }
                 getProcessedReferences().add(referenceType);
                 documentContext.setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
 
+                List<QName> elementPath = xmlSecStartElement.getElementPath();
+
                 //fire a SecurityEvent:
-                if (documentContext.getDocumentLevel() == 3
-                        && documentContext.isInSOAPHeader()) {
+                if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)) {
                     SignedPartSecurityEvent signedPartSecurityEvent =
                             new SignedPartSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
-                    signedPartSecurityEvent.setElementPath(documentContext.getPath());
-                    signedPartSecurityEvent.setXmlEvent(xmlEvent);
+                    signedPartSecurityEvent.setElementPath(elementPath);
+                    signedPartSecurityEvent.setXmlSecEvent(xmlSecEvent);
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
                 } else {
                     SignedElementSecurityEvent signedElementSecurityEvent =
                             new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
-                    signedElementSecurityEvent.setElementPath(documentContext.getPath());
-                    signedElementSecurityEvent.setXmlEvent(xmlEvent);
+                    signedElementSecurityEvent.setElementPath(elementPath);
+                    signedElementSecurityEvent.setXmlSecEvent(xmlSecEvent);
                     ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
                 }
             }
         }
-        return xmlEvent;
+        return xmlSecEvent;
     }
 
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
@@ -214,10 +216,10 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
     }
 
     @Override
-    public Attribute getReferenceIDAttribute(StartElement startElement) {
-        Attribute attribute = startElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+    public Attribute getReferenceIDAttribute(XMLSecStartElement xmlSecStartElement) {
+        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
         if (attribute == null) {
-            attribute = super.getReferenceIDAttribute(startElement);
+            attribute = super.getReferenceIDAttribute(xmlSecStartElement);
         }
         return attribute;
     }
@@ -225,8 +227,8 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
     class InternalSignatureReferenceVerifier extends AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier {
 
         InternalSignatureReferenceVerifier(WSSSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
-                                           ReferenceType referenceType, QName startElement) throws XMLSecurityException {
-            super(securityProperties, inputProcessorChain, referenceType, startElement);
+                                           ReferenceType referenceType, QName startElementName) throws XMLSecurityException {
+            super(securityProperties, inputProcessorChain, referenceType, startElementName);
             this.addAfterProcessor(SignatureReferenceVerifyInputProcessor.class.getName());
         }
 
@@ -303,17 +305,17 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
                 SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
                 //todo analyse and fix me: the following statement could be problematic
                 inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(this), this);
-                this.setStartElement(securityTokenReference.getXmlEvents().getLast().asStartElement().getName());
-                Iterator<XMLEvent> xmlEventIterator = securityTokenReference.getXmlEvents().descendingIterator();
-                while (xmlEventIterator.hasNext()) {
-                    processEvent(xmlEventIterator.next(), inputProcessorChain);
+                this.setStartElement(securityTokenReference.getXmlSecEvents().getLast().asStartElement().getName());
+                Iterator<XMLSecEvent> xmlSecEventIterator = securityTokenReference.getXmlSecEvents().descendingIterator();
+                while (xmlSecEventIterator.hasNext()) {
+                    processEvent(xmlSecEventIterator.next(), inputProcessorChain);
                 }
             }
         }
 
         @Override
-        protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            super.processEvent(xmlEvent, inputProcessorChain);
+        protected void processEvent(XMLSecEvent xmlSecEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            super.processEvent(xmlSecEvent, inputProcessorChain);
         }
     }
 }

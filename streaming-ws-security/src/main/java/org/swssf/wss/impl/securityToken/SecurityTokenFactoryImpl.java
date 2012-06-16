@@ -21,17 +21,16 @@ package org.swssf.wss.impl.securityToken;
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.binding.wss10.BinarySecurityTokenType;
 import org.swssf.binding.wss10.KeyIdentifierType;
-import org.swssf.binding.wss10.ReferenceType;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.binding.xmldsig.*;
 import org.swssf.binding.xmldsig11.ECKeyValueType;
 import org.swssf.wss.ext.*;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 
 /**
@@ -140,7 +139,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 }
             }
 
-            final ReferenceType referenceType
+            final org.swssf.binding.wss10.ReferenceType referenceType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
             if (referenceType != null) {
                 //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3058, BSP.R3059
@@ -240,14 +239,14 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         return new UsernameSecurityToken(username, password, created, nonce, salt, iteration, wsSecurityContext, id, WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
     }
 
-    public static WSSecurityToken getSecurityToken(String referencedTokenId, Deque<XMLEvent> xmlEvents,
+    public static WSSecurityToken getSecurityToken(String referencedTokenId, Deque<XMLSecEvent> xmlSecEvents,
                                                    CallbackHandler callbackHandler,
                                                    SecurityContext securityContext, String id)
             throws XMLSecurityException {
 
         return new SecurityTokenReference(
                 securityContext.getSecurityTokenProvider(referencedTokenId).
-                        getSecurityToken(), xmlEvents,
+                        getSecurityToken(), xmlSecEvents,
                 (WSSecurityContext) securityContext, callbackHandler, id, WSSConstants.KeyIdentifierType.SECURITY_TOKEN_REFERENCE);
     }
 }

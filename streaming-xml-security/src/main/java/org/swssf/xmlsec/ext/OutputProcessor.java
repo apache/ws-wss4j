@@ -18,8 +18,9 @@
  */
 package org.swssf.xmlsec.ext;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Set;
 
 /**
@@ -87,12 +88,12 @@ public interface OutputProcessor {
     /**
      * Will be called from the framework for every XMLEvent
      *
-     * @param xmlEvent             The next XMLEvent to process
+     * @param xmlSecEvent          The next XMLEvent to process
      * @param outputProcessorChain
      * @throws XMLStreamException   thrown when a streaming error occurs
      * @throws XMLSecurityException thrown when a Security failure occurs
      */
-    void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    void processNextEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
     /**
      * Will be called when the whole document is processed.

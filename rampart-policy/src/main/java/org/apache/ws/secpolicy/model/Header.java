@@ -24,8 +24,8 @@ package org.apache.ws.secpolicy.model;
  */
 public class Header {
 
-    private String name;
-    private String namespace;
+    private final String name;
+    private final String namespace;
 
     public Header(String name, String namespace) {
         this.name = name;

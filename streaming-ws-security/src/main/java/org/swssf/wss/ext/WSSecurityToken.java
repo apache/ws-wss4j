@@ -19,9 +19,9 @@
 package org.swssf.wss.ext;
 
 import org.swssf.xmlsec.ext.SecurityToken;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
 import java.util.List;
 
 /**
@@ -32,5 +32,5 @@ public interface WSSecurityToken extends SecurityToken {
 
     void setElementPath(List<QName> elementPath);
 
-    void setXMLEvent(XMLEvent xmlEvent);
+    void setXMLSecEvent(XMLSecEvent xmlSecEvent);
 }

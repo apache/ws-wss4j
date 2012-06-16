@@ -19,13 +19,13 @@
 package org.swssf.xmlsec.test;
 
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.OutputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,7 +74,7 @@ public class OutputProcessorChainTest {
             this.phase = phase;
         }
 
-        public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processNextEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         }
 
         public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {

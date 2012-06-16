@@ -18,13 +18,10 @@
     <logger name="org.swssf.xmlsec.impl.util.DigestOutputStream">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.xml.security.utils.DigesterOutputStream">
+    <logger name="org.apache.jcp.xml.dsig.internal.DigesterOutputStream">
         <level value="INFO"/>
     </logger>
-    <logger name="org.jcp.xml.dsig.internal">
-        <level value="INFO"/>
-    </logger>
-    <logger name="org.apache.xml.security.utils.SignerOutputStream">
+    <logger name="org.apache.jcp.xml.dsig.internal.SignerOutputStream">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.xml.security.encryption.XMLCipher">

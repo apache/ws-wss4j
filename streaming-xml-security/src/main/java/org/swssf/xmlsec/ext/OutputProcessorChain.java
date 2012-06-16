@@ -18,8 +18,10 @@
  */
 package org.swssf.xmlsec.ext;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
+
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.List;
 
 /**
@@ -78,12 +80,14 @@ public interface OutputProcessorChain extends ProcessorChain {
      */
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException;
 
+    public OutputProcessorChain createSubChain(OutputProcessor outputProcessor, XMLSecStartElement parentXMLSecStartElement) throws XMLStreamException, XMLSecurityException;
+
     /**
      * Forwards the XMLEvent to the next processor in the chain.
      *
-     * @param xmlEvent The XMLEvent which should be forwarded to the next processor
+     * @param xmlSecEvent The XMLEvent which should be forwarded to the next processor
      * @throws XMLStreamException   thrown when a streaming error occurs
      * @throws XMLSecurityException thrown when a Security failure occurs
      */
-    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException;
+    public void processEvent(XMLSecEvent xmlSecEvent) throws XMLStreamException, XMLSecurityException;
 }

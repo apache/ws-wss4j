@@ -26,13 +26,14 @@ import org.swssf.wss.impl.derivedKey.DerivationAlgorithm;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.PublicKey;
@@ -53,7 +54,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         try {
 
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY);
@@ -123,7 +124,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             final AbstractSecurityToken derivedKeySecurityToken = new AbstractSecurityToken(wsuIdDKT) {
 
-                private Map<String, Key> keyTable = new Hashtable<String, Key>();
+                private final Map<String, Key> keyTable = new Hashtable<String, Key>();
 
                 @Override
                 public boolean isAsymmetric() {
@@ -195,15 +196,15 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
-        outputProcessorChain.processEvent(xmlEvent);
+        outputProcessorChain.processEvent(xmlSecEvent);
     }
 
     class FinalDerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private SecurityToken securityToken;
-        private int offset;
-        private int length;
-        private String nonce;
+        private final SecurityToken securityToken;
+        private final int offset;
+        private final int length;
+        private final String nonce;
 
         FinalDerivedKeyTokenOutputProcessor(SecurityToken securityToken, int offset, int length, String nonce) throws XMLSecurityException {
 
@@ -215,15 +216,16 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            outputProcessorChain.processEvent(xmlEvent);
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            outputProcessorChain.processEvent(xmlSecEvent);
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    List<Attribute> attributes = new ArrayList<Attribute>(1);
-                    attributes.add(XMLSecurityConstants.XMLEVENTFACTORY.createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_DerivedKeyToken, true, attributes);
 
                     createSecurityTokenReferenceStructureForDerivedKey(subOutputProcessorChain, securityToken,
@@ -253,7 +255,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {
 
-            List<Attribute> attributes = new ArrayList<Attribute>(2);
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));

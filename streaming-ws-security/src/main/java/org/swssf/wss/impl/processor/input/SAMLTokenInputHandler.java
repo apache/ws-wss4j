@@ -24,6 +24,10 @@ import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecNamespace;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +36,11 @@ import org.w3c.dom.Node;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.events.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Comment;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.ProcessingInstruction;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -53,7 +61,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final Document samlTokenDocument = (Document) parseStructure(eventQueue, index, securityProperties);
 
@@ -71,8 +79,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             logger.debug("SAML Assertion issuer " + samlAssertionWrapper.getIssuerString());
         }
 
-        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
-        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final List<QName> elementPath = getElementPath(eventQueue);
+        final XMLSecEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -90,7 +98,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         securityProperties.getCallbackHandler(), samlAssertionWrapper.getId(), null);
 
                 this.securityToken.setElementPath(elementPath);
-                this.securityToken.setXMLEvent(responsibleStartXMLEvent);
+                this.securityToken.setXMLSecEvent(responsibleStartXMLEvent);
                 return this.securityToken;
             }
 
@@ -109,93 +117,95 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T> T parseStructure(Deque<XMLEvent> eventDeque, int index, XMLSecurityProperties securityProperties) throws XMLSecurityException {
-        Document document = null;
+    protected <T> T parseStructure(Deque<XMLSecEvent> eventDeque, int index, XMLSecurityProperties securityProperties)
+            throws XMLSecurityException {
+        Document document;
         try {
             document = documentBuilderFactory.newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }
 
-        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        Iterator<XMLSecEvent> xmlSecEventIterator = eventDeque.descendingIterator();
         int curIdx = 0;
         while (curIdx++ < index) {
-            xmlEventIterator.next();
+            xmlSecEventIterator.next();
         }
 
         Node currentNode = document;
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent next = xmlEventIterator.next();
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent next = xmlSecEventIterator.next();
             currentNode = parseXMLEvent(next, currentNode, document);
         }
         return (T) document;
     }
 
     //todo custom SAML unmarshaller directly to XMLObject?
-    public Node parseXMLEvent(XMLEvent xmlEvent, Node currentNode, Document document) throws WSSecurityException {
-        switch (xmlEvent.getEventType()) {
-            case XMLEvent.START_ELEMENT:
-                StartElement startElement = xmlEvent.asStartElement();
-                Element element = document.createElementNS(startElement.getName().getNamespaceURI(), startElement.getName().getLocalPart());
-                if (startElement.getName().getPrefix() != null && !startElement.getName().getPrefix().isEmpty()) {
-                    element.setPrefix(startElement.getName().getPrefix());
+    public Node parseXMLEvent(XMLSecEvent xmlSecEvent, Node currentNode, Document document) throws WSSecurityException {
+        switch (xmlSecEvent.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                Element element = document.createElementNS(xmlSecStartElement.getName().getNamespaceURI(),
+                        xmlSecStartElement.getName().getLocalPart());
+                if (xmlSecStartElement.getName().getPrefix() != null && !xmlSecStartElement.getName().getPrefix().isEmpty()) {
+                    element.setPrefix(xmlSecStartElement.getName().getPrefix());
                 }
                 currentNode = currentNode.appendChild(element);
                 @SuppressWarnings("unchecked")
-                Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
+                Iterator<XMLSecNamespace> namespaceIterator = xmlSecStartElement.getNamespaces();
                 while (namespaceIterator.hasNext()) {
-                    Namespace next = namespaceIterator.next();
+                    XMLSecNamespace next = namespaceIterator.next();
                     parseXMLEvent(next, currentNode, document);
                 }
                 @SuppressWarnings("unchecked")
-                Iterator<Attribute> attributesIterator = startElement.getAttributes();
+                Iterator<XMLSecAttribute> attributesIterator = xmlSecStartElement.getAttributes();
                 while (attributesIterator.hasNext()) {
-                    Attribute next = attributesIterator.next();
+                    XMLSecAttribute next = attributesIterator.next();
                     parseXMLEvent(next, currentNode, document);
                 }
                 break;
-            case XMLEvent.END_ELEMENT:
+            case XMLStreamConstants.END_ELEMENT:
                 if (currentNode.getParentNode() != null) {
                     currentNode = currentNode.getParentNode();
                 }
                 break;
-            case XMLEvent.PROCESSING_INSTRUCTION:
+            case XMLStreamConstants.PROCESSING_INSTRUCTION:
                 Node piNode = document.createProcessingInstruction(
-                        ((ProcessingInstruction) xmlEvent).getTarget(),
-                        ((ProcessingInstruction) xmlEvent).getTarget()
+                        ((ProcessingInstruction) xmlSecEvent).getTarget(),
+                        ((ProcessingInstruction) xmlSecEvent).getTarget()
                 );
                 currentNode.appendChild(piNode);
                 break;
-            case XMLEvent.CHARACTERS:
-                Node characterNode = document.createTextNode(xmlEvent.asCharacters().getData());
+            case XMLStreamConstants.CHARACTERS:
+                Node characterNode = document.createTextNode(xmlSecEvent.asCharacters().getData());
                 currentNode.appendChild(characterNode);
                 break;
-            case XMLEvent.COMMENT:
-                Node commentNode = document.createComment(((Comment) xmlEvent).getText());
+            case XMLStreamConstants.COMMENT:
+                Node commentNode = document.createComment(((Comment) xmlSecEvent).getText());
                 currentNode.appendChild(commentNode);
                 break;
-            case XMLEvent.START_DOCUMENT:
+            case XMLStreamConstants.START_DOCUMENT:
                 break;
-            case XMLEvent.END_DOCUMENT:
+            case XMLStreamConstants.END_DOCUMENT:
                 return currentNode;
-            case XMLEvent.ATTRIBUTE:
+            case XMLStreamConstants.ATTRIBUTE:
                 Attr attributeNode = document.createAttributeNS(
-                        ((Attribute) xmlEvent).getName().getNamespaceURI(), ((Attribute) xmlEvent).getName().getLocalPart()
-                );
-                attributeNode.setPrefix(((Attribute) xmlEvent).getName().getPrefix());
-                attributeNode.setValue(((Attribute) xmlEvent).getValue());
+                        ((Attribute) xmlSecEvent).getName().getNamespaceURI(),
+                        ((Attribute) xmlSecEvent).getName().getLocalPart());
+                attributeNode.setPrefix(((Attribute) xmlSecEvent).getName().getPrefix());
+                attributeNode.setValue(((Attribute) xmlSecEvent).getValue());
                 ((Element) currentNode).setAttributeNodeNS(attributeNode);
                 break;
-            case XMLEvent.DTD:
+            case XMLStreamConstants.DTD:
                 //todo?:
                 /*
                 Node dtdNode = document.getDoctype().getEntities()
-                ((DTD)xmlEvent).getDocumentTypeDeclaration():
-                ((DTD)xmlEvent).getEntities()
+                ((DTD)xmlSecEvent).getDocumentTypeDeclaration():
+                ((DTD)xmlSecEvent).getEntities()
                 */
                 break;
-            case XMLEvent.NAMESPACE:
-                Namespace namespace = (Namespace) xmlEvent;
+            case XMLStreamConstants.NAMESPACE:
+                Namespace namespace = (Namespace) xmlSecEvent;
                 Attr namespaceNode;
                 String prefix = namespace.getPrefix();
                 if (prefix == null || prefix.isEmpty()) {
@@ -207,7 +217,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 ((Element) currentNode).setAttributeNodeNS(namespaceNode);
                 break;
             default:
-                throw new WSSecurityException("Illegal XMLEvent received: " + xmlEvent.getEventType());
+                throw new WSSecurityException("Illegal XMLEvent received: " + xmlSecEvent.getEventType());
         }
         return currentNode;
     }

@@ -30,15 +30,16 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecNamespace;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.w3c.dom.*;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -57,7 +58,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, final OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, final OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
@@ -229,22 +230,22 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             XMLSecurityConstants.Action action = getAction();
             if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
                 if (senderVouches) {
-                    SecurePart securePart = new SecurePart(WSSConstants.SOAPMESSAGE_NS10_STRTransform, null, SecurePart.Modifier.Element, tokenId, securityTokenReferenceId);
-                    outputProcessorChain.getSecurityContext().putAsList(SecurePart.class, securePart);
+                    SecurePart securePart = new SecurePart(new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform), tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
+                    outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
                 }
             }
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
-        outputProcessorChain.processEvent(xmlEvent);
+        outputProcessorChain.processEvent(xmlSecEvent);
     }
 
     class FinalSAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private SecurityToken securityToken;
-        private SAMLAssertionWrapper samlAssertionWrapper;
-        private String securityTokenReferenceId;
-        private String binarySecurityTokenReferenceId;
+        private final SecurityToken securityToken;
+        private final SAMLAssertionWrapper samlAssertionWrapper;
+        private final String securityTokenReferenceId;
+        private final String binarySecurityTokenReferenceId;
         private boolean senderVouches = false;
 
         FinalSAMLTokenOutputProcessor(SecurityToken securityToken, SAMLAssertionWrapper samlAssertionWrapper,
@@ -261,11 +262,12 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            outputProcessorChain.processEvent(xmlEvent);
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            outputProcessorChain.processEvent(xmlSecEvent);
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     if (senderVouches && ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                         WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, binarySecurityTokenReferenceId, securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
@@ -281,7 +283,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     private void outputSecurityTokenReference(OutputProcessorChain outputProcessorChain, SAMLAssertionWrapper samlAssertionWrapper, String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
         if (samlAssertionWrapper.getSAMLVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
         } else {
@@ -289,7 +291,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
         attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
         createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
-        attributes = new ArrayList<Attribute>(1);
+        attributes = new ArrayList<XMLSecAttribute>(1);
         if (samlAssertionWrapper.getSAMLVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else {
@@ -305,8 +307,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     private void outputSamlAssertion(Element element, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         NamedNodeMap namedNodeMap = element.getAttributes();
-        List<Attribute> attributes = new ArrayList<Attribute>(namedNodeMap.getLength());
-        List<Namespace> namespaces = new ArrayList<Namespace>(namedNodeMap.getLength());
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(namedNodeMap.getLength());
+        List<XMLSecNamespace> namespaces = new ArrayList<XMLSecNamespace>(namedNodeMap.getLength());
         for (int i = 0; i < namedNodeMap.getLength(); i++) {
             Attr attribute = (Attr) namedNodeMap.item(i);
             if (attribute.getPrefix() == null) {

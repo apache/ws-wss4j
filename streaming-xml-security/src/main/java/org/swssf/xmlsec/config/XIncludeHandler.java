@@ -60,7 +60,7 @@ public class XIncludeHandler extends DefaultHandler {
 
     private static final String xIncludeNS = "http://www.w3.org/2001/XInclude";
     private static final String xIncludeLN = "include";
-    private ContentHandler contentHandler;
+    private final ContentHandler contentHandler;
     private URL systemId = null;
     private boolean skipEvents = false;
 
@@ -156,7 +156,7 @@ public class XIncludeHandler extends DefaultHandler {
             SAXResult saxResult = new SAXResult(this);
             skipEvents = true;
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = null;
+            Transformer transformer;
             try {
                 transformer = transformerFactory.newTransformer();
                 if (xpointer == null) {

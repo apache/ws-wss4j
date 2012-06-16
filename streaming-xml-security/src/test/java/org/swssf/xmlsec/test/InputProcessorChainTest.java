@@ -22,13 +22,13 @@ import org.swssf.xmlsec.ext.InputProcessor;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.InputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,11 +68,11 @@ public class InputProcessorChainTest {
             this.phase = phase;
         }
 
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             return null;
         }
 
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
             return null;
         }
 

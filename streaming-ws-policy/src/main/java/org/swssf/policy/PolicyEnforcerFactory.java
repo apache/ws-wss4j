@@ -52,7 +52,7 @@ public class PolicyEnforcerFactory {
 
     private Definition wsdlDefinition;
     private List<OperationPolicy> operationPolicies;
-    private Map<Element, Policy> elementPolicyCache;
+    private final Map<Element, Policy> elementPolicyCache;
 
     private PolicyEnforcerFactory() {
         elementPolicyCache = new HashMap<Element, Policy>();

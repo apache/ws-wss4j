@@ -19,16 +19,20 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSDocumentContext;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractInputProcessor;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
+import java.util.List;
 
 /**
  * Processor whiich emits the Operation-Security-Event
@@ -45,21 +49,25 @@ public class OperationInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
         return inputProcessorChain.processHeaderEvent();
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        XMLEvent xmlEvent = inputProcessorChain.processEvent();
-        if (xmlEvent.isStartElement()) {
-            if (inputProcessorChain.getDocumentContext().getDocumentLevel() == 3 && ((WSSDocumentContext) inputProcessorChain.getDocumentContext()).isInSOAPBody()) {
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
+        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+            List<QName> elementPath = xmlSecStartElement.getElementPath();
+            if (elementPath.size() == 3 && WSSUtils.isInSOAPBody(elementPath)) {
                 OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-                operationSecurityEvent.setOperation(xmlEvent.asStartElement().getName());
+                operationSecurityEvent.setOperation(xmlSecEvent.asStartElement().getName());
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(operationSecurityEvent);
                 inputProcessorChain.removeProcessor(this);
             }
         }
-        return xmlEvent;
+        return xmlSecEvent;
     }
 }

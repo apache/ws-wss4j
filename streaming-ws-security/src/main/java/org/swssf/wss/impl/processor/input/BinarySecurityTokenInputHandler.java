@@ -27,11 +27,11 @@ import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       final Deque<XMLEvent> eventQueue, final Integer index) throws XMLSecurityException {
+                       final Deque<XMLSecEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final BinarySecurityTokenType binarySecurityTokenType =
@@ -57,8 +57,8 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             binarySecurityTokenType.setId(IDGenerator.generateID(null));
         }
 
-        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
-        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final List<QName> elementPath = getElementPath(eventQueue);
+        final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
 
         final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
@@ -84,7 +84,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                         crypto,
                         securityProperties.getCallbackHandler());
                 this.binarySecurityToken.setElementPath(elementPath);
-                this.binarySecurityToken.setXMLEvent(responsibleStartXMLEvent);
+                this.binarySecurityToken.setXMLSecEvent(responsibleXMLSecStartXMLEvent);
                 return this.binarySecurityToken;
             }
 
@@ -101,7 +101,8 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         securityContext.registerSecurityEvent(x509TokenSecurityEvent);
     }
 
-    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, BinarySecurityTokenType binarySecurityTokenType) throws WSSecurityException {
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, BinarySecurityTokenType binarySecurityTokenType)
+            throws WSSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (binarySecurityTokenType.getEncodingType() == null) {
             securityContext.handleBSPRule(WSSConstants.BSPRule.R3029);

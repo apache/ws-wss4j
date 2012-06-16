@@ -62,9 +62,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -79,7 +79,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(this.getClass().getClassLoader().getResource("testdata/wsdl/actionSpoofing.wsdl"));
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("emptyPolicy");
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -131,7 +131,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(this.getClass().getClassLoader().getResource("testdata/wsdl/actionSpoofing.wsdl"));
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("goodPolicy");
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), policyEnforcer);

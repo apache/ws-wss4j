@@ -27,15 +27,16 @@ import org.swssf.binding.xmldsig.SignatureType;
 import org.swssf.binding.xmldsig.TransformType;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.util.DigestOutputStream;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,13 +54,14 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
 
     private static final transient Log logger = LogFactory.getLog(AbstractSignatureReferenceVerifyInputProcessor.class);
 
-    private SignatureType signatureType;
-    private SecurityToken securityToken;
-    private Map<String, ReferenceType> references;
-    private List<ReferenceType> processedReferences;
+    private final SignatureType signatureType;
+    private final SecurityToken securityToken;
+    private final Map<String, ReferenceType> references;
+    private final List<ReferenceType> processedReferences;
 
-    public AbstractSignatureReferenceVerifyInputProcessor(SignatureType signatureType, SecurityToken securityToken,
-                                                          XMLSecurityProperties securityProperties) throws XMLSecurityException {
+    public AbstractSignatureReferenceVerifyInputProcessor(
+            SignatureType signatureType, SecurityToken securityToken,
+            XMLSecurityProperties securityProperties) throws XMLSecurityException {
         super(securityProperties);
         this.signatureType = signatureType;
         this.securityToken = securityToken;
@@ -68,7 +70,6 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
         references = new HashMap<String, ReferenceType>(referencesTypeList.size() + 1);
         processedReferences = new ArrayList<ReferenceType>(referencesTypeList.size());
 
-        //if (referenceList != null) {
         Iterator<ReferenceType> referenceTypeIterator = referencesTypeList.iterator();
         while (referenceTypeIterator.hasNext()) {
             ReferenceType referenceType = referenceTypeIterator.next();
@@ -77,7 +78,6 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
             }
             references.put(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()), referenceType);
         }
-        //}
     }
 
     public SignatureType getSignatureType() {
@@ -93,39 +93,44 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
         return inputProcessorChain.processHeaderEvent();
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
 
-        XMLEvent xmlEvent = inputProcessorChain.processEvent();
+        XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
+        switch (xmlSecEvent.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                ReferenceType referenceType = matchesReferenceId(xmlSecStartElement);
+                if (referenceType != null) {
 
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
-            ReferenceType referenceType = matchesReferenceId(startElement);
-            if (referenceType != null) {
-
-                if (processedReferences.contains(referenceType)) {
-                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
+                    if (processedReferences.contains(referenceType)) {
+                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
+                    }
+                    InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
+                            new InternalSignatureReferenceVerifier(getSecurityProperties(), inputProcessorChain,
+                                    referenceType, xmlSecStartElement.getName());
+                    if (!internalSignatureReferenceVerifier.isFinished()) {
+                        internalSignatureReferenceVerifier.processEvent(xmlSecEvent, inputProcessorChain);
+                        inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
+                    }
+                    processedReferences.add(referenceType);
+                    inputProcessorChain.getDocumentContext().setIsInSignedContent(
+                            inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier),
+                            internalSignatureReferenceVerifier);
                 }
-                InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
-                        new InternalSignatureReferenceVerifier(getSecurityProperties(), inputProcessorChain, referenceType, startElement.getName());
-                if (!internalSignatureReferenceVerifier.isFinished()) {
-                    internalSignatureReferenceVerifier.processEvent(xmlEvent, inputProcessorChain);
-                    inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
-                }
-                processedReferences.add(referenceType);
-                inputProcessorChain.getDocumentContext().setIsInSignedContent(
-                        inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
-            }
+                break;
         }
-        return xmlEvent;
+        return xmlSecEvent;
     }
 
-    protected ReferenceType matchesReferenceId(StartElement startElement) {
-        Attribute refId = getReferenceIDAttribute(startElement);
+    protected ReferenceType matchesReferenceId(XMLSecStartElement xmlSecStartElement) {
+        Attribute refId = getReferenceIDAttribute(xmlSecStartElement);
         if (refId != null) {
             return references.get(refId.getValue());
         }
@@ -168,8 +173,10 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
             }
         }
 
-        protected AlgorithmType createMessageDigest(SecurityContext securityContext) throws XMLSecurityException, NoSuchAlgorithmException, NoSuchProviderException {
-            AlgorithmType digestAlgorithm = JCEAlgorithmMapper.getAlgorithmMapping(getReferenceType().getDigestMethod().getAlgorithm());
+        protected AlgorithmType createMessageDigest(SecurityContext securityContext)
+                throws XMLSecurityException, NoSuchAlgorithmException, NoSuchProviderException {
+            AlgorithmType digestAlgorithm =
+                    JCEAlgorithmMapper.getAlgorithmMapping(getReferenceType().getDigestMethod().getAlgorithm());
 
             MessageDigest messageDigest;
             if (digestAlgorithm.getJCEProvider() != null) {
@@ -182,69 +189,83 @@ public abstract class AbstractSignatureReferenceVerifyInputProcessor extends Abs
             return digestAlgorithm;
         }
 
-        protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain) throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain)
+                throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException,
+                IllegalAccessException, InvocationTargetException {
             List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
 
             Transformer parentTransformer = null;
             for (int i = transformTypeList.size() - 1; i >= 0; i--) {
                 TransformType transformType = transformTypeList.get(i);
 
-                InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-                List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
+                InclusiveNamespaces inclusiveNamespacesType =
+                        XMLSecurityUtils.getQNameType(transformType.getContent(),
+                                XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                List<String> inclusiveNamespaces = inclusiveNamespacesType != null
+                        ? inclusiveNamespacesType.getPrefixList()
+                        : null;
                 String algorithm = transformType.getAlgorithm();
                 if (parentTransformer != null) {
                     parentTransformer = XMLSecurityUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm);
                 } else {
-                    parentTransformer = XMLSecurityUtils.getTransformer(inclusiveNamespaces, this.getBufferedDigestOutputStream(), algorithm);
+                    parentTransformer =
+                            XMLSecurityUtils.getTransformer(inclusiveNamespaces, this.getBufferedDigestOutputStream(), algorithm);
                 }
             }
             this.setTransformer(parentTransformer);
         }
 
         @Override
-        public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
             return inputProcessorChain.processHeaderEvent();
         }
 
         @Override
-        public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            XMLEvent xmlEvent = inputProcessorChain.processEvent();
-            processEvent(xmlEvent, inputProcessorChain);
-            return xmlEvent;
+        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+            XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
+            processEvent(xmlSecEvent, inputProcessorChain);
+            return xmlSecEvent;
         }
 
-        protected void processEvent(XMLEvent xmlEvent, InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        protected void processEvent(XMLSecEvent xmlSecEvent, InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
 
-            getTransformer().transform(xmlEvent);
+            getTransformer().transform(xmlSecEvent);
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    this.elementCounter++;
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                    this.elementCounter--;
 
-            if (xmlEvent.isStartElement()) {
-                this.elementCounter++;
-            } else if (xmlEvent.isEndElement()) {
-                EndElement endElement = xmlEvent.asEndElement();
-                this.elementCounter--;
+                    if (this.elementCounter == 0 && xmlSecEndElement.getName().equals(getStartElement())) {
+                        try {
+                            getBufferedDigestOutputStream().close();
+                        } catch (IOException e) {
+                            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+                        }
 
-                if (this.elementCounter == 0 && endElement.getName().equals(getStartElement())) {
-                    try {
-                        getBufferedDigestOutputStream().close();
-                    } catch (IOException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+                        byte[] calculatedDigest = this.getDigestOutputStream().getDigestValue();
+                        byte[] storedDigest = getReferenceType().getDigestValue();
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Calculated Digest: " + new String(Base64.encodeBase64(calculatedDigest)));
+                            logger.debug("Stored Digest: " + new String(Base64.encodeBase64(storedDigest)));
+                        }
+
+                        if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
+                            throw new XMLSecurityException(
+                                    XMLSecurityException.ErrorCode.FAILED_CHECK,
+                                    "digestVerificationFailed", getReferenceType().getURI());
+                        }
+                        inputProcessorChain.removeProcessor(this);
+                        inputProcessorChain.getDocumentContext().unsetIsInSignedContent(this);
+                        setFinished(true);
                     }
-
-                    byte[] calculatedDigest = this.getDigestOutputStream().getDigestValue();
-                    byte[] storedDigest = getReferenceType().getDigestValue();
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Calculated Digest: " + new String(Base64.encodeBase64(calculatedDigest)));
-                        logger.debug("Stored Digest: " + new String(Base64.encodeBase64(storedDigest)));
-                    }
-
-                    if (!MessageDigest.isEqual(storedDigest, calculatedDigest)) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, "digestVerificationFailed", getReferenceType().getURI());
-                    }
-                    inputProcessorChain.removeProcessor(this);
-                    inputProcessorChain.getDocumentContext().unsetIsInSignedContent(this);
-                    setFinished(true);
-                }
+                    break;
             }
         }
 

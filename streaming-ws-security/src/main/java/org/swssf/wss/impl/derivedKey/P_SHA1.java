@@ -61,7 +61,7 @@ public class P_SHA1
 
             return key;
         } catch (Exception ex) {
-            throw new ConversationException("errorInKeyDerivation", ex, null);
+            throw new ConversationException("errorInKeyDerivation", ex, (Object[]) null);
         }
     }
 

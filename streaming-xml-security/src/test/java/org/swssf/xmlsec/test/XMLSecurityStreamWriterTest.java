@@ -20,6 +20,7 @@ package org.swssf.xmlsec.test;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.OutputProcessorChainImpl;
 import org.swssf.xmlsec.impl.SecurityContextImpl;
 import org.swssf.xmlsec.impl.XMLSecurityStreamWriter;
@@ -31,7 +32,6 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.events.XMLEvent;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
@@ -219,9 +219,9 @@ public class XMLSecurityStreamWriterTest {
         }
 
         @Override
-        public void processNextEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processNextEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
             outputProcessorChain.reset();
-            xmlEventWriter.add(xmlEvent);
+            xmlEventWriter.add(xmlSecEvent);
         }
 
         @Override

@@ -21,10 +21,11 @@ package org.swssf.xmlsec.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +43,10 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>(20); //the default of ten entries is not enough
     private int startPos = 0;
     private int curPos = 0;
+    private XMLSecStartElement parentXmlSecStartElement;
 
-    private ArrayDeque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>();
-    private ArrayDeque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>();
-
-    private SecurityContext securityContext;
-    private DocumentContextImpl documentContext;
+    private final SecurityContext securityContext;
+    private final DocumentContextImpl documentContext;
 
     public OutputProcessorChainImpl(SecurityContext securityContext) {
         this(securityContext, 0);
@@ -81,22 +80,6 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
 
     private void setOutputProcessors(List<OutputProcessor> outputProcessors) {
         this.outputProcessors = outputProcessors;
-    }
-
-    private ArrayDeque<List<ComparableNamespace>> getNsStack() {
-        return nsStack;
-    }
-
-    private void setNsStack(ArrayDeque<List<ComparableNamespace>> nsStack) {
-        this.nsStack = nsStack.clone();
-    }
-
-    private ArrayDeque<List<ComparableAttribute>> getAttrStack() {
-        return attrStack;
-    }
-
-    private void setAttrStack(ArrayDeque<List<ComparableAttribute>> attrStack) {
-        this.attrStack = attrStack.clone();
     }
 
     public void addProcessor(OutputProcessor newOutputProcessor) {
@@ -201,17 +184,36 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
         return this.outputProcessors;
     }
 
-    public void processEvent(XMLEvent xmlEvent) throws XMLStreamException, XMLSecurityException {
+    private void setParentXmlSecStartElement(XMLSecStartElement xmlSecStartElement) {
+        this.parentXmlSecStartElement = xmlSecStartElement;
+    }
+
+    public void processEvent(XMLSecEvent xmlSecEvent) throws XMLStreamException, XMLSecurityException {
+        boolean reparent = false;
         if (this.curPos == this.startPos) {
-            if (xmlEvent.isStartElement()) {
-                xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
-                getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
-            } else if (xmlEvent.isEndElement()) {
-                xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
-                getDocumentContext().removePathElement();
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    if (xmlSecEvent == parentXmlSecStartElement) {
+                        parentXmlSecStartElement = null;
+                    }
+                    xmlSecEvent.setParentXMLSecStartElement(parentXmlSecStartElement);
+                    parentXmlSecStartElement = xmlSecEvent.asStartElement();
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    xmlSecEvent.setParentXMLSecStartElement(parentXmlSecStartElement);
+                    reparent = true;
+                    break;
+                default:
+                    xmlSecEvent.setParentXMLSecStartElement(parentXmlSecStartElement);
+                    break;
             }
         }
-        outputProcessors.get(this.curPos++).processNextEvent(xmlEvent, this);
+        outputProcessors.get(this.curPos++).processNextEvent(xmlSecEvent, this);
+        if (reparent) {
+            if (parentXmlSecStartElement != null) {
+                parentXmlSecStartElement = parentXmlSecStartElement.getParentXMLSecStartElement();
+            }
+        }
     }
 
     public void doFinal() throws XMLStreamException, XMLSecurityException {
@@ -219,8 +221,12 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
     }
 
     public OutputProcessorChain createSubChain(OutputProcessor outputProcessor) throws XMLStreamException, XMLSecurityException {
+        return createSubChain(outputProcessor, null);
+    }
+
+    public OutputProcessorChain createSubChain(OutputProcessor outputProcessor, XMLSecStartElement parentXMLSecStartElement) throws XMLStreamException, XMLSecurityException {
         //we don't clone the processor-list to get updates in the sublist too!
-        OutputProcessorChainImpl outputProcessorChain = null;
+        OutputProcessorChainImpl outputProcessorChain;
         try {
             outputProcessorChain = new OutputProcessorChainImpl(securityContext, documentContext.clone(),
                     outputProcessors.indexOf(outputProcessor) + 1);
@@ -228,8 +234,11 @@ public class OutputProcessorChainImpl implements OutputProcessorChain {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILURE, e);
         }
         outputProcessorChain.setOutputProcessors(this.outputProcessors);
-        outputProcessorChain.setNsStack(getNsStack());
-        outputProcessorChain.setAttrStack(getAttrStack());
+        if (parentXMLSecStartElement != null) {
+            outputProcessorChain.setParentXmlSecStartElement(parentXMLSecStartElement);
+        } else {
+            outputProcessorChain.setParentXmlSecStartElement(this.parentXmlSecStartElement);
+        }
         return outputProcessorChain;
     }
 }

@@ -27,10 +27,11 @@ import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.AbstractInputProcessor;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,11 +46,11 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        XMLEvent xmlEvent = inputProcessorChain.processHeaderEvent();
-        if (xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-            if (endElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        XMLSecEvent xmlSecEvent = inputProcessorChain.processHeaderEvent();
+        if (xmlSecEvent.getEventType() == XMLStreamConstants.END_ELEMENT) {
+            XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+            if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
                 inputProcessorChain.removeProcessor(this);
 
                 List<SignatureValueSecurityEvent> signatureValueSecurityEventList = inputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
@@ -88,11 +89,11 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
                 }
             }
         }
-        return xmlEvent;
+        return xmlSecEvent;
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, WSSecurityException {
         //should never be called
         return null;
     }

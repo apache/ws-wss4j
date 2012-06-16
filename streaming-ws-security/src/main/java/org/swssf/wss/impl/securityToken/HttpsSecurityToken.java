@@ -37,7 +37,7 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
 
     private X509Certificate x509Certificate;
     private String username;
-    private AuthenticationType authenticationType;
+    private final AuthenticationType authenticationType;
 
     private enum AuthenticationType {
         httpsClientAuthentication,

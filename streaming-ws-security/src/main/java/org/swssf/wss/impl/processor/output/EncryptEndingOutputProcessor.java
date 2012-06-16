@@ -51,7 +51,7 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
     @Override
     public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-        WSSUtils.flushBufferAndCallbackAfterTokenID(subOutputProcessorChain, this, getXmlEventBuffer());
+        WSSUtils.flushBufferAndCallbackAfterTokenID(subOutputProcessorChain, this, getXmlSecEventBuffer());
         //call final on the rest of the chain
         subOutputProcessorChain.doFinal();
         //this processor is now finished and we can remove it now

@@ -18,14 +18,17 @@
  */
 package org.swssf.xmlsec.impl.transformer.canonicalizer;
 
-import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.Transformer;
+import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.XMLSecurityUtils;
+import org.swssf.xmlsec.ext.stax.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -63,7 +66,7 @@ public abstract class CanonicalizerBase implements Transformer {
     private OutputStream outputStream;
 
     private static final Map<String, byte[]> cache = new WeakHashMap<String, byte[]>();
-    private C14NStack<List<Comparable>> outputStack = new C14NStack<List<Comparable>>();
+    private final C14NStack outputStack = new C14NStack();
     private boolean includeComments = false;
     private DocumentLevel currentDocumentLevel = DocumentLevel.NODE_BEFORE_DOCUMENT_ELEMENT;
     private boolean firstCall = true;
@@ -79,6 +82,7 @@ public abstract class CanonicalizerBase implements Transformer {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setList(List list) throws XMLSecurityException {
         this.inclusiveNamespaces = prefixList2Set(list);
     }
@@ -90,7 +94,7 @@ public abstract class CanonicalizerBase implements Transformer {
 
     public static SortedSet<String> prefixList2Set(List<String> inclusiveNamespaces) {
 
-        if ((inclusiveNamespaces == null) || (inclusiveNamespaces.size() == 0)) {
+        if ((inclusiveNamespaces == null) || (inclusiveNamespaces.isEmpty())) {
             return null;
         }
 
@@ -107,175 +111,233 @@ public abstract class CanonicalizerBase implements Transformer {
         return prefixes;
     }
 
-    protected void getCurrentUtilizedNamespaces(final XMLEventNS xmlEventNS, final SortedSet<ComparableNamespace> utilizedNamespaces,
-                                                final C14NStack<List<Comparable>> outputStack) {
-        final List<ComparableNamespace> currentUtilizedNamespace = xmlEventNS.getNamespaceList()[0];
-        for (int j = 0; j < currentUtilizedNamespace.size(); j++) {
-            final ComparableNamespace comparableNamespace = currentUtilizedNamespace.get(j);
+    protected SortedSet<XMLSecNamespace> getCurrentUtilizedNamespaces(final XMLSecStartElement xmlSecStartElement,
+                                                                      final C14NStack outputStack) {
 
-            final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
+        SortedSet<XMLSecNamespace> utilizedNamespaces = emptySortedSet();
+
+        XMLSecNamespace elementNamespace = xmlSecStartElement.getElementNamespace();
+        final XMLSecNamespace found = (XMLSecNamespace) outputStack.containsOnStack(elementNamespace);
+        //found means the prefix matched. so check the ns further
+        if (found == null || found.getNamespaceURI() == null
+                || !found.getNamespaceURI().equals(elementNamespace.getNamespaceURI())) {
+
+            utilizedNamespaces = new TreeSet<XMLSecNamespace>();
+            utilizedNamespaces.add(elementNamespace);
+            outputStack.peek().add(elementNamespace);
+        }
+
+        List<XMLSecNamespace> declaredNamespaces = xmlSecStartElement.getOnElementDeclaredNamespaces();
+        for (int i = 0; i < declaredNamespaces.size(); i++) {
+            XMLSecNamespace comparableNamespace = declaredNamespaces.get(i);
+            final XMLSecNamespace resultNamespace = (XMLSecNamespace) outputStack.containsOnStack(comparableNamespace);
+            //resultNamespace means the prefix matched. so check the ns further
+            if (resultNamespace != null && resultNamespace.getNamespaceURI() != null
+                    && resultNamespace.getNamespaceURI().equals(comparableNamespace.getNamespaceURI())) {
+                continue;
+            }
+
+            if (utilizedNamespaces == (Object) emptySortedSet()) {
+                utilizedNamespaces = new TreeSet<XMLSecNamespace>();
+            }
+            utilizedNamespaces.add(comparableNamespace);
+            outputStack.peek().add(comparableNamespace);
+        }
+
+        List<XMLSecAttribute> comparableAttributes = xmlSecStartElement.getOnElementDeclaredAttributes();
+        for (int i = 0; i < comparableAttributes.size(); i++) {
+            XMLSecAttribute xmlSecAttribute = comparableAttributes.get(i);
+            XMLSecNamespace attributeNamespace = xmlSecAttribute.getAttributeNamespace();
+            if ("xml".equals(attributeNamespace.getPrefix())) {
+                continue;
+            }
+            if (attributeNamespace.getNamespaceURI() == null || attributeNamespace.getNamespaceURI().isEmpty()) {
+                continue;
+            }
+            final XMLSecNamespace resultNamespace = (XMLSecNamespace) outputStack.containsOnStack(attributeNamespace);
+            //resultNamespace means the prefix matched. so check the ns further
+            if (resultNamespace == null || resultNamespace.getNamespaceURI() == null
+                    || !resultNamespace.getNamespaceURI().equals(attributeNamespace.getNamespaceURI())) {
+
+                if (utilizedNamespaces == (Object) emptySortedSet()) {
+                    utilizedNamespaces = new TreeSet<XMLSecNamespace>();
+                }
+                utilizedNamespaces.add(attributeNamespace);
+                outputStack.peek().add(attributeNamespace);
+            }
+        }
+
+        return utilizedNamespaces;
+    }
+
+    protected SortedSet<XMLSecAttribute> getCurrentUtilizedAttributes(final XMLSecStartElement xmlSecStartElement,
+                                                                      final C14NStack outputStack) {
+        List<XMLSecAttribute> comparableAttributes = xmlSecStartElement.getOnElementDeclaredAttributes();
+        if (comparableAttributes.isEmpty()) {
+            return emptySortedSet();
+        }
+
+        return new TreeSet<XMLSecAttribute>(comparableAttributes);
+    }
+
+    protected SortedSet<XMLSecNamespace> getInitialUtilizedNamespaces(final XMLSecStartElement xmlSecStartElement,
+                                                                      final C14NStack outputStack) {
+
+        final SortedSet<XMLSecNamespace> utilizedNamespaces = new TreeSet<XMLSecNamespace>();
+        List<XMLSecNamespace> visibleNamespaces = new ArrayList<XMLSecNamespace>();
+        xmlSecStartElement.getNamespacesFromCurrentScope(visibleNamespaces);
+        for (int i = 0; i < visibleNamespaces.size(); i++) {
+            XMLSecNamespace comparableNamespace = visibleNamespaces.get(i);
+
+            final XMLSecNamespace found = (XMLSecNamespace) outputStack.containsOnStack(comparableNamespace);
             //found means the prefix matched. so check the ns further
             if (found != null && found.getNamespaceURI() != null && found.getNamespaceURI().equals(comparableNamespace.getNamespaceURI())) {
                 continue;
             }
-
             utilizedNamespaces.add(comparableNamespace);
             outputStack.peek().add(comparableNamespace);
         }
+
+        return utilizedNamespaces;
     }
 
-    protected void getCurrentUtilizedAttributes(final XMLEventNS xmlEventNS, final SortedSet<ComparableAttribute> utilizedAttributes,
-                                                final C14NStack<List<Comparable>> outputStack) {
-        final StartElement startElement = xmlEventNS.asStartElement();
-        @SuppressWarnings("unchecked")
-        final Iterator<Attribute> attributesIterator = startElement.getAttributes();
-        while (attributesIterator.hasNext()) {
-            final Attribute attribute = attributesIterator.next();
-            utilizedAttributes.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
-        }
-    }
+    protected SortedSet<XMLSecAttribute> getInitialUtilizedAttributes(final XMLSecStartElement xmlSecStartElement,
+                                                                      final C14NStack outputStack) {
 
-    protected void getInitialUtilizedNamespaces(final XMLEventNS xmlEventNS, final SortedSet<ComparableNamespace> utilizedNamespaces,
-                                                final C14NStack<List<Comparable>> outputStack) {
-        final List<ComparableNamespace>[] visibleNamespaceList = xmlEventNS.getNamespaceList();
-        for (int i = 0; i < visibleNamespaceList.length; i++) {
-            final List<ComparableNamespace> initialUtilizedNamespace = visibleNamespaceList[i];
-            for (int j = 0; j < initialUtilizedNamespace.size(); j++) {
-                final ComparableNamespace comparableNamespace = initialUtilizedNamespace.get(j);
+        SortedSet<XMLSecAttribute> utilizedAttributes = emptySortedSet();
 
-                final ComparableNamespace found = (ComparableNamespace) outputStack.containsOnStack(comparableNamespace);
-                //found means the prefix matched. so check the ns further
-                if (found != null && found.getNamespaceURI() != null && found.getNamespaceURI().equals(comparableNamespace.getNamespaceURI())) {
-                    continue;
-                }
-
-                utilizedNamespaces.add(comparableNamespace);
-                outputStack.peek().add(comparableNamespace);
-            }
-        }
-    }
-
-    protected void getInitialUtilizedAttributes(final XMLEventNS xmlEventNS, final SortedSet<ComparableAttribute> utilizedAttributes,
-                                                final C14NStack<List<Comparable>> outputStack) {
-        final List<ComparableAttribute>[] visibleAttributeList = xmlEventNS.getAttributeList();
-        for (int i = 0; i < visibleAttributeList.length; i++) {
-            final List<ComparableAttribute> comparableAttributes = visibleAttributeList[i];
-            for (int j = 0; j < comparableAttributes.size(); j++) {
-                final ComparableAttribute comparableAttribute = comparableAttributes.get(j);
-                if (outputStack.containsOnStack(comparableAttribute) != null) {
-                    continue;
-                }
-                utilizedAttributes.add(comparableAttribute);
-                outputStack.peek().add(comparableAttribute);
-            }
-        }
-        final StartElement startElement = xmlEventNS.asStartElement();
-        @SuppressWarnings("unchecked")
-        final Iterator<Attribute> attributesIterator = startElement.getAttributes();
-        while (attributesIterator.hasNext()) {
-            final Attribute attribute = attributesIterator.next();
-            //attributes with xml prefix are already processed in the for loop above
-            if (XML.equals(attribute.getName().getPrefix())) {
+        List<XMLSecAttribute> comparableAttributes = new ArrayList<XMLSecAttribute>();
+        xmlSecStartElement.getAttributesFromCurrentScope(comparableAttributes);
+        for (int i = 0; i < comparableAttributes.size(); i++) {
+            XMLSecAttribute comparableAttribute = comparableAttributes.get(i);
+            if (!XML.equals(comparableAttribute.getName().getPrefix())) {
                 continue;
             }
-
-            utilizedAttributes.add(new ComparableAttribute(attribute.getName(), attribute.getValue()));
+            if (outputStack.containsOnStack(comparableAttribute) != null) {
+                continue;
+            }
+            if (utilizedAttributes == (Object) emptySortedSet()) {
+                utilizedAttributes = new TreeSet<XMLSecAttribute>();
+            }
+            utilizedAttributes.add(comparableAttribute);
+            outputStack.peek().add(comparableAttribute);
         }
+
+        List<XMLSecAttribute> elementAttributes = xmlSecStartElement.getOnElementDeclaredAttributes();
+        for (int i = 0; i < elementAttributes.size(); i++) {
+            XMLSecAttribute comparableAttribute = elementAttributes.get(i);
+            //attributes with xml prefix are already processed in the for loop above
+            //xml:id attributes must be handled like other attributes: emit but dont inherit
+            final QName attributeName = comparableAttribute.getName();
+            if (XML.equals(attributeName.getPrefix())) {
+                continue;
+            }
+            if (utilizedAttributes == (Object) emptySortedSet()) {
+                utilizedAttributes = new TreeSet<XMLSecAttribute>();
+            }
+            utilizedAttributes.add(comparableAttribute);
+        }
+        return utilizedAttributes;
     }
 
-    public void transform(final XMLEvent xmlEvent) throws XMLStreamException {
+    public void transform(final XMLSecEvent xmlSecEvent) throws XMLStreamException {
         try {
-            switch (xmlEvent.getEventType()) {
+            switch (xmlSecEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
 
-                    final StartElement startElement = xmlEvent.asStartElement();
+                    final XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
 
                     currentDocumentLevel = DocumentLevel.NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT;
                     outputStack.push(Collections.<Comparable>emptyList());
 
-                    final XMLEventNS xmlEventNS = (XMLEventNS) xmlEvent;
-
-                    final SortedSet<ComparableNamespace> utilizedNamespaces = new TreeSet<ComparableNamespace>();
-                    final SortedSet<ComparableAttribute> utilizedAttributes = new TreeSet<ComparableAttribute>();
+                    final SortedSet<XMLSecNamespace> utilizedNamespaces;
+                    final SortedSet<XMLSecAttribute> utilizedAttributes;
 
                     if (firstCall) {
-                        outputStack.peek().add(new ComparableNamespace(""));
+                        utilizedNamespaces = new TreeSet<XMLSecNamespace>();
+                        utilizedAttributes = new TreeSet<XMLSecAttribute>();
+                        outputStack.peek().add(XMLSecEventFactory.createXMLSecNamespace(null, ""));
                         outputStack.push(Collections.<Comparable>emptyList());
                         firstCall = false;
 
                         if (this.inclusiveNamespaces != null) {
                             final Iterator<String> iterator = this.inclusiveNamespaces.iterator();
                             while (iterator.hasNext()) {
-                                final String next = iterator.next();
-                                final String ns = startElement.getNamespaceURI(next);
+                                final String prefix = iterator.next();
+                                final String ns = xmlSecStartElement.getNamespaceURI(prefix);
                                 //add default ns:
-                                if (ns == null && next != null && next.isEmpty()) {
-                                    final ComparableNamespace comparableNamespace = new ComparableNamespace(next, "");
+                                if (ns == null && prefix != null && prefix.isEmpty()) {
+                                    final XMLSecNamespace comparableNamespace = XMLSecEventFactory.createXMLSecNamespace(prefix, "");
                                     utilizedNamespaces.add(comparableNamespace);
                                     outputStack.peek().add(comparableNamespace);
                                 } else if (ns != null) {
-                                    final ComparableNamespace comparableNamespace = new ComparableNamespace(next, ns);
+                                    final XMLSecNamespace comparableNamespace = XMLSecEventFactory.createXMLSecNamespace(prefix, ns);
                                     utilizedNamespaces.add(comparableNamespace);
                                     outputStack.peek().add(comparableNamespace);
                                 }
                             }
                         }
 
-                        getInitialUtilizedNamespaces(xmlEventNS, utilizedNamespaces, outputStack);
-                        getInitialUtilizedAttributes(xmlEventNS, utilizedAttributes, outputStack);
+                        utilizedNamespaces.addAll(getInitialUtilizedNamespaces(xmlSecStartElement, outputStack));
+                        utilizedAttributes.addAll(getInitialUtilizedAttributes(xmlSecStartElement, outputStack));
                     } else {
-                        getCurrentUtilizedNamespaces(xmlEventNS, utilizedNamespaces, outputStack);
-                        getCurrentUtilizedAttributes(xmlEventNS, utilizedAttributes, outputStack);
+                        utilizedNamespaces = getCurrentUtilizedNamespaces(xmlSecStartElement, outputStack);
+                        utilizedAttributes = getCurrentUtilizedAttributes(xmlSecStartElement, outputStack);
                     }
 
                     outputStream.write('<');
-                    final String prefix = startElement.getName().getPrefix();
+                    final String prefix = xmlSecStartElement.getName().getPrefix();
                     if (prefix != null && !prefix.isEmpty()) {
                         UtfHelpper.writeByte(prefix, outputStream, cache);
                         outputStream.write(DOUBLEPOINT);
                     }
-                    final String name = startElement.getName().getLocalPart();
+                    final String name = xmlSecStartElement.getName().getLocalPart();
                     UtfHelpper.writeByte(name, outputStream, cache);
 
-                    final Iterator<ComparableNamespace> namespaceIterator = utilizedNamespaces.iterator();
-                    while (namespaceIterator.hasNext()) {
-                        final ComparableNamespace namespace = namespaceIterator.next();
+                    if (!utilizedNamespaces.isEmpty()) {
+                        final Iterator<XMLSecNamespace> namespaceIterator = utilizedNamespaces.iterator();
+                        while (namespaceIterator.hasNext()) {
+                            final XMLSecNamespace namespace = namespaceIterator.next();
 
-                        if (!namespaceIsAbsolute(namespace.getNamespaceURI())) {
-                            throw new XMLStreamException("namespace is relative encountered: " + namespace.getNamespaceURI());
-                        }
+                            if (!namespaceIsAbsolute(namespace.getNamespaceURI())) {
+                                throw new XMLStreamException("namespace is relative encountered: " + namespace.getNamespaceURI());
+                            }
 
-                        if (namespace.isDefaultNamespaceDeclaration()) {
-                            outputAttrToWriter(XMLNS, namespace.getNamespaceURI(), outputStream, cache);
-                        } else {
-                            outputAttrToWriter(XMLNS_DOUBLEPOINT + namespace.getPrefix(), namespace.getNamespaceURI(), outputStream, cache);
+                            if (namespace.isDefaultNamespaceDeclaration()) {
+                                outputAttrToWriter(XMLNS, namespace.getNamespaceURI(), outputStream, cache);
+                            } else {
+                                outputAttrToWriter(XMLNS_DOUBLEPOINT + namespace.getPrefix(), namespace.getNamespaceURI(), outputStream, cache);
+                            }
                         }
                     }
 
-                    final Iterator<ComparableAttribute> attributeIterator = utilizedAttributes.iterator();
-                    while (attributeIterator.hasNext()) {
-                        final ComparableAttribute attribute = attributeIterator.next();
+                    if (!utilizedAttributes.isEmpty()) {
+                        final Iterator<XMLSecAttribute> attributeIterator = utilizedAttributes.iterator();
+                        while (attributeIterator.hasNext()) {
+                            final XMLSecAttribute attribute = attributeIterator.next();
 
-                        final QName attributeName = attribute.getName();
-                        if (attributeName.getPrefix() != null && !attributeName.getPrefix().isEmpty()) {
-                            final String localPart = attributeName.getPrefix() + DOUBLEPOINT + attributeName.getLocalPart();
-                            outputAttrToWriter(localPart, attribute.getValue(), outputStream, cache);
-                        } else {
-                            outputAttrToWriter(attributeName.getLocalPart(), attribute.getValue(), outputStream, cache);
+                            final QName attributeName = attribute.getName();
+                            final String attributeNamePrefix = attributeName.getPrefix();
+                            if (attributeNamePrefix != null && !attributeNamePrefix.isEmpty()) {
+                                final String localPart = attributeNamePrefix + DOUBLEPOINT + attributeName.getLocalPart();
+                                outputAttrToWriter(localPart, attribute.getValue(), outputStream, cache);
+                            } else {
+                                outputAttrToWriter(attributeName.getLocalPart(), attribute.getValue(), outputStream, cache);
+                            }
                         }
                     }
 
                     outputStream.write('>');
                     break;
                 case XMLStreamConstants.END_ELEMENT:
-                    final EndElement endElement = xmlEvent.asEndElement();
-                    final String localPrefix = endElement.getName().getPrefix();
+                    final XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                    final String localPrefix = xmlSecEndElement.getName().getPrefix();
                     outputStream.write(_END_TAG);
                     if (localPrefix != null && !localPrefix.isEmpty()) {
                         UtfHelpper.writeByte(localPrefix, outputStream, cache);
                         outputStream.write(DOUBLEPOINT);
                     }
-                    UtfHelpper.writeStringToUtf8(endElement.getName().getLocalPart(), outputStream);
+                    UtfHelpper.writeStringToUtf8(xmlSecEndElement.getName().getLocalPart(), outputStream);
                     outputStream.write('>');
 
                     //We finished with this level, pop to the previous definitions.
@@ -286,21 +348,21 @@ public abstract class CanonicalizerBase implements Transformer {
 
                     break;
                 case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                    outputPItoWriter(((ProcessingInstruction) xmlEvent), this.outputStream, currentDocumentLevel);
+                    outputPItoWriter(((XMLSecProcessingInstruction) xmlSecEvent), this.outputStream, currentDocumentLevel);
                     break;
                 case XMLStreamConstants.CHARACTERS:
                     if (currentDocumentLevel == DocumentLevel.NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT) {
-                        outputTextToWriter(xmlEvent.asCharacters().getData(), this.outputStream);
+                        outputTextToWriter(xmlSecEvent.asCharacters().getData(), this.outputStream);
                     }
                     break;
                 case XMLStreamConstants.COMMENT:
                     if (includeComments) {
-                        outputCommentToWriter(((Comment) xmlEvent), this.outputStream, currentDocumentLevel);
+                        outputCommentToWriter(((XMLSecComment) xmlSecEvent), this.outputStream, currentDocumentLevel);
                     }
                     break;
                 case XMLStreamConstants.SPACE:
                     if (currentDocumentLevel == DocumentLevel.NODE_NOT_BEFORE_OR_AFTER_DOCUMENT_ELEMENT) {
-                        outputTextToWriter(xmlEvent.asCharacters().getData(), this.outputStream);
+                        outputTextToWriter(xmlSecEvent.asCharacters().getData(), this.outputStream);
                     }
                     break;
                 case XMLStreamConstants.START_DOCUMENT:
@@ -309,20 +371,20 @@ public abstract class CanonicalizerBase implements Transformer {
                 case XMLStreamConstants.END_DOCUMENT:
                     break;
                 case XMLStreamConstants.ENTITY_REFERENCE:
-                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlEvent));
+                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlSecEvent));
                 case XMLStreamConstants.ATTRIBUTE:
-                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlEvent));
+                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlSecEvent));
                 case XMLStreamConstants.DTD:
                     break;
                 case XMLStreamConstants.CDATA:
-                    outputTextToWriter(xmlEvent.asCharacters().getData(), this.outputStream);
+                    outputTextToWriter(xmlSecEvent.asCharacters().getData(), this.outputStream);
                     break;
                 case XMLStreamConstants.NAMESPACE:
-                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlEvent));
+                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlSecEvent));
                 case XMLStreamConstants.NOTATION_DECLARATION:
-                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlEvent));
+                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlSecEvent));
                 case XMLStreamConstants.ENTITY_DECLARATION:
-                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlEvent));
+                    throw new XMLStreamException("illegal event :" + XMLSecurityUtils.getXMLEventAsString(xmlSecEvent));
             }
         } catch (IOException e) {
             throw new XMLStreamException(e);
@@ -430,7 +492,7 @@ public abstract class CanonicalizerBase implements Transformer {
      * @param writer    where to write the things
      * @throws IOException
      */
-    protected static void outputPItoWriter(ProcessingInstruction currentPI, OutputStream writer, DocumentLevel position) throws IOException {
+    protected static void outputPItoWriter(XMLSecProcessingInstruction currentPI, OutputStream writer, DocumentLevel position) throws IOException {
         if (position == DocumentLevel.NODE_AFTER_DOCUMENT_ELEMENT) {
             writer.write(NEWLINE);
         }
@@ -482,7 +544,7 @@ public abstract class CanonicalizerBase implements Transformer {
      * @param writer         writer where to write the things
      * @throws IOException
      */
-    protected static void outputCommentToWriter(Comment currentComment, OutputStream writer, DocumentLevel position) throws IOException {
+    protected static void outputCommentToWriter(XMLSecComment currentComment, OutputStream writer, DocumentLevel position) throws IOException {
         if (position == DocumentLevel.NODE_AFTER_DOCUMENT_ELEMENT) {
             writer.write(NEWLINE);
         }
@@ -526,7 +588,7 @@ public abstract class CanonicalizerBase implements Transformer {
             final Iterator<List<Comparable>> elementIterator = super.iterator();
             while (elementIterator.hasNext()) {
                 final List list = elementIterator.next();
-                if (list.size() == 0) {
+                if (list.isEmpty()) {
                     continue;
                 }
                 final int idx = list.indexOf(o);
@@ -551,6 +613,102 @@ public abstract class CanonicalizerBase implements Transformer {
         @Override
         public List<Comparable> peekFirst() {
             throw new UnsupportedOperationException("Use peek()");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static <T> SortedSet<T> emptySortedSet() {
+        return (SortedSet<T>) EMPTY_SORTEDSET;
+    }
+
+    private static final SortedSet EMPTY_SORTEDSET = new EmptySortedSet();
+
+    private static class EmptySortedSet extends AbstractSet<Object> implements SortedSet<Object>, Serializable {
+
+        @Override
+        public Iterator<Object> iterator() {
+            return new Iterator<Object>() {
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
+
+                @Override
+                public Object next() {
+                    throw new NoSuchElementException();
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean contains(Object obj) {
+            return false;
+        }
+
+        @Override
+        public Comparator<? super Object> comparator() {
+            return null;
+        }
+
+        @Override
+        public SortedSet<Object> subSet(Object fromElement, Object toElement) {
+            return this;
+        }
+
+        @Override
+        public SortedSet<Object> headSet(Object toElement) {
+            return this;
+        }
+
+        @Override
+        public SortedSet<Object> tailSet(Object fromElement) {
+            return this;
+        }
+
+        @Override
+        public Object first() {
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        public Object last() {
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T[] toArray(T[] a) {
+            return (T[]) new Object[0];
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(Collection c) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return false;
         }
     }
 }

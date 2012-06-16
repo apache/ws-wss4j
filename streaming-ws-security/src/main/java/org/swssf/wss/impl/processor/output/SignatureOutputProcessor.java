@@ -21,24 +21,26 @@ package org.swssf.wss.impl.processor.output;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.SecurePart;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.processor.output.AbstractSignatureOutputProcessor;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
-import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author $Author$
@@ -62,41 +64,33 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
 
             //avoid double signature when child elements matches too
             if (getActiveInternalSignatureOutputProcessor() == null) {
-                SecurePart securePart = securePartMatches(startElement, outputProcessorChain, securityProperties.getSignatureSecureParts());
+                SecurePart securePart = securePartMatches(xmlSecStartElement, outputProcessorChain, WSSConstants.SIGNATURE_PARTS);
                 if (securePart != null) {
 
                     logger.debug("Matched securePart for signature");
-                    InternalSignatureOutputProcessor internalSignatureOutputProcessor = null;
+                    InternalSignatureOutputProcessor internalSignatureOutputProcessor;
                     try {
                         SignaturePartDef signaturePartDef = new SignaturePartDef();
                         if (securePart.getIdToSign() == null) {
                             signaturePartDef.setSigRefId(IDGenerator.generateID(null));
                             signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
 
-                            boolean found = false;
-                            @SuppressWarnings("unchecked")
-                            Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                            while (attributeIterator.hasNext()) {
-                                Attribute attribute = attributeIterator.next();
-                                if (attribute.getName().equals(WSSConstants.ATT_wsu_Id)) {
-                                    signaturePartDef.setSigRefId(attribute.getValue());
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                List<Attribute> attributeList = new ArrayList<Attribute>(1);
+                            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+                            if (attribute != null) {
+                                signaturePartDef.setSigRefId(attribute.getValue());
+                            } else {
+                                List<XMLSecAttribute> attributeList = new ArrayList<XMLSecAttribute>(1);
                                 attributeList.add(createAttribute(WSSConstants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
-                                xmlEvent = cloneStartElementEvent(xmlEvent, attributeList);
+                                xmlSecEvent = addAttributes(xmlSecStartElement, attributeList);
                             }
                         } else {
-                            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName())) {
+                            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName().getLocalPart())) {
                                 signaturePartDef.setSigRefId(securePart.getIdToReference());
                                 signaturePartDef.setTransformAlgo(WSSConstants.SOAPMESSAGE_NS10_STRTransform);
                                 signaturePartDef.setC14nAlgo(WSSConstants.NS_C14N_EXCL);
@@ -107,7 +101,7 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                         }
 
                         getSignaturePartDefList().add(signaturePartDef);
-                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(signaturePartDef, startElement.getName());
+                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(signaturePartDef, xmlSecStartElement.getName());
                         internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                         internalSignatureOutputProcessor.setAction(getAction());
                         internalSignatureOutputProcessor.addAfterProcessor(SignatureOutputProcessor.class.getName());
@@ -124,39 +118,53 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                     }
 
                     setActiveInternalSignatureOutputProcessor(internalSignatureOutputProcessor);
-                }
-            }
-        }
-        outputProcessorChain.processEvent(xmlEvent);
-    }
-
-    protected SecurePart securePartMatches(StartElement startElement, List<SecurePart> secureParts) {
-        Iterator<SecurePart> securePartIterator = secureParts.iterator();
-        while (securePartIterator.hasNext()) {
-            SecurePart securePart = securePartIterator.next();
-            if (securePart.getIdToSign() == null) {
-                if (startElement.getName().getLocalPart().equals(securePart.getName())
-                        && startElement.getName().getNamespaceURI().equals(securePart.getNamespace())) {
-                    return securePart;
-                }
-            } else {
-                @SuppressWarnings("unchecked")
-                Iterator<Attribute> attributeIterator = startElement.getAttributes();
-                while (attributeIterator.hasNext()) {
-                    Attribute attribute = attributeIterator.next();
-                    if (attribute != null) {
-                        QName attributeName = attribute.getName();
-                        if ((attributeName.equals(WSSConstants.ATT_wsu_Id)
-                                || attributeName.equals(WSSConstants.ATT_NULL_Id)
-                                || attributeName.equals(WSSConstants.ATT_NULL_ID)
-                                || attributeName.equals(WSSConstants.ATT_NULL_AssertionID))
-                                && attribute.getValue().equals(securePart.getIdToSign())) {
-                            return securePart;
-                        }
+                    //we can remove this processor when the whole body will be signed since there is
+                    //nothing more which can be signed.
+                    if (WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
+                            && WSSUtils.isInSOAPBody(xmlSecStartElement)) {
+                        outputProcessorChain.removeProcessor(this);
                     }
                 }
             }
         }
-        return null;
+        outputProcessorChain.processEvent(xmlSecEvent);
+    }
+
+    protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
+        SecurePart securePart = secureParts.get(xmlSecStartElement.getName());
+        if (securePart == null) {
+            if (xmlSecStartElement.getOnElementDeclaredAttributes().size() == 0) {
+                return null;
+            }
+            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+            if (attribute != null) {
+                securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_Id);
+            if (attribute != null) {
+                securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ID);
+            if (attribute != null) {
+                securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
+            if (attribute != null) {
+                securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+        }
+        return securePart;
     }
 }

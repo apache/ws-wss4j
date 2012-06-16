@@ -697,7 +697,7 @@ public class SP11Constants extends SPConstants {
             return lookup.get(name);
         }
 
-        private QName name;
+        private final QName name;
 
         SupportingTokenTypes(QName name) {
             this.name = name;

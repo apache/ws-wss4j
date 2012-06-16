@@ -20,13 +20,12 @@ package org.swssf.xmlsec.ext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +40,8 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected <T> T parseStructure(final Deque<XMLEvent> eventDeque, final int index,
+    @SuppressWarnings("unchecked")
+    protected <T> T parseStructure(final Deque<XMLSecEvent> eventDeque, final int index,
                                    final XMLSecurityProperties securityProperties) throws XMLSecurityException {
         try {
             Unmarshaller unmarshaller = XMLSecurityConstants.getJaxbUnmarshaller(securityProperties.isDisableSchemaValidation());
@@ -52,27 +52,17 @@ public abstract class AbstractInputSecurityHeaderHandler implements XMLSecurityH
         }
     }
 
-    protected List<QName> getElementPath(DocumentContext documentContext, Deque<XMLEvent> eventDeque) throws XMLSecurityException {
-        final List<QName> path = documentContext.getPath();
-        List<QName> elementPath = new ArrayList<QName>(path.size() + 1);
-        elementPath.addAll(path);
-        XMLEvent xmlEvent = eventDeque.peek();
-        if (xmlEvent.isStartElement()) {
-            elementPath.add(xmlEvent.asStartElement().getName());
-        } else if (xmlEvent.isEndElement()) {
-            elementPath.add(xmlEvent.asEndElement().getName());
-        } else {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY);
-        }
-        return elementPath;
+    protected List<QName> getElementPath(Deque<XMLSecEvent> eventDeque) throws XMLSecurityException {
+        XMLSecEvent xmlSecEvent = eventDeque.peek();
+        return xmlSecEvent.getElementPath();
     }
 
-    protected XMLEvent getResponsibleStartXMLEvent(Deque<XMLEvent> eventDeque, int index) {
-        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+    protected XMLSecEvent getResponsibleStartXMLEvent(Deque<XMLSecEvent> eventDeque, int index) {
+        Iterator<XMLSecEvent> xmlSecEventIterator = eventDeque.descendingIterator();
         int curIdx = 0;
         while (curIdx++ < index) {
-            xmlEventIterator.next();
+            xmlSecEventIterator.next();
         }
-        return xmlEventIterator.next();
+        return xmlSecEventIterator.next();
     }
 }

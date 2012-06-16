@@ -25,11 +25,12 @@ import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.XMLStreamConstants;
 import java.util.Calendar;
 import java.util.Deque;
 import java.util.GregorianCalendar;
@@ -44,7 +45,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
     //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
 
@@ -55,7 +56,9 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
         inputProcessorChain.getSecurityContext().put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
-        final TimestampType timestampType = ((JAXBElement<TimestampType>) parseStructure(eventQueue, index, securityProperties)).getValue();
+        @SuppressWarnings("unchecked")
+        final TimestampType timestampType =
+                ((JAXBElement<TimestampType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         checkBSPCompliance(inputProcessorChain, timestampType, eventQueue, index);
 
@@ -123,24 +126,25 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
     }
 
-    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, TimestampType timestampType, Deque<XMLEvent> eventDeque, int index) throws WSSecurityException {
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, TimestampType timestampType,
+                                    Deque<XMLSecEvent> eventDeque, int index) throws WSSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (timestampType.getCreated() == null) {
             securityContext.handleBSPRule(WSSConstants.BSPRule.R3203);
         }
 
-        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        Iterator<XMLSecEvent> xmlSecEventIterator = eventDeque.descendingIterator();
         int curIdx = 0;
         //forward to first timestamp child element
         while (curIdx++ <= index) {
-            xmlEventIterator.next();
+            xmlSecEventIterator.next();
         }
         int createdIndex = -1;
         int expiresIndex = -1;
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
-            if (xmlEvent.isStartElement()) {
-                if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
                     if (createdIndex != -1) {
                         securityContext.handleBSPRule(WSSConstants.BSPRule.R3203);
                     }
@@ -148,7 +152,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                         securityContext.handleBSPRule(WSSConstants.BSPRule.R3221);
                     }
                     createdIndex = curIdx;
-                } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Expires)) {
+                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Expires)) {
                     if (expiresIndex != -1) {
                         securityContext.handleBSPRule(WSSConstants.BSPRule.R3224);
                     }

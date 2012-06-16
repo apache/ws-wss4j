@@ -130,8 +130,7 @@ public abstract class CryptoBase implements Crypto {
      *
      * @return Returns a <code>CertificateFactory</code> to construct
      *         X509 certificates
-     * @throws org.apache.ws.security.XMLSecurityException
-     *
+     * @throws XMLSecurityException
      */
     public CertificateFactory getCertificateFactory() throws XMLSecurityException {
         String provider = getCryptoProvider();
@@ -174,8 +173,7 @@ public abstract class CryptoBase implements Crypto {
      *
      * @param in The <code>InputStream</code> containing the X509Certificate
      * @return An X509 certificate
-     * @throws org.apache.ws.security.XMLSecurityException
-     *
+     * @throws XMLSecurityException
      */
     public X509Certificate loadCertificate(InputStream in) throws XMLSecurityException {
         try {
@@ -294,7 +292,7 @@ public abstract class CryptoBase implements Crypto {
     protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
             try {
-                return BC_509CLASS_CONS.newInstance(new Object[]{s});
+                return BC_509CLASS_CONS.newInstance(s);
             } catch (Exception e) {
                 //ignore
             }

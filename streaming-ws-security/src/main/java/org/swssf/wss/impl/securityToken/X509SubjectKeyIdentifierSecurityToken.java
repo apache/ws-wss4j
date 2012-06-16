@@ -33,7 +33,7 @@ import java.security.cert.X509Certificate;
  */
 public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
     private String alias = null;
-    private byte[] binaryContent;
+    private final byte[] binaryContent;
 
     X509SubjectKeyIdentifierSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
                                           byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {

@@ -18,16 +18,16 @@
  */
 package org.swssf.xmlsec.test;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315_ExclOmitCommentsTransformer;
 import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315_ExclWithCommentsTransformer;
-import org.swssf.xmlsec.test.utils.XMLEventNSAllocator;
+import org.swssf.xmlsec.test.utils.XMLSecEventAllocator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +50,7 @@ public class Canonicalizer20010315ExclusiveTest {
     @BeforeMethod
     public void setUp() throws Exception {
         this.xmlInputFactory = XMLInputFactory.newInstance();
-        this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
+        this.xmlInputFactory.setEventAllocator(new XMLSecEventAllocator());
     }
 
     @Test
@@ -59,25 +59,25 @@ public class Canonicalizer20010315ExclusiveTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
         }
-        while (xmlEventReader.hasNext()) {
+        while (xmlSecEventReader.hasNext()) {
 
-            c.transform(xmlEvent);
+            c.transform(xmlSecEvent);
 
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_c14nized_exclusive.xml"));
@@ -98,25 +98,25 @@ public class Canonicalizer20010315ExclusiveTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
         }
-        while (xmlEventReader.hasNext()) {
+        while (xmlSecEventReader.hasNext()) {
 
-            c.transform(xmlEvent);
+            c.transform(xmlSecEvent);
 
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_c14nized_exclusive.xml"));
@@ -137,25 +137,25 @@ public class Canonicalizer20010315ExclusiveTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_4.xml")
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
         }
-        while (xmlEventReader.hasNext()) {
+        while (xmlSecEventReader.hasNext()) {
 
-            c.transform(xmlEvent);
+            c.transform(xmlSecEvent);
 
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_4_c14nized.xml"));
@@ -178,25 +178,25 @@ public class Canonicalizer20010315ExclusiveTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer20010315_ExclWithCommentsTransformer c = new Canonicalizer20010315_ExclWithCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml")
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(TAG_soap11_Body)) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(TAG_soap11_Body)) {
                 break;
             }
         }
-        while (xmlEventReader.hasNext()) {
+        while (xmlSecEventReader.hasNext()) {
 
-            c.transform(xmlEvent);
+            c.transform(xmlSecEvent);
 
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(TAG_soap11_Body)) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(TAG_soap11_Body)) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/plain-soap-c14nized.xml"));
@@ -264,24 +264,24 @@ public class Canonicalizer20010315ExclusiveTest {
         Canonicalizer20010315_ExclOmitCommentsTransformer c = new Canonicalizer20010315_ExclOmitCommentsTransformer();
         c.setList(inclusiveNamespaces);
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 new StringReader(XML)
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"))) {
                 break;
             }
         }
 
-        while (xmlEventReader.hasNext()) {
-            c.transform(xmlEvent);
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"))) {
+        while (xmlSecEventReader.hasNext()) {
+            c.transform(xmlSecEvent);
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         assertEquals(new String(baos.toByteArray()), c14nXML);

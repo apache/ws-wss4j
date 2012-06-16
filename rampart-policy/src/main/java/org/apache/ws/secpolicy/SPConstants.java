@@ -41,9 +41,9 @@ public abstract class SPConstants {
         SP12(SP12Constants.SP_NS, SP12Constants.SP_PREFIX, SP13Constants.getInstance()),
         SP13(SP13Constants.SP_NS, SP13Constants.SP_PREFIX, SP13Constants.getInstance());
 
-        private String prefix;
-        private String namespace;
-        private SPConstants spConstants;
+        private final String prefix;
+        private final String namespace;
+        private final SPConstants spConstants;
 
         SPVersion(String namespace, String prefix, SPConstants spConstants) {
             this.namespace = namespace;

@@ -48,7 +48,7 @@ public class WSSec {
         try {
             Class c = WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
             if (null == Security.getProvider("BC")) {
-                int i = Security.addProvider((Provider) c.newInstance());
+                Security.addProvider((Provider) c.newInstance());
             }
         } catch (Throwable e) {
             throw new RuntimeException("Adding BouncyCastle provider failed", e);
@@ -141,10 +141,6 @@ public class WSSec {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                 }
-                //signature namespace part will be set in SecurityHeaderOutputProcessor
-                if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                    securityProperties.addSignaturePart(new SecurePart("Body", "*", SecurePart.Modifier.Element));
-                }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
                 }
@@ -167,10 +163,6 @@ public class WSSec {
                         && securityProperties.getEncryptionUseThisCertificate() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
                     throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noEncryptionUser");
-                }
-                //encryption namespace part will be set in SecurityHeaderOutputProcessor
-                if (securityProperties.getEncryptionSecureParts().isEmpty()) {
-                    securityProperties.addEncryptionPart(new SecurePart("Body", "*", SecurePart.Modifier.Content));
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
@@ -201,10 +193,6 @@ public class WSSec {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
                 }
-                //signature namespace part will be set in SecurityHeaderOutputProcessor
-                if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                    securityProperties.addSignaturePart(new SecurePart("Body", "*", SecurePart.Modifier.Element));
-                }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
                 }
@@ -219,14 +207,10 @@ public class WSSec {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
             } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
-                securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart(), WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), SecurePart.Modifier.Element));
+                securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
             } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
-                }
-                //signature namespace part will be set in SecurityHeaderOutputProcessor
-                if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                    securityProperties.addSignaturePart(new SecurePart("Body", "*", SecurePart.Modifier.Element));
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
@@ -273,10 +257,6 @@ public class WSSec {
                         && !securityProperties.isUseReqSigCertForEncryption()) {
                     throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noEncryptionUser");
                 }
-                //encryption namespace part will be set in SecurityHeaderOutputProcessor
-                if (securityProperties.getEncryptionSecureParts().isEmpty()) {
-                    securityProperties.addEncryptionPart(new SecurePart("Body", "*", SecurePart.Modifier.Content));
-                }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
                 }
@@ -301,10 +281,6 @@ public class WSSec {
             } else if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
-                }
-                //signature namespace part will be set in SecurityHeaderOutputProcessor
-                if (securityProperties.getSignatureSecureParts().isEmpty()) {
-                    securityProperties.addSignaturePart(new SecurePart("Body", "*", SecurePart.Modifier.Element));
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");

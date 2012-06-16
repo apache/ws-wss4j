@@ -20,9 +20,9 @@ package org.swssf.wss.impl.transformer;
 
 import org.swssf.xmlsec.ext.Transformer;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class STRTransformer implements Transformer {
         this.transformer = transformer;
     }
 
-    public void transform(XMLEvent xmlEvent) throws XMLStreamException {
-        this.transformer.transform(xmlEvent);
+    public void transform(XMLSecEvent xmlSecEvent) throws XMLStreamException {
+        this.transformer.transform(xmlSecEvent);
     }
 }

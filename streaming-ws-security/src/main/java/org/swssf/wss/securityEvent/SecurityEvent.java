@@ -51,7 +51,7 @@ public abstract class SecurityEvent {
         EncryptedKeyToken,
     }
 
-    private Event securityEventType;
+    private final Event securityEventType;
 
     protected SecurityEvent(Event securityEventType) {
         this.securityEventType = securityEventType;

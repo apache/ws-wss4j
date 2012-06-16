@@ -18,18 +18,22 @@
  */
 package org.swssf.wss.impl.processor.output;
 
-import org.swssf.wss.ext.*;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.xmlsec.ext.AbstractOutputProcessor;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.SecurePart;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,86 +51,126 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         boolean eventHandled = false;
-        int level = outputProcessorChain.getDocumentContext().getDocumentLevel();
 
-        String soapMessageVersion = ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).getSOAPMessageVersionNamespace();
+        switch (xmlSecEvent.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                final String soapMessageVersion = WSSUtils.getSOAPMessageVersionNamespace(xmlSecStartElement);
+                int level = xmlSecStartElement.getDocumentLevel();
 
-        if (xmlEvent.isStartElement()) {
-            StartElement startElement = xmlEvent.asStartElement();
+                if (level == 1 && soapMessageVersion == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "notASOAPMessage");
+                } else if (level == 1) {
+                    //set correct namespace on secure parts
+                    List<SecurePart> encryptionParts = securityProperties.getEncryptionSecureParts();
+                    if (encryptionParts.isEmpty()) {
+                        SecurePart securePart = new SecurePart(
+                                new QName(soapMessageVersion, WSSConstants.TAG_soap_Body_LocalName),
+                                SecurePart.Modifier.Content);
+                        outputProcessorChain.getSecurityContext().putAsMap(
+                                WSSConstants.ENCRYPTION_PARTS,
+                                securePart.getName(), securePart
 
-            if (level == 1 && soapMessageVersion == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "notASOAPMessage");
-            } else if (level == 1 && soapMessageVersion != null) {
-                //set correct namespace on secure parts
-                List<SecurePart> securePartList = securityProperties.getEncryptionSecureParts();
-                for (int i = 0; i < securePartList.size(); i++) {
-                    SecurePart securePart = securePartList.get(i);
-                    if (securePart.getName().equals("Body") && securePart.getNamespace().equals("*")) {
-                        securePart.setNamespace(soapMessageVersion);
-                        break;
+                        );
+                    } else {
+                        for (int i = 0; i < encryptionParts.size(); i++) {
+                            SecurePart securePart = encryptionParts.get(i);
+                            if (securePart.getIdToSign() == null) {
+                                outputProcessorChain.getSecurityContext().putAsMap(
+                                        WSSConstants.ENCRYPTION_PARTS,
+                                        securePart.getName(),
+                                        securePart
+                                );
+                            } else {
+                                outputProcessorChain.getSecurityContext().putAsMap(
+                                        WSSConstants.ENCRYPTION_PARTS,
+                                        securePart.getIdToSign(),
+                                        securePart
+                                );
+                            }
+                        }
                     }
-                }
-                securePartList = securityProperties.getSignatureSecureParts();
-                for (int j = 0; j < securePartList.size(); j++) {
-                    SecurePart securePart = securePartList.get(j);
-                    if (securePart.getName().equals("Body") && securePart.getNamespace().equals("*")) {
-                        securePart.setNamespace(soapMessageVersion);
+                    List<SecurePart> signatureParts = securityProperties.getSignatureSecureParts();
+                    if (signatureParts.isEmpty()) {
+                        SecurePart securePart = new SecurePart(
+                                new QName(soapMessageVersion, WSSConstants.TAG_soap_Body_LocalName),
+                                SecurePart.Modifier.Element);
+                        outputProcessorChain.getSecurityContext().putAsMap(
+                                WSSConstants.SIGNATURE_PARTS,
+                                securePart.getName(), securePart
+                        );
+                    } else {
+                        for (int i = 0; i < signatureParts.size(); i++) {
+                            SecurePart securePart = signatureParts.get(i);
+                            if (securePart.getIdToSign() == null) {
+                                outputProcessorChain.getSecurityContext().putAsMap(
+                                        WSSConstants.SIGNATURE_PARTS,
+                                        securePart.getName(),
+                                        securePart
+                                );
+                            } else {
+                                outputProcessorChain.getSecurityContext().putAsMap(
+                                        WSSConstants.SIGNATURE_PARTS,
+                                        securePart.getIdToSign(),
+                                        securePart
+                                );
+                            }
+                        }
                     }
-                }
-            } else if (level == 3 && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
-                if (WSSUtils.isResponsibleActorOrRole(startElement, soapMessageVersion, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                    ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).setInSecurityHeader(true);
+                } else if (level == 3 && WSSConstants.TAG_wsse_Security.equals(xmlSecStartElement.getName())) {
+                    if (WSSUtils.isResponsibleActorOrRole(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+                        //remove this processor. its no longer needed.
+                        outputProcessorChain.removeProcessor(this);
+                    }
+                } else if (level == 2
+                        && WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
+                        && xmlSecStartElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
+                    //hmm it seems we don't have a soap header in the current document
+                    //so output one and add securityHeader
+
+                    //create subchain and output soap-header and securityHeader
+                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this, xmlSecStartElement.getParentXMLSecStartElement());
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain,
+                            new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV), true, null);
+                    buildSecurityHeader(soapMessageVersion, subOutputProcessorChain);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain,
+                            new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV));
+
+                    //output current soap-header event
+                    outputProcessorChain.processEvent(xmlSecEvent);
                     //remove this processor. its no longer needed.
                     outputProcessorChain.removeProcessor(this);
+
+                    eventHandled = true;
                 }
-            } else if (level == 2
-                    && startElement.getName().getLocalPart().equals(WSSConstants.TAG_soap_Body_LocalName)
-                    && startElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
-                //hmm it seems we don't have a soap header in the current document
-                //so output one and add securityHeader
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
+                int documentLevel = xmlSecEndElement.getDocumentLevel();
+                if (documentLevel == 2 && WSSConstants.TAG_soap_Header_LocalName.equals(xmlSecEndElement.getName().getLocalPart())
+                        && xmlSecEndElement.getName().getNamespaceURI().equals(WSSUtils.getSOAPMessageVersionNamespace(xmlSecEndElement.getParentXMLSecStartElement()))) {
+                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                    buildSecurityHeader(xmlSecEndElement.getName().getNamespaceURI(), subOutputProcessorChain);
+                    //output current soap-header event
+                    outputProcessorChain.processEvent(xmlSecEvent);
+                    //remove this processor. its no longer needed.
+                    outputProcessorChain.removeProcessor(this);
 
-                //create subchain and output soap-header and securityHeader
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain,
-                        new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV), true, null);
-                buildSecurityHeader(soapMessageVersion, subOutputProcessorChain);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain,
-                        new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV));
-
-                //output current soap-header event
-                outputProcessorChain.processEvent(xmlEvent);
-                //remove this processor. its no longer needed.
-                outputProcessorChain.removeProcessor(this);
-
-                eventHandled = true;
-            }
-        } else if (xmlEvent.isEndElement()) {
-            EndElement endElement = xmlEvent.asEndElement();
-            if (level == 2 && endElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
-                ((WSSDocumentContext) outputProcessorChain.getDocumentContext()).setInSecurityHeader(false);
-            } else if (level == 1 && endElement.getName().getLocalPart().equals(WSSConstants.TAG_soap_Header_LocalName)
-                    && endElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                buildSecurityHeader(soapMessageVersion, subOutputProcessorChain);
-                //output current soap-header event
-                outputProcessorChain.processEvent(xmlEvent);
-                //remove this processor. its no longer needed.
-                outputProcessorChain.removeProcessor(this);
-
-                eventHandled = true;
-            }
+                    eventHandled = true;
+                }
+                break;
         }
 
         if (!eventHandled) {
-            outputProcessorChain.processEvent(xmlEvent);
+            outputProcessorChain.processEvent(xmlSecEvent);
         }
     }
 
     private void buildSecurityHeader(String soapMessageVersion, OutputProcessorChain subOutputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        List<Attribute> attributes = new ArrayList<Attribute>(1);
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
         final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
         if (actor != null && !actor.isEmpty()) {
             if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {
@@ -135,9 +179,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 attributes.add(createAttribute(WSSConstants.ATT_soap12_Role, actor));
             }
         }
-        ((WSSDocumentContext) subOutputProcessorChain.getDocumentContext()).setInSecurityHeader(true);
         createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security, true, attributes);
         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security);
-        ((WSSDocumentContext) subOutputProcessorChain.getDocumentContext()).setInSecurityHeader(false);
     }
 }

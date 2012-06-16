@@ -30,7 +30,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -139,7 +138,6 @@ public class XMLSecurityConstants {
     }
 
     public static final String XMLINPUTFACTORY = "XMLInputFactory";
-    public static final XMLEventFactory XMLEVENTFACTORY = XMLEventFactory.newInstance();
 
     public static final String NS_XML = "http://www.w3.org/2000/xmlns/";
     public static final String NS_XMLENC = "http://www.w3.org/2001/04/xmlenc#";
@@ -230,6 +228,9 @@ public class XMLSecurityConstants {
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY";
 
     public static final String PROP_APPEND_SIGNATURE_ON_THIS_ID = "PROP_APPEND_SIGNATURE_ON_THIS_ID";
+
+    public static final String SIGNATURE_PARTS = "signatureParts";
+    public static final String ENCRYPTION_PARTS = "encryptionParts";
 
     public static final Action SIGNATURE = new Action("SIGNATURE");
     public static final Action ENCRYPT = new Action("ENCRYPT");

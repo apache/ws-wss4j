@@ -26,13 +26,13 @@ import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.xmlsec.ext.OutputProcessorChain;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.algorithms.SignatureAlgorithm;
 import org.swssf.xmlsec.impl.processor.output.AbstractSignatureEndingOutputProcessor;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
     public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         setAppendAfterThisTokenId(outputProcessorChain.getSecurityContext().<String>get(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID));
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-        WSSUtils.flushBufferAndCallbackAfterTokenID(subOutputProcessorChain, this, getXmlEventBuffer());
+        WSSUtils.flushBufferAndCallbackAfterTokenID(subOutputProcessorChain, this, getXmlSecEventBuffer());
         //call final on the rest of the chain
         subOutputProcessorChain.doFinal();
         //this processor is now finished and we can remove it now
@@ -95,7 +95,7 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
         if (keyIdentifierType == WSSConstants.KeyIdentifierType.KEY_VALUE) {
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
-            List<Attribute> attributes = new ArrayList<Attribute>(2);
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
@@ -138,18 +138,18 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
 
     protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) throws XMLStreamException, XMLSecurityException {
         if (signaturePartDef.getTransformAlgo() != null) {
-            List<Attribute> attributes = new ArrayList<Attribute>(1);
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getTransformAlgo()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters, false, null);
-            attributes = new ArrayList<Attribute>(1);
+            attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod, false, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
         } else {
-            List<Attribute> attributes = new ArrayList<Attribute>(1);
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);

@@ -31,12 +31,12 @@ import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Deque;
@@ -52,7 +52,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final AbstractDerivedKeyTokenType derivedKeyTokenType =
@@ -64,8 +64,8 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
 
-        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
-        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final List<QName> elementPath = getElementPath(eventQueue);
+        final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -155,7 +155,8 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     @Override
-                    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage)
+                            throws XMLSecurityException {
                         return null;
                     }
 
@@ -168,7 +169,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
                 };
                 this.derivedKeySecurityToken.setElementPath(elementPath);
-                this.derivedKeySecurityToken.setXMLEvent(responsibleStartXMLEvent);
+                this.derivedKeySecurityToken.setXMLSecEvent(responsibleXMLSecStartXMLEvent);
                 return this.derivedKeySecurityToken;
             }
 

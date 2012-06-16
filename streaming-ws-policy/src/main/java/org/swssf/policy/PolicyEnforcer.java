@@ -56,12 +56,12 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcer.class);
 
-    private List<OperationPolicy> operationPolicies;
+    private final List<OperationPolicy> operationPolicies;
     private OperationPolicy effectivePolicy;
-    private List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap;
-    private List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> failedAssertionStateMap;
+    private final List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap;
+    private final List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> failedAssertionStateMap;
 
-    private Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
+    private final Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction) throws WSSPolicyException {

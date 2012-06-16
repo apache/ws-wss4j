@@ -21,9 +21,10 @@ package org.swssf.xmlsec.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,9 +43,10 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     private List<InputProcessor> inputProcessors = Collections.synchronizedList(new ArrayList<InputProcessor>(20));//the default of ten entries is not enough
     private int startPos = 0;
     private int curPos = 0;
+    private XMLSecStartElement parentXmlSecStartElement;
 
-    private SecurityContext securityContext;
-    private DocumentContextImpl documentContext;
+    private final SecurityContext securityContext;
+    private final DocumentContextImpl documentContext;
 
     public InputProcessorChainImpl(SecurityContext securityContext) {
         this(securityContext, 0);
@@ -179,11 +181,11 @@ public class InputProcessorChainImpl implements InputProcessorChain {
         return this.inputProcessors;
     }
 
-    public XMLEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processHeaderEvent() throws XMLStreamException, XMLSecurityException {
         return inputProcessors.get(this.curPos++).processNextHeaderEvent(this);
     }
 
-    public XMLEvent processEvent() throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processEvent() throws XMLStreamException, XMLSecurityException {
         return inputProcessors.get(this.curPos++).processNextEvent(this);
     }
 
@@ -192,8 +194,7 @@ public class InputProcessorChainImpl implements InputProcessorChain {
     }
 
     public InputProcessorChain createSubChain(InputProcessor inputProcessor) throws XMLStreamException, XMLSecurityException {
-        //we don't clone the processor-list to get updates in the sublist too!
-        InputProcessorChainImpl inputProcessorChain = null;
+        InputProcessorChainImpl inputProcessorChain;
         try {
             inputProcessorChain = new InputProcessorChainImpl(securityContext, documentContext.clone(),
                     inputProcessors.indexOf(inputProcessor) + 1);

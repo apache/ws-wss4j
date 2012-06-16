@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class XMLSecurityProperties {
 
-    private List<InputProcessor> inputProcessorList = new ArrayList<InputProcessor>();
+    private final List<InputProcessor> inputProcessorList = new ArrayList<InputProcessor>();
 
     /**
      * Add an additional, non standard, InputProcessor to the chain
@@ -165,7 +165,7 @@ public class XMLSecurityProperties {
     private String encryptionSymAlgorithm;
     private String encryptionCompressionAlgorithm;
     private String encryptionKeyTransportAlgorithm;
-    private List<SecurePart> encryptionParts = new LinkedList<SecurePart>();
+    private final List<SecurePart> encryptionParts = new LinkedList<SecurePart>();
 
     /**
      * Returns the encryption keystore
@@ -332,7 +332,7 @@ public class XMLSecurityProperties {
         this.encryptionCompressionAlgorithm = encryptionCompressionAlgorithm;
     }
 
-    private List<SecurePart> signatureParts = new LinkedList<SecurePart>();
+    private final List<SecurePart> signatureParts = new LinkedList<SecurePart>();
     private String signatureAlgorithm;
     private String signatureDigestAlgorithm;
     private String signatureCanonicalizationAlgorithm;

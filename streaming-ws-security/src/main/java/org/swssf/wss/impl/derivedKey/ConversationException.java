@@ -35,10 +35,10 @@ public class ConversationException extends Exception {
     public final static String RENEW_NEEDED = "RenewNeeded";
     public final static String UNABLE_TO_REVIEW = "UnableToRenew";
 
-    private static ResourceBundle resources;
+    private static final ResourceBundle resources;
 
-    private String faultCode;
-    private String faultString;
+    private final String faultCode;
+    private final String faultString;
 
     static {
         try {
@@ -52,6 +52,16 @@ public class ConversationException extends Exception {
         super(getMessage(faultCode, args));
         this.faultCode = getFaultCode(faultCode);
         this.faultString = getMessage(faultCode, args);
+    }
+
+    public ConversationException(String faultCode) {
+        this(faultCode, (Object[]) null);
+    }
+
+    public ConversationException(String faultCode, Throwable e, Object... arguments) {
+        super(getMessage(faultCode, arguments), e);
+        this.faultCode = faultCode;
+        this.faultString = getMessage(faultCode, arguments);
     }
 
     /**
@@ -69,20 +79,6 @@ public class ConversationException extends Exception {
         } else {
             return code;
         }
-    }
-
-    public ConversationException(String faultCode) {
-        this(faultCode, (Object[]) null);
-    }
-
-    public ConversationException(String faultCode, Throwable e, Object... arguments) {
-        super(getMessage(faultCode, arguments), e);
-        this.faultCode = faultCode;
-        this.faultString = getMessage(faultCode, arguments);
-    }
-
-    public ConversationException(String faultCode, Throwable e) {
-        this(faultCode, e, null);
     }
 
     /**

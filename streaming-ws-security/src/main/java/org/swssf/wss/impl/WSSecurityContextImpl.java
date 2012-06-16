@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
 
-    private List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
+    private final List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
 
     public void addSecurityEventListener(SecurityEventListener securityEventListener) {
         if (securityEventListener != null) {

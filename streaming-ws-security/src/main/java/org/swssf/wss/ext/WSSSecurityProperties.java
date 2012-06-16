@@ -152,7 +152,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.derivedKeyTokenReference = derivedKeyTokenReference;
     }
 
-    private List<WSSConstants.BSPRule> ignoredBSPRules = new LinkedList<WSSConstants.BSPRule>();
+    private final List<WSSConstants.BSPRule> ignoredBSPRules = new LinkedList<WSSConstants.BSPRule>();
 
     public void addIgnoreBSPRule(WSSConstants.BSPRule bspRule) {
         ignoredBSPRules.add(bspRule);

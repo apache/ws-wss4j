@@ -73,9 +73,6 @@ public class OperationPolicy {
             return false;
         }
         OperationPolicy other = (OperationPolicy) obj;
-        if (getOperationName().equals(other.getOperationName())) {
-            return true;
-        }
-        return false;
+        return getOperationName().equals(other.getOperationName());
     }
 }

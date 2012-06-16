@@ -21,9 +21,9 @@ package org.swssf.xmlsec.impl.processor.input;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.io.StringWriter;
 
 /**
@@ -40,16 +40,18 @@ public class LogInputProcessor extends AbstractInputProcessor {
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
         return inputProcessorChain.processHeaderEvent();
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        XMLEvent xmlEvent = inputProcessorChain.processEvent();
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
         StringWriter stringWriter = new StringWriter();
-        xmlEvent.writeAsEncodedUnicode(stringWriter);
+        xmlSecEvent.writeAsEncodedUnicode(stringWriter);
         logger.trace(stringWriter.toString());
-        return xmlEvent;
+        return xmlSecEvent;
     }
 }

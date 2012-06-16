@@ -19,16 +19,18 @@
 package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSDocumentContext;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -46,7 +48,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         try {
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN);
             if (tokenId == null) {
@@ -143,13 +145,13 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
-        outputProcessorChain.processEvent(xmlEvent);
+        outputProcessorChain.processEvent(xmlSecEvent);
     }
 
     class FinalSecurityContextTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private SecurityToken securityToken;
-        private String identifier;
+        private final SecurityToken securityToken;
+        private final String identifier;
 
         FinalSecurityContextTokenOutputProcessor(SecurityToken securityToken, String identifier) throws XMLSecurityException {
             super();
@@ -158,14 +160,15 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            outputProcessorChain.processEvent(xmlEvent);
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            outputProcessorChain.processEvent(xmlSecEvent);
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    List<Attribute> attributes = new ArrayList<Attribute>(1);
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_SecurityContextToken, true, attributes);
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier, false, null);

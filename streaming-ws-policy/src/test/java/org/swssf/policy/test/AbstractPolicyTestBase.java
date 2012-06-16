@@ -38,7 +38,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.Key;
 import java.security.KeyStore;
@@ -55,7 +54,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     protected PolicyEnforcer buildAndStartPolicyEngine(String policyString) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         return this.buildAndStartPolicyEngine(policyString, false);
     }
-    
+
     protected PolicyEnforcer buildAndStartPolicyEngine(String policyString, boolean replacePolicyElement) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
@@ -129,7 +128,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             }
         };
     }
-    
+
     protected String loadResourceAsString(String resource, String encoding) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(resource), encoding);
         StringBuilder stringBuilder = new StringBuilder();

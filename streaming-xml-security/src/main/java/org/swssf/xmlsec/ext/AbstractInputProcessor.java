@@ -18,10 +18,11 @@
  */
 package org.swssf.xmlsec.ext;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +35,7 @@ import java.util.Set;
  */
 public abstract class AbstractInputProcessor implements InputProcessor {
 
-    private XMLSecurityProperties securityProperties;
+    private final XMLSecurityProperties securityProperties;
 
     private XMLSecurityConstants.Phase phase = XMLSecurityConstants.Phase.PROCESSING;
     private Set<Object> beforeProcessors;
@@ -76,9 +77,9 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         return this.afterProcessors;
     }
 
-    public abstract XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
-    public abstract XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         inputProcessorChain.doFinal();
@@ -88,7 +89,7 @@ public abstract class AbstractInputProcessor implements InputProcessor {
         return securityProperties;
     }
 
-    public Attribute getReferenceIDAttribute(StartElement startElement) {
-        return startElement.getAttributeByName(XMLSecurityConstants.ATT_NULL_Id);
+    public Attribute getReferenceIDAttribute(XMLSecStartElement xmlSecStartElement) {
+        return xmlSecStartElement.getAttributeByName(XMLSecurityConstants.ATT_NULL_Id);
     }
 }

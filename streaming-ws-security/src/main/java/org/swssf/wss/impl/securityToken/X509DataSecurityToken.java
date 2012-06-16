@@ -38,7 +38,7 @@ import java.security.cert.X509Certificate;
 public class X509DataSecurityToken extends X509SecurityToken {
 
     private String alias = null;
-    protected X509DataType x509DataType;
+    private final X509DataType x509DataType;
 
     X509DataSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
                           X509DataType x509DataType, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
@@ -53,7 +53,7 @@ public class X509DataSecurityToken extends X509SecurityToken {
             if (x509IssuerSerialType == null
                     || x509IssuerSerialType.getX509IssuerName() == null
                     || x509IssuerSerialType.getX509SerialNumber() == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
             cryptoType.setIssuerSerial(

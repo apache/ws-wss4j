@@ -30,7 +30,7 @@ import java.util.Iterator;
  */
 public class XMLSecurityEventWriter implements XMLEventWriter {
 
-    private XMLStreamWriter xmlStreamWriter;
+    private final XMLStreamWriter xmlStreamWriter;
 
     public XMLSecurityEventWriter(XMLStreamWriter xmlStreamWriter) {
         this.xmlStreamWriter = xmlStreamWriter;

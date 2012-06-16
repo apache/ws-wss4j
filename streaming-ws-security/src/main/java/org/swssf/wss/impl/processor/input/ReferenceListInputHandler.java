@@ -25,8 +25,8 @@ import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
 import org.swssf.xmlsec.ext.InputProcessorChain;
 import org.swssf.xmlsec.ext.XMLSecurityException;
 import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
-import javax.xml.stream.events.XMLEvent;
 import java.util.Deque;
 
 /**
@@ -39,7 +39,7 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       final Deque<XMLEvent> eventQueue, final Integer index) throws XMLSecurityException {
+                       final Deque<XMLSecEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
         final ReferenceList referenceList = (ReferenceList) parseStructure(eventQueue, index, securityProperties);
 

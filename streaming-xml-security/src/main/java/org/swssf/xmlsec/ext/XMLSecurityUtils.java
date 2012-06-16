@@ -19,20 +19,18 @@
 package org.swssf.xmlsec.ext;
 
 import org.swssf.xmlsec.config.TransformerAlgorithmMapper;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author $Author$
@@ -59,35 +57,35 @@ public class XMLSecurityUtils {
     /**
      * Returns the XMLEvent type in String form
      *
-     * @param xmlEvent
+     * @param xmlSecEvent
      * @return The XMLEvent type as string representation
      */
-    public static String getXMLEventAsString(XMLEvent xmlEvent) {
-        int eventType = xmlEvent.getEventType();
+    public static String getXMLEventAsString(XMLSecEvent xmlSecEvent) {
+        int eventType = xmlSecEvent.getEventType();
 
         switch (eventType) {
-            case XMLEvent.START_ELEMENT:
+            case XMLSecEvent.START_ELEMENT:
                 return "START_ELEMENT";
-            case XMLEvent.END_ELEMENT:
+            case XMLSecEvent.END_ELEMENT:
                 return "END_ELEMENT";
-            case XMLEvent.PROCESSING_INSTRUCTION:
+            case XMLSecEvent.PROCESSING_INSTRUCTION:
                 return "PROCESSING_INSTRUCTION";
-            case XMLEvent.CHARACTERS:
+            case XMLSecEvent.CHARACTERS:
                 return "CHARACTERS";
-            case XMLEvent.COMMENT:
+            case XMLSecEvent.COMMENT:
                 return "COMMENT";
-            case XMLEvent.START_DOCUMENT:
+            case XMLSecEvent.START_DOCUMENT:
                 return "START_DOCUMENT";
-            case XMLEvent.END_DOCUMENT:
+            case XMLSecEvent.END_DOCUMENT:
                 return "END_DOCUMENT";
-            case XMLEvent.ATTRIBUTE:
+            case XMLSecEvent.ATTRIBUTE:
                 return "ATTRIBUTE";
-            case XMLEvent.DTD:
+            case XMLSecEvent.DTD:
                 return "DTD";
-            case XMLEvent.NAMESPACE:
+            case XMLSecEvent.NAMESPACE:
                 return "NAMESPACE";
             default:
-                throw new IllegalArgumentException("Illegal XMLEvent received: " + eventType);
+                throw new IllegalArgumentException("Illegal XMLSecEvent received: " + eventType);
         }
     }
 
@@ -134,86 +132,11 @@ public class XMLSecurityUtils {
         return Thread.currentThread().getContextClassLoader().loadClass(className);
     }
 
-    @SuppressWarnings("unchecked")
-    public static final XMLEvent createXMLEventNS(final XMLEvent xmlEvent, final Deque<List<ComparableNamespace>> nsStack, final Deque<List<ComparableAttribute>> attrStack) {
-        if (xmlEvent.isStartElement()) {
-            final StartElement startElement = xmlEvent.asStartElement();
-            final QName startElementName = startElement.getName();
-            final String startElementNamePrefix = startElementName.getPrefix();
-
-            Set<String> prefixSet = new HashSet<String>();
-            prefixSet.add(startElementNamePrefix);
-
-            List<ComparableNamespace> comparableNamespaceList = new ArrayList<ComparableNamespace>();
-
-            ComparableNamespace curElementNamespace = new ComparableNamespace(startElementNamePrefix, startElementName.getNamespaceURI());
-            comparableNamespaceList.add(curElementNamespace);
-
-            @SuppressWarnings("unchecked")
-            Iterator<Namespace> namespaceIterator = startElement.getNamespaces();
-            while (namespaceIterator.hasNext()) {
-                final Namespace namespace = namespaceIterator.next();
-                final String prefix = namespace.getPrefix();
-                final String namespaceURI = namespace.getNamespaceURI();
-
-                if ((prefix == null || prefix.isEmpty())
-                        && (namespaceURI == null || namespaceURI.isEmpty())) {
-                    continue;
-                }
-
-                if (!prefixSet.contains(prefix)) {
-                    prefixSet.add(prefix);
-                    comparableNamespaceList.add(new ComparableNamespace(prefix, namespaceURI));
-                }
-            }
-
-            List<ComparableAttribute> comparableAttributeList;
-
-            @SuppressWarnings("unchecked")
-            Iterator<Attribute> attributeIterator = startElement.getAttributes();
-            if (attributeIterator.hasNext()) {
-                comparableAttributeList = new ArrayList<ComparableAttribute>();
-            } else {
-                comparableAttributeList = Collections.emptyList();
-            }
-
-            while (attributeIterator.hasNext()) {
-                final Attribute attribute = attributeIterator.next();
-                final QName attributeName = attribute.getName();
-                final String prefix = attributeName.getPrefix();
-                final String attributeNameNamespaceURI = attributeName.getNamespaceURI();
-
-                if (prefix != null && prefix.isEmpty() && attributeNameNamespaceURI.isEmpty()) {
-                    continue;
-                }
-                if (!"xml".equals(prefix)) {
-                    if (prefix != null && !prefix.isEmpty()) {
-                        if (!prefixSet.contains(prefix)) {
-                            prefixSet.add(prefix);
-                            comparableNamespaceList.add(new ComparableNamespace(prefix, attributeNameNamespaceURI));
-                        }
-                        continue;
-                    }
-                }
-                //add all attrs with xml - prefix (eg. xml:lang) to attr list:
-                comparableAttributeList.add(new ComparableAttribute(attributeName, attribute.getValue()));
-            }
-
-            nsStack.push(comparableNamespaceList);
-            attrStack.push(comparableAttributeList);
-
-            return new XMLEventNS(xmlEvent, nsStack.toArray(new List[nsStack.size()]), attrStack.toArray(new List[attrStack.size()]));
-        } else if (xmlEvent.isEndElement()) {
-            nsStack.pop();
-            attrStack.pop();
-        }
-        return xmlEvent;
-    }
-
     //todo transformer factory?
     public static Transformer getTransformer(Object methodParameter1, Object methodParameter2, String algorithm)
             throws XMLSecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
+        @SuppressWarnings("unchecked")
         Class<Transformer> transformerClass = (Class<Transformer>) TransformerAlgorithmMapper.getTransformerClass(algorithm, null);
         if (transformerClass == null) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
@@ -228,6 +151,7 @@ public class XMLSecurityUtils {
         return childTransformer;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getType(List<Object> objects, Class<T> clazz) {
         for (int i = 0; i < objects.size(); i++) {
             Object o = objects.get(i);
@@ -241,6 +165,7 @@ public class XMLSecurityUtils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getQNameType(List<Object> objects, QName qName) {
         for (int i = 0; i < objects.size(); i++) {
             Object o = objects.get(i);

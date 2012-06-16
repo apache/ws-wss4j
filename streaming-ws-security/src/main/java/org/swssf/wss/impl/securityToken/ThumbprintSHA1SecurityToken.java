@@ -33,7 +33,7 @@ import java.security.cert.X509Certificate;
  */
 public class ThumbprintSHA1SecurityToken extends X509SecurityToken {
     private String alias = null;
-    private byte[] binaryContent;
+    private final byte[] binaryContent;
 
     ThumbprintSHA1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent,
                                 String id, WSSConstants.KeyIdentifierType keyIdentifierType) {

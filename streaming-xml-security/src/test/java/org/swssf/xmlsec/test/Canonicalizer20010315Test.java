@@ -18,10 +18,11 @@
  */
 package org.swssf.xmlsec.test;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315_OmitCommentsTransformer;
 import org.swssf.xmlsec.impl.transformer.canonicalizer.Canonicalizer20010315_WithCommentsTransformer;
 import org.swssf.xmlsec.impl.transformer.canonicalizer.CanonicalizerBase;
-import org.swssf.xmlsec.test.utils.XMLEventNSAllocator;
+import org.swssf.xmlsec.test.utils.XMLSecEventAllocator;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -29,7 +30,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLResolver;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +47,7 @@ public class Canonicalizer20010315Test {
 
     public Canonicalizer20010315Test() throws Exception {
         this.xmlInputFactory = XMLInputFactory.newInstance();
-        this.xmlInputFactory.setEventAllocator(new XMLEventNSAllocator());
+        this.xmlInputFactory.setEventAllocator(new XMLSecEventAllocator());
         XMLResolver xmlResolver = new XMLResolver() {
             public Object resolveEntity(String publicID, String systemID, String baseURI, String namespace) throws XMLStreamException {
                 return this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/in/" + systemID);
@@ -62,25 +62,25 @@ public class Canonicalizer20010315Test {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_1.xml")
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
         }
-        while (xmlEventReader.hasNext()) {
+        while (xmlSecEventReader.hasNext()) {
 
-            c.transform(xmlEvent);
+            c.transform(xmlSecEvent);
 
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_1_c14nized.xml"));
@@ -101,25 +101,25 @@ public class Canonicalizer20010315Test {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Canonicalizer20010315_WithCommentsTransformer c = new Canonicalizer20010315_WithCommentsTransformer();
         c.setOutputStream(baos);
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(
                 this.getClass().getClassLoader().getResourceAsStream("testdata/c14n/inExcl/example2_2_2.xml")
         );
 
-        XMLEvent xmlEvent = null;
-        while (xmlEventReader.hasNext()) {
-            xmlEvent = xmlEventReader.nextEvent();
-            if (xmlEvent.isStartElement() && xmlEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
+        XMLSecEvent xmlSecEvent = null;
+        while (xmlSecEventReader.hasNext()) {
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            if (xmlSecEvent.isStartElement() && xmlSecEvent.asStartElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
         }
-        while (xmlEventReader.hasNext()) {
+        while (xmlSecEventReader.hasNext()) {
 
-            c.transform(xmlEvent);
+            c.transform(xmlSecEvent);
 
-            if (xmlEvent.isEndElement() && xmlEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(new QName("http://example.net", "elem2"))) {
                 break;
             }
-            xmlEvent = xmlEventReader.nextEvent();
+            xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
         }
 
         byte[] reference = getBytesFromResource(this.getClass().getClassLoader().getResource("testdata/c14n/inExcl/example2_2_2_c14nized.xml"));
@@ -618,10 +618,10 @@ public class Canonicalizer20010315Test {
             canonicalizerBase.setOutputStream(baos);
         }
 
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(fileIn.openStream());
-        while (xmlEventReader.hasNext()) {
-            XMLEvent xmlEvent = xmlEventReader.nextEvent();
-            canonicalizerBase.transform(xmlEvent);
+        XMLEventReader xmlSecEventReader = xmlInputFactory.createXMLEventReader(fileIn.openStream());
+        while (xmlSecEventReader.hasNext()) {
+            XMLSecEvent xmlSecEvent = (XMLSecEvent) xmlSecEventReader.nextEvent();
+            canonicalizerBase.transform(xmlSecEvent);
         }
 
         // org.xml.sax.InputSource refIs = resolver.resolveEntity(null, fileRef);

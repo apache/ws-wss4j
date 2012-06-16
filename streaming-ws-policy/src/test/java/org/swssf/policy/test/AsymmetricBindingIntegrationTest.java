@@ -33,6 +33,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -118,11 +119,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -135,7 +136,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
@@ -258,11 +259,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -275,7 +276,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
@@ -361,11 +362,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -378,7 +379,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -484,13 +485,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -503,7 +504,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
@@ -601,13 +602,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -620,7 +621,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -726,13 +727,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -745,7 +746,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -843,13 +844,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.ENCRYPT, WSSConstants.SIGNATURE};
         outSecurityProperties.setOutAction(actions);
 
@@ -862,7 +863,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
@@ -951,11 +952,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -970,7 +971,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5420);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1067,11 +1068,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2006/12/xml-c14n11");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1087,7 +1088,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5412);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1184,11 +1185,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#md5");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1202,7 +1203,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5420);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1299,11 +1300,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1316,7 +1317,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1413,12 +1414,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature.getLocalPart(), WSSConstants.TAG_dsig_Signature.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1431,7 +1432,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
@@ -1519,11 +1520,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1536,7 +1537,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1631,12 +1632,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature.getLocalPart(), WSSConstants.TAG_dsig_Signature.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1649,7 +1650,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1757,12 +1758,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart("definitions", "http://schemas.xmlsoap.org/wsdl/", SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1775,7 +1776,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
@@ -1863,11 +1864,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1880,7 +1881,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -1975,11 +1976,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
@@ -1992,7 +1993,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, null));
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
@@ -2119,14 +2120,14 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
         outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setEncryptionUser("receiver");
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created.getLocalPart(), WSSConstants.TAG_wsu_Created.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires.getLocalPart(), WSSConstants.TAG_wsu_Expires.getNamespaceURI(), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -2243,12 +2244,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap_Body_LocalName, WSSConstants.NS_SOAP11, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken.getLocalPart(), WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp.getLocalPart(), WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
         outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setEncryptionUser("receiver");
-        outSecurityProperties.addEncryptionPart(new SecurePart("simpleType", "http://www.w3.org/1999/XMLSchema", SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "simpleType"), SecurePart.Modifier.Element));
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);

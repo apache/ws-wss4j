@@ -31,12 +31,13 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.XMLStreamConstants;
 import java.util.*;
 
 /**
@@ -48,7 +49,7 @@ import java.util.*;
 public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     private static final String cacheRegionName = "usernameToken";
-    private static JCS cache;
+    private static final JCS cache;
 
     static {
         try {
@@ -60,9 +61,11 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       Deque<XMLEvent> eventQueue, Integer index) throws XMLSecurityException {
+                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
-        final UsernameTokenType usernameTokenType = ((JAXBElement<UsernameTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
+        @SuppressWarnings("unchecked")
+        final UsernameTokenType usernameTokenType =
+                ((JAXBElement<UsernameTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
         checkBSPCompliance(inputProcessorChain, usernameTokenType, eventQueue, index);
 
@@ -184,8 +187,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         final String password = passwordType.getValue();
 
-        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
-        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final List<QName> elementPath = getElementPath(eventQueue);
+        final XMLSecEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -196,9 +199,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                     return this.securityToken;
                 }
                 this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(username.getValue(), password,
-                        created, nonceVal, salt, iteration, (WSSecurityContext) inputProcessorChain.getSecurityContext(), usernameTokenType.getId());
+                        created, nonceVal, salt, iteration, (WSSecurityContext) inputProcessorChain.getSecurityContext(),
+                        usernameTokenType.getId());
                 this.securityToken.setElementPath(elementPath);
-                this.securityToken.setXMLEvent(responsibleStartXMLEvent);
+                this.securityToken.setXMLSecEvent(responsibleStartXMLEvent);
                 return this.securityToken;
             }
 
@@ -217,36 +221,36 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, UsernameTokenType usernameTokenType,
-                                    Deque<XMLEvent> eventDeque, int index) throws WSSecurityException {
+                                    Deque<XMLSecEvent> eventDeque, int index) throws WSSecurityException {
 
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (usernameTokenType.getAny() == null) {
             securityContext.handleBSPRule(WSSConstants.BSPRule.R3031);
         }
 
-        Iterator<XMLEvent> xmlEventIterator = eventDeque.descendingIterator();
+        Iterator<XMLSecEvent> xmlSecEventIterator = eventDeque.descendingIterator();
         int curIdx = 0;
         //forward to first Usernametoken child element
         while (curIdx++ <= index) {
-            xmlEventIterator.next();
+            xmlSecEventIterator.next();
         }
         int passwordIndex = -1;
         int createdIndex = -1;
         int nonceIndex = -1;
-        while (xmlEventIterator.hasNext()) {
-            XMLEvent xmlEvent = xmlEventIterator.next();
-            if (xmlEvent.isStartElement()) {
-                if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Password)) {
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Password)) {
                     if (passwordIndex != -1) {
                         securityContext.handleBSPRule(WSSConstants.BSPRule.R4222);
                     }
                     passwordIndex = curIdx;
-                } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
+                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
                     if (createdIndex != -1) {
                         securityContext.handleBSPRule(WSSConstants.BSPRule.R4223);
                     }
                     createdIndex = curIdx;
-                } else if (xmlEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Nonce)) {
+                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Nonce)) {
                     if (nonceIndex != -1) {
                         securityContext.handleBSPRule(WSSConstants.BSPRule.R4225);
                     }

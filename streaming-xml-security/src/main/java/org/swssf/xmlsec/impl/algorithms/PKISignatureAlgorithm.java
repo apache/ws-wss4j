@@ -31,8 +31,8 @@ import java.security.spec.AlgorithmParameterSpec;
  */
 public class PKISignatureAlgorithm implements SignatureAlgorithm {
 
-    private String jceName;
-    private Signature signature;
+    private final String jceName;
+    private final Signature signature;
 
     public PKISignatureAlgorithm(AlgorithmType algorithmType) throws NoSuchProviderException, NoSuchAlgorithmException {
         this.jceName = algorithmType.getJCEName();

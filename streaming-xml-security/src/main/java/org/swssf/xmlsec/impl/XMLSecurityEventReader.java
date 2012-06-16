@@ -19,6 +19,8 @@
 
 package org.swssf.xmlsec.impl;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
@@ -32,27 +34,27 @@ import java.util.NoSuchElementException;
  */
 public class XMLSecurityEventReader implements XMLEventReader {
 
-    private Iterator<XMLEvent> xmlEventIterator;
-    private XMLEvent nextXMLEvent;
+    private final Iterator<XMLSecEvent> xmlSecEventIterator;
+    private XMLEvent xmlSecEvent;
 
-    public XMLSecurityEventReader(Deque<XMLEvent> xmlEvents, int fromIndex) {
-        this.xmlEventIterator = xmlEvents.descendingIterator();
+    public XMLSecurityEventReader(Deque<XMLSecEvent> xmlSecEvents, int fromIndex) {
+        this.xmlSecEventIterator = xmlSecEvents.descendingIterator();
         int curIdx = 0;
         while (curIdx++ < fromIndex) {
-            this.xmlEventIterator.next();
+            this.xmlSecEventIterator.next();
         }
     }
 
     @Override
     public XMLEvent nextEvent() throws XMLStreamException {
-        if (this.nextXMLEvent != null) {
-            final XMLEvent currentXMLEvent = this.nextXMLEvent;
-            this.nextXMLEvent = null;
+        if (this.xmlSecEvent != null) {
+            final XMLEvent currentXMLEvent = this.xmlSecEvent;
+            this.xmlSecEvent = null;
             return currentXMLEvent;
         }
         final XMLEvent currentXMLEvent;
         try {
-            currentXMLEvent = xmlEventIterator.next();
+            currentXMLEvent = xmlSecEventIterator.next();
         } catch (NoSuchElementException e) {
             throw new XMLStreamException(e);
         }
@@ -61,19 +63,19 @@ public class XMLSecurityEventReader implements XMLEventReader {
 
     @Override
     public boolean hasNext() {
-        if (this.nextXMLEvent != null) {
+        if (this.xmlSecEvent != null) {
             return true;
         }
-        return xmlEventIterator.hasNext();
+        return xmlSecEventIterator.hasNext();
     }
 
     @Override
     public XMLEvent peek() throws XMLStreamException {
-        if (this.nextXMLEvent != null) {
-            return this.nextXMLEvent;
+        if (this.xmlSecEvent != null) {
+            return this.xmlSecEvent;
         }
         try {
-            return this.nextXMLEvent = xmlEventIterator.next();
+            return this.xmlSecEvent = xmlSecEventIterator.next();
         } catch (NoSuchElementException e) {
             return null;
         }

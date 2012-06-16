@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class EncryptedElementsAssertionState extends AssertionState implements Assertable {
 
-    private List<List<QName>> pathElements = new ArrayList<List<QName>>();
+    private final List<List<QName>> pathElements = new ArrayList<List<QName>>();
 
     public EncryptedElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);

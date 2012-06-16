@@ -23,9 +23,9 @@ import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -37,18 +37,18 @@ import java.util.Deque;
  */
 public class SecurityTokenReference extends AbstractSecurityToken {
 
-    private SecurityToken securityToken;
-    private Deque<XMLEvent> xmlEvents;
+    private final SecurityToken securityToken;
+    private final Deque<XMLSecEvent> xmlSecEvents;
 
-    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLEvent> xmlEvents, WSSecurityContext wsSecurityContext,
+    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLSecEvent> xmlSecEvents, WSSecurityContext wsSecurityContext,
                                   CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
         super(wsSecurityContext, null, callbackHandler, id, keyIdentifierType);
         this.securityToken = securityToken;
-        this.xmlEvents = xmlEvents;
+        this.xmlSecEvents = xmlSecEvents;
     }
 
-    public Deque<XMLEvent> getXmlEvents() {
-        return xmlEvents;
+    public Deque<XMLSecEvent> getXmlSecEvents() {
+        return xmlSecEvents;
     }
 
     public boolean isAsymmetric() {

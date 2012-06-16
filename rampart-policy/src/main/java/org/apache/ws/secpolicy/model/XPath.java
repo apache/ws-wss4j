@@ -30,7 +30,7 @@ public class XPath {
         V1("1"),
         V2("2");
 
-        private String version;
+        private final String version;
 
         Version(String version) {
             this.version = version;
@@ -41,10 +41,10 @@ public class XPath {
         }
     }
 
-    private String xPath;
-    private Version version;
-    private String filter;
-    private Map<String, String> prefixNamespaceMap;
+    private final String xPath;
+    private final Version version;
+    private final String filter;
+    private final Map<String, String> prefixNamespaceMap;
 
     public XPath(String xPath, Version version, String filter, Map<String, String> prefixNamespaceMap) {
         this.xPath = xPath;

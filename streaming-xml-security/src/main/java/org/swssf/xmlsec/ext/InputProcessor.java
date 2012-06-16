@@ -18,8 +18,9 @@
  */
 package org.swssf.xmlsec.ext;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.util.Set;
 
 /**
@@ -69,21 +70,21 @@ public interface InputProcessor {
      * Will be called from the framework when the next security-header XMLEvent is requested
      *
      * @param inputProcessorChain
-     * @return The next XMLEvent
+     * @return The next XMLSecEvent
      * @throws XMLStreamException   thrown when a streaming error occurs
      * @throws XMLSecurityException thrown when a Security failure occurs
      */
-    XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
     /**
      * Will be called from the framework when the next XMLEvent is requested
      *
      * @param inputProcessorChain
-     * @return The next XMLEvent
+     * @return The next XMLSecEvent
      * @throws XMLStreamException   thrown when a streaming error occurs
      * @throws XMLSecurityException thrown when a Security failure occurs
      */
-    XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException;
 
     /**
      * Will be called when the whole document is processed.

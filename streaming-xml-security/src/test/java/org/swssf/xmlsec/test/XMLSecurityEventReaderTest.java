@@ -19,11 +19,14 @@
 package org.swssf.xmlsec.test;
 
 import junit.framework.Assert;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecEventFactory;
 import org.swssf.xmlsec.impl.XMLSecurityEventReader;
 import org.testng.annotations.Test;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -37,17 +40,19 @@ public class XMLSecurityEventReaderTest {
     @Test
     public void testConformness() throws Exception {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
 
-        Deque<XMLEvent> xmlEventDeque = new ArrayDeque<XMLEvent>();
-        while (xmlEventReader.hasNext()) {
-            XMLEvent xmlEvent = xmlEventReader.nextEvent();
-            xmlEventDeque.push(xmlEvent);
+        Deque<XMLSecEvent> xmlSecEventDeque = new ArrayDeque<XMLSecEvent>();
+        do {
+            xmlSecEventDeque.push(XMLSecEventFactory.allocate(xmlStreamReader, null));
+            xmlStreamReader.next();
         }
+        while (xmlStreamReader.hasNext());
+        xmlSecEventDeque.push((XMLSecEventFactory.allocate(xmlStreamReader, null)));//EndDocumentEvent
 
-        XMLSecurityEventReader xmlSecurityEventReader = new XMLSecurityEventReader(xmlEventDeque, 0);
+        XMLSecurityEventReader xmlSecurityEventReader = new XMLSecurityEventReader(xmlSecEventDeque, 0);
 
-        xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         while (xmlEventReader.hasNext()) {
             Assert.assertEquals(xmlEventReader.hasNext(), xmlSecurityEventReader.hasNext());
             XMLEvent stdXmlEvent = xmlEventReader.nextEvent();
@@ -70,19 +75,21 @@ public class XMLSecurityEventReaderTest {
     @Test
     public void testIndex() throws Exception {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
 
-        Deque<XMLEvent> xmlEventDeque = new ArrayDeque<XMLEvent>();
-        while (xmlEventReader.hasNext()) {
-            XMLEvent xmlEvent = xmlEventReader.nextEvent();
-            xmlEventDeque.push(xmlEvent);
+        Deque<XMLSecEvent> xmlSecEventDeque = new ArrayDeque<XMLSecEvent>();
+        do {
+            xmlSecEventDeque.push(XMLSecEventFactory.allocate(xmlStreamReader, null));
+            xmlStreamReader.next();
         }
+        while (xmlStreamReader.hasNext());
+        xmlSecEventDeque.push((XMLSecEventFactory.allocate(xmlStreamReader, null)));//EndDocumentEvent
 
         int skip = 100;
 
-        XMLSecurityEventReader xmlSecurityEventReader = new XMLSecurityEventReader(xmlEventDeque, skip);
+        XMLSecurityEventReader xmlSecurityEventReader = new XMLSecurityEventReader(xmlSecEventDeque, skip);
 
-        xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+        XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
         int currentIndex = 0;
         while (xmlEventReader.hasNext()) {
             XMLEvent stdXmlEvent = xmlEventReader.nextEvent();

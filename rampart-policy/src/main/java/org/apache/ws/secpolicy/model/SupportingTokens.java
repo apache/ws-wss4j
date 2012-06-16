@@ -39,7 +39,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
 
     private Policy nestedPolicy;
     private SupportingTokenType supportingTokenType;
-    private List<AbstractToken> tokens = new ArrayList<AbstractToken>();
+    private final List<AbstractToken> tokens = new ArrayList<AbstractToken>();
     private AlgorithmSuite algorithmSuite;
     private SignedParts signedParts;
     private SignedElements signedElements;

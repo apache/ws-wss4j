@@ -24,6 +24,7 @@ import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
+import org.swssf.xmlsec.ext.SecurePart;
 import org.swssf.xmlsec.test.utils.StAX2DOM;
 import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
@@ -105,6 +106,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION};
             securityProperties.setOutAction(actions);
+            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());

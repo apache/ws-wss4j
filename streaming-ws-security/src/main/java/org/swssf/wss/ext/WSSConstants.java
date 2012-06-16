@@ -333,7 +333,7 @@ public class WSSConstants extends XMLSecurityConstants {
         PASSWORD_TEXT(NS_PASSWORD_TEXT),
         PASSWORD_DIGEST(NS_PASSWORD_DIGEST);
 
-        private String namespace;
+        private final String namespace;
         private static final Map<String, UsernameTokenPasswordType> lookup = new HashMap<String, UsernameTokenPasswordType>();
 
         static {
@@ -533,7 +533,7 @@ public class WSSConstants extends XMLSecurityConstants {
         R3069("Any SECURITY_TOKEN_REFERENCE to a ENCRYPTED_KEY_TOKEN MUST contain a wsse11:TokenType attribute with a value of \"http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#EncryptedKey\""),
         R3072("Any STR_KEY_IDENTIFIER element in a SECURITY_TOKEN_REFERENCE that refers to an ENCRYPTED_KEY_TOKEN MUST contain a ValueType attribute with a value of \"http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#EncryptedKeySHA1\"");
 
-        private String msg;
+        private final String msg;
 
         private BSPRule(String msg) {
             this.msg = msg;

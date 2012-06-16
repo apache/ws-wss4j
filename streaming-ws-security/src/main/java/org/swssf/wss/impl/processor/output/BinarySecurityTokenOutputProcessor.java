@@ -24,11 +24,12 @@ import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.crypto.CryptoType;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -45,7 +46,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
     }
 
     @Override
-    public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         try {
             final String bstId = IDGenerator.generateID(null);
             final X509Certificate[] x509Certificates;
@@ -188,7 +189,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
-        outputProcessorChain.processEvent(xmlEvent);
+        outputProcessorChain.processEvent(xmlSecEvent);
     }
 
     private X509Certificate getReqSigCert(SecurityContext securityContext) throws XMLSecurityException {
@@ -213,7 +214,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
     class FinalBinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private SecurityToken securityToken;
+        private final SecurityToken securityToken;
 
         FinalBinarySecurityTokenOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
             super();
@@ -222,11 +223,12 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-            outputProcessorChain.processEvent(xmlEvent);
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (((WSSDocumentContext) outputProcessorChain.getDocumentContext()).isInSecurityHeader() && startElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            outputProcessorChain.processEvent(xmlSecEvent);
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                     boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();

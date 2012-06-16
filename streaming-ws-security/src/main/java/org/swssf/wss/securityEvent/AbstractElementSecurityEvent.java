@@ -18,8 +18,9 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import java.util.List;
 public abstract class AbstractElementSecurityEvent extends SecurityEvent {
 
     private List<QName> elementPath;
-    private XMLEvent xmlEvent;
+    private XMLSecEvent xmlSecEvent;
 
     public AbstractElementSecurityEvent(Event securityEventType) {
         super(securityEventType);
@@ -44,11 +45,11 @@ public abstract class AbstractElementSecurityEvent extends SecurityEvent {
         this.elementPath = new ArrayList<QName>(elementPath);
     }
 
-    public XMLEvent getXmlEvent() {
-        return xmlEvent;
+    public XMLSecEvent getXmlSecEvent() {
+        return xmlSecEvent;
     }
 
-    public void setXmlEvent(XMLEvent xmlEvent) {
-        this.xmlEvent = xmlEvent;
+    public void setXmlSecEvent(XMLSecEvent xmlSecEvent) {
+        this.xmlSecEvent = xmlSecEvent;
     }
 }

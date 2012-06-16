@@ -18,7 +18,6 @@
  */
 package org.swssf.wss.ext;
 
-import org.swssf.wss.impl.WSSDocumentContextImpl;
 import org.swssf.wss.impl.WSSecurityContextImpl;
 import org.swssf.wss.impl.processor.output.*;
 import org.swssf.wss.securityEvent.SecurityEvent;
@@ -26,6 +25,7 @@ import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.xmlsec.ext.OutputProcessor;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.impl.DocumentContextImpl;
 import org.swssf.xmlsec.impl.OutputProcessorChainImpl;
 import org.swssf.xmlsec.impl.XMLSecurityStreamWriter;
 import org.swssf.xmlsec.impl.processor.output.FinalOutputProcessor;
@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class OutboundWSSec {
 
-    private WSSSecurityProperties securityProperties;
+    private final WSSSecurityProperties securityProperties;
 
     public OutboundWSSec(WSSSecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
@@ -101,7 +101,7 @@ public class OutboundWSSec {
         final WSSecurityContextImpl securityContextImpl = new WSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.addSecurityEventListener(securityEventListener);
-        final WSSDocumentContextImpl documentContext = new WSSDocumentContextImpl();
+        final DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(encoding);
 
         OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);

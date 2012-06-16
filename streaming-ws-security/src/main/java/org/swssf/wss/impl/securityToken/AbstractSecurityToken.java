@@ -27,11 +27,11 @@ import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.SecurityToken;
 import org.swssf.xmlsec.ext.XMLSecurityConstants;
 import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -57,17 +57,16 @@ public abstract class AbstractSecurityToken implements WSSecurityToken {
     private WSSecurityContext wsSecurityContext;
     private Crypto crypto;
     private CallbackHandler callbackHandler;
-    private String id;
+    private final String id;
     private Object processor;
     private List<QName> elementPath;
-    private XMLEvent xmlEvent;
+    private XMLSecEvent xmlSecEvent;
     private WSSConstants.KeyIdentifierType keyIdentifierType;
-    private List<SecurityToken> wrappedTokens;
-    private List<TokenUsage> tokenUsages = new ArrayList<TokenUsage>();
+    private final List<SecurityToken> wrappedTokens = new ArrayList<SecurityToken>();
+    private final List<TokenUsage> tokenUsages = new ArrayList<TokenUsage>();
 
     public AbstractSecurityToken(String id) {
         this.id = id;
-        wrappedTokens = new ArrayList<SecurityToken>();
     }
 
     public AbstractSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
@@ -77,7 +76,6 @@ public abstract class AbstractSecurityToken implements WSSecurityToken {
         this.callbackHandler = callbackHandler;
         this.id = id;
         this.keyIdentifierType = keyIdentifierType;
-        wrappedTokens = new ArrayList<SecurityToken>();
     }
 
     private void incrementAndTestInvocationCount() throws WSSecurityException {
@@ -117,13 +115,13 @@ public abstract class AbstractSecurityToken implements WSSecurityToken {
     }
 
     @Override
-    public XMLEvent getXMLEvent() {
-        return xmlEvent;
+    public XMLSecEvent getXMLSecEvent() {
+        return xmlSecEvent;
     }
 
     @Override
-    public void setXMLEvent(XMLEvent xmlEvent) {
-        this.xmlEvent = xmlEvent;
+    public void setXMLSecEvent(XMLSecEvent xmlSecEvent) {
+        this.xmlSecEvent = xmlSecEvent;
     }
 
     public Crypto getCrypto() {

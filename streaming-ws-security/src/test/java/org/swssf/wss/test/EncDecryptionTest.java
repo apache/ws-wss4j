@@ -158,11 +158,11 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
@@ -180,7 +180,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", SecurePart.Modifier.Content));
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Content));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -324,11 +324,11 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.ContentEncrypted) {
                     ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
-                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(contentEncryptedElementSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(contentEncryptedElementSecurityEvent.getSecurityToken());
                     Assert.assertNotNull(contentEncryptedElementSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://www.w3.org/1999/XMLSchema", "simpleType");
-                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(contentEncryptedElementSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
                     Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().size(), 6);
                     Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().get(contentEncryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
@@ -346,7 +346,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", SecurePart.Modifier.Element));
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
@@ -383,8 +383,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.addEncryptionPart(new SecurePart("complexType", "http://www.w3.org/1999/XMLSchema", SecurePart.Modifier.Element));
-            securityProperties.addEncryptionPart(new SecurePart("testEncryptedHeader", "http://www.example.com", SecurePart.Modifier.Element));
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.example.com", "testEncryptedHeader"), SecurePart.Modifier.Element));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-encryptedHeader.xml");
 
@@ -419,7 +419,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
-            //wss4j just encrypts the first found element and not all!
+
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Element}{http://www.w3.org/1999/XMLSchema}simpleType;");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -517,11 +517,11 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedElement) {
                     EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedElementSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedElementSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedElementSecurityEvent.getSecurityToken());
                     Assert.assertNotNull(encryptedElementSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://www.w3.org/1999/XMLSchema", "simpleType");
-                    Assert.assertEquals(encryptedElementSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedElementSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
                     Assert.assertEquals(encryptedElementSecurityEvent.getElementPath().size(), 6);
                     Assert.assertEquals(encryptedElementSecurityEvent.getElementPath().get(encryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
@@ -537,7 +537,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-encryptedHeader.xml");
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
-            //wss4j just encrypts the first found element and not all!
+
             properties.setProperty(WSHandlerConstants.ENCRYPTION_PARTS, "{Header}{http://www.example.com}testEncryptedHeader;");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -585,11 +585,11 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://www.example.com", "testEncryptedHeader");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 3);
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
@@ -1311,11 +1311,11 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
-                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
                     final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }

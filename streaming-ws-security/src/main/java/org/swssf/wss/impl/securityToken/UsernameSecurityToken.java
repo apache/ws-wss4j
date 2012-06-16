@@ -41,12 +41,12 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
 
     private static final long DEFAULT_ITERATION = 1000;
 
-    private String username;
-    private String password;
-    private String created;
-    private byte[] nonce;
-    private byte[] salt;
-    private Long iteration;
+    private final String username;
+    private final String password;
+    private final String created;
+    private final byte[] nonce;
+    private final byte[] salt;
+    private final Long iteration;
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
                                  WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
@@ -110,7 +110,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
         if (iteration == 0) {
             iteration = DEFAULT_ITERATION;
         }
-        byte[] pwBytes = null;
+        byte[] pwBytes;
         try {
             pwBytes = rawPassword.getBytes("UTF-8");
         } catch (final java.io.UnsupportedEncodingException e) {
@@ -121,7 +121,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
         System.arraycopy(pwBytes, 0, pwSalt, 0, pwBytes.length);
         System.arraycopy(salt, 0, pwSalt, pwBytes.length, salt.length);
 
-        MessageDigest sha = null;
+        MessageDigest sha;
         try {
             sha = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
@@ -148,7 +148,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
      *         username token
      */
     private byte[] getSecretKey(String rawPassword, int keylen, String labelString) throws WSSecurityException {
-        byte[] key = null;
+        byte[] key;
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
             byte[] password = rawPassword.getBytes("UTF-8");
@@ -221,7 +221,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
     private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
     protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        byte[] secretToken = null;
+        byte[] secretToken;
         if (getSalt() != null && getIteration() != null) {
             byte[] salt = getSalt();
             secretToken = generateDerivedKey(getPassword(), salt, getIteration());

@@ -19,54 +19,60 @@
 package org.swssf.xmlsec.impl.processor.input;
 
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.swssf.xmlsec.ext.stax.XMLSecEventFactory;
+import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
 
-import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * The XMLEventReaderInputProcessor reads requested XMLEvents from the original XMLEventReader
- * and returns them to the requestor
+ * and returns them to the requester
  *
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class XMLEventReaderInputProcessor extends AbstractInputProcessor {
 
-    private XMLEventReader xmlEventReader;
-    private Deque<List<ComparableNamespace>> nsStack = new ArrayDeque<List<ComparableNamespace>>();
-    private Deque<List<ComparableAttribute>> attrStack = new ArrayDeque<List<ComparableAttribute>>();
+    private final XMLStreamReader xmlStreamReader;
+    private XMLSecStartElement parentXmlSecStartElement;
 
-    public XMLEventReaderInputProcessor(XMLSecurityProperties securityProperties, XMLEventReader xmlEventReader) {
+    public XMLEventReaderInputProcessor(XMLSecurityProperties securityProperties, XMLStreamReader xmlStreamReader) {
         super(securityProperties);
         setPhase(XMLSecurityConstants.Phase.PREPROCESSING);
-        this.xmlEventReader = xmlEventReader;
+        this.xmlStreamReader = xmlStreamReader;
     }
 
     @Override
-    public XMLEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        return processNextEventInternal(inputProcessorChain);
+    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        return processNextEventInternal();
     }
 
     @Override
-    public XMLEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        return processNextEventInternal(inputProcessorChain);
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        return processNextEventInternal();
     }
 
-    private XMLEvent processNextEventInternal(InputProcessorChain inputProcessorChain) throws XMLStreamException {
-        XMLEvent xmlEvent = xmlEventReader.nextEvent();
-        if (xmlEvent.isStartElement()) {
-            xmlEvent = XMLSecurityUtils.createXMLEventNS(xmlEvent, nsStack, attrStack);
-            inputProcessorChain.getDocumentContext().addPathElement(xmlEvent.asStartElement().getName());
-        } else if (xmlEvent.isEndElement()) {
-            nsStack.pop();
-            attrStack.pop();
-            inputProcessorChain.getDocumentContext().removePathElement();
+    private XMLSecEvent processNextEventInternal() throws XMLStreamException {
+        XMLSecEvent xmlSecEvent = XMLSecEventFactory.allocate(xmlStreamReader, parentXmlSecStartElement);
+        switch (xmlSecEvent.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                parentXmlSecStartElement = (XMLSecStartElement) xmlSecEvent;
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                if (parentXmlSecStartElement != null) {
+                    parentXmlSecStartElement = parentXmlSecStartElement.getParentXMLSecStartElement();
+                }
+                break;
         }
-        return xmlEvent;
+        if (xmlStreamReader.hasNext()) {
+            xmlStreamReader.next();
+        }
+        return xmlSecEvent;
     }
 
     @Override

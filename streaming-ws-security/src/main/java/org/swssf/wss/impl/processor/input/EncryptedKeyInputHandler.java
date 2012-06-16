@@ -30,6 +30,7 @@ import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.crypto.Crypto;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.securityToken.SecurityTokenFactory;
 import org.swssf.xmlsec.impl.util.IDGenerator;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
@@ -41,7 +42,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.XMLEvent;
 import java.security.*;
 import java.util.Deque;
 import java.util.Hashtable;
@@ -58,7 +58,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
-                       final Deque<XMLEvent> eventQueue, final Integer index) throws XMLSecurityException {
+                       final Deque<XMLSecEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
         @SuppressWarnings("unchecked")
         final EncryptedKeyType encryptedKeyType =
@@ -74,8 +74,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
             encryptedKeyType.setId(IDGenerator.generateID(null));
         }
 
-        final List<QName> elementPath = getElementPath(inputProcessorChain.getDocumentContext(), eventQueue);
-        final XMLEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
+        final List<QName> elementPath = getElementPath(eventQueue);
+        final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
 
         final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
@@ -92,13 +92,14 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         securityContext, null, null,
                         encryptedKeyType.getId(), null) {
 
-                    private Map<String, Key> keyTable = new Hashtable<String, Key>();
+                    private final Map<String, Key> keyTable = new Hashtable<String, Key>();
 
                     public boolean isAsymmetric() {
                         return false;
                     }
 
-                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage)
+                            throws XMLSecurityException {
                         if (keyTable.containsKey(algorithmURI)) {
                             return keyTable.get(algorithmURI);
                         } else {
@@ -110,7 +111,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     }
 
                     @Override
-                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage)
+                            throws XMLSecurityException {
                         return null;
                     }
 
@@ -124,7 +126,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
                     private SecurityToken wrappingSecurityToken = null;
 
-                    private SecurityToken getWrappingSecurityToken(Crypto crypto, SecurityToken wrappedSecurityToken) throws XMLSecurityException {
+                    private SecurityToken getWrappingSecurityToken(Crypto crypto, SecurityToken wrappedSecurityToken)
+                            throws XMLSecurityException {
                         if (wrappingSecurityToken != null) {
                             return this.wrappingSecurityToken;
                         }
@@ -194,7 +197,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     }
                 };
                 this.securityToken.setElementPath(elementPath);
-                this.securityToken.setXMLEvent(responsibleStartXMLEvent);
+                this.securityToken.setXMLSecEvent(responsibleXMLSecStartXMLEvent);
                 return this.securityToken;
             }
 
@@ -229,7 +232,8 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
         }
     }
 
-    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType) throws WSSecurityException {
+    private void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType)
+            throws WSSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (encryptedKeyType.getType() != null) {
             securityContext.handleBSPRule(WSSConstants.BSPRule.R3209);

@@ -23,13 +23,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.swssf.xmlsec.config.JCEAlgorithmMapper;
 import org.swssf.xmlsec.ext.*;
+import org.swssf.xmlsec.ext.stax.XMLSecEvent;
 import org.swssf.xmlsec.impl.SignaturePartDef;
 import org.swssf.xmlsec.impl.util.DigestOutputStream;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,8 +49,7 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
 
     private static final transient Log logger = LogFactory.getLog(AbstractSignatureOutputProcessor.class);
 
-    private List<SignaturePartDef> signaturePartDefList = new ArrayList<SignaturePartDef>();
-
+    private final List<SignaturePartDef> signaturePartDefList = new ArrayList<SignaturePartDef>();
     private InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor = null;
 
     public AbstractSignatureOutputProcessor() throws XMLSecurityException {
@@ -61,13 +61,15 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
     }
 
     @Override
-    public abstract void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException;
+    public abstract void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException;
 
     protected InternalSignatureOutputProcessor getActiveInternalSignatureOutputProcessor() {
         return activeInternalSignatureOutputProcessor;
     }
 
-    protected void setActiveInternalSignatureOutputProcessor(InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor) {
+    protected void setActiveInternalSignatureOutputProcessor(
+            InternalSignatureOutputProcessor activeInternalSignatureOutputProcessor) {
         this.activeInternalSignatureOutputProcessor = activeInternalSignatureOutputProcessor;
     }
 
@@ -81,7 +83,8 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
         private DigestOutputStream digestOutputStream;
         private Transformer transformer;
 
-        public InternalSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+        public InternalSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement)
+                throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super();
             this.addBeforeProcessor(InternalSignatureOutputProcessor.class.getName());
             this.signaturePartDef = signaturePartDef;
@@ -104,7 +107,8 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
                 if (signaturePartDef.getTransformAlgo() != null) {
                     List<String> inclusiveNamespaces = new ArrayList<String>(1);
                     inclusiveNamespaces.add("#default");
-                    Transformer transformer = XMLSecurityUtils.getTransformer(inclusiveNamespaces, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
+                    Transformer transformer = XMLSecurityUtils.getTransformer(inclusiveNamespaces,
+                            this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
                     this.transformer = XMLSecurityUtils.getTransformer(transformer, null, signaturePartDef.getTransformAlgo());
                 } else {
                     transformer = XMLSecurityUtils.getTransformer(null, this.bufferedDigestOutputStream, signaturePartDef.getC14nAlgo());
@@ -127,32 +131,37 @@ public abstract class AbstractSignatureOutputProcessor extends AbstractOutputPro
         }
 
         @Override
-        public void processEvent(XMLEvent xmlEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
 
-            transformer.transform(xmlEvent);
+            transformer.transform(xmlSecEvent);
 
-            if (xmlEvent.isStartElement()) {
-                elementCounter++;
-            } else if (xmlEvent.isEndElement()) {
-                elementCounter--;
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    elementCounter++;
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    elementCounter--;
 
-                if (elementCounter == 0 && xmlEvent.asEndElement().getName().equals(this.startElement)) {
-                    try {
-                        bufferedDigestOutputStream.close();
-                    } catch (IOException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+                    if (elementCounter == 0 && xmlSecEvent.asEndElement().getName().equals(this.startElement)) {
+                        try {
+                            bufferedDigestOutputStream.close();
+                        } catch (IOException e) {
+                            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+                        }
+                        String calculatedDigest = new String(Base64.encodeBase64(this.digestOutputStream.getDigestValue()));
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Calculated Digest: " + calculatedDigest);
+                        }
+                        signaturePartDef.setDigestValue(calculatedDigest);
+
+                        outputProcessorChain.removeProcessor(this);
+                        //from now on signature is possible again
+                        setActiveInternalSignatureOutputProcessor(null);
                     }
-                    String calculatedDigest = new String(Base64.encodeBase64(this.digestOutputStream.getDigestValue()));
-                    logger.debug("Calculated Digest: " + calculatedDigest);
-                    signaturePartDef.setDigestValue(calculatedDigest);
-
-                    outputProcessorChain.removeProcessor(this);
-                    //from now on signature is possible again
-                    setActiveInternalSignatureOutputProcessor(null);
-                    xmlEvent = createEndElement(startElement);
-                }
+                    break;
             }
-            outputProcessorChain.processEvent(xmlEvent);
+            outputProcessorChain.processEvent(xmlSecEvent);
         }
     }
 }

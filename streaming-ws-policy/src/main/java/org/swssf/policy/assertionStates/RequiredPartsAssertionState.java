@@ -40,7 +40,7 @@ import java.util.*;
  */
 public class RequiredPartsAssertionState extends AssertionState implements Assertable {
 
-    private Map<Header, Boolean> headers = new HashMap<Header, Boolean>();
+    private final Map<Header, Boolean> headers = new HashMap<Header, Boolean>();
 
     public RequiredPartsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);

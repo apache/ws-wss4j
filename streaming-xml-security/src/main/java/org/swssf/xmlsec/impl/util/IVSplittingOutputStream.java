@@ -39,12 +39,12 @@ public class IVSplittingOutputStream extends FilterOutputStream {
 
     private ReplaceableOuputStream replaceableOuputStream;
 
-    private byte[] iv;
-    private int ivLength;
+    private final byte[] iv;
+    private final int ivLength;
     private int pos = 0;
 
-    private Cipher cipher;
-    private Key secretKey;
+    private final Cipher cipher;
+    private final Key secretKey;
 
     public IVSplittingOutputStream(OutputStream out, Cipher cipher, Key secretKey) {
         super(out);
