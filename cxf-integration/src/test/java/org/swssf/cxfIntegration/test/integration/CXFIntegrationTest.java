@@ -117,7 +117,7 @@ public class CXFIntegrationTest {
 
     private long starttimeWSS4J;
 
-    @Test(alwaysRun = true)
+    @Test(alwaysRun = true, dependsOnMethods = {"stopTiming"})
     public void startTimingWSS4J() {
         System.gc();
         System.out.println("startTiming");

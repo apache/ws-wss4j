@@ -33,7 +33,7 @@
     <name>Streaming XML Security</name>
 
     <properties>
-        <bcprov.version>1.45</bcprov.version>
+        <bcprov.version>1.46</bcprov.version>
     </properties>
 
     <dependencies>
@@ -60,7 +60,6 @@
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
-            <version>4.1.2</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -70,23 +69,23 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.4</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
+            <version>1.2.17</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>5.14.10</version>
+            <version>6.5.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -187,19 +186,6 @@
         </plugins>
     </build>
     <profiles>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                    <version>${bcprov.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
         <profile>
             <id>jdk16</id>
             <activation>
