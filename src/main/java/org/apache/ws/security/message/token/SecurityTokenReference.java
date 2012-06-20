@@ -25,6 +25,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.util.DOM2Writer;
@@ -380,7 +381,12 @@ public class SecurityTokenReference {
         }
         
         Document doc = element.getOwnerDocument();
-        byte data[] = crypto.getSKIBytesFromCert(cert);
+        // Fall back to Merlin if crypto parameter is null
+        Crypto skiCrypto = crypto;
+        if (skiCrypto == null) {
+            skiCrypto = new Merlin();
+        }
+        byte data[] = skiCrypto.getSKIBytesFromCert(cert);
         
         Text text = doc.createTextNode(Base64.encode(data));
         createKeyIdentifier(doc, SKI_URI, text, true);        
