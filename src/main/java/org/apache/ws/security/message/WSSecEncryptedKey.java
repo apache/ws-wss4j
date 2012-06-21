@@ -605,7 +605,10 @@ public class WSSecEncryptedKey extends WSSecBase {
     }
     
     public boolean isCertSet() {
-        return (useThisCert == null ? true : false) ;
+        if (useThisCert == null) {
+            return false;
+        }
+        return true;
     }
 
     public byte[] getEncryptedEphemeralKey() {
