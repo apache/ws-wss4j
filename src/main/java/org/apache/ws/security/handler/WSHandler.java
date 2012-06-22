@@ -42,10 +42,13 @@ import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -1105,6 +1108,25 @@ public abstract class WSHandler {
                 reqData, WSHandlerConstants.ENABLE_REVOCATION, false
             );
         reqData.setEnableRevocation(enableRevocation);
+        
+        String certConstraints = 
+            getString(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, reqData.getMsgContext());
+        if (certConstraints != null) {
+            String[] certConstraintsList = certConstraints.split(",");
+            if (certConstraintsList != null) {
+                Collection<Pattern> subjectCertConstraints = 
+                    new ArrayList<Pattern>(certConstraintsList.length);
+                for (String certConstraint : certConstraintsList) {
+                    try {
+                        subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
+                    } catch (PatternSyntaxException ex) {
+                        log.debug(ex.getMessage(), ex);
+                        throw new WSSecurityException(ex.getMessage(), ex);
+                    }
+                }
+                reqData.setSubjectCertConstraints(subjectCertConstraints);
+            }
+        }
     }
 
     /*

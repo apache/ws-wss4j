@@ -24,6 +24,9 @@ import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -66,9 +69,9 @@ public class SignatureTrustValidator implements Validator {
             boolean trust = false;
             boolean enableRevocation = data.isRevocationEnabled();
             if (certs.length == 1) {
-                trust = verifyTrustInCert(certs[0], crypto, enableRevocation);
+                trust = verifyTrustInCert(certs[0], crypto, data, enableRevocation);
             } else {
-                trust = verifyTrustInCerts(certs, crypto, enableRevocation);
+                trust = verifyTrustInCerts(certs, crypto, data, enableRevocation);
             }
             if (trust) {
                 return credential;
@@ -110,25 +113,16 @@ public class SignatureTrustValidator implements Validator {
         }
     }
     
-    /**
-     * Evaluate whether a given certificate should be trusted.
-     * 
-     * Policy used in this implementation:
-     * 1. Search the keystore for the transmitted certificate
-     * 2. Search the keystore for a connection to the transmitted certificate
-     * (that is, search for certificate(s) of the issuer of the transmitted certificate
-     * 3. Verify the trust path for those certificates found because the search for the issuer 
-     * might be fooled by a phony DN (String!)
-     *
-     * @param cert the certificate that should be validated against the keystore
-     * @param crypto A crypto instance to use for trust validation
-     * @return true if the certificate is trusted, false if not
-     * @throws WSSecurityException
-     */
     @Deprecated
     protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto) 
         throws WSSecurityException {
-        return verifyTrustInCert(cert, crypto, false);
+        return verifyTrustInCert(cert, crypto, new RequestData(), false);
+    }
+    
+    @Deprecated
+    protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto, boolean enableRevocation) 
+        throws WSSecurityException {
+        return verifyTrustInCert(cert, crypto, new RequestData(), enableRevocation);
     }
     
     /**
@@ -143,6 +137,7 @@ public class SignatureTrustValidator implements Validator {
      *
      * @param cert the certificate that should be validated against the keystore
      * @param crypto A crypto instance to use for trust validation
+     * @param data A RequestData instance
      * @param enableRevocation Whether revocation is enabled or not
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
@@ -150,6 +145,7 @@ public class SignatureTrustValidator implements Validator {
     protected boolean verifyTrustInCert(
         X509Certificate cert, 
         Crypto crypto,
+        RequestData data,
         boolean enableRevocation
     ) throws WSSecurityException {
         String subjectString = cert.getSubjectX500Principal().getName();
@@ -221,7 +217,10 @@ public class SignatureTrustValidator implements Validator {
                      + subjectString
                 );
             }
-            return true;
+            Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
+            if (matches(cert, subjectCertConstraints)) {
+                return true;
+            }
         }
 
         if (LOG.isDebugEnabled()) {
@@ -272,20 +271,21 @@ public class SignatureTrustValidator implements Validator {
         return false;
     }
     
-    /**
-     * Evaluate whether the given certificate chain should be trusted.
-     * 
-     * @param certificates the certificate chain that should be validated against the keystore
-     * @param crypto  A Crypto instance to use for trust validation
-     * @return true if the certificate chain is trusted, false if not
-     * @throws WSSecurityException
-     */
     @Deprecated
     protected boolean verifyTrustInCerts(
         X509Certificate[] certificates, 
         Crypto crypto
     ) throws WSSecurityException {
-        return verifyTrustInCerts(certificates, crypto, false);
+        return verifyTrustInCerts(certificates, crypto, new RequestData(), false);
+    }
+    
+    @Deprecated
+    protected boolean verifyTrustInCerts(
+        X509Certificate[] certificates, 
+        Crypto crypto,
+        boolean enableRevocation
+    ) throws WSSecurityException {
+        return verifyTrustInCerts(certificates, crypto, new RequestData(), enableRevocation);
     }
     
     /**
@@ -293,6 +293,7 @@ public class SignatureTrustValidator implements Validator {
      * 
      * @param certificates the certificate chain that should be validated against the keystore
      * @param crypto A Crypto instance
+     * @param data A RequestData instance
      * @param enableRevocation Whether revocation is enabled or not
      * @return true if the certificate chain is trusted, false if not
      * @throws WSSecurityException
@@ -300,6 +301,7 @@ public class SignatureTrustValidator implements Validator {
     protected boolean verifyTrustInCerts(
         X509Certificate[] certificates, 
         Crypto crypto,
+        RequestData data,
         boolean enableRevocation
     ) throws WSSecurityException {
         if (certificates == null || certificates.length < 2) {
@@ -318,7 +320,10 @@ public class SignatureTrustValidator implements Validator {
                     + subjectString
                 );
             }
-            return true;
+            Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
+            if (matches(certificates[0], subjectCertConstraints)) {
+                return true;
+            }
         }
         
         if (LOG.isDebugEnabled()) {
@@ -338,6 +343,42 @@ public class SignatureTrustValidator implements Validator {
     protected boolean validatePublicKey(PublicKey publicKey, Crypto crypto) 
         throws WSSecurityException {
         return crypto.verifyTrust(publicKey);
+    }
+    
+    /**
+     * @return      true if the certificate's SubjectDN matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matches(
+        final java.security.cert.X509Certificate cert,
+        final Collection<Pattern> subjectDNPatterns
+    ) {
+        if (subjectDNPatterns.isEmpty()) {
+            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
+        }
+        if (!subjectDNPatterns.isEmpty()) {
+            if (cert == null) {
+                LOG.debug("The certificate is null so no constraints matching was possible");
+                return false;
+            }
+            String subjectName = cert.getSubjectX500Principal().getName();
+            boolean subjectMatch = false;
+            for (Pattern subjectDNPattern : subjectDNPatterns) {
+                final Matcher matcher = subjectDNPattern.matcher(subjectName);
+                if (matcher.matches()) {
+                    LOG.debug("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
+                    subjectMatch = true;
+                    break;
+                }
+            }
+            if (!subjectMatch) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
 }

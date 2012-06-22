@@ -19,6 +19,15 @@
 
 package org.apache.ws.security.handler;
 
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
+
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -30,19 +39,13 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.validate.Validator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.security.cert.X509Certificate;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
-
 /**
  * This class holds per request data.
  *
  * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class RequestData {
+    
     private Object msgContext = null;
     private boolean noSerialization = false;
     private SOAPConstants soapConstants = null;
@@ -79,6 +82,7 @@ public class RequestData {
     protected boolean requireSignedEncryptedDataElements = false;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
 
     public void clear() {
         soapConstants = null;
@@ -102,6 +106,7 @@ public class RequestData {
         enableRevocation = false;
         timestampReplayCache = null;
         nonceReplayCache = null;
+        subjectDNPatterns.clear();
     }
 
     public Object getMsgContext() {
@@ -479,6 +484,22 @@ public class RequestData {
      */
     public ReplayCache getNonceReplayCache() {
         return nonceReplayCache;
+    }
+    
+    /**
+     * Set the Signature Subject Cert Constraints
+     */
+    public void setSubjectCertConstraints(Collection<Pattern> subjectCertConstraints) {
+        if (subjectCertConstraints != null) {
+            subjectDNPatterns.addAll(subjectCertConstraints);
+        }
+    }
+    
+    /**
+     * Get the Signature Subject Cert Constraints
+     */
+    public Collection<Pattern> getSubjectCertConstraints() {
+        return subjectDNPatterns;
     }
 
 }
