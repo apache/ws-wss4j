@@ -19,8 +19,12 @@
 
 package org.apache.ws.security.saml.ext;
 
+import java.io.InputStream;
+
+import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
+import org.opensaml.xml.XMLConfigurator;
 
 /**
  * This class intializes the Opensaml library. It is necessary to override DefaultBootstrap
@@ -71,7 +75,6 @@ public class OpenSAMLBootstrap extends DefaultBootstrap {
      * @throws ConfigurationException thrown if there is a problem initializing the OpenSAML library
      */
     public static synchronized void bootstrap() throws ConfigurationException {
-
         initializeXMLSecurity();
 
         initializeXMLTooling(xmlToolingConfigs);
@@ -83,4 +86,17 @@ public class OpenSAMLBootstrap extends DefaultBootstrap {
         initializeParserPool();
     }
 
+    
+    protected static void initializeXMLTooling(String[] providerConfigs) throws ConfigurationException {
+        XMLConfigurator configurator = new XMLConfigurator();
+        for (String config : providerConfigs) {
+            //most are found in the Configuration.class classloader
+            InputStream ins = Configuration.class.getResourceAsStream(config);
+            if (ins == null) {
+                //some are from us
+                ins = OpenSAMLBootstrap.class.getResourceAsStream(config);
+            }
+            configurator.load(ins);
+        }
+    }
 }
