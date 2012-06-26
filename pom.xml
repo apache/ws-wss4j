@@ -45,7 +45,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <xmlsec.version>1.5.2</xmlsec.version>
+        <xmlsec.version>2.0.0-SNAPSHOT</xmlsec.version>
         <wss4j.version>1.6.6</wss4j.version>
         <neethi.version>3.0.2</neethi.version>
         <targetJdk>1.6</targetJdk>
