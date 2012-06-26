@@ -81,6 +81,7 @@
                             <bindingDirectory>${basedir}/src/main/resources</bindingDirectory>
                             <bindingIncludes>
                                 <bindingInclude>wss11.xjb</bindingInclude>
+                                <bindingInclude>xmlsec.xjb</bindingInclude>
                             </bindingIncludes>
                             <catalog>${basedir}/src/main/resources/wss11.cat</catalog>
                             <forceRegenerate>false</forceRegenerate>
@@ -92,10 +93,6 @@
                             doesn't respect the catalog and will do online lookups :-( -->
                             <strict>false</strict>
                             <episodes>
-                                <episode>
-                                    <groupId>org.apache.santuario</groupId>
-                                    <artifactId>xmlsec</artifactId>
-                                </episode>
                                 <episode>
                                     <groupId>org.swssf</groupId>
                                     <artifactId>wsu10-binding</artifactId>
