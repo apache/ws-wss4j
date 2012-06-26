@@ -91,12 +91,10 @@
                             doesn't respect the catalog and will do online lookups :-( -->
                             <strict>false</strict>
                             <episodes>
-<!--
                                 <episode>
                                     <groupId>org.apache.santuario</groupId>
                                     <artifactId>xmlsec</artifactId>
                                 </episode>
--->
                                 <episode>
                                     <groupId>org.swssf</groupId>
                                     <artifactId>wsu10-binding</artifactId>
