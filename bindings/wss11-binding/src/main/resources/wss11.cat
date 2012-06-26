@@ -5,9 +5,9 @@ SYSTEM "http://www.w3.org/2001/XMLSchema.dtd" "schemas/XMLSchema.dtd"
 PUBLIC "datatypes" "schemas/datatypes.dtd"
 SYSTEM "datatypes.dtd" "schemas/datatypes.dtd"
 
-SYSTEM "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd" "../../../../xmldsig-binding/src/main/resources/schemas/xmldsig-core-schema.xsd"
+SYSTEM "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd" "schemas/xmldsig-core-schema.xsd"
 
-SYSTEM "http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd" "../../../../xmlenc-binding/src/main/resources/schemas/xenc-schema.xsd"
+SYSTEM "http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd" "schemas/xenc-schema.xsd"
 
 SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" "../../../../wsu10-binding/src/main/resources/schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd"
 
