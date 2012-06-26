@@ -96,11 +96,10 @@ public class XMLSecurityConstants {
             });
             Schema schema = schemaFactory.newSchema(
                     new Source[]{
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/exc-c14n.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xenc-schema.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig11-schema.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig-core-schema.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/xmldsig1-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/exc-c14n.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig-core-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xenc-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig11-schema.xsd")),
                     }
             );
             setJaxbSchemas(schema);
