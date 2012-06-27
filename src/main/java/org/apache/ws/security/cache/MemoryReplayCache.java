@@ -22,6 +22,7 @@ package org.apache.ws.security.cache;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -86,9 +87,10 @@ public class MemoryReplayCache implements ReplayCache {
     protected void processTokenExpiry() {
         Date current = new Date();
         synchronized (cache) {
-            for (ReplayCacheIdentifier identifier : cache) {
-                if (identifier.getExpiry().before(current)) {
-                    cache.remove(identifier);
+            Iterator<ReplayCacheIdentifier> iterator = cache.iterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getExpiry().before(current)) {
+                    iterator.remove();
                 }
             }
         }
