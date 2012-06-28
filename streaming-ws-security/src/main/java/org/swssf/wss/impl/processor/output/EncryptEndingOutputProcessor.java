@@ -20,9 +20,9 @@ package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
-import org.swssf.xmlsec.ext.OutputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.impl.processor.output.AbstractEncryptEndingOutputProcessor;
+import org.apache.xml.security.stax.ext.OutputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptEndingOutputProcessor;
 
 import javax.xml.stream.XMLStreamException;
 

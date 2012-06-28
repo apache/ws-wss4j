@@ -26,8 +26,8 @@ import org.swssf.wss.impl.securityToken.X509SecurityToken;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
 import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

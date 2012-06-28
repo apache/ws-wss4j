@@ -21,10 +21,10 @@ package org.swssf.wss.impl.securityToken;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.ext;
 
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import javax.xml.namespace.QName;
 import java.util.List;

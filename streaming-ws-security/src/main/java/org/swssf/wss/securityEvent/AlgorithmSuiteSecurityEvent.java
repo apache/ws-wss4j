@@ -19,7 +19,7 @@
 package org.swssf.wss.securityEvent;
 
 
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  * @author $Author$

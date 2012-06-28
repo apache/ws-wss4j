@@ -30,7 +30,7 @@ import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import javax.xml.namespace.QName;
 import java.util.*;

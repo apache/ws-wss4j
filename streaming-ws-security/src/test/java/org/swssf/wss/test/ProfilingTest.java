@@ -21,7 +21,7 @@ package org.swssf.wss.test;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.InboundWSSec;
 import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.xmlsec.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.test.utils.XmlReaderToWriter;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamReader;

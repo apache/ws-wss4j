@@ -26,12 +26,12 @@ import org.swssf.wss.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.wss.impl.processor.input.SignatureConfirmationInputProcessor;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
-import org.swssf.xmlsec.ext.InputProcessor;
-import org.swssf.xmlsec.impl.DocumentContextImpl;
-import org.swssf.xmlsec.impl.InputProcessorChainImpl;
-import org.swssf.xmlsec.impl.XMLSecurityStreamReader;
-import org.swssf.xmlsec.impl.processor.input.LogInputProcessor;
-import org.swssf.xmlsec.impl.processor.input.XMLEventReaderInputProcessor;
+import org.apache.xml.security.stax.ext.InputProcessor;
+import org.apache.xml.security.stax.impl.DocumentContextImpl;
+import org.apache.xml.security.stax.impl.InputProcessorChainImpl;
+import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
+import org.apache.xml.security.stax.impl.processor.input.LogInputProcessor;
+import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;

@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.securityEvent;
 
-import org.swssf.xmlsec.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.SecurityToken;
 
 /**
  * @author $Author$

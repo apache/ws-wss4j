@@ -24,8 +24,8 @@ import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
 import org.swssf.wss.securityEvent.RelTokenSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;

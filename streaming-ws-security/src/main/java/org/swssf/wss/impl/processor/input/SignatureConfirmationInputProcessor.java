@@ -24,11 +24,11 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
-import org.swssf.xmlsec.ext.AbstractInputProcessor;
-import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.AbstractInputProcessor;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;

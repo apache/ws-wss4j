@@ -22,11 +22,11 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
-import org.swssf.xmlsec.crypto.CryptoType;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
-import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
-import org.swssf.xmlsec.impl.util.IDGenerator;
+import org.apache.xml.security.stax.crypto.CryptoType;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;

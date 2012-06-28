@@ -27,7 +27,7 @@ import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 /**
  * WSP1.3, 5.4.1 UsernameToken Assertion

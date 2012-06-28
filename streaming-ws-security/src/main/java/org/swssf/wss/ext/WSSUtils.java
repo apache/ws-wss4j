@@ -20,13 +20,13 @@ package org.swssf.wss.ext;
 
 import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.crypto.Merlin;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
-import org.swssf.xmlsec.ext.stax.XMLSecEndElement;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
-import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
-import org.swssf.xmlsec.impl.algorithms.ECDSAUtils;
+import org.apache.xml.security.stax.crypto.Merlin;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
+import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.algorithms.ECDSAUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;

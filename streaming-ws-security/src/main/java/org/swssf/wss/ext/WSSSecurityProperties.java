@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.ext;
 
-import org.swssf.xmlsec.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 
 import java.util.Collections;
 import java.util.LinkedList;

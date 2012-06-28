@@ -20,10 +20,10 @@ package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;

@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.ext;
 
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.impl.util.ConcreteLSInput;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.util.ConcreteLSInput;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
@@ -44,7 +44,7 @@ public class WSSConstants extends XMLSecurityConstants {
 
     static {
         try {
-            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.wss10:org.swssf.binding.wss11:org.swssf.binding.wsu10:org.swssf.binding.wssc13:org.swssf.binding.wssc200502:org.swssf.binding.xmlenc:org.swssf.binding.xmldsig:org.swssf.binding.xmldsig11:org.swssf.binding.excc14n"));
+            setJaxbContext(JAXBContext.newInstance("org.swssf.binding.wss10:org.swssf.binding.wss11:org.swssf.binding.wsu10:org.swssf.binding.wssc13:org.swssf.binding.wssc200502:org.apache.xml.security.binding.xmlenc:org.apache.xml.security.binding.xmldsig:org.apache.xml.security.binding.xmldsig11:org.apache.xml.security.binding.excc14n"));
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setResourceResolver(new LSResourceResolver() {
                 @Override

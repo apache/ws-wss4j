@@ -19,10 +19,10 @@
 package org.swssf.wss;
 
 import org.swssf.wss.ext.*;
-import org.swssf.xmlsec.config.Init;
-import org.swssf.xmlsec.ext.SecurePart;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.config.Init;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import java.net.URISyntaxException;
 import java.security.Provider;

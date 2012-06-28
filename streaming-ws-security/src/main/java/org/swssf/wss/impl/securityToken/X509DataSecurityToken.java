@@ -18,15 +18,15 @@
  */
 package org.swssf.wss.impl.securityToken;
 
-import org.swssf.binding.xmldsig.X509DataType;
-import org.swssf.binding.xmldsig.X509IssuerSerialType;
+import org.apache.xml.security.binding.xmldsig.X509DataType;
+import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.crypto.CryptoType;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.crypto.Crypto;
+import org.apache.xml.security.stax.crypto.CryptoType;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;

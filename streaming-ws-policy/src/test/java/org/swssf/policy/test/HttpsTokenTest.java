@@ -24,7 +24,7 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.xmlsec.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

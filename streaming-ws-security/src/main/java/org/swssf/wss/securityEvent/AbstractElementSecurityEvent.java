@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.securityEvent;
 
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;

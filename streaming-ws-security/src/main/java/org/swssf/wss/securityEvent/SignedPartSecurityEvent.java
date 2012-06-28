@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 import java.util.List;
 

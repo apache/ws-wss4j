@@ -22,12 +22,12 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.xmlsec.ext.AbstractInputProcessor;
-import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.XMLSecurityProperties;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
-import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.ext.AbstractInputProcessor;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;

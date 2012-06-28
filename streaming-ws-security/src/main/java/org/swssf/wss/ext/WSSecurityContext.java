@@ -19,7 +19,7 @@
 package org.swssf.wss.ext;
 
 import org.swssf.wss.securityEvent.SecurityEventListener;
-import org.swssf.xmlsec.ext.SecurityContext;
+import org.apache.xml.security.stax.ext.SecurityContext;
 
 import java.util.List;
 

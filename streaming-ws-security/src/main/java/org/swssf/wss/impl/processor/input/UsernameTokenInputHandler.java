@@ -30,9 +30,9 @@ import org.swssf.binding.wsu10.AttributedDateTime;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
-import org.swssf.xmlsec.impl.util.IDGenerator;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;

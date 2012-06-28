@@ -21,12 +21,12 @@ package org.swssf.wss.impl.securityToken;
 import org.swssf.wss.ext.WSPasswordCallback;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.crypto.CryptoType;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.crypto.Crypto;
+import org.apache.xml.security.stax.crypto.CryptoType;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;

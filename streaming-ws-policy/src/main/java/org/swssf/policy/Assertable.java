@@ -20,7 +20,7 @@ package org.swssf.policy;
 
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 /**
  * @author $Author: giger $

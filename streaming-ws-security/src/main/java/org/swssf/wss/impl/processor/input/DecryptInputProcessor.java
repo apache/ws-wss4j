@@ -19,18 +19,18 @@
 package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
-import org.swssf.binding.xmldsig.KeyInfoType;
-import org.swssf.binding.xmlenc.EncryptedDataType;
-import org.swssf.binding.xmlenc.ReferenceList;
-import org.swssf.binding.xmlenc.ReferenceType;
+import org.apache.xml.security.binding.xmldsig.KeyInfoType;
+import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
+import org.apache.xml.security.binding.xmlenc.ReferenceList;
+import org.apache.xml.security.binding.xmlenc.ReferenceType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
-import org.swssf.xmlsec.impl.processor.input.AbstractDecryptInputProcessor;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;

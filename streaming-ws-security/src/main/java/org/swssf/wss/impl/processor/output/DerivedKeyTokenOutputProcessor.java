@@ -24,12 +24,12 @@ import org.swssf.wss.impl.derivedKey.AlgoFactory;
 import org.swssf.wss.impl.derivedKey.ConversationException;
 import org.swssf.wss.impl.derivedKey.DerivationAlgorithm;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
-import org.swssf.xmlsec.config.JCEAlgorithmMapper;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.ext.stax.XMLSecAttribute;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
-import org.swssf.xmlsec.ext.stax.XMLSecStartElement;
-import org.swssf.xmlsec.impl.util.IDGenerator;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.XMLStreamConstants;

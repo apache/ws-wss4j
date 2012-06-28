@@ -27,7 +27,7 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.test.AbstractTestBase;
 import org.swssf.wss.test.CallbackHandlerImpl;
-import org.swssf.xmlsec.ext.SecurePart;
+import org.apache.xml.security.stax.ext.SecurePart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;

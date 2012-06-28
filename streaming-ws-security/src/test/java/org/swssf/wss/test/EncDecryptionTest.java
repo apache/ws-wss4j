@@ -22,7 +22,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.ext.SecurePart;
+import org.apache.xml.security.stax.ext.SecurePart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;

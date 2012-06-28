@@ -18,14 +18,14 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.xmlenc.ReferenceList;
+import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.xmlsec.ext.AbstractInputSecurityHeaderHandler;
-import org.swssf.xmlsec.ext.InputProcessorChain;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.XMLSecurityProperties;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import java.util.Deque;
 

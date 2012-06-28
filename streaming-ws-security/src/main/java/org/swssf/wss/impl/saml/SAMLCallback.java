@@ -21,7 +21,7 @@ package org.swssf.wss.impl.saml;
 
 import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.impl.saml.bean.*;
-import org.swssf.xmlsec.crypto.Crypto;
+import org.apache.xml.security.stax.crypto.Crypto;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;

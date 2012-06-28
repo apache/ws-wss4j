@@ -20,9 +20,9 @@ package org.swssf.wss.securityEvent;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import java.security.Key;
 import java.security.PublicKey;

@@ -26,7 +26,7 @@ import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  * WSP1.3, 6.1 Algorithm Suite Property

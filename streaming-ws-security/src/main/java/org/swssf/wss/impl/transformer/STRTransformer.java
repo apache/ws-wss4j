@@ -18,9 +18,9 @@
  */
 package org.swssf.wss.impl.transformer;
 
-import org.swssf.xmlsec.ext.Transformer;
-import org.swssf.xmlsec.ext.XMLSecurityException;
-import org.swssf.xmlsec.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.Transformer;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;

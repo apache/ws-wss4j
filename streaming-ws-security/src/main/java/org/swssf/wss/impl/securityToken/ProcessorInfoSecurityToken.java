@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.impl.securityToken;
 
-import org.swssf.xmlsec.ext.OutputProcessor;
-import org.swssf.xmlsec.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.OutputProcessor;
+import org.apache.xml.security.stax.ext.SecurityToken;
 
 /**
  * @author $Author$

@@ -62,7 +62,7 @@ import org.swssf.wss.impl.saml.bean.KeyInfoBean;
 import org.swssf.wss.impl.saml.bean.SubjectBean;
 import org.swssf.wss.impl.saml.bean.SubjectConfirmationDataBean;
 import org.swssf.wss.impl.saml.bean.SubjectLocalityBean;
-import org.swssf.xmlsec.impl.util.IDGenerator;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,7 +19,7 @@
 
 package org.swssf.wss.ext;
 
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import javax.xml.namespace.QName;
 import java.text.MessageFormat;

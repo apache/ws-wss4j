@@ -25,7 +25,7 @@ import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.*;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 import javax.xml.namespace.QName;
 import java.util.List;

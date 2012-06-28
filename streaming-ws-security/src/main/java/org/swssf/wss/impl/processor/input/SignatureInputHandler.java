@@ -18,12 +18,12 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.excc14n.InclusiveNamespaces;
+import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
-import org.swssf.binding.xmldsig.CanonicalizationMethodType;
-import org.swssf.binding.xmldsig.ManifestType;
-import org.swssf.binding.xmldsig.ObjectType;
-import org.swssf.binding.xmldsig.SignatureType;
+import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
+import org.apache.xml.security.binding.xmldsig.ManifestType;
+import org.apache.xml.security.binding.xmldsig.ObjectType;
+import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
@@ -31,8 +31,8 @@ import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
-import org.swssf.xmlsec.ext.*;
-import org.swssf.xmlsec.impl.processor.input.AbstractSignatureInputHandler;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureInputHandler;
 
 import java.math.BigInteger;
 import java.util.Iterator;

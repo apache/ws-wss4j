@@ -22,10 +22,10 @@ import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
-import org.swssf.xmlsec.crypto.Crypto;
-import org.swssf.xmlsec.ext.SecurityToken;
-import org.swssf.xmlsec.ext.XMLSecurityConstants;
-import org.swssf.xmlsec.ext.XMLSecurityException;
+import org.apache.xml.security.stax.crypto.Crypto;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;

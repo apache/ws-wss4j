@@ -11,109 +11,109 @@ Generated on: 2012.06.26 at 12:06:16 PM UTC
   <bindings scd="x-schema::tns" xmlns:tns="http://www.w3.org/2001/04/xmlenc#">
     <schemaBindings map="false"/>
     <bindings scd="tns:ReferenceList">
-      <class ref="org.swssf.binding.xmlenc.ReferenceList"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.ReferenceList"/>
     </bindings>
     <bindings scd="~tns:ReferenceType">
-      <class ref="org.swssf.binding.xmlenc.ReferenceType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.ReferenceType"/>
     </bindings>
     <bindings scd="~tns:AgreementMethodType">
-      <class ref="org.swssf.binding.xmlenc.AgreementMethodType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.AgreementMethodType"/>
     </bindings>
     <bindings scd="~tns:CipherReferenceType">
-      <class ref="org.swssf.binding.xmlenc.CipherReferenceType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.CipherReferenceType"/>
     </bindings>
     <bindings scd="~tns:EncryptedKeyType">
-      <class ref="org.swssf.binding.xmlenc.EncryptedKeyType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.EncryptedKeyType"/>
     </bindings>
     <bindings scd="~tns:CipherDataType">
-      <class ref="org.swssf.binding.xmlenc.CipherDataType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.CipherDataType"/>
     </bindings>
     <bindings scd="~tns:EncryptionPropertyType">
-      <class ref="org.swssf.binding.xmlenc.EncryptionPropertyType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.EncryptionPropertyType"/>
     </bindings>
     <bindings scd="~tns:EncryptionPropertiesType">
-      <class ref="org.swssf.binding.xmlenc.EncryptionPropertiesType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.EncryptionPropertiesType"/>
     </bindings>
     <bindings scd="~tns:EncryptedDataType">
-      <class ref="org.swssf.binding.xmlenc.EncryptedDataType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.EncryptedDataType"/>
     </bindings>
     <bindings scd="~tns:EncryptedType">
-      <class ref="org.swssf.binding.xmlenc.EncryptedType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.EncryptedType"/>
     </bindings>
     <bindings scd="~tns:EncryptionMethodType">
-      <class ref="org.swssf.binding.xmlenc.EncryptionMethodType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.EncryptionMethodType"/>
     </bindings>
     <bindings scd="~tns:TransformsType">
-      <class ref="org.swssf.binding.xmlenc.TransformsType"/>
+      <class ref="org.apache.xml.security.binding.xmlenc.TransformsType"/>
     </bindings>
   </bindings>
   <bindings scd="x-schema::tns" xmlns:tns="http://www.w3.org/2000/09/xmldsig#">
     <schemaBindings map="false"/>
     <bindings scd="~tns:KeyInfoType">
-      <class ref="org.swssf.binding.xmldsig.KeyInfoType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.KeyInfoType"/>
     </bindings>
     <bindings scd="~tns:SignedInfoType">
-      <class ref="org.swssf.binding.xmldsig.SignedInfoType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SignedInfoType"/>
     </bindings>
     <bindings scd="~tns:RetrievalMethodType">
-      <class ref="org.swssf.binding.xmldsig.RetrievalMethodType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.RetrievalMethodType"/>
     </bindings>
     <bindings scd="~tns:DigestMethodType">
-      <class ref="org.swssf.binding.xmldsig.DigestMethodType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.DigestMethodType"/>
     </bindings>
     <bindings scd="~tns:SignatureMethodType">
-      <class ref="org.swssf.binding.xmldsig.SignatureMethodType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SignatureMethodType"/>
     </bindings>
     <bindings scd="~tns:SPKIDataType">
-      <class ref="org.swssf.binding.xmldsig.SPKIDataType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SPKIDataType"/>
     </bindings>
     <bindings scd="~tns:X509DataType">
-      <class ref="org.swssf.binding.xmldsig.X509DataType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.X509DataType"/>
     </bindings>
     <bindings scd="~tns:PGPDataType">
-      <class ref="org.swssf.binding.xmldsig.PGPDataType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.PGPDataType"/>
     </bindings>
     <bindings scd="~tns:SignatureType">
-      <class ref="org.swssf.binding.xmldsig.SignatureType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SignatureType"/>
     </bindings>
     <bindings scd="~tns:DSAKeyValueType">
-      <class ref="org.swssf.binding.xmldsig.DSAKeyValueType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.DSAKeyValueType"/>
     </bindings>
     <bindings scd="~tns:ManifestType">
-      <class ref="org.swssf.binding.xmldsig.ManifestType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.ManifestType"/>
     </bindings>
     <bindings scd="~tns:SignatureValueType">
-      <class ref="org.swssf.binding.xmldsig.SignatureValueType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SignatureValueType"/>
     </bindings>
     <bindings scd="~tns:TransformsType">
-      <class ref="org.swssf.binding.xmldsig.TransformsType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.TransformsType"/>
     </bindings>
     <bindings scd="~tns:RSAKeyValueType">
-      <class ref="org.swssf.binding.xmldsig.RSAKeyValueType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.RSAKeyValueType"/>
     </bindings>
     <bindings scd="~tns:TransformType">
-      <class ref="org.swssf.binding.xmldsig.TransformType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.TransformType"/>
     </bindings>
     <bindings scd="~tns:SignaturePropertyType">
-      <class ref="org.swssf.binding.xmldsig.SignaturePropertyType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SignaturePropertyType"/>
     </bindings>
     <bindings scd="~tns:KeyValueType">
-      <class ref="org.swssf.binding.xmldsig.KeyValueType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.KeyValueType"/>
     </bindings>
     <bindings scd="~tns:ReferenceType">
-      <class ref="org.swssf.binding.xmldsig.ReferenceType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.ReferenceType"/>
     </bindings>
     <bindings scd="~tns:CanonicalizationMethodType">
-      <class ref="org.swssf.binding.xmldsig.CanonicalizationMethodType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType"/>
     </bindings>
     <bindings scd="~tns:SignaturePropertiesType">
-      <class ref="org.swssf.binding.xmldsig.SignaturePropertiesType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.SignaturePropertiesType"/>
     </bindings>
     <bindings scd="~tns:ObjectType">
-      <class ref="org.swssf.binding.xmldsig.ObjectType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.ObjectType"/>
     </bindings>
     <bindings scd="~tns:X509IssuerSerialType">
-      <class ref="org.swssf.binding.xmldsig.X509IssuerSerialType"/>
+      <class ref="org.apache.xml.security.binding.xmldsig.X509IssuerSerialType"/>
     </bindings>
   </bindings>
 </bindings>

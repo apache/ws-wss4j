@@ -23,7 +23,7 @@ import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SecurityEventListener;
-import org.swssf.xmlsec.impl.SecurityContextImpl;
+import org.apache.xml.security.stax.impl.SecurityContextImpl;
 
 import java.util.ArrayList;
 import java.util.List;
