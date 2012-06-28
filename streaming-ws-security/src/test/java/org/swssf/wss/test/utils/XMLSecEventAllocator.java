@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.xml.security.test.stax.utils;
+package org.swssf.wss.test.utils;
 
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;

@@ -27,7 +27,7 @@ import org.swssf.wss.ext.InboundWSSec;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.test.AbstractTestBase;
-import org.apache.xml.security.stax.test.utils.StAX2DOM;
+import org.swssf.wss.test.utils.StAX2DOM;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;

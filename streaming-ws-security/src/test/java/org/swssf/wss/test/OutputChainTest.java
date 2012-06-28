@@ -24,7 +24,7 @@ import org.swssf.wss.ext.OutboundWSSec;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.test.utils.XmlReaderToWriter;
+import org.swssf.wss.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
