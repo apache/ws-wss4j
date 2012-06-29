@@ -152,7 +152,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     finalBinarySecurityTokenOutputProcessor.setAction(getAction());
-                    finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(SignatureOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     binarySecurityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 }

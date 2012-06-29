@@ -38,16 +38,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author $Author$
- * @version $Revision$ $Date$
+ * @author $Author: coheigea $
+ * @version $Revision: 1354898 $ $Date: 2012-06-28 11:19:02 +0100 (Thu, 28 Jun 2012) $
  */
-public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutputProcessor {
+public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOutputProcessor {
 
     private SignedInfoProcessor signedInfoProcessor = null;
 
-    public SignatureEndingOutputProcessor(SignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
+    public WSSSignatureEndingOutputProcessor(WSSSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
         super(signatureOutputProcessor);
-        this.addAfterProcessor(SignatureOutputProcessor.class.getName());
+        this.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
         this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
     }
 
@@ -67,7 +67,7 @@ public class SignatureEndingOutputProcessor extends AbstractSignatureEndingOutpu
         this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm);
         this.signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
         this.signedInfoProcessor.setAction(getAction());
-        this.signedInfoProcessor.addAfterProcessor(SignatureEndingOutputProcessor.class.getName());
+        this.signedInfoProcessor.addAfterProcessor(WSSSignatureEndingOutputProcessor.class.getName());
         this.signedInfoProcessor.init(outputProcessorChain);
         return this.signedInfoProcessor;
     }

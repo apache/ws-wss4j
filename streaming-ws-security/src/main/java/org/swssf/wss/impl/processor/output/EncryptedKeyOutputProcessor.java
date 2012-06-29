@@ -148,7 +148,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
-                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(SignatureOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
             } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);

@@ -43,21 +43,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author $Author$
- * @version $Revision$ $Date$
+ * @author $Author: coheigea $
+ * @version $Revision: 1354898 $ $Date: 2012-06-28 11:19:02 +0100 (Thu, 28 Jun 2012) $
  */
-public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
+public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcessor {
 
-    private static final transient Log logger = LogFactory.getLog(SignatureOutputProcessor.class);
+    private static final transient Log logger = LogFactory.getLog(WSSSignatureOutputProcessor.class);
 
-    public SignatureOutputProcessor() throws XMLSecurityException {
+    public WSSSignatureOutputProcessor() throws XMLSecurityException {
         super();
     }
 
     @Override
     public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
         super.init(outputProcessorChain);
-        SignatureEndingOutputProcessor signatureEndingOutputProcessor = new SignatureEndingOutputProcessor(this);
+        WSSSignatureEndingOutputProcessor signatureEndingOutputProcessor = new WSSSignatureEndingOutputProcessor(this);
         signatureEndingOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
         signatureEndingOutputProcessor.setAction(getAction());
         signatureEndingOutputProcessor.init(outputProcessorChain);
@@ -104,8 +104,8 @@ public class SignatureOutputProcessor extends AbstractSignatureOutputProcessor {
                         internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(signaturePartDef, xmlSecStartElement.getName());
                         internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                         internalSignatureOutputProcessor.setAction(getAction());
-                        internalSignatureOutputProcessor.addAfterProcessor(SignatureOutputProcessor.class.getName());
-                        internalSignatureOutputProcessor.addBeforeProcessor(SignatureEndingOutputProcessor.class.getName());
+                        internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
+                        internalSignatureOutputProcessor.addBeforeProcessor(WSSSignatureEndingOutputProcessor.class.getName());
                         internalSignatureOutputProcessor.init(outputProcessorChain);
 
                     } catch (NoSuchAlgorithmException e) {

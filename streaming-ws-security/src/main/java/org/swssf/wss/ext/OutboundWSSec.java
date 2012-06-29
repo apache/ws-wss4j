@@ -121,7 +121,7 @@ public class OutboundWSSec {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.ENCRYPT)) {
@@ -142,7 +142,7 @@ public class OutboundWSSec {
                     final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
 
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
@@ -165,7 +165,7 @@ public class OutboundWSSec {
                     final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
 
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
@@ -191,7 +191,7 @@ public class OutboundWSSec {
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
 
-                    SignatureOutputProcessor signatureOutputProcessor = new SignatureOutputProcessor();
+                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED)) {

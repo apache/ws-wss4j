@@ -45,7 +45,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
     public SignatureConfirmationOutputProcessor() throws XMLSecurityException {
         super();
-        addBeforeProcessor(SignatureOutputProcessor.class.getName());
+        addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
         addBeforeProcessor(EncryptOutputProcessor.class.getName());
     }
 
