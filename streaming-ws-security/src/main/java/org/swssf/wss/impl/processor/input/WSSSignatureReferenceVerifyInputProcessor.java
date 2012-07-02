@@ -55,7 +55,7 @@ import java.util.List;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
+public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
     private static final String cacheRegionName = "timestamp";
     private static final JCS cache;
@@ -70,11 +70,11 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
 
     private boolean replayChecked = false;
 
-    public SignatureReferenceVerifyInputProcessor(
+    public WSSSignatureReferenceVerifyInputProcessor(
             SignatureType signatureType, SecurityToken securityToken,
             XMLSecurityProperties securityProperties, WSSecurityContext securityContext) throws XMLSecurityException {
         super(signatureType, securityToken, securityProperties);
-        this.addAfterProcessor(SignatureReferenceVerifyInputProcessor.class.getName());
+        this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
 
         checkBSPCompliance(securityContext);
     }
@@ -229,7 +229,7 @@ public class SignatureReferenceVerifyInputProcessor extends AbstractSignatureRef
         InternalSignatureReferenceVerifier(WSSSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
                                            ReferenceType referenceType, QName startElementName) throws XMLSecurityException {
             super(securityProperties, inputProcessorChain, referenceType, startElementName);
-            this.addAfterProcessor(SignatureReferenceVerifyInputProcessor.class.getName());
+            this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
         }
 
         protected AlgorithmType createMessageDigest(SecurityContext securityContext)

@@ -42,7 +42,7 @@ import java.util.List;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SignatureInputHandler extends AbstractSignatureInputHandler {
+public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
     @Override
     protected SignatureVerifier newSignatureVerifier(final InputProcessorChain inputProcessorChain,
@@ -141,7 +141,7 @@ public class SignatureInputHandler extends AbstractSignatureInputHandler {
                                                               SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException {
         //add processors to verify references
         inputProcessorChain.addProcessor(
-                new SignatureReferenceVerifyInputProcessor(signatureType, securityToken, securityProperties,
+                new WSSSignatureReferenceVerifyInputProcessor(signatureType, securityToken, securityProperties,
                         (WSSecurityContext) inputProcessorChain.getSecurityContext()));
     }
 }

@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import java.util.List;
 
 /**
- * Processor whiich emits the Operation-Security-Event
+ * Processor which emits the Operation-Security-Event
  *
  * @author $Author$
  * @version $Revision$ $Date$
