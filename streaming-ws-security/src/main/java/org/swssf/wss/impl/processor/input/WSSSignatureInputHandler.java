@@ -21,6 +21,7 @@ package org.swssf.wss.impl.processor.input;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
+import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmldsig.ManifestType;
 import org.apache.xml.security.binding.xmldsig.ObjectType;
 import org.apache.xml.security.binding.xmldsig.SignatureType;
@@ -33,6 +34,7 @@ import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureInputHandler;
+import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -66,7 +68,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         checkBSPCompliance(inputProcessorChain, signatureType);
 
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
-        final SignatureVerifier signatureVerifier = new SignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
+        final SignatureVerifier signatureVerifier = new WSSSignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
             @Override
             protected void handleSecurityToken(SecurityToken securityToken) throws XMLSecurityException {
                 //we have to emit a TokenSecurityEvent here too since it could be an embedded token
@@ -143,5 +145,22 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         inputProcessorChain.addProcessor(
                 new WSSSignatureReferenceVerifyInputProcessor(signatureType, securityToken, securityProperties,
                         (WSSecurityContext) inputProcessorChain.getSecurityContext()));
+    }
+    
+    public class WSSSignatureVerifier extends SignatureVerifier {
+        
+        public WSSSignatureVerifier(SignatureType signatureType, SecurityContext securityContext,
+                                    XMLSecurityProperties securityProperties) throws XMLSecurityException {
+            super(signatureType, securityContext, securityProperties);
+        }
+        
+        protected SecurityToken retrieveSecurityToken(KeyInfoType keyInfoType,
+                                                      XMLSecurityProperties securityProperties,
+                                                      SecurityContext securityContext) throws XMLSecurityException {
+            return SecurityTokenFactory.getInstance().getSecurityToken(keyInfoType,
+                                                                securityProperties.getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(),
+                                                                securityContext);
+            
+        }
     }
 }
