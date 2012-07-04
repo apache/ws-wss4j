@@ -19,17 +19,15 @@
 package org.swssf.wss.ext;
 
 import org.apache.commons.codec.binary.Base64;
-import org.swssf.wss.securityEvent.*;
 import org.apache.xml.security.stax.crypto.Merlin;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
-import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.algorithms.ECDSAUtils;
+import org.swssf.wss.securityEvent.*;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import java.io.UnsupportedEncodingException;
@@ -45,7 +43,10 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -160,121 +161,6 @@ public class WSSUtils extends XMLSecurityUtils {
         } else {
             return responsibleActor.equals(actor);
         }
-    }
-
-    public static void flushBufferAndCallbackAfterTokenID(OutputProcessorChain outputProcessorChain,
-                                                          AbstractBufferingOutputProcessor abstractBufferingOutputProcessor,
-                                                          Deque<XMLSecEvent> xmlSecEventDeque)
-            throws XMLStreamException, XMLSecurityException {
-
-        final String actor = ((WSSSecurityProperties) abstractBufferingOutputProcessor.getSecurityProperties()).getActor();
-
-        //loop until we reach our security header and set flag
-        final Iterator<XMLSecEvent> xmlSecEventIterator = xmlSecEventDeque.descendingIterator();
-        loop:
-        while (xmlSecEventIterator.hasNext()) {
-            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
-            switch (xmlSecEvent.getEventType()) {
-                case XMLStreamConstants.START_ELEMENT:
-                    XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                    if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                            && isResponsibleActorOrRole(
-                            xmlSecStartElement, actor)) {
-                        outputProcessorChain.reset();
-                        outputProcessorChain.processEvent(xmlSecEvent);
-                        break loop;
-                    }
-                    break;
-            }
-            outputProcessorChain.reset();
-            outputProcessorChain.processEvent(xmlSecEvent);
-        }
-
-        final String appendAfterThisTokenId = abstractBufferingOutputProcessor.getAppendAfterThisTokenId();
-        //append current header
-        if (appendAfterThisTokenId == null) {
-            abstractBufferingOutputProcessor.processHeaderEvent(outputProcessorChain);
-        } else {
-            //we have a dependent token. so we have to append the current header after the token
-            QName matchingElementName = null;
-
-            loop:
-            while (xmlSecEventIterator.hasNext()) {
-                XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
-
-                outputProcessorChain.reset();
-                outputProcessorChain.processEvent(xmlSecEvent);
-                switch (xmlSecEvent.getEventType()) {
-                    //search for an element with a matching wsu:Id. this is our token
-                    case XMLStreamConstants.START_ELEMENT:
-                        XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                        List<XMLSecAttribute> xmlSecAttributes = xmlSecStartElement.getOnElementDeclaredAttributes();
-                        for (int i = 0; i < xmlSecAttributes.size(); i++) {
-                            XMLSecAttribute xmlSecAttribute = xmlSecAttributes.get(i);
-                            final QName attributeName = xmlSecAttribute.getName();
-                            final String attributeValue = xmlSecAttribute.getValue();
-                            if ((WSSConstants.ATT_wsu_Id.equals(attributeName)
-                                    || WSSConstants.ATT_NULL_Id.equals(attributeName)
-                                    || WSSConstants.ATT_NULL_AssertionID.equals(attributeName)
-                                    || WSSConstants.ATT_NULL_ID.equals(attributeName))
-                                    && appendAfterThisTokenId.equals(attributeValue)) {
-                                matchingElementName = xmlSecStartElement.getName();
-                                break loop;
-                            }
-                        }
-                        break;
-                }
-            }
-            //we found the token and...
-            int level = 0;
-            loop:
-            while (xmlSecEventIterator.hasNext()) {
-                XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
-
-                outputProcessorChain.reset();
-                outputProcessorChain.processEvent(xmlSecEvent);
-
-                //...loop until we reach the token end element
-                switch (xmlSecEvent.getEventType()) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        level++;
-                        break;
-                    case XMLStreamConstants.END_ELEMENT:
-                        XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
-                        if (level == 0 && xmlSecEndElement.getName().equals(matchingElementName)) {
-                            //output now the current header
-                            abstractBufferingOutputProcessor.processHeaderEvent(outputProcessorChain);
-                            break loop;
-                        }
-                        level--;
-                        break;
-                }
-            }
-        }
-        //loop until our security header end element and unset the flag
-        loop:
-        while (xmlSecEventIterator.hasNext()) {
-            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
-            switch (xmlSecEvent.getEventType()) {
-                case XMLStreamConstants.END_ELEMENT:
-                    XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
-                    if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
-                        outputProcessorChain.reset();
-                        outputProcessorChain.processEvent(xmlSecEvent);
-                        break loop;
-                    }
-                    break;
-            }
-            outputProcessorChain.reset();
-            outputProcessorChain.processEvent(xmlSecEvent);
-        }
-        //loop through the rest of the document
-        while (xmlSecEventIterator.hasNext()) {
-            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
-            outputProcessorChain.reset();
-            outputProcessorChain.processEvent(xmlSecEvent);
-        }
-        outputProcessorChain.reset();
     }
 
     public static void createBinarySecurityTokenStructure(AbstractOutputProcessor abstractOutputProcessor,

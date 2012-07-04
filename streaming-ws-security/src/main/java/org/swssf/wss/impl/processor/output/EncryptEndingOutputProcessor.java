@@ -18,13 +18,22 @@
  */
 package org.swssf.wss.impl.processor.output;
 
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSUtils;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptEndingOutputProcessor;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Processor buffers encrypted XMLEvents and forwards them when final is called
@@ -33,6 +42,17 @@ import javax.xml.stream.XMLStreamException;
  * @version $Revision$ $Date$
  */
 public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputProcessor {
+
+    private static final List<QName> appendAfterOneOfThisAttributes;
+
+    static {
+        List<QName> list = new ArrayList<QName>(5);
+        list.add(WSSConstants.ATT_wsu_Id);
+        list.add(WSSConstants.ATT_NULL_Id);
+        list.add(WSSConstants.ATT_NULL_AssertionID);
+        list.add(WSSConstants.ATT_NULL_ID);
+        appendAfterOneOfThisAttributes = Collections.unmodifiableList(list);
+    }
 
     public EncryptEndingOutputProcessor() throws XMLSecurityException {
         super();
@@ -48,13 +68,36 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
         }
     }
 
+    protected List<QName> getAppendAfterOneOfThisAttributes() {
+        return appendAfterOneOfThisAttributes;
+    }
+
     @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-        WSSUtils.flushBufferAndCallbackAfterTokenID(subOutputProcessorChain, this, getXmlSecEventBuffer());
-        //call final on the rest of the chain
-        subOutputProcessorChain.doFinal();
-        //this processor is now finished and we can remove it now
-        subOutputProcessorChain.removeProcessor(this);
+    public void flushBufferAndCallbackAfterTokenID(OutputProcessorChain outputProcessorChain,
+                                                   Iterator<XMLSecEvent> xmlSecEventIterator)
+            throws XMLStreamException, XMLSecurityException {
+
+        final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
+
+        //loop until we reach our security header
+        loop:
+        while (xmlSecEventIterator.hasNext()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+            switch (xmlSecEvent.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                    if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                            && WSSUtils.isResponsibleActorOrRole(
+                            xmlSecStartElement, actor)) {
+                        outputProcessorChain.reset();
+                        outputProcessorChain.processEvent(xmlSecEvent);
+                        break loop;
+                    }
+                    break;
+            }
+            outputProcessorChain.reset();
+            outputProcessorChain.processEvent(xmlSecEvent);
+        }
+        super.flushBufferAndCallbackAfterTokenID(outputProcessorChain, xmlSecEventIterator);
     }
 }
