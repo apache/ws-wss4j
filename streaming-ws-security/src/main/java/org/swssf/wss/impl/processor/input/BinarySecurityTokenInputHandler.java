@@ -20,6 +20,7 @@ package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wss10.BinarySecurityTokenType;
 import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.ext.WSSecurityToken;
@@ -71,7 +72,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 }
                 Crypto crypto = null;
                 try {
-                    crypto = securityProperties.getSignatureVerificationCrypto();
+                    crypto = ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto();
                 } catch (XMLSecurityConfigurationException e) {
                     //ignore
                 }

@@ -114,7 +114,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     if (keyInfoBean != null) {
                         X509Certificate x509Certificate = keyInfoBean.getCertificate();
                         if (x509Certificate != null) {
-                            String alias = getSecurityProperties().getSignatureCrypto().getX509Identifier(x509Certificate);
+                            String alias = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getX509Identifier(x509Certificate);
                             if (alias == null) {
                                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
@@ -122,8 +122,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), wsPasswordCallback);
                             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                             cryptoType.setAlias(alias);
-                            certificates = getSecurityProperties().getSignatureCrypto().getX509Certificates(cryptoType);
-                            privateKey = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
+                            certificates = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
+                            privateKey = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
                         }
                     }
                 }
@@ -211,7 +211,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         }
                         this.samlSecurityToken = new SAMLSecurityToken(
                                 samlCallback.getSamlVersion(), samlKeyInfo, (WSSecurityContext) outputProcessorChain.getSecurityContext(),
-                                getSecurityProperties().getSignatureCrypto(), getSecurityProperties().getCallbackHandler(), tokenId);
+                                ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto(), getSecurityProperties().getCallbackHandler(), tokenId);
                         this.samlSecurityToken.setProcessor(finalSAMLTokenOutputProcessor);
                         return this.samlSecurityToken;
                     }

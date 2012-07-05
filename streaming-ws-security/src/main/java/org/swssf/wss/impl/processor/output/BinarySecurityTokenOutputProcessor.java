@@ -57,17 +57,17 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     || action.equals(WSSConstants.SAML_TOKEN_SIGNED)
                     || action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
 
-                String alias = getSecurityProperties().getSignatureUser();
+                String alias = ((WSSSecurityProperties)getSecurityProperties()).getSignatureUser();
                 WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                 WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
                 String password = pwCb.getPassword();
                 if (password == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
                 }
-                key = getSecurityProperties().getSignatureCrypto().getPrivateKey(alias, password);
+                key = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                cryptoType.setAlias(getSecurityProperties().getSignatureUser());
-                x509Certificates = getSecurityProperties().getSignatureCrypto().getX509Certificates(cryptoType);
+                cryptoType.setAlias(alias);
+                x509Certificates = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
                 if (x509Certificates == null || x509Certificates.length == 0) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
                 }

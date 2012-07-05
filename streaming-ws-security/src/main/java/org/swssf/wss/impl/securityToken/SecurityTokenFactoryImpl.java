@@ -44,7 +44,6 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     public SecurityTokenFactoryImpl() {
     }
 
-    @Override
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto, final CallbackHandler callbackHandler,
                                           SecurityContext securityContext) throws XMLSecurityException {
         if (keyInfoType != null) {

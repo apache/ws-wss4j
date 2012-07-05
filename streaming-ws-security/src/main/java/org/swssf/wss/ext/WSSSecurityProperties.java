@@ -18,8 +18,14 @@
  */
 package org.swssf.wss.ext;
 
+import org.apache.xml.security.stax.crypto.Crypto;
+import org.apache.xml.security.stax.crypto.MerlinBase;
+import org.apache.xml.security.stax.ext.XMLSecurityConfigurationException;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 
+import java.net.URL;
+import java.security.KeyStore;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -160,5 +166,116 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public List<WSSConstants.BSPRule> getIgnoredBSPRules() {
         return Collections.unmodifiableList(ignoredBSPRules);
+    }
+    
+    private Class<? extends MerlinBase> signatureCryptoClass;
+    private KeyStore signatureKeyStore;
+    private String signatureUser;
+    
+    public void setSignatureUser(String signatureUser) {
+        this.signatureUser = signatureUser;
+    }
+
+    public String getSignatureUser() {
+        return signatureUser;
+    }
+    
+    public KeyStore getSignatureKeyStore() {
+        return signatureKeyStore;
+    }
+
+    public void loadSignatureKeyStore(URL url, char[] keyStorePassword) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("jks");
+        keyStore.load(url.openStream(), keyStorePassword);
+        this.signatureKeyStore = keyStore;
+    }
+
+    public Class<? extends MerlinBase> getSignatureCryptoClass() {
+        if (signatureCryptoClass != null) {
+            return signatureCryptoClass;
+        }
+        signatureCryptoClass = org.apache.xml.security.stax.crypto.Merlin.class;
+        return signatureCryptoClass;
+    }
+
+    public void setSignatureCryptoClass(Class<? extends MerlinBase> signatureCryptoClass) {
+        this.signatureCryptoClass = signatureCryptoClass;
+    }
+    
+    private Crypto cachedSignatureCrypto;
+    private KeyStore cachedSignatureKeyStore;
+
+    public Crypto getSignatureCrypto() throws XMLSecurityException {
+
+        if (this.getSignatureKeyStore() == null) {
+            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
+        }
+
+        if (this.getSignatureKeyStore() == cachedSignatureKeyStore) {
+            return cachedSignatureCrypto;
+        }
+
+        Class<? extends MerlinBase> signatureCryptoClass = this.getSignatureCryptoClass();
+
+        try {
+            MerlinBase signatureCrypto = signatureCryptoClass.newInstance();
+            signatureCrypto.setKeyStore(this.getSignatureKeyStore());
+            cachedSignatureCrypto = signatureCrypto;
+            cachedSignatureKeyStore = this.getSignatureKeyStore();
+            return signatureCrypto;
+        } catch (Exception e) {
+            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
+        }
+    }
+    
+    private Class<? extends MerlinBase> signatureVerificationCryptoClass;
+    private KeyStore signatureVerificationKeyStore;
+
+    public KeyStore getSignatureVerificationKeyStore() {
+        return signatureVerificationKeyStore;
+    }
+
+    public void loadSignatureVerificationKeystore(URL url, char[] keyStorePassword) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("jks");
+        keyStore.load(url.openStream(), keyStorePassword);
+        this.signatureVerificationKeyStore = keyStore;
+    }
+
+    public Class<? extends MerlinBase> getSignatureVerificationCryptoClass() {
+        if (signatureVerificationCryptoClass != null) {
+            return signatureVerificationCryptoClass;
+        }
+        signatureVerificationCryptoClass = org.apache.xml.security.stax.crypto.Merlin.class;
+        return signatureVerificationCryptoClass;
+    }
+
+    public void setSignatureVerificationCryptoClass(Class<? extends MerlinBase> signatureVerificationCryptoClass) {
+        this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
+    }
+
+    private Crypto cachedSignatureVerificationCrypto;
+    private KeyStore cachedSignatureVerificationKeyStore;
+
+    public Crypto getSignatureVerificationCrypto() throws XMLSecurityException {
+
+        if (this.getSignatureVerificationKeyStore() == null) {
+            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
+        }
+
+        if (this.getSignatureVerificationKeyStore() == cachedSignatureVerificationKeyStore) {
+            return cachedSignatureVerificationCrypto;
+        }
+
+        Class<? extends MerlinBase> signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
+
+        try {
+            MerlinBase signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
+            signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
+            cachedSignatureVerificationCrypto = signatureVerificationCrypto;
+            cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
+            return signatureVerificationCrypto;
+        } catch (Exception e) {
+            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureVerificationCryptoFailure", e);
+        }
     }
 }
