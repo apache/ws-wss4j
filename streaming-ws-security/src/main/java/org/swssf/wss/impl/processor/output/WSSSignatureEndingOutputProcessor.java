@@ -98,12 +98,12 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
         X509Certificate[] x509Certificates = securityToken.getX509Certificates();
 
-        if (keyIdentifierType == WSSConstants.KeyIdentifierType.KEY_VALUE) {
+        if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
-            if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
+            if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             } else if (WSSConstants.Saml10Token.equals(securityToken.getTokenType())
                     || WSSConstants.Saml11Token.equals(securityToken.getTokenType())) {
@@ -115,15 +115,15 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
             String tokenId = securityToken.getId();
 
-            if (keyIdentifierType == WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
+            if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL) {
                 createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER) {
                 WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
                 WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                 String valueType;
                 if (useSingleCertificate) {
                     valueType = WSSConstants.NS_X509_V3_TYPE;
@@ -131,12 +131,12 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     valueType = WSSConstants.NS_X509PKIPathv1;
                 }
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF) {
                 WSSUtils.createEmbeddedKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), tokenId);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.USERNAMETOKEN_REFERENCE) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.USERNAMETOKEN_REFERENCE) {
                 WSSUtils.createUsernameTokenReferenceStructure(this, outputProcessorChain, tokenId);
             } else {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken", keyIdentifierType.name());
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken");
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }

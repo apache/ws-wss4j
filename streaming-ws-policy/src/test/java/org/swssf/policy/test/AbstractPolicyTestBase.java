@@ -86,7 +86,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return keyAlias;

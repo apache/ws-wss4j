@@ -274,7 +274,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
-            if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
+            if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
@@ -282,15 +282,15 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             String tokenId = securityToken.getKeyWrappingToken().getId();
 
-            if (keyIdentifierType == WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
+            if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL) {
                 createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.SKI_KEY_IDENTIFIER) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER) {
                 WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
                 WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                 String valueType;
                 if (useSingleCertificate) {
                     valueType = WSSConstants.NS_X509_V3_TYPE;
@@ -299,7 +299,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 }
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
             } else {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken", keyIdentifierType.name());
+                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken");
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }

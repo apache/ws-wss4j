@@ -2117,7 +2117,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
         outSecurityProperties.setCallbackHandler(callbackHandler);
         outSecurityProperties.setTokenUser("tester");
-        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
@@ -2241,7 +2241,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
         outSecurityProperties.setCallbackHandler(callbackHandler);
         outSecurityProperties.setTokenUser("tester");
-        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));

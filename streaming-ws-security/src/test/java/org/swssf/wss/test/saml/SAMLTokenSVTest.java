@@ -67,7 +67,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -154,7 +154,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -250,7 +250,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -339,7 +339,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -430,7 +430,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());

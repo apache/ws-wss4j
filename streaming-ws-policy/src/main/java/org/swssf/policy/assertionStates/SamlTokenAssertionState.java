@@ -62,7 +62,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
             return false;
         }
-        if (samlToken.isRequireKeyIdentifierReference() && ((AbstractSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+        if (samlToken.isRequireKeyIdentifierReference() && ((AbstractSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
             setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
             return false;
         }

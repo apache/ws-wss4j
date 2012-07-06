@@ -86,7 +86,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -188,7 +188,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -269,7 +269,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
             securityProperties.setCallbackHandler(callbackHandler);
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
@@ -358,7 +358,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.DirectReference);
-            securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -449,7 +449,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.DirectReference);
-            securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType.SKI_KEY_IDENTIFIER);
+            securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -541,8 +541,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.setSignatureUser("receiver");
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
             securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.EncryptedKey);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -679,7 +679,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityProperties.setSignatureUser("receiver");
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
             securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.EncryptedKey);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);

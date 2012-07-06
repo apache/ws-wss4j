@@ -309,7 +309,7 @@ public class WSSConstants extends XMLSecurityConstants {
         }
     }
 
-    public enum KeyIdentifierType {
+    public enum WSSKeyIdentifierType implements KeyIdentifierType {
         ISSUER_SERIAL,
         SECURITY_TOKEN_DIRECT_REFERENCE,
         X509_KEY_IDENTIFIER,

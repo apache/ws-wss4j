@@ -78,16 +78,16 @@ public class X509TokenAssertionState extends TokenAssertionState {
                     return false;
                 }
             }
-            if (x509Token.isRequireKeyIdentifierReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER) {
+            if (x509Token.isRequireKeyIdentifierReference() && securityToken.getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
                 setErrorMessage("Policy enforces KeyIdentifierReference but we got " + securityToken.getKeyIdentifierType());
                 return false;
-            } else if (x509Token.isRequireIssuerSerialReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.ISSUER_SERIAL) {
+            } else if (x509Token.isRequireIssuerSerialReference() && securityToken.getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL) {
                 setErrorMessage("Policy enforces IssuerSerialReference but we got " + securityToken.getKeyIdentifierType());
                 return false;
-            } else if (x509Token.isRequireEmbeddedTokenReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+            } else if (x509Token.isRequireEmbeddedTokenReference() && securityToken.getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                 setErrorMessage("Policy enforces EmbeddedTokenReference but we got " + securityToken.getKeyIdentifierType());
                 return false;
-            } else if (x509Token.isRequireThumbprintReference() && securityToken.getKeyIdentifierType() != WSSConstants.KeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            } else if (x509Token.isRequireThumbprintReference() && securityToken.getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
                 setErrorMessage("Policy enforces ThumbprintReference but we got " + securityToken.getKeyIdentifierType());
                 return false;
             }

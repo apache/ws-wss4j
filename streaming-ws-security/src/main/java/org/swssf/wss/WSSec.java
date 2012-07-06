@@ -46,7 +46,7 @@ public class WSSec {
 
     static {
         try {
-            Class c = WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            Class<?> c = WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
             if (null == Security.getProvider("BC")) {
                 Security.addProvider((Provider) c.newInstance());
             }
@@ -151,7 +151,7 @@ public class WSSec {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
                 if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.ISSUER_SERIAL);
+                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
                 }
             } else if (action.equals(WSSConstants.ENCRYPT)) {
                 if (securityProperties.getEncryptionUseThisCertificate() == null
@@ -174,7 +174,7 @@ public class WSSec {
                     securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                 }
                 if (securityProperties.getEncryptionKeyIdentifierType() == null) {
-                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.ISSUER_SERIAL);
+                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
                 }
             } else if (action.equals(WSSConstants.USERNAMETOKEN)) {
                 if (securityProperties.getTokenUser() == null) {
@@ -202,7 +202,7 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.USERNAMETOKEN_REFERENCE);
+                securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.USERNAMETOKEN_REFERENCE);
                 if (securityProperties.getUsernameTokenPasswordType() == null) {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
@@ -221,7 +221,7 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
                 }
@@ -232,16 +232,16 @@ public class WSSec {
                     securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                 }
                 if (securityProperties.getEncryptionKeyIdentifierType() == null) {
-                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
                 }
                 if (securityProperties.getDerivedKeyKeyIdentifierType() == null) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() == null) {
                     securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.DirectReference);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
                 }
             } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
                 if (securityProperties.getCallbackHandler() == null) {
@@ -267,16 +267,16 @@ public class WSSec {
                     securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                 }
                 if (securityProperties.getEncryptionKeyIdentifierType() == null) {
-                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
                 }
                 if (securityProperties.getDerivedKeyKeyIdentifierType() == null) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType.X509_KEY_IDENTIFIER);
+                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() == null) {
                     securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.EncryptedKey);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
                 }
             } else if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
                 if (securityProperties.getCallbackHandler() == null) {
@@ -292,7 +292,7 @@ public class WSSec {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
                 if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
                 }
             } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED)) {
                 if (securityProperties.getCallbackHandler() == null) {

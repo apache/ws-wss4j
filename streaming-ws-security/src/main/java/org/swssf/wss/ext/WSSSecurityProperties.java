@@ -40,16 +40,7 @@ import java.util.List;
  */
 public class WSSSecurityProperties extends XMLSecurityProperties {
 
-    private WSSConstants.KeyIdentifierType signatureKeyIdentifierType;
     private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
-
-    public WSSConstants.KeyIdentifierType getSignatureKeyIdentifierType() {
-        return signatureKeyIdentifierType;
-    }
-
-    public void setSignatureKeyIdentifierType(WSSConstants.KeyIdentifierType signatureKeyIdentifierType) {
-        this.signatureKeyIdentifierType = signatureKeyIdentifierType;
-    }
 
     /**
      * returns the KeyIdentifierType which will be used in the secured document
