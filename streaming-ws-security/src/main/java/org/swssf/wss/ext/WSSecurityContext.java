@@ -18,7 +18,6 @@
  */
 package org.swssf.wss.ext;
 
-import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.ext.SecurityContext;
 
 import java.util.List;
@@ -29,14 +28,7 @@ import java.util.List;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public interface WSSecurityContext extends SecurityContext, SecurityEventListener {
-
-    /**
-     * Registers a SecurityEventListener to receive Security-Events
-     *
-     * @param securityEventListener The SecurityEventListener
-     */
-    public void addSecurityEventListener(SecurityEventListener securityEventListener);
+public interface WSSecurityContext extends SecurityContext {
 
     public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException;
 

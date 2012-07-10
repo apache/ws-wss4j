@@ -20,13 +20,13 @@ package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;

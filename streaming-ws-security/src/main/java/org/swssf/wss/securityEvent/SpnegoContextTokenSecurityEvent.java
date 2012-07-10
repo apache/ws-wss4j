@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -27,7 +29,7 @@ public class SpnegoContextTokenSecurityEvent extends TokenSecurityEvent {
     private String issuerName;
 
     public SpnegoContextTokenSecurityEvent() {
-        super(Event.SpnegoContextToken);
+        super(WSSecurityEventConstants.SpnegoContextToken);
     }
 
     public String getIssuerName() {

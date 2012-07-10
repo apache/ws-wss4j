@@ -30,12 +30,12 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureInputHandler;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import java.math.BigInteger;
 import java.util.Iterator;

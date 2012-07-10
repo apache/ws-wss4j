@@ -27,12 +27,12 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
-import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
@@ -148,7 +148,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         algorithmSuiteSecurityEvent.setAlgorithmURI(derivedKeyAlgorithm);
                         algorithmSuiteSecurityEvent.setKeyUsage(derivedKeyUsage);
                         algorithmSuiteSecurityEvent.setKeyLength(keyBytes.length * 8);
-                        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
+                        inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
                         String algo = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
                         return new SecretKeySpec(keyBytes, algo);

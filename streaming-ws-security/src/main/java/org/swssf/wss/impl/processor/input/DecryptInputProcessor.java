@@ -27,10 +27,10 @@ import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -121,7 +121,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                                        EncryptedDataType encryptedDataType) throws XMLSecurityException {
         securityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);
         TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
-        ((WSSecurityContext) securityContext).registerSecurityEvent(tokenSecurityEvent);
+        securityContext.registerSecurityEvent(tokenSecurityEvent);
     }
 
     /*

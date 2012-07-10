@@ -22,9 +22,10 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.SpnegoContextToken;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.securityEvent.SpnegoContextTokenSecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.5 SpnegoContextToken Assertion
@@ -40,9 +41,9 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.SpnegoContextToken
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.SpnegoContextToken
         };
     }
 

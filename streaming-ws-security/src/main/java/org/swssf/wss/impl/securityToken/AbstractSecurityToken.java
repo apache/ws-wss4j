@@ -22,12 +22,12 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.ext.WSSecurityToken;
-import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;

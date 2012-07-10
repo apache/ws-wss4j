@@ -22,9 +22,10 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.KeyValueToken;
-import org.swssf.wss.securityEvent.KeyValueTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.11 KeyValueToken Assertion
@@ -40,9 +41,9 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.KeyValueToken
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.KeyValueToken
         };
     }
 

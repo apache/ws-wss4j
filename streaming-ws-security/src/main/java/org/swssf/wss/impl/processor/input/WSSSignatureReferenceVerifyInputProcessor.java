@@ -29,23 +29,19 @@ import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.apache.xml.security.binding.xmldsig.TransformType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.SecurityTokenReference;
-import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
 import org.swssf.wss.securityEvent.TimestampSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
-import org.xmlsecurity.ns.configuration.AlgorithmType;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import java.lang.reflect.InvocationTargetException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -148,47 +144,37 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             detectReplayAttack(inputProcessorChain);
         }
 
-        XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
-
-        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-            final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
-            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-            ReferenceType referenceType = matchesReferenceId(xmlSecStartElement);
-            if (referenceType != null) {
-
-                if (getProcessedReferences().contains(referenceType)) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
-                }
-                InternalSignatureReferenceVerifier internalSignatureReferenceVerifier =
-                        new InternalSignatureReferenceVerifier(
-                                ((WSSSecurityProperties) getSecurityProperties()), inputProcessorChain,
-                                referenceType, xmlSecStartElement.getName());
-                if (!internalSignatureReferenceVerifier.isFinished()) {
-                    internalSignatureReferenceVerifier.processEvent(xmlSecEvent, inputProcessorChain);
-                    inputProcessorChain.addProcessor(internalSignatureReferenceVerifier);
-                }
-                getProcessedReferences().add(referenceType);
-                documentContext.setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
-
-                List<QName> elementPath = xmlSecStartElement.getElementPath();
-
-                //fire a SecurityEvent:
-                if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)) {
-                    SignedPartSecurityEvent signedPartSecurityEvent =
-                            new SignedPartSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
-                    signedPartSecurityEvent.setElementPath(elementPath);
-                    signedPartSecurityEvent.setXmlSecEvent(xmlSecEvent);
-                    ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
-                } else {
-                    SignedElementSecurityEvent signedElementSecurityEvent =
-                            new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
-                    signedElementSecurityEvent.setElementPath(elementPath);
-                    signedElementSecurityEvent.setXmlSecEvent(xmlSecEvent);
-                    ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
-                }
-            }
+        return super.processNextEvent(inputProcessorChain);
+    }
+    
+    @Override
+    protected void processElementPath(List<QName> elementPath,
+            InputProcessorChain inputProcessorChain, XMLSecEvent xmlSecEvent)
+            throws XMLSecurityException {
+        //fire a SecurityEvent:
+        final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
+        if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)) {
+            SignedPartSecurityEvent signedPartSecurityEvent =
+                    new SignedPartSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
+            signedPartSecurityEvent.setElementPath(elementPath);
+            signedPartSecurityEvent.setXmlSecEvent(xmlSecEvent);
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
+        } else {
+            SignedElementSecurityEvent signedElementSecurityEvent =
+                    new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
+            signedElementSecurityEvent.setElementPath(elementPath);
+            signedElementSecurityEvent.setXmlSecEvent(xmlSecEvent);
+            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
         }
-        return xmlSecEvent;
+    }
+    
+    @Override
+    protected InternalSignatureReferenceVerifier getSignatureReferenceVerifier(
+            XMLSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
+            ReferenceType referenceType, QName startElement) throws XMLSecurityException {
+        return new InternalSignatureReferenceVerifier((WSSSecurityProperties)securityProperties, 
+                                                      inputProcessorChain, referenceType, 
+                                                      startElement);
     }
 
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
@@ -230,17 +216,6 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                            ReferenceType referenceType, QName startElementName) throws XMLSecurityException {
             super(securityProperties, inputProcessorChain, referenceType, startElementName);
             this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
-        }
-
-        protected AlgorithmType createMessageDigest(SecurityContext securityContext)
-                throws XMLSecurityException, NoSuchAlgorithmException, NoSuchProviderException {
-            AlgorithmType digestAlgorithm = super.createMessageDigest(securityContext);
-
-            AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
-            algorithmSuiteSecurityEvent.setAlgorithmURI(digestAlgorithm.getURI());
-            algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Dig);
-            ((WSSecurityContext) securityContext).registerSecurityEvent(algorithmSuiteSecurityEvent);
-            return digestAlgorithm;
         }
 
         protected void buildTransformerChain(ReferenceType referenceType, InputProcessorChain inputProcessorChain)
@@ -318,4 +293,5 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             super.processEvent(xmlSecEvent, inputProcessorChain);
         }
     }
+
 }

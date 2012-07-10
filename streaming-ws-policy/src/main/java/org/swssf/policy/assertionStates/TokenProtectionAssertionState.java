@@ -25,11 +25,13 @@ import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -52,21 +54,21 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.SignedElement,
-                SecurityEvent.Event.EncryptedKeyToken,
-                SecurityEvent.Event.IssuedToken,
-                SecurityEvent.Event.KerberosToken,
-                SecurityEvent.Event.KeyValueToken,
-                SecurityEvent.Event.RelToken,
-                SecurityEvent.Event.SamlToken,
-                SecurityEvent.Event.SecureConversationToken,
-                SecurityEvent.Event.SecurityContextToken,
-                SecurityEvent.Event.SpnegoContextToken,
-                SecurityEvent.Event.UsernameToken,
-                SecurityEvent.Event.X509Token,
-                SecurityEvent.Event.Operation,
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                SecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.EncryptedKeyToken,
+                WSSecurityEventConstants.IssuedToken,
+                WSSecurityEventConstants.KerberosToken,
+                SecurityEventConstants.KeyValueToken,
+                WSSecurityEventConstants.RelToken,
+                WSSecurityEventConstants.SamlToken,
+                WSSecurityEventConstants.SecureConversationToken,
+                WSSecurityEventConstants.SecurityContextToken,
+                WSSecurityEventConstants.SpnegoContextToken,
+                WSSecurityEventConstants.UsernameToken,
+                SecurityEventConstants.X509Token,
+                WSSecurityEventConstants.Operation,
         };
     }
 

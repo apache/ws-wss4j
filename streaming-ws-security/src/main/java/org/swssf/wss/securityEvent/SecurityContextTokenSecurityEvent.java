@@ -28,7 +28,7 @@ public class SecurityContextTokenSecurityEvent extends IssuedTokenSecurityEvent 
     private String issuerName;
 
     public SecurityContextTokenSecurityEvent() {
-        super(Event.SecurityContextToken);
+        super(WSSecurityEventConstants.SecurityContextToken);
     }
 
     public boolean isExternalUriRef() {

@@ -264,31 +264,16 @@ public class WSSConstants extends XMLSecurityConstants {
     }
 
     //todo rename KeyUsage because C14N, etc are not keys...
-    public static final KeyUsage Sym_Sig = new KeyUsage(XMLSecurityConstants.Sym_Sig.toString());
-    public static final KeyUsage Asym_Sig = new KeyUsage(XMLSecurityConstants.Asym_Sig.toString());
-    public static final KeyUsage Enc = new KeyUsage(XMLSecurityConstants.Enc.toString());
-    public static final KeyUsage Dig = new KeyUsage("Dig");
     public static final KeyUsage Sym_Key_Wrap = new KeyUsage("Sym_Key_Wrap");
     public static final KeyUsage Asym_Key_Wrap = new KeyUsage("Asym_Key_Wrap");
     public static final KeyUsage Comp_Key = new KeyUsage("Comp_Key");
     public static final KeyUsage Enc_KD = new KeyUsage("Enc_KD");
     public static final KeyUsage Sig_KD = new KeyUsage("Sig_KD");
-    public static final KeyUsage C14n = new KeyUsage("C14n");
     public static final KeyUsage Soap_Norm = new KeyUsage("Soap_Norm");
     public static final KeyUsage STR_Trans = new KeyUsage("STR_Trans");
     public static final KeyUsage XPath = new KeyUsage("XPath");
 
-    public static class KeyUsage extends XMLSecurityConstants.KeyUsage {
-        protected KeyUsage(String name) {
-            super(name);
-        }
-    }
-
     public static final TokenType EncryptedKeyToken = new TokenType("EncryptedKeyToken");
-    public static final TokenType X509V3Token = new TokenType("X509V3Token");
-    public static final TokenType X509V1Token = new TokenType("X509V1Token");
-    public static final TokenType X509Pkcs7Token = new TokenType("X509Pkcs7Token");
-    public static final TokenType X509PkiPathV1Token = new TokenType("X509PkiPathV1Token");
     public static final TokenType UsernameToken = new TokenType("UsernameToken");
     public static final TokenType SecurityContextToken = new TokenType("SecurityContextToken");
     public static final TokenType Saml10Token = new TokenType("Saml10Token");
@@ -300,14 +285,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final TokenType KerberosToken = new TokenType("KerberosToken");
     public static final TokenType SpnegoContextToken = new TokenType("SpnegoContextToken");
     public static final TokenType RelToken = new TokenType("RelToken");
-    public static final TokenType KeyValueToken = new TokenType("KeyValueToken");
     public static final TokenType DerivedKeyToken = new TokenType("DerivedKeyToken");
-
-    public static class TokenType extends XMLSecurityConstants.TokenType {
-        protected TokenType(String name) {
-            super(name);
-        }
-    }
 
     public enum WSSKeyIdentifierType implements KeyIdentifierType {
         ISSUER_SERIAL,

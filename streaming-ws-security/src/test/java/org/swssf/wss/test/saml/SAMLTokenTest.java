@@ -19,6 +19,7 @@
 package org.swssf.wss.test.saml;
 
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -34,7 +35,6 @@ import org.swssf.wss.ext.OutboundWSSec;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.impl.saml.builder.SAML1Constants;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.test.AbstractTestBase;
 import org.swssf.wss.test.CallbackHandlerImpl;
 import org.swssf.wss.test.utils.StAX2DOM;

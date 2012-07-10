@@ -21,11 +21,8 @@ package org.swssf.wss.impl;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.impl.SecurityContextImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,25 +32,6 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
-
-    private final List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
-
-    public void addSecurityEventListener(SecurityEventListener securityEventListener) {
-        if (securityEventListener != null) {
-            this.securityEventListeners.add(securityEventListener);
-        }
-    }
-
-    public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-        forwardSecurityEvent(securityEvent);
-    }
-
-    protected void forwardSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-        for (int i = 0; i < securityEventListeners.size(); i++) {
-            SecurityEventListener securityEventListener = securityEventListeners.get(i);
-            securityEventListener.registerSecurityEvent(securityEvent);
-        }
-    }
 
     public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException {
     }

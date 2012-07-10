@@ -19,11 +19,11 @@
 package org.swssf.wss.test;
 
 
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.OutboundWSSec;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.test.utils.XmlReaderToWriter;
 import org.testng.Assert;
 import org.testng.annotations.Test;

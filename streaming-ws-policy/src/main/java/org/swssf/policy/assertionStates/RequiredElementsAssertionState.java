@@ -23,11 +23,13 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.RequiredElements;
 import org.apache.ws.secpolicy.model.XPath;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.swssf.policy.Assertable;
 import org.swssf.policy.PolicyUtils;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.RequiredElementSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
 import java.util.HashMap;
@@ -63,9 +65,9 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.RequiredElement
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.RequiredElement
         };
     }
 

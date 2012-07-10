@@ -18,12 +18,14 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public abstract class IssuedTokenSecurityEvent extends TokenSecurityEvent {
-    public IssuedTokenSecurityEvent(Event securityEventType) {
+    public IssuedTokenSecurityEvent(WSSecurityEventConstants.Event securityEventType) {
         super(securityEventType);
     }
 

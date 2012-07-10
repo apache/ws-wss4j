@@ -22,9 +22,10 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.SecurityContextToken;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.securityEvent.SecurityContextTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.6 SecurityContextToken Assertion
@@ -40,9 +41,9 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.SecurityContextToken
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.SecurityContextToken
         };
     }
 

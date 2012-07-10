@@ -23,6 +23,7 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.securityEvent.*;
 import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -128,12 +129,12 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.EncryptedPart,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.Operation,
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.EncryptedPart,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -153,10 +154,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -244,62 +245,62 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.Operation,
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.ContentEncrypted,
-                    SecurityEvent.Event.AlgorithmSuite,
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.ContentEncrypted,
+                    WSSecurityEventConstants.AlgorithmSuite,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -319,10 +320,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.ContentEncrypted) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ContentEncrypted) {
                     ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
                     Assert.assertNotNull(contentEncryptedElementSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(contentEncryptedElementSecurityEvent.getSecurityToken());
@@ -437,62 +438,62 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.wss.test.CallbackHandlerImpl());
 
-            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.Operation,
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
-                    SecurityEvent.Event.EncryptedKeyToken,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedElement,
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.EncryptedKeyToken,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedElement,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -512,10 +513,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedElement) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedElement) {
                     EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedElementSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedElementSecurityEvent.getSecurityToken());
@@ -555,12 +556,12 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.swssf.wss.test.CallbackHandlerImpl());
 
-            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.EncryptedPart,
-                    SecurityEvent.Event.Operation,
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.EncryptedPart,
+                    WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -580,10 +581,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -1281,12 +1282,12 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.X509Token,
-                    SecurityEvent.Event.EncryptedPart,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.Operation,
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.EncryptedPart,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -1306,10 +1307,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());

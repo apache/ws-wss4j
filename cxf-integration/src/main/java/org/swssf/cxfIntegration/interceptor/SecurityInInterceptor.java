@@ -23,13 +23,14 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.InboundWSSec;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -81,6 +82,8 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
             //todo correct faults per WSS-spec
         } catch (WSSecurityException e) {
+            throw new SoapFault("Invalid security", soapMessage.getVersion().getSender());
+        } catch (XMLSecurityException e) {
             throw new SoapFault("Invalid security", soapMessage.getVersion().getSender());
         } catch (XMLStreamException e) {
             throw new SoapFault("Invalid security", soapMessage.getVersion().getReceiver());

@@ -24,9 +24,10 @@ import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AlgorithmSuite;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
 /**
  * WSP1.3, 6.1 Algorithm Suite Property
@@ -41,9 +42,9 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.AlgorithmSuite
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                SecurityEventConstants.AlgorithmSuite
         };
     }
 

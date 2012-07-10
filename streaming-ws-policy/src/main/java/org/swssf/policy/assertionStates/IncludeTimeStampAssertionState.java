@@ -21,8 +21,10 @@ package org.swssf.policy.assertionStates;
 import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.model.AbstractBinding;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.swssf.policy.Assertable;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.2 Timestamp Property
@@ -37,9 +39,9 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.Timestamp
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.Timestamp
         };
     }
 

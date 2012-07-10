@@ -24,10 +24,10 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.*;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import java.util.Iterator;
 import java.util.List;

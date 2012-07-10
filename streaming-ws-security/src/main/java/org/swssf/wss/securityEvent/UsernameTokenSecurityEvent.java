@@ -18,6 +18,7 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.ext.WSSConstants;
 
 /**
@@ -30,7 +31,7 @@ public class UsernameTokenSecurityEvent extends TokenSecurityEvent {
     private String usernameTokenProfile;
 
     public UsernameTokenSecurityEvent() {
-        super(Event.UsernameToken);
+        super(WSSecurityEventConstants.UsernameToken);
     }
 
     public WSSConstants.UsernameTokenPasswordType getUsernameTokenPasswordType() {

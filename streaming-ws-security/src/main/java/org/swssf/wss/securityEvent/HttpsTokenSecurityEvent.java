@@ -23,6 +23,7 @@ import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import java.security.Key;
 import java.security.PublicKey;
@@ -45,7 +46,7 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
     private String issuerName;
 
     public HttpsTokenSecurityEvent() {
-        super(Event.HttpsToken);
+        super(WSSecurityEventConstants.HttpsToken);
     }
 
     public AuthenticationType getAuthenticationType() {

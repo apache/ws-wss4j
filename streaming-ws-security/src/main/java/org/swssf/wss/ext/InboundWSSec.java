@@ -24,14 +24,16 @@ import org.swssf.wss.impl.InboundWSSecurityContextImpl;
 import org.swssf.wss.impl.processor.input.OperationInputProcessor;
 import org.swssf.wss.impl.processor.input.SecurityHeaderInputProcessor;
 import org.swssf.wss.impl.processor.input.SignatureConfirmationInputProcessor;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.InputProcessor;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.InputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
 import org.apache.xml.security.stax.impl.processor.input.LogInputProcessor;
 import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -86,9 +88,9 @@ public class InboundWSSec {
      * @param xmlStreamReader The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws WSSecurityException thrown when a Security failure occurs
+     * @throws XMLSecurityException 
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
         return this.processInMessage(xmlStreamReader, null, null);
     }
 
@@ -108,9 +110,9 @@ public class InboundWSSec {
      * @param securityEventListener A SecurityEventListener to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws WSSecurityException thrown when a Security failure occurs
+     * @throws XMLSecurityException 
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
+    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, XMLSecurityException {
 
         if (requestSecurityEvents == null) {
             requestSecurityEvents = Collections.emptyList();
@@ -125,7 +127,7 @@ public class InboundWSSec {
             Iterator<SecurityEvent> securityEventIterator = requestSecurityEvents.iterator();
             while (securityEventIterator.hasNext()) {
                 SecurityEvent securityEvent = securityEventIterator.next();
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.HttpsToken) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
                     securityContextImpl.registerSecurityEvent(securityEvent);
                     securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
                     break;

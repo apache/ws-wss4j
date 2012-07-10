@@ -30,10 +30,12 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.*;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.wss.test.utils.SOAPUtil;
 import org.swssf.wss.test.utils.StAX2DOM;
 import org.swssf.wss.test.utils.XmlReaderToWriter;
@@ -123,31 +125,31 @@ public abstract class AbstractTestBase {
     }
 
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream)
-            throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+            throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), null);
     }
 
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream,
                                       SecurityEventListener securityEventListener)
-            throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+            throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventListener);
     }
 
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, InputStream inputStream,
                                       List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener)
-            throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+            throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventList, securityEventListener);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws WSSecurityException, WSSConfigurationException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlStreamReader, null);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws WSSecurityException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener) throws WSSecurityException, XMLStreamException, ParserConfigurationException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener) throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
         XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventList, securityEventListener);
         return StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
@@ -598,10 +600,10 @@ public abstract class AbstractTestBase {
     }
 
     protected class TestSecurityEventListener implements SecurityEventListener {
-        private SecurityEvent.Event[] expectedEvents;
+        private SecurityEventConstants.Event[] expectedEvents;
         private List<SecurityEvent> receivedSecurityEvents = new ArrayList<SecurityEvent>();
 
-        public TestSecurityEventListener(SecurityEvent.Event[] expectedEvents) {
+        public TestSecurityEventListener(SecurityEventConstants.Event[] expectedEvents) {
             this.expectedEvents = expectedEvents;
         }
 
@@ -635,7 +637,7 @@ public abstract class AbstractTestBase {
         private void printEvents() {
             System.out.println("expected events:");
             for (int i = 0; i < expectedEvents.length; i++) {
-                SecurityEvent.Event expectedEvent = expectedEvents[i];
+                SecurityEventConstants.Event expectedEvent = expectedEvents[i];
                 System.out.println("SecurityEvent.Event." + expectedEvent + ",");
             }
             System.out.println("received events:");

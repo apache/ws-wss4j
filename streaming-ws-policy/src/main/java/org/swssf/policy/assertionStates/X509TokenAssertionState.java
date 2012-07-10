@@ -24,11 +24,11 @@ import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.X509Token;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
-import org.swssf.wss.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 
 import java.security.cert.X509Certificate;
 
@@ -46,9 +46,9 @@ public class X509TokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.X509Token
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                SecurityEventConstants.X509Token
         };
     }
 

@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.AbstractElementSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -25,6 +27,6 @@ package org.swssf.wss.securityEvent;
 public class RequiredPartSecurityEvent extends AbstractElementSecurityEvent {
 
     public RequiredPartSecurityEvent() {
-        super(Event.RequiredPart);
+        super(WSSecurityEventConstants.RequiredPart);
     }
 }

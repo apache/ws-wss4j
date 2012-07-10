@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -27,6 +29,6 @@ public class DerivedKeyTokenSecurityEvent extends TokenSecurityEvent {
     //todo implement
 
     public DerivedKeyTokenSecurityEvent() {
-        super(Event.DerivedKeyToken);
+        super(WSSecurityEventConstants.DerivedKeyToken);
     }
 }

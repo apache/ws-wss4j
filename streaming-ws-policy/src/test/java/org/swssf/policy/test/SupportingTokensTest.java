@@ -29,6 +29,8 @@ import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
 import org.swssf.wss.impl.securityToken.X509SecurityToken;
 import org.swssf.wss.securityEvent.*;
 import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

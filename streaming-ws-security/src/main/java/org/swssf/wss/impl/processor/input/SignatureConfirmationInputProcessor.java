@@ -22,13 +22,13 @@ import org.swssf.binding.wss11.SignatureConfirmationType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.ext.AbstractInputProcessor;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;

@@ -24,9 +24,15 @@ import org.apache.commons.logging.LogFactory;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.*;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import javax.xml.namespace.QName;
 import java.util.*;
@@ -47,7 +53,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     private List<WSSConstants.BSPRule> ignoredBSPRules = Collections.emptyList();
 
-    public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+    public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
         if (operationSecurityEventOccured) {
             if (!this.messageEncryptionTokenOccured) {
@@ -75,7 +81,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
             return;
         }
 
-        if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+        if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
             operationSecurityEventOccured = true;
 
             try {
@@ -120,7 +126,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         while (securityEventIterator.hasNext()) {
             SecurityEvent securityEvent = securityEventIterator.next();
             if (securityEvent instanceof TokenSecurityEvent) {
-                if (securityEvent.getSecurityEventType() == SecurityEvent.Event.HttpsToken) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
                     HttpsTokenSecurityEvent actHttpsTokenSecurityEvent = (HttpsTokenSecurityEvent) securityEvent;
                     actHttpsTokenSecurityEvent.getSecurityToken().getTokenUsages().clear();
                     actHttpsTokenSecurityEvent.getSecurityToken().addTokenUsage(SecurityToken.TokenUsage.MainSignature);
@@ -380,7 +386,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
-            if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignedElement) {
+            if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignedElement) {
                 SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
                 if (signedElementSecurityEvent.isSigned()
                         && WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), tokenSecurityEvent.getSecurityToken().getElementPath(), true, false)) {
@@ -419,7 +425,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         }
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
-            if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignedElement) {
+            if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignedElement) {
                 SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
                 if (signedElementSecurityEvent.isSigned()
                         && tokenSecurityEvent.getSecurityToken() != null
@@ -444,7 +450,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         List<SecurityToken> securityTokenList = new ArrayList<SecurityToken>();
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
-            if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedElement) {
+            if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedElement) {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
                 if (encryptedElementSecurityEvent.isEncrypted()
                         && tokenSecurityEvent.getSecurityToken() != null
@@ -464,7 +470,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                                  Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
-            if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignedElement) {
+            if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignedElement) {
                 SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
                 if (signedElementSecurityEvent.isSigned()
                         && signedElementSecurityEvent.getSecurityToken() == tokenSecurityEvent.getSecurityToken()
@@ -480,14 +486,14 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                                     Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
-            if (securityEvent.getSecurityEventType() == SecurityEvent.Event.EncryptedElement) {
+            if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedElement) {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
                 if (encryptedElementSecurityEvent.isEncrypted()
                         && encryptedElementSecurityEvent.getSecurityToken() == tokenSecurityEvent.getSecurityToken()
                         && WSSUtils.pathMatches(elementPath, encryptedElementSecurityEvent.getElementPath(), true, false)) {
                     return true;
                 }
-            } else if (securityEvent.getSecurityEventType() == SecurityEvent.Event.ContentEncrypted) {
+            } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ContentEncrypted) {
                 ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
                 if (contentEncryptedElementSecurityEvent.isEncrypted()
                         && contentEncryptedElementSecurityEvent.getSecurityToken() == tokenSecurityEvent.getSecurityToken()

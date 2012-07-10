@@ -28,11 +28,10 @@ import org.apache.xml.security.stax.impl.SignaturePartDef;
 import org.apache.xml.security.stax.impl.algorithms.SignatureAlgorithm;
 import org.apache.xml.security.stax.impl.processor.output.AbstractSignatureEndingOutputProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.ext.WSSecurityContext;
-import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -84,7 +83,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
         signatureValueSecurityEvent.setSignatureValue(this.signedInfoProcessor.getSignatureValue());
-        ((WSSecurityContext) outputProcessorChain.getSecurityContext()).registerSecurityEvent(signatureValueSecurityEvent);
+        outputProcessorChain.getSecurityContext().registerSecurityEvent(signatureValueSecurityEvent);
     }
 
     @Override

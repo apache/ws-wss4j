@@ -20,11 +20,11 @@ package org.swssf.wss.test;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
 import org.swssf.wss.test.utils.StAX2DOM;
 import org.swssf.wss.test.utils.XmlReaderToWriter;

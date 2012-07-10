@@ -23,11 +23,13 @@ import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.EncryptedParts;
 import org.apache.ws.secpolicy.model.Header;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
 import java.util.LinkedList;
@@ -46,9 +48,9 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.EncryptedPart
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.EncryptedPart
         };
     }
 

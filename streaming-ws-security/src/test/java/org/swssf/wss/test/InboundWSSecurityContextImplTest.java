@@ -32,6 +32,11 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

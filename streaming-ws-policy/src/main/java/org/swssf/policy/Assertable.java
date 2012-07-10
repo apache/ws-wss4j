@@ -19,8 +19,9 @@
 package org.swssf.policy;
 
 import org.apache.ws.secpolicy.WSSPolicyException;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
 /**
  * @author $Author: giger $
@@ -28,7 +29,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityException;
  */
 public interface Assertable {
 
-    SecurityEvent.Event[] getSecurityEventType();
+    SecurityEventConstants.Event[] getSecurityEventType();
 
     boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException;
 

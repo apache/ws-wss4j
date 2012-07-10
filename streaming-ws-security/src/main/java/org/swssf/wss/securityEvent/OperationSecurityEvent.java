@@ -20,6 +20,8 @@ package org.swssf.wss.securityEvent;
 
 import javax.xml.namespace.QName;
 
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -29,7 +31,7 @@ public class OperationSecurityEvent extends SecurityEvent {
     private QName operation;
 
     public OperationSecurityEvent() {
-        super(Event.Operation);
+        super(WSSecurityEventConstants.Operation);
     }
 
     public QName getOperation() {

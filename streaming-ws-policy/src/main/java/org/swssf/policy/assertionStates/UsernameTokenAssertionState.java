@@ -24,10 +24,11 @@ import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.UsernameToken;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.swssf.wss.securityEvent.UsernameTokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
  * WSP1.3, 5.4.1 UsernameToken Assertion
@@ -43,9 +44,9 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.UsernameToken
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.UsernameToken
         };
     }
 

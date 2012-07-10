@@ -23,8 +23,8 @@ import org.swssf.policy.PolicyViolationException;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.wss.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -24,6 +24,7 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.*;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

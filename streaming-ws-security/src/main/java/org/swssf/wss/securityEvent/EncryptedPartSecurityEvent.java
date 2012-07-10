@@ -20,6 +20,7 @@ package org.swssf.wss.securityEvent;
 
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 
 import java.util.List;
 
@@ -30,6 +31,6 @@ import java.util.List;
 public class EncryptedPartSecurityEvent extends AbstractSecuredElementSecurityEvent {
 
     public EncryptedPartSecurityEvent(SecurityToken securityToken, boolean encrypted, List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(Event.EncryptedPart, securityToken, protectionOrder, false, encrypted);
+        super(WSSecurityEventConstants.EncryptedPart, securityToken, protectionOrder, false, encrypted);
     }
 }

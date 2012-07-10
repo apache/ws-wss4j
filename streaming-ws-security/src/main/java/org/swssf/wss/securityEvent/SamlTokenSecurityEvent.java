@@ -28,7 +28,7 @@ import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     public SamlTokenSecurityEvent() {
-        super(Event.SamlToken);
+        super(WSSecurityEventConstants.SamlToken);
     }
 
     public SAMLVersion getSamlVersion() {

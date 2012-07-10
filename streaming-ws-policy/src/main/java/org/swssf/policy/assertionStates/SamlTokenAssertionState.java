@@ -26,9 +26,10 @@ import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
  * WSP1.3, 5.4.8 SamlToken Assertion
@@ -44,9 +45,9 @@ public class SamlTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.SamlToken
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.SamlToken
         };
     }
 

@@ -22,8 +22,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
@@ -31,6 +29,9 @@ import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -63,7 +64,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                 List<SecurityEvent> requestSecurityEvents = outputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
                 for (int i = 0; i < requestSecurityEvents.size(); i++) {
                     SecurityEvent securityEvent = requestSecurityEvents.get(i);
-                    if (securityEvent.getSecurityEventType() == SecurityEvent.Event.SignatureValue) {
+                    if (securityEvent.getSecurityEventType() == SecurityEventConstants.SignatureValue) {
                         aSignatureFound = true;
                         SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 

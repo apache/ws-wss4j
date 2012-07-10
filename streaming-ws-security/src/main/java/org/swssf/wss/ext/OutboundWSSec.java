@@ -20,8 +20,6 @@ package org.swssf.wss.ext;
 
 import org.swssf.wss.impl.WSSecurityContextImpl;
 import org.swssf.wss.impl.processor.output.*;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.ext.OutputProcessor;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
@@ -29,6 +27,8 @@ import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.OutputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamWriter;
 import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
 import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;

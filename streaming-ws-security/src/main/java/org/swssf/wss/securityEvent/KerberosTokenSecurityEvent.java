@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -27,7 +29,7 @@ public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
     private String issuerName;
 
     public KerberosTokenSecurityEvent() {
-        super(Event.KerberosToken);
+        super(WSSecurityEventConstants.KerberosToken);
     }
 
     public String getIssuerName() {

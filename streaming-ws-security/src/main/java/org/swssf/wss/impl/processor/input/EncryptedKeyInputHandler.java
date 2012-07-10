@@ -26,13 +26,13 @@ import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.EncryptedKeyTokenSecurityEvent;
-import org.swssf.wss.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.xmlsecurity.ns.configuration.AlgorithmType;
 
 import javax.crypto.BadPaddingException;

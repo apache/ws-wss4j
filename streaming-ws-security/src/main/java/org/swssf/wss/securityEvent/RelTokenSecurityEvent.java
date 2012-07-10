@@ -28,7 +28,7 @@ public class RelTokenSecurityEvent extends IssuedTokenSecurityEvent {
     private String issuerName;
 
     public RelTokenSecurityEvent() {
-        super(Event.RelToken);
+        super(WSSecurityEventConstants.RelToken);
     }
 
     @Override

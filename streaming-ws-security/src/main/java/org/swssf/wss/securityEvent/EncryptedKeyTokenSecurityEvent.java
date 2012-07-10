@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -27,6 +29,6 @@ public class EncryptedKeyTokenSecurityEvent extends TokenSecurityEvent {
     //todo implement
 
     public EncryptedKeyTokenSecurityEvent() {
-        super(Event.EncryptedKeyToken);
+        super(WSSecurityEventConstants.EncryptedKeyToken);
     }
 }

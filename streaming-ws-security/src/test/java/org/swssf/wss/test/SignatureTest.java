@@ -21,10 +21,11 @@ package org.swssf.wss.test;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.swssf.wss.WSSec;
 import org.swssf.wss.ext.*;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.swssf.wss.test.utils.StAX2DOM;
 import org.swssf.wss.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -936,15 +937,15 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5417);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
-            SecurityEvent.Event[] expectedSecurityEvents = new SecurityEvent.Event[]{
-                    SecurityEvent.Event.KeyValueToken,
-                    SecurityEvent.Event.SignatureValue,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.AlgorithmSuite,
-                    SecurityEvent.Event.SignedElement,
-                    SecurityEvent.Event.Operation,
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.KeyValueToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);

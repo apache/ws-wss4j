@@ -22,11 +22,13 @@ import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.AbstractSymmetricAsymmetricBinding;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.securityEvent.SecurityEvent;
 import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.6 Entire Header and Body Signatures Property
@@ -41,9 +43,9 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.SignedPart
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.SignedPart
         };
     }
 

@@ -18,6 +18,8 @@
  */
 package org.swssf.wss.securityEvent;
 
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -28,7 +30,7 @@ public class SecureConversationTokenSecurityEvent extends TokenSecurityEvent {
     private String issuerName;
 
     public SecureConversationTokenSecurityEvent() {
-        super(Event.SecureConversationToken);
+        super(WSSecurityEventConstants.SecureConversationToken);
     }
 
     public boolean isExternalUriRef() {

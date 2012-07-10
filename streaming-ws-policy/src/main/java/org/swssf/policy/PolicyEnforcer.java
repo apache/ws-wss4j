@@ -28,9 +28,11 @@ import org.swssf.policy.assertionStates.*;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEvent;
-import org.swssf.wss.securityEvent.SecurityEventListener;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
 import javax.xml.namespace.QName;
 import java.util.*;
@@ -58,16 +60,16 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     private final List<OperationPolicy> operationPolicies;
     private OperationPolicy effectivePolicy;
-    private final List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap;
-    private final List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> failedAssertionStateMap;
+    private final List<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMap;
+    private final List<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> failedAssertionStateMap;
 
     private final Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
-        assertionStateMap = new LinkedList<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>>();
-        failedAssertionStateMap = new LinkedList<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>>();
+        assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
+        failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
 
         if (soapAction != null && !soapAction.isEmpty()) {
             effectivePolicy = findPolicyBySOAPAction(operationPolicies, soapAction);
@@ -104,7 +106,7 @@ public class PolicyEnforcer implements SecurityEventListener {
      */
     private void buildAssertionStateMap(
             PolicyComponent policyComponent,
-            List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap) throws WSSPolicyException {
+            List<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMap) throws WSSPolicyException {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
@@ -113,7 +115,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             while (policyComponentIterator.hasNext()) {
                 PolicyComponent curPolicyComponent = policyComponentIterator.next();
                 if (policyOperator instanceof ExactlyOne) {
-                    assertionStateMap.add(new HashMap<SecurityEvent.Event, Map<Assertion, List<Assertable>>>());
+                    assertionStateMap.add(new HashMap<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>());
                     buildAssertionStateMap(curPolicyComponent, assertionStateMap, alternative++);
                 } else {
                     buildAssertionStateMap(curPolicyComponent, assertionStateMap);
@@ -126,7 +128,7 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     private void buildAssertionStateMap(
             PolicyComponent policyComponent,
-            List<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMap, int alternative) throws WSSPolicyException {
+            List<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMap, int alternative) throws WSSPolicyException {
         if (policyComponent instanceof PolicyOperator) {
             PolicyOperator policyOperator = (PolicyOperator) policyComponent;
             List<PolicyComponent> policyComponents = policyOperator.getPolicyComponents();
@@ -141,10 +143,10 @@ public class PolicyEnforcer implements SecurityEventListener {
             Iterator<Assertable> assertableIterator = assertablesList.iterator();
             while (assertableIterator.hasNext()) {
                 Assertable assertable = assertableIterator.next();
-                final Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMap.get(alternative);
-                final SecurityEvent.Event[] securityEventType = assertable.getSecurityEventType();
+                final Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMap.get(alternative);
+                final SecurityEventConstants.Event[] securityEventType = assertable.getSecurityEventType();
                 for (int j = 0; j < securityEventType.length; j++) {
-                    SecurityEvent.Event event = securityEventType[j];
+                    SecurityEventConstants.Event event = securityEventType[j];
                     Map<Assertion, List<Assertable>> assertables = map.get(event);
                     if (assertables == null) {
                         assertables = new HashMap<Assertion, List<Assertable>>();
@@ -267,10 +269,10 @@ public class PolicyEnforcer implements SecurityEventListener {
     private void verifyPolicy(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException {
         {
             //We have to check the failed assertions for logging purposes firstly...
-            Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
+            Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
             alternative:
             while (assertionStateMapIterator.hasNext()) {
-                Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+                Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
                 //every list entry counts as an alternative...
                 Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
                 if (assertionListMap != null && assertionListMap.size() > 0) {
@@ -295,11 +297,11 @@ public class PolicyEnforcer implements SecurityEventListener {
         String assertionMessage = null;
         {
             //...and then check the remaining alternatives
-            Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
+            Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
             //every map entry counts as an alternative...
             alternative:
             while (assertionStateMapIterator.hasNext()) {
-                Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+                Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
                 Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
                 if (assertionListMap != null && assertionListMap.size() > 0) {
                     Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = assertionListMap.entrySet().iterator();
@@ -338,13 +340,13 @@ public class PolicyEnforcer implements SecurityEventListener {
      */
     private void verifyPolicy() throws WSSPolicyException {
         String assertionMessage = null;
-        Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
+        Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
         alternative:
         while (assertionStateMapIterator.hasNext()) {
-            Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
-            Iterator<Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> iterator = map.entrySet().iterator();
+            Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+            Iterator<Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> iterator = map.entrySet().iterator();
             while (iterator.hasNext()) {
-                Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>> mapEntry = iterator.next();
+                Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> mapEntry = iterator.next();
                 Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = mapEntry.getValue().entrySet().iterator();
                 while (assertionStateIterator.hasNext()) {
                     Map.Entry<Assertion, List<Assertable>> assertionListEntry = assertionStateIterator.next();
@@ -377,13 +379,13 @@ public class PolicyEnforcer implements SecurityEventListener {
      */
     private void verifyPolicyAfterOperationSecurityEvent() throws WSSPolicyException {
         String assertionMessage = null;
-        Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
+        Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.assertionStateMap.iterator();
         alternative:
         while (assertionStateMapIterator.hasNext()) {
-            Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
-            Iterator<Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> iterator = map.entrySet().iterator();
+            Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+            Iterator<Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> iterator = map.entrySet().iterator();
             while (iterator.hasNext()) {
-                Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>> mapEntry = iterator.next();
+                Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> mapEntry = iterator.next();
                 Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = mapEntry.getValue().entrySet().iterator();
                 while (assertionStateIterator.hasNext()) {
                     Map.Entry<Assertion, List<Assertable>> assertionListEntry = assertionStateIterator.next();
@@ -421,13 +423,13 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     private void logFailedAssertions() {
-        Iterator<Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
+        Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
         while (assertionStateMapIterator.hasNext()) {
-            Map<SecurityEvent.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
-            Set<Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> entrySet = map.entrySet();
-            Iterator<Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>>> entryIterator = entrySet.iterator();
+            Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+            Set<Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> entrySet = map.entrySet();
+            Iterator<Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> entryIterator = entrySet.iterator();
             while (entryIterator.hasNext()) {
-                Map.Entry<SecurityEvent.Event, Map<Assertion, List<Assertable>>> eventCollectionEntry = entryIterator.next();
+                Map.Entry<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> eventCollectionEntry = entryIterator.next();
                 Map<Assertion, List<Assertable>> assertionListMap = eventCollectionEntry.getValue();
                 Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateEntryIterator = assertionListMap.entrySet().iterator();
                 while (assertionStateEntryIterator.hasNext()) {
@@ -459,7 +461,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
         }
 
-        if (securityEvent.getSecurityEventType() == SecurityEvent.Event.Operation) {
+        if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
             operationSecurityEventOccured = true;
             final OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
             if (effectivePolicy != null) {

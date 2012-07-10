@@ -22,8 +22,10 @@ import org.apache.ws.secpolicy.AssertionState;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.AbstractSecurityAssertion;
 import org.apache.ws.secpolicy.model.Layout;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.swssf.policy.Assertable;
-import org.swssf.wss.securityEvent.SecurityEvent;
+import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,27 +36,27 @@ import java.util.List;
  */
 public class LayoutAssertionState extends AssertionState implements Assertable {
 
-    private List<SecurityEvent.Event> occuredEvents = new ArrayList<SecurityEvent.Event>();
+    private List<SecurityEventConstants.Event> occuredEvents = new ArrayList<SecurityEventConstants.Event>();
 
     public LayoutAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);
     }
 
     @Override
-    public SecurityEvent.Event[] getSecurityEventType() {
-        return new SecurityEvent.Event[]{
-                SecurityEvent.Event.UsernameToken,
-                SecurityEvent.Event.IssuedToken,
-                SecurityEvent.Event.X509Token,
-                SecurityEvent.Event.KerberosToken,
-                SecurityEvent.Event.SpnegoContextToken,
-                SecurityEvent.Event.SecurityContextToken,
-                SecurityEvent.Event.SecureConversationToken,
-                SecurityEvent.Event.SamlToken,
-                SecurityEvent.Event.RelToken,
-                SecurityEvent.Event.HttpsToken,
-                SecurityEvent.Event.KeyValueToken,
-                SecurityEvent.Event.Timestamp,
+    public SecurityEventConstants.Event[] getSecurityEventType() {
+        return new SecurityEventConstants.Event[]{
+                WSSecurityEventConstants.UsernameToken,
+                WSSecurityEventConstants.IssuedToken,
+                SecurityEventConstants.X509Token,
+                WSSecurityEventConstants.KerberosToken,
+                WSSecurityEventConstants.SpnegoContextToken,
+                WSSecurityEventConstants.SecurityContextToken,
+                WSSecurityEventConstants.SecureConversationToken,
+                WSSecurityEventConstants.SamlToken,
+                WSSecurityEventConstants.RelToken,
+                WSSecurityEventConstants.HttpsToken,
+                SecurityEventConstants.KeyValueToken,
+                WSSecurityEventConstants.Timestamp,
         };
     }
 
@@ -69,13 +71,13 @@ public class LayoutAssertionState extends AssertionState implements Assertable {
                 //todo?
                 break;
             case LaxTsFirst:
-                if (occuredEvents.isEmpty() && securityEvent.getSecurityEventType() != SecurityEvent.Event.Timestamp) {
+                if (occuredEvents.isEmpty() && securityEvent.getSecurityEventType() != WSSecurityEventConstants.Timestamp) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + layout.getLayoutType() + " but " + securityEvent.getSecurityEventType() + " occured first");
                 }
                 break;
             case LaxTsLast:
-                if (occuredEvents.contains(SecurityEvent.Event.Timestamp)) {
+                if (occuredEvents.contains(WSSecurityEventConstants.Timestamp)) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + layout.getLayoutType() + " but " + securityEvent.getSecurityEventType() + " occured last");
                 }
