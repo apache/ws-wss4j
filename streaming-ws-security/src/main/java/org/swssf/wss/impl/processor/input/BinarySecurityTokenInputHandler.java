@@ -24,7 +24,7 @@ import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
-import org.apache.xml.security.stax.crypto.Crypto;
+import org.swssf.wss.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;

@@ -24,11 +24,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.xml.security.stax.crypto.Crypto;
-import org.apache.xml.security.stax.crypto.MerlinBase;
 import org.apache.xml.security.stax.ext.XMLSecurityConfigurationException;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.swssf.wss.crypto.Crypto;
+import org.swssf.wss.crypto.MerlinBase;
 
 /**
  * Main configuration class to supply keys etc.
@@ -185,7 +185,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (signatureCryptoClass != null) {
             return signatureCryptoClass;
         }
-        signatureCryptoClass = org.apache.xml.security.stax.crypto.Merlin.class;
+        signatureCryptoClass = org.swssf.wss.crypto.Merlin.class;
         return signatureCryptoClass;
     }
 
@@ -236,7 +236,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (signatureVerificationCryptoClass != null) {
             return signatureVerificationCryptoClass;
         }
-        signatureVerificationCryptoClass = org.apache.xml.security.stax.crypto.Merlin.class;
+        signatureVerificationCryptoClass = org.swssf.wss.crypto.Merlin.class;
         return signatureVerificationCryptoClass;
     }
 
@@ -304,7 +304,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (decryptionCryptoClass != null) {
             return decryptionCryptoClass;
         }
-        decryptionCryptoClass = org.apache.xml.security.stax.crypto.Merlin.class;
+        decryptionCryptoClass = org.swssf.wss.crypto.Merlin.class;
         return decryptionCryptoClass;
     }
 
@@ -384,7 +384,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (encryptionCryptoClass != null) {
             return encryptionCryptoClass;
         }
-        encryptionCryptoClass = org.apache.xml.security.stax.crypto.Merlin.class;
+        encryptionCryptoClass = org.swssf.wss.crypto.Merlin.class;
         return encryptionCryptoClass;
     }
 

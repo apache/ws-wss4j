@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.xml.security.stax.crypto;
+package org.swssf.wss.crypto;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

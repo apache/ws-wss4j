@@ -25,7 +25,7 @@ import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.*;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
 import org.swssf.wss.ext.*;
-import org.apache.xml.security.stax.crypto.Crypto;
+import org.swssf.wss.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken;

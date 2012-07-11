@@ -20,8 +20,8 @@ package org.swssf.wss.impl.securityToken;
 
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
-import org.apache.xml.security.stax.crypto.Crypto;
-import org.apache.xml.security.stax.crypto.CryptoType;
+import org.swssf.wss.crypto.Crypto;
+import org.swssf.wss.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;

@@ -26,11 +26,11 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.xml.security.stax.crypto.Crypto;
-import org.apache.xml.security.stax.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.swssf.wss.crypto.Crypto;
+import org.swssf.wss.crypto.CryptoType;
 import org.swssf.wss.ext.WSPasswordCallback;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;

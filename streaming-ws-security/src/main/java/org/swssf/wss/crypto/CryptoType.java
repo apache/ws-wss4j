@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.xml.security.stax.crypto;
+package org.swssf.wss.crypto;
 
 import java.math.BigInteger;
 

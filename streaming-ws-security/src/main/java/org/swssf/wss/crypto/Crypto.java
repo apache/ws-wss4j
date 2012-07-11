@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.xml.security.stax.crypto;
+package org.swssf.wss.crypto;
 
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 

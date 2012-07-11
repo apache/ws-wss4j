@@ -26,8 +26,8 @@ import org.swssf.wss.impl.saml.SAMLCallback;
 import org.swssf.wss.impl.saml.bean.*;
 import org.swssf.wss.impl.saml.builder.SAML1Constants;
 import org.swssf.wss.impl.saml.builder.SAML2Constants;
-import org.apache.xml.security.stax.crypto.Merlin;
-import org.apache.xml.security.stax.crypto.MerlinBase;
+import org.swssf.wss.crypto.Merlin;
+import org.swssf.wss.crypto.MerlinBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

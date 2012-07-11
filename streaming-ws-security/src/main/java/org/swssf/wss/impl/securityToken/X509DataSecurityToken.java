@@ -23,8 +23,8 @@ import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.apache.xml.security.stax.crypto.Crypto;
-import org.apache.xml.security.stax.crypto.CryptoType;
+import org.swssf.wss.crypto.Crypto;
+import org.swssf.wss.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 

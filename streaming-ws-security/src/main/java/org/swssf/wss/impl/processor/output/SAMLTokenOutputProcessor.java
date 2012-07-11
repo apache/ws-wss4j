@@ -27,7 +27,7 @@ import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.wss.impl.saml.bean.KeyInfoBean;
 import org.swssf.wss.impl.saml.bean.SubjectBean;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
-import org.apache.xml.security.stax.crypto.CryptoType;
+import org.swssf.wss.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;

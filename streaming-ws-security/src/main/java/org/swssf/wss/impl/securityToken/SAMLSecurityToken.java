@@ -22,7 +22,7 @@ import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
-import org.apache.xml.security.stax.crypto.Crypto;
+import org.swssf.wss.crypto.Crypto;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;

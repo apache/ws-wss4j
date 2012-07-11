@@ -19,7 +19,7 @@
 package org.swssf.wss.impl.processor.output;
 
 import org.swssf.wss.ext.*;
-import org.apache.xml.security.stax.crypto.CryptoType;
+import org.swssf.wss.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;

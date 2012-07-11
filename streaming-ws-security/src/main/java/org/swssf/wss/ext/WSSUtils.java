@@ -19,7 +19,6 @@
 package org.swssf.wss.ext;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.xml.security.stax.crypto.Merlin;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -27,6 +26,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
+import org.swssf.wss.crypto.Merlin;
 import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.swssf.wss.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
