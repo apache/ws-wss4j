@@ -24,6 +24,7 @@ import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
@@ -41,7 +42,7 @@ public class SecureConversationSecurityToken extends AbstractSecurityToken {
     public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto,
                                            CallbackHandler callbackHandler, String id,
                                            WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
+        super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
     }
 
     public boolean isAsymmetric() {

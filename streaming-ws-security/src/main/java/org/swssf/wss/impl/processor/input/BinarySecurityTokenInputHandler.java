@@ -23,7 +23,6 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.ext.WSSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
@@ -64,7 +63,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
         final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private WSSecurityToken binarySecurityToken = null;
+            private SecurityToken binarySecurityToken = null;
 
             public SecurityToken getSecurityToken() throws XMLSecurityException {
                 if (this.binarySecurityToken != null) {

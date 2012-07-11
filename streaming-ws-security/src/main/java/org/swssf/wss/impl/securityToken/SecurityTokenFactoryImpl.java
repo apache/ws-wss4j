@@ -28,6 +28,9 @@ import org.swssf.wss.ext.*;
 import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.ECKeyValueSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.RsaKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -45,7 +48,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     }
 
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto, final CallbackHandler callbackHandler,
-                                          SecurityContext securityContext) throws XMLSecurityException {
+                        XMLSecurityProperties securityProperties, SecurityContext securityContext) throws XMLSecurityException {
         if (keyInfoType != null) {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
@@ -191,24 +194,24 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
             return new RsaKeyValueSecurityToken(rsaKeyValueType, (WSSecurityContext) securityContext,
-                    crypto, callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
         }
         final DSAKeyValueType dsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
         if (dsaKeyValueType != null) {
             return new DsaKeyValueSecurityToken(dsaKeyValueType, (WSSecurityContext) securityContext,
-                    crypto, callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
         }
         final ECKeyValueType ecKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
         if (ecKeyValueType != null) {
             return new ECKeyValueSecurityToken(ecKeyValueType, (WSSecurityContext) securityContext,
-                    crypto, callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
     }
 
-    public static WSSecurityToken getSecurityToken(
+    public static SecurityToken getSecurityToken(
             BinarySecurityTokenType binarySecurityTokenType, SecurityContext securityContext,
             Crypto crypto, CallbackHandler callbackHandler) throws XMLSecurityException {
 
@@ -232,13 +235,13 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         }
     }
 
-    public static WSSecurityToken getSecurityToken(String username, String password, String created, byte[] nonce,
+    public static SecurityToken getSecurityToken(String username, String password, String created, byte[] nonce,
                                                    byte[] salt, Long iteration, WSSecurityContext wsSecurityContext,
                                                    String id) throws WSSecurityException {
         return new UsernameSecurityToken(username, password, created, nonce, salt, iteration, wsSecurityContext, id, WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
     }
 
-    public static WSSecurityToken getSecurityToken(String referencedTokenId, Deque<XMLSecEvent> xmlSecEvents,
+    public static SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLSecEvent> xmlSecEvents,
                                                    CallbackHandler callbackHandler,
                                                    SecurityContext securityContext, String id)
             throws XMLSecurityException {

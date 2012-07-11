@@ -84,7 +84,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private WSSecurityToken securityToken = null;
+            private SecurityToken securityToken = null;
 
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {

@@ -19,10 +19,10 @@
 package org.swssf.wss.securityEvent;
 
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import java.security.Key;
@@ -69,7 +69,7 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
     public SecurityToken getSecurityToken() {
         SecurityToken securityToken = super.getSecurityToken();
         if (securityToken == null) {
-            securityToken = new AbstractSecurityToken(null, null, null, null, null) {
+            securityToken = new AbstractSecurityToken(null, null, null, null) {
                 @Override
                 protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
                     return null;

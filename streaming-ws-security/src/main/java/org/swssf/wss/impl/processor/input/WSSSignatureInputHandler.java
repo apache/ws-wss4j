@@ -160,7 +160,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
                                                       SecurityContext securityContext) throws XMLSecurityException {
             return SecurityTokenFactory.getInstance().getSecurityToken(keyInfoType,
                                                                 ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(),
-                                                                securityContext);
+                                                                securityProperties, securityContext);
             
         }
     }

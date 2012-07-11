@@ -23,7 +23,6 @@ import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.swssf.wss.impl.derivedKey.DerivedKeyUtils;
-import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.swssf.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.swssf.wss.impl.securityToken.UsernameSecurityToken;
@@ -31,6 +30,7 @@ import org.swssf.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 
@@ -78,7 +78,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                 }
 
                 this.derivedKeySecurityToken = new AbstractSecurityToken(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null, null,
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null,
                         derivedKeyTokenType.getId(), null) {
 
                     private SecurityToken referencedSecurityToken = null;

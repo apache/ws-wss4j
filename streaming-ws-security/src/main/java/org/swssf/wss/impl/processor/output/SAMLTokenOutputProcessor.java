@@ -26,7 +26,6 @@ import org.swssf.wss.impl.saml.SAMLCallback;
 import org.swssf.wss.impl.saml.SAMLKeyInfo;
 import org.swssf.wss.impl.saml.bean.KeyInfoBean;
 import org.swssf.wss.impl.saml.bean.SubjectBean;
-import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.impl.securityToken.SAMLSecurityToken;
 import org.apache.xml.security.stax.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.*;
@@ -34,6 +33,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.*;
 

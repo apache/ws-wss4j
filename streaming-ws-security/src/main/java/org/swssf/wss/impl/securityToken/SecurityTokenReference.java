@@ -24,6 +24,7 @@ import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
@@ -42,7 +43,7 @@ public class SecurityTokenReference extends AbstractSecurityToken {
 
     public SecurityTokenReference(SecurityToken securityToken, Deque<XMLSecEvent> xmlSecEvents, WSSecurityContext wsSecurityContext,
                                   CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, null, callbackHandler, id, keyIdentifierType);
+        super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
         this.securityToken = securityToken;
         this.xmlSecEvents = xmlSecEvents;
     }

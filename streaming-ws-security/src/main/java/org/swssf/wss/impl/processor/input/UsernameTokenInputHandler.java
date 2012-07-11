@@ -192,7 +192,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private WSSecurityToken securityToken = null;
+            private SecurityToken securityToken = null;
 
             public SecurityToken getSecurityToken() throws WSSecurityException {
                 if (this.securityToken != null) {

@@ -23,6 +23,7 @@ import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import java.security.Key;
@@ -46,13 +47,13 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
     }
 
     public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext) throws WSSecurityException {
-        super(wsSecurityContext, null, null, IDGenerator.generateID(null), null);
+        super(wsSecurityContext, null, IDGenerator.generateID(null), null);
         this.x509Certificate = x509Certificate;
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
     public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext) throws WSSecurityException {
-        super(wsSecurityContext, null, null, IDGenerator.generateID(null), null);
+        super(wsSecurityContext, null, IDGenerator.generateID(null), null);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;
         } else {

@@ -25,6 +25,7 @@ import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -50,7 +51,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
                                  WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, null, null, id, keyIdentifierType);
+        super(wsSecurityContext, null, id, keyIdentifierType);
         this.username = username;
         this.password = password;
         this.created = created;
@@ -61,7 +62,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
                                  String id) {
-        super(null, null, null, id, null);
+        super(null, null, id, null);
         this.username = username;
         this.password = password;
         this.created = created;

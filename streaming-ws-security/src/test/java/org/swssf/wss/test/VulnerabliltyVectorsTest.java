@@ -108,7 +108,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSecurityException);
+            Assert.assertTrue(throwable instanceof XMLSecurityException);
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
             //Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");

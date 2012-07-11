@@ -24,10 +24,10 @@ import org.apache.ws.secpolicy.model.AbstractToken;
 import org.apache.ws.secpolicy.model.SamlToken;
 import org.opensaml.common.SAMLVersion;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SamlTokenSecurityEvent;
 import org.swssf.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 

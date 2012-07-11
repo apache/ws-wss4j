@@ -24,12 +24,12 @@ import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.*;
-import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
@@ -80,7 +80,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
         final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private WSSecurityToken securityToken = null;
+            private SecurityToken securityToken = null;
 
             public SecurityToken getSecurityToken() throws XMLSecurityException {
 
@@ -89,8 +89,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                 }
 
                 this.securityToken = new AbstractSecurityToken(
-                        securityContext, null, null,
-                        encryptedKeyType.getId(), null) {
+                        securityContext, null, encryptedKeyType.getId(), null) {
 
                     private final Map<String, Key> keyTable = new Hashtable<String, Key>();
 
@@ -136,6 +135,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                                 keyInfoType,
                                 crypto,
                                 securityProperties.getCallbackHandler(),
+                                securityProperties,
                                 securityContext
                         );
                         this.wrappingSecurityToken.addWrappedToken(wrappedSecurityToken);

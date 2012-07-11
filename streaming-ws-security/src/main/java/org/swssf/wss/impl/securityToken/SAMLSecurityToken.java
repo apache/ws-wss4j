@@ -26,6 +26,7 @@ import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
@@ -44,21 +45,28 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
     private final SAMLKeyInfo samlKeyInfo;
     private String issuer;
     private X509Certificate[] x509Certificate;
+    private Crypto crypto;
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, String issuer,
                              WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
                              String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
+        super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
         this.issuer = issuer;
+        this.crypto = crypto;
     }
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, WSSecurityContext wsSecurityContext,
                              Crypto crypto, CallbackHandler callbackHandler, String id) {
-        super(wsSecurityContext, crypto, callbackHandler, id, null);
+        super(wsSecurityContext, callbackHandler, id, null);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
+        this.crypto = crypto;
+    }
+    
+    public Crypto getCrypto() {
+        return crypto;
     }
 
     public boolean isAsymmetric() {

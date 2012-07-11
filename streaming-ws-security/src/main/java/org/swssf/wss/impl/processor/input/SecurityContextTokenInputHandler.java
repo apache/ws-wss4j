@@ -20,11 +20,11 @@ package org.swssf.wss.impl.processor.input;
 
 import org.swssf.binding.wssc.AbstractSecurityContextTokenType;
 import org.swssf.wss.ext.*;
-import org.swssf.wss.impl.securityToken.AbstractSecurityToken;
 import org.swssf.wss.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -61,9 +61,9 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final List<QName> elementPath = getElementPath(eventQueue);
         final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
-        final WSSecurityToken securityContextToken =
+        final SecurityToken securityContextToken =
                 new AbstractSecurityToken(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null,
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
                         null, securityContextTokenType.getId(), null) {
 
                     public boolean isAsymmetric() {

@@ -18,52 +18,52 @@
  */
 package org.swssf.wss.impl.securityToken;
 
-import org.swssf.wss.ext.WSPasswordCallback;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSecurityContext;
-import org.apache.xml.security.stax.crypto.Crypto;
-import org.apache.xml.security.stax.crypto.CryptoType;
-import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.ext.XMLSecurityUtils;
-
-import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.xml.security.stax.crypto.Crypto;
+import org.apache.xml.security.stax.crypto.CryptoType;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.swssf.wss.ext.WSPasswordCallback;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSecurityContext;
+
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public abstract class X509SecurityToken extends AbstractSecurityToken {
+public abstract class X509SecurityToken 
+    extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken {
     private X509Certificate[] x509Certificates = null;
-    private final XMLSecurityConstants.TokenType tokenType;
+    private Crypto crypto;
 
     protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
                                 Crypto crypto, CallbackHandler callbackHandler, String id,
                                 WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
-        this.tokenType = tokenType;
+        super(tokenType, wsSecurityContext, callbackHandler, id, keyIdentifierType);
+        this.crypto = crypto;
+    }
+    
+    protected Crypto getCrypto() {
+        return crypto;
     }
 
     @Override
-    public boolean isAsymmetric() {
-        return true;
-    }
-
-    @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         XMLSecurityUtils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }
-
+    
     @Override
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
         X509Certificate[] x509Certificates = getX509Certificates();
         if (x509Certificates == null || x509Certificates.length == 0) {
             return null;
@@ -96,15 +96,6 @@ public abstract class X509SecurityToken extends AbstractSecurityToken {
         }
     }
 
-    @Override
-    public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
     protected abstract String getAlias() throws XMLSecurityException;
 
-    @Override
-    public XMLSecurityConstants.TokenType getTokenType() {
-        return tokenType;
-    }
 }
