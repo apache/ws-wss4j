@@ -76,7 +76,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                     //ignore
                 }
                 if (crypto == null) {
-                    crypto = securityProperties.getDecryptionCrypto();
+                    crypto = ((WSSSecurityProperties)securityProperties).getDecryptionCrypto();
                 }
                 this.binarySecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
                         binarySecurityTokenType,

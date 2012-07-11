@@ -26,7 +26,6 @@ import org.apache.xml.security.binding.xmldsig.ManifestType;
 import org.apache.xml.security.binding.xmldsig.ObjectType;
 import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;
@@ -158,8 +157,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         protected SecurityToken retrieveSecurityToken(KeyInfoType keyInfoType,
                                                       XMLSecurityProperties securityProperties,
                                                       SecurityContext securityContext) throws XMLSecurityException {
-            return SecurityTokenFactory.getInstance().getSecurityToken(keyInfoType,
-                                                                ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto(), securityProperties.getCallbackHandler(),
+            return SecurityTokenFactory.getInstance().getSecurityToken(keyInfoType, SecurityToken.KeyInfoUsage.SIGNATURE_VERIFICATION,
                                                                 securityProperties, securityContext);
             
         }

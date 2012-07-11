@@ -86,10 +86,11 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     x509Certificates[0] = x509Certificate;
                 } else {
                     CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(getSecurityProperties().getEncryptionUser());
-                    x509Certificates = getSecurityProperties().getEncryptionCrypto().getX509Certificates(cryptoType);
+                    cryptoType.setAlias(((WSSSecurityProperties)getSecurityProperties()).getEncryptionUser());
+                    x509Certificates = ((WSSSecurityProperties)getSecurityProperties()).getEncryptionCrypto().getX509Certificates(cryptoType);
                     if (x509Certificates == null || x509Certificates.length == 0) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound", getSecurityProperties().getEncryptionUser());
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound", 
+                                ((WSSSecurityProperties)getSecurityProperties()).getEncryptionUser());
                     }
                 }
                 key = null;

@@ -26,7 +26,6 @@ import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
@@ -103,7 +102,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             return keyTable.get(algorithmURI);
                         } else {
                             String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
-                            Key key = new SecretKeySpec(getSecret(securityProperties.getDecryptionCrypto(), this), algoFamily);
+                            Key key = new SecretKeySpec(getSecret(this), algoFamily);
                             keyTable.put(algorithmURI, key);
                             return key;
                         }
@@ -116,7 +115,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                     }
 
                     public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
-                        return getWrappingSecurityToken(securityProperties.getDecryptionCrypto(), this);
+                        return getWrappingSecurityToken(this);
                     }
 
                     public WSSConstants.TokenType getTokenType() {
@@ -125,7 +124,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
 
                     private SecurityToken wrappingSecurityToken = null;
 
-                    private SecurityToken getWrappingSecurityToken(Crypto crypto, SecurityToken wrappedSecurityToken)
+                    private SecurityToken getWrappingSecurityToken(SecurityToken wrappedSecurityToken)
                             throws XMLSecurityException {
                         if (wrappingSecurityToken != null) {
                             return this.wrappingSecurityToken;
@@ -133,8 +132,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         KeyInfoType keyInfoType = encryptedKeyType.getKeyInfo();
                         this.wrappingSecurityToken = SecurityTokenFactory.getInstance().getSecurityToken(
                                 keyInfoType,
-                                crypto,
-                                securityProperties.getCallbackHandler(),
+                                SecurityToken.KeyInfoUsage.DECRYPTION,
                                 securityProperties,
                                 securityContext
                         );
@@ -142,7 +140,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                         return this.wrappingSecurityToken;
                     }
 
-                    private byte[] getSecret(Crypto crypto, SecurityToken wrappedSecurityToken) throws XMLSecurityException {
+                    private byte[] getSecret(SecurityToken wrappedSecurityToken) throws XMLSecurityException {
 
                         String algorithmURI = encryptedKeyType.getEncryptionMethod().getAlgorithm();
                         if (algorithmURI == null) {
@@ -153,7 +151,7 @@ public class EncryptedKeyInputHandler extends AbstractInputSecurityHeaderHandler
                             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo");
                         }
 
-                        final SecurityToken wrappingSecurityToken = getWrappingSecurityToken(crypto, wrappedSecurityToken);
+                        final SecurityToken wrappingSecurityToken = getWrappingSecurityToken(wrappedSecurityToken);
                         try {
                             WSSConstants.KeyUsage keyUsage;
                             if (wrappingSecurityToken.isAsymmetric()) {

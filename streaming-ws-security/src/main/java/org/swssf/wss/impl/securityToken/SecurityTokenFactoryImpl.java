@@ -47,23 +47,30 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     public SecurityTokenFactoryImpl() {
     }
 
-    public SecurityToken getSecurityToken(KeyInfoType keyInfoType, Crypto crypto, final CallbackHandler callbackHandler,
+    public SecurityToken getSecurityToken(KeyInfoType keyInfoType, SecurityToken.KeyInfoUsage keyInfoUsage,
                         XMLSecurityProperties securityProperties, SecurityContext securityContext) throws XMLSecurityException {
+        Crypto crypto = null;
+        if (keyInfoUsage == SecurityToken.KeyInfoUsage.SIGNATURE_VERIFICATION) {
+            crypto = ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto();
+        } else if (keyInfoUsage == SecurityToken.KeyInfoUsage.DECRYPTION) {
+            crypto = ((WSSSecurityProperties)securityProperties).getDecryptionCrypto();
+        }
+        
         if (keyInfoType != null) {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
             if (securityTokenReferenceType != null) {
-                return getSecurityToken(securityTokenReferenceType, crypto, callbackHandler, securityContext);
+                return getSecurityToken(securityTokenReferenceType, crypto, securityProperties.getCallbackHandler(), securityContext);
             }
             final KeyValueType keyValueType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
             if (keyValueType != null) {
-                return getSecurityToken(keyValueType, crypto, callbackHandler, securityContext);
+                return getSecurityToken(keyValueType, crypto, securityProperties.getCallbackHandler(), securityContext);
             }
 
         } else if (crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityToken(
-                    (WSSecurityContext) securityContext, crypto, callbackHandler, crypto.getDefaultX509Identifier(),
+                    (WSSecurityContext) securityContext, crypto, securityProperties.getCallbackHandler(), crypto.getDefaultX509Identifier(),
                     crypto.getDefaultX509Identifier(), null
             );
         }
