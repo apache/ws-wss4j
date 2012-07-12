@@ -74,6 +74,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
                 //we have to emit a TokenSecurityEvent here too since it could be an embedded token
                 securityToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
                 TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+                tokenSecurityEvent.setSecurityToken(securityToken);
                 securityContext.registerSecurityEvent(tokenSecurityEvent);
 
                 SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
