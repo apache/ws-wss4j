@@ -59,7 +59,12 @@
    <JCEAlgorithmMappings>
       <xi:include href="security-config.xml" xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:JCEAlgorithmMappings/c:Algorithm)"/>
    </JCEAlgorithmMappings>
-   <ResourceResolvers>
-      <xi:include href="security-config.xml" xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:ResourceResolvers/c:Resolver)"/>
-   </ResourceResolvers>
+    <ResourceResolvers>
+        <Resolver JAVACLASS="org.swssf.wss.impl.resourceResolvers.ResolverSameDocument"
+                  DESCRIPTION="A simple resolver for requests of same-document URIs"/>
+        <Resolver JAVACLASS="org.swssf.wss.impl.resourceResolvers.ResolverXPointer"
+                  DESCRIPTION="A simple resolver for requests of XPointer fragents"/>
+        <xi:include href="security-config.xml"
+                    xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:ResourceResolvers/c:Resolver[@JAVACLASS!='org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument' and @JAVACLASS!='org.apache.xml.security.stax.impl.resourceResolvers.ResolverXPointer'])"/>
+    </ResourceResolvers>
 </Configuration>

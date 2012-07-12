@@ -143,6 +143,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
     protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) throws XMLStreamException, XMLSecurityException {
         if (signaturePartDef.getTransformAlgo() != null) {
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getTransformAlgo()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
@@ -153,11 +154,14 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
-        } else {
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms);
+        } else if (signaturePartDef.getC14nAlgo() != null) {
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo()));
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms);
         }
     }
 

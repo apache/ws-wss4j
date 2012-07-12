@@ -78,6 +78,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     try {
                         SignaturePartDef signaturePartDef = new SignaturePartDef();
                         if (securePart.getIdToSign() == null) {
+                            signaturePartDef.setGenerateXPointer(securePart.isGenerateXPointer());
                             signaturePartDef.setSigRefId(IDGenerator.generateID(null));
                             signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
 
