@@ -77,10 +77,16 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     InternalSignatureOutputProcessor internalSignatureOutputProcessor;
                     try {
                         SignaturePartDef signaturePartDef = new SignaturePartDef();
+                        signaturePartDef.setC14nAlgo(securePart.getC14nMethod());
+                        String digestMethod = securePart.getDigestMethod();
+                        if (digestMethod == null) {
+                            digestMethod = getSecurityProperties().getSignatureDigestAlgorithm();
+                        }
+                        signaturePartDef.setDigestAlgo(digestMethod);
+
                         if (securePart.getIdToSign() == null) {
                             signaturePartDef.setGenerateXPointer(securePart.isGenerateXPointer());
                             signaturePartDef.setSigRefId(IDGenerator.generateID(null));
-                            signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
 
                             Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
                             if (attribute != null) {
@@ -97,7 +103,6 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                                 signaturePartDef.setC14nAlgo(WSSConstants.NS_C14N_EXCL);
                             } else {
                                 signaturePartDef.setSigRefId(securePart.getIdToSign());
-                                signaturePartDef.setC14nAlgo(getSecurityProperties().getSignatureCanonicalizationAlgorithm());
                             }
                         }
 
