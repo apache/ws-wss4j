@@ -19,6 +19,8 @@
 package org.swssf.wss;
 
 import org.swssf.wss.ext.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
@@ -40,18 +42,22 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 public class WSSec {
+    
+    private static final transient Log logger = LogFactory.getLog(WSSec.class);
 
     //todo crl check
     //todo outgoing client setup per policy
 
     static {
         try {
-            Class<?> c = WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            Class<?> c = 
+                WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
             if (null == Security.getProvider("BC")) {
                 Security.addProvider((Provider) c.newInstance());
             }
         } catch (Throwable e) {
-            throw new RuntimeException("Adding BouncyCastle provider failed", e);
+            logger.debug("Adding BouncyCastle provider failed", e);
+            // throw new RuntimeException("Adding BouncyCastle provider failed", e);
         }
 
         try {

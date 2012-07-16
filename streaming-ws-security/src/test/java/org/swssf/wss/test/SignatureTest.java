@@ -44,6 +44,7 @@ import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -814,6 +815,11 @@ public class SignatureTest extends AbstractTestBase {
 
     @Test
     public void testSignatureUsePKIPathOutbound() throws Exception {
+        
+        // Needs BouncyCastle to work properly...
+        if (Security.getProvider("BC") == null) {
+            return;
+        }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -1010,6 +1016,10 @@ public class SignatureTest extends AbstractTestBase {
 
     @Test
     public void testSignatureECKeyValue() throws Exception {
+        
+        if (Security.getProvider("BC") == null) {
+            return;
+        }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

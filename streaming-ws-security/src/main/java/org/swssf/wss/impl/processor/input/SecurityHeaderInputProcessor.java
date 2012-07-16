@@ -154,7 +154,8 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                                              QName elementName)
             throws WSSecurityException, XMLStreamException {
 
-        Class<XMLSecurityHeaderHandler> clazz = SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
+        Class<XMLSecurityHeaderHandler> clazz = 
+            (Class<XMLSecurityHeaderHandler>)SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
         if (clazz == null) {
             logger.warn("No matching handler found for " + elementName);
             return;

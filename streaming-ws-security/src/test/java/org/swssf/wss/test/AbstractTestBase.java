@@ -30,6 +30,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.stax.ext.XMLSec;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -61,6 +62,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.security.Provider;
 import java.security.Security;
 import java.util.*;
 import java.util.logging.Level;
@@ -105,7 +107,17 @@ public abstract class AbstractTestBase {
         //we need an JCE provider which understands elliptic curve cryptography.
         //the sun default provider also supports ec but returns a sun.security.x509.X509Key
         //instead of the java.security.interfaces.ECPublicKey. Bug?
-        Security.insertProviderAt(new org.bouncycastle.jce.provider.BouncyCastleProvider(), 2);
+        // Security.insertProviderAt(new org.bouncycastle.jce.provider.BouncyCastleProvider(), 2);
+        try {
+            Class<?> c = 
+                XMLSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            if (null == Security.getProvider("BC")) {
+                Security.addProvider((Provider) c.newInstance());
+            }
+        } catch (Throwable e) {
+            // throw new RuntimeException("Adding BouncyCastle provider failed", e);
+        }
+
     }
 
     @AfterClass
