@@ -55,4 +55,9 @@ public class STRTransformer implements Transformer {
     public void transform(XMLSecEvent xmlSecEvent) throws XMLStreamException {
         this.transformer.transform(xmlSecEvent);
     }
+
+    @Override
+    public void doFinal() throws XMLStreamException {
+        //nothing to-do
+    }
 }

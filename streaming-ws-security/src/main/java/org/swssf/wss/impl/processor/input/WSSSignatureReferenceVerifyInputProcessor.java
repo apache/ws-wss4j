@@ -235,7 +235,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                         inclusiveNamespaces.add("#default");
                     }
                     algorithm = canonicalizationMethodType.getAlgorithm();
-                    parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm);
+                    parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm, XMLSecurityConstants.DIRECTION.IN);
                 }
             }
             algorithm = transformType.getAlgorithm();
@@ -248,9 +248,9 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
 
             if (parentTransformer != null) {
-                parentTransformer = WSSUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm);
+                parentTransformer = WSSUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm, XMLSecurityConstants.DIRECTION.IN);
             } else {
-                parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm);
+                parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm, XMLSecurityConstants.DIRECTION.IN);
             }
         }
 
