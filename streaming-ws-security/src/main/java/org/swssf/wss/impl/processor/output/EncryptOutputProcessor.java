@@ -25,6 +25,7 @@ import org.swssf.wss.ext.WSSUtils;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurityTokenProvider;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -141,6 +142,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         /**
          * Creates the Data structure around the cipher data
          */
+        @Override
         protected void processEventInternal(XMLSecStartElement xmlSecStartElement, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             List<QName> elementPath = xmlSecStartElement.getElementPath();
@@ -164,22 +166,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse11_EncryptedHeader, true, attributes);
             }
 
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
-            attributes.add(createAttribute(WSSConstants.ATT_NULL_Id, getEncryptionPartDef().getEncRefId()));
-            attributes.add(createAttribute(WSSConstants.ATT_NULL_Type, getEncryptionPartDef().getModifier().getModifier()));
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptedData, true, attributes);
-
-            attributes = new ArrayList<XMLSecAttribute>(1);
-            attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, securityProperties.getEncryptionSymAlgorithm()));
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
-
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
-            createKeyInfoStructure(outputProcessorChain);
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_CipherData, false, null);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_xenc_CipherValue, false, null);
-
+            super.processEventInternal(xmlSecStartElement, outputProcessorChain);
             /*
             <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncDataId-1612925417"
                 Type="http://www.w3.org/2001/04/xmlenc#Content">
@@ -202,6 +189,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         @Override
         protected void createKeyInfoStructure(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
 
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
@@ -209,6 +197,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
+            createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);
         }
 
         protected void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
