@@ -193,7 +193,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         }
     }
 
-    public static SecurityToken getSecurityToken(KeyValueType keyValueType, Crypto crypto,
+    public static SecurityToken getSecurityToken(KeyValueType keyValueType, final Crypto crypto,
                                                  final CallbackHandler callbackHandler, SecurityContext securityContext)
             throws XMLSecurityException {
 
@@ -201,19 +201,34 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
             return new RsaKeyValueSecurityToken(rsaKeyValueType, (WSSecurityContext) securityContext,
-                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+                            callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                @Override
+                public void verify() throws XMLSecurityException {
+                    crypto.verifyTrust(getPubKey("", null));
+                }
+            };
         }
         final DSAKeyValueType dsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
         if (dsaKeyValueType != null) {
             return new DsaKeyValueSecurityToken(dsaKeyValueType, (WSSecurityContext) securityContext,
-                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                @Override
+                public void verify() throws XMLSecurityException {
+                    crypto.verifyTrust(getPubKey("", null));
+                }
+            };
         }
         final ECKeyValueType ecKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
         if (ecKeyValueType != null) {
             return new ECKeyValueSecurityToken(ecKeyValueType, (WSSecurityContext) securityContext,
-                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                @Override
+                public void verify() throws XMLSecurityException {
+                    crypto.verifyTrust(getPubKey("", null));
+                }  
+            };
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
     }
