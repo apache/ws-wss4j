@@ -32,17 +32,21 @@ public class UsernameTokenAction implements Action {
     
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
         throws WSSecurityException {
-        CallbackHandler callbackHandler = 
-            handler.getPasswordCallbackHandler(reqData);
-        WSPasswordCallback passwordCallback = 
-            handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
-        String providedUsername = passwordCallback.getIdentifier();
-        String password = passwordCallback.getPassword();
+        String username = reqData.getUsername();
+        String password = null;
+        if (reqData.getPwType() != null) {
+            CallbackHandler callbackHandler = 
+                handler.getPasswordCallbackHandler(reqData);
+            WSPasswordCallback passwordCallback = 
+                handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
+            username = passwordCallback.getIdentifier();
+            password = passwordCallback.getPassword();
+        }
 
         WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());
         builder.setPasswordsAreEncoded(reqData.getWssConfig().getPasswordsAreEncoded());
-        builder.setUserInfo(providedUsername, password);
+        builder.setUserInfo(username, password);
 
         if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
             for (int j = 0; j < reqData.getUtElements().length; j++) {
