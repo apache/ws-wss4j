@@ -20,6 +20,7 @@ package org.swssf.wss.impl.processor.output;
 
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -167,6 +168,12 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
     protected List<QName> getAppendAfterOneOfThisAttributes() {
         return appendAfterOneOfThisAttributes;
+    }
+
+    @Override
+    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        setAppendAfterThisTokenId(outputProcessorChain.getSecurityContext().<String>get(XMLSecurityConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID));
+        super.doFinal(outputProcessorChain);
     }
 
     @Override
