@@ -18,24 +18,36 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
-import org.swssf.wss.ext.*;
-import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
-import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
-import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.DocumentContext;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.SecurityContext;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import java.util.Iterator;
-import java.util.List;
+import org.swssf.binding.wss10.SecurityTokenReferenceType;
+import org.swssf.wss.ext.WSSConstants;
+import org.swssf.wss.ext.WSSSecurityProperties;
+import org.swssf.wss.ext.WSSUtils;
+import org.swssf.wss.ext.WSSecurityContext;
+import org.swssf.wss.ext.WSSecurityException;
+import org.swssf.wss.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.EncryptedElementSecurityEvent;
+import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
 
 /**
  * Processor for decryption of EncryptedData XML structures
@@ -100,12 +112,12 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     }
 
     @Override
-    protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProccessor(
+    protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProcessor(
             boolean encryptedHeader, XMLSecStartElement xmlSecStartElement, EncryptedDataType currentEncryptedDataType,
             SecurityToken securityToken, SecurityContext securityContext) throws WSSecurityException {
 
         String encryptionAlgorithm = currentEncryptedDataType.getEncryptionMethod().getAlgorithm();
-        if (!WSSConstants.NS_XENC_TRIBLE_DES.equals(encryptionAlgorithm)
+        if (!WSSConstants.NS_XENC_TRIPLE_DES.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES128.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES256.equals(encryptionAlgorithm)) {
             ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R5620);
@@ -123,7 +135,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
         securityContext.registerSecurityEvent(tokenSecurityEvent);
     }
-
+    
     /*
    <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncDataId-1612925417" Type="http://www.w3.org/2001/04/xmlenc#Content">
        <xenc:EncryptionMethod xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
@@ -155,6 +167,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             super(securityProperties, encryptionModifier, encryptedHeader, xmlSecStartElement, decryptInputProcessor, securityToken);
         }
 
+        @Override
         protected void handleEncryptedElement(InputProcessorChain inputProcessorChain, XMLSecStartElement xmlSecStartElement,
                                               SecurityToken securityToken) throws XMLSecurityException {
             //fire a SecurityEvent:
