@@ -20,12 +20,11 @@ package org.swssf.wss.impl.processor.output;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.ext.WSSecurityException;
-import org.apache.xml.security.stax.ext.OutputProcessorChain;
-import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
@@ -33,9 +32,12 @@ import org.apache.xml.security.stax.impl.SignaturePartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractSignatureOutputProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
@@ -77,7 +79,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     InternalSignatureOutputProcessor internalSignatureOutputProcessor;
                     try {
                         SignaturePartDef signaturePartDef = new SignaturePartDef();
-                        signaturePartDef.setC14nAlgo(securePart.getC14nMethod());
+                        signaturePartDef.setTransforms(securePart.getTransforms());
                         String digestMethod = securePart.getDigestMethod();
                         if (digestMethod == null) {
                             digestMethod = getSecurityProperties().getSignatureDigestAlgorithm();
@@ -99,15 +101,18 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         } else {
                             if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName().getLocalPart())) {
                                 signaturePartDef.setSigRefId(securePart.getIdToReference());
-                                signaturePartDef.setTransformAlgo(WSSConstants.SOAPMESSAGE_NS10_STRTransform);
-                                signaturePartDef.setC14nAlgo(WSSConstants.NS_C14N_EXCL);
+                                String[] transforms = new String[]{
+                                        WSSConstants.SOAPMESSAGE_NS10_STRTransform,
+                                        WSSConstants.NS_C14N_EXCL
+                                };
+                                signaturePartDef.setTransforms(transforms);
                             } else {
                                 signaturePartDef.setSigRefId(securePart.getIdToSign());
                             }
                         }
 
                         getSignaturePartDefList().add(signaturePartDef);
-                        internalSignatureOutputProcessor = new InternalSignatureOutputProcessor(signaturePartDef, xmlSecStartElement.getName());
+                        internalSignatureOutputProcessor = new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement.getName());
                         internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                         internalSignatureOutputProcessor.setAction(getAction());
                         internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
@@ -172,5 +177,43 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             }
         }
         return securePart;
+    }
+
+    class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {
+
+        public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+            super(signaturePartDef, startElement);
+        }
+
+        @Override
+        protected Transformer buildTransformerChain(OutputStream outputStream, String[] transforms)
+                throws XMLSecurityException, NoSuchMethodException, InstantiationException,
+                IllegalAccessException, InvocationTargetException {
+
+            if (transforms == null || transforms.length == 0) {
+                Transformer transformer = new TransformIdentity();
+                transformer.setOutputStream(outputStream);
+                return transformer;
+            }
+
+            List<String> inclusiveNamespacesPrefixes = new ArrayList<String>();
+            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
+                inclusiveNamespacesPrefixes.add("#default");
+            }
+
+            Transformer parentTransformer = null;
+            for (int i = transforms.length - 1; i >= 0; i--) {
+                String transform = transforms[i];
+
+                if (parentTransformer != null) {
+                    parentTransformer = XMLSecurityUtils.getTransformer(
+                            parentTransformer, null, transform, XMLSecurityConstants.DIRECTION.OUT);
+                } else {
+                    parentTransformer = XMLSecurityUtils.getTransformer(
+                            inclusiveNamespacesPrefixes, outputStream, transform, XMLSecurityConstants.DIRECTION.OUT);
+                }
+            }
+            return parentTransformer;
+        }
     }
 }

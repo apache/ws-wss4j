@@ -143,25 +143,33 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
     }
 
     protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) throws XMLStreamException, XMLSecurityException {
-        if (signaturePartDef.getTransformAlgo() != null) {
+        String[] transforms = signaturePartDef.getTransforms();
+        if (transforms != null && transforms.length > 0) {
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
-            attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getTransformAlgo()));
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters, false, null);
-            attributes = new ArrayList<XMLSecAttribute>(1);
-            attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo()));
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod, false, attributes);
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters);
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms);
-        } else if (signaturePartDef.getC14nAlgo() != null) {
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
-            attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, signaturePartDef.getC14nAlgo()));
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
+
+            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[0]));
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
+                if (transforms.length >= 2) {
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters, false, null);
+                    attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[1]));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod, false, attributes);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters);
+                }
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
+            } else {
+                for (int i = 0; i < transforms.length; i++) {
+                    String transform = transforms[i];
+
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transform));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
+                }
+            }
             createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms);
         }
     }

@@ -1136,8 +1136,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element, WSSConstants.NS_C14N_EXCL, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap12_Body, SecurePart.Modifier.Element, WSSConstants.NS_C14N_EXCL, "http://www.w3.org/2001/04/xmldsig-more#md5"));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap12_Body, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap12_Body, SecurePart.Modifier.Content));
