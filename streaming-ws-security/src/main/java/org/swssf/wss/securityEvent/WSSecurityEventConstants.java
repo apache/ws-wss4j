@@ -30,8 +30,6 @@ public abstract class WSSecurityEventConstants extends SecurityEventConstants {
     public static final Event Timestamp = new Event("Timestamp");
     public static final Event SignedPart = new Event("SignedPart");
     public static final Event EncryptedPart = new Event("EncryptedPart");
-    public static final Event EncryptedElement = new Event("EncryptedElement");
-    public static final Event ContentEncrypted = new Event("ContentEncrypted");
     public static final Event RequiredElement = new Event("RequiredElement");
     public static final Event RequiredPart = new Event("RequiredPart");
     public static final Event IssuedToken = new Event("IssuedToken");

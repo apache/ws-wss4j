@@ -26,6 +26,8 @@ import org.swssf.policy.Assertable;
 import org.swssf.wss.ext.WSSUtils;
 import org.swssf.wss.securityEvent.*;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
