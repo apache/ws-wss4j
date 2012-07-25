@@ -5,6 +5,21 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.7
+=============
+
+Bug
+
+    [WSS-392] - WSS4J can't handle SAML KeyIdentifier references to encrypted SAML Assertions stored in the cache
+    [WSS-393] - WSS4J is not handling KeyIdentifier inside SecurityTokenReference inside a KeyInfo
+    [WSS-394] - WSS4J is not handling X509Data inside SecurityTokenReference inside a KeyInfo
+    [WSS-396] - ConcurrentModificationException in MemoryReplayCache.processTokenExpiry
+    [WSS-398] - Can't create a UsernameToken without a password
+
+Improvement
+
+    [WSS-395] - Support Certificate Constraints on the Subject DN of the certificate used for signature validation
+
 Release 1.6.6
 =============
 
