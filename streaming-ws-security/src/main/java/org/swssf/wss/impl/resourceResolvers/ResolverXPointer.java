@@ -40,7 +40,7 @@ public class ResolverXPointer extends org.apache.xml.security.stax.impl.resource
     }
 
     @Override
-    public ResourceResolver newInstance(String uri) {
+    public ResourceResolver newInstance(String uri, String baseURI) {
         return new ResolverXPointer(uri);
     }
 

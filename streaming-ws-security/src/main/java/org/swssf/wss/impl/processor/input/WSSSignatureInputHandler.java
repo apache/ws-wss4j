@@ -139,13 +139,13 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
     }
 
     @Override
-    protected void addSignatureReferenceInputProcessorToChain(InputProcessorChain inputProcessorChain,
-                                                              XMLSecurityProperties securityProperties,
-                                                              SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException {
+    protected void addSignatureReferenceInputProcessorToChain(
+            InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
+            SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException {
         //add processors to verify references
         inputProcessorChain.addProcessor(
-                new WSSSignatureReferenceVerifyInputProcessor(signatureType, securityToken, securityProperties,
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext()));
+                new WSSSignatureReferenceVerifyInputProcessor(inputProcessorChain, signatureType,
+                        securityToken, securityProperties));
     }
     
     public class WSSSignatureVerifier extends SignatureVerifier {

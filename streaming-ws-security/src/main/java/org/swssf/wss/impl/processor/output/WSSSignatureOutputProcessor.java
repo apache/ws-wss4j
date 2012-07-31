@@ -179,41 +179,42 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
         return securePart;
     }
 
+    @Override
+    protected Transformer buildTransformerChain(OutputStream outputStream, String[] transforms)
+            throws XMLSecurityException, NoSuchMethodException, InstantiationException,
+            IllegalAccessException, InvocationTargetException {
+
+        if (transforms == null || transforms.length == 0) {
+            Transformer transformer = new TransformIdentity();
+            transformer.setOutputStream(outputStream);
+            return transformer;
+        }
+
+        List<String> inclusiveNamespacesPrefixes = new ArrayList<String>();
+        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
+            inclusiveNamespacesPrefixes.add("#default");
+        }
+
+        Transformer parentTransformer = null;
+        for (int i = transforms.length - 1; i >= 0; i--) {
+            String transform = transforms[i];
+
+            if (parentTransformer != null) {
+                parentTransformer = XMLSecurityUtils.getTransformer(
+                        parentTransformer, null, transform, XMLSecurityConstants.DIRECTION.OUT);
+            } else {
+                parentTransformer = XMLSecurityUtils.getTransformer(
+                        inclusiveNamespacesPrefixes, outputStream, transform, XMLSecurityConstants.DIRECTION.OUT);
+            }
+        }
+        return parentTransformer;
+    }
+
     class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {
 
         public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
             super(signaturePartDef, startElement);
-        }
-
-        @Override
-        protected Transformer buildTransformerChain(OutputStream outputStream, String[] transforms)
-                throws XMLSecurityException, NoSuchMethodException, InstantiationException,
-                IllegalAccessException, InvocationTargetException {
-
-            if (transforms == null || transforms.length == 0) {
-                Transformer transformer = new TransformIdentity();
-                transformer.setOutputStream(outputStream);
-                return transformer;
-            }
-
-            List<String> inclusiveNamespacesPrefixes = new ArrayList<String>();
-            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
-                inclusiveNamespacesPrefixes.add("#default");
-            }
-
-            Transformer parentTransformer = null;
-            for (int i = transforms.length - 1; i >= 0; i--) {
-                String transform = transforms[i];
-
-                if (parentTransformer != null) {
-                    parentTransformer = XMLSecurityUtils.getTransformer(
-                            parentTransformer, null, transform, XMLSecurityConstants.DIRECTION.OUT);
-                } else {
-                    parentTransformer = XMLSecurityUtils.getTransformer(
-                            inclusiveNamespacesPrefixes, outputStream, transform, XMLSecurityConstants.DIRECTION.OUT);
-                }
-            }
-            return parentTransformer;
+            this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class.getName());
         }
     }
 }

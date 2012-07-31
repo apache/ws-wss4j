@@ -18,46 +18,11 @@
  */
 package org.swssf.wss.impl.transformer;
 
-import org.apache.xml.security.stax.ext.Transformer;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.OutputStream;
-import java.util.List;
+import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class STRTransformer implements Transformer {
-
-    private Transformer transformer;
-
-    public STRTransformer() {
-    }
-
-    @Override
-    public void setOutputStream(OutputStream outputStream) throws XMLSecurityException {
-        throw new UnsupportedOperationException("OutputStream not supported");
-    }
-
-    @Override
-    public void setList(List list) throws XMLSecurityException {
-        throw new UnsupportedOperationException("List not supported");
-    }
-
-    @Override
-    public void setTransformer(Transformer transformer) throws XMLSecurityException {
-        this.transformer = transformer;
-    }
-
-    public void transform(XMLSecEvent xmlSecEvent) throws XMLStreamException {
-        this.transformer.transform(xmlSecEvent);
-    }
-
-    @Override
-    public void doFinal() throws XMLStreamException {
-        //nothing to-do
-    }
+public class STRTransformer extends TransformIdentity {
 }

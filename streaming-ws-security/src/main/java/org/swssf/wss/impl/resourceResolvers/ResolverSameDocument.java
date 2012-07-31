@@ -39,7 +39,7 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
     }
 
     @Override
-    public ResourceResolver newInstance(String uri) {
+    public ResourceResolver newInstance(String uri, String baseURI) {
         return new ResolverSameDocument(uri);
     }
 

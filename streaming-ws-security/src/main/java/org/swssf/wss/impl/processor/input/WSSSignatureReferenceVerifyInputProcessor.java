@@ -67,13 +67,13 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
     private boolean replayChecked = false;
 
-    public WSSSignatureReferenceVerifyInputProcessor(
+    public WSSSignatureReferenceVerifyInputProcessor(InputProcessorChain inputProcessorChain,
             SignatureType signatureType, SecurityToken securityToken,
-            XMLSecurityProperties securityProperties, WSSecurityContext securityContext) throws XMLSecurityException {
-        super(signatureType, securityToken, securityProperties);
+            XMLSecurityProperties securityProperties) throws XMLSecurityException {
+        super(inputProcessorChain, signatureType, securityToken, securityProperties);
         this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
 
-        checkBSPCompliance(securityContext);
+        checkBSPCompliance((WSSecurityContext)inputProcessorChain.getSecurityContext());
     }
 
     private void checkBSPCompliance(WSSecurityContext securityContext) throws WSSecurityException {
@@ -203,9 +203,10 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     }
 
     @Override
-    protected Transformer buildTransformerChain(ReferenceType referenceType, OutputStream outputStream,
-                                                InputProcessorChain inputProcessorChain,
-                                                AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier internalSignatureReferenceVerifier)
+    protected Transformer buildTransformerChain(
+            ReferenceType referenceType, OutputStream outputStream,
+            InputProcessorChain inputProcessorChain,
+            AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier internalSignatureReferenceVerifier)
             throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException,
             IllegalAccessException, InvocationTargetException {
 
