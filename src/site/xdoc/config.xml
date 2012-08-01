@@ -512,6 +512,13 @@ default is "300".</td>
 <td>The time in seconds in the future within which the Created time of an incoming Timestamp is 
 valid. The default is "60".</td>
 </tr>
+<tr>
+<td>SIG_SUBJECT_CERT_CONSTRAINTS</td>
+<td>sigSubjectCertConstraints</td>
+<td>A comma separated String of regular expressions which will be applied to the subject DN of the
+certificate used for signature validation, after trust verification of the certificate chain associated 
+with the certificate. </td>
+</tr>
 </table>
 <p>
 The configuration values for setting the KeyIdentifiers for signature or encryption 
