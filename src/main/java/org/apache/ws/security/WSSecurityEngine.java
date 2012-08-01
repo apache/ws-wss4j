@@ -185,7 +185,7 @@ public class WSSecurityEngine {
      *               to the SOAP specification about <code>actor</code> or <code>role
      *               </code>
      * @param cb     a callback hander to the caller to resolve passwords during
-     *               encryption and {@link UsernameToken} handling
+     *               encryption and UsernameToken handling
      * @param crypto the object that implements the access to the keystore and the
      *               handling of certificates.
      * @return a result list
@@ -214,7 +214,7 @@ public class WSSecurityEngine {
      *                  to the SOAP specification about <code>actor</code> or <code>role
      *                  </code>
      * @param cb        a callback hander to the caller to resolve passwords during
-     *                  encryption and {@link UsernameToken} handling
+     *                  encryption and UsernameToken handling
      * @param sigCrypto the object that implements the access to the keystore and the
      *                  handling of certificates for Signature
      * @param decCrypto the object that implements the access to the keystore and the
@@ -277,7 +277,7 @@ public class WSSecurityEngine {
      *
      * @param securityHeader the <code>wsse:Security</code> header element
      * @param cb             a callback hander to the caller to resolve passwords during
-     *                       encryption and {@link UsernameToken}handling
+     *                       encryption and UsernameToken handling
      * @param sigCrypto      the object that implements the access to the keystore and the
      *                       handling of certificates used for Signature
      * @param decCrypto      the object that implements the access to the keystore and the

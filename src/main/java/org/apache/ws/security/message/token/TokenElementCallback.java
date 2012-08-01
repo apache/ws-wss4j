@@ -43,7 +43,7 @@ public class TokenElementCallback implements Callback {
 
     /**
      * Set the token element
-     * @param the token element
+     * @param element the token element
      */
     public void setTokenElement(Element element) {
         this.element = element;
