@@ -264,8 +264,6 @@ public class WSSConstants extends XMLSecurityConstants {
     }
 
     //todo rename KeyUsage because C14N, etc are not keys...
-    public static final KeyUsage Sym_Key_Wrap = new KeyUsage("Sym_Key_Wrap");
-    public static final KeyUsage Asym_Key_Wrap = new KeyUsage("Asym_Key_Wrap");
     public static final KeyUsage Comp_Key = new KeyUsage("Comp_Key");
     public static final KeyUsage Enc_KD = new KeyUsage("Enc_KD");
     public static final KeyUsage Sig_KD = new KeyUsage("Sig_KD");
@@ -273,7 +271,6 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final KeyUsage STR_Trans = new KeyUsage("STR_Trans");
     public static final KeyUsage XPath = new KeyUsage("XPath");
 
-    public static final TokenType EncryptedKeyToken = new TokenType("EncryptedKeyToken");
     public static final TokenType UsernameToken = new TokenType("UsernameToken");
     public static final TokenType SecurityContextToken = new TokenType("SecurityContextToken");
     public static final TokenType Saml10Token = new TokenType("Saml10Token");

@@ -11,7 +11,7 @@
                  JAVACLASS="org.swssf.wss.impl.processor.input.BinarySecurityTokenInputHandler"/>
         <Handler NAME="EncryptedKey"
                  URI="http://www.w3.org/2001/04/xmlenc#"
-                 JAVACLASS="org.swssf.wss.impl.processor.input.EncryptedKeyInputHandler"/>
+                 JAVACLASS="org.swssf.wss.impl.processor.input.WSSEncryptedKeyInputHandler"/>
         <Handler NAME="ReferenceList"
                  URI="http://www.w3.org/2001/04/xmlenc#"
                  JAVACLASS="org.swssf.wss.impl.processor.input.ReferenceListInputHandler"/>
