@@ -46,6 +46,8 @@ import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -101,6 +103,12 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Algorithm to be used with the ephemeral key
      */
     protected String symEncAlgo = WSConstants.AES_128;
+    
+    /**
+     * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
+     * written out unless it is explicitly configured).
+     */
+    protected String digestAlgo = null;
 
     /**
      * xenc:EncryptedKey element
@@ -233,9 +241,14 @@ public class WSSecEncryptedKey extends WSSecBase {
         try {
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)) {
+                String jceDigestAlgorithm = "SHA-1";
+                if (digestAlgo != null) {
+                    jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgo);
+                }
+                
                 oaepParameterSpec = 
                     new OAEPParameterSpec(
-                        "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                        jceDigestAlgorithm, "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
                     );
             }
             if (oaepParameterSpec == null) {
@@ -442,6 +455,14 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element encryptionMethod = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
+        
+        if (digestAlgo != null) {
+            Element digestElement = 
+                XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_DIGESTMETHOD);
+            digestElement.setAttributeNS(null, "Algorithm", digestAlgo);
+            encryptionMethod.appendChild(digestElement);
+        }
+        
         encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }
@@ -655,6 +676,24 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public String getSymmetricEncAlgorithm() {
         return symEncAlgo;
+    }
+    
+    /**
+     * Set the digest algorithm to use with the RSA-OAEP key transport algorithm. The
+     * default is SHA-1.
+     * 
+     * @param digestAlgorithm the digest algorithm to use with the RSA-OAEP key transport algorithm
+     */
+    public void setDigestAlgorithm(String digestAlgorithm) {
+        this.digestAlgo = digestAlgorithm;
+    }
+    
+    /**
+     * Get the digest algorithm to use with the RSA-OAEP key transport algorithm. The
+     * default is SHA-1.
+     */
+    public String getDigestAlgorithm() {
+        return digestAlgo;
     }
     
     /**

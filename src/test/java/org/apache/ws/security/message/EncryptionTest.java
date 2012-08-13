@@ -636,6 +636,43 @@ public class EncryptionTest extends org.junit.Assert {
         verify(doc, crypto, keystoreCallbackHandler);
     }
 
+    /**
+     * Test that encrypt and decrypt a WS-Security envelope.
+     * This test uses the RSA OAEP algorithm to transport (wrap) the symmetric
+     * key and SHA-256.
+     * <p/>
+     * 
+     * @throws Exception Thrown when there is any problem in signing or verification
+     */
+    @org.junit.Test
+    public void testEncryptionDecryptionOAEPSHA256() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setDigestAlgorithm(WSConstants.SHA256);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);        
+        LOG.info("Before Encryption Triple DES/RSA-OAEP....");
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        LOG.info("After Encryption Triple DES/RSA-OAEP....");
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        assertNotNull(actionResult);
+    }
     
     /**
      * Verifies the soap envelope <p/>

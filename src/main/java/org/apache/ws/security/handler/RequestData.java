@@ -58,6 +58,7 @@ public class RequestData {
     private int sigKeyId = 0;
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
+    private String encryptionDigestAlgorithm = null;
     private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
     private Crypto encCrypto = null;
     private int encKeyId = 0;
@@ -95,6 +96,7 @@ public class RequestData {
         wssConfig = null;
         signatureValues.clear();
         signatureDigestAlgorithm = null;
+        encryptionDigestAlgorithm = null;
         encSymmetricEncryptionKey = true;
         secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
         signatureUser = null;
@@ -219,6 +221,14 @@ public class RequestData {
 
     public void setSigDigestAlgorithm(String sigDigestAlgorithm) {
         this.signatureDigestAlgorithm = sigDigestAlgorithm;
+    }
+    
+    public String getEncDigestAlgorithm() {
+        return encryptionDigestAlgorithm;
+    }
+
+    public void setEncDigestAlgorithm(String encDigestAlgorithm) {
+        this.encryptionDigestAlgorithm = encDigestAlgorithm;
     }
 
     public List<WSEncryptionPart> getSignatureParts() {

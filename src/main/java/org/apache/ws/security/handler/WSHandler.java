@@ -566,6 +566,9 @@ public abstract class WSHandler {
             getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
         reqData.setEncKeyTransport(encKeyTransport);
         
+        String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
+        reqData.setEncDigestAlgorithm(digestAlgo);
+        
         String encSymEncKey = getString(WSHandlerConstants.ENC_SYM_ENC_KEY, mc);
         if (encSymEncKey != null) {
             boolean encSymEndKeyBoolean = Boolean.parseBoolean(encSymEncKey);

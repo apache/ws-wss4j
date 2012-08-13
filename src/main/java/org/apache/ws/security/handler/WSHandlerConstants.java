@@ -655,6 +655,19 @@ public final class WSHandlerConstants {
      * <code>Content</code> mode by default.
      */
     public static final String ENCRYPTION_PARTS = "encryptionParts";
+    
+    /**
+     * Defines which encryption digest algorithm to use with the RSA OAEP Key Transport 
+     * algorithm for encryption. The default is SHA-1.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(
+     *    WSHandlerConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
+     * );
+     * </pre>
+     */
+    public static final String ENC_DIGEST_ALGO = "encryptionDigestAlgorithm";
 
     /**
      * Time-To-Live is the time difference between creation and expiry time in

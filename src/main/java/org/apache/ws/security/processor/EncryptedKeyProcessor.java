@@ -107,9 +107,16 @@ public class EncryptedKeyProcessor implements Processor {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)) {
+                // Get the DigestMethod if it exists
+                String digestAlgorithm = getDigestAlgorithm(elem);
+                String jceDigestAlgorithm = "SHA-1";
+                if (digestAlgorithm != null && !"".equals(digestAlgorithm)) {
+                    jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
+                }
+                
                 oaepParameterSpec = 
                     new OAEPParameterSpec(
-                        "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                        jceDigestAlgorithm, "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
                     );
             }
             if (oaepParameterSpec == null) {
@@ -203,6 +210,21 @@ public class EncryptedKeyProcessor implements Processor {
         }
         String encodedData = sb.toString();
         return Base64.decode(encodedData);
+    }
+    
+    private static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {
+        Element tmpE = 
+            WSSecurityUtil.getDirectChildElement(
+                encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+            );
+        if (tmpE != null) {
+            Element digestElement = 
+                WSSecurityUtil.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
+            if (digestElement != null) {
+                return digestElement.getAttribute("Algorithm");
+            }
+        }
+        return null;
     }
     
     /**

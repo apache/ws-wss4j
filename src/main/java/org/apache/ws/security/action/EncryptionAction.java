@@ -64,6 +64,10 @@ public class EncryptionAction implements Action {
         if (reqData.getEncKeyTransport() != null) {
             wsEncrypt.setKeyEnc(reqData.getEncKeyTransport());
         }
+        if (reqData.getEncDigestAlgorithm() != null) {
+            wsEncrypt.setDigestAlgorithm(reqData.getEncDigestAlgorithm());
+        }
+        
         wsEncrypt.setUserInfo(reqData.getEncUser());
         wsEncrypt.setUseThisCert(reqData.getEncCert());
         Crypto crypto = reqData.getEncCrypto();
