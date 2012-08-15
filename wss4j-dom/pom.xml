@@ -203,7 +203,6 @@
                     <configuration>
                         <reportFormat>brief</reportFormat>
                         <useFile>false</useFile>
-                        <argLine>-Djava.endorsed.dirs=${basedir}/endorsed</argLine>
                         <forkMode>once</forkMode>
                         <childDelegation>false</childDelegation>
                         <includes>
