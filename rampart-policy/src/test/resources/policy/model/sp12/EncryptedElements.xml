@@ -1,8 +1,0 @@
-<wsp:Policy
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy">
-    <sp:EncryptedElements XPathVersion="1.1" wsp:Optional="true" wsp:Ignorable="true">
-            <sp:XPath xmlns:a="http://a" xmlns:b="http://b">/a:a/b:b</sp:XPath>
-            <sp:XPath xmlns:a="http://a" xmlns:c="http://c">/a:a/c:c</sp:XPath>
-    </sp:EncryptedElements>
-</wsp:Policy>
