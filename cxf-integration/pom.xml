@@ -24,7 +24,8 @@
 
     <parent>
         <groupId>org.apache.ws.security</groupId>
-        <artifactId>wss4j</artifactId>
+        <artifactId>wss4j-parent</artifactId>
+        <relativePath>../parent/pom.xml</relativePath>
         <version>2.0-SNAPSHOT</version>
     </parent>
     <groupId>org.swssf</groupId>
@@ -40,7 +41,7 @@
         <dependency>
             <groupId>org.swssf</groupId>
             <artifactId>streaming-ws-security</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -60,7 +61,7 @@
         <dependency>
             <groupId>org.swssf</groupId>
             <artifactId>streaming-ws-security</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
