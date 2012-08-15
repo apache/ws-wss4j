@@ -1,0 +1,26 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:X509Token xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                          sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once"
+                          wsp:Ignorable="true">
+                <sp:Issuer>
+                    <wsa:Address xmlns:wsa="http://www.w3.org/2005/08/addressing">http://example.org/sts</wsa:Address>
+                </sp:Issuer>
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:RequireDerivedKeys/>
+                            <sp:RequireKeyIdentifierReference/>
+                            <sp:RequireIssuerSerialReference/>
+                            <sp:RequireEmbeddedTokenReference/>
+                            <sp:RequireThumbprintReference/>
+                            <sp:WssX509V1Token11/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:X509Token>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

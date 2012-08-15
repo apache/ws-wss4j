@@ -1,0 +1,29 @@
+<wsp:Policy
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:SymmetricBinding wsp:Optional="true" wsp:Ignorable="true">
+        <wsp:Policy>
+            <sp:EncryptionToken>
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:EncryptionToken>
+            <sp:SignatureToken>
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:SignatureToken>
+            <sp:AlgorithmSuite>
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+                <wsp:Policy>
+                </wsp:Policy>
+            </sp:Layout>
+            <sp:IncludeTimestamp/>
+            <sp:EncryptBeforeSigning/>
+            <sp:EncryptSignature/>
+            <sp:ProtectTokens/>
+            <sp:OnlySignEntireHeadersAndBody/>
+        </wsp:Policy>
+    </sp:SymmetricBinding>
+</wsp:Policy>

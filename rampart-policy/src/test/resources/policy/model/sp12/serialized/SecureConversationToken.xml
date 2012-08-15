@@ -1,0 +1,25 @@
+<wsp:Policy
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:SecureConversationToken
+            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once"
+            wsp:Optional="true" wsp:Ignorable="true">
+        <sp:IssuerName>issuerName</sp:IssuerName>
+        <wsp:Policy>
+            <sp:RequireDerivedKeys/>
+            <sp:RequireExternalUriReference/>
+            <sp:SC13SecurityContextToken/>
+            <sp:MustNotSendCancel/>
+            <sp:MustNotSendAmend/>
+            <sp:MustNotSendRenew/>
+            <sp:BootstrapPolicy>
+                <wsp:Policy>
+                    <wsp:ExactlyOne>
+                        <Test1/>
+                        <Test2/>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:BootstrapPolicy>
+        </wsp:Policy>
+    </sp:SecureConversationToken>
+</wsp:Policy>

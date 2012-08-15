@@ -1,0 +1,12 @@
+<wsp:Policy
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <sp:SecurityContextToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once" wsp:Optional="true" wsp:Ignorable="true">
+        <sp:IssuerName>issuerName</sp:IssuerName>
+        <wsp:Policy>
+            <sp:RequireDerivedKeys/>
+            <sp:RequireExternalUriReference/>
+            <sp:SC13SecurityContextToken/>
+        </wsp:Policy>
+    </sp:SecurityContextToken>
+</wsp:Policy>

@@ -1,0 +1,41 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                 wsp:Ignorable="true">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:X509Token xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                          sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:X509Token>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                    <sp:Body/>
+                            </sp:SignedParts>
+                            <sp:SignedElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                               XPathVersion="1.0"/>
+                            <sp:EncryptedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                    <sp:Body/>
+                            </sp:EncryptedParts>
+                            <sp:EncryptedElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                  XPathVersion="1.0"/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SupportingTokens>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

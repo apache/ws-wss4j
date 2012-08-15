@@ -1,0 +1,15 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:SignedElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" XPathVersion="1.1"
+                               wsp:Ignorable="true">
+                <sp:XPath xmlns:b="http://b" xmlns:a="http://a">/a:a/b:b</sp:XPath>
+                <sp:XPath xmlns:c="http://c" xmlns:a="http://a">/a:a/c:c</sp:XPath>
+                <sp13:Xpath2 xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802" Filter="xs:string">
+                    xs:string
+                </sp13:Xpath2>
+            </sp:SignedElements>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

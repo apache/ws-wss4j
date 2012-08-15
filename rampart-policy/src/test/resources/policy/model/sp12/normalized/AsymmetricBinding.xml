@@ -1,0 +1,67 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:AsymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                  wsp:Ignorable="true">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:InitiatorSignatureToken
+                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:InitiatorSignatureToken>
+                            <sp:InitiatorEncryptionToken
+                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:InitiatorEncryptionToken>
+                            <sp:RecipientSignatureToken
+                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:RecipientSignatureToken>
+                            <sp:RecipientEncryptionToken
+                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:RecipientEncryptionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All/>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                            <sp:EncryptBeforeSigning/>
+                            <sp:EncryptSignature/>
+                            <sp:ProtectTokens/>
+                            <sp:OnlySignEntireHeadersAndBody/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:AsymmetricBinding>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

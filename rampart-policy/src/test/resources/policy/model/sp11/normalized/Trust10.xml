@@ -1,0 +1,20 @@
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:Trust10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" wsp:Ignorable="true">
+                <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:MustSupportClientChallenge/>
+                            <sp:MustSupportServerChallenge/>
+                            <sp:RequireClientEntropy/>
+                            <sp:RequireServerEntropy/>
+                            <sp:MustSupportIssuedTokens/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:Trust10>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

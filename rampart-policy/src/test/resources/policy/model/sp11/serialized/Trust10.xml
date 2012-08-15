@@ -1,0 +1,13 @@
+<wsp:Policy
+        xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+        xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+    <sp:Trust10 wsp:Optional="true" wsp:Ignorable="true">
+        <wsp:Policy>
+            <sp:MustSupportClientChallenge/>
+            <sp:MustSupportServerChallenge/>
+            <sp:RequireClientEntropy/>
+            <sp:RequireServerEntropy/>
+            <sp:MustSupportIssuedTokens/>
+        </wsp:Policy>
+    </sp:Trust10>
+</wsp:Policy>

@@ -1,0 +1,22 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All/>
+        <wsp:All>
+            <sp:IssuedToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never"
+                            wsp:Ignorable="true">
+                <sp:IssuerName>issuerName</sp:IssuerName>
+                <sp:RequestSecurityTokenTemplate TrustVersion="http://trust/sowieso"/>
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:RequireImpliedDerivedKeys/>
+                            <sp:RequireExternalReference/>
+                            <sp:RequireInternalReference/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:IssuedToken>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

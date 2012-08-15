@@ -1,0 +1,2002 @@
+<wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    <wsp:ExactlyOne>
+        <wsp:All>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Basic256/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Basic256/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:TripleDesRsa15/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:TripleDesRsa15/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:InclusiveC14N/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:InclusiveC14N/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:SOAPNormalization10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:SOAPNormalization10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:STRTransform10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:STRTransform10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:XPath10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:HttpsToken
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All/>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:HttpsToken>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:XPath10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Basic256/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Basic256/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:TripleDesRsa15/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:TripleDesRsa15/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:InclusiveC14N/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:InclusiveC14N/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:SOAPNormalization10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:SOAPNormalization10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:STRTransform10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:STRTransform10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:XPath10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509V3Token10/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:XPath10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Basic256/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Basic256/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:TripleDesRsa15/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:TripleDesRsa15/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:InclusiveC14N/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:InclusiveC14N/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:SOAPNormalization10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:SOAPNormalization10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:STRTransform10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:STRTransform10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:XPath10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Strict/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+        <wsp:All>
+            <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:ProtectionToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:X509Token
+                                                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                                                <sp:IssuerName>xs:anyURI</sp:IssuerName>
+                                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                                    <wsp:ExactlyOne>
+                                                        <wsp:All>
+                                                            <sp:RequireImpliedDerivedKeys/>
+                                                            <sp:RequireKeyIdentifierReference/>
+                                                            <sp:RequireIssuerSerialReference/>
+                                                            <sp:RequireEmbeddedTokenReference/>
+                                                            <sp:RequireThumbprintReference/>
+                                                            <sp:WssX509PkiPathV1Token11/>
+                                                        </wsp:All>
+                                                    </wsp:ExactlyOne>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:ProtectionToken>
+                            <sp:AlgorithmSuite xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:XPath10/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                    <wsp:ExactlyOne>
+                                        <wsp:All>
+                                            <sp:Lax/>
+                                        </wsp:All>
+                                    </wsp:ExactlyOne>
+                                </wsp:Policy>
+                            </sp:Layout>
+                            <sp:IncludeTimestamp/>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SymmetricBinding>
+            <sp:SignedParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsp:Ignorable="true">
+                <sp:Body/>
+                <sp:Header Namespace="http://www.w3.org/2005/08/addressing"/>
+            </sp:SignedParts>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>
