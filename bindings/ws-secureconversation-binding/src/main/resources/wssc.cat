@@ -1,0 +1,16 @@
+PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "schemas/XMLSchema.dtd"
+PUBLIC "http://www.w3.org/2001/XMLSchema.dtd" "schemas/XMLSchema.dtd"
+SYSTEM "http://www.w3.org/2001/XMLSchema.dtd" "schemas/XMLSchema.dtd"
+
+PUBLIC "datatypes" "schemas/datatypes.dtd"
+SYSTEM "datatypes.dtd" "schemas/datatypes.dtd"
+
+SYSTEM "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" "../../../../xmldsig-binding/src/main/resources/schemas/xmldsig-core-schema.xsd"
+
+SYSTEM "http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd" "../../../../xmlenc-binding/src/main/resources/schemas/xenc-schema.xsd"
+
+SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" "../../../../wss10-binding/src/main/resources/schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+
+SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" "../../../../wsu10-binding/src/main/resources/schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+
+SYSTEM "http://www.w3.org/2001/xml.xsd" "schemas/xml.xsd"
