@@ -31,7 +31,7 @@
     <groupId>org.swssf</groupId>
     <artifactId>ws-secureconversation-binding</artifactId>
     <version>2.0-SNAPSHOT</version>
-    <name>WS-Secure-Conversation binding</name>
+    <name>Apache WSS4J WS-SecureConversation binding</name>
 
     <properties>
         <cobertura.skip>true</cobertura.skip>

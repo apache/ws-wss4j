@@ -19,21 +19,19 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <!--
-    <parent>
-        <groupId>org.apache.rampart</groupId>
-        <artifactId>rampart-project</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
-    -->
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache.ws.security</groupId>
+        <artifactId>wss4j-parent</artifactId>
+        <relativePath>../parent/pom.xml</relativePath>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
     <groupId>org.swssf</groupId>
     <artifactId>rampart-policy</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Rampart - Policy</name>
+    <name>Apache WSS4J WS-SecurityPolicy model</name>
 
     <dependencies>
         <dependency>
@@ -44,84 +42,18 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
-            <version>1.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>0.8</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>.gitignore</exclude>
-                        <exclude>.git/**</exclude>
-                        <exclude>.svn/**</exclude>
-                        <exclude>.pmd/**</exclude>
-                        <exclude>.checkstyle/**</exclude>
-                        <exclude>src/main/resources/**</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>**/*.patch</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-<!--
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>2.0-beta-5</version>
-                <configuration>
-                    <templateDirectory>${basedir}</templateDirectory>
-                    <menu ref="parent"/>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
--->
-    <repositories>
-        <repository>
-            <id>Apache snapshot</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>http://repository.apache.org/snapshots</url>
-        </repository>
-    </repositories>
 
 </project>
