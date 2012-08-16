@@ -24,8 +24,8 @@ import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.RelToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.swssf.wss.securityEvent.RelTokenSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.securityEvent.RelTokenSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.9 RelToken Assertion

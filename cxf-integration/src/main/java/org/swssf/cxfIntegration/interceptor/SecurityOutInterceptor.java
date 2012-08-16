@@ -29,12 +29,14 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+
+import org.apache.ws.security.wss.WSSec;
+import org.apache.ws.security.wss.ext.OutboundWSSec;
+import org.apache.ws.security.wss.ext.WSSSecurityProperties;
+import org.apache.ws.security.wss.ext.WSSecurityException;
+
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.swssf.wss.WSSec;
-import org.swssf.wss.ext.OutboundWSSec;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSecurityException;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;

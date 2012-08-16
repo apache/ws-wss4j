@@ -20,12 +20,12 @@ package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.policy.stax.PolicyInputProcessor;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.HttpsSecurityToken;
-import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
-import org.swssf.wss.test.CallbackHandlerImpl;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSSecurityProperties;
+import org.apache.ws.security.wss.ext.WSSecurityException;
+import org.apache.ws.security.wss.impl.securityToken.HttpsSecurityToken;
+import org.apache.ws.security.wss.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.ws.security.wss.test.CallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

@@ -24,7 +24,7 @@ import org.apache.ws.security.policy.model.AbstractSecurityAssertion;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.policy.stax.Assertable;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.2 Timestamp Property

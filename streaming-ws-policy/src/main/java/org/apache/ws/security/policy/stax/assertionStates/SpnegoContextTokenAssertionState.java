@@ -24,8 +24,8 @@ import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.SpnegoContextToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.swssf.wss.securityEvent.SpnegoContextTokenSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.securityEvent.SpnegoContextTokenSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.5 SpnegoContextToken Assertion

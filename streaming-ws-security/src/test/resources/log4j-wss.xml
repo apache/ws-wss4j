@@ -12,10 +12,10 @@
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
     </appender>
-    <logger name="org.swssf.xmlsec.impl.util.SignerOutputStream">
+    <logger name="org.apache.ws.security.xmlsec.impl.util.SignerOutputStream">
         <level value="INFO"/>
     </logger>
-    <logger name="org.swssf.xmlsec.impl.util.DigestOutputStream">
+    <logger name="org.apache.ws.security.xmlsec.impl.util.DigestOutputStream">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.jcp.xml.dsig.internal.DigesterOutputStream">
@@ -27,19 +27,19 @@
     <logger name="org.apache.xml.security.encryption.XMLCipher">
         <level value="INFO"/>
     </logger>
-    <logger name="org.swssf.xmlsec.impl.InputProcessorChainImpl">
+    <logger name="org.apache.ws.security.xmlsec.impl.InputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
-    <logger name="org.swssf.xmlsec.impl.OutputProcessorChainImpl">
+    <logger name="org.apache.ws.security.xmlsec.impl.OutputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
-    <logger name="org.swssf.wss.impl.processor.input">
+    <logger name="org.apache.ws.security.wss.impl.processor.input">
         <level value="INFO"/>
     </logger>
-    <logger name="org.swssf.wss.impl.saml.SAMLAssertionWrapper">
+    <logger name="org.apache.ws.security.wss.impl.saml.SAMLAssertionWrapper">
         <level value="INFO"/>
     </logger>
-    <logger name="org.swssf.wss.test.AbstractTestBase$CustomWSS4JHandler">
+    <logger name="org.apache.ws.security.wss.test.AbstractTestBase$CustomWSS4JHandler">
         <level value="INFO"/>
     </logger>
     <root>

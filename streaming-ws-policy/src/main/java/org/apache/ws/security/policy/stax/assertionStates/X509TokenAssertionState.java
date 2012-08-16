@@ -22,7 +22,7 @@ import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.AbstractSecurityAssertion;
 import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.X509Token;
-import org.swssf.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;

@@ -28,8 +28,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.policy.stax.Assertable;
 import org.apache.ws.security.policy.stax.PolicyUtils;
-import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.ext.WSSUtils;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;

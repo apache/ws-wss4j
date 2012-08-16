@@ -19,15 +19,15 @@
 package org.apache.ws.security.policy.stax;
 
 import org.apache.ws.security.policy.WSSPolicyException;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSSecurityProperties;
-import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.processor.input.SecurityHeaderInputProcessor;
-import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.RequiredElementSecurityEvent;
-import org.swssf.wss.securityEvent.RequiredPartSecurityEvent;
-import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSSecurityProperties;
+import org.apache.ws.security.wss.ext.WSSUtils;
+import org.apache.ws.security.wss.ext.WSSecurityException;
+import org.apache.ws.security.wss.impl.processor.input.SecurityHeaderInputProcessor;
+import org.apache.ws.security.wss.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.RequiredElementSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.RequiredPartSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;

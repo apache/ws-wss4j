@@ -24,8 +24,8 @@ import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.HttpsToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.swssf.wss.securityEvent.HttpsTokenSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.10 HttpsToken Assertion

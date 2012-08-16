@@ -25,10 +25,10 @@ import org.apache.ws.security.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.policy.stax.Assertable;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSUtils;
+import org.apache.ws.security.wss.securityEvent.SignedPartSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.6 Entire Header and Body Signatures Property

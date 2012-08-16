@@ -23,7 +23,7 @@ import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.AbstractSecurityAssertion;
 import org.apache.ws.security.policy.model.AlgorithmSuite;
 import org.apache.ws.security.policy.stax.Assertable;
-import org.swssf.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

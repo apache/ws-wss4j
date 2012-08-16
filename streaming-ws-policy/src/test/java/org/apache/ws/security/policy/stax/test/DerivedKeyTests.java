@@ -20,10 +20,10 @@ package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.impl.securityToken.X509SecurityToken;
-import org.swssf.wss.securityEvent.*;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSecurityException;
+import org.apache.ws.security.wss.impl.securityToken.X509SecurityToken;
+import org.apache.ws.security.wss.securityEvent.*;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;

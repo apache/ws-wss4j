@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyBuilder;
 import org.apache.ws.security.policy.WSSPolicyException;
-import org.swssf.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

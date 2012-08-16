@@ -21,9 +21,9 @@ package org.apache.ws.security.policy.stax.test;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.policy.stax.PolicyViolationException;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSecurityException;
-import org.swssf.wss.securityEvent.OperationSecurityEvent;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSecurityException;
+import org.apache.ws.security.wss.securityEvent.OperationSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

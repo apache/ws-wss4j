@@ -24,8 +24,8 @@ import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.SecureConversationToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.swssf.wss.securityEvent.SecureConversationTokenSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.securityEvent.SecureConversationTokenSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.7 SecureConversationToken Assertion

@@ -19,10 +19,10 @@
 package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.securityEvent.KerberosTokenSecurityEvent;
-import org.swssf.wss.securityEvent.OperationSecurityEvent;
-import org.swssf.wss.securityEvent.SignedPartSecurityEvent;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.OperationSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;

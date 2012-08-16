@@ -25,7 +25,7 @@ import org.apache.ws.security.policy.model.KeyValueToken;
 import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.11 KeyValueToken Assertion

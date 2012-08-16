@@ -39,8 +39,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>streaming-ws-security</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-streaming-ws-security</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -59,8 +59,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>streaming-ws-security</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-streaming-ws-security</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>

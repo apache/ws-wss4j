@@ -12,7 +12,7 @@
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
     </appender>
-    <logger name="org.swssf.policy.PolicyEnforcer">
+    <logger name="org.apache.ws.security.policy.PolicyEnforcer">
         <level value="INFO"/>
     </logger>
     <root>

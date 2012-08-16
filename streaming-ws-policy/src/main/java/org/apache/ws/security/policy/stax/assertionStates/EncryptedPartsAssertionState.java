@@ -26,10 +26,10 @@ import org.apache.ws.security.policy.model.Header;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.policy.stax.Assertable;
-import org.swssf.wss.ext.WSSConstants;
-import org.swssf.wss.ext.WSSUtils;
-import org.swssf.wss.securityEvent.EncryptedPartSecurityEvent;
-import org.swssf.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.wss.ext.WSSConstants;
+import org.apache.ws.security.wss.ext.WSSUtils;
+import org.apache.ws.security.wss.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.ws.security.wss.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
 import java.util.LinkedList;
