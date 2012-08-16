@@ -27,7 +27,7 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.apache.ws.security.wss.test.WSS4JCallbackHandlerImpl;
+import org.apache.ws.security.stax.wss.test.WSS4JCallbackHandlerImpl;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

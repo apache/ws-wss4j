@@ -24,11 +24,11 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 
-import org.apache.ws.security.wss.WSSec;
-import org.apache.ws.security.wss.ext.InboundWSSec;
-import org.apache.ws.security.wss.ext.WSSConstants;
-import org.apache.ws.security.wss.ext.WSSSecurityProperties;
-import org.apache.ws.security.wss.ext.WSSecurityException;
+import org.apache.ws.security.stax.wss.WSSec;
+import org.apache.ws.security.stax.wss.ext.InboundWSSec;
+import org.apache.ws.security.stax.wss.ext.WSSConstants;
+import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

@@ -28,13 +28,13 @@
     </cxf:bus>
     -->
     
-    <bean name="inSecurityProperties" class="org.apache.ws.security.wss.ext.WSSSecurityProperties">
+    <bean name="inSecurityProperties" class="org.apache.ws.security.stax.wss.ext.WSSSecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <util:constant static-field="org.apache.ws.security.wss.ext.WSSConstants.TIMESTAMP"/>
-                <util:constant static-field="org.apache.ws.security.wss.ext.WSSConstants.SIGNATURE"/>
-                <util:constant static-field="org.apache.ws.security.wss.ext.WSSConstants.ENCRYPT"/>
+                <util:constant static-field="org.apache.ws.security.stax.wss.ext.WSSConstants.TIMESTAMP"/>
+                <util:constant static-field="org.apache.ws.security.stax.wss.ext.WSSConstants.SIGNATURE"/>
+                <util:constant static-field="org.apache.ws.security.stax.wss.ext.WSSConstants.ENCRYPT"/>
             </list>
         </property>
         <!--<property name="encryptionUser" value="transmitter"/>-->
@@ -44,13 +44,13 @@
         <property name="disableSchemaValidation" value="true"/>
     </bean>
 
-    <bean name="outSecurityProperties" class="org.apache.ws.security.wss.ext.WSSSecurityProperties">
+    <bean name="outSecurityProperties" class="org.apache.ws.security.stax.wss.ext.WSSSecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <util:constant static-field="org.apache.ws.security.wss.ext.WSSConstants.TIMESTAMP"/>
-                <util:constant static-field="org.apache.ws.security.wss.ext.WSSConstants.SIGNATURE"/>
-                <util:constant static-field="org.apache.ws.security.wss.ext.WSSConstants.ENCRYPT"/>
+                <util:constant static-field="org.apache.ws.security.stax.wss.ext.WSSConstants.TIMESTAMP"/>
+                <util:constant static-field="org.apache.ws.security.stax.wss.ext.WSSConstants.SIGNATURE"/>
+                <util:constant static-field="org.apache.ws.security.stax.wss.ext.WSSConstants.ENCRYPT"/>
             </list>
         </property>
         <property name="signatureUser" value="receiver"/>
@@ -132,7 +132,7 @@
         <constructor-arg index="1" ref="outSecurityProperties"/>
     </bean>
 
-    <bean name="callbackHandler" class="org.apache.ws.security.wss.test.CallbackHandlerImpl">
+    <bean name="callbackHandler" class="org.apache.ws.security.stax.wss.test.CallbackHandlerImpl">
     </bean>
 
     <jaxws:endpoint id="greeterServiceWSS4J" implementor="#greeterServiceImpl"
@@ -172,7 +172,7 @@
         </property>
     </bean>
 
-    <bean name="passwordCallbackHandlerWSS4J" class="org.apache.ws.security.wss.test.WSS4JCallbackHandlerImpl">
+    <bean name="passwordCallbackHandlerWSS4J" class="org.apache.ws.security.stax.wss.test.WSS4JCallbackHandlerImpl">
     </bean>
 
     <httpj:engine-factory bus="cxf">
