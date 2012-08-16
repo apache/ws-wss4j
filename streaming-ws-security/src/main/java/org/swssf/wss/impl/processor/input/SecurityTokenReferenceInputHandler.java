@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.wss10.KeyIdentifierType;
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.binding.wss10.KeyIdentifierType;
+import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;

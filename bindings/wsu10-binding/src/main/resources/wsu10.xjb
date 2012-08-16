@@ -4,7 +4,7 @@
           version="2.1">
     <bindings schemaLocation="schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd" version="1.0">
         <schemaBindings>
-            <package name="org.swssf.binding.wsu10"/>
+            <package name="org.apache.ws.security.binding.wsu10"/>
         </schemaBindings>
     </bindings>
 </bindings>

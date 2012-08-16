@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.wsu10.TimestampType;
+import org.apache.ws.security.binding.wsu10.TimestampType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;

@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
@@ -41,7 +42,6 @@ import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputPro
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSUtils;

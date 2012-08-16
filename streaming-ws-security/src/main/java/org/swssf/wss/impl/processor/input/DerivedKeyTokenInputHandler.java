@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.wssc.AbstractDerivedKeyTokenType;
+import org.apache.ws.security.binding.wssc.AbstractDerivedKeyTokenType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;

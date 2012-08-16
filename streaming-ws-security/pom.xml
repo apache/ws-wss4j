@@ -35,18 +35,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>wss10-binding</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-bindings-wss10</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>wss11-binding</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-bindings-wss11</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>ws-secureconversation-binding</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-bindings-wssc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

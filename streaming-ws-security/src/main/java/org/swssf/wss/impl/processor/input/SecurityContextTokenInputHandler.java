@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.wssc.AbstractSecurityContextTokenType;
+import org.apache.ws.security.binding.wssc.AbstractSecurityContextTokenType;
 import org.swssf.wss.ext.*;
 import org.swssf.wss.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;

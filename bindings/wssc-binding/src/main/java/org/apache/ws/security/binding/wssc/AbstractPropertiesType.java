@@ -16,35 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.swssf.binding.wssc;
+package org.apache.ws.security.binding.wssc;
 
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
-
-import java.math.BigInteger;
+import java.util.List;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public abstract class AbstractDerivedKeyTokenType {
-
-    public abstract SecurityTokenReferenceType getSecurityTokenReference();
-
-    public abstract AbstractPropertiesType getProperties();
-
-    public abstract BigInteger getGeneration();
-
-    public abstract BigInteger getOffset();
-
-    public abstract BigInteger getLength();
-
-    public abstract String getLabel();
-
-    public abstract byte[] getNonce();
-
-    public abstract String getId();
-
-    public abstract void setId(String value);
-
-    public abstract String getAlgorithm();
+public abstract class AbstractPropertiesType {
+    public abstract List<Object> getAny();
 }

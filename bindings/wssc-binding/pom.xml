@@ -28,8 +28,8 @@
         <version>2.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
-    <groupId>org.swssf</groupId>
-    <artifactId>ws-secureconversation-binding</artifactId>
+    <groupId>org.apache.ws.security</groupId>
+    <artifactId>wss4j-bindings-wssc</artifactId>
     <version>2.0-SNAPSHOT</version>
     <name>Apache WSS4J WS-SecureConversation binding</name>
 
@@ -44,13 +44,13 @@
             <version>${xmlsec.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>wss10-binding</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-bindings-wss10</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.swssf</groupId>
-            <artifactId>wsu10-binding</artifactId>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-bindings-wsu10</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -100,12 +100,12 @@
                             </plugins>
                             <episodes>
                                 <episode>
-                                    <groupId>org.swssf</groupId>
-                                    <artifactId>wsu10-binding</artifactId>
+                                    <groupId>org.apache.ws.security</groupId>
+                                    <artifactId>wss4j-bindings-wsu10</artifactId>
                                 </episode>
                                 <episode>
-                                    <groupId>org.swssf</groupId>
-                                    <artifactId>wss10-binding</artifactId>
+                                    <groupId>org.apache.ws.security</groupId>
+                                    <artifactId>wss4j-bindings-wss10</artifactId>
                                 </episode>
                             </episodes>
                         </configuration>

@@ -18,8 +18,8 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmldsig.ManifestType;

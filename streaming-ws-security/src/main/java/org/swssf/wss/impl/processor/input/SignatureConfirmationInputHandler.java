@@ -18,7 +18,7 @@
  */
 package org.swssf.wss.impl.processor.input;
 
-import org.swssf.binding.wss11.SignatureConfirmationType;
+import org.apache.ws.security.binding.wss11.SignatureConfirmationType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSecurityContext;
 import org.swssf.wss.ext.WSSecurityException;

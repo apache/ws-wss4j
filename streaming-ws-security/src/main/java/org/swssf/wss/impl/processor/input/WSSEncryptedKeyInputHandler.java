@@ -18,15 +18,15 @@
  */
 package org.swssf.wss.impl.processor.input;
 
+import org.apache.ws.security.binding.wss10.ObjectFactory;
+import org.apache.ws.security.binding.wss10.ReferenceType;
+import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.impl.processor.input.XMLEncryptedKeyInputHandler;
-import org.swssf.binding.wss10.ObjectFactory;
-import org.swssf.binding.wss10.ReferenceType;
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
 import org.swssf.wss.ext.WSSConstants;
 import org.swssf.wss.ext.WSSSecurityProperties;
 import org.swssf.wss.ext.WSSecurityContext;

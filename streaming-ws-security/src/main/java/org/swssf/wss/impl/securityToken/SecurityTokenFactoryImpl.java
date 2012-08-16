@@ -19,9 +19,9 @@
 package org.swssf.wss.impl.securityToken;
 
 import org.apache.commons.codec.binary.Base64;
-import org.swssf.binding.wss10.BinarySecurityTokenType;
-import org.swssf.binding.wss10.KeyIdentifierType;
-import org.swssf.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
+import org.apache.ws.security.binding.wss10.KeyIdentifierType;
+import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.xml.security.binding.xmldsig.*;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
 import org.swssf.wss.ext.*;
@@ -148,7 +148,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 }
             }
 
-            final org.swssf.binding.wss10.ReferenceType referenceType
+            final org.apache.ws.security.binding.wss10.ReferenceType referenceType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
             if (referenceType != null) {
                 //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3058, BSP.R3059
