@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.message.token;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 
 /**
  * unit test for the Reference type

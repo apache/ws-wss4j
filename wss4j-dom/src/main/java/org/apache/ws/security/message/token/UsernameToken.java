@@ -20,9 +20,9 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -115,7 +115,7 @@ public class UsernameToken {
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "badUsernameToken"
             );
         }
@@ -145,7 +145,7 @@ public class UsernameToken {
             );
         if (elementUsername == null) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "badUsernameToken"
             );
         }
@@ -163,7 +163,7 @@ public class UsernameToken {
             //
             if (elementPassword != null || elementIteration == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN,
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                     "badUsernameToken"
                 );
             }
@@ -177,7 +177,7 @@ public class UsernameToken {
                 int iterInt = Integer.parseInt(iter);
                 if (iterInt < 0 || iterInt > 10000) {
                     throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY_TOKEN,
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "badUsernameToken"
                     );
                 }
@@ -197,7 +197,7 @@ public class UsernameToken {
                         );
                 } else {
                     throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY_TOKEN,
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "badUsernameToken"
                     );
                 }
@@ -208,7 +208,7 @@ public class UsernameToken {
             hashed = true;
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN,
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                     "badUsernameToken"
                 );
             }
@@ -509,12 +509,12 @@ public class UsernameToken {
         WSPasswordCallback pwCb = 
             new WSPasswordCallback(
                 getName(), getPassword(), getPasswordType(), 
-                WSPasswordCallback.USERNAME_TOKEN, data
+                WSPasswordCallback.Usage.USERNAME_TOKEN
             );
         
         if (data.getCallbackHandler() == null) {
             LOG.debug("CallbackHandler is null");
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
@@ -523,14 +523,14 @@ public class UsernameToken {
                 LOG.debug(e);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, e
             );
         } catch (UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILED_AUTHENTICATION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, e
             );
         }
         rawPassword = pwCb.getPassword();
@@ -774,7 +774,7 @@ public class UsernameToken {
                 LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noSHA1availabe", null, e
+                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", null, e
             );
         }
         //
@@ -826,7 +826,7 @@ public class UsernameToken {
     public byte[] getDerivedKey() throws WSSecurityException {
         if (rawPassword == null || !bspCompliantDerivedKey) {
             LOG.debug("The raw password was null or the Username Token is not BSP compliant");
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         int iteration = getIteration();
         byte[] salt = getSalt();
@@ -1036,7 +1036,7 @@ public class UsernameToken {
                 LOG.debug("The Username Token had more than one password element");
             }
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
             );
         }
         
@@ -1049,7 +1049,7 @@ public class UsernameToken {
                     LOG.debug("The Username Token password does not have a Type attribute");
                 }
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
                 );
             }
         }
@@ -1078,7 +1078,7 @@ public class UsernameToken {
                 LOG.debug("The Username Token has more than one created element");
             }
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
             );
         }
         
@@ -1092,7 +1092,7 @@ public class UsernameToken {
                 LOG.debug("The Username Token has more than one nonce element");
             }
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, "badUsernameToken"
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
             );
         }
         
@@ -1106,7 +1106,7 @@ public class UsernameToken {
                     LOG.debug("The Username Token's nonce element has a bad encoding type");
                 }
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "badUsernameToken" 
                 );
             }

@@ -23,9 +23,9 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.EncryptedKeySTRParser;
@@ -64,10 +64,10 @@ public class EncryptedKeyProcessor implements Processor {
             log.debug("Found encrypted key element");
         }
         if (data.getDecCrypto() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noDecCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noDecCryptoFile");
         }
         if (data.getCallbackHandler() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
         }
         //
         // lookup xenc:EncryptionMethod, get the Algorithm attribute to determine
@@ -76,7 +76,7 @@ public class EncryptedKeyProcessor implements Processor {
         String encryptedKeyTransportMethod = X509Util.getEncAlgo(elem);
         if (encryptedKeyTransportMethod == null) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
         }
         if (data.getWssConfig().isWsiBSPCompliant()) {
@@ -96,7 +96,7 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityUtil.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
         }
         if (xencCipherValue == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
         }
         
         STRParser strParser = new EncryptedKeySTRParser();
@@ -125,7 +125,7 @@ public class EncryptedKeyProcessor implements Processor {
                 cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParameterSpec);
             }
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
         }
         
         List<String> dataRefURIs = getDataRefURIs(elem);
@@ -136,7 +136,7 @@ public class EncryptedKeyProcessor implements Processor {
             encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
             decryptedBytes = cipher.doFinal(encryptedEphemeralKey);
         } catch (IllegalStateException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
         } catch (Exception ex) {
             decryptedBytes = getRandomKey(dataRefURIs, elem.getOwnerDocument(), wsDocInfo);
         }
@@ -188,7 +188,7 @@ public class EncryptedKeyProcessor implements Processor {
             SecretKey k = kgen.generateKey();
             return k.getEncoded();
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
         }
     }
     
@@ -256,7 +256,7 @@ public class EncryptedKeyProcessor implements Processor {
                 }
                 if (result != 1) {
                     throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY, "invalidDataRef"
+                        WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidDataRef"
                     );
                 }
             } else {
@@ -269,7 +269,7 @@ public class EncryptedKeyProcessor implements Processor {
             }
             if (strElement == null || strParser == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, "noSecTokRef"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
                 );
             }
             strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
@@ -277,7 +277,7 @@ public class EncryptedKeyProcessor implements Processor {
             X509Certificate[] certs = strParser.getCertificates();
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+                    WSSecurityException.ErrorCode.FAILURE,
                     "noCertsFound", 
                     new Object[] {"decryption (KeyId)"}
                 );
@@ -291,14 +291,14 @@ public class EncryptedKeyProcessor implements Processor {
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+                    WSSecurityException.ErrorCode.FAILURE,
                     "noCertsFound", 
                     new Object[] {"decryption (KeyId)"}
                 );
             }
             return certs;
         } else {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         }
     }
     
@@ -379,7 +379,7 @@ public class EncryptedKeyProcessor implements Processor {
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedData);
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
                 new Object[]{symEncAlgo}, ex
             );
         }
@@ -397,25 +397,25 @@ public class EncryptedKeyProcessor implements Processor {
         String attribute = elem.getAttribute("Type");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
         attribute = elem.getAttribute("MimeType");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
         attribute = elem.getAttribute("Encoding");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
         attribute = elem.getAttribute("Recipient");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
+                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
         
@@ -423,7 +423,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (!WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
             && !WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
             );
         }
     }

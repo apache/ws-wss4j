@@ -23,7 +23,7 @@ import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.DOM2Writer;
@@ -65,7 +65,7 @@ public class SAMLTokenProcessor implements Processor {
             return java.util.Collections.singletonList(result);
         } else if (foundElement != null) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
             );
         }
 

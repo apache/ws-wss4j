@@ -20,7 +20,7 @@
 package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
 

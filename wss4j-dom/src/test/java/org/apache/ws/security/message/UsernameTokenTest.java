@@ -20,8 +20,6 @@
 package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
@@ -29,6 +27,8 @@ import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.EncodedPasswordCallbackHandler;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -208,7 +208,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         } catch (WSSecurityException ex) {
             String message = ex.getMessage();
             assertTrue(message.indexOf("badusername") == -1);
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -237,7 +237,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             verify(signedDoc);
             fail("Failure expected on a bad password digest");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -328,7 +328,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             verify(signedDoc);
             fail("Failure expected on a bad password text");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -379,7 +379,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             verify(doc);
             fail("Failure expected on no password");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -473,7 +473,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             secEngine.processSecurityHeader(signedDoc, null, this, null);
             fail("Custom token types are not permitted");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -554,7 +554,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             verify(utDoc);
             fail("Expected failure due to a bad password");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -597,7 +597,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             verify(utDoc);
             fail("Expected failure due to a bad password");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -889,7 +889,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
+                if (pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN) {
                     if ("emptyuser".equals(pc.getIdentifier())) {
                         pc.setPassword("");
                     } else if ("customUser".equals(pc.getIdentifier())) {

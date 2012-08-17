@@ -20,8 +20,8 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -69,7 +69,7 @@ public class X509Security extends BinarySecurity {
         String valueType = getValueType();
         if (bspCompliant && !X509_V3_TYPE.equals(valueType)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                 "invalidValueType", 
                 new Object[]{valueType}
             );
@@ -97,12 +97,12 @@ public class X509Security extends BinarySecurity {
             return cachedCert;
         }
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
         }
         byte[] data = getToken();
         if (data == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "invalidCertData", new Object[]{Integer.valueOf(0)}
+                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", new Object[]{Integer.valueOf(0)}
             );
         }
         InputStream in = new ByteArrayInputStream(data);
@@ -121,14 +121,14 @@ public class X509Security extends BinarySecurity {
      */
     public void setX509Certificate(X509Certificate cert) throws WSSecurityException {
         if (cert == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCert");
         }
         cachedCert = cert;
         try {
             setToken(cert.getEncoded());
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
             );
         }
     }

@@ -27,7 +27,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.MessageProp;
@@ -73,7 +73,7 @@ public class SpnegoTokenContext {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 new Object[] {ex.getMessage()},
                 ex
@@ -87,7 +87,7 @@ public class SpnegoTokenContext {
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
         if (clientPrincipals.isEmpty()) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, 
                 "kerberosLoginError", 
                 new Object[] {"No Client principals found after login"}
             );
@@ -99,7 +99,7 @@ public class SpnegoTokenContext {
         token = (byte[])Subject.doAs(clientSubject, clientAction);
         if (token == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "kerberosServiceTicketError"
+                WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
             );
         }
         
@@ -138,7 +138,7 @@ public class SpnegoTokenContext {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 new Object[] {ex.getMessage()},
                 ex
@@ -155,7 +155,7 @@ public class SpnegoTokenContext {
             Set<Principal> principals = subject.getPrincipals();
             if (principals.isEmpty()) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, 
+                    WSSecurityException.ErrorCode.FAILURE, 
                     "kerberosLoginError", 
                     new Object[] {"No Client principals found after login"}
                 );
@@ -211,7 +211,7 @@ public class SpnegoTokenContext {
                 LOG.debug("Error in cleaning up a GSS context", e);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "spnegoKeyError", null, e
+                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", null, e
             );
         }
     }
@@ -228,7 +228,7 @@ public class SpnegoTokenContext {
                 LOG.debug("Error in cleaning up a GSS context", e);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "spnegoKeyError", null, e
+                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", null, e
             );
         }
     }

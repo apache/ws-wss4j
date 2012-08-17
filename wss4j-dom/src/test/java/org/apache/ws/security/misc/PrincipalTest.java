@@ -24,15 +24,15 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
@@ -332,7 +332,7 @@ public class PrincipalTest extends org.junit.Assert {
                 credential.setTransformedToken(assertion);
                 return credential;
             } catch (Exception ex) {
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
         }
         

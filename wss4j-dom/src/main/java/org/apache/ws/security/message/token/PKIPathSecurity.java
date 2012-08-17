@@ -20,8 +20,8 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,7 +56,7 @@ public class PKIPathSecurity extends BinarySecurity {
         super(elem, bspCompliant);
         if (bspCompliant && !PKI_TYPE.equals(getValueType())) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "invalidValueType",
                 new Object[]{PKI_TYPE, getValueType()}
             );
@@ -85,7 +85,7 @@ public class PKIPathSecurity extends BinarySecurity {
             return null;
         }
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
         }
         return crypto.getCertificatesFromBytes(data);
     }
@@ -102,7 +102,7 @@ public class PKIPathSecurity extends BinarySecurity {
         Crypto crypto
     ) throws WSSecurityException {
         if (certs == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCert");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCert");
         }
         byte[] data = crypto.getBytesFromCertificates(certs);
         setToken(data);

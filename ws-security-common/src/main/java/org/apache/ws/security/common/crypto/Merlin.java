@@ -477,7 +477,7 @@ public class Merlin extends CryptoBase {
      *
      * @return Returns a <code>CertificateFactory</code> to construct
      *         X509 certificates
-     * @throws org.apache.ws.security.WSSecurityException
+     * @throws WSSecurityException
      */
     @Override
     public CertificateFactory getCertificateFactory() throws WSSecurityException {

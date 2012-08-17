@@ -17,7 +17,7 @@
 
 package org.apache.ws.security.util;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 
 /**
  * This class provides encode/decode for RFC 2045 Base64 as defined by RFC 2045,

@@ -27,13 +27,13 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.w3c.dom.Document;
 
 
@@ -125,10 +125,10 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
+                if (pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN
                         && "alice".equals(pc.getIdentifier())) {
                     pc.setPassword("verySecret");
-                } else if (pc.getUsage() == WSPasswordCallback.SIGNATURE
+                } else if (pc.getUsage() == WSPasswordCallback.Usage.SIGNATURE
                         && "wss40".equals(pc.getIdentifier())) {
                     pc.setPassword("security");
                 } else {

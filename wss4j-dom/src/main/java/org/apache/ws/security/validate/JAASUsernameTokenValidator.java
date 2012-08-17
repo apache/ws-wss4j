@@ -25,7 +25,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.ws.security.NamePasswordCallbackHandler;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
 
@@ -66,7 +66,7 @@ public class JAASUsernameTokenValidator implements Validator {
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null || credential.getUsernametoken() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         
         String user = null;
@@ -83,19 +83,19 @@ public class JAASUsernameTokenValidator implements Validator {
         
         if (usernameToken.isHashed()) {
             log.warn("Authentication failed as hashed username token not supported");
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         
         password = usernameToken.getPassword();
         
         if (!WSConstants.PASSWORD_TEXT.equals(pwType)) {
             log.warn("Password type " + pwType + " not supported");
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);        	
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);        	
         }
         
         if (!(user != null && user.length() > 0 && password != null && password.length() > 0)) {
             log.warn("User or password empty");
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         
         try {
@@ -107,7 +107,7 @@ public class JAASUsernameTokenValidator implements Validator {
         } catch (LoginException ex) {
             log.info("Authentication failed", ex);
             throw new WSSecurityException(
-                WSSecurityException.FAILED_AUTHENTICATION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, ex
             );
         }
         

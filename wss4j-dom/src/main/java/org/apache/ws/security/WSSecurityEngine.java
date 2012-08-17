@@ -19,7 +19,8 @@
 
 package org.apache.ws.security;
 
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
@@ -380,7 +381,7 @@ public class WSSecurityEngine {
                             );
                         }
                         throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY_TOKEN, "invalidTimestamp"
+                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidTimestamp"
                         );
                     } else if (el.equals(TIMESTAMP)) {
                         foundTimestamp = true;

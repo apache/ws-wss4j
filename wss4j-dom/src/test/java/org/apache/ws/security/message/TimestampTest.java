@@ -22,9 +22,9 @@ package org.apache.ws.security.message;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
@@ -139,7 +139,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(createdDoc, WSSConfig.getNewInstance());
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }        
     }
     
@@ -173,7 +173,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(createdDoc, wssConfig);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }  
     }
     
@@ -223,7 +223,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, config);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }
     }
     
@@ -269,7 +269,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, config);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }
     }
     
@@ -325,7 +325,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }
     }
     

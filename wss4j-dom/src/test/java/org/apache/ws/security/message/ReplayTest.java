@@ -29,13 +29,13 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.cache.MemoryReplayCache;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -104,7 +104,7 @@ public class ReplayTest extends org.junit.Assert {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }   
     }
     
@@ -152,7 +152,7 @@ public class ReplayTest extends org.junit.Assert {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }   
     }
     
@@ -205,7 +205,7 @@ public class ReplayTest extends org.junit.Assert {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }   
     }
     
@@ -239,7 +239,7 @@ public class ReplayTest extends org.junit.Assert {
             verify(signedDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }   
     }
     

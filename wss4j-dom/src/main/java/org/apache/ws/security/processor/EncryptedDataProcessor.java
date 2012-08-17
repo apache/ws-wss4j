@@ -24,7 +24,7 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SecurityTokenRefSTRParser;
@@ -66,7 +66,7 @@ public class EncryptedDataProcessor implements Processor {
         // KeyInfo cannot be null
         if (kiElem == null) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noKeyinfo"
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noKeyinfo"
             );
         }
         
@@ -110,7 +110,7 @@ public class EncryptedDataProcessor implements Processor {
             key = WSSecurityUtil.prepareSecretKey(symEncAlgo, symmKey);
         } else {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncKey"
             );
         }
         
@@ -122,7 +122,7 @@ public class EncryptedDataProcessor implements Processor {
             xmlCipher.init(XMLCipher.DECRYPT_MODE, key);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, ex
             );
         }
         Node previousSibling = elem.getPreviousSibling();
@@ -131,7 +131,7 @@ public class EncryptedDataProcessor implements Processor {
             xmlCipher.doFinal(elem.getOwnerDocument(), elem, false);
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, null, null, e
+                WSSecurityException.ErrorCode.FAILED_CHECK, null, null, e
             );
         }
         
@@ -199,7 +199,7 @@ public class EncryptedDataProcessor implements Processor {
         // EncryptionAlgorithm cannot be null
         if (encAlgo == null) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
         }
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
@@ -209,7 +209,7 @@ public class EncryptedDataProcessor implements Processor {
             && !WSConstants.AES_256.equals(encAlgo)
             && !WSConstants.AES_256_GCM.equals(encAlgo)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
             );
         }
     }

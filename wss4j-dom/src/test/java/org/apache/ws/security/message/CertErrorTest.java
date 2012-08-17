@@ -20,9 +20,9 @@
 package org.apache.ws.security.message;
 
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 
 

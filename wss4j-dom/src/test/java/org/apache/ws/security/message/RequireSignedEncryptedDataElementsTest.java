@@ -31,12 +31,12 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -53,7 +53,7 @@ import org.w3c.dom.Element;
 public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(RequireSignedEncryptedDataElementsTest.class);
-    private static ResourceBundle resources = ResourceBundle.getBundle("org.apache.ws.security.errors");
+    private static ResourceBundle resources = ResourceBundle.getBundle("messages.wss4j_errors");
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -228,7 +228,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     private static void checkFailure(Element attackElement, WSSecurityException e) {
         final String mex = MessageFormat.format(resources.getString("requiredElementNotSigned"), attackElement);
         assertTrue(e.getMessage().contains(mex));
-        assertEquals(WSSecurityException.FAILED_CHECK, e.getErrorCode());
+        assertEquals(WSSecurityException.ErrorCode.FAILED_CHECK, e.getErrorCode());
     }
     
     private RequestData getRequestData(boolean reqSignedEncData) throws WSSecurityException {

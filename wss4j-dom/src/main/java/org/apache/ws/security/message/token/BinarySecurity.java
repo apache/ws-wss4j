@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.Base64;
@@ -71,7 +71,7 @@ public class BinarySecurity {
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                 "unhandledToken",
                 new Object[] {el}
             );
@@ -80,7 +80,7 @@ public class BinarySecurity {
         if (bspCompliant && !BASE64_ENCODING.equals(encoding)) {
             // The EncodingType attribute must be specified, and must be equal to Base64Binary
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "badEncodingType", 
                 new Object[] {encoding}
             );
@@ -89,7 +89,7 @@ public class BinarySecurity {
         String valueType = getValueType();
         if (bspCompliant && (valueType == null || "".equals(valueType))) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN,
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "invalidValueType",
                 new Object[]{valueType}
             );
@@ -115,7 +115,7 @@ public class BinarySecurity {
     public BinarySecurity(CallbackHandler callbackHandler) throws WSSecurityException {
         if (callbackHandler == null) {
             LOG.debug("Trying to create a BinarySecurityToken via a null CallbackHandler");
-            throw new WSSecurityException(WSSecurityException.FAILURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
         TokenElementCallback[] callback = new TokenElementCallback[] { new TokenElementCallback() };
 
@@ -133,7 +133,7 @@ public class BinarySecurity {
         element = callback[0].getTokenElement();
         if (element == null) {
             LOG.debug("CallbackHandler did not return a token element");
-            throw new WSSecurityException(WSSecurityException.FAILURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
     }
     

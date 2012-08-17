@@ -21,11 +21,11 @@ package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.components.crypto.Merlin;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.util.DOM2Writer;
@@ -90,7 +90,7 @@ public class SecurityTokenReference {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", null);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "badElement");
         }
         if (bspCompliant) {
             checkBSPCompliance();
@@ -221,7 +221,7 @@ public class SecurityTokenReference {
         
         if (uri == null) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badReferenceURI"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI"
             );
         }
         
@@ -233,7 +233,7 @@ public class SecurityTokenReference {
         
         if (tokElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE,
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
                 "noToken",
                 new Object[]{uri}
             );
@@ -318,7 +318,7 @@ public class SecurityTokenReference {
             || KerberosSecurity.isKerberosToken(type))) {
             //try to find a custom token
             WSPasswordCallback pwcb = 
-                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
+                new WSPasswordCallback(id, WSPasswordCallback.Usage.CUSTOM_TOKEN);
             try {
                 cb.handle(new Callback[]{pwcb});
                 Element assertionElem = pwcb.getCustomToken();
@@ -350,7 +350,7 @@ public class SecurityTokenReference {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
             );
         }
         Text text = doc.createTextNode(Base64.encode(data));
@@ -374,7 +374,7 @@ public class SecurityTokenReference {
         //
         if (cert.getVersion() != 3) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
+                WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                 "invalidCertForSKI",
                 new Object[]{Integer.valueOf(cert.getVersion())}
             );
@@ -409,7 +409,7 @@ public class SecurityTokenReference {
             encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException e1) {
             throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e1
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e1
             );
         }
         try {
@@ -418,7 +418,7 @@ public class SecurityTokenReference {
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "noSHA1availabe", null, e1
+                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", null, e1
             );
         }
     }
@@ -802,7 +802,7 @@ public class SecurityTokenReference {
         }
         if (result != 1) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "invalidDataRef"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidDataRef"
             );
         }
         if ("KeyIdentifier".equals(child.getLocalName()) 
@@ -812,7 +812,7 @@ public class SecurityTokenReference {
             // ValueType cannot be null
             if (valueType == null || "".equals(valueType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, "invalidValueType"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidValueType"
                 );
             }
             String encodingType = getFirstElement().getAttribute("EncodingType");
@@ -820,7 +820,7 @@ public class SecurityTokenReference {
             if (encodingType != null && !"".equals(encodingType)
                 && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, 
                     "badEncodingType", 
                     new Object[] {encodingType}
                 );
@@ -830,7 +830,7 @@ public class SecurityTokenReference {
                 && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
                 && (encodingType == null || "".equals(encodingType))) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, "noEncodingType"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "noEncodingType"
                 );
             }
         } else if ("Embedded".equals(child.getLocalName())) {
@@ -843,7 +843,7 @@ public class SecurityTokenReference {
                     if ("SecurityTokenReference".equals(node.getLocalName())
                         && WSConstants.WSSE_NS.equals(node.getNamespaceURI())) {
                         throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY, "invalidEmbeddedRef"
+                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidEmbeddedRef"
                         );
                     }
                 }
@@ -852,7 +852,7 @@ public class SecurityTokenReference {
             // We can only have one embedded child
             if (result != 1) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, "invalidEmbeddedRef"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidEmbeddedRef"
                 );
             }
         }

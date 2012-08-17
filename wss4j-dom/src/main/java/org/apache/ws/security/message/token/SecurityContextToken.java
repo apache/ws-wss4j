@@ -21,7 +21,7 @@ package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.util.DOM2Writer;
@@ -143,7 +143,7 @@ public class SecurityContextToken {
         } else if (el.equals(ConversationConstants.SECURITY_CTX_TOKEN_QNAME_05_12)) {
             tokenType = WSConstants.WSC_SCT_05_12;
         } else {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY_TOKEN);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
         }
 
         elementIdentifier = 

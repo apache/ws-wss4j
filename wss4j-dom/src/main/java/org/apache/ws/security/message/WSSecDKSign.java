@@ -23,7 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -158,7 +158,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         } catch (Exception ex) {
             log.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
             );
         }
 
@@ -301,7 +301,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         } catch (Exception ex) {
             log.error(ex);
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, null, null, ex
             );
         }
     }

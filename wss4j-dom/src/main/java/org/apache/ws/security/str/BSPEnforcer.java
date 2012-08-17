@@ -20,7 +20,7 @@
 package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
@@ -57,7 +57,7 @@ public final class BSPEnforcer {
                 || ((token instanceof KerberosSecurity) 
                         && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType))) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
                     new Object[]{valueType}
                 );
@@ -68,7 +68,7 @@ public final class BSPEnforcer {
                 && !SecurityTokenReference.THUMB_URI.equals(valueType)
                 && !WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
                     new Object[]{valueType}
                 );
@@ -80,7 +80,7 @@ public final class BSPEnforcer {
             String tokenType = secRef.getTokenType();
             if (!PKIPathSecurity.PKI_TYPE.equals(tokenType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidTokenType", 
                      new Object[]{tokenType}
                 );
@@ -101,7 +101,7 @@ public final class BSPEnforcer {
             String valueType = secRef.getKeyIdentifierValueType();
             if (!SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
                     new Object[]{valueType}
                 );
@@ -111,7 +111,7 @@ public final class BSPEnforcer {
         String tokenType = secRef.getTokenType();
         if (!WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(tokenType)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                 "invalidTokenType", 
                  new Object[]{tokenType}
             );
@@ -135,7 +135,7 @@ public final class BSPEnforcer {
             if (assertion.getSaml1() != null 
                 && !WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
                     new Object[]{valueType}
                 );
@@ -143,7 +143,7 @@ public final class BSPEnforcer {
             if (assertion.getSaml2() != null 
                 && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
                     new Object[]{valueType}
                 );
@@ -151,7 +151,7 @@ public final class BSPEnforcer {
             String encoding = secRef.getKeyIdentifierEncodingType();
             if (encoding != null && !"".equals(encoding)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "badEncodingType", 
                     new Object[]{encoding}
                 );
@@ -162,14 +162,14 @@ public final class BSPEnforcer {
         String tokenType = secRef.getTokenType();
         if (assertion.getSaml1() != null && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                 "invalidTokenType", 
                  new Object[]{tokenType}
             );
         }
         if (assertion.getSaml2() != null && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                 "invalidTokenType", 
                  new Object[]{tokenType}
             );
@@ -180,7 +180,7 @@ public final class BSPEnforcer {
             String valueType = secRef.getReference().getValueType();
             if (valueType != null && !"".equals(valueType)) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                     "invalidValueType", 
                     new Object[]{valueType}
                 );
@@ -200,7 +200,7 @@ public final class BSPEnforcer {
         if (!secRef.containsReference()) {
             // BSP does not permit using a KeyIdentifier to refer to a U/T
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+                WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId"
             );
         }
         
@@ -208,7 +208,7 @@ public final class BSPEnforcer {
         if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(valueType)) {
             // BSP says the Reference must have a ValueType of UsernameToken
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
                 "invalidValueType", 
                 new Object[]{valueType}
             );

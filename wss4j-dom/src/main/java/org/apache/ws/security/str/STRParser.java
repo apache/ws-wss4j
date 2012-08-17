@@ -20,7 +20,7 @@
 package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 
 import org.w3c.dom.Element;

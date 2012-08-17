@@ -21,11 +21,11 @@ package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -93,10 +93,10 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         } else if (secRef.containsReference()) { 
             // Now use the callback and get it
             secretKey = 
-                getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, data);
+                getSecretKeyFromToken(uri, null, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN, data);
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                 );
             }
         } else if (secRef.containsKeyIdentifier()) {
@@ -105,7 +105,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 secretKey = 
                     getSecretKeyFromToken(
                         secRef.getKeyIdentifierValue(), keyIdentifierValueType, 
-                        WSPasswordCallback.SECRET_KEY, data
+                        WSPasswordCallback.Usage.SECRET_KEY, data
                     );
                 if (secretKey == null) {
                     byte[] keyBytes = secRef.getSKIBytes();
@@ -123,7 +123,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                     );
                 }
             } else {
@@ -136,11 +136,11 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                     secretKey = 
                         this.getSecretKeyFromToken(
                             secRef.getKeyIdentifierValue(), keyIdentifierValueType, 
-                            WSPasswordCallback.SECRET_KEY, data
+                            WSPasswordCallback.Usage.SECRET_KEY, data
                        ); 
                     if (secretKey == null) {
                         throw new WSSecurityException(
-                            WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                         );
                     }
                 } else {
@@ -149,7 +149,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             }
         } else {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+                WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId"
             );
         }
     }
@@ -216,14 +216,14 @@ public class DerivedKeyTokenSTRParser implements STRParser {
     private byte[] getSecretKeyFromToken(
         String id,
         String type,
-        int identifier,
+        WSPasswordCallback.Usage identifier,
         RequestData data
     ) throws WSSecurityException {
         if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, identifier, data);
+            new WSPasswordCallback(id, null, type, identifier);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
             if (data.getCallbackHandler() != null) {
@@ -232,7 +232,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noPassword", 
                 new Object[] {id}, 
                 e
@@ -279,7 +279,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             secretKey = keyInfo.getSecret();
         } else {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "unsupportedKeyId"
+                WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId"
             );
         }
     }

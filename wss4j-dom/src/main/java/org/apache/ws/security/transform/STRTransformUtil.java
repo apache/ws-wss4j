@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.util.Base64;
@@ -79,7 +79,7 @@ public final class STRTransformUtil {
             X509Certificate[] certs = 
                 secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
             return createBSTX509(doc, certs[0], secRef.getElement());
         }
@@ -98,7 +98,7 @@ public final class STRTransformUtil {
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                 }
                 return createBSTX509(doc, certs[0], secRef.getElement());
             }
@@ -113,7 +113,7 @@ public final class STRTransformUtil {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
             );
         }
         String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);

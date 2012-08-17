@@ -32,8 +32,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.ws.security.action.Action;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.Loader;
 import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.validate.Validator;
 import org.apache.xml.security.utils.XMLUtils;
@@ -669,7 +670,7 @@ public class WSSConfig {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(t.getMessage(), t);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILURE,
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "unableToLoadClass", new Object[] { ((Class<?>)actionObject).getName() }, t);
             }
         } else if (actionObject instanceof Action) {
@@ -761,7 +762,7 @@ public class WSSConfig {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(t.getMessage(), t);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILURE,
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "unableToLoadClass", new Object[] { ((Class<?>)validatorObject).getName() }, t);
             }
         } else if (validatorObject instanceof Validator) {
@@ -787,7 +788,7 @@ public class WSSConfig {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(t.getMessage(), t);
                 }
-                throw new WSSecurityException(WSSecurityException.FAILURE,
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "unableToLoadClass", new Object[] { ((Class<?>)processorObject).getName() }, t);
             }
         } else if (processorObject instanceof Processor) {

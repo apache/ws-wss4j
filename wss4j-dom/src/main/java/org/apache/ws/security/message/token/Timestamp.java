@@ -20,7 +20,7 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
@@ -93,14 +93,14 @@ public class Timestamp {
                         if (bspCompliant && valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             throw new WSSecurityException(
-                                WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
                             );
                         }
                         strCreated = ((Text)currentChildElement.getFirstChild()).getData();
                     } else {
                         // Test for multiple Created elements
                         throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
                         );
                     }
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
@@ -111,14 +111,14 @@ public class Timestamp {
                         // elements
                         //
                         throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
                         ); 
                     } else {
                         String valueType = currentChildElement.getAttribute("ValueType");
                         if (bspCompliant && valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             throw new WSSecurityException(
-                                WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
                             );
                         }
                         strExpires = ((Text)currentChildElement.getFirstChild()).getData();
@@ -126,7 +126,7 @@ public class Timestamp {
                 } else {
                     if (bspCompliant) {
                         throw new WSSecurityException(
-                            WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
                         );
                     }
                     customElements.add(currentChildElement);
@@ -137,7 +137,7 @@ public class Timestamp {
         // We must have a Created element
         if (bspCompliant && strCreated == null) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
             );  
         }
 
@@ -164,7 +164,7 @@ public class Timestamp {
             }
         } catch (ParseException e) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "invalidTimestamp", null, e
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp", null, e
             );
         }
     }

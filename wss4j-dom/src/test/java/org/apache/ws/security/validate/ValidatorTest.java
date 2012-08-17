@@ -27,14 +27,14 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
@@ -82,7 +82,7 @@ public class ValidatorTest extends org.junit.Assert {
             verify(createdDoc, wssConfig, null, null);
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }
 
         // Now switch out the default Timestamp validator
@@ -123,7 +123,7 @@ public class ValidatorTest extends org.junit.Assert {
             newEngine.processSecurityHeader(signedDoc, null, null, cryptoCA);
             fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
         
@@ -159,7 +159,7 @@ public class ValidatorTest extends org.junit.Assert {
             verify(signedDoc, wssConfig, new UsernamePasswordCallbackHandler(), null);
             fail("Failure expected on a bad password text");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
         
@@ -281,7 +281,7 @@ public class ValidatorTest extends org.junit.Assert {
         public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
             BinarySecurity token = credential.getBinarySecurityToken();
             if (token == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
 
             try {
@@ -296,7 +296,7 @@ public class ValidatorTest extends org.junit.Assert {
                 credential.setTransformedToken(assertion);
                 return credential;
             } catch (Exception ex) {
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
         }
         

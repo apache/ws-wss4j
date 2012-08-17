@@ -30,7 +30,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.DOMCallbackLookup;
@@ -140,7 +140,7 @@ public class ReferenceListProcessor implements Processor {
             );
         // KeyInfo cannot be null
         if (keyInfoElement == null) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyinfo");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         }
         // Check BSP compliance
         if (data.getWssConfig().isWsiBSPCompliant()) {
@@ -198,21 +198,21 @@ public class ReferenceListProcessor implements Processor {
         }
         if (result != 1) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "invalidDataRef"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidDataRef"
             );
         }
         
         if (!WSConstants.WSSE_NS.equals(child.getNamespaceURI()) || 
             !SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "noSecTokRef"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
             );
         }
         
         // EncryptionAlgorithm cannot be null
         if (encAlgo == null) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
         }
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
@@ -222,7 +222,7 @@ public class ReferenceListProcessor implements Processor {
             && !WSConstants.AES_256.equals(encAlgo)
             && !WSConstants.AES_256_GCM.equals(encAlgo)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
             );
         }
     }
@@ -252,7 +252,7 @@ public class ReferenceListProcessor implements Processor {
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
             );
         }
         if (encryptedDataElement.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
@@ -291,7 +291,7 @@ public class ReferenceListProcessor implements Processor {
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, ex
             );
         }
 
@@ -311,7 +311,7 @@ public class ReferenceListProcessor implements Processor {
         try {
             xmlCipher.doFinal(doc, encData, content);
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
         }
         
         if (parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)

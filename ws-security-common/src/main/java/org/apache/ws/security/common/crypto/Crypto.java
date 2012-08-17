@@ -80,7 +80,7 @@ public interface Crypto {
      *
      * @return Returns a <code>CertificateFactory</code> to construct
      *         X509 certificates
-     * @throws org.apache.ws.security.WSSecurityException
+     * @throws WSSecurityException
      */
     CertificateFactory getCertificateFactory() throws WSSecurityException;
     

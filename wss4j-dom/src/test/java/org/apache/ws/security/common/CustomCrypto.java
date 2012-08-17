@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.common;
 
-import org.apache.ws.security.components.crypto.Merlin;
+import org.apache.ws.security.common.crypto.Merlin;
 
 public class CustomCrypto extends Merlin {
     

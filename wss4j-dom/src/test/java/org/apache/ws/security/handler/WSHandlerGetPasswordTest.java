@@ -19,12 +19,12 @@
 
 package org.apache.ws.security.handler;
 
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -60,7 +60,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
             handler.getPasswordCB("alice", WSConstants.UT, callbackHandler, reqData);
         assertTrue("alice".equals(callback.getIdentifier()));
         assertTrue("securityPassword".equals(callback.getPassword()));
-        assertTrue(WSPasswordCallback.USERNAME_TOKEN == callback.getUsage());
+        assertTrue(WSPasswordCallback.Usage.USERNAME_TOKEN == callback.getUsage());
     }
     
     /**

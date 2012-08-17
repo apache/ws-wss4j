@@ -34,9 +34,9 @@ import javax.crypto.spec.PSource;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DOMX509Data;
 import org.apache.ws.security.message.token.DOMX509IssuerSerial;
@@ -209,7 +209,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+                    WSSecurityException.ErrorCode.FAILURE,
                     "noUserCertsFound", 
                     new Object[] {user, "encryption"}
                 );
@@ -258,11 +258,11 @@ public class WSSecEncryptedKey extends WSSecBase {
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
             );
         } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
             );
         }
         int blockSize = cipher.getBlockSize();
@@ -276,15 +276,15 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedEphemeralKey = cipher.wrap(secretKey);
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         } catch (IllegalBlockSizeException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         } catch (InvalidKeyException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         }
         Text keyText = 
@@ -394,7 +394,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             break;           
 
         default:
-            throw new WSSecurityException(WSSecurityException.FAILURE, "unsupportedKeyId");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
         }
         Element keyInfoElement = 
             document.createElementNS(
@@ -435,7 +435,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             return keyGen;
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, e
             );
         }
     }

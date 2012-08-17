@@ -93,7 +93,9 @@ public class WSSecurityException extends XMLSecurityException {
         FAILED_SIGNATURE,
     }
 
+    private static final ResourceBundle xmlsecResources;
     private static final ResourceBundle resources;
+    
     /*
      * This is an Integer -> QName map. Its function is to map the integer error codes
      * given above to the QName fault codes as defined in the SOAP Message Security 1.1
@@ -105,7 +107,8 @@ public class WSSecurityException extends XMLSecurityException {
 
     static {
         try {
-            resources = ResourceBundle.getBundle("messages.errors");
+            xmlsecResources = ResourceBundle.getBundle("messages.errors");
+            resources = ResourceBundle.getBundle("messages.wss4j_errors");
         } catch (MissingResourceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -275,8 +278,13 @@ public class WSSecurityException extends XMLSecurityException {
      */
     private static String getMessage(ErrorCode errorCode, String msgId, Object... arguments) {
         String msg = null;
+        String errorCodeString = String.valueOf(errorCode.ordinal());
         try {
-            msg = resources.getString(String.valueOf(errorCode.ordinal()));
+            if (resources.containsKey(errorCodeString)) {
+                msg = resources.getString(errorCodeString);
+            } else {
+                msg = xmlsecResources.getString(errorCodeString);
+            }
             if (msgId != null) {
                 return msg += (" (" + MessageFormat.format(resources.getString(msgId), arguments) + ")");
             }
@@ -285,4 +293,5 @@ public class WSSecurityException extends XMLSecurityException {
         }
         return msg;
     }
+    
 }

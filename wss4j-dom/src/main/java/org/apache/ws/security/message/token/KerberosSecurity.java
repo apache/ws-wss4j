@@ -30,7 +30,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -67,7 +67,7 @@ public class KerberosSecurity extends BinarySecurity {
         String valueType = getValueType();
         if (bspCompliant && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
                 "invalidValueType", 
                 new Object[]{valueType}
             );
@@ -136,7 +136,7 @@ public class KerberosSecurity extends BinarySecurity {
                 log.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 new Object[] {ex.getMessage()},
                 ex
@@ -150,7 +150,7 @@ public class KerberosSecurity extends BinarySecurity {
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
         if (clientPrincipals.isEmpty()) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, 
                 "kerberosLoginError", 
                 new Object[] {"No Client principals found after login"}
             );
@@ -164,7 +164,7 @@ public class KerberosSecurity extends BinarySecurity {
         byte[] ticket = (byte[])Subject.doAs(clientSubject, action);
         if (ticket == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "kerberosServiceTicketError"
+                WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
             );
         }
         if (log.isDebugEnabled()) {

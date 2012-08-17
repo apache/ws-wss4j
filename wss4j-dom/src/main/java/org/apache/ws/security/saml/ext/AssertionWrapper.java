@@ -20,9 +20,9 @@
 package org.apache.ws.security.saml.ext;
 
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
@@ -544,7 +544,7 @@ public class AssertionWrapper {
                 );
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                     new Object[]{"cannot get certificate or key"}
                 );
             }
@@ -562,7 +562,7 @@ public class AssertionWrapper {
                 credential.setPublicKey(samlKeyInfo.getPublicKey());
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                     new Object[]{"cannot get certificate or key"}
                 );
             }
@@ -679,11 +679,11 @@ public class AssertionWrapper {
                 return xmlSignature.getSignatureValue();
             } catch (XMLSignatureException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
                 );
             } catch (XMLSecurityException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
                 );
             }
         }

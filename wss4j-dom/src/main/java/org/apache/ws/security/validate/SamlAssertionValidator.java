@@ -21,7 +21,7 @@ package org.apache.ws.security.validate;
 
 import java.util.List;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -67,7 +67,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null || credential.getAssertion() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         AssertionWrapper assertion = credential.getAssertion();
         
@@ -80,12 +80,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
             if (assertion.getSubjectKeyInfo() == null) {
                 LOG.debug("There is no Subject KeyInfo to match the holder-of-key subject conf method");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeyInSAMLToken");
             }
             // The assertion must have been signed for HOK
             if (!assertion.isSigned()) {
                 LOG.debug("A holder-of-key assertion must be signed");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
         
@@ -142,13 +142,13 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             currentTime = currentTime.plusSeconds(futureTTL);
             if (validFrom.isAfter(currentTime)) {
                 LOG.debug("SAML Token condition (Not Before) not met");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
 
         if (validTill != null && validTill.isBeforeNow()) {
             LOG.debug("SAML Token condition (Not On Or After) not met");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
@@ -167,7 +167,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             } catch (ValidationException e) {
                 LOG.debug("Saml Validation error: " + e.getMessage(), e);
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
                 );
             }
         } else if (assertion.getSaml2() != null) {
@@ -181,7 +181,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             } catch (ValidationException e) {
                 LOG.debug("Saml Validation error: " + e.getMessage(), e);
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
                 );
             }
         }

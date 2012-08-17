@@ -178,14 +178,14 @@ public abstract class AbstractTestBase {
         return baos;
     }
 
-    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws org.apache.ws.security.WSSecurityException {
+    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws WSSecurityException {
         Map<String, Object> context = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
         return (Document) context.get(SECURED_DOCUMENT);
     }
 
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
             InputStream sourceDocument, String action, final Properties properties
-    ) throws org.apache.ws.security.WSSecurityException {
+    ) throws WSSecurityException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);
@@ -385,7 +385,7 @@ public abstract class AbstractTestBase {
          * Handles incoming web service requests and outgoing responses
          */
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
-                throws org.apache.ws.security.WSSecurityException {
+                throws WSSecurityException {
 
             reqData.getSignatureParts().clear();
             reqData.getEncryptParts().clear();
@@ -394,7 +394,7 @@ public abstract class AbstractTestBase {
              */
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new org.apache.ws.security.WSSecurityException("WSS4JHandler: No action defined");
+                throw new WSSecurityException("WSS4JHandler: No action defined");
             }
             List<Integer> actions = new ArrayList<Integer>();
             int doAction = WSSecurityUtil.decodeAction(action, actions);
@@ -422,7 +422,7 @@ public abstract class AbstractTestBase {
                  * We need a username - if none throw a WSSecurityException. For encryption
                  * there is a specific parameter to get a username.
                  */
-                throw new org.apache.ws.security.WSSecurityException(
+                throw new WSSecurityException(
                         "WSS4JHandler: Empty username for specified action"
                 );
             }
@@ -438,7 +438,7 @@ public abstract class AbstractTestBase {
             */
             Document doc = (Document) mc.get(SECURED_DOCUMENT);
             if (doc == null) {
-                throw new org.apache.ws.security.WSSecurityException(
+                throw new WSSecurityException(
                         "WSS4JHandler: cannot get SOAP envlope from message"
                 );
             }
@@ -455,10 +455,10 @@ public abstract class AbstractTestBase {
 
         @SuppressWarnings("unchecked")
         public boolean doReceiver(Map<String, Object> mc, RequestData reqData, boolean isRequest)
-                throws org.apache.ws.security.WSSecurityException {
+                throws WSSecurityException {
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new org.apache.ws.security.WSSecurityException("WSS4JHandler: No action defined");
+                throw new WSSecurityException("WSS4JHandler: No action defined");
             }
             List<Integer> actions = new ArrayList<Integer>();
             int doAction = WSSecurityUtil.decodeAction(action, actions);
@@ -496,11 +496,11 @@ public abstract class AbstractTestBase {
             List<WSSecurityEngineResult> wsResult = null;
             try {
                 wsResult = secEngine.processSecurityHeader(elem, reqData);
-            } catch (org.apache.ws.security.WSSecurityException ex) {
+            } catch (WSSecurityException ex) {
                 if (doDebug) {
                     log.debug(ex.getMessage(), ex);
                 }
-                throw new org.apache.ws.security.WSSecurityException(
+                throw new WSSecurityException(
                         "WSS4JHandler: security processing failed", ex
                 );
             }
@@ -509,7 +509,7 @@ public abstract class AbstractTestBase {
                 if (doAction == WSConstants.NO_SECURITY) {
                     return true;
                 } else {
-                    throw new org.apache.ws.security.WSSecurityException(
+                    throw new WSSecurityException(
                             "WSS4JHandler: Request does not contain required Security header"
                     );
                 }
@@ -526,7 +526,7 @@ public abstract class AbstractTestBase {
              * now check the security actions: do they match, in right order?
              */
             if (!checkReceiverResults(wsResult, actions)) {
-                throw new org.apache.ws.security.WSSecurityException(
+                throw new WSSecurityException(
                         "WSS4JHandler: security processing failed (actions mismatch)"
                 );
             }

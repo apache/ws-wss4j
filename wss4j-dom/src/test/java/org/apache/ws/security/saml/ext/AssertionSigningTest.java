@@ -24,10 +24,10 @@ import java.security.KeyStore;
 
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.SAML2CallbackHandler;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.Merlin;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.util.Loader;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.Loader;
 import org.junit.Assert;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;

@@ -23,7 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -86,7 +86,7 @@ public class WSSecSignatureBase extends WSSecBase {
         } catch (Exception ex) {
             log.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
             );
         }
         
@@ -158,7 +158,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     if (elementsToSign == null || elementsToSign.size() == 0) {
                         throw new WSSecurityException(
-                            WSSecurityException.FAILURE, 
+                            WSSecurityException.ErrorCode.FAILURE, 
                             "noEncElement",
                             new Object[] {nmSpace + ", " + elemName}
                         );
@@ -189,7 +189,7 @@ public class WSSecSignatureBase extends WSSecBase {
             } catch (Exception ex) {
                 log.error("", ex);
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                    WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
                 );
             }
         }

@@ -20,8 +20,8 @@
 package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -61,7 +61,7 @@ public final class X509Util {
             symEncAlgo = tmpE.getAttribute("Algorithm");
             if (symEncAlgo == null || "".equals(symEncAlgo)) {
                 throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
                 );
             }
         }
@@ -94,21 +94,22 @@ public final class X509Util {
             keyName = builder.toString();
         }
         if (keyName == null || keyName.length() <= 0) {
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noKeyname");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyname");
         }
-        WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
+        WSPasswordCallback pwCb = 
+                new WSPasswordCallback(keyName, WSPasswordCallback.Usage.SECRET_KEY);
         try {
             cb.handle(new Callback[]{pwCb});
         } catch (IOException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",
                 new Object[]{keyName}, 
                 e
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",
                 new Object[]{keyName}, 
                 e
@@ -117,7 +118,7 @@ public final class X509Util {
         byte[] decryptedData = pwCb.getKey();
         if (decryptedData == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",
                 new Object[]{keyName}
             );

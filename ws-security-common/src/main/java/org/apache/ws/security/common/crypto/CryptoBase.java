@@ -136,7 +136,7 @@ public abstract class CryptoBase implements Crypto {
      *
      * @return Returns a <code>CertificateFactory</code> to construct
      *         X509 certificates
-     * @throws org.apache.ws.security.WSSecurityException
+     * @throws WSSecurityException
      */
     public CertificateFactory getCertificateFactory() throws WSSecurityException {
         String provider = getCryptoProvider();
@@ -179,7 +179,7 @@ public abstract class CryptoBase implements Crypto {
      *
      * @param in The <code>InputStream</code> containing the X509Certificate
      * @return An X509 certificate
-     * @throws org.apache.ws.security.WSSecurityException
+     * @throws WSSecurityException
      */
     public X509Certificate loadCertificate(InputStream in) throws WSSecurityException {
         try {

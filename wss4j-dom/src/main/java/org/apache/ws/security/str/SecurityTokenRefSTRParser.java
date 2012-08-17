@@ -21,11 +21,11 @@ package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
@@ -101,7 +101,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                 );
             }
         } else if (secRef.containsReference()) {
@@ -126,7 +126,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             }
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                 );
             }
         } else if (secRef.containsKeyIdentifier()) {
@@ -163,7 +163,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                     );
                 }
             } else {
@@ -176,12 +176,12 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     );
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
                     );
                 }
             }
         } else {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, "noReference");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
     }
     
@@ -253,7 +253,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY, data);
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.Usage.SECRET_KEY);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
             if (data.getCallbackHandler() != null) {
@@ -262,7 +262,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noPassword", 
                 new Object[] {id}, 
                 e
@@ -289,7 +289,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             SAMLUtil.getCredentialFromSubject(assertion, data, wsDocInfo, bspCompliant);
         if (samlKi == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "invalidSAMLToken", new Object[] {"No Secret Key"}
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", new Object[] {"No Secret Key"}
             );
         }
         return samlKi.getSecret();

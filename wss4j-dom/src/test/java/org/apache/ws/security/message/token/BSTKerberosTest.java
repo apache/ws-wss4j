@@ -24,11 +24,11 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
@@ -434,16 +434,16 @@ public class BSTKerberosTest extends org.junit.Assert {
         public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
             BinarySecurity token = credential.getBinarySecurityToken();
             if (token == null) {
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
 
             if (!AP_REQ.equals(token.getValueType())) {
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             
             byte[] tokenBytes = token.getToken();
             if (!Arrays.equals(tokenBytes, "12345678".getBytes())) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             return credential;
         }

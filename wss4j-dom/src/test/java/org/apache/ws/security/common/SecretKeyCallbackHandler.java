@@ -19,8 +19,8 @@
 
 package org.apache.ws.security.common;
 
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 
@@ -44,16 +44,14 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                switch (pc.getUsage()) {
-                case WSPasswordCallback.SECRET_KEY:
-                case WSPasswordCallback.SECURITY_CONTEXT_TOKEN: {
+                if ((pc.getUsage() == WSPasswordCallback.Usage.SECRET_KEY)
+                    || (pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN)) {
                     byte[] secret = (byte[]) this.secrets.get(pc.getIdentifier());
                     if (secret == null) {
                         secret = outboundSecret;
                     }
                     pc.setKey(secret);
                     break;
-                }
                 }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");

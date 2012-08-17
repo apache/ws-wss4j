@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 
 /**
@@ -55,13 +55,13 @@ public class SignatureTrustValidator implements Validator {
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         X509Certificate[] certs = credential.getCertificates();
         PublicKey publicKey = credential.getPublicKey();
         Crypto crypto = getCrypto(data);
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
         }
         
         if (certs != null && certs.length > 0) {
@@ -83,7 +83,7 @@ public class SignatureTrustValidator implements Validator {
                 return credential;
             }
         }
-        throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
     }
 
 
@@ -104,11 +104,11 @@ public class SignatureTrustValidator implements Validator {
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", null, e
             );
         } catch (CertificateNotYetValidException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, "invalidCert", null, e
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", null, e
             );
         }
     }

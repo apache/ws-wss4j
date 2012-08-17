@@ -21,9 +21,9 @@ package org.apache.ws.security.processor;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.validate.Credential;
@@ -100,24 +100,24 @@ public class SecurityContextTokenProcessor implements Processor {
         throws WSSecurityException {
 
         if (cb == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCallback");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
         }
 
         WSPasswordCallback callback = 
-            new WSPasswordCallback(identifier, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
+            new WSPasswordCallback(identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
         try {
             Callback[] callbacks = new Callback[]{callback};
             cb.handle(callbacks);
         } catch (IOException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, 
                 "noKey",
                 new Object[] {identifier}, 
                 e
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, 
                 "noKey",
                 new Object[] {identifier}, 
                 e

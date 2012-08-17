@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.AlgoFactory;
@@ -123,7 +123,7 @@ public class DerivedKeyToken {
         if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
             el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_12))) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY_TOKEN
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN
             );
         }
         elementSecurityTokenReference = 
@@ -553,7 +553,7 @@ public class DerivedKeyToken {
             
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, null, null, e
+                WSSecurityException.ErrorCode.FAILURE, null, null, e
             );
         }
     }

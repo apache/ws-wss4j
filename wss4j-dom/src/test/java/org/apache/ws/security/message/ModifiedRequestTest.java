@@ -24,12 +24,12 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
@@ -124,7 +124,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             verify(signedDoc);
             fail("Failure expected on multiple elements with the same wsu:Id");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }
@@ -209,7 +209,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             WSSecurityUtil.checkSignsAllElements(actionResult, new String[]{actualId});
             fail("Failure expected on bad wsu:Id");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }
@@ -391,7 +391,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
             fail("Failure expected on a modified EncryptedData CipherValue");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }
@@ -439,7 +439,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
             fail("Failure expected on a modified EncryptedData CipherValue");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }
@@ -489,7 +489,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             verify(signedDoc);
             fail("Failure expected on a modified Signature Reference");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }
@@ -518,7 +518,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             verify(signedDoc);
             fail("Failure expected on an untrusted Certificate");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }
@@ -554,7 +554,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             verify(signedDoc);
             fail("Failure expected on a modified Signature element");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
         }
     }

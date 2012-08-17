@@ -172,7 +172,7 @@
         </property>
     </bean>
 
-    <bean name="passwordCallbackHandlerWSS4J" class="org.apache.ws.security.stax.wss.test.WSS4JCallbackHandlerImpl">
+    <bean name="passwordCallbackHandlerWSS4J" class="org.swssf.cxfIntegration.test.integration.WSS4JCallbackHandlerImpl">
     </bean>
 
     <httpj:engine-factory bus="cxf">

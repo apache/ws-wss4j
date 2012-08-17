@@ -24,8 +24,8 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
@@ -61,7 +61,7 @@ public class BinarySecurityTokenProcessor implements Processor {
                 return java.util.Collections.singletonList(result);
             } else if (foundElement != null) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
                 );
             }
         }

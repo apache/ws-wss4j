@@ -22,7 +22,7 @@ package org.apache.ws.security.processor;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.w3c.dom.Element;
@@ -49,7 +49,7 @@ public class SignatureConfirmationProcessor implements Processor {
         // A wsu:Id is required as per the BSP spec
         if (data.getWssConfig().isWsiBSPCompliant() && (id == null || "".equals(id))) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY, 
                 "requiredElementNoID", 
                 new Object[] {elem.getLocalName()}
             );

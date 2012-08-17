@@ -162,7 +162,7 @@ Index: modules/rampart-core/src/main/java/org/apache/rampart/builder/AsymmetricB
 +import org.apache.ws.secpolicy.model.*;
  import org.apache.ws.security.WSConstants;
  import org.apache.ws.security.WSEncryptionPart;
- import org.apache.ws.security.WSSecurityException;
+ import WSSecurityException;
 @@ -45,8 +45,10 @@
  import org.w3c.dom.Document;
  import org.w3c.dom.Element;
@@ -1040,7 +1040,7 @@ Index: modules/rampart-core/src/main/java/org/apache/rampart/builder/TransportBi
 +import org.apache.ws.secpolicy.model.*;
  import org.apache.ws.security.WSConstants;
  import org.apache.ws.security.WSEncryptionPart;
- import org.apache.ws.security.WSSecurityException;
+ import WSSecurityException;
 @@ -52,6 +44,7 @@
  
  import java.util.ArrayList;

@@ -21,17 +21,17 @@ package org.apache.ws.security.handler;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.action.Action;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.Loader;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SignatureConfirmation;
-import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -998,18 +998,18 @@ public abstract class WSHandler {
         int doAction
     ) throws WSSecurityException {
 
-        int reason = WSPasswordCallback.UNKNOWN;
+        WSPasswordCallback.Usage reason = WSPasswordCallback.Usage.UNKNOWN;
 
         switch (doAction) {
         case WSConstants.UT:
         case WSConstants.UT_SIGN:
-            reason = WSPasswordCallback.USERNAME_TOKEN;
+            reason = WSPasswordCallback.Usage.USERNAME_TOKEN;
             break;
         case WSConstants.SIGN:
-            reason = WSPasswordCallback.SIGNATURE;
+            reason = WSPasswordCallback.Usage.SIGNATURE;
             break;
         case WSConstants.ENCR:
-            reason = WSPasswordCallback.SECRET_KEY;
+            reason = WSPasswordCallback.Usage.SECRET_KEY;
             break;
         }
         return new WSPasswordCallback(username, reason);

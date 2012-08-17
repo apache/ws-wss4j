@@ -24,8 +24,8 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -135,9 +135,8 @@ public class EncryptedKeySTRParser implements STRParser {
                 certs = new X509Certificate[]{token.getX509Certificate(crypto)};
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                    "unsupportedBinaryTokenType",
-                    null
+                    WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
+                    "unsupportedBinaryTokenType"
                 );
             }
         } 
@@ -234,9 +233,8 @@ public class EncryptedKeySTRParser implements STRParser {
             certs = keyInfo.getCerts();
         } else {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_SECURITY_TOKEN,
-                "unsupportedBinaryTokenType",
-                null
+                WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
+                "unsupportedBinaryTokenType"
             );
         }
     }

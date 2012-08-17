@@ -26,8 +26,8 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
@@ -131,7 +131,7 @@ public final class WSSecurityUtil {
                                 "Two or more security headers have the same actor name: " + actor
                             );
                         }
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
                     }
                     foundSecurityHeader = elem;
                 }
@@ -803,7 +803,7 @@ public final class WSSecurityUtil {
             return Cipher.getInstance(keyAlgorithm);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
                 new Object[] { "No such padding: " + cipherAlgo }, ex
             );
         } catch (NoSuchAlgorithmException ex) {
@@ -814,13 +814,13 @@ public final class WSSecurityUtil {
                     return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
                 } catch (Exception e) {
                     throw new WSSecurityException(
-                        WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
                         new Object[] { "No such algorithm: " + cipherAlgo }, e
                     );
                 }
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
                     new Object[] { "No such algorithm: " + cipherAlgo }, ex
                 );
             }
@@ -1027,9 +1027,7 @@ public final class WSSecurityUtil {
         } else if (WSConstants.HMAC_MD5.equals(algorithm)) {
             return 16;
         } else {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, null
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
         }
     }
 
@@ -1115,7 +1113,7 @@ public final class WSSecurityUtil {
                 }
                 if (!found) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILED_CHECK,
+                        WSSecurityException.ErrorCode.FAILED_CHECK,
                         "requiredElementNotProtected",
                         new Object[] {requiredPart}
                     );
@@ -1167,7 +1165,7 @@ public final class WSSecurityUtil {
             }
             if (!found) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILED_CHECK,
+                    WSSecurityException.ErrorCode.FAILED_CHECK,
                     "requiredElementNotSigned",
                     new Object[] {requiredIDs[i]}
                 );
@@ -1309,7 +1307,7 @@ public final class WSSecurityUtil {
                 if (cur.getNodeType() == Node.ELEMENT_NODE) {
                     if (WSConstants.SIG_LN.equals(cur.getLocalName())
                         && WSConstants.SIG_NS.equals(cur.getNamespaceURI())) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK,
                             "requiredElementNotSigned", new Object[] {elem});
                     } else if (isLinkedBySignatureRefs((Element)cur, signatureRefIDs)) {
                         return;
@@ -1319,7 +1317,7 @@ public final class WSSecurityUtil {
             }
         }
         throw new WSSecurityException(
-            WSSecurityException.FAILED_CHECK, "requiredElementNotSigned", new Object[] {elem});
+            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", new Object[] {elem});
     }
     
     private static boolean isLinkedBySignatureRefs(Element elem, Set<String> allIDs) {

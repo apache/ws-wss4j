@@ -19,13 +19,13 @@
 
 package org.apache.ws.security.saml;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.util.Loader;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Properties;
+
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.Loader;
 
 /**
  * CryptoFactory.
@@ -157,7 +157,7 @@ public abstract class SAMLIssuerFactory {
             URL url = Loader.getResource(propFilename);
             if (url == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, 
+                    WSSecurityException.ErrorCode.FAILURE, 
                     "resourceNotFound",
                     new Object[]{propFilename}
                 );
@@ -168,7 +168,7 @@ public abstract class SAMLIssuerFactory {
                 LOG.debug("Cannot find resource: " + propFilename, e);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, 
                 "resourceNotFound",
                 new Object[]{propFilename},
                 e

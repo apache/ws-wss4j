@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.common;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.validate.Credential;
@@ -36,7 +36,7 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
         //
         AssertionWrapper assertion = credential.getAssertion();
         if (!"www.example.com".equals(assertion.getIssuerString())) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         if (assertion.getSaml1() != null) {
             // Get the SAML subject and validate it
@@ -62,20 +62,20 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
                 
             if (samlSubject == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLToken", 
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
                     new Object[] {"for Signature (no Subject)"}
                 );
             }
             String nameIdentifier = samlSubject.getNameIdentifier().getNameIdentifier();
             if (nameIdentifier == null || !nameIdentifier.contains("uid=joe")) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         } else {
             org.opensaml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
             org.opensaml.saml2.core.Subject subject = saml2Assertion.getSubject();
             String nameIdentifier = subject.getNameID().getValue();
             if (nameIdentifier == null || !nameIdentifier.contains("uid=joe")) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
         

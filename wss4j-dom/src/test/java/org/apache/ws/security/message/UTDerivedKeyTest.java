@@ -22,13 +22,13 @@ package org.apache.ws.security.message;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.EncodedPasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
@@ -255,7 +255,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on a bad derived encryption");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             // expected
         }
     }
@@ -306,7 +306,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on a bad derived encryption");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }
@@ -457,7 +457,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(signedDoc);
             fail("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_CHECK);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             // expected
         }
     }
@@ -503,7 +503,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(signedDoc);
             fail("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.FAILED_AUTHENTICATION);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
     }

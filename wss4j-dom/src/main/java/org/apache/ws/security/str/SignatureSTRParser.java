@@ -24,11 +24,11 @@ import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
@@ -220,7 +220,7 @@ public class SignatureSTRParser implements STRParser {
             }
         } else {
             throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY,
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "unsupportedKeyInfo", 
                     new Object[]{strElement.toString()}
             );
@@ -319,7 +319,7 @@ public class SignatureSTRParser implements STRParser {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY, data);
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.Usage.SECRET_KEY);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
             if (data.getCallbackHandler() != null) {
@@ -328,7 +328,7 @@ public class SignatureSTRParser implements STRParser {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noPassword", 
                 new Object[] {id}, 
                 e
@@ -438,7 +438,7 @@ public class SignatureSTRParser implements STRParser {
                                 }
                             } catch (CertificateEncodingException ex) {
                                 throw new WSSecurityException(
-                                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
+                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
                                     null, ex
                                 );
                             }
@@ -529,7 +529,7 @@ public class SignatureSTRParser implements STRParser {
             SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
             if (keyInfo == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity"
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
                 );
             }
             X509Certificate[] foundCerts = keyInfo.getCerts();

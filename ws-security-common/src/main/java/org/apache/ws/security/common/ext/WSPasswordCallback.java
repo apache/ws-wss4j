@@ -87,7 +87,7 @@ public class WSPasswordCallback implements Callback {
     private Usage usage;
     private String type;
     private Element customToken;
-
+    
     /**
      * Constructor.
      *
@@ -97,7 +97,7 @@ public class WSPasswordCallback implements Callback {
     public WSPasswordCallback(String id, Usage usage) {
         this(id, null, null, usage);
     }
-
+    
     /**
      * Constructor.
      *
@@ -110,7 +110,7 @@ public class WSPasswordCallback implements Callback {
         this.type = type;
         this.usage = usage;
     }
-
+    
     /**
      * Get the identifier.
      * <p/>
@@ -120,25 +120,9 @@ public class WSPasswordCallback implements Callback {
     public String getIdentifier() {
         return identifier;
     }
-
+    
     /**
-     * Get the identifier.
-     * <p/>
-     *
-     * @return The identifier
-     * @deprecated use getIdentifier() instead
-     */
-    public String getIdentifer() {
-        return getIdentifier();
-    }
-
-    /**
-     * Extended callback interface allows for setting the username as well.
-     * Callback functions can change the identifier, this is intended in the usernametoken scenario
-     * where the usernametoken denotes the identity, but a fixed identity for signing is used
-     * The initial value is that from the configuration file. If this method is not called, the
-     * configured identity is used.
-     *
+     * Set the identifier
      * @param ident The identity.
      */
     public void setIdentifier(String ident) {
@@ -194,31 +178,28 @@ public class WSPasswordCallback implements Callback {
     public Usage getUsage() {
         return usage;
     }
-
+    
     /**
-     * The password type is only relevant for usage <code>USERNAME_TOKEN</code>
-     * and <code>USERNAME_TOKEN_UNKNOWN</code>.
-     *
-     * @return Returns the passwordType.
-     */
-    public String getPasswordType() {
-        return type;
-    }
-
-    /**
-     * The key type is only relevant for usage <code>ENCRYPTED_KEY_TOKEN</code>
-     *
      * @return Returns the type.
      */
-    public String getKeyType() {
+    public String getType() {
         return type;
     }
 
+    /**
+     * 
+     * @return the custom token
+     */
     public Element getCustomToken() {
         return customToken;
     }
 
+    /**
+     * Set the custom token
+     * @param customToken
+     */
     public void setCustomToken(Element customToken) {
         this.customToken = customToken;
     }
+    
 }

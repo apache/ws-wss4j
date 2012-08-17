@@ -21,7 +21,7 @@ package org.apache.ws.security.validate;
 
 
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.Timestamp;
 
@@ -40,7 +40,7 @@ public class TimestampValidator implements Validator {
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null || credential.getTimestamp() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         if (data.getWssConfig() == null) {
             throw new WSSecurityException("WSSConfig cannot be null");
@@ -60,7 +60,7 @@ public class TimestampValidator implements Validator {
         if ((timeStampStrict && timeStamp.isExpired()) 
             || !timeStamp.verifyCreated(timeStampTTL, futureTimeToLive)) {
             throw new WSSecurityException(
-                WSSecurityException.MESSAGE_EXPIRED,
+                WSSecurityException.ErrorCode.MESSAGE_EXPIRED,
                 "invalidTimestamp",
                 new Object[] {"The security semantics of the message have expired"}
             );

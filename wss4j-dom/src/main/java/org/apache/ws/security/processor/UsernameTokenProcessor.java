@@ -25,9 +25,9 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.cache.ReplayCache;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.validate.Credential;
@@ -57,7 +57,7 @@ public class UsernameTokenProcessor implements Processor {
                 return java.util.Collections.singletonList(result);
             } else if (foundElement != null) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, "duplicateError"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
                 );
             }
         }
@@ -138,7 +138,7 @@ public class UsernameTokenProcessor implements Processor {
         if (replayCache != null && ut.getNonce() != null) {
             if (replayCache.contains(ut.getNonce())) {
                 throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY,
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badUsernameToken",
                     new Object[] {"A replay attack has been detected"}
                 );

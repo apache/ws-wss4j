@@ -20,12 +20,12 @@
 package org.apache.ws.security.misc;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SOAPUtil;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
@@ -72,7 +72,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             verify(encryptedDoc);
             fail("Failure expected with a bad password");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 6);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "FailedCheck");
             assertTrue(ex.getFaultCode().equals(faultCode));
@@ -90,7 +90,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             WSSecurityUtil.getCipherInstance("Bad Algorithm");
             fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 2);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
             assertTrue(ex.getMessage().startsWith(
                 "An unsupported signature or encryption algorithm was used"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "UnsupportedAlgorithm");
@@ -116,7 +116,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             verify(timestampedDoc);
             fail("Failure expected on an expired message");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 8);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             assertTrue(ex.getMessage().startsWith(
                 "The message has expired"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
@@ -144,7 +144,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             verify(timestampedDoc);
             fail("Failure expected on a bad password");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 5);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             assertTrue(ex.getMessage().startsWith(
                 "The security token could not be authenticated or authorized"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "FailedAuthentication");
@@ -172,7 +172,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             new UsernameToken(doc.getDocumentElement());
             fail("Failure expected on an invalid security token");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 4);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
             assertTrue(ex.getMessage().startsWith(
                 "An invalid security token was provided"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurityToken");
@@ -189,7 +189,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             new Reference((org.w3c.dom.Element)null);
             fail("Failure expected on processing the security header");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == 3);
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
             assertTrue(ex.getMessage().startsWith(
                 "An error was discovered processing the <wsse:Security> header"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurity");

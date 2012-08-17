@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.ws.security.stax.wss.WSSec;
@@ -243,7 +244,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
         xmlStreamReader.close();
     }
 
-    private void doDOMSecurityOutbound(File input, File output) throws org.apache.ws.security.WSSecurityException, FileNotFoundException, TransformerException {
+    private void doDOMSecurityOutbound(File input, File output) throws WSSecurityException, FileNotFoundException, TransformerException {
         Properties properties = new Properties();
         properties.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
         properties.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");

@@ -19,12 +19,12 @@
 
 package org.apache.ws.security.common;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 
 /**
  * a custom processor that inserts itself into the results list

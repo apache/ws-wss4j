@@ -27,7 +27,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
@@ -140,7 +140,7 @@ public class KerberosTokenValidator implements Validator {
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         if (credential == null || credential.getBinarySecurityToken() == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         
         BinarySecurity binarySecurity = credential.getBinarySecurityToken();
@@ -173,7 +173,7 @@ public class KerberosTokenValidator implements Validator {
                 log.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 new Object[] {ex.getMessage()},
                 ex
@@ -192,7 +192,7 @@ public class KerberosTokenValidator implements Validator {
             Set<Principal> principals = subject.getPrincipals();
             if (principals.isEmpty()) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, 
+                    WSSecurityException.ErrorCode.FAILURE, 
                     "kerberosLoginError", 
                     new Object[] {"No Client principals found after login"}
                 );
@@ -205,7 +205,7 @@ public class KerberosTokenValidator implements Validator {
         Principal principal = (Principal)Subject.doAs(subject, action);
         if (principal == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "kerberosTicketValidationError"
+                WSSecurityException.ErrorCode.FAILURE, "kerberosTicketValidationError"
             );
         }
         credential.setPrincipal(principal);

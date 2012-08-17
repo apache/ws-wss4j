@@ -37,9 +37,9 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
@@ -107,7 +107,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @param secHeader
      *            The Security header
      * @return A signed SOAP envelope as <code>Document</code>
-     * @throws org.apache.ws.security.WSSecurityException
+     * @throws WSSecurityException
      */
     public Document build(
         Document doc, Crypto uCrypto, AssertionWrapper assertion, 
@@ -246,7 +246,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         else {
             if (userCrypto == null || !assertion.isSigned()) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+                    WSSecurityException.ErrorCode.FAILURE,
                     "invalidSAMLsecurity",
                     new Object[] { "for SAML Signature (Key Holder)" }
                 );
@@ -267,7 +267,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         if ((certs == null || certs.length == 0 || certs[0] == null) 
             && publicKey == null && secretKey == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "noCertsFound",
                 new Object[] { "SAML signature" }
             );
@@ -281,7 +281,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 key = publicKey;
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "unknownSignatureAlgorithm"
+                    WSSecurityException.ErrorCode.FAILURE, "unknownSignatureAlgorithm"
                 );
             }
             
@@ -293,7 +293,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 sigAlgo = WSConstants.RSA;
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+                    WSSecurityException.ErrorCode.FAILURE,
                     "unknownSignatureAlgorithm",
                     new Object[] {
                         pubKeyAlgo
@@ -315,7 +315,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         } catch (Exception ex) {
             log.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
             );
         }
 
@@ -373,7 +373,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
             );
         }
         
@@ -413,7 +413,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
             default:
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "unsupportedKeyId", new Object[]{}
+                    WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId", new Object[]{}
                 );
             }
         } else if (useDirectReferenceToAssertion) {
@@ -549,7 +549,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         } catch (Exception ex) {
             log.error(ex);
             throw new WSSecurityException(
-                WSSecurityException.FAILED_SIGNATURE, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, null, null, ex
             );
         }
     }

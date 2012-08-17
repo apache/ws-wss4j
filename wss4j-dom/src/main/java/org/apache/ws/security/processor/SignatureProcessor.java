@@ -26,11 +26,11 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.cache.ReplayCache;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.message.CallbackLookup;
@@ -136,11 +136,11 @@ public class SignatureProcessor implements Processor {
             if (data.getWssConfig().isWsiBSPCompliant()) {
                 if (strElements.isEmpty()) {
                     throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY, "noSecurityTokenReference"
+                        WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecurityTokenReference"
                     );
                 } else if (strElements.size() > 1) {
                     throw new WSSecurityException(
-                        WSSecurityException.INVALID_SECURITY, "badSecurityTokenReference"
+                        WSSecurityException.ErrorCode.INVALID_SECURITY, "badSecurityTokenReference"
                     );
                 }
             }
@@ -191,7 +191,7 @@ public class SignatureProcessor implements Processor {
         if ((certs == null || certs.length == 0 || certs[0] == null) 
             && secretKey == null
             && publicKey == null) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
         
         XMLSignature xmlSignature = 
@@ -202,7 +202,7 @@ public class SignatureProcessor implements Processor {
         if (data.getWssConfig().isWsiBSPCompliant() 
             && !WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "badC14nAlgo"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badC14nAlgo"
             );
         }
         List<WSDataRef> dataRefs =  
@@ -210,7 +210,7 @@ public class SignatureProcessor implements Processor {
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data.getWssConfig(), wsDocInfo
             );
         if (dataRefs.size() == 0) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
         
         int actionPerformed = WSConstants.SIGN;
@@ -245,7 +245,7 @@ public class SignatureProcessor implements Processor {
         Crypto crypto
     ) throws WSSecurityException {
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
         }
         if (crypto.getDefaultX509Identifier() != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -253,7 +253,7 @@ public class SignatureProcessor implements Processor {
             return crypto.getX509Certificates(cryptoType);
         } else {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo"
             );
         }
     }
@@ -268,7 +268,7 @@ public class SignatureProcessor implements Processor {
             //
             keyValue = getKeyValue(keyInfoElement);
         } catch (javax.xml.crypto.MarshalException ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
         } 
 
         if (keyValue != null) {
@@ -279,11 +279,11 @@ public class SignatureProcessor implements Processor {
                 return keyValue.getPublicKey();
             } catch (java.security.KeyException ex) {
                 LOG.error(ex.getMessage(), ex);
-                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
             }     
         } else {
             throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY, "unsupportedKeyInfo"
+                    WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo"
             );
         }
     }
@@ -405,10 +405,10 @@ public class SignatureProcessor implements Processor {
             throw ex;
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_CHECK, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex
             );
         }
-        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
     }
     
     /**
@@ -514,7 +514,7 @@ public class SignatureProcessor implements Processor {
                     }
                 }
                 if (se == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                 }
                 
                 WSDataRef ref = new WSDataRef();
@@ -634,7 +634,7 @@ public class SignatureProcessor implements Processor {
 
         if (replayCache.contains(identifier)) {
             throw new WSSecurityException(
-                WSSecurityException.INVALID_SECURITY,
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
                 "invalidTimestamp",
                 new Object[] {"A replay attack has been detected"}
             );

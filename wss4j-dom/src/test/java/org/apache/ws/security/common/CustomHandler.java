@@ -20,6 +20,7 @@
 package org.apache.ws.security.common;
 
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.RequestData;
 import org.w3c.dom.Document;
@@ -82,7 +83,7 @@ public class CustomHandler extends WSHandler {
         RequestData reqData, 
         List<Integer> actions,
         boolean request
-    ) throws org.apache.ws.security.WSSecurityException {
+    ) throws WSSecurityException {
         doSenderAction(
             action, 
             doc, 
@@ -95,7 +96,7 @@ public class CustomHandler extends WSHandler {
     public void receive(
         int action, 
         RequestData reqData
-    ) throws org.apache.ws.security.WSSecurityException {
+    ) throws WSSecurityException {
         doReceiverAction(
             action, 
             reqData
@@ -105,21 +106,21 @@ public class CustomHandler extends WSHandler {
     public void signatureConfirmation(
         RequestData requestData,
         List<WSSecurityEngineResult> results
-    ) throws org.apache.ws.security.WSSecurityException {
+    ) throws WSSecurityException {
         checkSignatureConfirmation(requestData, results);
     }
     
     public boolean checkResults(
         List<WSSecurityEngineResult> results,
         List<Integer> actions
-    ) throws org.apache.ws.security.WSSecurityException {
+    ) throws WSSecurityException {
         return checkReceiverResults(results, actions);
     }
 
     public boolean checkResultsAnyOrder(
         List<WSSecurityEngineResult> results,
         List<Integer> actions
-    ) throws org.apache.ws.security.WSSecurityException {
+    ) throws WSSecurityException {
         return checkReceiverResultsAnyOrder(results, actions);
     }
     

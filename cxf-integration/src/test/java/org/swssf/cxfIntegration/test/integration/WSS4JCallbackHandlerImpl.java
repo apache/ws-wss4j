@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.ws.security.stax.wss.test;
+package org.swssf.cxfIntegration.test.integration;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.WSPasswordCallback;
 
 import java.io.IOException;
 
@@ -49,7 +49,7 @@ public class WSS4JCallbackHandlerImpl implements CallbackHandler {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
         }
 */
-        if (pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN) {
+        if (pc.getUsage() == WSPasswordCallback.SECURITY_CONTEXT_TOKEN) {
             pc.setKey(secret);
         }
     }

@@ -22,9 +22,9 @@ package org.apache.ws.security.message;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -172,7 +172,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
                 if (certs == null || certs.length <= 0) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILURE,
+                        WSSecurityException.ErrorCode.FAILURE,
                         "noUserCertsFound", 
                         new Object[] { user, "encryption" }
                     );
@@ -215,7 +215,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             //
             if (symmetricKey == null) {
                 if (embeddedKey == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE, "noKeySupplied");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeySupplied");
                 }
                 symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
             }
@@ -378,7 +378,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             xmlCipher = XMLCipher.getInstance(encryptionAlgorithm);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, ex
             );
         }
 
@@ -395,7 +395,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 WSSecurityUtil.findElements(encPart, callbackLookup, doc);
             if (elementsToEncrypt == null || elementsToEncrypt.size() == 0) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE,
+                    WSSecurityException.ErrorCode.FAILURE,
                     "noEncElement", 
                     new Object[] {"{" + encPart.getNamespace() + "}" + encPart.getName()}
                 );
@@ -415,7 +415,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
                 } catch (Exception ex) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
                     );
                 }
             }
@@ -491,7 +491,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             return xencEncryptedDataId;
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         }
     }

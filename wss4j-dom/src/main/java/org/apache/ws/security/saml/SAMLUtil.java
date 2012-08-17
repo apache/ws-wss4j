@@ -21,11 +21,11 @@ package org.apache.ws.security.saml;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
@@ -108,7 +108,7 @@ public final class SAMLUtil {
             if (token != null) {
                 if (!"Assertion".equals(token.getLocalName())) {
                     throw new WSSecurityException(
-                        WSSecurityException.FAILURE, "invalidSAMLsecurity"
+                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
                     );
                 }
                 return new AssertionWrapper(token);
@@ -121,7 +121,7 @@ public final class SAMLUtil {
             
             if (token == null || !"Assertion".equals(token.getLocalName())) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLsecurity"
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
                 );
             }
             Processor proc = request.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
@@ -170,11 +170,11 @@ public final class SAMLUtil {
     ) throws WSSecurityException {
         if (cb != null) {
             WSPasswordCallback pwcb = 
-                new WSPasswordCallback(id, WSPasswordCallback.SECRET_KEY);
+                new WSPasswordCallback(id, WSPasswordCallback.Usage.SECRET_KEY);
             try {
                 cb.handle(new Callback[]{pwcb});
             } catch (Exception e1) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKey",
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey",
                         new Object[] { id }, e1);
             }
             return pwcb.getKey();
@@ -222,7 +222,7 @@ public final class SAMLUtil {
             
             if (samlSubject == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.FAILURE, "invalidSAMLToken", 
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
                     new Object[] {"for Signature (no Subject)"}
                 );
             }
@@ -263,7 +263,7 @@ public final class SAMLUtil {
         org.opensaml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject == null) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "invalidSAMLToken", 
+                WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
                 new Object[]{"for Signature (no Subject)"}
             );
         }
@@ -366,7 +366,7 @@ public final class SAMLUtil {
                         } else if (x509obj instanceof X509IssuerSerial) {
                             if (data.getSigCrypto() == null) {
                                 throw new WSSecurityException(
-                                    WSSecurityException.FAILURE, "noSigCryptoFile"
+                                    WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile"
                                 );
                             }
                             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
@@ -377,7 +377,7 @@ public final class SAMLUtil {
                             certs = data.getSigCrypto().getX509Certificates(cryptoType);
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
-                                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                                     new Object[]{"cannot get certificate or key"}
                                 );
                             }
@@ -388,7 +388,7 @@ public final class SAMLUtil {
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                 new Object[]{"cannot get certificate or key"}, ex
             );
         }

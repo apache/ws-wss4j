@@ -25,12 +25,15 @@ import java.security.KeyStore;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.common.CustomCrypto;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.Loader;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.util.Loader;
 import org.w3c.dom.Document;
 
 public class CryptoTest extends org.junit.Assert {

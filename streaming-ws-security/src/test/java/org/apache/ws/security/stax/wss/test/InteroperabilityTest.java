@@ -966,7 +966,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         try {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
             Assert.fail("Expected WSSecurityException");
-        } catch (org.apache.ws.security.WSSecurityException e) {
+        } catch (WSSecurityException e) {
             Assert.assertEquals(e.getMessage(), "WSS4JHandler: Request does not contain required Security header");
         }
     }
