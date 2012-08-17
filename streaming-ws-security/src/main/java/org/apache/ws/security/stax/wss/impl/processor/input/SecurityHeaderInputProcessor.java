@@ -20,10 +20,10 @@ package org.apache.ws.security.stax.wss.impl.processor.input;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.ext.WSSUtils;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.xml.security.stax.config.SecurityHeaderHandlerMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;

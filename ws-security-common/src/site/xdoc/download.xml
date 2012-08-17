@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Obtain the Apache WSS4J distribution">
+<p> 
+The <b>Apache WSS4J&#8482;</b> project provides a Java implementation of the primary security 
+standards for Web Services.
+</p>
+<subsection name="How to Download">
+<p>
+Use the links below to download a distribution of Apache WSS4J from one of our mirrors. 
+It is good practice to verify the integrity of the distribution files. Apache WSS4J releases are 
+available under the 
+<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a> - see the 
+LICENSE.txt and NOTICE.txt files contained in each release artifact.
+</p>
+</subsection>
+<subsection name="Current official release (closest mirror site selected automatically)">
+<ul>
+<li>
+<p>
+The current release is Apache WSS4J 1.6.7:
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6_7/wss4j-bin-1.6.7.zip">wss4j-bin-1.6.7.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/1_6_7/wss4j-bin-1.6.7.zip.md5">
+MD5</a>)
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6_7/wss4j-bin-1.6.7.zip.asc">
+PGP</a>)
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6_7/wss4j-src-1.6.7.zip">wss4j-src-1.6.7.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/1_6_7/wss4j-src-1.6.7.zip.md5">
+MD5</a>)
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_6_7/wss4j-src-1.6.7.zip.asc">
+PGP</a>)
+</p>
+</li>
+<li>
+<p>
+The current release of the older 1.5.x branch is Apache WSS4J 1.5.12:
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_12/wss4j-bin-1.5.12.zip">
+wss4j-bin-1.5.12.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/1_5_12/wss4j-bin-1.5.12.zip.md5">
+MD5</a>)
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_12/wss4j-bin-1.5.12.zip.asc">PGP</a>)
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_12/wss4j-src-1.5.12.zip">
+wss4j-src-1.5.12.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/1_5_12/wss4j-src-1.5.12.zip.md5">
+MD5</a>)
+(<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1_5_12/wss4j-src-1.5.12.zip.asc">PGP</a>)
+</p>
+</li>
+</ul>
+</subsection>
+<subsection name="Archive of old releases">
+<p>
+Older releases are available in the <a href="http://archive.apache.org/dist/ws/wss4j/">archive</a>.
+</p>
+</subsection>
+</section>
+            
+</body>
+</document>

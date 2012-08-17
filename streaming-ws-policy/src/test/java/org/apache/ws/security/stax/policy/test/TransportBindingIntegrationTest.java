@@ -18,11 +18,11 @@
  */
 package org.apache.ws.security.stax.policy.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.policy.PolicyEnforcer;
 import org.apache.ws.security.stax.policy.PolicyInputProcessor;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.securityToken.HttpsSecurityToken;
 import org.apache.ws.security.stax.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.wss.test.CallbackHandlerImpl;

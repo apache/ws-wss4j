@@ -18,8 +18,10 @@
  */
 package org.apache.ws.security.stax.wss.impl.processor.output;
 
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
-import org.apache.ws.security.stax.wss.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;

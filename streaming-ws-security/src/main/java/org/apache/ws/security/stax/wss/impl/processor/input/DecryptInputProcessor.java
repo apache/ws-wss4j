@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
@@ -46,7 +47,6 @@ import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.ext.WSSUtils;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.securityEvent.EncryptedPartSecurityEvent;
 
 /**

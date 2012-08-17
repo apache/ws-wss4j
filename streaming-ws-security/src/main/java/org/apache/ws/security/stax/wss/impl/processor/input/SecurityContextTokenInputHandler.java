@@ -19,6 +19,8 @@
 package org.apache.ws.security.stax.wss.impl.processor.input;
 
 import org.apache.ws.security.binding.wssc.AbstractSecurityContextTokenType;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
 import org.apache.ws.security.stax.wss.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;

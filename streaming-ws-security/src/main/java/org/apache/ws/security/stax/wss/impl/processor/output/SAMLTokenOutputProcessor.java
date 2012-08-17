@@ -19,6 +19,9 @@
 package org.apache.ws.security.stax.wss.impl.processor.output;
 
 import org.opensaml.common.SAMLVersion;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
 import org.apache.ws.security.stax.wss.impl.saml.OpenSAMLUtil;
 import org.apache.ws.security.stax.wss.impl.saml.SAMLAssertionWrapper;
@@ -27,7 +30,6 @@ import org.apache.ws.security.stax.wss.impl.saml.SAMLKeyInfo;
 import org.apache.ws.security.stax.wss.impl.saml.bean.KeyInfoBean;
 import org.apache.ws.security.stax.wss.impl.saml.bean.SubjectBean;
 import org.apache.ws.security.stax.wss.impl.securityToken.SAMLSecurityToken;
-import org.apache.ws.security.stax.wss.crypto.CryptoType;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;

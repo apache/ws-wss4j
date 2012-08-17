@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.ext;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.stax.ext.SecurityContext;
 
 import java.util.List;

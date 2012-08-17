@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

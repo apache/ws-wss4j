@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Using Apache WSS4J">
+<p>
+This page describes how to use Apache WSS4J, either in a standalone manner, or in conjunction with
+other software packages. For information about how to configure WSS4J 1.6, see the 
+<a href="config.html">configuration page</a>.
+</p>
+<subsection name="Standalone">
+<p>
+Apache WSS4J provides a set of APIs to implement WS-Security functionality on a SOAP message. It is
+possible to use these APIs directly in a standalone manner. The best way of finding out how to do
+this is to take a look at the test sources. For example: 
+</p>
+<ul>
+<li>
+<a href="xref-test/org/apache/ws/security/message/UsernameTokenTest.html">Username Token Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/message/EncryptionTest.html">Encryption Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/message/SignatureTest.html">Signature Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/message/TimestampTest.html">Timestamp Test</a>
+</li>
+<li>
+<a href="xref-test/org/apache/ws/security/saml/SamlTokenTest.html">SAML Token Test</a>
+</li>
+</ul>
+</subsection>
+<subsection name="Apache CXF">
+<p>
+<a href="http://cxf.apache.org">Apache CXF</a> is an open-source web services stack. CXF uses 
+WSS4J to perform the core WS-Security functionality, and provides extended security functionality 
+based around the WS-SecurityPolicy, WS-SecureConversation and WS-Trust specifications. More
+information:
+</p>
+<ul>
+<li>
+<a href="http://cxf.apache.org/docs/ws-security.html">CXF WS-Security configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-secureconversation.html">CXF WS-SecureConversation 
+configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-securitypolicy.html">CXF WS-SecurityPolicy configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-trust.html">CXF WS-Trust configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/resources-and-articles.html">CXF Security articles</a>
+</li>
+</ul>
+</subsection>
+<subsection name="Apache Rampart">
+<p>
+<a href="http://axis.apache.org/axis2/java/rampart/">Apache Rampart</a> is the security module
+for the Axis2 web services stack. Rampart uses WSS4J to perform the core WS-Security functionality,
+and provides extended security functionality based around the WS-SecurityPolicy, 
+WS-SecureConversation and WS-Trust specifications. More information:
+</p>
+<ul>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/developer-guide.html">Rampart developer guide</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/samples.html">Rampart samples</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/rampartconfig-guide.html">Rampart configuration
+guide</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/articles.html">Rampart articles</a>
+</li>
+</ul>
+</subsection>
+<subsection name="Apache Axis 1">
+<p>
+The 1.5.x branch of WSS4J contains special support for 
+<a href="http://ws.apache.org/axis/">Apache Axis 1</a>, the open-source web services stack which has been
+replaced by Axis2. For some information about how to use WSS4J 1.5.x with Axis 1 see:
+</p>
+<ul>
+<li>
+<a href="axis.html">Axis deployment tutorial 1</a>
+</li>
+<li>
+<a href="package.html">Axis deployment tutorial 2</a>
+</li>
+</ul>
+<p>
+Please note that these deployment tutorials do not apply to WSS4J 1.6+, only WSS4J 1.5.x.
+</p>
+</subsection>
+</section>            
+</body>
+</document>

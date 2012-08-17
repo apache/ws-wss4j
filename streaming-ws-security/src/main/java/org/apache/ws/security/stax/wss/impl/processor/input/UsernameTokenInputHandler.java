@@ -27,6 +27,8 @@ import org.apache.ws.security.binding.wss10.EncodedString;
 import org.apache.ws.security.binding.wss10.PasswordString;
 import org.apache.ws.security.binding.wss10.UsernameTokenType;
 import org.apache.ws.security.binding.wsu10.AttributedDateTime;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
 import org.apache.ws.security.stax.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.ws.security.stax.wss.securityEvent.UsernameTokenSecurityEvent;

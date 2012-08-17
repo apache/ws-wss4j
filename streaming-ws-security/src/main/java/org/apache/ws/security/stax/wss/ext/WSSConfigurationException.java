@@ -18,6 +18,8 @@
  */
 package org.apache.ws.security.stax.wss.ext;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
+
 /**
  * Exception when configuration errors are detected
  *

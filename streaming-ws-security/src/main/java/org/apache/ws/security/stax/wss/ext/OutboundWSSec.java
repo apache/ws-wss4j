@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.ext;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.WSSecurityContextImpl;
 import org.apache.ws.security.stax.wss.impl.processor.output.*;
 import org.apache.xml.security.stax.ext.OutputProcessor;

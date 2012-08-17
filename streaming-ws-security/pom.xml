@@ -53,6 +53,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-ws-security-common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>jcs</groupId>
             <artifactId>jcs</artifactId>
             <scope>compile</scope>

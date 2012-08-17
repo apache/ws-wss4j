@@ -18,11 +18,11 @@
  */
 package org.apache.ws.security.stax.policy;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.ext.WSSUtils;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.processor.input.SecurityHeaderInputProcessor;
 import org.apache.ws.security.stax.wss.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.ws.security.stax.wss.securityEvent.RequiredElementSecurityEvent;

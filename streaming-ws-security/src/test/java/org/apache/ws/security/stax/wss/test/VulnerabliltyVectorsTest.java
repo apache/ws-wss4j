@@ -23,7 +23,6 @@ import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.InboundWSSec;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.test.utils.StAX2DOM;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.testng.Assert;
@@ -306,7 +305,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.stax.wss.ext.WSSecurityException: The message has expired");
+                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The message has expired");
             }
         }
     }

@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="WSS4J configuration">
+<p>
+This page describes how to use configure Apache WSS4J. This page only applies to WSS4J 1.6, a lot of the
+properties have changed since WSS4J 1.5.x.
+</p>
+<subsection name="Crypto properties">
+<p>
+Apache WSS4J uses the Crypto interface to get keys and certificates for encryption/decryption and for
+signature creation/verification. WSS4J ships with two implementations, the standard "Merlin" implementation,
+which is based around two JDK keystores for key retrieval and trust verification, as well as a 
+CertificateStore, which is based around a set of X509Certificates (presently supporting encryption/signature verification
+only). For more information on the Crypto implementations see the
+<a href="http://ws.apache.org/wss4j/topics.html#Crypto_Interface">Special Topics page</a>. 
+</p>
+<p>
+It is possible to instantiate a Crypto implementation directly, but it can also be loaded via a 
+properties file. The property values are as follows:
+</p>
+<p>
+General properties:
+</p>
+<table name="General Properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.provider</td>
+<td>WSS4J specific provider used to create Crypto instances. Defaults to 
+"org.apache.ws.security.components.crypto.Merlin".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.provider</td>
+<td>The provider used to load keystores. Defaults to installed provider.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.cert.provider</td>
+<td>The provider used to load certificates. Defaults to keystore provider.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.x509crl.file</td>
+<td>The location of an (X509) CRL file to use.</td>
+</tr>
+</table>
+<p>
+Keystore properties:
+</p>
+<table name="Merlin Keystore Properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.file</td>
+<td>The location of the keystore</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.password</td>
+<td>The password used to load the keystore. Default value is "security".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.type</td>
+<td>Type of keystore. Defaults to: java.security.KeyStore.getDefaultType())</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.alias</td>
+<td>The default keystore alias to use, if none is specified.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.keystore.private.password</td>
+<td>The default password used to load the private key.</td>
+</tr>
+</table>
+<p>
+TrustStore properties:
+</p>
+<table name="Merlin TrustStore properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.load.cacerts</td>
+<td>Whether or not to load the CA certs in ${java.home}/lib/security/cacerts (default is false)</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.truststore.file</td>
+<td>The location of the truststore</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.truststore.password </td>
+<td>The truststore password. Defaults to "changeit".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.crypto.merlin.truststore.type</td>
+<td>The truststore type. Defaults to: java.security.KeyStore.getDefaultType().</td>
+</tr>
+</table>
+ 
+</subsection>
+<subsection name="SAML properties">
+<p>
+Apache WSS4J uses the SAMLIssuer interface to configure the creation and signing of a SAML 
+Assertion. WSS4J ships with a default "SAMLIssuerImpl" implementation. It is possible to 
+instantiate a SAMLIssuer implementation directly, but it can also be loaded via a properties file.
+The property values are as follows:
+</p>
+<table name="SAMLIssuer properties">
+<tr>
+<th>Property name</th>
+<th>Property value</th>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuerClass</td>
+<td>The SAML Issuer implementation (defaults to "org.apache.ws.security.saml.SAMLIssuerImpl").</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.cryptoProp.file</td>
+<td>The crypto properties file corresponding to the issuer crypto instance, if the assertion is to
+be signed.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.key.name</td>
+<td>The KeyStore alias for the issuer key.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.key.password</td>
+<td>The KeyStore password for the issuer key.</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer</td>
+<td>The issuer name</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.sendKeyValue</td>
+<td>Whether to send the key value or the X509Certificate. Default is "false".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.issuer.signAssertion</td>
+<td>Whether the SAMLIssuer implementation will sign the assertion or not. Defaults is 
+"false".</td>
+</tr>
+<tr>
+<td>org.apache.ws.security.saml.callback</td>
+<td>The name of the SAML CallbackHandler implementation used to populate the SAML Assertion.</td>
+</tr>
+</table>
+</subsection>
+<subsection name="WSHandler configuration tags">
+<p>
+Apache WSS4J provides a set of configuration tags for the WSHandler object used for the creation
+and processing of WS-Security enabled messages. For more information see the 
+<a href="apidocs/org/apache/ws/security/handler/WSHandlerConstants.html">WSHandlerConstants Javadoc</a>.
+</p>
+<p>
+The configuration tags for WSHandler Actions are as follows:
+</p>
+<table name="WSHandler Action configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ACTION</td>
+<td>action</td>
+<td>The action to perform, e.g. WSHandlerConstants.TIMESTAMP</td>
+</tr>
+<tr>
+<td>NO_SECURITY</td>
+<td>NoSecurity</td>
+<td>Do not perform any action, do nothing.</td>
+</tr>
+<tr>
+<td>USERNAME_TOKEN</td>
+<td>UsernameToken</td>
+<td>Perform a UsernameToken action.</td>
+</tr>
+<tr>
+<td>USERNAME_TOKEN_NO_PASSWORD</td>
+<td>UsernameTokenNoPassword</td>
+<td>Used on the receiving side to specify a UsernameToken with no password</td>
+</tr>
+<tr>
+<td>SAML_TOKEN_UNSIGNED</td>
+<td>SAMLTokenUnsigned</td>
+<td>Perform an unsigned SAML Token action.</td>
+</tr>
+<tr>
+<td>SAML_TOKEN_SIGNED</td>
+<td>SAMLTokenSigned</td>
+<td>Perform a signed SAML Token action.</td>
+</tr>
+<tr>
+<td>SIGNATURE</td>
+<td>Signature</td>
+<td>Perform a signature action.</td>
+</tr>
+<tr>
+<td>ENCRYPT</td>
+<td>Encrypt</td>
+<td>Perform an encryption action.</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>Timestamp</td>
+<td>Perform a Timestamp action.</td>
+</tr>
+<tr>
+<td>SIGN_WITH_UT_KEY</td>
+<td>UsernameTokenSignature</td>
+<td>Perform a .NET specific signature using a Username Token action.</td>
+</tr>
+</table>
+<p>
+The configuration tags for WSHandler user properties are as follows:
+</p>
+<table name="WSHandler User configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ACTOR</td>
+<td>"actor"</td>
+<td>The actor or role name of the wsse:Security header.</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>"user"</td>
+<td>The user's name. Consult the Javadoc for an explanation of this property.</td>
+</tr>
+<tr>
+<td>ENCRYPTION_USER</td>
+<td>"encryptionUser"</td>
+<td>The user's name for encryption. Consult the Javadoc for an explanation of this property.</td>
+</tr>
+<tr>
+<td>SIGNATURE_USER</td>
+<td>"signatureUser"</td>
+<td>The user's name for signature. Consult the Javadoc for an explanation of this property.</td>
+</tr>
+<tr>
+<td>USE_REQ_SIG_CERT</td>
+<td>"useReqSigCert"</td>
+<td>A special value for ENCRYPTION_USER. Consult the Javadoc for an explanation of this
+property.</td>
+</tr>
+</table>
+<p>
+The configuration tags for WSHandler callback class and property file configuration are
+summarised here:
+</p>
+<table name="WSHandler Callback class and Property File configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>PW_CALLBACK_CLASS</td>
+<td>passwordCallbackClass</td>
+<td>The CallbackHandler implementation class used to obtain passwords.</td>
+</tr>
+<tr>
+<td>PW_CALLBACK_REF</td>
+<td>passwordCallbackRef</td>
+<td>The CallbackHandler implementation object used to obtain passwords.</td>
+</tr>
+<tr>
+<td>SAML_CALLBACK_CLASS</td>
+<td>samlCallbackClass</td>
+<td>The CallbackHandler implementation class used to construct SAML Assertions.</td>
+</tr>
+<tr>
+<td>SAML_CALLBACK_REF</td>
+<td>samlCallbackRef</td>
+<td>The CallbackHandler implementation object used to construct SAML Assertions.</td>
+</tr>
+<tr>
+<td>ENC_CALLBACK_CLASS</td>
+<td>embeddedKeyCallbackClass</td>
+<td>The CallbackHandler implementation class used to get the key associated with a key name.</td>
+</tr>
+<tr>
+<td>ENC_CALLBACK_REF</td>
+<td>embeddedKeyCallbackRef</td>
+<td>The CallbackHandler implementation object used to get the key associated with a key name.</td>
+</tr>
+<tr>
+<td>SIG_PROP_FILE</td>
+<td>signaturePropFile</td>
+<td>The path of the crypto property file to use for Signature.</td>
+</tr>
+<tr>
+<td>SIG_PROP_REF_ID</td>
+<td>signaturePropRefId</td>
+<td>The String ID that is used to store a reference to the Crypto object or the Crypto Properties 
+object for Signature.
+</td>
+</tr>
+<tr>
+<td>DEC_PROP_FILE</td>
+<td>decryptionPropFile</td>
+<td>The path of the crypto property file to use for Decryption.</td>
+</tr>
+<tr>
+<td>DEC_PROP_REF_ID</td>
+<td>decryptionPropRefId</td>
+<td>The String ID that is used to store a reference to the Crypto object or the Crypto Properties 
+object for decryption.</td>
+</tr>
+<tr>
+<td>ENC_PROP_FILE</td>
+<td>encryptionPropFile</td>
+<td>The path of the crypto property file to use for encryption.</td>
+</tr>
+<tr>
+<td>ENC_PROP_REF_ID</td>
+<td>encryptionPropRefId</td>
+<td>The String ID that is used to store a reference to the Crypto object or the Crypto Properties 
+object for encryption.</td>
+</tr>
+<tr>
+<td>SAML_PROP_FILE</td>
+<td>samlPropFile</td>
+<td>The path of the property file to use for creating SAML Assertions.</td>
+</tr>
+</table>
+<p>
+The configuration tags for WSHandler properties that are configured via a boolean parameter 
+(i.e. "true" or "false") are as follows:
+</p>
+<table name="WSHandler boolean configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ENABLE_SIGNATURE_CONFIRMATION</td>
+<td>enableSignatureConfirmation</td>
+<td>Whether to enable signature confirmation or not. Default is "false".</td>
+</tr>
+<tr>
+<td>MUST_UNDERSTAND</td>
+<td>mustUnderstand</td>
+<td>Set the outbound MustUnderstand flag or not. Default is "true".</td>
+</tr>
+<tr>
+<td>IS_BSP_COMPLIANT</td>
+<td>isBSPCompliant</td>
+<td>Whether or not to ensure compliance with the BSP 1.1 spec. Default is "true".</td>
+</tr>
+<tr>
+<td>HANDLE_CUSTOM_PASSWORD_TYPES</td>
+<td>handleCustomPasswordTypes</td>
+<td>Whether to allow non-standard password types in a UsernameToken. Default is "false".</td>
+</tr>
+<tr>
+<td>PASSWORD_TYPE_STRICT</td>
+<td>passwordTypeStrict</td>
+<td>Whether to enable strict Username Token password type handling. Default is "false".</td>
+</tr>
+<tr>
+<td>REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS</td>
+<td>requireSignedEncryptedDataElements</td>
+<td>Whether the engine needs to enforce EncryptedData elements are in a signed subtree of the document.
+Default is "false".</td>
+</tr>
+<tr>
+<td>ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES</td>
+<td>allowNamespaceQualifiedPasswordTypes</td>
+<td>Whether (wsse) namespace qualified password types are accepted when processing UsernameTokens. 
+Default is "false".</td>
+</tr>
+<tr>
+<td>ENABLE_REVOCATION</td>
+<td>enableRevocation</td>
+<td>Whether to enable Certificate Revocation List (CRL) checking when verifying trust in a 
+certificate. Default is "false".</td>
+</tr>
+<tr>
+<td>USE_ENCODED_PASSWORDS</td>
+<td>useEncodedPasswords</td>
+<td>Set whether to treat passwords as binary values for Username Tokens. Default is "false".</td>
+</tr>
+<tr>
+<td>USE_SINGLE_CERTIFICATE</td>
+<td>useSingleCertificate</td>
+<td>Whether to use a single certificate or a whole certificate chain to construct a 
+BinarySecurityToken. Default is "true".</td>
+</tr>
+<tr>
+<td>USE_DERIVED_KEY</td>
+<td>useDerivedKey</td>
+<td>Whether to use the standard UsernameToken Key Derivation algorithm. Default is "true".</td>
+</tr>
+<tr>
+<td>USE_DERIVED_KEY_FOR_MAC</td>
+<td>useDerivedKeyForMAC</td>
+<td>Whether to use the Username Token derived key for a MAC. Default is "true".</td>
+</tr>
+<tr>
+<td>TIMESTAMP_PRECISION</td>
+<td>precisionInMilliseconds</td>
+<td>Set whether outbound timestamps have precision in milliseconds. Default is "true".</td>
+</tr>
+<tr>
+<td>TIMESTAMP_STRICT</td>
+<td>timestampStrict</td>
+<td>Set whether to enable strict Timestamp handling. Default is "true".</td>
+</tr>
+<tr>
+<td>ENC_SYM_ENC_KEY</td>
+<td>encryptSymmetricEncryptionKey</td>
+<td>Set whether to encrypt the symmetric encryption key or not. Default is "true".</td>
+</tr>
+</table>
+<p>
+The configuration tags for WSHandler properties that are configured via a non-boolean parameter 
+are as follows:
+</p>
+<table name="WSHandler non-boolean configuration tags">
+<tr>
+<th>Tag name</th>
+<th>Tag value</th>
+<th>Tag meaning</th>
+</tr>
+<tr>
+<td>ENC_KEY_NAME</td>
+<td>embeddedKeyName</td>
+<td>The text of the key name to be sent in the KeyInfo for encryption</td>
+</tr>
+<tr>
+<td>PASSWORD_TYPE</td>
+<td>passwordType</td>
+<td>The encoding of the password for a Username Token. The default is WSConstants.PW_DIGEST.</td>
+</tr>
+<tr>
+<td>ADD_UT_ELEMENTS</td>
+<td>addUTElements</td>
+<td>Additional elements to add to a Username Token, i.e. "nonce" and "created".</td>
+</tr>
+<tr>
+<td>SIG_KEY_ID</td>
+<td>signatureKeyIdentifier</td>
+<td>The key identifier type to use for signature. The default is "IssuerSerial".</td>
+</tr>
+<tr>
+<td>SIG_ALGO</td>
+<td>signatureAlgorithm</td>
+<td>The signature algorithm to use. The default is set by the data in the certificate.
+</td>
+</tr>
+<tr>
+<td>SIG_DIGEST_ALGO</td>
+<td>signatureDigestAlgorithm</td>
+<td>The signature digest algorithm to use.  The default is SHA-1.</td>
+</tr>
+<tr>
+<td>SIGNATURE_PARTS</td>
+<td>signatureParts</td>
+<td>Parameter to define which parts of the request shall be signed. The SOAP body is signed
+by default.</td>
+</tr>
+<tr>
+<td>WSE_SECRET_KEY_LENGTH</td>
+<td>wseSecretKeyLength</td>
+<td>The length of the secret (derived) key to use for the WSE UT_SIGN functionality.</td>
+</tr>
+<tr>
+<td>DERIVED_KEY_ITERATIONS</td>
+<td>derivedKeyIterations</td>
+<td>The number of iterations to use when deriving a key from a Username Token. The default is 
+1000.</td>
+</tr>
+<tr>
+<td>ENC_KEY_ID</td>
+<td>encryptionKeyIdentifier</td>
+<td>The key identifier type to use for encryption. The default is "IssuerSerial".</td>
+</tr>
+<tr>
+<td>ENC_SYM_ALGO</td>
+<td>encryptionSymAlgorithm</td>
+<td>The symmetric encryption algorithm to use. The default is AES-128.</td>
+</tr>
+<tr>
+<td>ENC_KEY_TRANSPORT</td>
+<td>encryptionKeyTransportAlgorithm</td>
+<td>The algorithm to use to encrypt the generated symmetric key. The default is RSA-15.</td>
+</tr>
+<tr>
+<td>ENC_DIGEST_ALGO</td>
+<td>encryptionDigestAlgorithm</td>
+<td>The encryption digest algorithm to use with the RSA-OAEP key transport algorithm. The default 
+is SHA-1.</td>
+</tr>
+<tr>
+<td>ENCRYPTION_PARTS</td>
+<td>encryptionParts</td>
+<td>Parameter to define which parts of the request shall be encrypted. The SOAP body is encrypted
+in "Content" mode by default.</td>
+</tr>
+<tr>
+<td>TTL_TIMESTAMP</td>
+<td>timeToLive</td>
+<td>The time difference between creation and expiry time in seconds in the WSS Timestamp. The 
+default is "300".</td>
+</tr>
+<tr>
+<td>TTL_FUTURE_TIMESTAMP</td>
+<td>futureTimeToLive</td>
+<td>The time in seconds in the future within which the Created time of an incoming Timestamp is 
+valid. The default is "60".</td>
+</tr>
+<tr>
+<td>SIG_SUBJECT_CERT_CONSTRAINTS</td>
+<td>sigSubjectCertConstraints</td>
+<td>A comma separated String of regular expressions which will be applied to the subject DN of the
+certificate used for signature validation, after trust verification of the certificate chain associated 
+with the certificate. </td>
+</tr>
+</table>
+<p>
+The configuration values for setting the KeyIdentifiers for signature or encryption 
+are shown below. See the <a href="http://ws.apache.org/wss4j/apidocs/org/apache/ws/security/handler/WSHandlerConstants.html">Javadoc</a> 
+for SIG_KEY_ID and ENC_KEY_ID for more details:
+</p>
+<table name="WSHandler KeyIdentifier values">
+<tr>
+<th>Value</th>
+</tr>
+<tr>
+<td>DirectReference</td>
+</tr>
+<tr>
+<td>IssuerSerial</td>
+</tr>
+<tr>
+<td>X509KeyIdentifier</td>
+</tr>
+<tr>
+<td>SKIKeyIdentifier</td>
+</tr>
+<tr>
+<td>EmbeddedKeyName</td>
+</tr>
+<tr>
+<td>Thumbprint</td>
+</tr>
+<tr>
+<td>EncryptedKeySHA1</td>
+</tr>
+</table>
+</subsection>
+</section>            
+</body>
+</document>

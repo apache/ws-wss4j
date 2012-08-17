@@ -19,13 +19,13 @@
 package org.apache.ws.security.stax.policy.test;
 
 import org.opensaml.common.SAMLVersion;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.stax.policy.PolicyEnforcer;
 import org.apache.ws.security.stax.policy.PolicyInputProcessor;
-import org.apache.ws.security.stax.wss.crypto.CryptoType;
-import org.apache.ws.security.stax.wss.crypto.Merlin;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.saml.builder.SAML2Constants;
 import org.apache.ws.security.stax.wss.test.CallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;

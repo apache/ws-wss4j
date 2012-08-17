@@ -24,11 +24,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityConfigurationException;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
-import org.apache.ws.security.stax.wss.crypto.Crypto;
-import org.apache.ws.security.stax.wss.crypto.MerlinBase;
 
 /**
  * Main configuration class to supply keys etc.
@@ -159,7 +160,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         return Collections.unmodifiableList(ignoredBSPRules);
     }
     
-    private Class<? extends MerlinBase> signatureCryptoClass;
+    private Class<? extends Merlin> signatureCryptoClass;
     private KeyStore signatureKeyStore;
     private String signatureUser;
     
@@ -181,15 +182,15 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.signatureKeyStore = keyStore;
     }
 
-    public Class<? extends MerlinBase> getSignatureCryptoClass() {
+    public Class<? extends Merlin> getSignatureCryptoClass() {
         if (signatureCryptoClass != null) {
             return signatureCryptoClass;
         }
-        signatureCryptoClass = org.apache.ws.security.stax.wss.crypto.Merlin.class;
+        signatureCryptoClass = org.apache.ws.security.common.crypto.Merlin.class;
         return signatureCryptoClass;
     }
 
-    public void setSignatureCryptoClass(Class<? extends MerlinBase> signatureCryptoClass) {
+    public void setSignatureCryptoClass(Class<? extends Merlin> signatureCryptoClass) {
         this.signatureCryptoClass = signatureCryptoClass;
     }
     
@@ -206,10 +207,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             return cachedSignatureCrypto;
         }
 
-        Class<? extends MerlinBase> signatureCryptoClass = this.getSignatureCryptoClass();
+        Class<? extends Merlin> signatureCryptoClass = this.getSignatureCryptoClass();
 
         try {
-            MerlinBase signatureCrypto = signatureCryptoClass.newInstance();
+            Merlin signatureCrypto = signatureCryptoClass.newInstance();
+            signatureCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
+            signatureCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
             signatureCrypto.setKeyStore(this.getSignatureKeyStore());
             cachedSignatureCrypto = signatureCrypto;
             cachedSignatureKeyStore = this.getSignatureKeyStore();
@@ -219,7 +222,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
     }
     
-    private Class<? extends MerlinBase> signatureVerificationCryptoClass;
+    private Class<? extends Merlin> signatureVerificationCryptoClass;
     private KeyStore signatureVerificationKeyStore;
 
     public KeyStore getSignatureVerificationKeyStore() {
@@ -232,15 +235,15 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.signatureVerificationKeyStore = keyStore;
     }
 
-    public Class<? extends MerlinBase> getSignatureVerificationCryptoClass() {
+    public Class<? extends Merlin> getSignatureVerificationCryptoClass() {
         if (signatureVerificationCryptoClass != null) {
             return signatureVerificationCryptoClass;
         }
-        signatureVerificationCryptoClass = org.apache.ws.security.stax.wss.crypto.Merlin.class;
+        signatureVerificationCryptoClass = Merlin.class;
         return signatureVerificationCryptoClass;
     }
 
-    public void setSignatureVerificationCryptoClass(Class<? extends MerlinBase> signatureVerificationCryptoClass) {
+    public void setSignatureVerificationCryptoClass(Class<? extends Merlin> signatureVerificationCryptoClass) {
         this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
     }
 
@@ -257,11 +260,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             return cachedSignatureVerificationCrypto;
         }
 
-        Class<? extends MerlinBase> signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
+        Class<? extends Merlin> signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
 
         try {
-            MerlinBase signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
+            Merlin signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
+            signatureVerificationCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
+            signatureVerificationCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
             cachedSignatureVerificationCrypto = signatureVerificationCrypto;
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
@@ -270,7 +275,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
     }
     
-    private Class<? extends MerlinBase> decryptionCryptoClass;
+    private Class<? extends Merlin> decryptionCryptoClass;
     private KeyStore decryptionKeyStore;
 
     /**
@@ -300,11 +305,11 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      *
      * @return
      */
-    public Class<? extends MerlinBase> getDecryptionCryptoClass() {
+    public Class<? extends Merlin> getDecryptionCryptoClass() {
         if (decryptionCryptoClass != null) {
             return decryptionCryptoClass;
         }
-        decryptionCryptoClass = org.apache.ws.security.stax.wss.crypto.Merlin.class;
+        decryptionCryptoClass = Merlin.class;
         return decryptionCryptoClass;
     }
 
@@ -313,7 +318,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      *
      * @param decryptionCryptoClass
      */
-    public void setDecryptionCryptoClass(Class<? extends MerlinBase> decryptionCryptoClass) {
+    public void setDecryptionCryptoClass(Class<? extends Merlin> decryptionCryptoClass) {
         this.decryptionCryptoClass = decryptionCryptoClass;
     }
 
@@ -336,11 +341,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             return cachedDecryptionCrypto;
         }
 
-        Class<? extends MerlinBase> decryptionCryptoClass = this.getDecryptionCryptoClass();
+        Class<? extends Merlin> decryptionCryptoClass = this.getDecryptionCryptoClass();
 
         try {
-            MerlinBase decryptionCrypto = decryptionCryptoClass.newInstance();
+            Merlin decryptionCrypto = decryptionCryptoClass.newInstance();
             decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
+            decryptionCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
+            decryptionCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
             cachedDecryptionCrypto = decryptionCrypto;
             cachedDecryptionKeyStore = this.getDecryptionKeyStore();
             return decryptionCrypto;
@@ -349,7 +356,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
     }
     
-    private Class<? extends MerlinBase> encryptionCryptoClass;
+    private Class<? extends Merlin> encryptionCryptoClass;
     private KeyStore encryptionKeyStore;
     private String encryptionUser;
     
@@ -380,11 +387,11 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      *
      * @return
      */
-    public Class<? extends MerlinBase> getEncryptionCryptoClass() {
+    public Class<? extends Merlin> getEncryptionCryptoClass() {
         if (encryptionCryptoClass != null) {
             return encryptionCryptoClass;
         }
-        encryptionCryptoClass = org.apache.ws.security.stax.wss.crypto.Merlin.class;
+        encryptionCryptoClass = Merlin.class;
         return encryptionCryptoClass;
     }
 
@@ -393,7 +400,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      *
      * @param encryptionCryptoClass
      */
-    public void setEncryptionCryptoClass(Class<? extends MerlinBase> encryptionCryptoClass) {
+    public void setEncryptionCryptoClass(Class<? extends Merlin> encryptionCryptoClass) {
         this.encryptionCryptoClass = encryptionCryptoClass;
     }
 
@@ -416,11 +423,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             return cachedEncryptionCrypto;
         }
 
-        Class<? extends MerlinBase> encryptionCryptoClass = this.getEncryptionCryptoClass();
+        Class<? extends Merlin> encryptionCryptoClass = this.getEncryptionCryptoClass();
 
         try {
-            MerlinBase encryptionCrypto = encryptionCryptoClass.newInstance();
+            Merlin encryptionCrypto = encryptionCryptoClass.newInstance();
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
+            encryptionCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
+            encryptionCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
             cachedEncryptionCrypto = encryptionCrypto;
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;

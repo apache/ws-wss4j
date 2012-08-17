@@ -30,10 +30,10 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.OutboundWSSec;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;

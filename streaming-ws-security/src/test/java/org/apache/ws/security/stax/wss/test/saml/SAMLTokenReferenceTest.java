@@ -18,6 +18,8 @@
  */
 package org.apache.ws.security.stax.wss.test.saml;
 
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
@@ -31,8 +33,6 @@ import org.apache.ws.security.stax.wss.test.AbstractTestBase;
 import org.apache.ws.security.stax.wss.test.CallbackHandlerImpl;
 import org.apache.ws.security.stax.wss.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.wss.test.utils.XmlReaderToWriter;
-import org.apache.ws.security.stax.wss.crypto.CryptoType;
-import org.apache.ws.security.stax.wss.crypto.Merlin;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;

@@ -19,6 +19,7 @@
 package org.apache.ws.security.stax.wss.test;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
@@ -172,7 +173,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.stax.wss.ext.WSSecurityException: Wrong username");
+                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: Wrong username");
             }
         }
     }
@@ -279,7 +280,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.ws.security.stax.wss.ext.WSSecurityException: The security token could not be authenticated or authorized");
+            Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
         }
     }
 

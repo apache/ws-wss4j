@@ -18,12 +18,12 @@
  */
 package org.apache.ws.security.stax.policy.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.stax.policy.PolicyEnforcer;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.wss.impl.securityToken.UsernameSecurityToken;
 import org.apache.ws.security.stax.wss.impl.securityToken.X509SecurityToken;

@@ -18,10 +18,10 @@
  */
 package org.apache.ws.security.stax.policy.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.policy.PolicyEnforcer;
 import org.apache.ws.security.stax.policy.PolicyViolationException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.securityEvent.OperationSecurityEvent;
 import org.apache.ws.security.stax.wss.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;

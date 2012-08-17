@@ -27,7 +27,8 @@ import org.apache.xml.security.stax.securityEvent.EncryptedKeyTokenSecurityEvent
 import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
-import org.apache.ws.security.stax.wss.crypto.Merlin;
+import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.apache.ws.security.stax.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.wss.securityEvent.KerberosTokenSecurityEvent;

@@ -19,12 +19,12 @@
 
 package org.apache.ws.security.stax.wss.impl.saml;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.opensaml.xml.*;
 import org.opensaml.xml.io.*;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;

@@ -22,6 +22,7 @@ import org.apache.jcs.JCS;
 import org.apache.jcs.access.exception.CacheException;
 import org.apache.jcs.engine.ElementAttributes;
 import org.apache.ws.security.binding.wss10.TransformationParametersType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
 import org.apache.xml.security.binding.xmldsig.ReferenceType;

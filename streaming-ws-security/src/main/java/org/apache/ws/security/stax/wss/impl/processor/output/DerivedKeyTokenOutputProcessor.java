@@ -19,6 +19,8 @@
 package org.apache.ws.security.stax.wss.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
 import org.apache.ws.security.stax.wss.impl.derivedKey.AlgoFactory;
 import org.apache.ws.security.stax.wss.impl.derivedKey.ConversationException;

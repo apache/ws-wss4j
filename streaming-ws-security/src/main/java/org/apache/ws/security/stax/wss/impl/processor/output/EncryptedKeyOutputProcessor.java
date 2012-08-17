@@ -19,10 +19,10 @@
 package org.apache.ws.security.stax.wss.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.ext.WSSUtils;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;

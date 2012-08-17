@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.impl.processor.input;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.*;
 import org.apache.ws.security.stax.wss.impl.saml.SAMLAssertionWrapper;
 import org.apache.ws.security.stax.wss.impl.saml.SAMLKeyInfo;

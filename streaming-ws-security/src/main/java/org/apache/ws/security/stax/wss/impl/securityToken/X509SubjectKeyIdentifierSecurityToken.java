@@ -18,8 +18,8 @@
  */
 package org.apache.ws.security.stax.wss.impl.securityToken;
 
-import org.apache.ws.security.stax.wss.crypto.Crypto;
-import org.apache.ws.security.stax.wss.crypto.CryptoType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
 import org.apache.xml.security.stax.ext.XMLSecurityException;

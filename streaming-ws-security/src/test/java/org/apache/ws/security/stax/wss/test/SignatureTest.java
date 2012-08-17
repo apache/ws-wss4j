@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.*;
@@ -1100,7 +1101,7 @@ public class SignatureTest extends AbstractTestBase {
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             } catch (XMLStreamException e) {
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.stax.wss.ext.WSSecurityException: An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
+                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
                         "\tjavax.xml.bind.UnmarshalException\n" +
                         " - with linked exception:\n" +
                         "[org.xml.sax.SAXParseException: cvc-datatype-valid.1.2.1: 'abc' is not a valid value for 'integer'.]; nested exception is: \n" +

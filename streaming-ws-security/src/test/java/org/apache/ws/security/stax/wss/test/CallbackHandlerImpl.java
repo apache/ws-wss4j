@@ -19,15 +19,14 @@
 package org.apache.ws.security.stax.wss.test;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.opensaml.common.SAMLVersion;
-import org.apache.ws.security.stax.wss.ext.WSPasswordCallback;
 import org.apache.ws.security.stax.wss.impl.saml.SAMLCallback;
 import org.apache.ws.security.stax.wss.impl.saml.bean.*;
 import org.apache.ws.security.stax.wss.impl.saml.builder.SAML1Constants;
 import org.apache.ws.security.stax.wss.impl.saml.builder.SAML2Constants;
-import org.apache.ws.security.stax.wss.crypto.Merlin;
-import org.apache.ws.security.stax.wss.crypto.MerlinBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -108,7 +107,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 SAMLCallback samlCallback = (SAMLCallback) callbacks[0];
                 KeyStore keyStore = KeyStore.getInstance("jks");
                 keyStore.load(this.getClass().getClassLoader().getResourceAsStream("saml/issuer.jks"), "default".toCharArray());
-                MerlinBase crypto = new Merlin();
+                Merlin crypto = new Merlin();
                 crypto.setKeyStore(keyStore);
                 samlCallback.setIssuerCrypto(crypto);
                 samlCallback.setIssuerKeyName("samlissuer");

@@ -518,48 +518,4 @@ public class WSSConstants extends XMLSecurityConstants {
         }
     }
 
-
-    /****************************************************************************
-     * Fault codes defined in the WSS 1.1 spec under section 12, Error handling
-     */
-
-    /**
-     * An unsupported token was provided
-     */
-    public static final QName UNSUPPORTED_SECURITY_TOKEN = new QName(NS_WSSE10, "UnsupportedSecurityToken");
-
-    /**
-     * An unsupported signature or encryption algorithm was used
-     */
-    public static final QName UNSUPPORTED_ALGORITHM = new QName(NS_WSSE10, "UnsupportedAlgorithm");
-
-    /**
-     * An error was discovered processing the <Security> header
-     */
-    public static final QName INVALID_SECURITY = new QName(NS_WSSE10, "InvalidSecurity");
-
-    /**
-     * An invalid security token was provided
-     */
-    public static final QName INVALID_SECURITY_TOKEN = new QName(NS_WSSE10, "InvalidSecurityToken");
-
-    /**
-     * The security token could not be authenticated or authorized
-     */
-    public static final QName FAILED_AUTHENTICATION = new QName(NS_WSSE10, "FailedAuthentication");
-
-    /**
-     * The signature or decryption was invalid
-     */
-    public static final QName FAILED_CHECK = new QName(NS_WSSE10, "FailedCheck");
-
-    /**
-     * Referenced security token could not be retrieved
-     */
-    public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName(NS_WSSE10, "SecurityTokenUnavailable");
-
-    /**
-     * The message has expired
-     */
-    public static final QName MESSAGE_EXPIRED = new QName(NS_WSSE10, "MessageExpired");
 }

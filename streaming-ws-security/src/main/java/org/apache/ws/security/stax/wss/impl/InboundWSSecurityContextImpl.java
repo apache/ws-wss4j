@@ -18,12 +18,11 @@
  */
 package org.apache.ws.security.stax.wss.impl;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSUtils;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.SecurityToken;

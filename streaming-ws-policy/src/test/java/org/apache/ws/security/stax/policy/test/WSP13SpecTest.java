@@ -18,11 +18,11 @@
  */
 package org.apache.ws.security.stax.policy.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.stax.policy.PolicyEnforcer;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.wss.test.InboundWSSecurityContextImplTest;
 import org.testng.Assert;

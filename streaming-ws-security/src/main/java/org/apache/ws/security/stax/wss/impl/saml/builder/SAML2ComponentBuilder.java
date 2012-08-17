@@ -51,7 +51,7 @@ import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xml.signature.KeyInfo;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.saml.bean.ActionBean;
 import org.apache.ws.security.stax.wss.impl.saml.bean.AttributeBean;
 import org.apache.ws.security.stax.wss.impl.saml.bean.AttributeStatementBean;

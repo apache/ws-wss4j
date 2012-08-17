@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.*;
@@ -816,7 +817,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             ));
             Assert.fail("XMLStreamException expected");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.ws.security.stax.wss.ext.WSSecurityException: General security error (Security header is missing)");
+            Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: General security error (Security header is missing)");
         }
     }
 

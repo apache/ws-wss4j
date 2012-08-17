@@ -19,12 +19,12 @@
 package org.apache.ws.security.stax.wss.impl.processor.input;
 
 import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.securityToken.SecurityTokenFactoryImpl;
-import org.apache.ws.security.stax.wss.crypto.Crypto;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;

@@ -49,7 +49,7 @@ import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xml.security.x509.BasicX509Credential;
 import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
 import org.opensaml.xml.signature.KeyInfo;
-import org.apache.ws.security.stax.wss.ext.WSSecurityException;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.impl.saml.OpenSAMLUtil;
 import org.apache.ws.security.stax.wss.impl.saml.bean.ActionBean;
 import org.apache.ws.security.stax.wss.impl.saml.bean.AttributeBean;

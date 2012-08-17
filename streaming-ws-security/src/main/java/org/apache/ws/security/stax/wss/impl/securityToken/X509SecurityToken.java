@@ -29,9 +29,9 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
-import org.apache.ws.security.stax.wss.crypto.Crypto;
-import org.apache.ws.security.stax.wss.crypto.CryptoType;
-import org.apache.ws.security.stax.wss.ext.WSPasswordCallback;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
 
