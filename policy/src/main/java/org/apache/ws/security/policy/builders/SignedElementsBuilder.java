@@ -18,7 +18,6 @@
  */
 package org.apache.ws.security.policy.builders;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
@@ -83,7 +82,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
                 Map<String, String> declaredNamespaces = new HashMap<String, String>();
                 addDeclaredNamespaces(child, declaredNamespaces);
                 String filter = child.getAttribute(SPConstants.FILTER);
-                if (StringUtils.isEmpty(filter)) {
+                if (filter == null || "".equals(filter)) {
                     throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                 }
                 xPaths.add(new XPath(child.getTextContent().trim(), XPath.Version.V2, filter, declaredNamespaces));
@@ -95,7 +94,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
 
     protected String getXPathVersion(Element element) {
         String xPathVersion = element.getAttribute(SPConstants.XPATH_VERSION);
-        if (StringUtils.isEmpty(xPathVersion)) {
+        if (xPathVersion == null || "".equals(xPathVersion)) {
             xPathVersion = "1.0";
         }
         return xPathVersion;

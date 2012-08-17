@@ -18,7 +18,6 @@
  */
 package org.apache.ws.security.policy.builders;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
@@ -64,7 +63,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
                     }
                 }
                 String headerNamespace = child.getAttribute(SPConstants.NAMESPACE);
-                if (StringUtils.isEmpty(headerNamespace)) {
+                if (headerNamespace == null || "".equals(headerNamespace)) {
                     throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                 }
                 headers.add(new Header(headerName, headerNamespace));

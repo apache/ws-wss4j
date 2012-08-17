@@ -18,7 +18,6 @@
  */
 package org.apache.ws.security.policy;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.ws.security.policy.model.SupportingTokenType;
 
 import javax.xml.namespace.QName;
@@ -330,7 +329,7 @@ public class SP11Constants extends SPConstants {
 
     @Override
     public IncludeTokenType getInclusionFromAttributeValue(String value) throws IllegalArgumentException {
-        if (StringUtils.isEmpty(value)) {
+        if (value == null || "".equals(value)) {
             return IncludeTokenType.INCLUDE_TOKEN_ALWAYS;
         } else if (INCLUDE_ALWAYS.equals(value)) {
             return IncludeTokenType.INCLUDE_TOKEN_ALWAYS;

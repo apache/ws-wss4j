@@ -18,7 +18,6 @@
  */
 package org.apache.ws.security.policy;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.*;
 
 import javax.xml.namespace.QName;
@@ -152,7 +151,7 @@ public class SPUtils {
 
     public static String getAttribute(Element element, QName attName) {
         Attr attr;
-        if (StringUtils.isEmpty(attName.getNamespaceURI())) {
+        if (attName.getNamespaceURI() == null || "".equals(attName.getNamespaceURI())) {
             attr = element.getAttributeNode(attName.getLocalPart());
         } else {
             attr = element.getAttributeNodeNS(attName.getNamespaceURI(), attName.getLocalPart());
