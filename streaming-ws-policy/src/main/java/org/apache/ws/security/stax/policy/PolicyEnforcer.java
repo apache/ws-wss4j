@@ -371,11 +371,11 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     /**
-     * verifies the policy after the OperationSecurityEvent occured. This allows to
+     * verifies the policy after the OperationSecurityEvent occurred. This allows to
      * stop further processing after the header is processed when the policy is not fulfilled.
      *
      * @throws WSSPolicyException       throws when the policy is invalid
-     * @throws PolicyViolationException thrown when no alternative could be satisifed
+     * @throws PolicyViolationException thrown when no alternative could be satisfied
      */
     private void verifyPolicyAfterOperationSecurityEvent() throws WSSPolicyException {
         String assertionMessage = null;

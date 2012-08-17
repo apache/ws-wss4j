@@ -38,26 +38,24 @@
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j-bindings-wss10</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j-bindings-wss11</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j-bindings-wssc</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j-dom</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>jcs</groupId>
             <artifactId>jcs</artifactId>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>javax.sql</groupId>
@@ -198,6 +196,12 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j-dom</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <scope>test</scope>
@@ -210,16 +214,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>serializer</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
