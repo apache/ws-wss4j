@@ -102,6 +102,7 @@
         <module>parent</module>
         <module>bindings</module>
         <module>policy</module>
+        <module>ws-security-common</module>
         <module>wss4j-dom</module>
         <module>streaming-ws-security</module>
         <module>streaming-ws-policy</module>
