@@ -28,6 +28,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -84,7 +85,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(doc);
@@ -122,7 +123,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(doc);
@@ -156,7 +157,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         List<WSSecurityEngineResult> results = verify(doc);
@@ -198,7 +199,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: ThumbprintSHA1 + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         List<WSSecurityEngineResult> results = verify(doc);
@@ -239,7 +240,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: SKI + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         List<WSSecurityEngineResult> results = verify(doc);
@@ -286,7 +287,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedEncryptedDoc);
+                XMLUtils.PrettyDocumentToString(signedEncryptedDoc);
             LOG.debug(outputString);
         }
         verify(signedEncryptedDoc);
@@ -327,7 +328,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
 
@@ -345,7 +346,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         
         return results;

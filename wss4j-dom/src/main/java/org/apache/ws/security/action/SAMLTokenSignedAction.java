@@ -24,13 +24,13 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 import org.w3c.dom.Document;
 

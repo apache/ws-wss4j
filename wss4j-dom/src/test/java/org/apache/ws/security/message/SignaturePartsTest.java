@@ -32,13 +32,14 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.util.Loader;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerImpl;
 import org.apache.ws.security.saml.SignedSamlTokenHOKTest;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -112,7 +113,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -211,7 +212,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message (key holder):");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -340,7 +341,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -417,7 +418,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -452,7 +453,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -474,7 +475,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

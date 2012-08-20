@@ -29,6 +29,10 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.OpenSAMLUtil;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
@@ -37,10 +41,7 @@ import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.ws.security.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
@@ -173,7 +174,11 @@ public class SignatureSTRParser implements STRParser {
                             );
                     } else {
                         assertion = new AssertionWrapper(processedToken);
-                        assertion.parseHOKSubject(data, wsDocInfo);
+                        assertion.parseHOKSubject(
+                            new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                            data.getSigCrypto(), data.getCallbackHandler(),
+                            data.getWssConfig().isWsiBSPCompliant()
+                        );
                     }
                     if (bspCompliant) {
                         BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
@@ -351,14 +356,17 @@ public class SignatureSTRParser implements STRParser {
         secretKey = getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
         if (secretKey == null) {
             AssertionWrapper assertion = 
-                SAMLUtil.getAssertionFromKeyIdentifier(
+                STRParserUtil.getAssertionFromKeyIdentifier(
                     secRef, secRef.getElement(), data, wsDocInfo
                 );
             if (bspCompliant) {
                 BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
             }
             SAMLKeyInfo samlKi = 
-                SAMLUtil.getCredentialFromSubject(assertion, data, wsDocInfo, bspCompliant);
+                SAMLUtil.getCredentialFromSubject(assertion,  
+                        new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                        data.getSigCrypto(), data.getCallbackHandler(),
+                        data.getWssConfig().isWsiBSPCompliant());
             X509Certificate[] foundCerts = samlKi.getCerts();
             if (foundCerts != null && foundCerts.length > 0) {
                 certs = new X509Certificate[]{foundCerts[0]};

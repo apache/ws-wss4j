@@ -28,6 +28,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -95,7 +96,7 @@ public class SignatureCertTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         //
@@ -133,7 +134,7 @@ public class SignatureCertTest extends org.junit.Assert {
                 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug("BST CA Cert");
             LOG.debug(outputString);
         }
@@ -171,7 +172,7 @@ public class SignatureCertTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug("BST CA Cert");
             LOG.debug(outputString);
         }
@@ -209,7 +210,7 @@ public class SignatureCertTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -242,7 +243,7 @@ public class SignatureCertTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         //
@@ -308,14 +309,14 @@ public class SignatureCertTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> 
-    verify(Document doc, Crypto crypto) throws WSSecurityException {
+    verify(Document doc, Crypto crypto) throws Exception {
         List<WSSecurityEngineResult> results = secEngine.processSecurityHeader(
             doc, null, null, crypto
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

@@ -26,6 +26,9 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.DerivedKeyToken;
@@ -33,9 +36,7 @@ import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
@@ -137,7 +138,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
                 if (secretKey == null) {
                     AssertionWrapper assertion = 
-                        SAMLUtil.getAssertionFromKeyIdentifier(
+                        STRParserUtil.getAssertionFromKeyIdentifier(
                             secRef, strElement, 
                             data, wsDocInfo
                         );
@@ -286,7 +287,10 @@ public class SecurityTokenRefSTRParser implements STRParser {
             BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
         }
         SAMLKeyInfo samlKi = 
-            SAMLUtil.getCredentialFromSubject(assertion, data, wsDocInfo, bspCompliant);
+            SAMLUtil.getCredentialFromSubject(assertion, 
+                    new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                    data.getSigCrypto(), data.getCallbackHandler(),
+                    data.getWssConfig().isWsiBSPCompliant());
         if (samlKi == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", new Object[] {"No Secret Key"}

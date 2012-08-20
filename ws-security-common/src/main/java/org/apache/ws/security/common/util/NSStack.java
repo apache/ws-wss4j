@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.util;
+package org.apache.ws.security.common.util;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -17,9 +17,8 @@
  * under the License.
  */
 
-package org.apache.ws.security.util;
+package org.apache.ws.security.common.util;
 
-import org.apache.ws.security.WSConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -262,9 +261,9 @@ public final class DOM2Writer {
                                            PrintWriter out) {
         String namespaceURI = node.getNamespaceURI();
         String prefix = node.getPrefix();
-        if (!(namespaceURI.equals(WSConstants.XMLNS_NS) && prefix.equals("xmlns")) &&
-                !(namespaceURI.equals(WSConstants.XML_NS) && prefix.equals("xml"))) {
-            if (WSSecurityUtil.getNamespace(prefix, owner) == null) {
+        if (!(namespaceURI.equals(XMLUtils.XMLNS_NS) && prefix.equals("xmlns")) &&
+                !(namespaceURI.equals(XMLUtils.XML_NS) && prefix.equals("xml"))) {
+            if (XMLUtils.getNamespace(prefix, owner) == null) {
                 out.print(" xmlns:" + prefix + "=\"" + namespaceURI + '\"');
             }
         } else {

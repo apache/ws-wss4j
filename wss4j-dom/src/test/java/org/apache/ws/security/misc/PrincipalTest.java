@@ -33,14 +33,15 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
@@ -76,7 +77,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         List<WSSecurityEngineResult> results = verify(signedDoc, null);
@@ -107,7 +108,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         List<WSSecurityEngineResult> results = 
@@ -142,7 +143,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
         
@@ -183,7 +184,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
         
@@ -225,7 +226,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
         
@@ -266,7 +267,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         

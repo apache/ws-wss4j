@@ -24,6 +24,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -76,7 +77,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         try {
@@ -99,7 +100,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSSConfig wssConfig = secEngine.getWssConfig();

@@ -29,6 +29,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
@@ -85,7 +86,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -126,7 +127,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -167,7 +168,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -192,7 +193,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -226,7 +227,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -279,7 +280,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
     }
@@ -320,7 +321,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
     }
@@ -358,7 +359,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
     }
@@ -399,7 +400,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
     }
@@ -419,7 +420,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

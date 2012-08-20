@@ -20,7 +20,7 @@
 package org.apache.ws.security.message.token;
 
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.utils.RFC2253Parser;
 import org.w3c.dom.Document;

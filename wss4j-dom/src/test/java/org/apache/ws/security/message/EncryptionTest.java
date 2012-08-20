@@ -33,6 +33,8 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.str.STRParser.REFERENCE_TYPE;
@@ -112,7 +114,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES....");
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
@@ -143,7 +145,7 @@ public class EncryptionTest extends org.junit.Assert {
         encryptedDoc = builder.build(doc, crypto, secHeader);
         LOG.info("After Encryption AES 128/RSA-15....");
         outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, AES 128:");
             LOG.debug(outputString);
@@ -189,7 +191,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
@@ -247,7 +249,7 @@ public class EncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the first encryption:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         
@@ -256,7 +258,7 @@ public class EncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the second encryption:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedEncryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedEncryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -285,7 +287,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
             LOG.debug(outputString);
@@ -325,7 +327,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
      
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
@@ -360,7 +362,7 @@ public class EncryptionTest extends org.junit.Assert {
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
@@ -395,7 +397,7 @@ public class EncryptionTest extends org.junit.Assert {
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
@@ -440,7 +442,7 @@ public class EncryptionTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -507,7 +509,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES....");
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
@@ -517,7 +519,7 @@ public class EncryptionTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true
                 : false);
         
@@ -579,7 +581,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = doc;
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -628,7 +630,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.encryptForRef(null, parts);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -658,7 +660,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
@@ -688,7 +690,7 @@ public class EncryptionTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;
@@ -710,7 +712,7 @@ public class EncryptionTest extends org.junit.Assert {
         final java.util.List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, handler, null, crypto);
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -743,9 +745,7 @@ public class EncryptionTest extends org.junit.Assert {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("WSDataRef element: ");
                         LOG.debug(
-                            org.apache.ws.security.util.DOM2Writer.nodeToString(
-                                ref.getProtectedElement()
-                            )
+                            DOM2Writer.nodeToString(ref.getProtectedElement())
                         );
                     }
                 }

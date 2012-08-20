@@ -37,6 +37,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -261,7 +262,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         
@@ -270,7 +271,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         return encryptedSignedDoc;
@@ -283,7 +284,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             secEngine.processSecurityHeader(elem, reqData);
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         

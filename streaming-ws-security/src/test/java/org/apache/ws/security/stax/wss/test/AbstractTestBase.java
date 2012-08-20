@@ -25,11 +25,11 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WsuIdAllocator;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.stax.ext.XMLSec;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
@@ -55,6 +55,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
@@ -90,17 +91,6 @@ public abstract class AbstractTestBase {
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
 
         Security.addProvider(new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
-    }
-
-    //we have to set a custom baseUUID until WSS4J-DOM is fixed. WSS4J generates invalid id's. (wsu:id's must start with a letter)
-    static {
-        try {
-            Field field = UUIDGenerator.class.getDeclaredField("baseUUID");
-            field.setAccessible(true);
-            field.set(null, "G" + UUID.randomUUID().toString());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @BeforeClass
@@ -178,14 +168,14 @@ public abstract class AbstractTestBase {
         return baos;
     }
 
-    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws WSSecurityException {
+    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws WSSecurityException, TransformerException {
         Map<String, Object> context = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
         return (Document) context.get(SECURED_DOCUMENT);
     }
 
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
             InputStream sourceDocument, String action, final Properties properties
-    ) throws WSSecurityException {
+    ) throws WSSecurityException, TransformerException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);
@@ -383,9 +373,10 @@ public abstract class AbstractTestBase {
 
         /**
          * Handles incoming web service requests and outgoing responses
+         * @throws TransformerException 
          */
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
-                throws WSSecurityException {
+                throws WSSecurityException, TransformerException {
 
             reqData.getSignatureParts().clear();
             reqData.getEncryptParts().clear();
@@ -444,7 +435,7 @@ public abstract class AbstractTestBase {
             }
             if (doDebug) {
                 log.debug("WSS4JHandler: orginal SOAP request: ");
-                log.debug(org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc));
+                log.debug(XMLUtils.PrettyDocumentToString(doc));
             }
             doSenderAction(doAction, doc, reqData, actions, isRequest);
 

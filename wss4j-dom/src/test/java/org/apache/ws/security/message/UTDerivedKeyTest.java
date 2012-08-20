@@ -29,6 +29,7 @@ import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
@@ -85,7 +86,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -146,7 +147,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -190,7 +191,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -241,7 +242,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -292,7 +293,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -342,7 +343,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -392,7 +393,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -448,7 +449,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -494,7 +495,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -542,7 +543,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") == -1);
@@ -591,7 +592,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -641,7 +642,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -698,7 +699,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -761,7 +762,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);

@@ -30,6 +30,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -71,7 +72,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -119,7 +120,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -281,7 +282,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

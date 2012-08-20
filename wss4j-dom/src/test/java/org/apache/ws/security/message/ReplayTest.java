@@ -36,6 +36,7 @@ import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -86,7 +87,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
         
@@ -134,7 +135,7 @@ public class ReplayTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
         
@@ -187,7 +188,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
         
@@ -221,7 +222,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         

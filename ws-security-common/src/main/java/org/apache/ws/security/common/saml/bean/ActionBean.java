@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext.bean;
+package org.apache.ws.security.common.saml.bean;
 
 
 /**

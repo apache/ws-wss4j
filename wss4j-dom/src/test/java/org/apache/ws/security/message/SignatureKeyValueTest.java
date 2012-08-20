@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -61,7 +62,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -104,7 +105,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
             builder.build(doc, CryptoFactory.getInstance("wss86.properties"), secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -138,7 +139,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

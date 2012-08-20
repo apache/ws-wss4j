@@ -21,12 +21,12 @@ package org.apache.ws.security.str;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * This class enforces processing rules for SecurityTokenReferences to various token elements,

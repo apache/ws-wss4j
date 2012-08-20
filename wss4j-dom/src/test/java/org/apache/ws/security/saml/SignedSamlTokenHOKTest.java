@@ -32,13 +32,14 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
+import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.common.util.Loader;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -111,7 +112,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -173,7 +174,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 1.1 Attr Assertion (key holder):");
             LOG.debug(outputString);
@@ -235,7 +236,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 2 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -297,7 +298,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 2 Attr Assertion (key holder):");
             LOG.debug(outputString);
@@ -362,7 +363,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion Issuer Serial (holder-of-key):");
             LOG.debug(outputString);
@@ -422,7 +423,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion Key Value (holder-of-key):");
             LOG.debug(outputString);
@@ -482,7 +483,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion Key Value (holder-of-key):");
             LOG.debug(outputString);
@@ -547,7 +548,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, crypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -588,7 +589,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
                 doc, null, callbackHandler, sigCrypto, userCrypto
             );
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

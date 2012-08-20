@@ -20,19 +20,19 @@
 package org.apache.ws.security.common;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.bean.ActionBean;
+import org.apache.ws.security.common.saml.bean.AttributeBean;
+import org.apache.ws.security.common.saml.bean.AttributeStatementBean;
+import org.apache.ws.security.common.saml.bean.AuthDecisionStatementBean;
+import org.apache.ws.security.common.saml.bean.AuthenticationStatementBean;
+import org.apache.ws.security.common.saml.bean.ConditionsBean;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
+import org.apache.ws.security.common.saml.bean.SubjectConfirmationDataBean;
+import org.apache.ws.security.common.saml.bean.SubjectLocalityBean;
 import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.ActionBean;
-import org.apache.ws.security.saml.ext.bean.AttributeBean;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
-import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

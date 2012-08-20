@@ -24,6 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
+
+import org.apache.ws.security.common.util.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,7 +43,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory
         .getLog(TestMessageTransformer.class);
 
-    public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) {
+    public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -76,7 +79,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
 
-    public static Element duplicateEncryptedDataInWsseWrapperHeader(Element saaj, boolean moveReferenceList) {
+    public static Element duplicateEncryptedDataInWsseWrapperHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -116,7 +119,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     }
 
     public static Element duplicateEncryptedDataInExternalWrapperElement(Element saaj,
-                                                                         boolean moveReferenceList) {
+                                                                         boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -154,7 +157,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) {
+    public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) throws TransformerException {
         moveReferenceList(saaj);
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
@@ -224,10 +227,10 @@ public class TestMessageTransformer extends org.junit.Assert {
         ref.getParentNode().appendChild(newRef);
     }
 
-    private static void print(Document doc) {
+    private static void print(Document doc) throws TransformerException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After transformation....");
-            String outputString = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

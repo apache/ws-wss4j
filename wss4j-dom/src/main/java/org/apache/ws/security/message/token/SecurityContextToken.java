@@ -22,11 +22,11 @@ package org.apache.ws.security.message.token;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.common.derivedKey.ConversationException;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -91,7 +91,7 @@ public class SecurityContextToken {
 
         element.appendChild(elementIdentifier);
 
-        String uuid = "uuid:" + UUIDGenerator.getUUID();
+        String uuid = IDGenerator.generateID("uuid:");
         
         elementIdentifier.appendChild(doc.createTextNode(uuid));
         

@@ -19,9 +19,9 @@
 package org.apache.ws.security.stax.wss.test.saml;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
+import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.InboundWSSec;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;

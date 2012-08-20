@@ -26,13 +26,14 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.WSSSAMLKeyInfoProcessor;
 import org.w3c.dom.Element;
 
 import java.security.Principal;
@@ -102,7 +103,7 @@ public class EncryptedKeySTRParser implements STRParser {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 AssertionWrapper assertion = 
-                    SAMLUtil.getAssertionFromKeyIdentifier(
+                    STRParserUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, data, wsDocInfo
                     );
                 if (bspCompliant) {
@@ -110,7 +111,9 @@ public class EncryptedKeySTRParser implements STRParser {
                 }
                 SAMLKeyInfo samlKi = 
                     SAMLUtil.getCredentialFromSubject(assertion, 
-                                                      data, wsDocInfo, bspCompliant);
+                            new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                            data.getSigCrypto(), data.getCallbackHandler(),
+                            data.getWssConfig().isWsiBSPCompliant());
                 certs = samlKi.getCerts();
             } else {
                 if (bspCompliant) {
@@ -228,8 +231,9 @@ public class EncryptedKeySTRParser implements STRParser {
             }
             SAMLKeyInfo keyInfo = 
                 SAMLUtil.getCredentialFromSubject(assertion, 
-                                                  data,
-                                                  wsDocInfo, bspCompliant);
+                        new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                        data.getSigCrypto(), data.getCallbackHandler(),
+                        data.getWssConfig().isWsiBSPCompliant());
             certs = keyInfo.getCerts();
         } else {
             throw new WSSecurityException(

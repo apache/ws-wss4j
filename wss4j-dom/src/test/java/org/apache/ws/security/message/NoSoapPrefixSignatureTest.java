@@ -25,6 +25,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 /**
@@ -60,7 +61,7 @@ public class NoSoapPrefixSignatureTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         verify(signedDoc);
@@ -78,7 +79,7 @@ public class NoSoapPrefixSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

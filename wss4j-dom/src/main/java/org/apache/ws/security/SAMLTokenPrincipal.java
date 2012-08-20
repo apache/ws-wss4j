@@ -19,7 +19,7 @@
 
 package org.apache.ws.security;
 
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.opensaml.common.SAMLVersion;
 
 import java.io.Serializable;

@@ -30,6 +30,8 @@ import org.apache.ws.security.common.KeystoreCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 /**
@@ -77,7 +79,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
@@ -98,7 +100,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
@@ -123,7 +125,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         final java.util.List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, handler, null, crypto);
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -156,9 +158,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("WSDataRef element: ");
                         LOG.debug(
-                            org.apache.ws.security.util.DOM2Writer.nodeToString(
-                                ref.getProtectedElement()
-                            )
+                            DOM2Writer.nodeToString(ref.getProtectedElement())
                         );
                     }
                 }

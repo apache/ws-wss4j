@@ -26,12 +26,13 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
@@ -273,7 +274,9 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             }
             SAMLKeyInfo keyInfo = 
                 SAMLUtil.getCredentialFromSubject(assertion, 
-                                                  data, wsDocInfo, bspCompliant);
+                        new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                        data.getSigCrypto(), data.getCallbackHandler(),
+                        data.getWssConfig().isWsiBSPCompliant());
             // TODO Handle malformed SAML tokens where they don't have the 
             // secret in them
             secretKey = keyInfo.getSecret();

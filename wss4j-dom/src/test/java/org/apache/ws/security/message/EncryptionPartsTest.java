@@ -31,6 +31,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -106,7 +107,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         
@@ -172,7 +173,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -294,7 +295,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         
@@ -369,7 +370,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -405,7 +406,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -414,7 +415,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         verify(encryptedDoc);
         
         outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.contains("asf1"));
         assertTrue(outputString.contains("asf2"));
     }
@@ -433,7 +434,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

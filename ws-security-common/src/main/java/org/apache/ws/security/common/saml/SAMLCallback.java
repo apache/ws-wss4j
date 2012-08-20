@@ -17,13 +17,13 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext;
+package org.apache.ws.security.common.saml;
 
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.common.saml.bean.AttributeStatementBean;
+import org.apache.ws.security.common.saml.bean.AuthDecisionStatementBean;
+import org.apache.ws.security.common.saml.bean.AuthenticationStatementBean;
+import org.apache.ws.security.common.saml.bean.ConditionsBean;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.Element;
 

@@ -23,11 +23,11 @@ import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
+import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * This class stores various Credential types that can be validated and/or returned by a

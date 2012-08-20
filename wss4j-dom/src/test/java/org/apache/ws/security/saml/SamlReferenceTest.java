@@ -32,13 +32,14 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
+import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.common.util.Loader;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
@@ -113,7 +114,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             );
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Key Identifier (sender vouches):");
             LOG.debug(outputString);
@@ -177,7 +178,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             );
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Direct Reference (sender vouches):");
             LOG.debug(outputString);
@@ -241,7 +242,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
@@ -305,7 +306,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
@@ -374,7 +375,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeaderElement.appendChild(assertionNode);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
@@ -432,7 +433,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.appendToHeader(secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted SAML 1.1 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
@@ -508,7 +509,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.appendToHeader(secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted SAML 1.1 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
@@ -567,7 +568,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             );
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML2 message Key Identifier (sender vouches):");
             LOG.debug(outputString);
@@ -630,7 +631,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             );
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML2 message Direct Reference (sender vouches):");
             LOG.debug(outputString);
@@ -694,7 +695,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML2 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
@@ -758,7 +759,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML2 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
@@ -833,7 +834,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.appendToHeader(secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted SAML 2 message Key Identifier (holder-of-key):");
             LOG.debug(outputString);
@@ -909,7 +910,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.appendToHeader(secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted SAML 2 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
@@ -952,7 +953,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, verifyCrypto, decCrypto);
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

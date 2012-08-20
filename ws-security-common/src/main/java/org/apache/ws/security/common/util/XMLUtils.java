@@ -16,53 +16,87 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.ws.security.common.util;
 
-package org.apache.ws.security.util;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
-public final class XMLUtils {
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+
+public class XMLUtils {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(XMLUtils.class);
-    private static final boolean DO_DEBUG = LOG.isDebugEnabled();
-    
-    private XMLUtils() {
-        // Complete
+    public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
+    public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
+
+    /**
+     * Gets a direct child with specified localname and namespace. <p/>
+     *
+     * @param parentNode the node where to start the search
+     * @param localName  local name of the child to get
+     * @param namespace  the namespace of the child to get
+     * @return the node or <code>null</code> if not such node found
+     */
+    public static Element getDirectChildElement(Node parentNode, String localName, String namespace) {
+        if (parentNode == null) {
+            return null;
+        }
+        for (
+                Node currentChild = parentNode.getFirstChild();
+                currentChild != null;
+                currentChild = currentChild.getNextSibling()
+                ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                    && localName.equals(currentChild.getLocalName())
+                    && namespace.equals(currentChild.getNamespaceURI())) {
+                return (Element) currentChild;
+            }
+        }
+        return null;
     }
     
-    public static String PrettyDocumentToString(Document doc) {
+    public static String getNamespace(String prefix, Node e) {
+        while (e != null && (e.getNodeType() == Node.ELEMENT_NODE)) {
+            Attr attr = null;
+            if (prefix == null) {
+                attr = ((Element) e).getAttributeNode("xmlns");
+            } else {
+                attr = ((Element) e).getAttributeNodeNS(XMLNS_NS, prefix);
+            }
+            if (attr != null) {
+                return attr.getValue();
+            }
+            e = e.getParentNode();
+        }
+        return null;
+    }
+    
+    public static String PrettyDocumentToString(Document doc) throws TransformerException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ElementToStream(doc.getDocumentElement(), baos);
         return new String(baos.toByteArray());
     }
 
-    public static void ElementToStream(Element element, OutputStream out) {
-        try {
-            DOMSource source = new DOMSource(element);
-            StreamResult result = new StreamResult(out);
-            TransformerFactory transFactory = TransformerFactory.newInstance();
-            Transformer transformer = transFactory.newTransformer();
-            transformer.transform(source, result);
-        } catch (Exception ex) {
-            if (DO_DEBUG) {
-                LOG.debug(ex.getMessage(), ex);
-            }
-        }
+    public static void ElementToStream(Element element, OutputStream out) 
+        throws TransformerException {
+        DOMSource source = new DOMSource(element);
+        StreamResult result = new StreamResult(out);
+        TransformerFactory transFactory = TransformerFactory.newInstance();
+        Transformer transformer = transFactory.newTransformer();
+        transformer.transform(source, result);
     }
 
     /**
@@ -70,7 +104,7 @@ public final class XMLUtils {
      *
      * @param source the resource to get
      */
-    public static InputSource sourceToInputSource(Source source) {
+    public static InputSource sourceToInputSource(Source source) throws TransformerException {
         if (source instanceof SAXSource) {
             return ((SAXSource) source).getInputSource();
         } else if (source instanceof DOMSource) {
@@ -106,5 +140,4 @@ public final class XMLUtils {
     public static InputSource getInputSourceFromURI(String uri) {
         return new InputSource(uri);
     }
-    
 }

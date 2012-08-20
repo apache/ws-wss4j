@@ -25,6 +25,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
@@ -79,7 +80,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Text....");
@@ -120,7 +121,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message using a 32 byte key length:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -168,7 +169,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token Signature via WSHandler");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -224,7 +225,7 @@ public class UTWseSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");

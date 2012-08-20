@@ -35,8 +35,8 @@ import org.apache.ws.security.action.Action;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.Loader;
 import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.validate.Validator;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**
@@ -299,10 +299,7 @@ public class WSSConfig {
         }
 
         public String createSecureId(String prefix, Object o) {
-            if (prefix == null) {
-                return UUIDGenerator.getUUID();
-            }
-            return prefix + UUIDGenerator.getUUID();
+            return IDGenerator.generateID(prefix);
         }
     };
     protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;

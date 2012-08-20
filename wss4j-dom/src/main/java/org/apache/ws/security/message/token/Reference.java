@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

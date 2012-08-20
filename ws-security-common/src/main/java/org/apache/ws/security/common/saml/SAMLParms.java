@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext;
+package org.apache.ws.security.common.saml;
 
 import javax.security.auth.callback.CallbackHandler;
 

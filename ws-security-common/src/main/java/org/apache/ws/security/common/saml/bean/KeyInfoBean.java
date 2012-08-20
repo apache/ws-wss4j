@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext.bean;
+package org.apache.ws.security.common.saml.bean;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;

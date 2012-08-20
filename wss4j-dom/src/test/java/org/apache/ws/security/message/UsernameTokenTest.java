@@ -29,6 +29,7 @@ import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -121,7 +122,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");
@@ -171,7 +172,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");
@@ -198,7 +199,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");
@@ -229,7 +230,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");
@@ -258,7 +259,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Text....");
@@ -298,7 +299,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
     }
@@ -319,7 +320,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Text....");
@@ -345,7 +346,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -372,7 +373,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUTNOUSERMSG);
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         try {
@@ -399,7 +400,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -426,7 +427,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         secEngine.processSecurityHeader(doc, null, this, null);
@@ -441,7 +442,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Empty password message: ");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -466,7 +467,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         try {
@@ -496,7 +497,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW custom type:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -543,7 +544,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+                XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
         
@@ -586,7 +587,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+                XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
         
@@ -615,7 +616,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         secHeader.insertSecurityHeader(doc);
         Document signedDoc = builder.build(doc, secHeader);
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(outputString.indexOf("EncodingType") != -1);
     }
     
@@ -642,7 +643,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
@@ -669,7 +670,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
@@ -697,7 +698,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token with an empty password via WSHandler");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
@@ -727,7 +728,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+                XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
         
@@ -769,7 +770,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+                XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
         
@@ -811,7 +812,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+                XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
         
@@ -854,7 +855,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(utDoc);
+                XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
         

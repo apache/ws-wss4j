@@ -43,9 +43,9 @@ import org.apache.ws.security.message.token.DOMX509IssuerSerial;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.XMLUtils;
 
@@ -300,7 +300,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         //
         encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
-            encKeyId = "EK-" + UUIDGenerator.getUUID();
+            encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
@@ -337,7 +337,7 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         case WSConstants.BST_DIRECT_REFERENCE:
             Reference ref = new Reference(document);
-            String certUri = UUIDGenerator.getUUID();
+            String certUri = IDGenerator.generateID(null);
             ref.setURI("#" + certUri);
             bstToken = new X509Security(document);
             ((X509Security) bstToken).setX509Certificate(remoteCert);

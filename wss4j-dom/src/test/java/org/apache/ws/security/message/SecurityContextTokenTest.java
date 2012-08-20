@@ -31,6 +31,7 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.derivedKey.ConversationConstants;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -64,7 +65,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             String out = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             
             if (LOG.isDebugEnabled()) {
                 LOG.debug(out);
@@ -115,7 +116,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -165,7 +166,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -215,7 +216,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("DKT Absolute");
                 String outputString = 
-                    org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                    XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(outputString);
             }
 
@@ -258,7 +259,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -301,7 +302,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -347,7 +348,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("SCT sign");
                 String outputString = 
-                    org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                    XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(outputString);
             }
 
@@ -369,7 +370,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

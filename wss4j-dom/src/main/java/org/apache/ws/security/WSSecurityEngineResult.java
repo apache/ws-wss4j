@@ -19,12 +19,12 @@
 
 package org.apache.ws.security;
 
+import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.message.token.SignatureConfirmation;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;

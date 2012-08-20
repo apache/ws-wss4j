@@ -23,7 +23,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.common.saml.AssertionWrapper;
 
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope.

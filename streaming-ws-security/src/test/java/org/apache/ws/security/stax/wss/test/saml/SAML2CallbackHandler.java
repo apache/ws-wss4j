@@ -22,10 +22,10 @@ package org.apache.ws.security.stax.wss.test.saml;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
+import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;

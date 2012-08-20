@@ -17,20 +17,20 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext.builder;
+package org.apache.ws.security.common.saml.builder;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.saml.ext.bean.ActionBean;
-import org.apache.ws.security.saml.ext.bean.AttributeBean;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
-import org.apache.ws.security.util.UUIDGenerator;
+import org.apache.ws.security.common.saml.OpenSAMLUtil;
+import org.apache.ws.security.common.saml.bean.ActionBean;
+import org.apache.ws.security.common.saml.bean.AttributeBean;
+import org.apache.ws.security.common.saml.bean.AttributeStatementBean;
+import org.apache.ws.security.common.saml.bean.AuthDecisionStatementBean;
+import org.apache.ws.security.common.saml.bean.AuthenticationStatementBean;
+import org.apache.ws.security.common.saml.bean.ConditionsBean;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
+import org.apache.ws.security.common.saml.bean.SubjectLocalityBean;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
@@ -139,7 +139,7 @@ public final class SAML1ComponentBuilder {
         assertion.setVersion(SAMLVersion.VERSION_11);
         assertion.setIssuer(issuer);
         assertion.setIssueInstant(new DateTime()); // now
-        assertion.setID("_" + UUIDGenerator.getUUID());
+        assertion.setID(IDGenerator.generateID("_"));
         return assertion;
     }
 

@@ -23,11 +23,11 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.bean.AuthenticationStatementBean;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;

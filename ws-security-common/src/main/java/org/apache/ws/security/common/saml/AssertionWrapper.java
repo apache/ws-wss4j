@@ -17,23 +17,19 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext;
+package org.apache.ws.security.common.saml;
 
-import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
-import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
+import org.apache.ws.security.common.saml.builder.SAML1ComponentBuilder;
+import org.apache.ws.security.common.saml.builder.SAML2ComponentBuilder;
+import org.apache.ws.security.common.util.DOM2Writer;
 
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.SignableSAMLObject;
@@ -243,6 +239,19 @@ public class AssertionWrapper {
             fromDOM = false;
         }
     }
+    
+    public AssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {
+        OpenSAMLUtil.initSamlEngine();
+
+        if (samlCallback.getAssertionElement() != null) {
+            parseElement(samlCallback.getAssertionElement());
+            fromDOM = true;
+        } else {
+            // If not then parse the SAMLCallback object
+            parseCallback(samlCallback, new SAMLParms());
+            fromDOM = false;
+        }
+    }
 
     /**
      * Method getSaml1 returns the saml1 of this AssertionWrapper object.
@@ -329,7 +338,7 @@ public class AssertionWrapper {
         }
         if (id == null || id.length() == 0) {
             LOG.error("AssertionWrapper: ID was null, seeting a new ID value");
-            id = "_" + UUIDGenerator.getUUID();
+            id = IDGenerator.generateID("_");
             if (saml2 != null) {
                 saml2.setID(id);
             } else if (saml1 != null) {
@@ -528,7 +537,9 @@ public class AssertionWrapper {
      * @throws ValidationException
      */
     public void verifySignature(
-        RequestData data, WSDocInfo docInfo
+        SAMLKeyInfoProcessor keyInfoProcessor,
+        Crypto sigCrypto,
+        boolean isBSPCompliant
     ) throws WSSecurityException {
         Signature sig = null;
         if (saml2 != null && saml2.getSignature() != null) {
@@ -540,7 +551,7 @@ public class AssertionWrapper {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), data, docInfo, data.getWssConfig().isWsiBSPCompliant()
+                    keyInfo.getDOM(), keyInfoProcessor, sigCrypto, isBSPCompliant
                 );
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
@@ -581,11 +592,14 @@ public class AssertionWrapper {
     /**
      * This method parses the KeyInfo of the Subject for the holder-of-key confirmation
      * method, as required by the SAML Token spec. It then stores the SAMLKeyInfo object that
-     * has been obtained for future processing by the SignatureProcessor.
+     * has been obtained for future processing.
      * @throws WSSecurityException
      */
     public void parseHOKSubject(
-        RequestData data, WSDocInfo docInfo
+        SAMLKeyInfoProcessor keyInfoProcessor,
+        Crypto sigCrypto,
+        CallbackHandler callbackHandler,
+        boolean isBSPCompliant
     ) throws WSSecurityException {
         String confirmMethod = null;
         List<String> methods = getConfirmationMethods();
@@ -595,12 +609,14 @@ public class AssertionWrapper {
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
             if (saml1 != null) {
                 subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(saml1, data, docInfo, 
-                                                      data.getWssConfig().isWsiBSPCompliant());
+                    SAMLUtil.getCredentialFromSubject(
+                        saml1, keyInfoProcessor, sigCrypto, callbackHandler, isBSPCompliant
+                    );
             } else if (saml2 != null) {
                 subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(saml2, data, docInfo, 
-                                                      data.getWssConfig().isWsiBSPCompliant());
+                    SAMLUtil.getCredentialFromSubject(
+                        saml2, keyInfoProcessor, sigCrypto, callbackHandler, isBSPCompliant
+                    );
             }
         }
     }

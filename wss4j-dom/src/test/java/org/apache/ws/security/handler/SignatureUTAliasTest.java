@@ -34,6 +34,7 @@ import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
 
@@ -89,7 +90,7 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -113,7 +114,7 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

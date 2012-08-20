@@ -17,29 +17,12 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml;
+package org.apache.ws.security.common.saml;
 
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.common.crypto.CryptoType;
-import org.apache.ws.security.common.ext.WSPasswordCallback;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.processor.EncryptedKeyProcessor;
-import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.str.STRParser;
-import org.apache.ws.security.str.SignatureSTRParser;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
-
-import org.opensaml.saml2.core.SubjectConfirmationData;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -49,112 +32,51 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
-import javax.xml.namespace.QName;
 
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
+import org.opensaml.saml2.core.SubjectConfirmationData;
+import org.w3c.dom.Element;
 
 /**
  * Utility methods for SAML stuff
  */
 public final class SAMLUtil {
     
-    private static final QName BINARY_SECRET = 
-        new QName(WSConstants.WST_NS, "BinarySecret");
-    private static final QName BINARY_SECRET_05_12 = 
-        new QName(WSConstants.WST_NS_05_12, "BinarySecret");
+    private static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     
     private SAMLUtil() {
         // Complete
     }
 
     /**
-     * Get an AssertionWrapper object from parsing a SecurityTokenReference that uses
-     * a KeyIdentifier that points to a SAML Assertion.
-     * 
-     * @param secRef the SecurityTokenReference to the SAML Assertion
-     * @param strElement The SecurityTokenReference DOM element
-     * @param request The RequestData instance used to obtain configuration
-     * @param wsDocInfo The WSDocInfo object that holds previous results
-     * @return an AssertionWrapper object
-     * @throws WSSecurityException
-     */
-    public static AssertionWrapper getAssertionFromKeyIdentifier(
-        SecurityTokenReference secRef,
-        Element strElement,
-        RequestData request,
-        WSDocInfo wsDocInfo
-    ) throws WSSecurityException {
-        String keyIdentifierValue = secRef.getKeyIdentifierValue();
-        String type = secRef.getKeyIdentifierValueType();
-        WSSecurityEngineResult result = wsDocInfo.getResult(keyIdentifierValue);
-
-        AssertionWrapper assertion = null;
-        Element token = null;
-        if (result != null) {
-            assertion = 
-                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            return assertion;
-        } else {
-            token = 
-                secRef.findProcessedTokenElement(
-                    strElement.getOwnerDocument(), wsDocInfo,
-                    request.getCallbackHandler(),
-                    keyIdentifierValue, type
-                );
-            if (token != null) {
-                if (!"Assertion".equals(token.getLocalName())) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
-                    );
-                }
-                return new AssertionWrapper(token);
-            }
-            token = 
-                secRef.findUnprocessedTokenElement(
-                    strElement.getOwnerDocument(), wsDocInfo,
-                    request.getCallbackHandler(), keyIdentifierValue, type
-                );
-            
-            if (token == null || !"Assertion".equals(token.getLocalName())) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
-                );
-            }
-            Processor proc = request.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
-            List<WSSecurityEngineResult> samlResult =
-                proc.handleToken(token, request, wsDocInfo);
-            return 
-                (AssertionWrapper)samlResult.get(0).get(
-                    WSSecurityEngineResult.TAG_SAML_ASSERTION
-                );
-        }
-    }
-    
-    /**
      * Parse a SAML Assertion to obtain a SAMLKeyInfo object from
      * the Subject of the assertion
      * 
      * @param assertion The SAML Assertion
-     * @param data The RequestData instance used to obtain configuration
-     * @param docInfo A WSDocInfo instance
+     * @param keyInfoProcessor A pluggable way to parse the KeyInfo
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return a SAMLKeyInfo object
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         AssertionWrapper assertion, 
-        RequestData data,
-        WSDocInfo docInfo,
+        SAMLKeyInfoProcessor keyInfoProcessor,
+        Crypto sigCrypto,
+        CallbackHandler callbackHandler,
         boolean bspCompliant
     ) throws WSSecurityException {
         if (assertion.getSaml1() != null) {
-            return getCredentialFromSubject(assertion.getSaml1(), data, docInfo, bspCompliant);
+            return getCredentialFromSubject(
+                assertion.getSaml1(), keyInfoProcessor, sigCrypto, callbackHandler, bspCompliant
+            );
         } else {
-            return getCredentialFromSubject(assertion.getSaml2(), data, docInfo, bspCompliant);
+            return getCredentialFromSubject(
+                assertion.getSaml2(), keyInfoProcessor, sigCrypto, callbackHandler, bspCompliant
+            );
         }
     }
     
@@ -186,20 +108,22 @@ public final class SAMLUtil {
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a 
      * SAML 1.1 assertion
      * @param assertion The SAML 1.1 assertion
-     * @param data The RequestData instance used to obtain configuration
-     * @param docInfo A WSDocInfo instance
+     * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param sigCrypto A Crypto instance
+     * @param callbackHandler A CallbackHandler instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml1.core.Assertion assertion,
-        RequestData data,
-        WSDocInfo docInfo,
+        SAMLKeyInfoProcessor keyInfoProcessor,
+        Crypto sigCrypto,
+        CallbackHandler callbackHandler,
         boolean bspCompliant
     ) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
-        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), data.getCallbackHandler());
+        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), callbackHandler);
         if (key != null && key.length > 0) {
             return new SAMLKeyInfo(key);
         }
@@ -229,9 +153,11 @@ public final class SAMLUtil {
 
             Element sub = samlSubject.getSubjectConfirmation().getDOM();
             Element keyInfoElement = 
-                WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
+                XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
             if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant);
+                return getCredentialFromKeyInfo(
+                    keyInfoElement, keyInfoProcessor, sigCrypto, bspCompliant
+                );
             }
         }
 
@@ -242,20 +168,22 @@ public final class SAMLUtil {
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a 
      * SAML 2 assertion
      * @param assertion The SAML 2 assertion
-     * @param data The RequestData instance used to obtain configuration
-     * @param docInfo A WSDocInfo instance
+     * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param sigCrypto A Crypto instance
+     * @param callbackHandler A CallbackHandler instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The SAMLKeyInfo object obtained from the Subject
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
         org.opensaml.saml2.core.Assertion assertion,
-        RequestData data,
-        WSDocInfo docInfo,
+        SAMLKeyInfoProcessor keyInfoProcessor,
+        Crypto sigCrypto,
+        CallbackHandler callbackHandler,
         boolean bspCompliant
     ) throws WSSecurityException {
         // First try to get the credential from a CallbackHandler
-        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), data.getCallbackHandler());
+        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), callbackHandler);
         if (key != null && key.length > 0) {
             return new SAMLKeyInfo(key);
         }
@@ -274,9 +202,11 @@ public final class SAMLUtil {
                 subjectConfirmation.getSubjectConfirmationData();
             Element sub = subjConfData.getDOM();
             Element keyInfoElement = 
-                WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
+                XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
             if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant);
+                return getCredentialFromKeyInfo(
+                    keyInfoElement, keyInfoProcessor, sigCrypto, bspCompliant
+                );
             }
         }
 
@@ -287,49 +217,24 @@ public final class SAMLUtil {
      * This method returns a SAMLKeyInfo corresponding to the credential found in the
      * KeyInfo (DOM Element) argument.
      * @param keyInfoElement The KeyInfo as a DOM Element
-     * @param data The RequestData instance used to obtain configuration
-     * @param docInfo A WSDocInfo instance
+     * @param keyInfoProcessor A pluggable way to parse the KeyInfo
+     * @param sigCrypto A Crypto instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
      * @return The credential (as a SAMLKeyInfo object)
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromKeyInfo(
         Element keyInfoElement,
-        RequestData data,
-        WSDocInfo docInfo,
+        SAMLKeyInfoProcessor keyInfoProcessor,
+        Crypto sigCrypto,
         boolean bspCompliant
     ) throws WSSecurityException {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
         //
-        Node node = keyInfoElement.getFirstChild();
-        while (node != null) {
-            if (Node.ELEMENT_NODE == node.getNodeType()) {
-                QName el = new QName(node.getNamespaceURI(), node.getLocalName());
-                if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
-                    EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                    List<WSSecurityEngineResult> result =
-                        proc.handleToken((Element)node, data, docInfo);
-                    byte[] secret = 
-                        (byte[])result.get(0).get(
-                            WSSecurityEngineResult.TAG_SECRET
-                        );
-                    return new SAMLKeyInfo(secret);
-                } else if (el.equals(BINARY_SECRET) || el.equals(BINARY_SECRET_05_12)) {
-                    Text txt = (Text)node.getFirstChild();
-                    return new SAMLKeyInfo(Base64.decode(txt.getData()));
-                } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
-                    STRParser strParser = new SignatureSTRParser();
-                    strParser.parseSecurityTokenReference(
-                        (Element)node, data, docInfo, new HashMap<String, Object>()
-                    );
-                    SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
-                    samlKeyInfo.setPublicKey(strParser.getPublicKey());
-                    samlKeyInfo.setSecret(strParser.getSecretKey());
-                    return samlKeyInfo;
-                }
-            }
-            node = node.getNextSibling();
+        SAMLKeyInfo samlKeyInfo = keyInfoProcessor.processSAMLKeyInfo(keyInfoElement);
+        if (samlKeyInfo != null) {
+            return samlKeyInfo;
         }
         
         //
@@ -364,7 +269,7 @@ public final class SAMLUtil {
                             certs[0] = (X509Certificate)x509obj;
                             return new SAMLKeyInfo(certs);
                         } else if (x509obj instanceof X509IssuerSerial) {
-                            if (data.getSigCrypto() == null) {
+                            if (sigCrypto == null) {
                                 throw new WSSecurityException(
                                     WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile"
                                 );
@@ -374,7 +279,7 @@ public final class SAMLUtil {
                                 ((X509IssuerSerial)x509obj).getIssuerName(), 
                                 ((X509IssuerSerial)x509obj).getSerialNumber()
                             );
-                            certs = data.getSigCrypto().getX509Certificates(cryptoType);
+                            certs = sigCrypto.getX509Certificates(cryptoType);
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
                                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",

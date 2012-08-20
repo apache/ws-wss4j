@@ -19,21 +19,21 @@
 
 package org.apache.ws.security.message;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
-import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * This is a test for Certificate Revocation List checking. A message is signed and sent to the
@@ -92,7 +92,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         //
@@ -124,7 +124,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         //
@@ -163,7 +163,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         //
@@ -189,7 +189,7 @@ public class SignatureCRLTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> 
-    verify(Document doc, Crypto crypto, boolean revocationEnabled) throws WSSecurityException {
+    verify(Document doc, Crypto crypto, boolean revocationEnabled) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData reqData = new RequestData();
         reqData.setSigCrypto(crypto);
@@ -200,7 +200,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

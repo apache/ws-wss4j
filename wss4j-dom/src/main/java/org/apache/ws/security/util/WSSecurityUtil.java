@@ -28,6 +28,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
@@ -554,22 +555,6 @@ public final class WSSecurityUtil {
         return null;
     }
 
-    public static String getNamespace(String prefix, Node e) {
-        while (e != null && (e.getNodeType() == Node.ELEMENT_NODE)) {
-            Attr attr = null;
-            if (prefix == null) {
-                attr = ((Element) e).getAttributeNode("xmlns");
-            } else {
-                attr = ((Element) e).getAttributeNodeNS(WSConstants.XMLNS_NS, prefix);
-            }
-            if (attr != null) {
-                return attr.getValue();
-            }
-            e = e.getParentNode();
-        }
-        return null;
-    }
-
     /**
      * Return a QName when passed a string like "foo:bar" by mapping the "foo"
      * prefix to a namespace in the context of the given Node.
@@ -598,14 +583,14 @@ public final class WSSecurityUtil {
         int idx = str.indexOf(':');
         if (idx > -1) {
             String prefix = str.substring(0, idx);
-            String ns = getNamespace(prefix, e);
+            String ns = XMLUtils.getNamespace(prefix, e);
             if (ns == null) {
                 return null;
             }
             return new QName(ns, str.substring(idx + 1));
         } else {
             if (defaultNS) {
-                String ns = getNamespace(null, e);
+                String ns = XMLUtils.getNamespace(null, e);
                 if (ns != null) {
                     return new QName(ns, str);
                 }
@@ -624,7 +609,7 @@ public final class WSSecurityUtil {
         if (prefix == null) {
             int i = 1;
             prefix = "ns" + i;
-            while (getNamespace(prefix, e) != null) {
+            while (XMLUtils.getNamespace(prefix, e) != null) {
                 i++;
                 prefix = "ns" + i;
             }

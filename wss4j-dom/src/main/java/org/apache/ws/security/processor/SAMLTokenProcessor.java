@@ -24,9 +24,10 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 
@@ -106,10 +107,16 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            assertion.verifySignature(data, docInfo);
+            assertion.verifySignature(
+                new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigCrypto(),
+                data.getWssConfig().isWsiBSPCompliant()
+            );
         }
         // Parse the HOK subject if it exists
-        assertion.parseHOKSubject(data, docInfo);
+        assertion.parseHOKSubject( 
+            new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigCrypto(), 
+            data.getCallbackHandler(), data.getWssConfig().isWsiBSPCompliant()
+        );
             
         // Now delegate the rest of the verification to the Validator
         Credential credential = new Credential();

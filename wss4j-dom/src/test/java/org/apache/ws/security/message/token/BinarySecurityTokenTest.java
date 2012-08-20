@@ -28,6 +28,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -68,7 +69,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -111,7 +112,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("PKIPath output");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         
@@ -147,7 +148,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom Token output");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         

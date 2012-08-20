@@ -29,6 +29,7 @@ import org.apache.ws.security.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -82,7 +83,7 @@ public class UTSignatureTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -126,7 +127,7 @@ public class UTSignatureTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -169,7 +170,7 @@ public class UTSignatureTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);
@@ -216,7 +217,7 @@ public class UTSignatureTest extends org.junit.Assert {
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("wsse:Username") != -1);
         assertTrue(outputString.indexOf("wsse:Password") == -1);
         assertTrue(outputString.indexOf("wsse11:Salt") != -1);

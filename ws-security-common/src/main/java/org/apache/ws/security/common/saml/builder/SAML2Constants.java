@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext.builder;
+package org.apache.ws.security.common.saml.builder;
 
 
 /**

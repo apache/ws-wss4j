@@ -38,6 +38,7 @@ import org.apache.ws.security.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.Base64;
@@ -102,7 +103,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message SHA1:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -140,7 +141,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message DR:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -188,7 +189,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         
@@ -225,7 +226,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         );
         
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -255,7 +256,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

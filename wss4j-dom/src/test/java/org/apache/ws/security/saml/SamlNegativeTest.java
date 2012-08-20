@@ -33,15 +33,16 @@ import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
+import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.common.util.Loader;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -126,7 +127,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -179,7 +180,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed (modified) SAML message (key holder):");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -225,7 +226,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed (modified) SAML message (key holder):");
             String outputString = 
-                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         
@@ -261,7 +262,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document signedDoc = wsSign.build(doc, assertion, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -301,7 +302,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document signedDoc = wsSign.build(doc, assertion, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (unsigned key holder):");
             LOG.debug(outputString);
@@ -348,7 +349,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Untrusted signed SAML 2 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -374,7 +375,7 @@ public class SamlNegativeTest extends org.junit.Assert {
                 doc, null, callbackHandler, sigCrypto, userCrypto
             );
         String outputString = 
-            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

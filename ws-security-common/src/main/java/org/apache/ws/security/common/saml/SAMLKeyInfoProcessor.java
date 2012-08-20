@@ -17,26 +17,15 @@
  * under the License.
  */
 
-package org.apache.ws.security.action;
+package org.apache.ws.security.common.saml;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.message.WSSecSAMLToken;
-import org.apache.ws.security.saml.SAMLIssuer;
-import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
-
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
-            throws WSSecurityException {
-        WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getWssConfig());
-
-        SAMLIssuer saml = loadSamlIssuer(handler, reqData);
-        AssertionWrapper assertion = saml.newAssertion();
-
-        // add the SAMLAssertion Token to the SOAP Envelope
-        builder.build(doc, assertion, reqData.getSecHeader());
-    }
+/**
+ * This interface allows the user to plug in custom ways of processing a SAML KeyInfo.
+ */
+public interface SAMLKeyInfoProcessor {
+    
+    SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException;
 }

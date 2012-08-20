@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package org.apache.ws.security.saml.ext.bean;
+package org.apache.ws.security.common.saml.bean;
 
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
 
 /**
  * Class SubjectBean represents a SAML subject (can be used to create
