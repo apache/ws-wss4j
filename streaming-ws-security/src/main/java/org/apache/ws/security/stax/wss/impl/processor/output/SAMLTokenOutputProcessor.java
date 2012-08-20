@@ -26,6 +26,7 @@ import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.bean.KeyInfoBean;
 import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.common.saml.bean.SubjectLocalityBean;
@@ -65,7 +66,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
-            WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), samlCallback);
+            SAMLUtil.doSAMLCallback(getSecurityProperties().getCallbackHandler(), samlCallback, null);
             AssertionWrapper samlAssertionWrapper = new AssertionWrapper(samlCallback);
 
             // todo support setting signature and c14n algorithms

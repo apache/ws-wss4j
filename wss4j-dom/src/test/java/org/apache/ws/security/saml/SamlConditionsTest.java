@@ -31,7 +31,8 @@ import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.bean.ConditionsBean;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecHeader;
@@ -71,9 +72,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.plusMinutes(20));
         callbackHandler.setConditions(conditions);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -116,9 +117,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.minusMinutes(3));
         callbackHandler.setConditions(conditions);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -159,10 +160,10 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.plusMinutes(5));
         callbackHandler.setConditions(conditions);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
-
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -202,9 +203,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.plusMinutes(5));
         callbackHandler.setConditions(conditions);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 

@@ -36,7 +36,8 @@ import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
@@ -290,9 +291,9 @@ public class ValidatorTest extends org.junit.Assert {
                 callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
                 callbackHandler.setIssuer("www.example.com");
                 
-                SAMLParms samlParms = new SAMLParms();
-                samlParms.setCallbackHandler(callbackHandler);
-                AssertionWrapper assertion = new AssertionWrapper(samlParms);
+                SAMLCallback samlCallback = new SAMLCallback();
+                SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+                AssertionWrapper assertion = new AssertionWrapper(samlCallback);
     
                 credential.setTransformedToken(assertion);
                 return credential;

@@ -33,7 +33,8 @@ import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
@@ -93,9 +94,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -154,9 +156,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         byte[] ephemeralKey = callbackHandler.getEphemeralKey();
 
@@ -217,9 +220,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -277,9 +281,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         byte[] ephemeralKey = callbackHandler.getEphemeralKey();
 
@@ -344,9 +349,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setCertIdentifier(CERT_IDENTIFIER.X509_ISSUER_SERIAL);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -404,9 +410,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setCertIdentifier(CERT_IDENTIFIER.KEY_VALUE);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -464,9 +471,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setCertIdentifier(CERT_IDENTIFIER.KEY_VALUE);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -529,9 +537,10 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         callbackHandler.setCerts(certs);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();

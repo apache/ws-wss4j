@@ -27,7 +27,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.w3c.dom.Element;
 
@@ -68,11 +68,12 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
      * @throws Exception 
      */
     private Element getSAMLAssertion() throws Exception {
-        SAMLParms parms = new SAMLParms();
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setIssuer(issuer);
-        parms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertionWrapper = new AssertionWrapper(parms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        
+        AssertionWrapper assertionWrapper = new AssertionWrapper(samlCallback);
         
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         return assertionWrapper.toDOM(factory.newDocumentBuilder().newDocument());

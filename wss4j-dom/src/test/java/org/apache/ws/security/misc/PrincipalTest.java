@@ -34,7 +34,8 @@ import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
@@ -129,9 +130,9 @@ public class PrincipalTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -170,9 +171,9 @@ public class PrincipalTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -212,10 +213,10 @@ public class PrincipalTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
-
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -326,9 +327,9 @@ public class PrincipalTest extends org.junit.Assert {
                 callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
                 callbackHandler.setIssuer("www.example.com");
                 
-                SAMLParms samlParms = new SAMLParms();
-                samlParms.setCallbackHandler(callbackHandler);
-                AssertionWrapper assertion = new AssertionWrapper(samlParms);
+                SAMLCallback samlCallback = new SAMLCallback();
+                SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+                AssertionWrapper assertion = new AssertionWrapper(samlCallback);
     
                 credential.setTransformedToken(assertion);
                 return credential;

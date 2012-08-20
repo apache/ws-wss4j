@@ -23,7 +23,8 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.util.Loader;
 
 import java.util.Properties;
@@ -136,12 +137,11 @@ public class SAMLIssuerImpl implements SAMLIssuer {
             }
         }
             
-        // Create a new SAMLParms with all of the information from the properties file.
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setIssuer(issuer);
-        samlParms.setCallbackHandler(callbackHandler);
+        // Create a new SAMLCallback with all of the information from the properties file.
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, issuer);
 
-        AssertionWrapper sa = new AssertionWrapper(samlParms);
+        AssertionWrapper sa = new AssertionWrapper(samlCallback);
         if (signAssertion) {
             sa.signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto, sendKeyValue);
         }

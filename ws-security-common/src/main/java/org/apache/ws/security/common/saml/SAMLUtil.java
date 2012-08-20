@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.common.saml;
 
+import java.io.IOException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
@@ -298,6 +300,28 @@ public final class SAMLUtil {
             );
         }
         return null;
+    }
+    
+    public static void doSAMLCallback(
+        CallbackHandler callbackHandler, SAMLCallback callback, String issuer
+    ) {
+        // Create a new SAMLCallback with all of the information from the properties file.
+        try {
+            // Get the SAML source data using the currently configured callback implementation.
+            callbackHandler.handle(new SAMLCallback[]{callback});
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                "IOException while creating SAML assertion wrapper", e
+            );
+        } catch (UnsupportedCallbackException e) {
+            throw new IllegalStateException(
+                "UnsupportedCallbackException while creating SAML assertion wrapper", e
+            );
+        }
+        
+        if (callback.getIssuer() == null) {
+            callback.setIssuer(issuer);
+        }
     }
 
 }

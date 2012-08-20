@@ -30,7 +30,8 @@ import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.common.util.XMLUtils;
@@ -68,9 +69,10 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -141,11 +143,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
-
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -187,9 +189,10 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -226,9 +229,10 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
 

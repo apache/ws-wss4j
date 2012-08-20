@@ -19,18 +19,23 @@
 
 package org.apache.ws.security.common.saml;
 
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.ws.security.common.saml.builder.SAML2ComponentBuilder;
 import org.apache.ws.security.common.util.DOM2Writer;
-
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml1.core.AttributeStatement;
@@ -45,6 +50,7 @@ import org.opensaml.saml2.core.AuthzDecisionStatement;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.security.x509.BasicX509Credential;
 import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
 import org.opensaml.xml.signature.KeyInfo;
@@ -52,18 +58,8 @@ import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class AssertionWrapper can generate, sign, and validate both SAML v1.1
@@ -98,14 +94,6 @@ public class AssertionWrapper {
      */
     private SAMLVersion samlVersion;
 
-    /**
-     * Fully qualified class name of the SAML callback handler implementation to use.
-     * NOTE: Each application should provide a unique implementation of this 
-     * <code>CallbackHandler</code> that is able to extract any dynamic data from the
-     * local environment that should be included in the generated SAML statements.
-     */
-    private CallbackHandler samlCallbackHandler = null;
-    
     /**
      * The Assertion as a DOM element
      */
@@ -198,48 +186,14 @@ public class AssertionWrapper {
         }
         fromDOM = false;
     }
-
+    
     /**
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
      * This constructor is primarily called on the client side to initialize
      * the wrapper from a configuration file. <br>
      *
-     * @param parms of type SAMLParms
+     * @param samlCallback of type SAMLCallback
      */
-    public AssertionWrapper(SAMLParms parms) throws WSSecurityException {
-        OpenSAMLUtil.initSamlEngine();
-        
-        //
-        // Create the SAML callback that the handler will use to get the required data from the 
-        // client application.
-        //
-        SAMLCallback[] samlCallbacks = new SAMLCallback[] { new SAMLCallback() };
-
-        try {
-            // Get the SAML source data using the currently configured callback implementation.
-            samlCallbackHandler = parms.getCallbackHandler();
-            samlCallbackHandler.handle(samlCallbacks);
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                "IOException while creating SAML assertion wrapper", e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new IllegalStateException(
-                "UnsupportedCallbackException while creating SAML assertion wrapper", e
-            );
-        }
-        
-        // See if we already have a DOM element in SAMLCallback
-        if (samlCallbacks[0].getAssertionElement() != null) {
-            parseElement(samlCallbacks[0].getAssertionElement());
-            fromDOM = true;
-        } else {
-            // If not then parse the SAMLCallback object
-            parseCallback(samlCallbacks[0], parms);
-            fromDOM = false;
-        }
-    }
-    
     public AssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
 
@@ -248,7 +202,7 @@ public class AssertionWrapper {
             fromDOM = true;
         } else {
             // If not then parse the SAMLCallback object
-            parseCallback(samlCallback, new SAMLParms());
+            parseCallback(samlCallback);
             fromDOM = false;
         }
     }
@@ -731,16 +685,14 @@ public class AssertionWrapper {
      * Parse a SAMLCallback object to create a SAML Assertion
      */
     private void parseCallback(
-        SAMLCallback samlCallback, SAMLParms parms
+        SAMLCallback samlCallback
     ) throws WSSecurityException {
         samlVersion = samlCallback.getSamlVersion();
         if (samlVersion == null) {
-            samlVersion = parms.getSAMLVersion();
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSAMLVersion");
         }
         String issuer = samlCallback.getIssuer();
-        if (issuer == null && parms.getIssuer() != null) {
-            issuer = parms.getIssuer();
-        }
+        
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
             saml1 = SAML1ComponentBuilder.createSamlv1Assertion(issuer);

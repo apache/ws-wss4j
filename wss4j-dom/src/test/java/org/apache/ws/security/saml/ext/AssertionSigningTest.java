@@ -27,7 +27,8 @@ import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLParms;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.common.util.Loader;
 import org.junit.Assert;
@@ -77,9 +78,11 @@ public class AssertionSigningTest extends org.junit.Assert {
         callbackHandler
                 .setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false);
         Signature signature = assertion.getSaml2().getSignature();
@@ -102,9 +105,11 @@ public class AssertionSigningTest extends org.junit.Assert {
         callbackHandler
                 .setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        
         assertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false, customCanonicalizationAlgorithm,
                 customSignatureAlgorithm);
