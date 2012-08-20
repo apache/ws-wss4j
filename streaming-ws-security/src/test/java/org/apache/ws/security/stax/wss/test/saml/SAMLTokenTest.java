@@ -105,7 +105,6 @@ public class SAMLTokenTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -177,7 +176,6 @@ public class SAMLTokenTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -251,7 +249,6 @@ public class SAMLTokenTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -324,7 +321,6 @@ public class SAMLTokenTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -397,7 +393,6 @@ public class SAMLTokenTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -472,7 +467,6 @@ public class SAMLTokenTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 

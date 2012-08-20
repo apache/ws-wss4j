@@ -19,12 +19,16 @@
 
 package org.apache.ws.security.action;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.WSSecSAMLToken;
-import org.apache.ws.security.saml.SAMLIssuer;
 import org.w3c.dom.Document;
 
 public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
@@ -33,8 +37,22 @@ public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
             throws WSSecurityException {
         WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getWssConfig());
 
-        SAMLIssuer saml = loadSamlIssuer(handler, reqData);
-        AssertionWrapper assertion = saml.newAssertion();
+        CallbackHandler samlCallbackHandler = 
+                handler.getCallbackHandler(
+                    WSHandlerConstants.SAML_CALLBACK_CLASS,
+                    WSHandlerConstants.SAML_CALLBACK_REF, 
+                    reqData
+                );
+        if (samlCallbackHandler == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, 
+                "noSAMLCallbackHandler"
+            );
+        }
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
+
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         // add the SAMLAssertion Token to the SOAP Envelope
         builder.build(doc, assertion, reqData.getSecHeader());

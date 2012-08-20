@@ -323,13 +323,6 @@ public final class WSHandlerConstants {
      */
     public static final String ENC_PROP_REF_ID = "encryptionPropRefId";
     
-    /**
-     * The name of the SAML Issuer factory property file.
-     * The classloader loads this file. Therefore it must be accessible
-     * via the classpath.
-     */
-    public static final String SAML_PROP_FILE = "samlPropFile";
-    
     //
     // Boolean configuration tags, e.g. the value should be "true" or "false".
     //

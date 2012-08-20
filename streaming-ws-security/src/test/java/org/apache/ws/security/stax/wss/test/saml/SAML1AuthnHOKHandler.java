@@ -46,12 +46,18 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
     private String subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
     private String subjectQualifier = "www.example.com";
     private X509Certificate[] certs;
+    private String issuerKeyName;
+    private String issuerKeyPassword;
+    private Crypto issuerCrypto;
 
     public SAML1AuthnHOKHandler() throws WSSecurityException {
         Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("transmitter");
         certs = crypto.getX509Certificates(cryptoType);
+        issuerKeyName = "samlissuer";
+        issuerKeyPassword = "default";
+        issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
     }
 
     public void handle(Callback[] callbacks)
@@ -60,6 +66,11 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(SAMLVersion.VERSION_11);
+                callback.setIssuer("www.example.com");
+                callback.setIssuerKeyName(issuerKeyName);
+                callback.setIssuerKeyPassword(issuerKeyPassword);
+                callback.setIssuerCrypto(issuerCrypto);
+                
                 SubjectBean subjectBean =
                         new SubjectBean(
                                 subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY

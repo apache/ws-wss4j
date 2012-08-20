@@ -71,7 +71,7 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setIssuer(issuer);
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         
         AssertionWrapper assertionWrapper = new AssertionWrapper(samlCallback);
         

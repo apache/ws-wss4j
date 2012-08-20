@@ -33,11 +33,11 @@ import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.util.Loader;
 import org.apache.ws.security.common.util.XMLUtils;
-import org.apache.ws.security.saml.SAMLIssuer;
-import org.apache.ws.security.saml.SAMLIssuerImpl;
 import org.apache.ws.security.saml.SignedSamlTokenHOKTest;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -181,15 +181,15 @@ public class SignaturePartsTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-        SAMLIssuer saml = new SAMLIssuerImpl();
-        saml.setIssuerName("www.example.com");
-        saml.setIssuerCrypto(issuerCrypto);
-        saml.setIssuerKeyName("wss40_server");
-        saml.setIssuerKeyPassword("security");
-        saml.setSignAssertion(true);
-        saml.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = saml.newAssertion();
-
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        
+        samlCallback.setIssuer("www.example.com");
+        
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         wsSign.setUserInfo("wss40", "security");

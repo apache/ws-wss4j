@@ -82,7 +82,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -111,39 +111,6 @@ public class SamlTokenTest extends org.junit.Assert {
     }
     
     /**
-     * Test that creates, sends and processes an unsigned SAML 1 authentication assertion, where
-     * the configuration is loaded from a properties file
-     */
-    @org.junit.Test
-    public void testSAML1AuthnAssertionFromProperties() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
-    }
-    
-    /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion.
      * It set a DOM Element on the CallbackHandler rather than creating a set of beans for
      * AssertionWrapper to parse.
@@ -154,7 +121,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -192,7 +159,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -230,7 +197,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setResource("http://resource.org");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -267,7 +234,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -304,7 +271,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -341,7 +308,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setResource("http://resource.org");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -379,7 +346,7 @@ public class SamlTokenTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
-        config.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
+        config.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
@@ -422,7 +389,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example2.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -460,7 +427,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example2.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -498,7 +465,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -538,7 +505,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -578,7 +545,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -619,7 +586,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -660,7 +627,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setResource("http://resource.org");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -716,7 +683,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
 
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -761,7 +728,7 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken();

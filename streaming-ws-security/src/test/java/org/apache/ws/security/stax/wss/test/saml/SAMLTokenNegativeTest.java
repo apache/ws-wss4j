@@ -62,7 +62,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-signed.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -110,7 +109,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-signed.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -163,7 +161,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-unsigned.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             //properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
@@ -206,7 +203,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-signed.properties");
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
             properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);

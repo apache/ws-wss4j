@@ -80,7 +80,7 @@ public class AssertionSigningTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         assertion.signAssertion("client_certchain", "password", issuerCrypto,
@@ -107,7 +107,7 @@ public class AssertionSigningTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         assertion.signAssertion("client_certchain", "password", issuerCrypto,

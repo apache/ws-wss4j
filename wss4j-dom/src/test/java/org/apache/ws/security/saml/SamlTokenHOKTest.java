@@ -70,7 +70,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
@@ -101,39 +101,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     }
     
     /**
-     * Test that creates, sends and processes a signed SAML 1 authentication assertion, where
-     * the configuration is loaded from a properties file
-     */
-    @org.junit.Test
-    public void testSAML1AuthnAssertionFromProperties() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_hok.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 1.1 Authn Assertion (holder-of-key):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        
-        List<WSSecurityEngineResult> results = verify(signedDoc);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
-    }
-    
-    /**
      * Test that creates, sends and processes a signed SAML 1.1 attribute assertion.
      */
     @org.junit.Test
@@ -144,7 +111,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
@@ -190,7 +157,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
@@ -230,7 +197,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);

@@ -20,6 +20,7 @@
 package org.apache.ws.security.stax.wss.test.saml;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.bean.ActionBean;
 import org.apache.ws.security.common.saml.bean.AttributeBean;
@@ -68,6 +69,14 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String resource = null;
     protected List<?> customAttributeValues = null;
     protected ConditionsBean conditions = null;
+    protected String issuerKeyName;
+    protected String issuerKeyPassword;
+    protected Crypto issuerCrypto;
+    protected boolean signAssertion = true;
+    
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
+    }
 
     public void setConditions(ConditionsBean conditionsBean) {
         this.conditions = conditionsBean;

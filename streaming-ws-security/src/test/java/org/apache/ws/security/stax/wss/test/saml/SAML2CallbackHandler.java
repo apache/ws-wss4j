@@ -44,11 +44,15 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias("transmitter");
             certs = crypto.getX509Certificates(cryptoType);
+            issuerKeyName = "samlissuer";
+            issuerKeyPassword = "default";
+            issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
         }
 
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
+        issuer = "www.example.com";
     }
 
     public void handle(Callback[] callbacks)
@@ -58,6 +62,10 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(SAMLVersion.VERSION_20);
                 callback.setIssuer(issuer);
+                callback.setIssuerKeyName(issuerKeyName);
+                callback.setIssuerKeyPassword(issuerKeyPassword);
+                callback.setIssuerCrypto(issuerCrypto);
+                callback.setSignAssertion(signAssertion);
                 if (conditions != null) {
                     callback.setConditions(conditions);
                 }

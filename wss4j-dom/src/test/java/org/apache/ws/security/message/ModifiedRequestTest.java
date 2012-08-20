@@ -227,7 +227,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();

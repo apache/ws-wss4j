@@ -303,7 +303,7 @@ public final class SAMLUtil {
     }
     
     public static void doSAMLCallback(
-        CallbackHandler callbackHandler, SAMLCallback callback, String issuer
+        CallbackHandler callbackHandler, SAMLCallback callback
     ) {
         // Create a new SAMLCallback with all of the information from the properties file.
         try {
@@ -317,10 +317,6 @@ public final class SAMLUtil {
             throw new IllegalStateException(
                 "UnsupportedCallbackException while creating SAML assertion wrapper", e
             );
-        }
-        
-        if (callback.getIssuer() == null) {
-            callback.setIssuer(issuer);
         }
     }
 

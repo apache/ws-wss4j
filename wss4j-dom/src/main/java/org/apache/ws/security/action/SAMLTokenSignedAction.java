@@ -25,11 +25,11 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.saml.SAMLIssuer;
-import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 
 import org.w3c.dom.Document;
@@ -56,13 +56,30 @@ public class SAMLTokenSignedAction implements Action {
             }
         }
 
-        SAMLIssuer saml = loadSamlIssuer(handler, reqData);
-
-        AssertionWrapper assertion = saml.newAssertion();
-        if (assertion == null) {
-            throw new WSSecurityException("WSHandler: Signed SAML: no SAML token received");
+        CallbackHandler samlCallbackHandler = 
+                handler.getCallbackHandler(
+                    WSHandlerConstants.SAML_CALLBACK_CLASS,
+                    WSHandlerConstants.SAML_CALLBACK_REF, 
+                    reqData
+                );
+        if (samlCallbackHandler == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, 
+                "noSAMLCallbackHandler"
+            );
         }
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
 
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        if (samlCallback.isSignAssertion()) {
+            assertion.signAssertion(
+                samlCallback.getIssuerKeyName(),
+                samlCallback.getIssuerKeyPassword(), 
+                samlCallback.getIssuerCrypto(),
+                samlCallback.isSendKeyValue()
+            );
+        }
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getWssConfig());
 
         CallbackHandler callbackHandler = 
@@ -96,33 +113,14 @@ public class SAMLTokenSignedAction implements Action {
                     doc,
                     crypto,
                     assertion,
-                    saml.getIssuerCrypto(),
-                    saml.getIssuerKeyName(),
-                    saml.getIssuerKeyPassword(),
+                    samlCallback.getIssuerCrypto(),
+                    samlCallback.getIssuerKeyName(),
+                    samlCallback.getIssuerKeyPassword(),
                     reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("Error when signing the SAML token: ", e);
         }
-    }
-
-    protected SAMLIssuer loadSamlIssuer(
-        WSHandler handler, 
-        RequestData reqData
-    ) throws WSSecurityException {
-        String samlPropFile = 
-            handler.getString(WSHandlerConstants.SAML_PROP_FILE, reqData.getMsgContext());
-        SAMLIssuer samlIssuer = SAMLIssuerFactory.getInstance(samlPropFile);
-        CallbackHandler callbackHandler = 
-            handler.getCallbackHandler(
-                WSHandlerConstants.SAML_CALLBACK_CLASS,
-                WSHandlerConstants.SAML_CALLBACK_REF, 
-                reqData
-            );
-        if (callbackHandler != null) {
-            samlIssuer.setCallbackHandler(callbackHandler);
-        }
-        return samlIssuer;
     }
 
 }

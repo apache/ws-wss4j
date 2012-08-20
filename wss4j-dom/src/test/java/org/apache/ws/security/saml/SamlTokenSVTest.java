@@ -75,64 +75,9 @@ public class SamlTokenSVTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document signedDoc = 
-            wsSign.build(
-                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
-                "security", secHeader
-            );
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        
-        // Test we processed a SAML assertion
-        List<WSSecurityEngineResult> results = verify(signedDoc);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        
-        // Test we processed a signature (SAML assertion + SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-        assertTrue(actionResult != null);
-        assertFalse(actionResult.isEmpty());
-        final List<WSDataRef> refs =
-            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertTrue(refs.size() == 2);
-        
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
-        String xpath = wsDataRef.getXpath();
-        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
-        
-        wsDataRef = (WSDataRef)refs.get(1);
-        xpath = wsDataRef.getXpath();
-        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
-    }
-    
-    /**
-     * Test that creates, sends and processes a signed SAML 1 authentication assertion, where
-     * the configuration is loaded from a properties file
-     */
-    @org.junit.Test
-    @SuppressWarnings("unchecked")
-    public void testSAML1AuthnAssertionFromProperties() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
@@ -190,7 +135,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -250,7 +195,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -310,7 +255,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback, null);
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
@@ -359,47 +304,6 @@ public class SamlTokenSVTest extends org.junit.Assert {
     }
     
     /**
-     * Test the default issuer class as specified in SAMLIssuerFactory. The configuration
-     * file "saml3.saml_sv_noissuer.properties" has no "org.apache.ws.security.saml.issuerClass"
-     * property, and so the default value is used (A bad value was previously used for the
-     * default value).
-     */
-    @org.junit.Test
-    public void testDefaultIssuerClass() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv_noissuer.properties");
-        AssertionWrapper assertion = saml.newAssertion();
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document signedDoc = 
-            wsSign.build(
-                 doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
-                 "security", secHeader
-             );
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Signed SAML message (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(signedDoc);
-            LOG.debug(outputString);
-        }
-        
-        List<WSSecurityEngineResult> results = verify(signedDoc);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-    }
-    
-    
-    /**
      * A test for WSS-62: "the crypto file not being retrieved in the doReceiverAction
      * method for the Saml Signed Token"
      * 
@@ -407,8 +311,14 @@ public class SamlTokenSVTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testWSS62() throws Exception {
-        SAMLIssuer saml = SAMLIssuerFactory.getInstance("saml_sv.properties");
-        AssertionWrapper assertion = saml.newAssertion();
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
