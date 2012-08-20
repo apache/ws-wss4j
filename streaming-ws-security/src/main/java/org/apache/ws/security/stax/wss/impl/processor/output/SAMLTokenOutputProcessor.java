@@ -22,13 +22,14 @@ import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.OpenSAMLUtil;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.bean.KeyInfoBean;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
+import org.apache.ws.security.common.saml.bean.SubjectLocalityBean;
 import org.apache.ws.security.stax.wss.ext.*;
-import org.apache.ws.security.stax.wss.impl.saml.OpenSAMLUtil;
-import org.apache.ws.security.stax.wss.impl.saml.SAMLAssertionWrapper;
-import org.apache.ws.security.stax.wss.impl.saml.SAMLCallback;
-import org.apache.ws.security.stax.wss.impl.saml.SAMLKeyInfo;
-import org.apache.ws.security.stax.wss.impl.saml.bean.KeyInfoBean;
-import org.apache.ws.security.stax.wss.impl.saml.bean.SubjectBean;
 import org.apache.ws.security.stax.wss.impl.securityToken.SAMLSecurityToken;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
@@ -65,7 +66,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
             WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), samlCallback);
-            SAMLAssertionWrapper samlAssertionWrapper = new SAMLAssertionWrapper(samlCallback);
+            AssertionWrapper samlAssertionWrapper = new AssertionWrapper(samlCallback);
 
             // todo support setting signature and c14n algorithms
             if (samlCallback.isSignAssertion()) {
@@ -245,18 +246,18 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     class FinalSAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
         private final SecurityToken securityToken;
-        private final SAMLAssertionWrapper samlAssertionWrapper;
+        private final AssertionWrapper assertionWrapper;
         private final String securityTokenReferenceId;
         private final String binarySecurityTokenReferenceId;
         private boolean senderVouches = false;
 
-        FinalSAMLTokenOutputProcessor(SecurityToken securityToken, SAMLAssertionWrapper samlAssertionWrapper,
+        FinalSAMLTokenOutputProcessor(SecurityToken securityToken, AssertionWrapper assertionWrapper,
                                       String securityTokenReferenceId, String binarySecurityTokenReferenceId,
                                       boolean senderVouches) throws XMLSecurityException {
             super();
             this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
             this.addAfterProcessor(SAMLTokenOutputProcessor.class.getName());
-            this.samlAssertionWrapper = samlAssertionWrapper;
+            this.assertionWrapper = assertionWrapper;
             this.securityTokenReferenceId = securityTokenReferenceId;
             this.senderVouches = senderVouches;
             this.binarySecurityTokenReferenceId = binarySecurityTokenReferenceId;
@@ -274,9 +275,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     if (senderVouches && ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType() == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
                         WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, binarySecurityTokenReferenceId, securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
                     }
-                    outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
+                    outputSamlAssertion(assertionWrapper.toDOM(null), subOutputProcessorChain);
                     if (senderVouches) {
-                        outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper, securityTokenReferenceId, samlAssertionWrapper.getId());
+                        outputSecurityTokenReference(subOutputProcessorChain, assertionWrapper, securityTokenReferenceId, assertionWrapper.getId());
                     }
                     outputProcessorChain.removeProcessor(this);
                 }
@@ -284,9 +285,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
     }
 
-    private void outputSecurityTokenReference(OutputProcessorChain outputProcessorChain, SAMLAssertionWrapper samlAssertionWrapper, String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
+    private void outputSecurityTokenReference(OutputProcessorChain outputProcessorChain, AssertionWrapper assertionWrapper, String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
-        if (samlAssertionWrapper.getSAMLVersion() == SAMLVersion.VERSION_11) {
+        if (assertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
         } else {
             attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
@@ -294,7 +295,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
         createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
         attributes = new ArrayList<XMLSecAttribute>(1);
-        if (samlAssertionWrapper.getSAMLVersion() == SAMLVersion.VERSION_11) {
+        if (assertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else {
             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));

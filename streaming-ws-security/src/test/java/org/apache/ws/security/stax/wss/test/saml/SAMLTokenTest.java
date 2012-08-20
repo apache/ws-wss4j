@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.test.saml;
 
+import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
@@ -34,7 +35,6 @@ import org.apache.ws.security.stax.wss.ext.InboundWSSec;
 import org.apache.ws.security.stax.wss.ext.OutboundWSSec;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.wss.impl.saml.builder.SAML1Constants;
 import org.apache.ws.security.stax.wss.test.AbstractTestBase;
 import org.apache.ws.security.stax.wss.test.CallbackHandlerImpl;
 import org.apache.ws.security.stax.wss.test.utils.StAX2DOM;

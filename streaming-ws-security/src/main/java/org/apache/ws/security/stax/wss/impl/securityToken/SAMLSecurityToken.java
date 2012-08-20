@@ -20,9 +20,9 @@ package org.apache.ws.security.stax.wss.impl.securityToken;
 
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
-import org.apache.ws.security.stax.wss.impl.saml.SAMLKeyInfo;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;

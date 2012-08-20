@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.common.saml;
 
+import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.saml.bean.AttributeStatementBean;
 import org.apache.ws.security.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.ws.security.common.saml.bean.AuthenticationStatementBean;
@@ -79,6 +80,16 @@ public class SAMLCallback implements Callback {
      * A DOM Element representation of this SAML Assertion
      */
     private Element assertionElement;
+    
+    private boolean signAssertion = true;
+
+    private String issuerKeyName;
+
+    private String issuerKeyPassword;
+
+    private Crypto issuerCrypto;
+
+    private boolean sendKeyValue;
 
     /**
      * Constructor SAMLCallback creates a new SAMLCallback instance.
@@ -242,4 +253,45 @@ public class SAMLCallback implements Callback {
     public Element getAssertionElement() {
         return assertionElement;
     }
+    
+    public boolean isSignAssertion() {
+        return signAssertion;
+    }
+
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
+    }
+
+    public String getIssuerKeyName() {
+        return issuerKeyName;
+    }
+
+    public void setIssuerKeyName(String issuerKeyName) {
+        this.issuerKeyName = issuerKeyName;
+    }
+
+    public String getIssuerKeyPassword() {
+        return issuerKeyPassword;
+    }
+
+    public void setIssuerKeyPassword(String issuerKeyPassword) {
+        this.issuerKeyPassword = issuerKeyPassword;
+    }
+
+    public Crypto getIssuerCrypto() {
+        return issuerCrypto;
+    }
+
+    public void setIssuerCrypto(Crypto issuerCrypto) {
+        this.issuerCrypto = issuerCrypto;
+    }
+
+    public boolean isSendKeyValue() {
+        return sendKeyValue;
+    }
+
+    public void setSendKeyValue(boolean sendKeyValue) {
+        this.sendKeyValue = sendKeyValue;
+    }
+
 }
