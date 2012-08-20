@@ -21,8 +21,8 @@ package org.apache.ws.security.message;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.common.derivedKey.ConversationConstants;
+import org.apache.ws.security.common.derivedKey.ConversationException;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;

@@ -17,12 +17,9 @@
  * under the License.
  */
 
-package org.apache.ws.security.conversation.dkalgo;
-
-import org.apache.ws.security.conversation.ConversationException;
+package org.apache.ws.security.common.derivedKey;
 
 /**
- *
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public interface DerivationAlgorithm {

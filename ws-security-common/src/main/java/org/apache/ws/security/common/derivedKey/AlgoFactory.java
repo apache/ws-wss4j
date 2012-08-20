@@ -17,15 +17,11 @@
  * under the License.
  */
 
-package org.apache.ws.security.conversation.dkalgo;
-
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationException;
+package org.apache.ws.security.common.derivedKey;
 
 /**
  * @author Ruchith Fernando
  */
-
 public final class AlgoFactory {
     
     private AlgoFactory() {
@@ -35,7 +31,7 @@ public final class AlgoFactory {
     /**
      * This gives a DerivationAlgorithm instance from the default set of algorithms provided
      *
-     * @param algorithm The algo identifier @see DeivationAlgorithm
+     * @param algorithm The algorithm identifier
      * @return A derivation algorithm
      * @throws ConversationException If the specified algorithm is not available
      *                               in default implementations

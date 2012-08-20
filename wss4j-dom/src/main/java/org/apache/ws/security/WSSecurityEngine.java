@@ -21,7 +21,7 @@ package org.apache.ws.security;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.processor.Processor;

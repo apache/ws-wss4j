@@ -24,7 +24,7 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationException;
+import org.apache.ws.security.common.derivedKey.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.transform.STRTransform;

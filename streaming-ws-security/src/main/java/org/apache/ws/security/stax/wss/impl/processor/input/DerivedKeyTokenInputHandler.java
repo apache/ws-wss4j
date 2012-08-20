@@ -23,7 +23,7 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.ext.WSSecurityContext;
-import org.apache.ws.security.stax.wss.impl.derivedKey.DerivedKeyUtils;
+import org.apache.ws.security.common.derivedKey.DerivedKeyUtils;
 import org.apache.ws.security.stax.wss.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.wss.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.ws.security.stax.wss.impl.securityToken.UsernameSecurityToken;

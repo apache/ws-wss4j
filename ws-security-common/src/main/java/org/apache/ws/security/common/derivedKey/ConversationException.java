@@ -17,27 +17,27 @@
  * under the License.
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.security.common.derivedKey;
 
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class ConversationException extends Exception {
-    
-    private static final long serialVersionUID = 970894530660804319L;
-    
-    public static final String BAD_CONTEXT_TOKEN = "BadContextToken";
-    public static final String UNSUPPORTED_CONTEXT_TOKEN = "UnsupportedContextToken";
-    public static final String UNKNOWN_DERIVATION_SOURCE = "UnknownDerivationSource";
-    public static final String RENEW_NEEDED = "RenewNeeded";
-    public static final String UNABLE_TO_REVIEW = "UnableToRenew";
-    
-    private static ResourceBundle resources;
 
-    private String faultCode;
-    private String faultString;
-    
+    private static final long serialVersionUID = 970894530660804319L;
+
+    public final static String BAD_CONTEXT_TOKEN = "BadContextToken";
+    public final static String UNSUPPORTED_CONTEXT_TOKEN = "UnsupportedContextToken";
+    public final static String UNKNOWN_DERIVATION_SOURCE = "UnknownDerivationSource";
+    public final static String RENEW_NEEDED = "RenewNeeded";
+    public final static String UNABLE_TO_REVIEW = "UnableToRenew";
+
+    private static final ResourceBundle resources;
+
+    private final String faultCode;
+    private final String faultString;
+
     static {
         try {
             resources = ResourceBundle.getBundle("org.apache.ws.security.conversation.errors");
@@ -45,42 +45,38 @@ public class ConversationException extends Exception {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
-    public ConversationException(String faultCode, Object[] args) {
+
+    public ConversationException(String faultCode, Object... args) {
         super(getMessage(faultCode, args));
         this.faultCode = getFaultCode(faultCode);
         this.faultString = getMessage(faultCode, args);
     }
-    
+
+    public ConversationException(String faultCode) {
+        this(faultCode, (Object[]) null);
+    }
+
+    public ConversationException(String faultCode, Throwable e, Object... arguments) {
+        super(getMessage(faultCode, arguments), e);
+        this.faultCode = faultCode;
+        this.faultString = getMessage(faultCode, arguments);
+    }
+
     /**
      * Construct the fault properly code for the standard faults
-     * @param faultCode2
+     *
      * @return
      */
     private String getFaultCode(String code) {
-        if(BAD_CONTEXT_TOKEN.equals(code) ||
-           UNABLE_TO_REVIEW.equals(code) ||
-           UNKNOWN_DERIVATION_SOURCE.equals(code) ||
-           UNSUPPORTED_CONTEXT_TOKEN.equals(code) ||
-           RENEW_NEEDED.equals(code)) {
-            return ConversationConstants.WSC_PREFIX+ ":" + code;
+        if (BAD_CONTEXT_TOKEN.equals(code) ||
+                UNABLE_TO_REVIEW.equals(code) ||
+                UNKNOWN_DERIVATION_SOURCE.equals(code) ||
+                UNSUPPORTED_CONTEXT_TOKEN.equals(code) ||
+                RENEW_NEEDED.equals(code)) {
+            return ConversationConstants.WSC_PREFIX + ":" + code;
         } else {
             return code;
         }
-    }
-
-    public ConversationException(String faultCode) {
-        this(faultCode, (Object[])null);
-    }
-    
-    public ConversationException(String faultCode, Object[] args, Throwable e) {
-        super(getMessage(faultCode, args),e);
-        this.faultCode = faultCode;
-        this.faultString = getMessage(faultCode, args);
-    }
-    
-    public ConversationException(String faultCode, Throwable e) {
-        this(faultCode, null, e);
     }
 
     /**
@@ -89,7 +85,7 @@ public class ConversationException extends Exception {
      *
      * @return the message translated from the property (message) file.
      */
-    protected static String getMessage(String faultCode, Object[] args) {
+    protected static String getMessage(String faultCode, Object... args) {
         String msg = null;
         try {
             msg = MessageFormat.format(resources.getString(faultCode), args);
@@ -116,6 +112,4 @@ public class ConversationException extends Exception {
     protected String getFaultString() {
         return faultString;
     }
-    
-
 }

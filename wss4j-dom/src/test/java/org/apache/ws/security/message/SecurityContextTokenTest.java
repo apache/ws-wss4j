@@ -30,7 +30,7 @@ import org.apache.ws.security.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
-import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.message.token.SecurityContextToken;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.conversation;
+package org.apache.ws.security.common.derivedKey;
 
 import javax.xml.namespace.QName;
 

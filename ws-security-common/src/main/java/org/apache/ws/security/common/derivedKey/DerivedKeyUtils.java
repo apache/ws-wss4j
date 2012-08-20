@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.ws.security.stax.wss.impl.derivedKey;
+package org.apache.ws.security.common.derivedKey;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.wss.ext.WSSConstants;
 
 /**
  * @author $Author$
@@ -40,7 +39,8 @@ public class DerivedKeyUtils {
             DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
             byte[] labelBytes;
             if (label == null || label.length() == 0) {
-                labelBytes = (WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL).getBytes("UTF-8");
+                labelBytes = (ConversationConstants.DEFAULT_LABEL 
+                        + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
             } else {
                 labelBytes = label.getBytes("UTF-8");
             }

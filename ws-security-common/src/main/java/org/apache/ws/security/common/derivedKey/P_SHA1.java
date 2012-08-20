@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.stax.wss.impl.derivedKey;
+package org.apache.ws.security.common.derivedKey;
 
 /**
  *
@@ -44,27 +44,27 @@ package org.apache.ws.security.stax.wss.impl.derivedKey;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class P_SHA1
-        implements DerivationAlgorithm {
+public class P_SHA1 implements DerivationAlgorithm {
 
     public byte[] createKey(byte[] secret, byte[] seed, int offset,
-                            int length) throws ConversationException {
+            long length) throws ConversationException {
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
 
-            byte[] tempBytes = P_hash(secret, seed, mac,
-                    (offset + length));
+            byte[] tempBytes = P_hash(secret, seed, mac, (offset + (int) length));
 
-            byte[] key = new byte[length];
+            byte[] key = new byte[(int) length];
 
-            System.arraycopy(tempBytes, offset, key, 0, key.length);
+            for (int i = 0; i < key.length; i++) {
+                key[i] = tempBytes[i + offset];
+            }
 
             return key;
         } catch (Exception ex) {
-            throw new ConversationException("errorInKeyDerivation", ex, (Object[]) null);
+            throw new ConversationException("errorInKeyDerivation", null, ex);
         }
     }
-
+    
     /**
      * From WSUsernameToken  :-)
      *
@@ -73,22 +73,21 @@ public class P_SHA1
      * @param mac
      * @param required
      * @return
-     * @throws Exception
+     * @throws java.lang.Exception
      */
-    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac,
-                                 int required) throws Exception {
+    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required) throws Exception {
         byte[] out = new byte[required];
         int offset = 0, tocpy;
-        byte[] A, tmp;
-        A = seed;
+        byte[] a, tmp;
+        a = seed;
         while (required > 0) {
             SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
             mac.init(key);
-            mac.update(A);
-            A = mac.doFinal();
+            mac.update(a);
+            a = mac.doFinal();
             mac.reset();
             mac.init(key);
-            mac.update(A);
+            mac.update(a);
             mac.update(seed);
             tmp = mac.doFinal();
             tocpy = min(required, tmp.length);
@@ -102,4 +101,5 @@ public class P_SHA1
     private static int min(int a, int b) {
         return (a > b) ? b : a;
     }
+
 }

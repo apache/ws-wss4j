@@ -23,7 +23,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
-import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.*;
 import org.apache.ws.security.message.token.SecurityTokenReference;
