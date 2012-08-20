@@ -23,8 +23,9 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -133,7 +134,13 @@ public class WSSecUsernameToken extends WSSecBase {
         }
         if (useDerivedKey) {
             if (passwordsAreEncoded) {
-                return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
+                try {
+                    return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
+                } catch (Base64DecodingException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    );
+                }
             } else {
                 return UsernameToken.generateDerivedKey(password, saltValue, iteration);
             }
@@ -156,7 +163,13 @@ public class WSSecUsernameToken extends WSSecBase {
             return null;
         }
         if (passwordsAreEncoded) {
-            return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
+            try {
+                return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
+            } catch (Base64DecodingException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                );
+            }
         } else {
             return UsernameToken.generateDerivedKey(password, saltValue, iteration);
         }

@@ -30,7 +30,8 @@ import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.util.Base64;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * This class validates a processed UsernameToken, extracted from the Credential passed to
@@ -191,7 +192,13 @@ public class UsernameTokenValidator implements Validator {
         if (usernameToken.isHashed()) {
             String passDigest;
             if (passwordsAreEncoded) {
-                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, Base64.decode(origPassword));
+                try {
+                    passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, Base64.decode(origPassword));
+                } catch (Base64DecodingException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    );
+                }
             } else {
                 passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
             }

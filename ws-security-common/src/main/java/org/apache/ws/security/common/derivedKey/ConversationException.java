@@ -40,7 +40,7 @@ public class ConversationException extends Exception {
 
     static {
         try {
-            resources = ResourceBundle.getBundle("org.apache.ws.security.conversation.errors");
+            resources = ResourceBundle.getBundle("messages.conversation.errors");
         } catch (MissingResourceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

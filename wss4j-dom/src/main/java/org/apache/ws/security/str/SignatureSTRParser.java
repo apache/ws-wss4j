@@ -42,8 +42,9 @@ import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Element;
 
 import java.security.Principal;
@@ -439,10 +440,16 @@ public class SignatureSTRParser implements STRParser {
                         if (certs != null) {
                             try {
                                 byte[] digest = WSSecurityUtil.generateDigest(certs[0].getEncoded());
-                                if (Arrays.equals(Base64.decode(kiValue), digest)) {
-                                    principal = (Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                                    foundCerts = certs;
-                                    break;
+                                try {
+                                    if (Arrays.equals(Base64.decode(kiValue), digest)) {
+                                        principal = (Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                                        foundCerts = certs;
+                                        break;
+                                    }
+                                } catch (Base64DecodingException e) {
+                                    throw new WSSecurityException(
+                                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                                    );
                                 }
                             } catch (CertificateEncodingException ex) {
                                 throw new WSSecurityException(

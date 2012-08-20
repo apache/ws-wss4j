@@ -21,8 +21,8 @@ package org.apache.ws.security.common;
 
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;

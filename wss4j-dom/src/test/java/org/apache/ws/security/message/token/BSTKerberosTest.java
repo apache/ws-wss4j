@@ -35,10 +35,10 @@ import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecSignature;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 
 import javax.crypto.KeyGenerator;

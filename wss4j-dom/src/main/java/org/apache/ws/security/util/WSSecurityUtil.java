@@ -32,6 +32,7 @@ import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

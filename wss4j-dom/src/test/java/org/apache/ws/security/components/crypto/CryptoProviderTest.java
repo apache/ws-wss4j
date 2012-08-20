@@ -29,6 +29,7 @@ import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSignature;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -94,7 +95,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         // keytool -export -rfc -keystore wss86.keystore -alias wss86 -file wss86.cer
         //
         byte[] certBytes = 
-            org.apache.ws.security.util.Base64.decode(
+            Base64.decode(
                 "MIICfDCCAeUCBEnHoGMwDQYJKoZIhvcNAQEEBQAwgYQxCzAJBgNVBAYTAkRFMQ8wDQYDVQQIEwZC"
                 + "YXllcm4xDzANBgNVBAcTBk11bmljaDEPMA0GA1UEChMGQXBhY2hlMQ4wDAYDVQQLEwVXU1M0SjEP"
                 + "MA0GA1UEAxMGV2VybmVyMSEwHwYJKoZIhvcNAQkBFhJXZXJuZXJAZXhhbXBsZS5jb20wHhcNMDkw"
@@ -140,7 +141,7 @@ public class CryptoProviderTest extends org.junit.Assert {
     @org.junit.Test
     public void testBadInterop() throws Exception {
         byte[] certBytes = 
-            org.apache.ws.security.util.Base64.decode(
+            Base64.decode(
                 "MIIDNDCCAp2gAwIBAgIBEDANBgkqhkiG9w0BAQQFADBmMQswCQYDVQQGEwJERTEPMA0GA1UECBMG"
                 + "QmF5ZXJuMQ8wDQYDVQQHEwZNdW5pY2gxDTALBgNVBAoTBEhvbWUxFTATBgNVBAsTDEFwYWNoZSBX"
                 + "U1M0SjEPMA0GA1UEAxMGV2VybmVyMB4XDTA4MDQwNDE5MzIxOFoXDTEwMDQwNDE5MzIxOFowYTEL"

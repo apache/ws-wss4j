@@ -27,7 +27,8 @@ import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
-import org.apache.ws.security.util.Base64;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -425,7 +426,13 @@ public class UsernameToken {
     public byte[] getSalt() throws WSSecurityException {
         String salt = nodeString(elementSalt);
         if (salt != null) {
-            return Base64.decode(salt);
+            try {
+                return Base64.decode(salt);
+            } catch (Base64DecodingException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                );
+            }
         }
         return null;
     }
@@ -831,7 +838,13 @@ public class UsernameToken {
         int iteration = getIteration();
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {
-            return generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
+            try {
+                return generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
+            } catch (Base64DecodingException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                );
+            }
         } else {
             return generateDerivedKey(rawPassword, salt, iteration);
         }

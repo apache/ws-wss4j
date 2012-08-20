@@ -30,9 +30,10 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.str.EncryptedKeySTRParser;
 import org.apache.ws.security.str.STRParser;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -209,7 +210,13 @@ public class EncryptedKeyProcessor implements Processor {
             node = node.getNextSibling();
         }
         String encodedData = sb.toString();
-        return Base64.decode(encodedData);
+        try {
+            return Base64.decode(encodedData);
+        } catch (Base64DecodingException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+            );
+        }
     }
     
     private static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {

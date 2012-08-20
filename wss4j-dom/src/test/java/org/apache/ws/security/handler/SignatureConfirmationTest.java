@@ -32,8 +32,8 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.SignatureConfirmation;
-import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

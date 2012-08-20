@@ -30,7 +30,8 @@ import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.DOMCallbackLookup;
 import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.Base64;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -499,7 +500,14 @@ public class SecurityTokenReference {
                 return null;
             }
             if (Node.TEXT_NODE == node.getNodeType()) {
-                byte[] thumb = Base64.decode(((Text) node).getData());
+                byte[] thumb;
+                try {
+                    thumb = Base64.decode(((Text) node).getData());
+                } catch (Base64DecodingException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    );
+                }
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
                 cryptoType.setBytes(thumb);
                 X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
@@ -568,7 +576,8 @@ public class SecurityTokenReference {
         if (node.getNodeType() == Node.TEXT_NODE) {
             try {
                 skiBytes = Base64.decode(((Text) node).getData());
-            } catch (WSSecurityException e) {
+            } catch (Exception e) {
+                log.debug(e.getMessage(), e);
                 return null;
             }
         }
