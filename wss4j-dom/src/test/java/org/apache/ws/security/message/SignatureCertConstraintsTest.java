@@ -128,7 +128,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
-        data.setSigCrypto(sigCrypto);
+        data.setSigVerCrypto(sigCrypto);
         
         if (certConstraint != null) {
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());

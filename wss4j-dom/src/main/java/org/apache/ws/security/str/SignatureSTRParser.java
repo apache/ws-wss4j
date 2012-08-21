@@ -103,7 +103,7 @@ public class SignatureSTRParser implements STRParser {
         Map<String, Object> parameters
     ) throws WSSecurityException {
         boolean bspCompliant = true;
-        Crypto crypto = data.getSigCrypto();
+        Crypto crypto = data.getSigVerCrypto();
         if (data.getWssConfig() != null) {
             bspCompliant = data.getWssConfig().isWsiBSPCompliant();
         }
@@ -177,7 +177,7 @@ public class SignatureSTRParser implements STRParser {
                         assertion = new AssertionWrapper(processedToken);
                         assertion.parseHOKSubject(
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                            data.getSigCrypto(), data.getCallbackHandler(),
+                            data.getSigVerCrypto(), data.getCallbackHandler(),
                             data.getWssConfig().isWsiBSPCompliant()
                         );
                     }
@@ -366,7 +366,7 @@ public class SignatureSTRParser implements STRParser {
             SAMLKeyInfo samlKi = 
                 SAMLUtil.getCredentialFromSubject(assertion,  
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                        data.getSigCrypto(), data.getCallbackHandler(),
+                        data.getSigVerCrypto(), data.getCallbackHandler(),
                         data.getWssConfig().isWsiBSPCompliant());
             X509Certificate[] foundCerts = samlKi.getCerts();
             if (foundCerts != null && foundCerts.length > 0) {

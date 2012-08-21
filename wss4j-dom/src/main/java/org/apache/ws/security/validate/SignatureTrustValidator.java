@@ -88,7 +88,7 @@ public class SignatureTrustValidator implements Validator {
 
 
     protected Crypto getCrypto(RequestData data) {
-        return data.getSigCrypto();
+        return data.getSigVerCrypto();
     }
 
 

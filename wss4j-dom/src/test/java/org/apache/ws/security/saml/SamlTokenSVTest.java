@@ -340,14 +340,14 @@ public class SamlTokenSVTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> msgContext = new java.util.HashMap<String, Object>();
-        msgContext.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        msgContext.put(WSHandlerConstants.SIG_VER_PROP_FILE, "crypto.properties");
         reqData.setMsgContext(msgContext);
         
         CustomHandler handler = new CustomHandler();
         handler.receive(WSConstants.ST_SIGNED, reqData);
         
         secEngine.processSecurityHeader(
-            signedDoc, null, callbackHandler, reqData.getSigCrypto(), reqData.getDecCrypto()
+            signedDoc, null, callbackHandler, reqData.getSigVerCrypto(), reqData.getDecCrypto()
         );
     }
     

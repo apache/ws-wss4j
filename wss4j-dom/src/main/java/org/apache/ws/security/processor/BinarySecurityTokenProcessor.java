@@ -71,10 +71,10 @@ public class BinarySecurityTokenProcessor implements Processor {
         Validator validator = data.getValidator(new QName(elem.getNamespaceURI(),
                                                           elem.getLocalName()));
         
-        if (data.getSigCrypto() == null) {
+        if (data.getSigVerCrypto() == null) {
             certs = getCertificatesTokenReference(token, data.getDecCrypto());
         } else {
-            certs = getCertificatesTokenReference(token, data.getSigCrypto());
+            certs = getCertificatesTokenReference(token, data.getSigVerCrypto());
         }
         
         WSSecurityEngineResult result = 

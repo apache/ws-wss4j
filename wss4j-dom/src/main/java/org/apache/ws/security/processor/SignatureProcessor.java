@@ -124,7 +124,7 @@ public class SignatureProcessor implements Processor {
 
         Validator validator = data.getValidator(WSSecurityEngine.SIGNATURE);
         if (keyInfoElement == null) {
-            certs = getDefaultCerts(data.getSigCrypto());
+            certs = getDefaultCerts(data.getSigVerCrypto());
             principal = certs[0].getSubjectX500Principal();
         } else {
             List<Element> strElements = 

@@ -192,7 +192,7 @@ public class WSSecurityEngine {
      * @return a result list
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,
-     * Crypto sigCrypto, Crypto decCrypto)
+     * Crypto sigVerCrypto, Crypto decCrypto)
      */
     public List<WSSecurityEngineResult> processSecurityHeader(
         Document doc,
@@ -216,20 +216,20 @@ public class WSSecurityEngine {
      *                  </code>
      * @param cb        a callback hander to the caller to resolve passwords during
      *                  encryption and UsernameToken handling
-     * @param sigCrypto the object that implements the access to the keystore and the
-     *                  handling of certificates for Signature
+     * @param sigVerCrypto the object that implements the access to the keystore and the
+     *                  handling of certificates for Signature verification
      * @param decCrypto the object that implements the access to the keystore and the
      *                  handling of certificates for Decryption
      * @return a result list
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(
-     * Element securityHeader, CallbackHandler cb, Crypto sigCrypto, Crypto decCrypto)
+     * Element securityHeader, CallbackHandler cb, Crypto sigVerCrypto, Crypto decCrypto)
      */
     public List<WSSecurityEngineResult> processSecurityHeader(
         Document doc,
         String actor,
         CallbackHandler cb,
-        Crypto sigCrypto,
+        Crypto sigVerCrypto,
         Crypto decCrypto
     ) throws WSSecurityException {
         doDebug = log.isDebugEnabled();
@@ -246,7 +246,7 @@ public class WSSecurityEngine {
             if (doDebug) {
                 log.debug("Processing WS-Security header for '" + actor + "' actor.");
             }
-            wsResult = processSecurityHeader(elem, cb, sigCrypto, decCrypto);
+            wsResult = processSecurityHeader(elem, cb, sigVerCrypto, decCrypto);
         }
         return wsResult;
     }
@@ -279,8 +279,8 @@ public class WSSecurityEngine {
      * @param securityHeader the <code>wsse:Security</code> header element
      * @param cb             a callback hander to the caller to resolve passwords during
      *                       encryption and UsernameToken handling
-     * @param sigCrypto      the object that implements the access to the keystore and the
-     *                       handling of certificates used for Signature
+     * @param sigVerCrypto   the object that implements the access to the keystore and the
+     *                       handling of certificates used for Signature verification
      * @param decCrypto      the object that implements the access to the keystore and the
      *                       handling of certificates used for Decryption
      * @return a List of {@link WSSecurityEngineResult}. Each element in the
@@ -293,13 +293,13 @@ public class WSSecurityEngine {
     public List<WSSecurityEngineResult> processSecurityHeader(
         Element securityHeader,
         CallbackHandler cb,
-        Crypto sigCrypto,
+        Crypto sigVerCrypto,
         Crypto decCrypto
     ) throws WSSecurityException { 
         RequestData data = new RequestData();
         data.setWssConfig(getWssConfig());
         data.setDecCrypto(decCrypto);
-        data.setSigCrypto(sigCrypto);
+        data.setSigVerCrypto(sigVerCrypto);
         data.setCallbackHandler(cb);
         return processSecurityHeader(securityHeader, data);
     }
@@ -360,7 +360,7 @@ public class WSSecurityEngine {
         //
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
         wsDocInfo.setCallbackLookup(callbackLookup);
-        wsDocInfo.setCrypto(requestData.getSigCrypto());
+        wsDocInfo.setCrypto(requestData.getSigVerCrypto());
         wsDocInfo.setSecurityHeader(securityHeader);
 
         final WSSConfig cfg = getWssConfig();

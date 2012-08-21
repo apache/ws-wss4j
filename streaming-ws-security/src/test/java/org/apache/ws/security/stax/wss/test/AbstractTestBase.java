@@ -18,34 +18,19 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WsuIdAllocator;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.util.XMLUtils;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.xml.security.stax.ext.XMLSec;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
-import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.ws.security.stax.wss.WSSec;
-import org.apache.ws.security.stax.wss.ext.*;
-import org.apache.ws.security.stax.wss.test.utils.SOAPUtil;
-import org.apache.ws.security.stax.wss.test.utils.StAX2DOM;
-import org.apache.ws.security.stax.wss.test.utils.XmlReaderToWriter;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.NamespaceContext;
@@ -61,15 +46,35 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.security.Provider;
-import java.security.Security;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WsuIdAllocator;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandler;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.stax.wss.WSSec;
+import org.apache.ws.security.stax.wss.ext.InboundWSSec;
+import org.apache.ws.security.stax.wss.ext.OutboundWSSec;
+import org.apache.ws.security.stax.wss.ext.WSSConstants;
+import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.wss.test.utils.SOAPUtil;
+import org.apache.ws.security.stax.wss.test.utils.StAX2DOM;
+import org.apache.ws.security.stax.wss.test.utils.XmlReaderToWriter;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.testng.Assert;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author $Author$
@@ -89,31 +94,6 @@ public abstract class AbstractTestBase {
     static {
         LogManager.getLogManager().addLogger(Logger.getLogger("org.jcp.xml.dsig.internal.dom"));
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
-
-        Security.addProvider(new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
-    }
-
-    @BeforeClass
-    public void insertBC() {
-        //we need an JCE provider which understands elliptic curve cryptography.
-        //the sun default provider also supports ec but returns a sun.security.x509.X509Key
-        //instead of the java.security.interfaces.ECPublicKey. Bug?
-        // Security.insertProviderAt(new org.bouncycastle.jce.provider.BouncyCastleProvider(), 2);
-        try {
-            Class<?> c = 
-                XMLSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
-            if (null == Security.getProvider("BC")) {
-                Security.addProvider((Provider) c.newInstance());
-            }
-        } catch (Throwable e) {
-            // throw new RuntimeException("Adding BouncyCastle provider failed", e);
-        }
-
-    }
-
-    @AfterClass
-    public void removeBC() {
-        Security.removeProvider("BC");
     }
 
     public AbstractTestBase() {
@@ -270,7 +250,7 @@ public abstract class AbstractTestBase {
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
         wss4JHandler.setPassword(messageContext, "default");
 
-        messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + sigProperties.hashCode());
+        messageContext.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "" + sigProperties.hashCode());
         messageContext.put("" + sigProperties.hashCode(), sigProperties);
         if (properties.get(WSHandlerConstants.PW_CALLBACK_REF) != null) {
             messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, properties.get(WSHandlerConstants.PW_CALLBACK_REF));

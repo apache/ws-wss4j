@@ -241,7 +241,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         CustomHandler handler = new CustomHandler();
         handler.receive(WSSecurityUtil.decodeAction("Encrypt Signature", new LinkedList<Integer>()), reqData);
         reqData.setCallbackHandler(callbackHandler);
-        reqData.setSigCrypto(crypto);
+        reqData.setSigVerCrypto(crypto);
         reqData.setDecCrypto(crypto);
         return reqData;
     }

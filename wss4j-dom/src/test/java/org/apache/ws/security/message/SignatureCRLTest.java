@@ -192,7 +192,7 @@ public class SignatureCRLTest extends org.junit.Assert {
     verify(Document doc, Crypto crypto, boolean revocationEnabled) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData reqData = new RequestData();
-        reqData.setSigCrypto(crypto);
+        reqData.setSigVerCrypto(crypto);
         reqData.setEnableRevocation(revocationEnabled);
         Element securityHeader = WSSecurityUtil.getSecurityHeader(doc, null);
         List<WSSecurityEngineResult> results = 

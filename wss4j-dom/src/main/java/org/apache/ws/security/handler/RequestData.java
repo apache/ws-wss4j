@@ -54,13 +54,14 @@ public class RequestData {
     private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
     private String[] utElements = null;
     private Crypto sigCrypto = null;
+    private Crypto sigVerCrypto = null;
+    private Crypto encCrypto = null;
     private Crypto decCrypto = null;
     private int sigKeyId = 0;
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
     private String encryptionDigestAlgorithm = null;
     private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
-    private Crypto encCrypto = null;
     private int encKeyId = 0;
     private String encSymmAlgo = null;
     private String encKeyTransport = null;
@@ -88,7 +89,7 @@ public class RequestData {
     public void clear() {
         soapConstants = null;
         actor = username = pwType = sigAlgorithm = encSymmAlgo = encKeyTransport = encUser = null;
-        sigCrypto = decCrypto = encCrypto = null;
+        sigCrypto = decCrypto = encCrypto = sigVerCrypto = null;
         signatureParts.clear();
         encryptParts.clear();
         encCert = null;
@@ -189,6 +190,14 @@ public class RequestData {
 
     public void setSigCrypto(Crypto sigCrypto) {
         this.sigCrypto = sigCrypto;
+    }
+    
+    public Crypto getSigVerCrypto() {
+        return sigVerCrypto;
+    }
+
+    public void setSigVerCrypto(Crypto sigVerCrypto) {
+        this.sigVerCrypto = sigVerCrypto;
     }
 
     public Crypto getDecCrypto() {

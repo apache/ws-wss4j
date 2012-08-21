@@ -112,7 +112,7 @@ public class EncryptedKeySTRParser implements STRParser {
                 SAMLKeyInfo samlKi = 
                     SAMLUtil.getCredentialFromSubject(assertion, 
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                            data.getSigCrypto(), data.getCallbackHandler(),
+                            data.getSigVerCrypto(), data.getCallbackHandler(),
                             data.getWssConfig().isWsiBSPCompliant());
                 certs = samlKi.getCerts();
             } else {
@@ -232,7 +232,7 @@ public class EncryptedKeySTRParser implements STRParser {
             SAMLKeyInfo keyInfo = 
                 SAMLUtil.getCredentialFromSubject(assertion, 
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                        data.getSigCrypto(), data.getCallbackHandler(),
+                        data.getSigVerCrypto(), data.getCallbackHandler(),
                         data.getWssConfig().isWsiBSPCompliant());
             certs = keyInfo.getCerts();
         } else {

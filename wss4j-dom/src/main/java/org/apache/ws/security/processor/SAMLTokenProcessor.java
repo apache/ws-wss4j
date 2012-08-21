@@ -108,13 +108,13 @@ public class SAMLTokenProcessor implements Processor {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
             assertion.verifySignature(
-                new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigCrypto(),
+                new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(),
                 data.getWssConfig().isWsiBSPCompliant()
             );
         }
         // Parse the HOK subject if it exists
         assertion.parseHOKSubject( 
-            new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigCrypto(), 
+            new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(), 
             data.getCallbackHandler(), data.getWssConfig().isWsiBSPCompliant()
         );
             

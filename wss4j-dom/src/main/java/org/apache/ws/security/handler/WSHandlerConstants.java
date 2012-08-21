@@ -241,8 +241,8 @@ public final class WSHandlerConstants {
     public static final String ENC_CALLBACK_REF = "embeddedKeyCallbackRef";
     
     /**
-     * The path of the crypto property file to use for Signature. The classloader loads this 
-     * file. Therefore it must be accessible via the classpath.
+     * The path of the crypto property file to use for Signature creation. The classloader 
+     * loads this file. Therefore it must be accessible via the classpath.
      * <p/>
      * To locate the implementation of the
      * {@link org.apache.ws.security.components.crypto.Crypto Crypto}
@@ -276,6 +276,25 @@ public final class WSHandlerConstants {
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      */
     public static final String SIG_PROP_REF_ID = "signaturePropRefId";
+    
+    /**
+     * The path of the crypto property file to use for Signature verification. The 
+     * classloader loads this file. Therefore it must be accessible via the classpath.
+     * <p/>
+     * Refer to documentation of {@link #SIG_PROP_FILE}.
+     */
+    public static final String SIG_VER_PROP_FILE = "signatureVerificationPropFile";
+    
+    /**
+     * The key that holds a reference to the object holding complete information about 
+     * the signature verification Crypto implementation. This object can either be a Crypto
+     * instance or a <code>java.util.Properties</code> file, which should contain all 
+     * information that would contain in an equivalent properties file which includes the 
+     * Crypto implementation class name.
+     * 
+     * Refer to documentation of {@link #SIG_VER_PROP_FILE}.
+     */
+    public static final String SIG_VER_PROP_REF_ID = "signatureVerificationPropRefId";
     
     /**
      * The path of the crypto property file to use for Decryption. The classloader loads this 

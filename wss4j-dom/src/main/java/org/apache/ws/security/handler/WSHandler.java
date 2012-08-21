@@ -730,17 +730,34 @@ public abstract class WSHandler {
     }
     
     /**
-     * Hook to allow subclasses to load their Signature Crypto however they see
+     * Hook to allow subclasses to load their Signature creation Crypto however they see
      * fit. 
      * 
      * @param requestData the RequestData object
-     * @return a Crypto instance to use for Signature creation/verification
+     * @return a Crypto instance to use for Signature creation
      */
     public Crypto loadSignatureCrypto(RequestData requestData) throws WSSecurityException {
         return 
             loadCrypto(
                 WSHandlerConstants.SIG_PROP_FILE,
                 WSHandlerConstants.SIG_PROP_REF_ID,
+                requestData
+            );
+    }
+    
+    /**
+     * Hook to allow subclasses to load their Signature verification Crypto however they see
+     * fit. 
+     * 
+     * @param requestData the RequestData object
+     * @return a Crypto instance to use for Signature verification
+     */
+    public Crypto loadSignatureVerificationCrypto(RequestData requestData) 
+        throws WSSecurityException {
+        return 
+            loadCrypto(
+                WSHandlerConstants.SIG_VER_PROP_FILE,
+                WSHandlerConstants.SIG_VER_PROP_REF_ID,
                 requestData
             );
     }
@@ -1103,8 +1120,8 @@ public abstract class WSHandler {
 
     protected void decodeSignatureParameter2(RequestData reqData) 
         throws WSSecurityException {
-        if (reqData.getSigCrypto() == null) {
-            reqData.setSigCrypto(loadSignatureCrypto(reqData));
+        if (reqData.getSigVerCrypto() == null) {
+            reqData.setSigVerCrypto(loadSignatureVerificationCrypto(reqData));
         }
         boolean enableRevocation = 
             decodeBooleanConfigValue(

@@ -257,7 +257,7 @@ public class ReplayTest extends org.junit.Assert {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         Element elem = WSSecurityUtil.getSecurityHeader(doc, null);
-        data.setSigCrypto(crypto);
+        data.setSigVerCrypto(crypto);
         return secEngine.processSecurityHeader(elem, data);
     }
     
