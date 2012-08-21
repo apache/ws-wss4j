@@ -19,10 +19,10 @@
 package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
-import org.apache.ws.security.stax.wss.ext.WSSConstants;
-import org.apache.ws.security.stax.wss.securityEvent.OperationSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.RelTokenSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.SignedPartSecurityEvent;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.RelTokenSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;

@@ -20,9 +20,9 @@ package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
-import org.apache.ws.security.stax.wss.ext.WSSConstants;
-import org.apache.ws.security.stax.wss.securityEvent.OperationSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.RequiredPartSecurityEvent;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.RequiredPartSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -24,8 +24,8 @@ import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.IssuedToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.IssuedTokenSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.stax.securityEvent.IssuedTokenSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.2 IssuedToken Assertion

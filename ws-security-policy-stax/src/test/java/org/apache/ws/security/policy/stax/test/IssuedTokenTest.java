@@ -21,11 +21,11 @@ package org.apache.ws.security.policy.stax.test;
 
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
-import org.apache.ws.security.stax.wss.ext.WSSConstants;
-import org.apache.ws.security.stax.wss.impl.securityToken.SAMLSecurityToken;
-import org.apache.ws.security.stax.wss.securityEvent.OperationSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.SamlTokenSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.SignedPartSecurityEvent;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.SamlTokenSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;

@@ -33,13 +33,13 @@
     <logger name="org.apache.ws.security.xmlsec.impl.OutputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.stax.wss.impl.processor.input">
+    <logger name="org.apache.ws.security.stax.impl.processor.input">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.stax.wss.impl.saml.SAMLAssertionWrapper">
+    <logger name="org.apache.ws.security.stax.impl.saml.SAMLAssertionWrapper">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.stax.wss.test.AbstractTestBase$CustomWSS4JHandler">
+    <logger name="org.apache.ws.security.stax.test.AbstractTestBase$CustomWSS4JHandler">
         <level value="INFO"/>
     </logger>
     <root>

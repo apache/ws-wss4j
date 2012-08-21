@@ -28,7 +28,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.ws.security.policy.stax.Assertable;
 import org.apache.ws.security.policy.stax.PolicyUtils;
-import org.apache.ws.security.stax.wss.ext.WSSUtils;
+import org.apache.ws.security.stax.ext.WSSUtils;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;

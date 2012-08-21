@@ -25,10 +25,10 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.wss.WSSec;
-import org.apache.ws.security.stax.wss.ext.InboundWSSec;
-import org.apache.ws.security.stax.wss.ext.WSSConstants;
-import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.WSSec;
+import org.apache.ws.security.stax.ext.InboundWSSec;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

@@ -27,9 +27,9 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.policy.stax.Assertable;
 import org.apache.ws.security.policy.stax.PolicyUtils;
-import org.apache.ws.security.stax.wss.ext.WSSUtils;
-import org.apache.ws.security.stax.wss.securityEvent.RequiredElementSecurityEvent;
-import org.apache.ws.security.stax.wss.securityEvent.WSSecurityEventConstants;
+import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.ws.security.stax.securityEvent.RequiredElementSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
 import java.util.HashMap;

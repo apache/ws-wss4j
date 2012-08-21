@@ -23,7 +23,7 @@ import org.apache.ws.security.policy.SPConstants;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.*;
 import org.apache.ws.security.policy.stax.Assertable;
-import org.apache.ws.security.stax.wss.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
