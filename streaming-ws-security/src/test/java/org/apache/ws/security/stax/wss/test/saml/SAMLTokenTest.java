@@ -19,7 +19,7 @@
 package org.apache.ws.security.stax.wss.test.saml;
 
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;

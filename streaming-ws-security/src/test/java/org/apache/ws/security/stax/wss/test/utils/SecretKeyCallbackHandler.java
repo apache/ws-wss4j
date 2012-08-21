@@ -21,7 +21,7 @@ package org.apache.ws.security.stax.wss.test.utils;
 
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 
 import javax.security.auth.callback.Callback;

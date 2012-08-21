@@ -18,7 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.wss.ext.WSSConstants;
 import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.securityEvent.*;

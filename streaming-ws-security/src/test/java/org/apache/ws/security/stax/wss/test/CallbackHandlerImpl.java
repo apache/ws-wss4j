@@ -18,7 +18,7 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
-import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.saml.SAMLCallback;
@@ -33,7 +33,7 @@ import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.common.saml.bean.SubjectLocalityBean;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
-import org.apache.ws.security.message.WSSecEncryptedKey;
+import org.apache.ws.security.dom.message.WSSecEncryptedKey;
 import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

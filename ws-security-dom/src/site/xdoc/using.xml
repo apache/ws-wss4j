@@ -15,19 +15,19 @@ this is to take a look at the test sources. For example:
 </p>
 <ul>
 <li>
-<a href="xref-test/org/apache/ws/security/message/UsernameTokenTest.html">Username Token Test</a>
+<a href="xref-test/org.apache.ws.security.dom.message/UsernameTokenTest.html">Username Token Test</a>
 </li>
 <li>
-<a href="xref-test/org/apache/ws/security/message/EncryptionTest.html">Encryption Test</a>
+<a href="xref-test/org.apache.ws.security.dom.message/EncryptionTest.html">Encryption Test</a>
 </li>
 <li>
-<a href="xref-test/org/apache/ws/security/message/SignatureTest.html">Signature Test</a>
+<a href="xref-test/org.apache.ws.security.dom.message/SignatureTest.html">Signature Test</a>
 </li>
 <li>
-<a href="xref-test/org/apache/ws/security/message/TimestampTest.html">Timestamp Test</a>
+<a href="xref-test/org.apache.ws.security.dom.message/TimestampTest.html">Timestamp Test</a>
 </li>
 <li>
-<a href="xref-test/org/apache/ws/security/saml/SamlTokenTest.html">SAML Token Test</a>
+<a href="xref-test/org.apache.ws.security.dom.saml/SamlTokenTest.html">SAML Token Test</a>
 </li>
 </ul>
 </subsection>

@@ -49,16 +49,16 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WsuIdAllocator;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.WsuIdAllocator;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.XMLUtils;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.dom.handler.WSHandler;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.handler.WSHandlerResult;
 import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.InboundWSSec;
 import org.apache.ws.security.stax.wss.ext.OutboundWSSec;
@@ -67,7 +67,7 @@ import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.wss.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.wss.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.wss.test.utils.XmlReaderToWriter;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -441,7 +441,7 @@ public abstract class AbstractTestBase {
             /*
              * Check if it's a fault. Don't process faults.
              */
-            org.apache.ws.security.SOAPConstants soapConstants =
+            org.apache.ws.security.dom.SOAPConstants soapConstants =
                     WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             if (WSSecurityUtil.findElement(
                     doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null

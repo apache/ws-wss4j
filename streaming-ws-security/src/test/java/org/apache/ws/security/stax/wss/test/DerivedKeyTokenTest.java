@@ -18,15 +18,15 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.derivedKey.ConversationConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.*;
-import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.message.*;
+import org.apache.ws.security.dom.message.token.SecurityTokenReference;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.stax.wss.WSSec;

@@ -45,7 +45,7 @@ the WSS4J Axis handlers and how the parameters and their values control the
 handlers. For a better understanding of this chapter the reader shall 
 have a knowledge of the OASIS WSS specifications.
 </p><p></p><p>
-The {@link org.apache.ws.security.handler.WSHandlerConstants}, 
+The {@link org.apache.ws.security.dom.handler.WSHandlerConstants}, 
 {@link org.apache.ws.axis.security.WSDoAllSender}, and 
 {@link org.apache.ws.axis.security.WSDoAllReceiver}
 provide additional and detailed documentation.
@@ -96,7 +96,7 @@ The parameters and their meanings are:
 <li><code>passwordCallbackClass</code> contains the name of a class that
     implements a method to get the user's password. Please refer to the
     detailed documentation in 
-    {@link org.apache.ws.security.handler.WSHandlerConstants#PW_CALLBACK_CLASS}.
+    {@link org.apache.ws.security.dom.handler.WSHandlerConstants#PW_CALLBACK_CLASS}.
     </li>
 </ul>
 The WSS4J Axis security handler interprets the parameter values and controls
@@ -139,7 +139,7 @@ class. This class must implement the
 interface. The WSS4J Axis handler gets this class,
 instantiates it, and calls the <code>handle</code> method when it
 needs a password. Refer also to the 
-{@link org.apache.ws.security.handler.WSHandlerConstants#PW_CALLBACK_CLASS
+{@link org.apache.ws.security.dom.handler.WSHandlerConstants#PW_CALLBACK_CLASS
  parameter} documentation.
  </p><p></p><p>
  The following code snippet shows a simple password callback class:
@@ -152,7 +152,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.dom.WSPasswordCallback;
 
 public class PWCallback implements CallbackHandler {
 
@@ -199,7 +199,7 @@ informations. The <code>WSSPasswordCallback</code> class implements the
 JAAS. Depending on it usage this class either carries the required password
 as a Java <code>String </code> or it carries the required key information 
 as a Java <code>byte[]</code> array. Refer to
-{@link org.apache.ws.security.WSPasswordCallback} that contains a
+{@link org.apache.ws.security.dom.WSPasswordCallback} that contains a
 detailed description of the usage codes.
 </p><p></p><p>
 The WSS4J Axis handler or the WSS4J modules set the usage code before
@@ -332,12 +332,12 @@ This descriptor contains some new parameters to control the <code>UsernameToken
   <li><code>encryptionPropFile</code> - the name of a crypto property file. This
     file contains parameters and property that control the encryption. Please refer
     to the
-    {@link org.apache.ws.security.handler.WSHandlerConstants#ENC_PROP_FILE 
+    {@link org.apache.ws.security.dom.handler.WSHandlerConstants#ENC_PROP_FILE 
     detailed} description of the cyrpto property file.</li>
   <li><code>encryptionKeyIdentifier</code> - specifies the format in which the 
     handler inserts the encryption key into the SOAP request. Please refer
     to the 
-    {@link org.apache.ws.security.handler.WSHandlerConstants#ENC_KEY_ID 
+    {@link org.apache.ws.security.dom.handler.WSHandlerConstants#ENC_KEY_ID 
     detailed} description.</li>
   <li><code>encryptionUser</code> - the name or identifier of the user who owns
     the public key to encrypt the data. Usually this is the name or alias name
@@ -350,7 +350,7 @@ This descriptor contains some new parameters to control the <code>UsernameToken
     <code>http://schemas.xmlsoap.org/ws/2002/07/secext</code>. The encryption
     module uses the <code>Element</code> mode to encrypt the element data.
     Please refer to the
-    {@link org.apache.ws.security.handler.WSHandlerConstants#ENCRYPTION_PARTS 
+    {@link org.apache.ws.security.dom.handler.WSHandlerConstants#ENCRYPTION_PARTS 
     detailed} description.
     </li>
 </ul>
@@ -408,7 +408,7 @@ signature part parameters, WSS4J defaults to the data of the SOAP Body element.
 </p><p></p><p>
 Also all other parameters use their default setting, such as the format of the
 key identifiers, encryption modifiers, and so on. Please refer to the
-{@link org.apache.ws.security.handler.WSHandlerConstants detailed}
+{@link org.apache.ws.security.dom.handler.WSHandlerConstants detailed}
 documentation of the parameters.
 </p><p></p><p>
 If the WSS4J Axis handler shall perform encryption only, then the
@@ -436,7 +436,7 @@ Sometimes it is necessary to sign and/or encrypt several parts of a SOAP
 message. The deployment parameters <code>signatureParts</code> and 
 <code>encryptionParts</code> control which SOAP elements to sign or
 to encrypt. Please refer to the
-{@link org.apache.ws.security.handler.WSHandlerConstants#ENCRYPTION_PARTS 
+{@link org.apache.ws.security.dom.handler.WSHandlerConstants#ENCRYPTION_PARTS 
 detailed} description of these parameters.
 </p><p></p><p>
 WSS4J signs or encrypts all declared parts using the same keys, that is 
@@ -553,7 +553,7 @@ that contains the results of the performed security actions. This data
 structure holds information about the performed action, the usernames or
 identifier in case the security engine performed signature or username token
 processing. Please refer to the
-{@link org.apache.ws.security.WSSecurityEngineResult result} structure.
+{@link org.apache.ws.security.dom.WSSecurityEngineResult result} structure.
 </p><p></p><p>
 The <code>WSDoAllReceiver</code> WSS4J handler takes this structure and
 checks if all required actions were performed. If this check fails, the
@@ -563,7 +563,7 @@ Otherwise it creates its own data structure
 security results in this structure, and adds the actor name of the
 security header. The it stores this new data structure in a vector and stores
 this vector in a specific 
-{@link org.apache.ws.security.handler.WSHandlerConstants#RECV_RESULTS property} 
+{@link org.apache.ws.security.dom.handler.WSHandlerConstants#RECV_RESULTS property} 
 of the current message context. If WSS4J handlers are
 chained, then every handler in the chain adds its result to the vector. The
 vector contains the results in handler-chain order.
@@ -605,7 +605,7 @@ data:
     }
 </source>
 The principal structure is either a 
-{@link org.apache.ws.security.WSUsernameTokenPrincipal UsernameToken} principal 
+{@link org.apache.ws.security.dom.WSUsernameTokenPrincipal UsernameToken} principal 
 or a {@link java.security.Principal X509Principal}. The 
 princpals contain the names plus other information of the verified username
 token or signature certificate.

@@ -203,7 +203,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j-dom</artifactId>
+            <artifactId>ws-security-dom</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

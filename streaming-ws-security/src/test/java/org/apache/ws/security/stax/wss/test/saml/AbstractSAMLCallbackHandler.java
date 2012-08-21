@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.stax.wss.test.saml;
 
-import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.bean.ActionBean;
@@ -32,7 +32,7 @@ import org.apache.ws.security.common.saml.bean.KeyInfoBean;
 import org.apache.ws.security.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.common.saml.bean.SubjectLocalityBean;
-import org.apache.ws.security.message.WSSecEncryptedKey;
+import org.apache.ws.security.dom.message.WSSecEncryptedKey;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

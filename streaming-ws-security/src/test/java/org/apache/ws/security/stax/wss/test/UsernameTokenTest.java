@@ -18,9 +18,9 @@
  */
 package org.apache.ws.security.stax.wss.test;
 
-import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.ws.security.stax.wss.WSSec;

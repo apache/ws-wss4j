@@ -28,7 +28,7 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <groupId>org.apache.ws.security</groupId>
-    <artifactId>wss4j-dom</artifactId>
+    <artifactId>ws-security-dom</artifactId>
     <packaging>bundle</packaging>
     <name>Apache WSS4J DOM WS-Security</name>
     <version>2.0-SNAPSHOT</version>
@@ -95,8 +95,8 @@
                         </Import-Package>
                         <DynamicImport-Package>
                               org.bouncycastle.jce.provider,
-                              org.apache.ws.security.components.crypto,
-                              org.apache.ws.security.saml
+                              org.apache.ws.security.dom.components.crypto,
+                              org.apache.ws.security.dom.saml
                         </DynamicImport-Package>
                     </instructions>
                 </configuration>

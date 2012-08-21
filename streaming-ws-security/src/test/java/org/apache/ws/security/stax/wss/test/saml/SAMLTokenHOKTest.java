@@ -22,7 +22,7 @@ import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.stax.wss.WSSec;
 import org.apache.ws.security.stax.wss.ext.InboundWSSec;

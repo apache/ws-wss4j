@@ -43,7 +43,7 @@ public class WSS4JCallbackHandlerImpl implements CallbackHandler {
     public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 
-//        if (pc.getUsage() == org.apache.ws.security.WSPasswordCallback.DECRYPT || pc.getUsage() == org.apache.ws.security.WSPasswordCallback.SIGNATURE) {
+//        if (pc.getUsage() == org.apache.ws.security.dom.WSPasswordCallback.DECRYPT || pc.getUsage() == org.apache.ws.security.WSPasswordCallback.SIGNATURE) {
         pc.setPassword("default");
 /*        } else {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
