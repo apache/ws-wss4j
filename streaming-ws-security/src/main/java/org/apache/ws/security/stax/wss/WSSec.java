@@ -18,21 +18,22 @@
  */
 package org.apache.ws.security.stax.wss;
 
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.ws.security.common.crypto.WSProviderConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.wss.ext.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.stax.wss.ext.InboundWSSec;
+import org.apache.ws.security.stax.wss.ext.OutboundWSSec;
+import org.apache.ws.security.stax.wss.ext.WSSConfigurationException;
+import org.apache.ws.security.stax.wss.ext.WSSConstants;
+import org.apache.ws.security.stax.wss.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
-
-import java.net.URISyntaxException;
-import java.security.Provider;
-import java.security.Security;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This is the central class of the streaming webservice-security framework.<br/>
@@ -44,23 +45,10 @@ import java.util.List;
  */
 public class WSSec {
     
-    private static final transient Log logger = LogFactory.getLog(WSSec.class);
-
     //todo crl check
     //todo outgoing client setup per policy
 
     static {
-        try {
-            Class<?> c = 
-                WSSec.class.getClassLoader().loadClass("org.bouncycastle.jce.provider.BouncyCastleProvider");
-            if (null == Security.getProvider("BC")) {
-                Security.addProvider((Provider) c.newInstance());
-            }
-        } catch (Throwable e) {
-            logger.debug("Adding BouncyCastle provider failed", e);
-            // throw new RuntimeException("Adding BouncyCastle provider failed", e);
-        }
-
         try {
             Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
         } catch (XMLSecurityException e) {
@@ -68,6 +56,7 @@ public class WSSec {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+        WSProviderConfig.init();
     }
 
     /**
