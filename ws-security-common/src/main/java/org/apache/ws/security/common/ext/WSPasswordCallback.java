@@ -48,17 +48,6 @@ import javax.security.auth.callback.Callback;
  * this identifier (username) from    the keystore. WSS4J uses this private
  * key to produce a signature. The signature verification uses the public
  * key to verify the signature.</li>
- * <li><code>KEY_NAME</code> - need the <i>key</i>, not the password,
- * associated with the identifier. WSS4J uses this key to encrypt or
- * decrypt parts of the SOAP request. Note, the key must match the
- * symmetric encryption/decryption algorithm specified (refer to
- * {@link org.apache.ws.security.handler.WSHandlerConstants#ENC_SYM_ALGO}).</li>
- * <li><code>USERNAME_TOKEN_UNKNOWN</code> - either an not specified
- * password type or a password type passwordText. In these both cases <b>only</b>
- * the password variable is <b>set</b>. The callback class now may check if
- * the username and password match. If they don't match the callback class must
- * throw an exception. The exception can be a UnsupportedCallbackException or
- * an IOException.</li>
  * <li><code>SECURITY_CONTEXT_TOKEN</code> - need the key to to be associated
  * with a <code>wsc:SecurityContextToken</code>.</li>
  * </ul>
@@ -73,8 +62,6 @@ public class WSPasswordCallback implements Callback {
         DECRYPT,
         USERNAME_TOKEN,
         SIGNATURE,
-        KEY_NAME,
-        USERNAME_TOKEN_UNKNOWN,
         SECURITY_CONTEXT_TOKEN,
         CUSTOM_TOKEN,
         ENCRYPTED_KEY_TOKEN,

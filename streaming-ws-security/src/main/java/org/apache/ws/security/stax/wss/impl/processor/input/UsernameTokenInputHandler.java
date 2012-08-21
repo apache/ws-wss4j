@@ -84,7 +84,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         if (salt != null && (passwordType != null || iteration == null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
-
+        
+        boolean handleCustomPasswordTypes = false;
+        handleCustomPasswordTypes = ((WSSSecurityProperties)securityProperties).getHandleCustomPasswordTypes();
+        
         final byte[] nonceVal;
         final String created;
 
@@ -100,6 +103,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         final EncodedString encodedNonce = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
         final AttributedDateTime attributedDateTimeCreated = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
 
+        // TODO revisit this once we add in Validators
         if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
             if (encodedNonce == null || attributedDateTimeCreated == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
@@ -163,31 +167,64 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             passwordType.setValue(pwCb.getPassword());
-        } else {
+        } else if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)
+            || (passwordType != null && passwordType.getValue() != null 
+                && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE)) {
             nonceVal = null;
             created = null;
-            WSPasswordCallback pwCb;
-            if (passwordType == null) {
-                passwordType = new PasswordString();
-                pwCb = new WSPasswordCallback(username.getValue(),
-                        null,
-                        null,
-                        WSPasswordCallback.Usage.USERNAME_TOKEN_UNKNOWN);
-            } else {
-                pwCb = new WSPasswordCallback(username.getValue(),
-                        passwordType.getValue(),
-                        passwordType.getType(),
-                        WSPasswordCallback.Usage.USERNAME_TOKEN_UNKNOWN);
-            }
+            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
+                    null,
+                    passwordType.getType(),
+                    WSPasswordCallback.Usage.USERNAME_TOKEN);
             try {
                 WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
             }
+
+            if (pwCb.getPassword() == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+
+            if (!passwordType.getValue().equals(pwCb.getPassword())) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
             passwordType.setValue(pwCb.getPassword());
+        } else if (passwordType != null && passwordType.getValue() != null && usernameTokenPasswordType == null) { 
+            if (!handleCustomPasswordTypes) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+            nonceVal = null;
+            created = null;
+            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
+                    null,
+                    passwordType.getType(),
+                    WSPasswordCallback.Usage.USERNAME_TOKEN);
+            try {
+                WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
+            } catch (WSSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+            }
+
+            if (pwCb.getPassword() == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+
+            if (!passwordType.getValue().equals(pwCb.getPassword())) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+            passwordType.setValue(pwCb.getPassword());
+        } else {
+            nonceVal = null;
+            created = null;
         }
 
-        final String password = passwordType.getValue();
+        final String password;
+        if (passwordType != null) {
+            password = passwordType.getValue();
+        } else {
+            password = null;
+        }
 
         final List<QName> elementPath = getElementPath(eventQueue);
         final XMLSecEvent responsibleStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);

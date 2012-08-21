@@ -101,7 +101,6 @@ public class CallbackHandlerImpl implements CallbackHandler {
             if (pc.getUsage() == WSPasswordCallback.Usage.DECRYPT
                     || pc.getUsage() == WSPasswordCallback.Usage.SIGNATURE
                     || pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN
-                    || pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN_UNKNOWN
                     ) {
                 pc.setPassword(username);
             } else if (pc.getUsage() == WSPasswordCallback.Usage.SECRET_KEY

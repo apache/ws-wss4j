@@ -173,7 +173,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: Wrong username");
+                Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
             }
         }
     }
@@ -214,42 +214,6 @@ public class UsernameTokenTest extends AbstractTestBase {
         }
     }
     */
-
-    @Test
-    public void testInboundUT_SIGN() throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.SIGN_WITH_UT_KEY;
-            Properties properties = new Properties();
-            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-
-            //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-        }
-
-        //done UsernameToken; now verification:
-        {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-            securityProperties.setDisableSchemaValidation(true);
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-
-            //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-        }
-    }
 
     @Test
     public void testReusedNonce() throws Exception {

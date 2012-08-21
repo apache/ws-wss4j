@@ -80,6 +80,31 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setStrictTimestampCheck(boolean strictTimestampCheck) {
         this.strictTimestampCheck = strictTimestampCheck;
     }
+    
+
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. 
+     * 
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    private boolean handleCustomPasswordTypes = false;
+    
+    /**
+     * @param handleCustomTypes 
+     * whether to handle custom UsernameToken password types or not
+     */
+    public void setHandleCustomPasswordTypes(boolean handleCustomTypes) {
+        this.handleCustomPasswordTypes = handleCustomTypes;
+    }
+    
+    /**
+     * @return whether custom UsernameToken password types are allowed or not
+     */
+    public boolean getHandleCustomPasswordTypes() {
+        return handleCustomPasswordTypes;
+    }
 
     private String tokenUser;
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
