@@ -164,7 +164,7 @@ public class Timestamp {
             }
         } catch (ParseException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp", null, e
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp", e
             );
         }
     }

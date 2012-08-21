@@ -112,15 +112,15 @@ public class SecurityContextTokenProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
                 "noKey",
-                new Object[] {identifier}, 
-                e
+                e,
+                new Object[] {identifier} 
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
                 "noKey",
-                new Object[] {identifier}, 
-                e
+                e,
+                new Object[] {identifier} 
             );
         }
 

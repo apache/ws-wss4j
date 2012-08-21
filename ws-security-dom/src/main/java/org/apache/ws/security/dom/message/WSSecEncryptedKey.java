@@ -258,11 +258,11 @@ public class WSSecEncryptedKey extends WSSecBase {
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         }
         int blockSize = cipher.getBlockSize();
@@ -276,15 +276,15 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedEphemeralKey = cipher.wrap(secretKey);
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         } catch (IllegalBlockSizeException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         } catch (InvalidKeyException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         }
         Text keyText = 
@@ -435,7 +435,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             return keyGen;
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, e
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e
             );
         }
     }

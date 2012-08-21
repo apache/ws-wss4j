@@ -172,14 +172,14 @@ public class UsernameTokenValidator implements Validator {
                 log.debug(e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         } catch (UnsupportedCallbackException e) {
             if (log.isDebugEnabled()) {
                 log.debug(e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         }
         String origPassword = pwCb.getPassword();

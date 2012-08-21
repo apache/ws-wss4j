@@ -319,7 +319,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         } catch (Exception ex) {
             log.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
         }
 
@@ -377,7 +377,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
         }
         
@@ -553,7 +553,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         } catch (Exception ex) {
             log.error(ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
             );
         }
     }

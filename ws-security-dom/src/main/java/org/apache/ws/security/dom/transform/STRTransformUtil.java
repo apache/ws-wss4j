@@ -113,7 +113,7 @@ public final class STRTransformUtil {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
             );
         }
         String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);

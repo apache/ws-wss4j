@@ -175,8 +175,8 @@ public class KerberosTokenValidator implements Validator {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
-                new Object[] {ex.getMessage()},
-                ex
+                ex,
+                new Object[] {ex.getMessage()}
             );
         }
         if (log.isDebugEnabled()) {

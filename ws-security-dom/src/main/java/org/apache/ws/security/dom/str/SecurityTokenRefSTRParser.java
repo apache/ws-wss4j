@@ -265,8 +265,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword", 
-                new Object[] {id}, 
-                e
+                e,
+                new Object[] {id}
             );
         }
 

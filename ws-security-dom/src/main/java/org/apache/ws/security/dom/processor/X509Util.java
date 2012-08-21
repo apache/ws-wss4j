@@ -104,15 +104,15 @@ public final class X509Util {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",
-                new Object[]{keyName}, 
-                e
+                e,
+                new Object[]{keyName} 
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",
-                new Object[]{keyName}, 
-                e
+                e,
+                new Object[]{keyName} 
             );
         }
         byte[] decryptedData = pwCb.getKey();

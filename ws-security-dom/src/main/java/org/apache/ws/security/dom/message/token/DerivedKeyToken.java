@@ -553,7 +553,7 @@ public class DerivedKeyToken {
             
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, null, null, e
+                WSSecurityException.ErrorCode.FAILURE, e
             );
         }
     }

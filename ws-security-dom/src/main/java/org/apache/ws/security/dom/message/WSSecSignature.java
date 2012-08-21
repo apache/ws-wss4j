@@ -179,7 +179,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         } catch (Exception ex) {
             log.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
         }
 
@@ -316,7 +316,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 } catch (java.security.KeyException ex) {
                     log.error("", ex);
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", null, ex
+                        WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
                     );
                 }
                 break;
@@ -556,7 +556,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         } catch (Exception ex) {
             log.error(ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
             );
         }
     }

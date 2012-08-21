@@ -167,7 +167,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             } catch (ValidationException e) {
                 LOG.debug("Saml Validation error: " + e.getMessage(), e);
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
                 );
             }
         } else if (assertion.getSaml2() != null) {
@@ -181,7 +181,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             } catch (ValidationException e) {
                 LOG.debug("Saml Validation error: " + e.getMessage(), e);
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
                 );
             }
         }

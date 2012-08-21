@@ -128,7 +128,7 @@ public class X509Security extends BinarySecurity {
             setToken(cert.getEncoded());
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
             );
         }
     }

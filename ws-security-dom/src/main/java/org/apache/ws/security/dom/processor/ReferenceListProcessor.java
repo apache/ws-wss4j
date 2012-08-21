@@ -291,7 +291,7 @@ public class ReferenceListProcessor implements Processor {
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, ex
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
             );
         }
 
@@ -311,7 +311,7 @@ public class ReferenceListProcessor implements Processor {
         try {
             xmlCipher.doFinal(doc, encData, content);
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
         
         if (parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)

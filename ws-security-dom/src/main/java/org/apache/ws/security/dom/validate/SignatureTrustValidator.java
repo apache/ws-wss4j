@@ -104,11 +104,11 @@ public class SignatureTrustValidator implements Validator {
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", null, e
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
             );
         } catch (CertificateNotYetValidException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", null, e
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
             );
         }
     }

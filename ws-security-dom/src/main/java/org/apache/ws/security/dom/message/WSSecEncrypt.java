@@ -378,7 +378,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             xmlCipher = XMLCipher.getInstance(encryptionAlgorithm);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, ex
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
             );
         }
 
@@ -415,7 +415,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
                 } catch (Exception ex) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
+                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
                     );
                 }
             }
@@ -491,7 +491,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             return xencEncryptedDataId;
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         }
     }

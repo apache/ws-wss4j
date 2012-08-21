@@ -790,7 +790,7 @@ public final class WSSecurityUtil {
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
-                new Object[] { "No such padding: " + cipherAlgo }, ex
+                ex, new Object[] { "No such padding: " + cipherAlgo }
             );
         } catch (NoSuchAlgorithmException ex) {
             // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
@@ -801,13 +801,13 @@ public final class WSSecurityUtil {
                 } catch (Exception e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        new Object[] { "No such algorithm: " + cipherAlgo }, e
+                        e, new Object[] { "No such algorithm: " + cipherAlgo }
                     );
                 }
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                    new Object[] { "No such algorithm: " + cipherAlgo }, ex
+                    ex, new Object[] { "No such algorithm: " + cipherAlgo }
                 );
             }
         }

@@ -530,14 +530,14 @@ public class UsernameToken {
                 LOG.debug(e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         } catch (UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         }
         rawPassword = pwCb.getPassword();
@@ -781,7 +781,7 @@ public class UsernameToken {
                 LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", null, e
+                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e
             );
         }
         //

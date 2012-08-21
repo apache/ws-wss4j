@@ -75,8 +75,8 @@ public class SpnegoTokenContext {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
-                new Object[] {ex.getMessage()},
-                ex
+                ex,
+                new Object[] {ex.getMessage()}
             );
         }
         if (LOG.isDebugEnabled()) {
@@ -140,8 +140,8 @@ public class SpnegoTokenContext {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
-                new Object[] {ex.getMessage()},
-                ex
+                ex,
+                new Object[] {ex.getMessage()}
             );
         }
         if (LOG.isDebugEnabled()) {
@@ -211,7 +211,7 @@ public class SpnegoTokenContext {
                 LOG.debug("Error in cleaning up a GSS context", e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", null, e
+                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", e
             );
         }
     }
@@ -228,7 +228,7 @@ public class SpnegoTokenContext {
                 LOG.debug("Error in cleaning up a GSS context", e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", null, e
+                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", e
             );
         }
     }

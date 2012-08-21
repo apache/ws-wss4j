@@ -122,7 +122,7 @@ public class EncryptedDataProcessor implements Processor {
             xmlCipher.init(XMLCipher.DECRYPT_MODE, key);
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, null, null, ex
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
             );
         }
         Node previousSibling = elem.getPreviousSibling();
@@ -131,7 +131,7 @@ public class EncryptedDataProcessor implements Processor {
             xmlCipher.doFinal(elem.getOwnerDocument(), elem, false);
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, null, null, e
+                WSSecurityException.ErrorCode.FAILED_CHECK, e
             );
         }
         

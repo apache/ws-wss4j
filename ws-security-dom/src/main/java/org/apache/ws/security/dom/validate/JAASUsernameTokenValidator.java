@@ -107,7 +107,7 @@ public class JAASUsernameTokenValidator implements Validator {
         } catch (LoginException ex) {
             log.info("Authentication failed", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, ex
             );
         }
         

@@ -351,7 +351,7 @@ public class SecurityTokenReference {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
             );
         }
         Text text = doc.createTextNode(Base64.encode(data));
@@ -410,7 +410,7 @@ public class SecurityTokenReference {
             encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException e1) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e1
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e1
             );
         }
         try {
@@ -419,7 +419,7 @@ public class SecurityTokenReference {
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", null, e1
+                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e1
             );
         }
     }

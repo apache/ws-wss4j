@@ -126,7 +126,7 @@ public class EncryptedKeyProcessor implements Processor {
                 cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParameterSpec);
             }
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
         
         List<String> dataRefURIs = getDataRefURIs(elem);
@@ -137,7 +137,7 @@ public class EncryptedKeyProcessor implements Processor {
             encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
             decryptedBytes = cipher.doFinal(encryptedEphemeralKey);
         } catch (IllegalStateException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         } catch (Exception ex) {
             decryptedBytes = getRandomKey(dataRefURIs, elem.getOwnerDocument(), wsDocInfo);
         }
@@ -189,7 +189,7 @@ public class EncryptedKeyProcessor implements Processor {
             SecretKey k = kgen.generateKey();
             return k.getEncoded();
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
     }
     
@@ -387,7 +387,7 @@ public class EncryptedKeyProcessor implements Processor {
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
-                new Object[]{symEncAlgo}, ex
+                ex, new Object[]{symEncAlgo}
             );
         }
 

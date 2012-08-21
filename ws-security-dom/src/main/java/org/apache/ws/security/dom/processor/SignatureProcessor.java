@@ -268,7 +268,7 @@ public class SignatureProcessor implements Processor {
             //
             keyValue = getKeyValue(keyInfoElement);
         } catch (javax.xml.crypto.MarshalException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         } 
 
         if (keyValue != null) {
@@ -279,7 +279,7 @@ public class SignatureProcessor implements Processor {
                 return keyValue.getPublicKey();
             } catch (java.security.KeyException ex) {
                 LOG.error(ex.getMessage(), ex);
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
             }     
         } else {
             throw new WSSecurityException(
@@ -405,7 +405,7 @@ public class SignatureProcessor implements Processor {
             throw ex;
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_CHECK, ex
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
