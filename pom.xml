@@ -103,7 +103,7 @@
         <module>bindings</module>
         <module>policy</module>
         <module>ws-security-common</module>
-        <module>wss4j-dom</module>
+        <module>ws-security-dom</module>
         <module>streaming-ws-security</module>
         <module>streaming-ws-policy</module>
         <module>cxf-integration</module>
