@@ -28,7 +28,7 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <groupId>org.apache.ws.security</groupId>
-    <artifactId>ws-security-dom</artifactId>
+    <artifactId>wss4j-ws-security-dom</artifactId>
     <packaging>bundle</packaging>
     <name>Apache WSS4J DOM WS-Security</name>
     <version>2.0-SNAPSHOT</version>

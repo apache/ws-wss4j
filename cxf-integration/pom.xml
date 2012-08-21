@@ -40,7 +40,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j-streaming-ws-security</artifactId>
+            <artifactId>wss4j-ws-security-stax</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -60,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j-streaming-ws-security</artifactId>
+            <artifactId>wss4j-ws-security-stax</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>

@@ -19,7 +19,7 @@
 package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.policy.stax.PolicyEnforcerFactory;
 import org.apache.ws.security.policy.stax.PolicyInputProcessor;
