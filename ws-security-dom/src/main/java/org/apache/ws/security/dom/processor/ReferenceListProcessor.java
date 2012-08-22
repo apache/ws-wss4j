@@ -30,7 +30,9 @@ import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.CallbackLookup;
 import org.apache.ws.security.dom.message.DOMCallbackLookup;
@@ -143,9 +145,8 @@ public class ReferenceListProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         }
         // Check BSP compliance
-        if (data.getWssConfig().isWsiBSPCompliant()) {
-            checkBSPCompliance(keyInfoElement, symEncAlgo);
-        }
+        checkBSPCompliance(keyInfoElement, symEncAlgo, data.getBSPEnforcer());
+        
         //
         // Try to get a security reference token, if none found try to get a
         // shared key using a KeyName.
@@ -183,7 +184,8 @@ public class ReferenceListProcessor implements Processor {
      */
     private static void checkBSPCompliance(
         Element keyInfoElement, 
-        String encAlgo
+        String encAlgo,
+        BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
         // We can only have one token reference
         int result = 0;
@@ -197,23 +199,17 @@ public class ReferenceListProcessor implements Processor {
             node = node.getNextSibling();
         }
         if (result != 1) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidDataRef"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5424);
         }
         
         if (!WSConstants.WSSE_NS.equals(child.getNamespaceURI()) || 
             !SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5426);
         }
         
         // EncryptionAlgorithm cannot be null
         if (encAlgo == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5601);
         }
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
         if (!WSConstants.TRIPLE_DES.equals(encAlgo)
@@ -221,9 +217,7 @@ public class ReferenceListProcessor implements Processor {
             && !WSConstants.AES_128_GCM.equals(encAlgo)
             && !WSConstants.AES_256.equals(encAlgo)
             && !WSConstants.AES_256_GCM.equals(encAlgo)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5620);
         }
     }
 

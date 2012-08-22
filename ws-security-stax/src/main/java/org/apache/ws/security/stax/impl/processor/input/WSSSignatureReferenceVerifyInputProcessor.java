@@ -22,6 +22,7 @@ import org.apache.jcs.JCS;
 import org.apache.jcs.access.exception.CacheException;
 import org.apache.jcs.engine.ElementAttributes;
 import org.apache.ws.security.binding.wss10.TransformationParametersType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
@@ -82,9 +83,9 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);
             if (referenceType.getTransforms() == null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R5416);
+                securityContext.handleBSPRule(BSPRule.R5416);
             } else if (referenceType.getTransforms().getTransform().size() == 0) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R5411);
+                securityContext.handleBSPRule(BSPRule.R5411);
             } else {
                 List<TransformType> transformTypes = referenceType.getTransforms().getTransform();
                 for (int j = 0; j < transformTypes.size(); j++) {
@@ -96,35 +97,35 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                             && !WSSConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R5423);
+                        securityContext.handleBSPRule(BSPRule.R5423);
                         if (j == transformTypes.size() - 1) {
                             if (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
                                     && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
                                     && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                                     && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
-                                securityContext.handleBSPRule(WSSConstants.BSPRule.R5412);
+                                securityContext.handleBSPRule(BSPRule.R5412);
                             }
                         }
                         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                         if (WSSConstants.NS_C14N_EXCL.equals(algorithm)
                                 && inclusiveNamespacesType != null
                                 && inclusiveNamespacesType.getPrefixList().size() == 0) {
-                            securityContext.handleBSPRule(WSSConstants.BSPRule.R5407);
+                            securityContext.handleBSPRule(BSPRule.R5407);
                         }
                         if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
                             if (inclusiveNamespacesType != null
                                     && inclusiveNamespacesType.getPrefixList().size() == 0) {
-                                securityContext.handleBSPRule(WSSConstants.BSPRule.R5413);
+                                securityContext.handleBSPRule(BSPRule.R5413);
                             }
                             TransformationParametersType transformationParametersType =
                                     XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_wsse_TransformationParameters);
                             if (transformationParametersType == null) {
-                                securityContext.handleBSPRule(WSSConstants.BSPRule.R3065);
+                                securityContext.handleBSPRule(BSPRule.R3065);
                             } else {
                                 CanonicalizationMethodType canonicalizationMethodType =
                                         XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), WSSConstants.TAG_dsig_CanonicalizationMethod);
                                 if (canonicalizationMethodType == null) {
-                                    securityContext.handleBSPRule(WSSConstants.BSPRule.R3065);
+                                    securityContext.handleBSPRule(BSPRule.R3065);
                                 }
                             }
                         }
@@ -132,7 +133,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 }
             }
             if (!WSSConstants.NS_XMLDSIG_SHA1.equals(referenceType.getDigestMethod().getAlgorithm())) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R5420);
+                securityContext.handleBSPRule(BSPRule.R5420);
             }
         }
     }

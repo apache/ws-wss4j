@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.test;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -397,8 +398,8 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R3203);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R3221);
+            securityProperties.addIgnoreBSPRule(BSPRule.R3203);
+            securityProperties.addIgnoreBSPRule(BSPRule.R3221);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -485,7 +486,7 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R3203);
+            securityProperties.addIgnoreBSPRule(BSPRule.R3203);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 

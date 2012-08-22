@@ -19,19 +19,18 @@
 
 package org.apache.ws.security.dom.processor;
 
+import java.util.List;
+
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
-import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.token.Timestamp;
 import org.apache.ws.security.dom.validate.Credential;
 import org.apache.ws.security.dom.validate.Validator;
 import org.w3c.dom.Element;
-
-import java.util.List;
 
 public class TimestampProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -48,8 +47,7 @@ public class TimestampProcessor implements Processor {
         //
         // Decode Timestamp, add the found time (created/expiry) to result
         //
-        WSSConfig config = data.getWssConfig();
-        Timestamp timestamp = new Timestamp(elem, config.isWsiBSPCompliant());
+        Timestamp timestamp = new Timestamp(elem, data.getBSPEnforcer());
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
         

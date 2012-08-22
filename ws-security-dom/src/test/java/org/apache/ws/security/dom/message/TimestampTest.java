@@ -23,7 +23,10 @@ import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.WSSecurityEngine;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.message.token.Timestamp;
@@ -34,6 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +81,7 @@ public class TimestampTest extends org.junit.Assert {
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
         
-        Timestamp clone = new Timestamp(receivedTimestamp.getElement());
+        Timestamp clone = new Timestamp(receivedTimestamp.getElement(), new BSPEnforcer(true));
         assertTrue(clone.equals(receivedTimestamp));
         assertTrue(clone.hashCode() == receivedTimestamp.hashCode());
     }
@@ -297,13 +302,13 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
+        long currentTime = createdDate.getTime();
         createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
         
         Date expiresDate = new Date();
-        expiresDate.setTime(expiresDate.getTime() -300000);
+        expiresDate.setTime(expiresDate.getTime() - 300000);
 
         Element elementExpires =
             doc.createElementNS(
@@ -326,7 +331,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+            //
         }
     }
     
@@ -358,7 +363,6 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
         try {
             verify(createdDoc, wssConfig);
             fail("Expected failure on multiple timestamps");
@@ -366,9 +370,7 @@ public class TimestampTest extends org.junit.Assert {
             // expected
         }
         
-        // Turn off BSP compliance and the test should pass
-        wssConfig.setWsiBSPCompliant(false);
-        verify(createdDoc, wssConfig);
+        verify(createdDoc, Collections.singletonList(BSPRule.R3227));
     }
     
     /**
@@ -393,8 +395,6 @@ public class TimestampTest extends org.junit.Assert {
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
-        createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
         timestampElement.appendChild(elementCreated.cloneNode(true));
@@ -415,6 +415,8 @@ public class TimestampTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             // expected
         }
+        
+        verify(doc, Collections.singletonList(BSPRule.R3203));
     }
     
     /**
@@ -454,14 +456,17 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
         try {
-            verify(doc, wssConfig);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed on no Created element");
         } catch (WSSecurityException ex) {
             // expected
         }
+        
+        List<BSPRule> rules = new ArrayList<BSPRule>();
+        rules.add(BSPRule.R3203);
+        rules.add(BSPRule.R3221);
+        verify(doc, rules);
     }
     
     /**
@@ -479,18 +484,27 @@ public class TimestampTest extends org.junit.Assert {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
-
+        
         DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
+        long currentTime = createdDate.getTime();
         createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
-        timestampElement.appendChild(elementCreated.cloneNode(true));
+
+        zulu = new XmlSchemaDateFormat();
+        Element elementExpires =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        createdDate.setTime(currentTime + 300000);
+        elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementExpires);
+        timestampElement.appendChild(elementExpires.cloneNode(true));
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
         
@@ -508,6 +522,8 @@ public class TimestampTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             // expected
         }
+        
+        verify(doc, Collections.singletonList(BSPRule.R3224));
     }
     
     /**
@@ -531,17 +547,17 @@ public class TimestampTest extends org.junit.Assert {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
             );
-        Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
-        createdDate.setTime(currentTime);
-        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        Date expiresDate = new Date();
+        long currentTime = expiresDate.getTime() + 300000;
+        expiresDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(expiresDate)));
         timestampElement.appendChild(elementCreated);
         
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        elementExpires.appendChild(doc.createTextNode(zulu.format(new Date())));
         timestampElement.appendChild(elementExpires);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
@@ -554,14 +570,14 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
         try {
-            verify(doc, wssConfig);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             // expected
         }
+        
+        verify(doc, Collections.singletonList(BSPRule.R3221));
     }
     
     
@@ -600,7 +616,6 @@ public class TimestampTest extends org.junit.Assert {
         // is rejecting the Timestamp
         //
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
         wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         try {
             verify(doc, wssConfig);
@@ -650,18 +665,16 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
         wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         try {
-            verify(doc, wssConfig);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
         }
         
         // Now it should pass...
-        wssConfig.setWsiBSPCompliant(false);
-        verify(doc, wssConfig);
+        verify(doc, wssConfig, Collections.singletonList(BSPRule.R3225));
     }
     
 
@@ -685,13 +698,19 @@ public class TimestampTest extends org.junit.Assert {
         DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
-                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
         Date createdDate = new Date();
-        long currentTime = createdDate.getTime() + 300000;
-        createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
+        
+        Element elementExpires =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
+            );
+        createdDate.setTime(createdDate.getTime() + 300000);
+        elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        timestampElement.appendChild(elementExpires);
         
         Element elementCustom =
             doc.createElementNS(
@@ -709,33 +728,52 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
         try {
-            verify(doc, wssConfig);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
         }
         
         // Now it should pass...
-        wssConfig.setWsiBSPCompliant(false);
-        verify(doc, wssConfig);
+        verify(doc, Collections.singletonList(BSPRule.R3222));
     }
     
     /**
      * Verifies the soap envelope
-     * 
-     * @param env soap envelope
-     * @param wssConfig
-     * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(
         Document doc, WSSConfig wssConfig
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        secEngine.setWssConfig(wssConfig);
-        return secEngine.processSecurityHeader(doc, null, null, null);
+        RequestData requestData = new RequestData();
+        requestData.setWssConfig(wssConfig);
+        return secEngine.processSecurityHeader(doc, "", requestData);
+    }
+    
+    /**
+     * Verifies the soap envelope
+     */
+    private List<WSSecurityEngineResult> verify(
+        Document doc, List<BSPRule> ignoredRules
+    ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData requestData = new RequestData();
+        requestData.setIgnoredBSPRules(ignoredRules);
+        return secEngine.processSecurityHeader(doc, "", requestData);
+    }
+    
+    /**
+     * Verifies the soap envelope
+     */
+    private List<WSSecurityEngineResult> verify(
+        Document doc, WSSConfig wssConfig, List<BSPRule> ignoredRules
+    ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData requestData = new RequestData();
+        requestData.setWssConfig(wssConfig);
+        requestData.setIgnoredBSPRules(ignoredRules);
+        return secEngine.processSecurityHeader(doc, "", requestData);
     }
     
     

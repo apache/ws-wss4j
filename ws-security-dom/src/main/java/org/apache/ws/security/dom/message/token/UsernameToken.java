@@ -21,9 +21,11 @@ package org.apache.ws.security.dom.message.token;
 
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSUsernameTokenPrincipal;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.ws.security.dom.util.XmlSchemaDateFormat;
@@ -82,20 +84,7 @@ public class UsernameToken {
     protected boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded = false;
-    private boolean bspCompliantDerivedKey = true;
     
-    /**
-     * Constructs a <code>UsernameToken</code> object and parses the
-     * <code>wsse:UsernameToken</code> element to initialize it.
-     * 
-     * @param elem the <code>wsse:UsernameToken</code> element that contains
-     *             the UsernameToken data
-     * @throws WSSecurityException
-     */
-    public UsernameToken(Element elem) throws WSSecurityException {
-        this (elem, false, true);
-    }
-
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
      * <code>wsse:UsernameToken</code> element to initialize it.
@@ -104,13 +93,13 @@ public class UsernameToken {
      *             the UsernameToken data
      * @param allowNamespaceQualifiedPasswordTypes whether to allow (wsse)
      *        namespace qualified password types or not (for interop with WCF)
-     * @param bspCompliant whether the UsernameToken processing complies with the BSP spec
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
     public UsernameToken(
         Element elem, 
         boolean allowNamespaceQualifiedPasswordTypes,
-        boolean bspCompliant
+        BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
@@ -151,9 +140,7 @@ public class UsernameToken {
             );
         }
         
-        if (bspCompliant) {
-            checkBSPCompliance();
-        }
+        checkBSPCompliance(bspEnforcer);
         
         hashed = false;
         if (elementSalt != null) {
@@ -199,7 +186,8 @@ public class UsernameToken {
                 } else {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "badUsernameToken"
+                        "badUsernameToken",
+                        "The Password Type is not allowed to be namespace qualified"
                     );
                 }
             }
@@ -830,11 +818,26 @@ public class UsernameToken {
      * @return Returns the derived key as a byte array
      * @throws WSSecurityException
      */
-    public byte[] getDerivedKey() throws WSSecurityException {
-        if (rawPassword == null || !bspCompliantDerivedKey) {
-            LOG.debug("The raw password was null or the Username Token is not BSP compliant");
+    public byte[] getDerivedKey(BSPEnforcer bspEnforcer) throws WSSecurityException {
+        if (rawPassword == null) {
+            LOG.debug("The raw password was null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
+        
+        if (elementSalt == null) {
+            // We must have a salt element to use this token for a derived key
+            bspEnforcer.handleBSPRule(BSPRule.R4217);
+        }
+        if (elementIteration == null) {
+            // we must have an iteration element to use this token for a derived key
+            bspEnforcer.handleBSPRule(BSPRule.R4218);
+        } else {
+            String iter = nodeString(elementIteration);
+            if (iter == null || Integer.parseInt(iter) < 1000) {
+                bspEnforcer.handleBSPRule(BSPRule.R4218);
+            }
+        }
+        
         int iteration = getIteration();
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {
@@ -1038,7 +1041,7 @@ public class UsernameToken {
      * A method to check that the UsernameToken is compliant with the BSP spec.
      * @throws WSSecurityException
      */
-    private void checkBSPCompliance() throws WSSecurityException {
+    private void checkBSPCompliance(BSPEnforcer bspEnforcer) throws WSSecurityException {
         List<Element> passwordElements = 
             WSSecurityUtil.getDirectChildElements(
                 element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
@@ -1048,9 +1051,7 @@ public class UsernameToken {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("The Username Token had more than one password element");
             }
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R4222);
         }
         
         // We must have a password type
@@ -1061,23 +1062,7 @@ public class UsernameToken {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("The Username Token password does not have a Type attribute");
                 }
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
-                );
-            }
-        }
-        
-        if (elementSalt == null) {
-            // We must have a salt element to use this token for a derived key
-            bspCompliantDerivedKey = false;
-        }
-        if (elementIteration == null) {
-            // we must have an iteration element to use this token for a derived key
-            bspCompliantDerivedKey = false;
-        } else {
-            String iter = nodeString(elementIteration);
-            if (iter == null || Integer.parseInt(iter) < 1000) {
-                bspCompliantDerivedKey = false;
+                bspEnforcer.handleBSPRule(BSPRule.R4201);
             }
         }
         
@@ -1090,9 +1075,7 @@ public class UsernameToken {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("The Username Token has more than one created element");
             }
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R4223);
         }
         
         List<Element> nonceElements = 
@@ -1104,24 +1087,20 @@ public class UsernameToken {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("The Username Token has more than one nonce element");
             }
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badUsernameToken"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R4225);
         }
         
         if (nonceElements.size() == 1) {
             Element nonce = nonceElements.get(0);
             String encodingType = nonce.getAttribute("EncodingType");
             // Encoding Type must be equal to Base64Binary
-            if (encodingType == null || "".equals(encodingType)
-                || !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
+            if (encodingType == null || "".equals(encodingType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R4220);
+            } else if (!BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("The Username Token's nonce element has a bad encoding type");
                 }
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
-                    "badUsernameToken" 
-                );
+                bspEnforcer.handleBSPRule(BSPRule.R4221);
             }
         }
     }

@@ -338,7 +338,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
             usernameToken.setRawPassword(data);
-            secretKey = usernameToken.getDerivedKey();
+            secretKey = usernameToken.getDerivedKey(data.getBSPEnforcer());
         } 
     }
     

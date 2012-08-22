@@ -24,7 +24,9 @@ import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.str.STRParser;
 import org.apache.ws.security.dom.str.SecurityTokenRefSTRParser;
@@ -73,7 +75,7 @@ public class EncryptedDataProcessor implements Processor {
         String symEncAlgo = X509Util.getEncAlgo(elem);
         // Check BSP compliance
         if (request.getWssConfig().isWsiBSPCompliant()) {
-            checkBSPCompliance(symEncAlgo);
+            checkBSPCompliance(symEncAlgo, request.getBSPEnforcer());
         }
         
         // Get the Key either via a SecurityTokenReference or an EncryptedKey
@@ -194,13 +196,11 @@ public class EncryptedDataProcessor implements Processor {
      * @throws WSSecurityException
      */
     private static void checkBSPCompliance(
-        String encAlgo
+        String encAlgo, BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
         // EncryptionAlgorithm cannot be null
         if (encAlgo == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5601);
         }
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
         if (!WSConstants.TRIPLE_DES.equals(encAlgo)
@@ -208,9 +208,7 @@ public class EncryptedDataProcessor implements Processor {
             && !WSConstants.AES_128_GCM.equals(encAlgo)
             && !WSConstants.AES_256.equals(encAlgo)
             && !WSConstants.AES_256_GCM.equals(encAlgo)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5620);
         }
     }
 

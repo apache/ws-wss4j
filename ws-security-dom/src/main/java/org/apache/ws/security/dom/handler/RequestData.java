@@ -22,6 +22,8 @@ package org.apache.ws.security.dom.handler;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -32,7 +34,9 @@ import org.apache.ws.security.dom.SOAPConstants;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSEncryptionPart;
 import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.cache.ReplayCache;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.message.WSSecHeader;
@@ -85,6 +89,7 @@ public class RequestData {
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
+    private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
 
     public void clear() {
         soapConstants = null;
@@ -110,6 +115,7 @@ public class RequestData {
         timestampReplayCache = null;
         nonceReplayCache = null;
         subjectDNPatterns.clear();
+        ignoredBSPRules.clear();
     }
 
     public Object getMsgContext() {
@@ -519,6 +525,19 @@ public class RequestData {
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
+    }
+    
+    public void setIgnoredBSPRules(List<BSPRule> bspRules) {
+        ignoredBSPRules.clear();
+        ignoredBSPRules.addAll(bspRules);
+    }
+
+    public List<BSPRule> getIgnoredBSPRules() {
+        return Collections.unmodifiableList(ignoredBSPRules);
+    }
+    
+    public BSPEnforcer getBSPEnforcer() {
+        return new BSPEnforcer(ignoredBSPRules);
     }
 
 }

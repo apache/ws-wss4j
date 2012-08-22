@@ -30,6 +30,8 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,29 +50,14 @@ public class KerberosSecurity extends BinarySecurity {
      * it from the data contained in the element.
      *
      * @param elem the element containing the Kerberos token data
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
-    public KerberosSecurity(Element elem) throws WSSecurityException {
-        this(elem, true);
-    }
-    
-    /**
-     * This constructor creates a new Kerberos token object and initializes
-     * it from the data contained in the element.
-     *
-     * @param elem the element containing the Kerberos token data
-     * @param bspCompliant Whether the token is processed according to the BSP spec
-     * @throws WSSecurityException
-     */
-    public KerberosSecurity(Element elem, boolean bspCompliant) throws WSSecurityException {
-        super(elem, bspCompliant);
+    public KerberosSecurity(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
+        super(elem, bspEnforcer);
         String valueType = getValueType();
-        if (bspCompliant && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
-                "invalidValueType", 
-                new Object[]{valueType}
-            );
+        if (!WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
+            bspEnforcer.handleBSPRule(BSPRule.R6902);
         }
     }
 

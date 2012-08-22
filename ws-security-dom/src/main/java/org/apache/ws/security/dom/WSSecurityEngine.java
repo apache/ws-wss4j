@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.derivedKey.ConversationConstants;
@@ -304,6 +305,39 @@ public class WSSecurityEngine {
         return processSecurityHeader(securityHeader, data);
     }
     
+    /**
+     * Process the security header given the soap envelope as W3C document.
+     * <p/>
+     * This is the main entry point to verify or decrypt a SOAP envelope.
+     * First check if a <code>wsse:Security</code> is available with the
+     * defined actor.
+     *
+     * @param doc       the SOAP envelope as {@link Document}
+     * @param actor     the engine works on behalf of this <code>actor</code>. Refer
+     *                  to the SOAP specification about <code>actor</code> or <code>role
+     *                  </code>
+     * @param requestData    the RequestData associated with the request.  It should
+     *                       be able to provide the callback handler, cryptos, etc...
+     *                       as needed by the processing
+     * @return a result list
+     * @throws WSSecurityException
+     */
+    public List<WSSecurityEngineResult> processSecurityHeader(
+        Document doc, String actor, RequestData requestData
+    ) throws WSSecurityException {
+        if (actor == null) {
+            actor = "";
+        }
+        List<WSSecurityEngineResult> wsResult = null;
+        Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
+        if (elem != null) {
+            if (doDebug) {
+                log.debug("Processing WS-Security header for '" + actor + "' actor.");
+            }
+            wsResult = processSecurityHeader(elem, requestData);
+        }
+        return wsResult;
+    }
     
     /**
      * Process the security header given the <code>wsse:Security</code> DOM
@@ -343,7 +377,8 @@ public class WSSecurityEngine {
      */
     public List<WSSecurityEngineResult> processSecurityHeader(
         Element securityHeader,
-        RequestData requestData) throws WSSecurityException {
+        RequestData requestData
+    ) throws WSSecurityException {
         List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
         if (securityHeader == null) {
             return returnResults;
@@ -373,19 +408,10 @@ public class WSSecurityEngine {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
                 
                 // Check for multiple timestamps
-                if (requestData.getWssConfig().isWsiBSPCompliant()) {
-                    if (foundTimestamp && el.equals(TIMESTAMP)) {
-                        if (doDebug) {
-                            log.debug(
-                                "Failure on processing multiple Timestamps as per the BSP"
-                            );
-                        }
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidTimestamp"
-                        );
-                    } else if (el.equals(TIMESTAMP)) {
-                        foundTimestamp = true;
-                    }
+                if (foundTimestamp && el.equals(TIMESTAMP)) {
+                    requestData.getBSPEnforcer().handleBSPRule(BSPRule.R3227);
+                } else if (el.equals(TIMESTAMP)) {
+                    foundTimestamp = true;
                 }
                 //
                 // Call the processor for this token. After the processor returns, 

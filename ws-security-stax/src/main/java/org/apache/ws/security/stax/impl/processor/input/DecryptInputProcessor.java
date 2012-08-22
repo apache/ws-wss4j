@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
@@ -62,19 +63,19 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             throws XMLSecurityException {
 
         super(keyInfoType, referenceList, securityProperties);
-        checkBSPCompliance(keyInfoType, referenceList, securityContext, WSSConstants.BSPRule.R3006);
+        checkBSPCompliance(keyInfoType, referenceList, securityContext, BSPRule.R3006);
     }
 
     private void checkBSPCompliance(KeyInfoType keyInfoType, ReferenceList referenceList, WSSecurityContext securityContext,
-                                    WSSConstants.BSPRule bspRule) throws WSSecurityException {
+                                    BSPRule bspRule) throws WSSecurityException {
         if (keyInfoType != null) {
             if (keyInfoType.getContent().size() != 1) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R5424);
+                securityContext.handleBSPRule(BSPRule.R5424);
             }
             SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoType.getContent(),
                     WSSConstants.TAG_wsse_SecurityTokenReference);
             if (securityTokenReferenceType == null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R5426);
+                securityContext.handleBSPRule(BSPRule.R5426);
             }
         }
 
@@ -120,7 +121,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         if (!WSSConstants.NS_XENC_TRIPLE_DES.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES128.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES256.equals(encryptionAlgorithm)) {
-            ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R5620);
+            ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R5620);
         }
 
         return new DecryptedEventReaderInputProcessor(getSecurityProperties(),

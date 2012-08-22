@@ -615,7 +615,7 @@ public class SignatureProcessor implements Processor {
                 if (sibling instanceof Element 
                     && WSConstants.TIMESTAMP_TOKEN_LN.equals(((Element)sibling).getLocalName())
                     && WSConstants.WSU_NS.equals(((Element)sibling).getNamespaceURI())) {
-                    timeStamp = new Timestamp((Element)sibling, requestData.getWssConfig().isWsiBSPCompliant());
+                    timeStamp = new Timestamp((Element)sibling, requestData.getBSPEnforcer());
                     break;
                 }
                 sibling = sibling.getNextSibling();

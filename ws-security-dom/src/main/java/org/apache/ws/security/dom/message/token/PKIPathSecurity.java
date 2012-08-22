@@ -20,6 +20,8 @@
 package org.apache.ws.security.dom.message.token;
 
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
@@ -37,29 +39,15 @@ public class PKIPathSecurity extends BinarySecurity {
 
     /**
      * Constructor.
-     *
-     * @param elem The PKIPath element to process
-     * @throws WSSecurityException
-     */
-    public PKIPathSecurity(Element elem) throws WSSecurityException {
-        this(elem, true);
-    }
-    
-    /**
-     * Constructor.
      * 
      * @param elem The PKIPath element to process
-     * @param bspCompliant Whether the token is processed according to the BSP spec
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
-    public PKIPathSecurity(Element elem, boolean bspCompliant) throws WSSecurityException {
-        super(elem, bspCompliant);
-        if (bspCompliant && !PKI_TYPE.equals(getValueType())) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                "invalidValueType",
-                new Object[]{PKI_TYPE, getValueType()}
-            );
+    public PKIPathSecurity(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
+        super(elem, bspEnforcer);
+        if (!PKI_TYPE.equals(getValueType())) {
+            bspEnforcer.handleBSPRule(BSPRule.R5214);
         }
     }
 

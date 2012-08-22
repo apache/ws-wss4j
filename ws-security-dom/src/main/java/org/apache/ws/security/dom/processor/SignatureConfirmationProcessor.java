@@ -44,20 +44,11 @@ public class SignatureConfirmationProcessor implements Processor {
         //
         // Decode SignatureConfirmation, just store in result
         //
-        SignatureConfirmation sigConf = new SignatureConfirmation(elem);
-        String id = sigConf.getID();
-        // A wsu:Id is required as per the BSP spec
-        if (data.getWssConfig().isWsiBSPCompliant() && (id == null || "".equals(id))) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, 
-                "requiredElementNoID", 
-                new Object[] {elem.getLocalName()}
-            );
-        }
-        
+        SignatureConfirmation sigConf = new SignatureConfirmation(elem, data.getBSPEnforcer());
+
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.SC, sigConf);
-        result.put(WSSecurityEngineResult.TAG_ID, id);
+        result.put(WSSecurityEngineResult.TAG_ID, sigConf.getID());
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);

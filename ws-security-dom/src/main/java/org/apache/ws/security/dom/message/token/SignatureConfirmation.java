@@ -22,8 +22,10 @@ package org.apache.ws.security.dom.message.token;
 import java.util.Arrays;
 
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
@@ -50,9 +52,16 @@ public class SignatureConfirmation {
      *
      * @param elem the <code>wsse11:SignatureCOnfirmation</code> element that
      *             contains the confirmation data
+     * @param bspEnforcer a BSPEnforcer instance used to enforce BSP rules             
      */
-    public SignatureConfirmation(Element elem) throws WSSecurityException {
+    public SignatureConfirmation(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
         element = elem;
+        
+        String id = getID();
+        if (id == null || "".equals(id)) {
+            bspEnforcer.handleBSPRule(BSPRule.R5441);
+        }
+        
         String sv = element.getAttribute(SC_VALUE_ATTR);
         if (sv != null) {
             try {

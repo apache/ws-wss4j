@@ -26,6 +26,8 @@ import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.common.EncodedPasswordCallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.dom.common.UsernamePasswordCallbackHandler;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -40,6 +42,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -657,12 +660,13 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             // expected
         }
-        
-        // Turn off BSP compliance and it should work
-        config.setWsiBSPCompliant(false);
-        WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setDecCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4218));
+        WSSecurityEngine engine = new WSSecurityEngine();
+        engine.processSecurityHeader(doc, "", data);
     }
 
     

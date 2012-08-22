@@ -131,7 +131,7 @@ public class EncryptedKeySTRParser implements STRParser {
             // at this point ... check token type: Binary
             QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
             if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                X509Security token = new X509Security(bstElement);
+                X509Security token = new X509Security(bstElement, data.getBSPEnforcer());
                 if (bspCompliant) {
                     BSPEnforcer.checkBinarySecurityBSPCompliance(secRef, token);
                 }

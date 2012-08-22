@@ -30,6 +30,7 @@ import org.apache.ws.security.dom.common.CustomHandler;
 import org.apache.ws.security.dom.common.KeystoreCallbackHandler;
 import org.apache.ws.security.dom.common.SecretKeyCallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -48,6 +49,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -585,23 +587,20 @@ public class EncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
-        // Turn off BSP compliance
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(wssConfig);
-        newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
-        
-        // Now turn on BSP compliance
-        wssConfig.setWsiBSPCompliant(true);
-        newEngine.setWssConfig(wssConfig);
         try {
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
             fail("Failure expected on a bad attribute type");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("bad attribute"));
+            // expected
         }
+        
+        RequestData data = new RequestData();
+        data.setCallbackHandler(keystoreCallbackHandler);
+        data.setDecCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3209));
+        newEngine.processSecurityHeader(encryptedDoc, "", data);
     }
     
     /**

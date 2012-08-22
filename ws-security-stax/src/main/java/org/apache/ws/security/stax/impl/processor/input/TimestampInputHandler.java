@@ -19,6 +19,7 @@
 package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.binding.wsu10.TimestampType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
@@ -130,7 +131,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                                     Deque<XMLSecEvent> eventDeque, int index) throws WSSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (timestampType.getCreated() == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R3203);
+            securityContext.handleBSPRule(BSPRule.R3203);
         }
 
         Iterator<XMLSecEvent> xmlSecEventIterator = eventDeque.descendingIterator();
@@ -146,27 +147,27 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
                 if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
                     if (createdIndex != -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R3203);
+                        securityContext.handleBSPRule(BSPRule.R3203);
                     }
                     if (expiresIndex != -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R3221);
+                        securityContext.handleBSPRule(BSPRule.R3221);
                     }
                     createdIndex = curIdx;
                 } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Expires)) {
                     if (expiresIndex != -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R3224);
+                        securityContext.handleBSPRule(BSPRule.R3224);
                     }
                     if (createdIndex == -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R3221);
+                        securityContext.handleBSPRule(BSPRule.R3221);
                     }
                     expiresIndex = curIdx;
                 } else {
-                    securityContext.handleBSPRule(WSSConstants.BSPRule.R3222);
+                    securityContext.handleBSPRule(BSPRule.R3222);
                 }
             }
             curIdx++;
         }
-
+        
         if (timestampType.getCreated() != null) {
             XMLGregorianCalendar createdCalendar;
             try {
@@ -175,19 +176,22 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             if (createdCalendar.getFractionalSecond().scale() > 3) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3220);
+                securityContext.handleBSPRule(BSPRule.R3220);
             }
             if (createdCalendar.getSecond() > 59) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3213);
+                securityContext.handleBSPRule(BSPRule.R3213);
             }
             String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(), WSSConstants.ATT_NULL_ValueType);
             if (valueType != null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3225);
+                securityContext.handleBSPRule(BSPRule.R3225);
             }
             if (createdCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3217);
+                securityContext.handleBSPRule(BSPRule.R3217);
             }
+        } else {
+            securityContext.handleBSPRule(BSPRule.R3203);
         }
+        
         if (timestampType.getExpires() != null) {
             XMLGregorianCalendar expiresCalendar;
             try {
@@ -196,17 +200,17 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             if (expiresCalendar.getFractionalSecond().scale() > 3) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3229);
+                securityContext.handleBSPRule(BSPRule.R3229);
             }
             if (expiresCalendar.getSecond() > 59) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3215);
+                securityContext.handleBSPRule(BSPRule.R3215);
             }
             String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(), WSSConstants.ATT_NULL_ValueType);
             if (valueType != null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3226);
+                securityContext.handleBSPRule(BSPRule.R3226);
             }
             if (expiresCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R3223);
+                securityContext.handleBSPRule(BSPRule.R3223);
             }
         }
     }

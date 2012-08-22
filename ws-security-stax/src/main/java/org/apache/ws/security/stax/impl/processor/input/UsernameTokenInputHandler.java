@@ -27,6 +27,7 @@ import org.apache.ws.security.binding.wss10.EncodedString;
 import org.apache.ws.security.binding.wss10.PasswordString;
 import org.apache.ws.security.binding.wss10.UsernameTokenType;
 import org.apache.ws.security.binding.wsu10.AttributedDateTime;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.*;
@@ -264,7 +265,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (usernameTokenType.getAny() == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R3031);
+            securityContext.handleBSPRule(BSPRule.R3031);
         }
 
         Iterator<XMLSecEvent> xmlSecEventIterator = eventDeque.descendingIterator();
@@ -281,17 +282,17 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
                 if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Password)) {
                     if (passwordIndex != -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R4222);
+                        securityContext.handleBSPRule(BSPRule.R4222);
                     }
                     passwordIndex = curIdx;
                 } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
                     if (createdIndex != -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R4223);
+                        securityContext.handleBSPRule(BSPRule.R4223);
                     }
                     createdIndex = curIdx;
                 } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Nonce)) {
                     if (nonceIndex != -1) {
-                        securityContext.handleBSPRule(WSSConstants.BSPRule.R4225);
+                        securityContext.handleBSPRule(BSPRule.R4225);
                     }
                     nonceIndex = curIdx;
                 }
@@ -302,16 +303,16 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
         if (passwordType != null) {
             if (passwordType.getType() == null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R4201);
+                securityContext.handleBSPRule(BSPRule.R4201);
             }
         }
 
         EncodedString encodedNonce = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
         if (encodedNonce != null) {
             if (encodedNonce.getEncodingType() == null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R4220);
+                securityContext.handleBSPRule(BSPRule.R4220);
             } else if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R4221);
+                securityContext.handleBSPRule(BSPRule.R4221);
             }
         }
 

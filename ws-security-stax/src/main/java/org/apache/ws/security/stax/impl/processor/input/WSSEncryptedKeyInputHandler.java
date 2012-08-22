@@ -21,6 +21,7 @@ package org.apache.ws.security.stax.impl.processor.input;
 import org.apache.ws.security.binding.wss10.ObjectFactory;
 import org.apache.ws.security.binding.wss10.ReferenceType;
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
@@ -64,19 +65,19 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             throws XMLSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (encryptedKeyType.getType() != null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R3209);
+            securityContext.handleBSPRule(BSPRule.R3209);
         }
         if (encryptedKeyType.getMimeType() != null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5622);
+            securityContext.handleBSPRule(BSPRule.R5622);
         }
         if (encryptedKeyType.getEncoding() != null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5623);
+            securityContext.handleBSPRule(BSPRule.R5623);
         }
         if (encryptedKeyType.getRecipient() != null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5602);
+            securityContext.handleBSPRule(BSPRule.R5602);
         }
         if (encryptedKeyType.getEncryptionMethod() == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5603);
+            securityContext.handleBSPRule(BSPRule.R5603);
         }
     }
 

@@ -19,6 +19,7 @@
 package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
@@ -96,25 +97,25 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) && !WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5421);
+            securityContext.handleBSPRule(BSPRule.R5421);
         }
         //todo test:
         BigInteger hmacOutputLength = XMLSecurityUtils.getQNameType(
                 signatureType.getSignedInfo().getSignatureMethod().getContent(),
                 WSSConstants.TAG_dsig_HMACOutputLength);
         if (hmacOutputLength != null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5401);
+            securityContext.handleBSPRule(BSPRule.R5401);
         }
 
         List<Object> keyInfoContent = signatureType.getKeyInfo().getContent();
         if (keyInfoContent.size() != 1) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5402);
+            securityContext.handleBSPRule(BSPRule.R5402);
         }
 
         SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoContent,
                 WSSConstants.TAG_wsse_SecurityTokenReference);
         if (securityTokenReferenceType == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5417);
+            securityContext.handleBSPRule(BSPRule.R5417);
         }
 
         Iterator<ObjectType> objectTypeIterator = signatureType.getObject().iterator();
@@ -122,19 +123,19 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             ObjectType objectType = objectTypeIterator.next();
             ManifestType manifestType = XMLSecurityUtils.getQNameType(objectType.getContent(), WSSConstants.TAG_dsig_Manifest);
             if (manifestType != null) {
-                securityContext.handleBSPRule(WSSConstants.BSPRule.R5403);
+                securityContext.handleBSPRule(BSPRule.R5403);
             }
         }
 
         CanonicalizationMethodType canonicalizationMethodType = signatureType.getSignedInfo().getCanonicalizationMethod();
         if (!WSSConstants.NS_C14N_EXCL.equals(canonicalizationMethodType.getAlgorithm())) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5404);
+            securityContext.handleBSPRule(BSPRule.R5404);
         }
 
         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(),
                 WSSConstants.TAG_c14nExcl_InclusiveNamespaces);
         if (inclusiveNamespacesType != null && inclusiveNamespacesType.getPrefixList().size() == 0) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R5406);
+            securityContext.handleBSPRule(BSPRule.R5406);
         }
     }
 

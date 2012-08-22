@@ -20,6 +20,7 @@ package org.apache.ws.security.stax.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSUtils;
@@ -50,7 +51,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
     private boolean operationSecurityEventOccured = false;
     private boolean messageEncryptionTokenOccured = false;
 
-    private List<WSSConstants.BSPRule> ignoredBSPRules = Collections.emptyList();
+    private List<BSPRule> ignoredBSPRules = Collections.emptyList();
 
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
@@ -505,7 +506,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         return false;
     }
 
-    public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException {
+    public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
         if (!ignoredBSPRules.contains(bspRule)) {
             throw new WSSecurityException("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         } else {
@@ -513,7 +514,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         }
     }
 
-    public void ignoredBSPRules(List<WSSConstants.BSPRule> bspRules) {
-        ignoredBSPRules = new ArrayList<WSSConstants.BSPRule>(bspRules);
+    public void ignoredBSPRules(List<BSPRule> bspRules) {
+        ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
     }
 }

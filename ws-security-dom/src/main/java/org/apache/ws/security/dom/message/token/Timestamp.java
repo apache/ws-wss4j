@@ -19,23 +19,28 @@
 
 package org.apache.ws.security.dom.message.token;
 
-import org.apache.ws.security.dom.WSConstants;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.ws.security.dom.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Timestamp according to SOAP Message Security 1.0,
@@ -59,20 +64,9 @@ public class Timestamp {
      *
      * @param timestampElement the <code>wsu:Timestamp</code> element that
      *        contains the timestamp data
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      */
-    public Timestamp(Element timestampElement) throws WSSecurityException {
-        this(timestampElement, true);
-    }
-    
-    /**
-     * Constructs a <code>Timestamp</code> object and parses the
-     * <code>wsu:Timestamp</code> element to initialize it.
-     *
-     * @param timestampElement the <code>wsu:Timestamp</code> element that
-     *        contains the timestamp data
-     * @param bspCompliant whether the Timestamp processing complies with the BSP spec
-     */
-    public Timestamp(Element timestampElement, boolean bspCompliant) throws WSSecurityException {
+    public Timestamp(Element timestampElement, BSPEnforcer bspEnforcer) throws WSSecurityException {
 
         element = timestampElement;
         customElements = new ArrayList<Element>();
@@ -90,82 +84,85 @@ public class Timestamp {
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
                         String valueType = currentChildElement.getAttribute("ValueType");
-                        if (bspCompliant && valueType != null && !"".equals(valueType)) {
+                        if (valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
-                            throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
-                            );
+                            bspEnforcer.handleBSPRule(BSPRule.R3225);
                         }
                         strCreated = ((Text)currentChildElement.getFirstChild()).getData();
                     } else {
                         // Test for multiple Created elements
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
-                        );
+                        bspEnforcer.handleBSPRule(BSPRule.R3203);
                     }
                 } else if (WSConstants.EXPIRES_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
-                    if (strExpires != null || (bspCompliant && strCreated == null)) {
-                        //
-                        // Created must appear before Expires and we can't have multiple Expires 
-                        // elements
-                        //
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
-                        ); 
+                    if (strCreated == null) {
+                        // Created must appear before Expires
+                        bspEnforcer.handleBSPRule(BSPRule.R3221);
+                    }
+                    if (strExpires != null ) {
+                        // We can't have multiple Expires elements
+                        bspEnforcer.handleBSPRule(BSPRule.R3224);
                     } else {
                         String valueType = currentChildElement.getAttribute("ValueType");
-                        if (bspCompliant && valueType != null && !"".equals(valueType)) {
+                        if (valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
-                            throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
-                            );
+                            bspEnforcer.handleBSPRule(BSPRule.R3226);
                         }
                         strExpires = ((Text)currentChildElement.getFirstChild()).getData();
                     }
                 } else {
-                    if (bspCompliant) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
-                        );
-                    }
+                    bspEnforcer.handleBSPRule(BSPRule.R3222);
                     customElements.add(currentChildElement);
                 }
             }
         }
         
         // We must have a Created element
-        if (bspCompliant && strCreated == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp"
-            );  
+        if (strCreated == null) {
+            bspEnforcer.handleBSPRule(BSPRule.R3203);
         }
 
         // Parse the dates
-        DateFormat zulu = new XmlSchemaDateFormat();
-        if (bspCompliant) {
-            zulu.setLenient(false);
+        if (strCreated != null) {
+            XMLGregorianCalendar createdCalendar = null;
+            try {
+                createdCalendar = 
+                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(strCreated);
+            } catch (IllegalArgumentException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+            
+            if (createdCalendar.getFractionalSecond().scale() > 3) {
+                bspEnforcer.handleBSPRule(BSPRule.R3220);
+            }
+            if (createdCalendar.getSecond() > 59) {
+                bspEnforcer.handleBSPRule(BSPRule.R3213);
+            }
+            if (createdCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                bspEnforcer.handleBSPRule(BSPRule.R3217);
+            }
+            createdDate = createdCalendar.toGregorianCalendar().getTime();
         }
-        try {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Current time: " + zulu.format(new Date()));
+        
+        if (strExpires != null) {
+            XMLGregorianCalendar expiresCalendar = null;
+            try {
+                expiresCalendar = 
+                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(strExpires);
+            } catch (IllegalArgumentException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            if (strCreated != null) {
-                createdDate = zulu.parse(strCreated);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Timestamp created: " + zulu.format(createdDate));
-                }
+            
+            if (expiresCalendar.getFractionalSecond().scale() > 3) {
+                bspEnforcer.handleBSPRule(BSPRule.R3229);
             }
-            if (strExpires != null) {
-                expiresDate = zulu.parse(strExpires);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Timestamp expires: " + zulu.format(expiresDate));
-                }
+            if (expiresCalendar.getSecond() > 59) {
+                bspEnforcer.handleBSPRule(BSPRule.R3215);
             }
-        } catch (ParseException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp", e
-            );
+            if (expiresCalendar.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                bspEnforcer.handleBSPRule(BSPRule.R3223);
+            }
+            expiresDate = expiresCalendar.toGregorianCalendar().getTime();
         }
     }
 

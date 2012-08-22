@@ -27,6 +27,7 @@ import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.message.CallbackLookup;
 import org.apache.ws.security.dom.message.DOMCallbackLookup;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
@@ -484,7 +485,7 @@ public class SecurityTokenReference {
         String value = elem.getAttribute("ValueType");
 
         if (X509Security.X509_V3_TYPE.equals(value)) {
-            X509Security token = new X509Security(elem);
+            X509Security token = new X509Security(elem, new BSPEnforcer(true));
             if (token != null) {
                 X509Certificate cert = token.getX509Certificate(crypto);
                 return new X509Certificate[]{cert};

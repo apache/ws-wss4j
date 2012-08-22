@@ -20,6 +20,7 @@ package org.apache.ws.security.stax.test;
 
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.derivedKey.ConversationConstants;
@@ -325,7 +326,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
             securityProperties.setCallbackHandler(callbackHandler);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5204);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5204);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 

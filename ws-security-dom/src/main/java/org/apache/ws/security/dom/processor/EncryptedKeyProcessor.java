@@ -19,15 +19,29 @@
 
 package org.apache.ws.security.dom.processor;
 
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.security.spec.MGF1ParameterSpec;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+
+import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.crypto.CryptoType;
-import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.handler.RequestData;
-import org.apache.ws.security.dom.message.token.SecurityTokenReference;
 import org.apache.ws.security.dom.str.EncryptedKeySTRParser;
 import org.apache.ws.security.dom.str.STRParser;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
@@ -38,19 +52,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.security.spec.MGF1ParameterSpec;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class EncryptedKeyProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -80,9 +81,10 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
         }
-        if (data.getWssConfig().isWsiBSPCompliant()) {
-            checkBSPCompliance(elem, encryptedKeyTransportMethod);
-        }
+            
+        // Check BSP Compliance
+        checkBSPCompliance(elem, encryptedKeyTransportMethod, data.getBSPEnforcer());
+        
         Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
         //
         // Now lookup CipherValue.
@@ -251,29 +253,20 @@ public class EncryptedKeyProcessor implements Processor {
             );
         if (keyInfo != null) {
             Element strElement = null;
-            if (data.getWssConfig().isWsiBSPCompliant()) {
-                int result = 0;
-                Node node = keyInfo.getFirstChild();
-                while (node != null) {
-                    if (Node.ELEMENT_NODE == node.getNodeType()) {
-                        result++;
-                        strElement = (Element)node;
-                    }
-                    node = node.getNextSibling();
+
+            int result = 0;
+            Node node = keyInfo.getFirstChild();
+            while (node != null) {
+                if (Node.ELEMENT_NODE == node.getNodeType()) {
+                    result++;
+                    strElement = (Element)node;
                 }
-                if (result != 1) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidDataRef"
-                    );
-                }
-            } else {
-                 strElement = 
-                    WSSecurityUtil.getDirectChildElement(
-                        keyInfo,
-                        SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-                        WSConstants.WSSE_NS
-                    );
+                node = node.getNextSibling();
             }
+            if (result != 1) {
+                data.getBSPEnforcer().handleBSPRule(BSPRule.R5424);
+            }
+
             if (strElement == null || strParser == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
@@ -400,38 +393,30 @@ public class EncryptedKeyProcessor implements Processor {
      * A method to check that the EncryptedKey is compliant with the BSP spec.
      * @throws WSSecurityException
      */
-    private void checkBSPCompliance(Element elem, String encAlgo) throws WSSecurityException {
+    private void checkBSPCompliance(
+        Element elem, String encAlgo, BSPEnforcer bspEnforcer
+    ) throws WSSecurityException {
         String attribute = elem.getAttribute("Type");
         if (attribute != null && !"".equals(attribute)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R3209);
         }
         attribute = elem.getAttribute("MimeType");
         if (attribute != null && !"".equals(attribute)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5622);
         }
         attribute = elem.getAttribute("Encoding");
         if (attribute != null && !"".equals(attribute)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5623);
         }
         attribute = elem.getAttribute("Recipient");
         if (attribute != null && !"".equals(attribute)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "badAttribute", new Object[]{attribute}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5602);
         }
         
         // EncryptionAlgorithm must be RSA15, or RSAOEP.
         if (!WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
             && !WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badEncAlgo", new Object[]{encAlgo}
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R5621);
         }
     }
   

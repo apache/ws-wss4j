@@ -23,6 +23,7 @@ import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
@@ -86,7 +87,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
         
-        BinarySecurity clone = new BinarySecurity(token.getElement());
+        BinarySecurity clone = new BinarySecurity(token.getElement(), new BSPEnforcer(true));
         assertTrue(clone.equals(token));
         assertTrue(clone.hashCode() == token.hashCode());
     }

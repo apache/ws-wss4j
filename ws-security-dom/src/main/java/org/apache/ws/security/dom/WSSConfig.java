@@ -25,6 +25,8 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.ws.security.dom.action.Action;
@@ -47,6 +49,16 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
  * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSConfig {
+    
+    public static final DatatypeFactory datatypeFactory;
+    
+    static {
+        try {
+            datatypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
     
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(WSSConfig.class);

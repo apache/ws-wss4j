@@ -19,6 +19,9 @@
 
 package org.apache.ws.security.dom.processor;
 
+import java.util.List;
+
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.SAMLTokenPrincipal;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
@@ -27,14 +30,11 @@ import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.WSUsernameTokenPrincipal;
 import org.apache.ws.security.dom.cache.ReplayCache;
-import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.token.UsernameToken;
 import org.apache.ws.security.dom.validate.Credential;
 import org.apache.ws.security.dom.validate.Validator;
 import org.w3c.dom.Element;
-
-import java.util.List;
 
 public class UsernameTokenProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -72,7 +72,7 @@ public class UsernameTokenProcessor implements Processor {
             action = WSConstants.UT_NOPASSWORD;
             if (token.isDerivedKey()) {
                 token.setRawPassword(data);
-                secretKey = token.getDerivedKey();
+                secretKey = token.getDerivedKey(data.getBSPEnforcer());
             } 
         }
         WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);
@@ -119,19 +119,18 @@ public class UsernameTokenProcessor implements Processor {
         RequestData data
     ) throws WSSecurityException {
         boolean allowNamespaceQualifiedPasswordTypes = false;
-        boolean bspCompliant = true;
         WSSConfig wssConfig = data.getWssConfig();
         if (wssConfig != null) {
             allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
-            bspCompliant = wssConfig.isWsiBSPCompliant();
         }
         
         //
         // Parse and validate the UsernameToken element
         //
         UsernameToken ut = 
-            new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, bspCompliant);
+            new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, 
+                    data.getBSPEnforcer());
         
         // Test for replay attacks
         ReplayCache replayCache = data.getNonceReplayCache();

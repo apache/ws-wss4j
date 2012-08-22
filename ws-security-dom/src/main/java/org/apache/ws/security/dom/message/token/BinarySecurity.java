@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -52,21 +54,11 @@ public class BinarySecurity {
 
     /**
      * Constructor.
-     * 
      * @param elem The BinarySecurityToken element to process
-     * @throws WSSecurityException 
-     */
-    public BinarySecurity(Element elem) throws WSSecurityException {
-        this(elem, true);
-    }
-
-    /**
-     * Constructor.
-     * @param elem The BinarySecurityToken element to process
-     * @param bspCompliant whether the processing conforms to the BSP spec
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
-    public BinarySecurity(Element elem, boolean bspCompliant) throws WSSecurityException {
+    public BinarySecurity(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
@@ -77,22 +69,17 @@ public class BinarySecurity {
             );
         }
         String encoding = getEncodingType();
-        if (bspCompliant && !BASE64_ENCODING.equals(encoding)) {
-            // The EncodingType attribute must be specified, and must be equal to Base64Binary
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                "badEncodingType", 
-                new Object[] {encoding}
-            );
+        if (encoding == null || "".equals(encoding)) {
+            bspEnforcer.handleBSPRule(BSPRule.R3029);
+        }
+        
+        if (!BASE64_ENCODING.equals(encoding)) {
+            bspEnforcer.handleBSPRule(BSPRule.R3030);
         }
         
         String valueType = getValueType();
-        if (bspCompliant && (valueType == null || "".equals(valueType))) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                "invalidValueType",
-                new Object[]{valueType}
-            );
+        if (valueType == null || "".equals(valueType)) {
+            bspEnforcer.handleBSPRule(BSPRule.R3031);
         }
     }
 

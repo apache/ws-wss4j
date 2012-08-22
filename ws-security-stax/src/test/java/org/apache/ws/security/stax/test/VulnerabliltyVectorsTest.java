@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.test;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
@@ -185,7 +186,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R3006);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R3006);
         //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
         inSecurityProperties.setDisableSchemaValidation(true);
 

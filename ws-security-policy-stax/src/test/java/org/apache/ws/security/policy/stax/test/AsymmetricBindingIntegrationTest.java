@@ -21,6 +21,7 @@ package org.apache.ws.security.policy.stax.test;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
@@ -967,8 +968,8 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5421);
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5420);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5420);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
@@ -1083,9 +1084,9 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5404);
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5423);
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5412);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5404);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5423);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5412);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
@@ -1200,7 +1201,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        inSecurityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5420);
+        inSecurityProperties.addIgnoreBSPRule(BSPRule.R5420);
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));

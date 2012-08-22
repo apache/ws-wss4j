@@ -21,6 +21,7 @@ package org.apache.ws.security.dom.misc;
 
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSecurityEngine;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
@@ -169,7 +170,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.build(doc, secHeader);
         
         try {
-            new UsernameToken(doc.getDocumentElement());
+            new UsernameToken(doc.getDocumentElement(), false, new BSPEnforcer());
             fail("Failure expected on an invalid security token");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);

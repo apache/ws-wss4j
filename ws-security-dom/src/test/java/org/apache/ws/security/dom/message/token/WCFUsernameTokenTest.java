@@ -19,15 +19,22 @@
 
 package org.apache.ws.security.dom.message.token;
 
-import org.apache.ws.security.dom.WSSecurityEngine;
-import org.apache.ws.security.dom.WSSConfig;
-import org.apache.ws.security.dom.common.SOAPUtil;
-import org.apache.ws.security.dom.common.UsernamePasswordCallbackHandler;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.util.XMLUtils;
-import org.w3c.dom.Document;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
+import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.WSSecurityEngine;
+import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.dom.common.UsernamePasswordCallbackHandler;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.w3c.dom.Document;
 
 
 /**
@@ -57,15 +64,8 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         + "<value xmlns=\"\">15</value>" + "</add>" 
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     
-    public WCFUsernameTokenTest() {
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        secEngine.setWssConfig(config);
-    }
-
     /**
      * Test that adds a UserNameToken with a namespace qualified type. This should fail
      * as WSS4J rejects these tokens by default.
@@ -103,23 +103,46 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        WSSConfig wssConfig = secEngine.getWssConfig();
-        wssConfig.setAllowNamespaceQualifiedPasswordTypes(true);
-        secEngine.setWssConfig(wssConfig);
-        verify(doc);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setAllowNamespaceQualifiedPasswordTypes(true);
+        verify(doc, config, Collections.singletonList(BSPRule.R4201));
     }
     
     
     /**
      * Verifies the soap envelope
-     * 
-     * @param env soap envelope
-     * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        LOG.info("Before verifying UsernameToken....");
-        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
-        LOG.info("After verifying UsernameToken....");
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        return verify(doc, new ArrayList<BSPRule>(0));
     }
+    
+    /**
+     * Verifies the soap envelope
+     */
+    private List<WSSecurityEngineResult> verify(
+        Document doc, List<BSPRule> ignoredRules
+    ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData requestData = new RequestData();
+        requestData.setIgnoredBSPRules(ignoredRules);
+        requestData.setCallbackHandler(callbackHandler);
+        return secEngine.processSecurityHeader(doc, "", requestData);
+    }
+    
+    /**
+     * Verifies the soap envelope
+     */
+    private List<WSSecurityEngineResult> verify(
+        Document doc, WSSConfig wssConfig, List<BSPRule> ignoredRules
+    ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData requestData = new RequestData();
+        requestData.setWssConfig(wssConfig);
+        requestData.setIgnoredBSPRules(ignoredRules);
+        requestData.setCallbackHandler(callbackHandler);
+        return secEngine.processSecurityHeader(doc, "", requestData);
+    }
+    
 
 }

@@ -19,6 +19,7 @@
 package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
@@ -105,13 +106,13 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             throws WSSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (binarySecurityTokenType.getEncodingType() == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R3029);
+            securityContext.handleBSPRule(BSPRule.R3029);
         }
         if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R3030);
+            securityContext.handleBSPRule(BSPRule.R3030);
         }
         if (binarySecurityTokenType.getValueType() == null) {
-            securityContext.handleBSPRule(WSSConstants.BSPRule.R3031);
+            securityContext.handleBSPRule(BSPRule.R3031);
         }
     }
 }

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
@@ -175,13 +176,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.derivedKeyTokenReference = derivedKeyTokenReference;
     }
 
-    private final List<WSSConstants.BSPRule> ignoredBSPRules = new LinkedList<WSSConstants.BSPRule>();
+    private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
 
-    public void addIgnoreBSPRule(WSSConstants.BSPRule bspRule) {
+    public void addIgnoreBSPRule(BSPRule bspRule) {
         ignoredBSPRules.add(bspRule);
     }
 
-    public List<WSSConstants.BSPRule> getIgnoredBSPRules() {
+    public List<BSPRule> getIgnoredBSPRules() {
         return Collections.unmodifiableList(ignoredBSPRules);
     }
     

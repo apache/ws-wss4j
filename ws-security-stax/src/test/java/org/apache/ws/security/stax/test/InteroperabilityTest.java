@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.test;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
@@ -617,9 +618,9 @@ public class InteroperabilityTest extends AbstractTestBase {
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5404);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5423);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5412);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5404);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5423);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5412);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
@@ -1053,7 +1054,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            Iterator<WSSConstants.BSPRule> bspRules = EnumSet.allOf(WSSConstants.BSPRule.class).iterator();
+            Iterator<BSPRule> bspRules = EnumSet.allOf(BSPRule.class).iterator();
             while (bspRules.hasNext()) {
                 securityProperties.addIgnoreBSPRule(bspRules.next());
             }

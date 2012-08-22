@@ -19,28 +19,29 @@
 
 package org.apache.ws.security.dom.handler;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.WSConstants;
-import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.common.CustomHandler;
 import org.apache.ws.security.dom.common.KeystoreCallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
-import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.crypto.CryptoFactory;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.message.WSSecHeader;
 import org.apache.ws.security.dom.message.token.SignatureConfirmation;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import javax.security.auth.callback.CallbackHandler;
 
 /**
  * A set of test-cases for SignatureConfirmation.
@@ -278,23 +279,19 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         }
         
         // Verify the results
-        
-        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
-        
-        // Now turn on BSP spec compliance
-        config.setWsiBSPCompliant(true);
-        newEngine.setWssConfig(config);
         try {
             newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
             fail("Failure expected on a request with no wsu:Id");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("wsu:Id"));
+            // expected
         }
+        
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setSigVerCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5441));
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     

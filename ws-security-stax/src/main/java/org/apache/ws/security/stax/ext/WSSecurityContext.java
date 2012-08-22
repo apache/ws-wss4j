@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.ext;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.stax.ext.SecurityContext;
 
@@ -31,7 +32,7 @@ import java.util.List;
  */
 public interface WSSecurityContext extends SecurityContext {
 
-    public void handleBSPRule(WSSConstants.BSPRule bspRule) throws WSSecurityException;
+    public void handleBSPRule(BSPRule bspRule) throws WSSecurityException;
 
-    public void ignoredBSPRules(List<WSSConstants.BSPRule> bspRules);
+    public void ignoredBSPRules(List<BSPRule> bspRules);
 }

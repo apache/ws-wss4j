@@ -22,6 +22,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
 import org.apache.ws.security.binding.wss10.KeyIdentifierType;
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.xmldsig.*;
@@ -91,7 +92,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             }
 
             if (securityTokenReferenceType.getAny().size() > 1) {
-                ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3061);
+                ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3061);
             }
 
             //todo BSP.R3027 KeyName? not supported ATM
@@ -109,7 +110,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             if (keyIdentifierType != null) {
                 String valueType = keyIdentifierType.getValueType();
                 if (valueType == null) {
-                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3054);
+                    ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3054);
                 }
                 String encodingType = keyIdentifierType.getEncodingType();
 
@@ -118,9 +119,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
                 } else if (!WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
                     if (encodingType == null) {
-                        ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3070);
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3070);
                     } else {
-                        ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3071);
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3071);
                     }
                 }
 
@@ -145,7 +146,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     return securityTokenProvider.getSecurityToken();
                 } else {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
-                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3063);
+                    ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3063);
                 }
             }
 
@@ -157,11 +158,11 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 String uri = referenceType.getURI();
                 if (uri == null) {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
-                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3062);
+                    ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3062);
                     throw new WSSecurityException("badReferenceURI");
                 }
                 if (!uri.startsWith("#")) {
-                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R5204);
+                    ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R5204);
                 }
                 uri = WSSUtils.dropReferenceMarker(uri);
                 //referenced BST:*/
@@ -184,7 +185,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
                 }
                 if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
-                    ((WSSecurityContext) securityContext).handleBSPRule(WSSConstants.BSPRule.R3057);
+                    ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3057);
                 }
                 return securityTokenProvider.getSecurityToken();
             }

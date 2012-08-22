@@ -19,13 +19,17 @@
 
 package org.apache.ws.security.dom.processor;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.SAMLTokenPrincipal;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
-import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.token.BinarySecurity;
 import org.apache.ws.security.dom.message.token.KerberosSecurity;
@@ -34,10 +38,6 @@ import org.apache.ws.security.dom.message.token.X509Security;
 import org.apache.ws.security.dom.validate.Credential;
 import org.apache.ws.security.dom.validate.Validator;
 import org.w3c.dom.Element;
-
-import java.security.cert.X509Certificate;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 /**
  * Processor implementation to handle wsse:BinarySecurityToken elements
@@ -66,7 +66,7 @@ public class BinarySecurityTokenProcessor implements Processor {
             }
         }
         
-        BinarySecurity token = createSecurityToken(elem, data.getWssConfig());
+        BinarySecurity token = createSecurityToken(elem, data);
         X509Certificate[] certs = null;
         Validator validator = data.getValidator(new QName(elem.getNamespaceURI(),
                                                           elem.getLocalName()));
@@ -135,24 +135,24 @@ public class BinarySecurityTokenProcessor implements Processor {
      *
      * @param element The XML element that contains either a <code>BinarySecurityToken
      *                </code> or a <code>PKIPath</code> element.
-     * @param config A WSSConfig instance
+     * @param data A RequestData instance
      * @return a BinarySecurity token element
      * @throws WSSecurityException
      */
     private BinarySecurity createSecurityToken(
         Element element,
-        WSSConfig config
+        RequestData data
     ) throws WSSecurityException {
         String type = element.getAttribute("ValueType");
         BinarySecurity token = null;
         if (X509Security.X509_V3_TYPE.equals(type)) {
-            token = new X509Security(element, config.isWsiBSPCompliant());
+            token = new X509Security(element, data.getBSPEnforcer());
         } else if (PKIPathSecurity.getType().equals(type)) {
-            token = new PKIPathSecurity(element, config.isWsiBSPCompliant());
+            token = new PKIPathSecurity(element, data.getBSPEnforcer());
         } else if (KerberosSecurity.isKerberosToken(type)) {
-            token = new KerberosSecurity(element, config.isWsiBSPCompliant());
+            token = new KerberosSecurity(element, data.getBSPEnforcer());
         } else {
-            token = new BinarySecurity(element, config.isWsiBSPCompliant());
+            token = new BinarySecurity(element, data.getBSPEnforcer());
         }
         return token;
     }

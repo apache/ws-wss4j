@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.test;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
@@ -333,9 +334,9 @@ public class SignatureTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5404);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5423);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5412);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5404);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5423);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5412);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -940,8 +941,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5421);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5417);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5421);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5417);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
@@ -1006,8 +1007,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5421);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5417);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5421);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5417);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -1063,8 +1064,8 @@ public class SignatureTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5421);
-            securityProperties.addIgnoreBSPRule(WSSConstants.BSPRule.R5417);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5421);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5417);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 

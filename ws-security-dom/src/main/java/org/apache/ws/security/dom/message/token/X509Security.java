@@ -20,6 +20,8 @@
 package org.apache.ws.security.dom.message.token;
 
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
@@ -50,29 +52,14 @@ public class X509Security extends BinarySecurity {
      * it from the data contained in the element.
      *
      * @param elem the element containing the X509 certificate data
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
-    public X509Security(Element elem) throws WSSecurityException {
-        this(elem, true);
-    }
-    
-    /**
-     * This constructor creates a new X509 certificate object and initializes
-     * it from the data contained in the element.
-     *
-     * @param elem the element containing the X509 certificate data
-     * @param bspCompliant Whether the token is processed according to the BSP spec
-     * @throws WSSecurityException
-     */
-    public X509Security(Element elem, boolean bspCompliant) throws WSSecurityException {
-        super(elem, bspCompliant);
+    public X509Security(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
+        super(elem, bspEnforcer);
         String valueType = getValueType();
-        if (bspCompliant && !X509_V3_TYPE.equals(valueType)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
-                "invalidValueType", 
-                new Object[]{valueType}
-            );
+        if (!X509_V3_TYPE.equals(valueType)) {
+            bspEnforcer.handleBSPRule(BSPRule.R3033);
         }
     }
 

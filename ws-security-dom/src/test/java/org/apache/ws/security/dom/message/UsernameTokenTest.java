@@ -23,10 +23,12 @@ import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.common.CustomHandler;
 import org.apache.ws.security.dom.common.EncodedPasswordCallbackHandler;
 import org.apache.ws.security.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.XMLUtils;
@@ -42,6 +44,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -134,7 +137,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
         
-        UsernameToken clone = new UsernameToken(receivedToken.getElement());
+        UsernameToken clone = 
+            new UsernameToken(receivedToken.getElement(), false, new BSPEnforcer());
         assertTrue(clone.equals(receivedToken));
         assertTrue(clone.hashCode() == receivedToken.hashCode());
     }
@@ -271,7 +275,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
         
-        UsernameToken clone = new UsernameToken(receivedToken.getElement());
+        UsernameToken clone = 
+            new UsernameToken(receivedToken.getElement(), false, new BSPEnforcer());
         assertTrue(clone.equals(receivedToken));
         assertTrue(clone.hashCode() == receivedToken.hashCode());
     }
@@ -357,10 +362,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         } catch (WSSecurityException ex) {
             // expected
         }
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4201));
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
@@ -739,10 +744,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         } catch (WSSecurityException ex) {
             // expected
         }
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4225));
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
@@ -781,10 +787,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         } catch (WSSecurityException ex) {
             // expected
         }
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4223));
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
@@ -823,10 +830,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         } catch (WSSecurityException ex) {
             // expected
         }
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4222));
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
@@ -866,10 +874,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         } catch (WSSecurityException ex) {
             // expected
         }
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4221));
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
