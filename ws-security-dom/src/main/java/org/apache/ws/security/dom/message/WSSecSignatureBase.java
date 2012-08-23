@@ -122,7 +122,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             }
                             element = callbackLookup.getElement(idToSign, null, false);
                         }
-                        if (wssConfig.isWsiBSPCompliant()) {
+                        if (wssConfig.isAddInclusivePrefixes()) {
                             List<String> prefixes = getInclusivePrefixes(element);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
@@ -165,7 +165,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     for (Element elementToSign : elementsToSign) {
                         TransformParameterSpec transformSpec = null;
-                        if (wssConfig.isWsiBSPCompliant()) {
+                        if (wssConfig.isAddInclusivePrefixes()) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }

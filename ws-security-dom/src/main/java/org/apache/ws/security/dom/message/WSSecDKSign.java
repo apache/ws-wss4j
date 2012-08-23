@@ -148,7 +148,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (getWsConfig().isWsiBSPCompliant() && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (getWsConfig().isAddInclusivePrefixes() 
+                && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);

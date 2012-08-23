@@ -117,6 +117,7 @@ public abstract class WSHandler {
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement())
         );
         wssConfig.setWsiBSPCompliant(decodeBSPCompliance(reqData));
+        wssConfig.setAddInclusivePrefixes(decodeAddInclusivePrefixes(reqData));
         /*
          * Here we have action, username, password, and actor, mustUnderstand.
          * Now get the action specific parameters.
@@ -620,6 +621,13 @@ public abstract class WSHandler {
         throws WSSecurityException {
         return decodeBooleanConfigValue(
             reqData, WSHandlerConstants.IS_BSP_COMPLIANT, true
+        );
+    }
+    
+    protected boolean decodeAddInclusivePrefixes(RequestData reqData)
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.ADD_INCLUSIVE_PREFIXES, true
         );
     }
     

@@ -374,6 +374,13 @@ public final class WSHandlerConstants {
     public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
     
     /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    public static final String ADD_INCLUSIVE_PREFIXES = "addInclusivePrefixes";
+    
+    /**
      * This variable controls whether types other than PasswordDigest or PasswordText
      * are allowed when processing UsernameTokens. The default value is "false".
      */

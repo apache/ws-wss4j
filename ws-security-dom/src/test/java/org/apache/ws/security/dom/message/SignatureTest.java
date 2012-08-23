@@ -197,7 +197,7 @@ public class SignatureTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignatureInclusivePrefixes() throws Exception {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
+        wssConfig.setAddInclusivePrefixes(true);
         WSSecSignature builder = new WSSecSignature();
         builder.setWsConfig(wssConfig);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

@@ -217,6 +217,13 @@ public class WSSConfig {
     }
 
     protected boolean wsiBSPCompliant = true;
+    
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    protected boolean addInclusivePrefixes = true;
 
     /**
      * Set the timestamp precision mode. If set to <code>true</code> then use
@@ -721,6 +728,24 @@ public class WSSConfig {
             return (Processor)processorObject;
         }
         return null;
+    }
+
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    public boolean isAddInclusivePrefixes() {
+        return addInclusivePrefixes;
+    }
+
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
+        this.addInclusivePrefixes = addInclusivePrefixes;
     }
     
 }
