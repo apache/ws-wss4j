@@ -21,6 +21,7 @@ package org.apache.ws.security.dom.transform;
 
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.message.token.PKIPathSecurity;
 import org.apache.ws.security.dom.message.token.SecurityTokenReference;
 import org.apache.ws.security.dom.message.token.X509Security;
@@ -177,7 +178,7 @@ public class STRTransform extends TransformService {
             // The element to transform MUST be a SecurityTokenReference
             // element.
             //
-            SecurityTokenReference secRef = new SecurityTokenReference(str);
+            SecurityTokenReference secRef = new SecurityTokenReference(str, new BSPEnforcer());
             
             Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
 

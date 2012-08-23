@@ -21,6 +21,7 @@ package org.apache.ws.security.dom.message.token;
 
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
@@ -74,29 +75,18 @@ public class SecurityTokenReference {
      * Constructor.
      *
      * @param elem A SecurityTokenReference element
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
-    public SecurityTokenReference(Element elem) throws WSSecurityException {
-        this(elem, true);
-    }
-    
-    /**
-     * Constructor.
-     *
-     * @param elem A SecurityTokenReference element
-     * @param bspCompliant whether the SecurityTokenReference processing complies with the 
-     * BSP spec
-     * @throws WSSecurityException
-     */
-    public SecurityTokenReference(Element elem, boolean bspCompliant) throws WSSecurityException {
+    public SecurityTokenReference(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "badElement");
         }
-        if (bspCompliant) {
-            checkBSPCompliance();
-        }
+        
+        checkBSPCompliance(bspEnforcer);
+        
         if (containsReference()) {
             Node node = element.getFirstChild();
             while (node != null) {
@@ -798,7 +788,7 @@ public class SecurityTokenReference {
      * A method to check that the SecurityTokenReference is compliant with the BSP spec.
      * @throws WSSecurityException
      */
-    private void checkBSPCompliance() throws WSSecurityException {
+    private void checkBSPCompliance(BSPEnforcer bspEnforcer) throws WSSecurityException {
         // We can only have one token reference
         int result = 0;
         Node node = element.getFirstChild();
@@ -811,9 +801,7 @@ public class SecurityTokenReference {
             node = node.getNextSibling();
         }
         if (result != 1) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidDataRef"
-            );
+            bspEnforcer.handleBSPRule(BSPRule.R3061);
         }
         if ("KeyIdentifier".equals(child.getLocalName()) 
             && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
@@ -821,27 +809,19 @@ public class SecurityTokenReference {
             String valueType = getKeyIdentifierValueType();
             // ValueType cannot be null
             if (valueType == null || "".equals(valueType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidValueType"
-                );
+                bspEnforcer.handleBSPRule(BSPRule.R3054);
             }
             String encodingType = getFirstElement().getAttribute("EncodingType");
             // Encoding Type must be equal to Base64Binary if it's specified
             if (encodingType != null && !"".equals(encodingType)
                 && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY, 
-                    "badEncodingType", 
-                    new Object[] {encodingType}
-                );
+                bspEnforcer.handleBSPRule(BSPRule.R3071);
             }
             // Encoding type must be specified other than for a SAML Assertion
             if (!WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
                 && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
                 && (encodingType == null || "".equals(encodingType))) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY, "noEncodingType"
-                );
+                bspEnforcer.handleBSPRule(BSPRule.R3070);
             }
         } else if ("Embedded".equals(child.getLocalName())) {
             result = 0;
@@ -852,18 +832,14 @@ public class SecurityTokenReference {
                     // We cannot have a SecurityTokenReference child element
                     if ("SecurityTokenReference".equals(node.getLocalName())
                         && WSConstants.WSSE_NS.equals(node.getNamespaceURI())) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidEmbeddedRef"
-                        );
+                        bspEnforcer.handleBSPRule(BSPRule.R3056);
                     }
                 }
                 node = node.getNextSibling();
             }
             // We can only have one embedded child
             if (result != 1) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidEmbeddedRef"
-                );
+                bspEnforcer.handleBSPRule(BSPRule.R3060);
             }
         }
     }

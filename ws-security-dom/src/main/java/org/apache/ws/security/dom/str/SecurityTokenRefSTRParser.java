@@ -84,7 +84,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
             bspCompliant = config.isWsiBSPCompliant();
         }
         
-        SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
+        SecurityTokenReference secRef = 
+            new SecurityTokenReference(strElement, data.getBSPEnforcer());
         
         String uri = null;
         if (secRef.containsReference()) {

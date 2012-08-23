@@ -107,7 +107,8 @@ public class SignatureSTRParser implements STRParser {
         if (data.getWssConfig() != null) {
             bspCompliant = data.getWssConfig().isWsiBSPCompliant();
         }
-        SecurityTokenReference secRef = new SecurityTokenReference(strElement, bspCompliant);
+        SecurityTokenReference secRef = 
+            new SecurityTokenReference(strElement, data.getBSPEnforcer());
         //
         // Here we get some information about the document that is being
         // processed, in particular the crypto implementation, and already

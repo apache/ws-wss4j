@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.dom.message.token;
 
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
+
 /**
  * Tests for DerivedKeyToken type.
  */
@@ -51,15 +53,15 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
         token = new DerivedKeyToken(createReferenceDocument(
                 TEST_TOKEN_TEMPLATE,
                 "#uuid-4063ae9b-fe66-4e09-a5fb-8fda903f34d8", "16")
-                .getDocumentElement());
+                .getDocumentElement(), new BSPEnforcer());
         tokenEqual = new DerivedKeyToken(createReferenceDocument(
                 TEST_TOKEN_TEMPLATE,
                 "#uuid-4063ae9b-fe66-4e09-a5fb-8fda903f34d8", "16")
-                .getDocumentElement());
+                .getDocumentElement(), new BSPEnforcer());
         tokenNotEqual = new DerivedKeyToken(createReferenceDocument(
                 TEST_TOKEN_TEMPLATE,
                 "#uuid-5603ae9b-fe66-4e09-a5fb-8fda903f34d8", "88")
-                .getDocumentElement());
+                .getDocumentElement(), new BSPEnforcer());
     }
 
     @org.junit.Test

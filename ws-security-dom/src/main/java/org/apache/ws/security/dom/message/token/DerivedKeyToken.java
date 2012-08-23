@@ -33,6 +33,7 @@ import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.common.derivedKey.ConversationException;
 import org.apache.ws.security.common.derivedKey.AlgoFactory;
 import org.apache.ws.security.common.derivedKey.DerivationAlgorithm;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -72,7 +73,8 @@ public class DerivedKeyToken {
     protected Element elementNonce = null;
     
     private String ns;
-    private boolean bspCompliant = true;
+    
+    private final BSPEnforcer bspEnforcer;
     
     /**
      * This will create an empty DerivedKeyToken
@@ -95,16 +97,7 @@ public class DerivedKeyToken {
         element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.DERIVED_KEY_TOKEN_LN);
         WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
-    }
-    
-    /**
-     * This will create a DerivedKeyToken object with the given DerivedKeyToken element
-     *
-     * @param elem The DerivedKeyToken DOM element
-     * @throws WSSecurityException If the element is not a derived key token
-     */
-    public DerivedKeyToken(Element elem) throws WSSecurityException {
-        this(elem, true);
+        bspEnforcer = new BSPEnforcer();
     }
 
     /**
@@ -114,10 +107,10 @@ public class DerivedKeyToken {
      * @param bspCompliant whether the DerivedKeyToken processing complies with the BSP spec 
      * @throws WSSecurityException If the element is not a derived key token
      */
-    public DerivedKeyToken(Element elem, boolean bspCompliant) throws WSSecurityException {
+    public DerivedKeyToken(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
         log.debug("DerivedKeyToken: created : element constructor");
         element = elem;
-        this.bspCompliant = bspCompliant;
+        this.bspEnforcer = bspEnforcer;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         
         if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
@@ -193,7 +186,7 @@ public class DerivedKeyToken {
      */
     public SecurityTokenReference getSecurityTokenReference() throws WSSecurityException {
         if (elementSecurityTokenReference != null) {
-            return new SecurityTokenReference(elementSecurityTokenReference, bspCompliant);
+            return new SecurityTokenReference(elementSecurityTokenReference, bspEnforcer);
         }
         return null;
     }

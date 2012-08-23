@@ -19,39 +19,19 @@
 
 package org.apache.ws.security.dom.processor;
 
-import org.apache.ws.security.dom.PublicKeyPrincipal;
-import org.apache.ws.security.dom.WSConstants;
-import org.apache.ws.security.dom.WSDataRef;
-import org.apache.ws.security.dom.WSDocInfo;
-import org.apache.ws.security.dom.WSSConfig;
-import org.apache.ws.security.dom.WSSecurityEngine;
-import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.dom.WSUsernameTokenPrincipal;
-import org.apache.ws.security.dom.bsp.BSPEnforcer;
-import org.apache.ws.security.dom.cache.ReplayCache;
-import org.apache.ws.security.common.bsp.BSPRule;
-import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.crypto.CryptoType;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.dom.handler.RequestData;
-import org.apache.ws.security.dom.message.DOMCallbackLookup;
-import org.apache.ws.security.dom.message.CallbackLookup;
-import org.apache.ws.security.dom.message.token.SecurityTokenReference;
-import org.apache.ws.security.dom.message.token.Timestamp;
-import org.apache.ws.security.dom.str.STRParser;
-import org.apache.ws.security.dom.str.STRParser.REFERENCE_TYPE;
-import org.apache.ws.security.dom.str.SignatureSTRParser;
-import org.apache.ws.security.dom.transform.STRTransform;
-import org.apache.ws.security.dom.transform.STRTransformUtil;
-import org.apache.ws.security.dom.util.WSSecurityUtil;
-import org.apache.ws.security.dom.util.XmlSchemaDateFormat;
-import org.apache.ws.security.dom.validate.Credential;
-import org.apache.ws.security.dom.validate.Validator;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
+import java.security.Key;
+import java.security.NoSuchProviderException;
+import java.security.Principal;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
@@ -72,19 +52,36 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
-import java.security.Key;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.Principal;
-import java.security.cert.X509Certificate;
-import java.security.spec.AlgorithmParameterSpec;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoType;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.dom.PublicKeyPrincipal;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSDataRef;
+import org.apache.ws.security.dom.WSDocInfo;
+import org.apache.ws.security.dom.WSSecurityEngine;
+import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.WSUsernameTokenPrincipal;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
+import org.apache.ws.security.dom.cache.ReplayCache;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.dom.message.CallbackLookup;
+import org.apache.ws.security.dom.message.DOMCallbackLookup;
+import org.apache.ws.security.dom.message.token.SecurityTokenReference;
+import org.apache.ws.security.dom.message.token.Timestamp;
+import org.apache.ws.security.dom.str.STRParser;
+import org.apache.ws.security.dom.str.STRParser.REFERENCE_TYPE;
+import org.apache.ws.security.dom.str.SignatureSTRParser;
+import org.apache.ws.security.dom.transform.STRTransform;
+import org.apache.ws.security.dom.transform.STRTransformUtil;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
+import org.apache.ws.security.dom.util.XmlSchemaDateFormat;
+import org.apache.ws.security.dom.validate.Credential;
+import org.apache.ws.security.dom.validate.Validator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class SignatureProcessor implements Processor {
     private static final org.apache.commons.logging.Log LOG = 
@@ -207,7 +204,7 @@ public class SignatureProcessor implements Processor {
 
         List<WSDataRef> dataRefs =  
             buildProtectedRefs(
-                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data.getWssConfig(), wsDocInfo
+                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data, wsDocInfo
             );
         if (dataRefs.size() == 0) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -480,7 +477,7 @@ public class SignatureProcessor implements Processor {
      * to caller
      * @param doc The owning document
      * @param signedInfo The SignedInfo object
-     * @param wssConfig A WSSConfig instance
+     * @param requestData A RequestData instance
      * @param protectedRefs A list of protected references
      * @return A list of protected references
      * @throws WSSecurityException
@@ -488,7 +485,7 @@ public class SignatureProcessor implements Processor {
     private List<WSDataRef> buildProtectedRefs(
         Document doc,
         SignedInfo signedInfo,
-        WSSConfig wssConfig,
+        RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> protectedRefs = new java.util.ArrayList<WSDataRef>();
@@ -498,7 +495,7 @@ public class SignatureProcessor implements Processor {
             String uri = siRef.getURI();
             
             if (!"".equals(uri)) {
-                Element se = dereferenceSTR(doc, siRef, wssConfig, wsDocInfo);
+                Element se = dereferenceSTR(doc, siRef, requestData, wsDocInfo);
                 // If an STR Transform is not used then just find the cached element
                 if (se == null) {
                     NodeSetData data = (NodeSetData)siRef.getDereferencedData();
@@ -547,7 +544,7 @@ public class SignatureProcessor implements Processor {
     private Element dereferenceSTR(
         Document doc,
         Reference siRef, 
-        WSSConfig wssConfig,
+        RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<?> transformsList = siRef.getTransforms();
@@ -574,7 +571,7 @@ public class SignatureProcessor implements Processor {
                         SecurityTokenReference secTokenRef = 
                             new SecurityTokenReference(
                                 (Element)securityTokenReference,
-                                wssConfig.isWsiBSPCompliant()
+                                requestData.getBSPEnforcer()
                             );
                         Element se = STRTransformUtil.dereferenceSTR(doc, secTokenRef, wsDocInfo);
                         if (se != null) {

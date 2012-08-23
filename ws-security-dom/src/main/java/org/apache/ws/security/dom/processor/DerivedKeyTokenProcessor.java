@@ -45,7 +45,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         // Deserialize the DKT
-        DerivedKeyToken dkt = new DerivedKeyToken(elem, data.getWssConfig().isWsiBSPCompliant());
+        DerivedKeyToken dkt = new DerivedKeyToken(elem, data.getBSPEnforcer());
         byte[] secret = null;
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
