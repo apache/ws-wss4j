@@ -88,11 +88,6 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Encrypted bytes of the ephemeral key
      */
     protected byte[] encryptedEphemeralKey;
-    
-    /**
-     * Remote user's alias to obtain the cert to encrypt the ephemeral key
-     */
-    protected String encrUser = null;
 
     /**
      * Algorithm used to encrypt the ephemeral key
@@ -108,7 +103,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
      * written out unless it is explicitly configured).
      */
-    protected String digestAlgo = null;
+    private String digestAlgo = null;
 
     /**
      * xenc:EncryptedKey element
@@ -124,12 +119,12 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * Custom token value
      */
-    protected String customEKTokenValueType;
+    private String customEKTokenValueType;
     
     /**
      * Custom token id
      */
-    protected String customEKTokenId;
+    private String customEKTokenId;
     
     /**
      * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE

@@ -25,6 +25,8 @@ import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.common.KeystoreCallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.CertificateStore;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
@@ -37,6 +39,7 @@ import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -115,13 +118,14 @@ public class CertificateStoreTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
+        RequestData data = new RequestData();
+        data.setCallbackHandler(keystoreCallbackHandler);
+        data.setSigVerCrypto(receiverCrypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
         List<WSSecurityEngineResult> results = 
-            newEngine.processSecurityHeader(signedDoc, null, keystoreCallbackHandler, receiverCrypto);
+            newEngine.processSecurityHeader(signedDoc, "", data);
+        
         WSSecurityEngineResult result = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 

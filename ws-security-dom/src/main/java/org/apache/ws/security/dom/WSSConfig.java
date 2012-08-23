@@ -216,8 +216,6 @@ public class WSSConfig {
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
     }
 
-    protected boolean wsiBSPCompliant = true;
-    
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
      * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
@@ -369,24 +367,6 @@ public class WSSConfig {
     public static WSSConfig getNewInstance() {
         init();
         return new WSSConfig();
-    }
-
-    /**
-     * Checks if we are in WS-I Basic Security Profile compliance mode
-     * 
-     * @return whether we are in WS-I Basic Security Profile compliance mode
-     */
-    public boolean isWsiBSPCompliant() {
-        return wsiBSPCompliant;
-    }
-
-    /**
-     * Set the WS-I Basic Security Profile compliance mode. The default is true.
-     * 
-     * @param wsiBSPCompliant
-     */
-    public void setWsiBSPCompliant(boolean wsiBSPCompliant) {
-        this.wsiBSPCompliant = wsiBSPCompliant;
     }
 
     /**

@@ -66,7 +66,8 @@ public class SecurityTokenReference {
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
     private static org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(SecurityTokenReference.class);
-    protected Element element = null;
+    
+    private Element element = null;
     private DOMX509IssuerSerial issuerSerial = null;
     private byte[] skiBytes = null;
     private Reference reference = null;

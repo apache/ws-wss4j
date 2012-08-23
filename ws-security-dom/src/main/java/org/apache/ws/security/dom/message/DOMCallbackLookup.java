@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public class DOMCallbackLookup implements CallbackLookup {
     
-    protected Document doc;
+    private Document doc;
     
     public DOMCallbackLookup(Document doc) {
         this.doc = doc;

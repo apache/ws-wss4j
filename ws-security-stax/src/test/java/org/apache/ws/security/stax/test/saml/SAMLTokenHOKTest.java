@@ -94,7 +94,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
@@ -229,7 +228,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }

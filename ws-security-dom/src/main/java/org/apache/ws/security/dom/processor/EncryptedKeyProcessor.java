@@ -34,7 +34,6 @@ import javax.crypto.spec.PSource;
 
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
@@ -275,20 +274,6 @@ public class EncryptedKeyProcessor implements Processor {
             strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
             
             X509Certificate[] certs = strParser.getCertificates();
-            if (certs == null || certs.length < 1 || certs[0] == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "noCertsFound", 
-                    new Object[] {"decryption (KeyId)"}
-                );
-            }
-            return certs;
-        } else if (!data.getWssConfig().isWsiBSPCompliant() 
-            && crypto.getDefaultX509Identifier() != null) {
-            String alias = crypto.getDefaultX509Identifier();
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(alias);
-            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,

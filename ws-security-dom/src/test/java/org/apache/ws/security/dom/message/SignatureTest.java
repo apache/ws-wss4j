@@ -20,6 +20,7 @@
 package org.apache.ws.security.dom.message;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -306,13 +307,20 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        List<WSSecurityEngineResult> results = newEngine.processSecurityHeader(doc, null, null, crypto);
+        try {
+            newEngine.processSecurityHeader(doc, null, null, crypto);
+            fail("Failure expected on a bad ValueType attribute");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
         
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(signedDoc, "", data);
+
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
@@ -320,16 +328,6 @@ public class SignatureTest extends org.junit.Assert {
         REFERENCE_TYPE referenceType = 
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
-        
-        // Now turn on BSP spec compliance
-        config.setWsiBSPCompliant(true);
-        newEngine.setWssConfig(config);
-        try {
-            newEngine.processSecurityHeader(doc, null, null, crypto);
-            fail("Failure expected on a bad ValueType attribute");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
     }
     
     /**

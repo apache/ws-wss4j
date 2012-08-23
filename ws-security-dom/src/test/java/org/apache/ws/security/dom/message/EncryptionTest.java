@@ -89,9 +89,7 @@ public class EncryptionTest extends org.junit.Assert {
         keyGen.init(128);
         key = keyGen.generateKey();
         keyData = key.getEncoded();
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
-        secEngine.setWssConfig(wssConfig);
+        secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
 
     /**
@@ -200,13 +198,21 @@ public class EncryptionTest extends org.junit.Assert {
         }
         assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
         
-        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        List<WSSecurityEngineResult> results = 
+        
+        try {
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+            fail("Failure expected on a bad ValueType attribute");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        RequestData data = new RequestData();
+        data.setCallbackHandler(keystoreCallbackHandler);
+        data.setDecCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(encryptedDoc, "", data);
         
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -215,17 +221,6 @@ public class EncryptionTest extends org.junit.Assert {
         REFERENCE_TYPE referenceType = 
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
-        
-        // Now turn on BSP spec compliance
-        config.setWsiBSPCompliant(true);
-        newEngine.setWssConfig(config);
-        try {
-            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
-            fail("Failure expected on a bad ValueType attribute");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-
     }
     
     /**

@@ -74,10 +74,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(true);
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        secEngine.setWssConfig(config);
+        secEngine.setWssConfig(WSSConfig.getNewInstance());
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         
@@ -117,10 +115,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(true);
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        secEngine.setWssConfig(config);
+        secEngine.setWssConfig(WSSConfig.getNewInstance());
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         
@@ -153,10 +149,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(true);
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        secEngine.setWssConfig(config);
+        secEngine.setWssConfig(WSSConfig.getNewInstance());
         // Processing should fail as we have no ValueType attribute
         try {
             secEngine.processSecurityHeader(doc, null, null, crypto);

@@ -20,6 +20,7 @@
 package org.apache.ws.security.dom.validate;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -31,6 +32,7 @@ import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.common.SAML1CallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.dom.common.UsernamePasswordCallbackHandler;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
@@ -118,21 +120,22 @@ public class ValidatorTest extends org.junit.Assert {
         Crypto cryptoCA = CryptoFactory.getInstance("crypto.properties");
         // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(cryptoCA);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
         try {
-            newEngine.processSecurityHeader(signedDoc, null, null, cryptoCA);
+            newEngine.processSecurityHeader(signedDoc, "", data);
             fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
         
         // Now switch out the default signature validator
+        WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSSecurityEngine.SIGNATURE, NoOpValidator.class);
         newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(signedDoc, null, null, cryptoCA);
+        data.setWssConfig(config);
+        newEngine.processSecurityHeader(signedDoc, "", data);
     }
     
     /**

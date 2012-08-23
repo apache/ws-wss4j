@@ -21,13 +21,20 @@ package org.apache.ws.security.dom.str;
 
 import java.util.List;
 
+import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.dom.message.token.BinarySecurity;
+import org.apache.ws.security.dom.message.token.KerberosSecurity;
+import org.apache.ws.security.dom.message.token.PKIPathSecurity;
 import org.apache.ws.security.dom.message.token.SecurityTokenReference;
+import org.apache.ws.security.dom.message.token.X509Security;
 import org.apache.ws.security.dom.processor.Processor;
 import org.w3c.dom.Element;
 
@@ -102,5 +109,145 @@ public final class STRParserUtil {
                 );
         }
     }
+    
+
+    /**
+     * Check that the BinarySecurityToken referenced by the SecurityTokenReference argument 
+     * is BSP compliant.
+     * @param secRef The SecurityTokenReference to the BinarySecurityToken
+     * @param token The BinarySecurityToken
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
+     * @throws WSSecurityException
+     */
+    public static void checkBinarySecurityBSPCompliance(
+        SecurityTokenReference secRef,
+        BinarySecurity token,
+        BSPEnforcer bspEnforcer
+    ) throws WSSecurityException {
+        if (secRef.containsReference()) {
+            // Check the ValueType attributes
+            String valueType = secRef.getReference().getValueType();
+            if ((valueType == null || "".equals(valueType)) && (token instanceof KerberosSecurity)) {
+                bspEnforcer.handleBSPRule(BSPRule.R3059);
+            }
+            
+            if (((token instanceof X509Security) && !X509Security.X509_V3_TYPE.equals(valueType))
+                || ((token instanceof PKIPathSecurity) && !PKIPathSecurity.PKI_TYPE.equals(valueType))
+                || ((token instanceof KerberosSecurity) 
+                        && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType))) {
+                bspEnforcer.handleBSPRule(BSPRule.R3058);
+            }
+        } else if (secRef.containsKeyIdentifier()) {
+            String valueType = secRef.getKeyIdentifierValueType();
+            if (!SecurityTokenReference.SKI_URI.equals(valueType) 
+                && !SecurityTokenReference.THUMB_URI.equals(valueType)
+                && !WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R3063);
+            }
+        }
+        
+        // Check TokenType attributes
+        if (token instanceof PKIPathSecurity) {
+            String tokenType = secRef.getTokenType();
+            if (!PKIPathSecurity.PKI_TYPE.equals(tokenType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R5215);
+            }
+        }
+    }
+    
+    /**
+     * Check that the EncryptedKey referenced by the SecurityTokenReference argument 
+     * is BSP compliant.
+     * @param secRef The SecurityTokenReference to the BinarySecurityToken
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
+     * @throws WSSecurityException
+     */
+    public static void checkEncryptedKeyBSPCompliance(
+        SecurityTokenReference secRef, BSPEnforcer bspEnforcer
+    ) throws WSSecurityException {
+        if (secRef.containsKeyIdentifier()) {
+            String valueType = secRef.getKeyIdentifierValueType();
+            if (!SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R3063);
+            }
+        }
+        
+        String tokenType = secRef.getTokenType();
+        if (!WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(tokenType)) {
+            bspEnforcer.handleBSPRule(BSPRule.R5215);
+        }
+    }
+    
+    /**
+     * Check that the SAML token referenced by the SecurityTokenReference argument 
+     * is BSP compliant.
+     * @param secRef The SecurityTokenReference to the SAML token
+     * @param assertion The SAML Token AssertionWrapper object
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
+     * @throws WSSecurityException
+     */
+    public static void checkSamlTokenBSPCompliance(
+        SecurityTokenReference secRef,
+        AssertionWrapper assertion,
+        BSPEnforcer bspEnforcer
+    ) throws WSSecurityException {
+        // Check the KeyIdentifier ValueType attributes
+        if (secRef.containsKeyIdentifier()) {
+            String valueType = secRef.getKeyIdentifierValueType();
+            if (assertion.getSaml1() != null 
+                && !WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R6603);
+            }
+            if (assertion.getSaml2() != null 
+                && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R6616);
+            }
+            String encoding = secRef.getKeyIdentifierEncodingType();
+            if (encoding != null && !"".equals(encoding)) {
+                bspEnforcer.handleBSPRule(BSPRule.R6604);
+            }
+        }
+        
+        // Check the TokenType attribute
+        String tokenType = secRef.getTokenType();
+        if (assertion.getSaml1() != null && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+            bspEnforcer.handleBSPRule(BSPRule.R6611);
+        }
+        if (assertion.getSaml2() != null && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+            bspEnforcer.handleBSPRule(BSPRule.R6617);
+        }
+        
+        // Check the ValueType attribute of the Reference for SAML2
+        if (assertion.getSaml2() != null && secRef.containsReference()) {
+            String valueType = secRef.getReference().getValueType();
+            if (valueType != null && !"".equals(valueType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R6614);
+            }
+        }
+    }
+    
+    /**
+     * Check that the Username token referenced by the SecurityTokenReference argument 
+     * is BSP compliant.
+     * @param secRef The SecurityTokenReference to the Username token
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
+     * @throws WSSecurityException
+     */
+    public static void checkUsernameTokenBSPCompliance(
+        SecurityTokenReference secRef, BSPEnforcer bspEnforcer
+    ) throws WSSecurityException {
+        if (!secRef.containsReference()) {
+            // BSP does not permit using a KeyIdentifier to refer to a U/T
+            bspEnforcer.handleBSPRule(BSPRule.R4215);
+        }
+        
+        if (secRef.getReference() != null) {
+            String valueType = secRef.getReference().getValueType();
+            if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(valueType)) {
+                bspEnforcer.handleBSPRule(BSPRule.R4214);
+            }
+        }
+    }
+
     
 }

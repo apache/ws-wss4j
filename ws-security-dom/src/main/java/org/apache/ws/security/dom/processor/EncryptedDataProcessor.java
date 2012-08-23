@@ -73,10 +73,7 @@ public class EncryptedDataProcessor implements Processor {
         }
         
         String symEncAlgo = X509Util.getEncAlgo(elem);
-        // Check BSP compliance
-        if (request.getWssConfig().isWsiBSPCompliant()) {
-            checkBSPCompliance(symEncAlgo, request.getBSPEnforcer());
-        }
+        checkBSPCompliance(symEncAlgo, request.getBSPEnforcer());
         
         // Get the Key either via a SecurityTokenReference or an EncryptedKey
         Element secRefToken = 

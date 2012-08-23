@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
 public class SignatureConfirmation {
 
     public static final String SC_VALUE_ATTR = "Value"; 
-    protected Element element = null;
+    private Element element = null;
     private byte[] signatureValue = null;
     
     /**

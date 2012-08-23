@@ -116,7 +116,6 @@ public abstract class WSHandler {
         reqData.setSoapConstants(
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement())
         );
-        wssConfig.setWsiBSPCompliant(decodeBSPCompliance(reqData));
         wssConfig.setAddInclusivePrefixes(decodeAddInclusivePrefixes(reqData));
         /*
          * Here we have action, username, password, and actor, mustUnderstand.
@@ -269,7 +268,6 @@ public abstract class WSHandler {
             decodeNamespaceQualifiedPasswordTypes(reqData)
         );
         wssConfig.setSecretKeyLength(reqData.getSecretKeyLength());
-        wssConfig.setWsiBSPCompliant(decodeBSPCompliance(reqData));
         reqData.setWssConfig(wssConfig);
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
@@ -615,13 +613,6 @@ public abstract class WSHandler {
             }
         }
         return defaultFutureTimeToLive;
-    }
-    
-    protected boolean decodeBSPCompliance(RequestData reqData)
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.IS_BSP_COMPLIANT, true
-        );
     }
     
     protected boolean decodeAddInclusivePrefixes(RequestData reqData)

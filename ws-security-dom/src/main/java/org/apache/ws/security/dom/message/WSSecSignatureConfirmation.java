@@ -37,7 +37,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
 
     private SignatureConfirmation sc = null;
 
-    byte[] signatureValue = null;
+    private byte[] signatureValue = null;
 
     public WSSecSignatureConfirmation() {
         super();

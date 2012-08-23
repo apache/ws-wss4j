@@ -62,9 +62,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
      */
     @org.junit.Before
     public void setUp() throws Exception {
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(true);
-        secEngine.setWssConfig(wssConfig);
+        secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
     
     @org.junit.Test

@@ -288,6 +288,7 @@ public abstract class AbstractTestBase {
         ignoredRules.add(BSPRule.R5406);
         ignoredRules.add(BSPRule.R5407);
         ignoredRules.add(BSPRule.R5417);
+        ignoredRules.add(BSPRule.R3063);
         requestData.setIgnoredBSPRules(ignoredRules);
         
         wss4JHandler.doReceiver(messageContext, requestData, false);

@@ -53,10 +53,10 @@ public class Timestamp {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(Timestamp.class);
 
-    protected Element element = null;
-    protected List<Element> customElements = null;
-    protected Date createdDate;
-    protected Date expiresDate;
+    private Element element = null;
+    private List<Element> customElements = null;
+    private Date createdDate;
+    private Date expiresDate;
     
     /**
      * Constructs a <code>Timestamp</code> object and parses the

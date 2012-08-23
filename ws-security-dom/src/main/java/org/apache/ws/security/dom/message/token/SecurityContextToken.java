@@ -43,12 +43,12 @@ public class SecurityContextToken {
     /**
      * Security context token element
      */
-    protected Element element = null;
+    private Element element = null;
 
     /**
      * Identifier element
      */
-    protected Element elementIdentifier = null;
+    private Element elementIdentifier = null;
     
     private WSSConfig wssConfig = WSSConfig.getNewInstance();
     

@@ -18,12 +18,23 @@
  */
 package org.apache.ws.security.stax.test.saml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.Properties;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
-import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.OutboundWSSec;
@@ -34,21 +45,11 @@ import org.apache.ws.security.stax.test.CallbackHandlerImpl;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.opensaml.common.SAMLVersion;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.Properties;
 
 /**
  * @author $Author$
@@ -70,7 +71,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             securityProperties.setCallbackHandler(callbackHandler);
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
 
@@ -89,7 +90,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
@@ -175,7 +175,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "true");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
@@ -398,7 +397,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_UNSIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
@@ -486,7 +484,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.SAML_TOKEN_SIGNED;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }

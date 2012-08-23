@@ -55,7 +55,7 @@ public class WSSecSecurityContextToken {
     /**
      * The symmetric secret associated with the SecurityContextToken
      */
-    protected byte[] secret;
+    private byte[] secret;
     
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
 

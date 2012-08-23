@@ -130,6 +130,9 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 } else {
                     valueType = WSSConstants.NS_X509PKIPathv1;
                 }
+                if (WSSConstants.Saml20Token.equals(securityToken.getTokenType())) {
+                    valueType = null;
+                }
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
             } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF) {
                 WSSUtils.createEmbeddedKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), tokenId);

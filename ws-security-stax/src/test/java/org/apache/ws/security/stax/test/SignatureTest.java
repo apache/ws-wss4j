@@ -220,7 +220,6 @@ public class SignatureTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
@@ -608,7 +607,6 @@ public class SignatureTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
@@ -934,7 +932,6 @@ public class SignatureTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
         //also test swssf inbound
@@ -1000,7 +997,6 @@ public class SignatureTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
         //also test swssf inbound
@@ -1057,7 +1053,6 @@ public class SignatureTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
         //also test swssf inbound

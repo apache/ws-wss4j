@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
-    protected String symEncAlgo = WSConstants.AES_128;
+    private String symEncAlgo = WSConstants.AES_128;
     
     public WSSecDKEncrypt() {
         super();

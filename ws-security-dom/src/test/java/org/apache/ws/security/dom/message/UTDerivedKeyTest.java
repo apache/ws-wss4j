@@ -672,8 +672,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body. The Reference to the
-     * UsernameToken contains a non-standard value type, which is rejected when BSP compliance
-     * is turned on.
+     * UsernameToken contains a non-standard value type, which is rejected when the corresponding
+     * BSP rule is turned on.
      */
     @org.junit.Test
     public void testBadValueType() throws Exception {
@@ -721,11 +721,12 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         }
         
         // Turn off BSP compliance and it should work
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setDecCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4214));
+        newEngine.processSecurityHeader(encryptedDoc, "", data);
     }
 
     
@@ -784,11 +785,12 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         }
         
         // Turn off BSP compliance and it should work
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        RequestData data = new RequestData();
+        data.setCallbackHandler(callbackHandler);
+        data.setDecCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4215));
+        newEngine.processSecurityHeader(encryptedDoc, "", data);
     }
 
     

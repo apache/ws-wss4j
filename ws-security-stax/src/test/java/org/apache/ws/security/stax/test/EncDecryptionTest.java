@@ -938,7 +938,6 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.ENCRYPT;
             Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }

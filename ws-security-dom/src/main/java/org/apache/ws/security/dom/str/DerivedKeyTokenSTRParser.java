@@ -19,23 +19,6 @@
 
 package org.apache.ws.security.dom.str;
 
-import org.apache.ws.security.dom.WSConstants;
-import org.apache.ws.security.dom.WSDocInfo;
-import org.apache.ws.security.dom.WSSConfig;
-import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.ext.WSPasswordCallback;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.SAMLKeyInfo;
-import org.apache.ws.security.common.saml.SAMLUtil;
-import org.apache.ws.security.dom.handler.RequestData;
-import org.apache.ws.security.dom.message.token.BinarySecurity;
-import org.apache.ws.security.dom.message.token.SecurityTokenReference;
-import org.apache.ws.security.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.ws.security.dom.util.WSSecurityUtil;
-import org.w3c.dom.Element;
-
 import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -44,6 +27,22 @@ import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
+
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SAMLUtil;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSDocInfo;
+import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.dom.message.token.BinarySecurity;
+import org.apache.ws.security.dom.message.token.SecurityTokenReference;
+import org.apache.ws.security.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
+import org.w3c.dom.Element;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element associated
@@ -68,14 +67,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         WSDocInfo wsDocInfo,
         Map<String, Object> parameters
     ) throws WSSecurityException {
-        boolean bspCompliant = true;
         Crypto crypto = data.getDecCrypto();
-        WSSConfig config = data.getWssConfig();
-
-        if (config != null) {
-            bspCompliant = config.isWsiBSPCompliant();
-        }
-        
         SecurityTokenReference secRef = 
             new SecurityTokenReference(strElement, data.getBSPEnforcer());
         
@@ -91,7 +83,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         
         WSSecurityEngineResult result = wsDocInfo.getResult(uri);
         if (result != null) {
-            processPreviousResult(result, secRef, data, wsDocInfo, bspCompliant);
+            processPreviousResult(result, secRef, data, wsDocInfo);
         } else if (secRef.containsReference()) { 
             // Now use the callback and get it
             secretKey = 
@@ -129,9 +121,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                     );
                 }
             } else {
-                if (bspCompliant 
-                    && keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
-                    BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
+                if (keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                    STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
                 }
                 X509Certificate[] certs = secRef.getKeyIdentifier(crypto);
                 if (certs == null || certs.length < 1 || certs[0] == null) {
@@ -251,28 +242,22 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         WSSecurityEngineResult result,
         SecurityTokenReference secRef,
         RequestData data,
-        WSDocInfo wsDocInfo,
-        boolean bspCompliant
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
         if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
-            if (bspCompliant) {
-                BSPEnforcer.checkUsernameTokenBSPCompliance(secRef);
-            }
+            STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.ENCR == action) {
-            if (bspCompliant) {
-                BSPEnforcer.checkEncryptedKeyBSPCompliance(secRef);
-            }
+            STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.SCT == action || WSConstants.BST == action) {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
             AssertionWrapper assertion = 
                 (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            if (bspCompliant) {
-                BSPEnforcer.checkSamlTokenBSPCompliance(secRef, assertion);
-            }
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+           
             SAMLKeyInfo keyInfo = 
                 SAMLUtil.getCredentialFromSubject(assertion, 
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 

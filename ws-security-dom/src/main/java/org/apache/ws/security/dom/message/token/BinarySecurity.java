@@ -50,7 +50,8 @@ public class BinarySecurity {
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(BinarySecurity.class);
-    protected Element element = null;
+    
+    private Element element = null;
 
     /**
      * Constructor.

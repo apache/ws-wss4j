@@ -51,7 +51,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     /**
      * Session key used as the secret in key derivation
      */
-    protected byte[] ephemeralKey;
+    private byte[] ephemeralKey;
      
     /**
      * DerivedKeyToken of this builder
@@ -71,12 +71,12 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     /**
      * Client's label value
      */
-    protected String clientLabel = ConversationConstants.DEFAULT_LABEL;
+    private String clientLabel = ConversationConstants.DEFAULT_LABEL;
     
     /**
      * Service's label value
      */
-    protected String serviceLabel = ConversationConstants.DEFAULT_LABEL;
+    private String serviceLabel = ConversationConstants.DEFAULT_LABEL;
     
     /**
      * soap:Envelope element
@@ -87,13 +87,13 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      * The Token identifier of the token that the <code>DerivedKeyToken</code> 
      * is (or to be) derived from.
      */
-    protected String tokenIdentifier = null;
+    private String tokenIdentifier = null;
     
     /**
      * True if the tokenIdentifier is a direct reference to a key identifier
      * instead of a URI to a key
      */
-    protected boolean tokenIdDirectId;
+    private boolean tokenIdDirectId;
 
     /**
      * The derived key will change depending on the sig/encr algorithm.
@@ -106,7 +106,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     /**
      * The wsse:SecurityTokenReference element to be used
      */
-    protected Element strElem;
+    private Element strElem;
     
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     
