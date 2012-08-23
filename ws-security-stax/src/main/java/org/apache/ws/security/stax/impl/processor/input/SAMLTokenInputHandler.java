@@ -81,8 +81,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         if (assertionWrapper.isSigned()) {
             assertionWrapper.verifySignature(
                     new WSSSAMLKeyInfoProcessor(),
-                    ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto(),
-                    true // TODO
+                    ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto()
             );
             // Verify trust on the signature
             final SAMLKeyInfo samlIssuerKeyInfo = assertionWrapper.getSignatureKeyInfo();
@@ -93,8 +92,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         assertionWrapper.parseHOKSubject(
                 new WSSSAMLKeyInfoProcessor(),
                 ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto(),
-                securityProperties.getCallbackHandler(),
-                true // TODO
+                securityProperties.getCallbackHandler()
         );
         
         // TODO move this into a Validator eventually

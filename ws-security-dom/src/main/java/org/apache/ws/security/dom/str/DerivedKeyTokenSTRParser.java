@@ -275,8 +275,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             SAMLKeyInfo keyInfo = 
                 SAMLUtil.getCredentialFromSubject(assertion, 
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                        data.getSigVerCrypto(), data.getCallbackHandler(),
-                        data.getWssConfig().isWsiBSPCompliant());
+                        data.getSigVerCrypto(), data.getCallbackHandler());
             // TODO Handle malformed SAML tokens where they don't have the 
             // secret in them
             secretKey = keyInfo.getSecret();

@@ -49,16 +49,18 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.WsuIdAllocator;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.handler.WSHandler;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.dom.handler.WSHandlerResult;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.OutboundWSSec;
@@ -67,7 +69,6 @@ import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
-import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -280,6 +281,15 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
+        
+        // Disable PrefixList checking as the stax code doesn't support this yet
+        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        ignoredRules.add(BSPRule.R5404);
+        ignoredRules.add(BSPRule.R5406);
+        ignoredRules.add(BSPRule.R5407);
+        ignoredRules.add(BSPRule.R5417);
+        requestData.setIgnoredBSPRules(ignoredRules);
+        
         wss4JHandler.doReceiver(messageContext, requestData, false);
 
         return messageContext;

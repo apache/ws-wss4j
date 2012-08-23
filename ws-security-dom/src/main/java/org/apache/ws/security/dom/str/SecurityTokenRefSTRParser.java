@@ -289,8 +289,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
         SAMLKeyInfo samlKi = 
             SAMLUtil.getCredentialFromSubject(assertion, 
                     new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                    data.getSigVerCrypto(), data.getCallbackHandler(),
-                    data.getWssConfig().isWsiBSPCompliant());
+                    data.getSigVerCrypto(), data.getCallbackHandler());
         if (samlKi == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", new Object[] {"No Secret Key"}

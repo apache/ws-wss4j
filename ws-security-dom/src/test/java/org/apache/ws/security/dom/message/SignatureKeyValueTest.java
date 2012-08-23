@@ -25,12 +25,15 @@ import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.dom.handler.RequestData;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -69,11 +72,11 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("RSAKeyValue") != -1);
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        secEngine.setWssConfig(config);
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
         final List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(signedDoc, null, null, crypto);
+            secEngine.processSecurityHeader(signedDoc, "", data);
 
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -113,10 +116,10 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         
         try {
             WSSecurityEngine secEngine = new WSSecurityEngine();
-            WSSConfig config = WSSConfig.getNewInstance();
-            config.setWsiBSPCompliant(false);
-            secEngine.setWssConfig(config);
-            secEngine.processSecurityHeader(signedDoc, null, null, crypto);
+            RequestData data = new RequestData();
+            data.setSigVerCrypto(crypto);
+            data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
+            secEngine.processSecurityHeader(signedDoc, "", data);
             fail("Failure expected on bad public key");
         } catch (Exception ex) {
             // expected
@@ -146,11 +149,11 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("DSAKeyValue") != -1);
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        secEngine.setWssConfig(config);
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(crypto);
+        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
         final List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(signedDoc, null, null, crypto);
+            secEngine.processSecurityHeader(signedDoc, "", data);
         
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);

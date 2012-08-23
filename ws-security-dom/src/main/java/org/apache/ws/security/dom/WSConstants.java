@@ -87,6 +87,15 @@ public final class WSConstants {
     public static final String C14N_EXCL_WITH_COMMENTS = 
         "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
     
+    public static final String NS_XMLDSIG_FILTER2 = 
+        "http://www.w3.org/2002/06/xmldsig-filter2";
+    public static final String NS_XMLDSIG_ENVELOPED_SIGNATURE = 
+        SIG_NS + "enveloped-signature";
+    public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS = 
+        "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
+    public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS = 
+        "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform";
+    
     public static final String KEYTRANSPORT_RSA15 = 
         "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
     public static final String KEYTRANSPORT_RSAOEP = 

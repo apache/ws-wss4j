@@ -177,8 +177,7 @@ public class SignatureSTRParser implements STRParser {
                         assertion = new AssertionWrapper(processedToken);
                         assertion.parseHOKSubject(
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                            data.getSigVerCrypto(), data.getCallbackHandler(),
-                            data.getWssConfig().isWsiBSPCompliant()
+                            data.getSigVerCrypto(), data.getCallbackHandler()
                         );
                     }
                     if (bspCompliant) {
@@ -366,8 +365,7 @@ public class SignatureSTRParser implements STRParser {
             SAMLKeyInfo samlKi = 
                 SAMLUtil.getCredentialFromSubject(assertion,  
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
-                        data.getSigVerCrypto(), data.getCallbackHandler(),
-                        data.getWssConfig().isWsiBSPCompliant());
+                        data.getSigVerCrypto(), data.getCallbackHandler());
             X509Certificate[] foundCerts = samlKi.getCerts();
             if (foundCerts != null && foundCerts.length > 0) {
                 certs = new X509Certificate[]{foundCerts[0]};

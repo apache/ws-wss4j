@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
@@ -48,6 +49,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
     private final byte[] nonce;
     private final byte[] salt;
     private final Long iteration;
+    private final WSSecurityContext wsSecurityContext;
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
                                  WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
@@ -58,6 +60,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
         this.nonce = nonce;
         this.salt = salt;
         this.iteration = iteration;
+        this.wsSecurityContext = wsSecurityContext;
     }
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
@@ -69,6 +72,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
         this.nonce = nonce;
         this.salt = salt;
         this.iteration = iteration;
+        this.wsSecurityContext = null;
     }
 
     public String getUsername() {
@@ -108,6 +112,15 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
      *
      */
     public byte[] generateDerivedKey(String rawPassword, byte[] salt, long iteration) throws WSSecurityException {
+        
+        if (wsSecurityContext != null) {
+            if (salt == null || salt.length == 0) {
+                wsSecurityContext.handleBSPRule(BSPRule.R4217);
+            }
+            if (iteration < DEFAULT_ITERATION) {
+                wsSecurityContext.handleBSPRule(BSPRule.R4218);
+            }
+        }
         if (iteration == 0) {
             iteration = DEFAULT_ITERATION;
         }

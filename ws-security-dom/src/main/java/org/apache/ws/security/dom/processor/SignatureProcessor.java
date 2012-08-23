@@ -27,7 +27,9 @@ import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.dom.WSUsernameTokenPrincipal;
+import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.cache.ReplayCache;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -55,9 +57,11 @@ import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.XMLValidateContext;
@@ -65,12 +69,15 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
+import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
 import java.security.Key;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,25 +134,24 @@ public class SignatureProcessor implements Processor {
             certs = getDefaultCerts(data.getSigVerCrypto());
             principal = certs[0].getSubjectX500Principal();
         } else {
-            List<Element> strElements = 
-                WSSecurityUtil.getDirectChildElements(
-                    keyInfoElement,
-                    SecurityTokenReference.SECURITY_TOKEN_REFERENCE,
-                    WSConstants.WSSE_NS
-                );
-            if (data.getWssConfig().isWsiBSPCompliant()) {
-                if (strElements.isEmpty()) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecurityTokenReference"
-                    );
-                } else if (strElements.size() > 1) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY, "badSecurityTokenReference"
-                    );
+            int result = 0;
+            Node node = keyInfoElement.getFirstChild();
+            Element child = null;
+            while (node != null) {
+                if (Node.ELEMENT_NODE == node.getNodeType()) {
+                    result++;
+                    child = (Element)node;
                 }
+                node = node.getNextSibling();
             }
+            if (result != 1) {
+                data.getBSPEnforcer().handleBSPRule(BSPRule.R5402);
+            }
+            
+            if (!(SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName()) 
+                && WSConstants.WSSE_NS.equals(child.getNamespaceURI()))) {
+                data.getBSPEnforcer().handleBSPRule(BSPRule.R5417);
                 
-            if (strElements.isEmpty()) {
                 publicKey = parseKeyValue(keyInfoElement);
                 if (validator != null) {
                     Credential credential = new Credential();
@@ -162,7 +168,7 @@ public class SignatureProcessor implements Processor {
                     SignatureSTRParser.SECRET_KEY_LENGTH, Integer.valueOf(data.getWssConfig().getSecretKeyLength())
                 );
                 strParser.parseSecurityTokenReference(
-                    strElements.get(0), data, wsDocInfo, parameters
+                    child, data, wsDocInfo, parameters
                 );
                 principal = strParser.getPrincipal();
                 certs = strParser.getCertificates();
@@ -198,13 +204,7 @@ public class SignatureProcessor implements Processor {
             verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, data, wsDocInfo);
         byte[] signatureValue = xmlSignature.getSignatureValue().getValue();
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
-        // The c14n algorithm must be as specified by the BSP spec
-        if (data.getWssConfig().isWsiBSPCompliant() 
-            && !WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badC14nAlgo"
-            );
-        }
+
         List<WSDataRef> dataRefs =  
             buildProtectedRefs(
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data.getWssConfig(), wsDocInfo
@@ -372,6 +372,7 @@ public class SignatureProcessor implements Processor {
         
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
+            checkBSPCompliance(xmlSignature, data.getBSPEnforcer());
             
             // Test for replay attacks
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), data, wsDocInfo);
@@ -651,6 +652,87 @@ public class SignatureProcessor implements Processor {
             replayCache.add(identifier);
         }
         
+    }
+    
+    /**
+     * Check BSP compliance (Note some other checks are done elsewhere in this class)
+     * @throws WSSecurityException
+     */
+    private void checkBSPCompliance(
+        XMLSignature xmlSignature,
+        BSPEnforcer bspEnforcer
+    ) throws WSSecurityException {
+        // Check for Manifests
+        for (Object object : xmlSignature.getObjects()) {
+            if (object instanceof XMLObject) {
+                XMLObject xmlObject = (XMLObject)object;
+                for (Object xmlStructure : xmlObject.getContent()) {
+                    if (xmlStructure instanceof Manifest) {
+                        bspEnforcer.handleBSPRule(BSPRule.R5403);
+                    }
+                }
+            }
+        }
+        
+        // Check the c14n algorithm
+        String c14nMethod = 
+            xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
+        if (!WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
+            bspEnforcer.handleBSPRule(BSPRule.R5404);
+        }
+
+        // Not allowed HMAC OutputLength
+        AlgorithmParameterSpec parameterSpec = 
+            xmlSignature.getSignedInfo().getSignatureMethod().getParameterSpec();
+        if (parameterSpec instanceof HMACParameterSpec) {
+            bspEnforcer.handleBSPRule(BSPRule.R5401);
+        }
+        
+        // Must have InclusiveNamespaces with a PrefixList
+        parameterSpec = 
+            xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
+        if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
+            bspEnforcer.handleBSPRule(BSPRule.R5406);
+        }
+        
+        // Check References
+        for (Object refObject : xmlSignature.getSignedInfo().getReferences()) {
+            Reference reference = (Reference)refObject;
+            if (reference.getTransforms().isEmpty()) {
+                bspEnforcer.handleBSPRule(BSPRule.R5416);
+            }
+            for (int i = 0; i < reference.getTransforms().size(); i++) {
+                Transform transform = (Transform)reference.getTransforms().get(i);
+                String algorithm = transform.getAlgorithm();
+                if (!(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)
+                    || STRTransform.TRANSFORM_URI.equals(algorithm)
+                    || WSConstants.NS_XMLDSIG_FILTER2.equals(algorithm)
+                    || WSConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE.equals(algorithm)
+                    || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)
+                    || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm))) {
+                    bspEnforcer.handleBSPRule(BSPRule.R5423);
+                }
+                if (i == (reference.getTransforms().size() - 1)
+                    && (!(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)
+                        || STRTransform.TRANSFORM_URI.equals(algorithm)
+                        || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)
+                        || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)))) {
+                    bspEnforcer.handleBSPRule(BSPRule.R5412);
+                }
+                
+                if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)) {
+                    parameterSpec = transform.getParameterSpec();
+                    if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
+                        bspEnforcer.handleBSPRule(BSPRule.R5407);
+                    }
+                } /*else if (STRTransform.TRANSFORM_URI.equals(algorithm)) {
+                    parameterSpec = transform.getParameterSpec();
+                    if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
+                        bspEnforcer.handleBSPRule(BSPRule.R5413);
+                    }
+                }*/
+            }
+        }
     }
 
 }

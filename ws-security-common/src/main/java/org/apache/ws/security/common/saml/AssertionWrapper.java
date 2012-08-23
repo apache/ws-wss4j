@@ -491,9 +491,7 @@ public class AssertionWrapper {
      * @throws ValidationException
      */
     public void verifySignature(
-        SAMLKeyInfoProcessor keyInfoProcessor,
-        Crypto sigCrypto,
-        boolean isBSPCompliant
+        SAMLKeyInfoProcessor keyInfoProcessor, Crypto sigCrypto
     ) throws WSSecurityException {
         Signature sig = null;
         if (saml2 != null && saml2.getSignature() != null) {
@@ -505,7 +503,7 @@ public class AssertionWrapper {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), keyInfoProcessor, sigCrypto, isBSPCompliant
+                    keyInfo.getDOM(), keyInfoProcessor, sigCrypto
                 );
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
@@ -552,8 +550,7 @@ public class AssertionWrapper {
     public void parseHOKSubject(
         SAMLKeyInfoProcessor keyInfoProcessor,
         Crypto sigCrypto,
-        CallbackHandler callbackHandler,
-        boolean isBSPCompliant
+        CallbackHandler callbackHandler
     ) throws WSSecurityException {
         String confirmMethod = null;
         List<String> methods = getConfirmationMethods();
@@ -564,12 +561,12 @@ public class AssertionWrapper {
             if (saml1 != null) {
                 subjectKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
-                        saml1, keyInfoProcessor, sigCrypto, callbackHandler, isBSPCompliant
+                        saml1, keyInfoProcessor, sigCrypto, callbackHandler
                     );
             } else if (saml2 != null) {
                 subjectKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
-                        saml2, keyInfoProcessor, sigCrypto, callbackHandler, isBSPCompliant
+                        saml2, keyInfoProcessor, sigCrypto, callbackHandler
                     );
             }
         }

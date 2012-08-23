@@ -24,18 +24,19 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.ws.security.dom.WSEncryptionPart;
-import org.apache.ws.security.dom.WSSConfig;
-import org.apache.ws.security.dom.WSSecurityEngine;
-import org.apache.ws.security.dom.WSConstants;
-import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.dom.common.CustomHandler;
-import org.apache.ws.security.dom.common.KeystoreCallbackHandler;
-import org.apache.ws.security.dom.common.SOAPUtil;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.XMLUtils;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSEncryptionPart;
+import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.WSSecurityEngine;
+import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.common.CustomHandler;
+import org.apache.ws.security.dom.common.KeystoreCallbackHandler;
+import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.dom.message.token.Reference;
@@ -170,22 +171,21 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(doc, null, null, crypto);
-        
-        // Now turn on BSP spec compliance
-        config.setWsiBSPCompliant(true);
-        newEngine.setWssConfig(config);
         try {
             newEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Failure expected on a bad c14n algorithm");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("bad canonicalization algorithm"));
+            // expected
         }
+        
+        RequestData data = new RequestData();
+        data.setSigVerCrypto(crypto);
+        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        ignoredRules.add(BSPRule.R5404);
+        ignoredRules.add(BSPRule.R5406);
+        data.setIgnoredBSPRules(ignoredRules);
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
