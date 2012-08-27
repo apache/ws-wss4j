@@ -120,7 +120,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
-                    if (startElementName != null && xmlSecEndElement.getName().equals(startElementName)
+                    if (xmlSecEndElement.getName().equals(startElementName)
                             && xmlSecEndElement.getDocumentLevel() == startElementLevel) {
                         end = true;
                         xmlSecEventList.push(xmlSecEvent);

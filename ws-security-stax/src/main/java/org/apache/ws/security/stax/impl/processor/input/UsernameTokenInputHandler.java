@@ -301,10 +301,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
 
         PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
-        if (passwordType != null) {
-            if (passwordType.getType() == null) {
-                securityContext.handleBSPRule(BSPRule.R4201);
-            }
+        if (passwordType != null && passwordType.getType() == null) {
+            securityContext.handleBSPRule(BSPRule.R4201);
         }
 
         EncodedString encodedNonce = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);

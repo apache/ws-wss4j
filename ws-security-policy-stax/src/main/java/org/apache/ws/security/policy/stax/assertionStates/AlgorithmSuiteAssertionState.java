@@ -156,12 +156,11 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
                 setAsserted(false);
                 setErrorMessage("STR transformation algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
             }
-        } else if (WSSConstants.XPath.equals(keyUsage)) {
-            if (algorithmSuite.getXPathType() != null
-                    && !algorithmSuite.getXPathType().getValue().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
-                setAsserted(false);
-                setErrorMessage("XPath algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
-            }
+        } else if (WSSConstants.XPath.equals(keyUsage) &&
+            algorithmSuite.getXPathType() != null && 
+            !algorithmSuite.getXPathType().getValue().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+            setAsserted(false);
+            setErrorMessage("XPath algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
         }
         return isAsserted();
     }

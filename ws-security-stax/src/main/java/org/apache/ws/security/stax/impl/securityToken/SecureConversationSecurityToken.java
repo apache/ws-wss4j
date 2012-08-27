@@ -18,18 +18,18 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
-import org.apache.ws.security.common.crypto.Crypto;
+import java.security.Key;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
-
-import javax.security.auth.callback.CallbackHandler;
-import java.security.Key;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
@@ -39,7 +39,7 @@ public class SecureConversationSecurityToken extends AbstractSecurityToken {
 
     //todo implement
 
-    public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto,
+    public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext,
                                            CallbackHandler callbackHandler, String id,
                                            WSSConstants.KeyIdentifierType keyIdentifierType) {
         super(wsSecurityContext, callbackHandler, id, keyIdentifierType);

@@ -158,9 +158,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             if (abstractSecurityAssertion instanceof PolicyContainingAssertion) {
                 buildAssertionStateMap(((PolicyContainingAssertion) abstractSecurityAssertion).getPolicy(), assertionStateMap, alternative);
             }
-        } else if (policyComponent instanceof PrimitiveAssertion) {
-            //nothing to-do. should be covered by the surrounding assertion
-        } else {
+        } else if (!(policyComponent instanceof PrimitiveAssertion)) {
             throw new WSSPolicyException("Unsupported PolicyComponent: " + policyComponent + " type: " + policyComponent.getType());
         }
     }
@@ -222,10 +220,10 @@ public class PolicyEnforcer implements SecurityEventListener {
         } else if (abstractSecurityAssertion instanceof AlgorithmSuite) {
             //initialized with asserted=true because we do negative matching
             assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, true));
-        } else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
+        } /*else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof SymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof TransportBinding) {
-        } /*else if (abstractSecurityAssertion instanceof Layout) {
+        } else if (abstractSecurityAssertion instanceof Layout) {
             assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
         }*/
 

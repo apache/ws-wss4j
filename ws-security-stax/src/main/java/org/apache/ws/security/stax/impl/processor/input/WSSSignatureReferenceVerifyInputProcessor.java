@@ -98,13 +98,12 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                         securityContext.handleBSPRule(BSPRule.R5423);
-                        if (j == transformTypes.size() - 1) {
-                            if (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
-                                    && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
-                                    && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
-                                    && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
-                                securityContext.handleBSPRule(BSPRule.R5412);
-                            }
+                        if ((j == transformTypes.size() - 1) &&
+                            (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
+                                && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
+                                && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
+                                && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm))) {
+                            securityContext.handleBSPRule(BSPRule.R5412);
                         }
                         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                         if (WSSConstants.NS_C14N_EXCL.equals(algorithm)

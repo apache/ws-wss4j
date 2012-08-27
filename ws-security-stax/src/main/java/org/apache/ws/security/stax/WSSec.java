@@ -112,13 +112,12 @@ public class WSSec {
 
         //todo encrypt sigconf when original signature was encrypted
         int pos = Arrays.binarySearch(securityProperties.getOutAction(), WSSConstants.SIGNATURE_CONFIRMATION);
-        if (pos >= 0) {
-            if (Arrays.binarySearch(securityProperties.getOutAction(), WSSConstants.SIGNATURE) < 0) {
-                List<XMLSecurityConstants.Action> actionList = new ArrayList<XMLSecurityConstants.Action>(securityProperties.getOutAction().length);
-                actionList.addAll(Arrays.asList(securityProperties.getOutAction()));
-                actionList.add(pos, WSSConstants.SIGNATURE);
-                securityProperties.setOutAction(actionList.toArray(new XMLSecurityConstants.Action[securityProperties.getOutAction().length + 1]));
-            }
+        if ((pos >= 0) 
+                && (Arrays.binarySearch(securityProperties.getOutAction(), WSSConstants.SIGNATURE) < 0)) {
+            List<XMLSecurityConstants.Action> actionList = new ArrayList<XMLSecurityConstants.Action>(securityProperties.getOutAction().length);
+            actionList.addAll(Arrays.asList(securityProperties.getOutAction()));
+            actionList.add(pos, WSSConstants.SIGNATURE);
+            securityProperties.setOutAction(actionList.toArray(new XMLSecurityConstants.Action[securityProperties.getOutAction().length + 1]));
         }
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
@@ -290,10 +289,9 @@ public class WSSec {
                 if (securityProperties.getSignatureKeyIdentifierType() == null) {
                     securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
                 }
-            } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED)) {
-                if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
-                }
+            } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED) && 
+                    (securityProperties.getCallbackHandler() == null)) {
+                throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
             }
         }
         //todo clone securityProperties

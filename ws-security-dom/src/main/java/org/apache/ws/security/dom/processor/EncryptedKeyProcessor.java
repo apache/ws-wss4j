@@ -33,7 +33,6 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
 import org.apache.ws.security.common.bsp.BSPRule;
-import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
@@ -103,7 +102,7 @@ public class EncryptedKeyProcessor implements Processor {
         
         STRParser strParser = new EncryptedKeySTRParser();
         X509Certificate[] certs = 
-            getCertificatesFromEncryptedKey(elem, data, data.getDecCrypto(), wsDocInfo, strParser);
+            getCertificatesFromEncryptedKey(elem, data, wsDocInfo, strParser);
 
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
@@ -242,7 +241,6 @@ public class EncryptedKeyProcessor implements Processor {
     private X509Certificate[] getCertificatesFromEncryptedKey(
         Element xencEncryptedKey,
         RequestData data,
-        Crypto crypto,
         WSDocInfo wsDocInfo,
         STRParser strParser
     ) throws WSSecurityException {

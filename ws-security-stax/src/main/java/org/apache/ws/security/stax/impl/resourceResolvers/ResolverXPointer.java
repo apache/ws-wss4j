@@ -18,12 +18,11 @@
  */
 package org.apache.ws.security.stax.impl.resourceResolvers;
 
-import org.apache.xml.security.stax.ext.ResourceResolver;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.ws.security.stax.ext.WSSConstants;
-
 import javax.xml.stream.events.Attribute;
+
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.xml.security.stax.ext.ResourceResolver;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 
 /**
  * @author $Author: $

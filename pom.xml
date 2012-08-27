@@ -110,6 +110,32 @@
     </modules>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <failOnViolation>true</failOnViolation>
+                    <linkXRef>false</linkXRef>
+                    <minimumTokens>100</minimumTokens>
+                    <targetJdk>${targetJdk}</targetJdk>
+                    <excludes>
+                        <exclude>**/CryptoBase.java, **/DOM2Writer.java</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -190,6 +216,14 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.12</version>
                     <inherited>true</inherited>
+                    <configuration>
+                        <reportFormat>brief</reportFormat>
+                        <useFile>false</useFile>
+                        <childDelegation>false</childDelegation>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -261,21 +295,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.4</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <sourceEncoding>utf-8</sourceEncoding>
-                    <failOnViolation>true</failOnViolation>
-                    <linkXRef>true</linkXRef>
-                    <minimumTokens>100</minimumTokens>
-                    <targetJdk>${targetJdk}</targetJdk>
-                    <excludes>
-                        <exclude>**/CryptoBase.java, **/DOM2Writer.java</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </reporting>

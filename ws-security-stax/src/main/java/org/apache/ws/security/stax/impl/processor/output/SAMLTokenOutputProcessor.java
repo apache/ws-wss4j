@@ -231,11 +231,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
             XMLSecurityConstants.Action action = getAction();
-            if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
-                if (senderVouches) {
-                    SecurePart securePart = new SecurePart(new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform), tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
-                    outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
-                }
+            if (action.equals(WSSConstants.SAML_TOKEN_SIGNED) && senderVouches) {
+                SecurePart securePart = new SecurePart(new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform), tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
+                outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
             }
         } finally {
             outputProcessorChain.removeProcessor(this);

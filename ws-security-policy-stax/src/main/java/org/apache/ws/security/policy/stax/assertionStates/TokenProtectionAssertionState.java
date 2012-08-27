@@ -110,22 +110,18 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     }
                 }
 
-                if (isEndorsingToken(securityToken)) {
+                if (isEndorsingToken(securityToken) && !signsMainSignature(securityToken)) {
                     //[WSP1.3_8.9b]
-                    if (!signsMainSignature(securityToken)) {
-                        setAsserted(false);
-                        setErrorMessage("Token " + WSSUtils.pathAsString(securityToken.getElementPath()) + " must sign the main signature.");
-                        return false;
-                    }
+                    setAsserted(false);
+                    setErrorMessage("Token " + WSSUtils.pathAsString(securityToken.getElementPath()) + " must sign the main signature.");
+                    return false;
                 }
 
-                if (isMainSignatureToken(securityToken)) {
-                    //[WSP1.3_8.9c] [WSP1.3_8.9d]
-                    if (!signsSignedSupportingTokens(securityToken)) {
-                        setAsserted(false);
-                        setErrorMessage("Main signature must sign the Signed*Supporting-Tokens.");
-                        return false;
-                    }
+                if (isMainSignatureToken(securityToken) 
+                        && !signsSignedSupportingTokens(securityToken)) {
+                    setAsserted(false);
+                    setErrorMessage("Main signature must sign the Signed*Supporting-Tokens.");
+                    return false;
                 }
             }
         }

@@ -18,6 +18,14 @@
  */
 package org.apache.ws.security.stax.impl.processor.input;
 
+import java.util.Deque;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
@@ -26,15 +34,16 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.SecurityTokenProvider;
+import org.apache.xml.security.stax.ext.XMLSecurityConfigurationException;
+import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import java.util.Deque;
-import java.util.List;
 
 /**
  * Processor for the BinarySecurityToken XML Structure
@@ -43,6 +52,9 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
+    
+    private static final transient Log log = 
+            LogFactory.getLog(BinarySecurityTokenInputHandler.class);
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
@@ -74,6 +86,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 try {
                     crypto = ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto();
                 } catch (XMLSecurityConfigurationException e) {
+                    log.debug(e.getMessage(), e);
                     //ignore
                 }
                 if (crypto == null) {

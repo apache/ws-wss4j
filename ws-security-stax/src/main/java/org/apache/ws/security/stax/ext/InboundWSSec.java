@@ -63,6 +63,7 @@ public class InboundWSSec {
             xmlInputFactory.setProperty("org.codehaus.stax2.internNsUris", true);
             xmlInputFactory.setProperty("org.codehaus.stax2.preserveLocation", false);
         } catch (IllegalArgumentException e) {
+            log.debug(e.getMessage(), e);
             //ignore
         }
     }

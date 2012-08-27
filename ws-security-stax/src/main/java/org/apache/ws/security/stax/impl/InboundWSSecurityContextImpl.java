@@ -56,24 +56,23 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
         if (operationSecurityEventOccured) {
-            if (!this.messageEncryptionTokenOccured) {
-                if (securityEvent instanceof TokenSecurityEvent) {
-                    TokenSecurityEvent tokenSecurityEvent = ((TokenSecurityEvent) securityEvent);
-                    if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.Encryption)) {
-                        SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
+            if (!this.messageEncryptionTokenOccured 
+                    && (securityEvent instanceof TokenSecurityEvent)) {
+                TokenSecurityEvent tokenSecurityEvent = ((TokenSecurityEvent) securityEvent);
+                if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.Encryption)) {
+                    SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
 
-                        try {
-                            while (securityToken.getKeyWrappingToken() != null) {
-                                securityToken = securityToken.getKeyWrappingToken();
-                            }
-                            TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
-                            setTokenUsage(newTokenSecurityEvent, SecurityToken.TokenUsage.MainEncryption);
-                            forwardSecurityEvent(newTokenSecurityEvent);
-                        } catch (XMLSecurityException e) {
-                            throw new WSSecurityException(e.getMessage(), e);
+                    try {
+                        while (securityToken.getKeyWrappingToken() != null) {
+                            securityToken = securityToken.getKeyWrappingToken();
                         }
-                        this.messageEncryptionTokenOccured = true;
+                        TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+                        setTokenUsage(newTokenSecurityEvent, SecurityToken.TokenUsage.MainEncryption);
+                        forwardSecurityEvent(newTokenSecurityEvent);
+                    } catch (XMLSecurityException e) {
+                        throw new WSSecurityException(e.getMessage(), e);
                     }
+                    this.messageEncryptionTokenOccured = true;
                 }
             }
 
@@ -431,13 +430,8 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                         && tokenSecurityEvent.getSecurityToken() != null
                         && signedElementSecurityEvent.getXmlSecEvent() != null
                         && signedElementSecurityEvent.getXmlSecEvent() == tokenSecurityEvent.getSecurityToken().getXMLSecEvent()
-                    /*&& WSSUtils.pathMatches(
-                  tokenSecurityEvent.getSecurityToken().getElementPath(),
-                  signedElementSecurityEvent.getElementPath(), false, false)*/) {
-
-                    if (!securityTokenList.contains(signedElementSecurityEvent.getSecurityToken())) {
-                        securityTokenList.add(signedElementSecurityEvent.getSecurityToken());
-                    }
+                        && !securityTokenList.contains(signedElementSecurityEvent.getSecurityToken())) {
+                    securityTokenList.add(signedElementSecurityEvent.getSecurityToken());
                 }
             }
         }
@@ -455,11 +449,9 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                 if (encryptedElementSecurityEvent.isEncrypted()
                         && tokenSecurityEvent.getSecurityToken() != null
                         && encryptedElementSecurityEvent.getXmlSecEvent() != null
-                        && encryptedElementSecurityEvent.getXmlSecEvent() == tokenSecurityEvent.getSecurityToken().getXMLSecEvent()) {
-
-                    if (!securityTokenList.contains(encryptedElementSecurityEvent.getSecurityToken())) {
-                        securityTokenList.add(encryptedElementSecurityEvent.getSecurityToken());
-                    }
+                        && encryptedElementSecurityEvent.getXmlSecEvent() == tokenSecurityEvent.getSecurityToken().getXMLSecEvent()
+                        && !securityTokenList.contains(encryptedElementSecurityEvent.getSecurityToken())) {
+                    securityTokenList.add(encryptedElementSecurityEvent.getSecurityToken());
                 }
             }
         }

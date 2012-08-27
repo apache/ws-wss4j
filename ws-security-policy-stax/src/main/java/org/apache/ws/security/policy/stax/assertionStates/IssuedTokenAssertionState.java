@@ -57,11 +57,10 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
 
         IssuedToken issuedToken = (IssuedToken) abstractToken;
         IssuedTokenSecurityEvent issuedTokenSecurityEvent = (IssuedTokenSecurityEvent) tokenSecurityEvent;
-        if (issuedToken.getIssuerName() != null) {
-            if (!issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
-                setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
-                return false;
-            }
+        if ((issuedToken.getIssuerName() != null) &&
+                !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
+            setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
+            return false;
         }
         //todo internal/external reference?
         //always return true to prevent false alarm in case additional tokens with the same usage
