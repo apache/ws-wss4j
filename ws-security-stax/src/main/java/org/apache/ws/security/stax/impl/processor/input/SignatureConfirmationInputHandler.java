@@ -21,7 +21,6 @@ package org.apache.ws.security.stax.impl.processor.input;
 import org.apache.ws.security.binding.wss11.SignatureConfirmationType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
 import org.apache.xml.security.stax.ext.InputProcessorChain;

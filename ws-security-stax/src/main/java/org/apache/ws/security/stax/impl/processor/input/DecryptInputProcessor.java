@@ -120,7 +120,9 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         String encryptionAlgorithm = currentEncryptedDataType.getEncryptionMethod().getAlgorithm();
         if (!WSSConstants.NS_XENC_TRIPLE_DES.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES128.equals(encryptionAlgorithm)
-                && !WSSConstants.NS_XENC_AES256.equals(encryptionAlgorithm)) {
+                && !WSSConstants.NS_XENC11_AES128_GCM.equals(encryptionAlgorithm)
+                && !WSSConstants.NS_XENC_AES256.equals(encryptionAlgorithm)
+                && !WSSConstants.NS_XENC11_AES256_GCM.equals(encryptionAlgorithm)) {
             ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R5620);
         }
 

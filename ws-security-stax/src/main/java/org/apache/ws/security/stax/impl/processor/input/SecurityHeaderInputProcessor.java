@@ -20,10 +20,12 @@ package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.config.SecurityHeaderHandlerMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
@@ -74,6 +76,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         subInputProcessorChain.addProcessor(internalSecurityHeaderBufferProcessor);
 
         boolean responsibleSecurityHeaderFound = false;
+        boolean timestampFound = false;
 
         XMLSecEvent xmlSecEvent;
         do {
@@ -133,6 +136,16 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                         //element should have a responsible handler:
                         engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
                                 xmlSecEventList, startIndexForProcessor, xmlSecEndElement.getName());
+                        
+                        // Check for multiple timestamps
+                        if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsu_Timestamp)) {
+                            if (timestampFound) {
+                                WSSecurityContext context = 
+                                    (WSSecurityContext)subInputProcessorChain.getSecurityContext();
+                                context.handleBSPRule(BSPRule.R3227);
+                            }
+                            timestampFound = true;
+                        }
                     }
                     break;
             }
@@ -149,7 +162,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
     @SuppressWarnings("unchecked")
     private void engageSecurityHeaderHandler(InputProcessorChain inputProcessorChain,
                                              XMLSecurityProperties securityProperties,
-                                             Deque eventQueue,
+                                             Deque<XMLSecEvent> eventQueue,
                                              Integer index,
                                              QName elementName)
             throws WSSecurityException, XMLStreamException {

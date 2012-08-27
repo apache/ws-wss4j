@@ -24,6 +24,7 @@ import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
+import org.apache.xml.security.binding.xmlenc.EncryptionMethodType;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
@@ -76,9 +77,17 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
         if (encryptedKeyType.getRecipient() != null) {
             securityContext.handleBSPRule(BSPRule.R5602);
         }
-        if (encryptedKeyType.getEncryptionMethod() == null) {
+        EncryptionMethodType encryptionMethodType = encryptedKeyType.getEncryptionMethod();
+        if (encryptionMethodType == null) {
             securityContext.handleBSPRule(BSPRule.R5603);
+        } else {
+            String encryptionMethod = encryptionMethodType.getAlgorithm();
+            if (!WSSConstants.NS_XENC_RSA15.equals(encryptionMethod)
+                && !WSSConstants.NS_XENC_RSAOAEP.equals(encryptionMethod)) {
+                securityContext.handleBSPRule(BSPRule.R5621);
+            }
         }
+        
     }
 
     /*
