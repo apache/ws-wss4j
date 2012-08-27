@@ -95,7 +95,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <targetJdk>1.6</targetJdk>
-        <bcprov.version>1.46</bcprov.version>
+        <bcprov.version>1.47</bcprov.version>
     </properties>
 
     <modules>
@@ -235,7 +235,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk16</artifactId>
+                    <artifactId>bcprov-jdk15on</artifactId>
                     <version>${bcprov.version}</version>
                 </dependency>
             </dependencies>
