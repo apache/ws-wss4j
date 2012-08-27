@@ -109,12 +109,14 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 }
 
                 @Override
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws WSSecurityException {
                     return key;
                 }
 
                 @Override
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                           String correlationID) throws WSSecurityException {
                     return x509Certificates[0].getPublicKey();
                 }
 

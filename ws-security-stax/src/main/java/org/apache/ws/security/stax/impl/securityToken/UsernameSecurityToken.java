@@ -112,7 +112,7 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
      *
      */
     public byte[] generateDerivedKey(String rawPassword, byte[] salt, long iteration) throws WSSecurityException {
-        
+
         if (wsSecurityContext != null) {
             if (salt == null || salt.length == 0) {
                 wsSecurityContext.handleBSPRule(BSPRule.R4217);
@@ -234,7 +234,8 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
 
     private Map<String, Key> keyTable = new Hashtable<String, Key>();
 
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                         String correlationID) throws XMLSecurityException {
         byte[] secretToken;
         if (getSalt() != null && getIteration() != null) {
             byte[] salt = getSalt();
@@ -253,7 +254,8 @@ public class UsernameSecurityToken extends AbstractSecurityToken {
         }
     }
 
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws XMLSecurityException {
         return null;
     }
 

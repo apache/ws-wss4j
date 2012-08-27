@@ -74,13 +74,15 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 }
 
                 @Override
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                    return wrappingSecurityToken.getSecretKey(algorithmURI, null);
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws XMLSecurityException {
+                    return wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
                 }
 
                 @Override
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-                    return wrappingSecurityToken.getPublicKey(null, null);
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                           String correlationID) throws XMLSecurityException {
+                    return wrappingSecurityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
                 }
 
                 @Override

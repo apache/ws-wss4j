@@ -72,7 +72,8 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                         return false;
                     }
 
-                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                      String correlationID) throws XMLSecurityException {
                         String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
                         WSPasswordCallback passwordCallback = new WSPasswordCallback(identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
                         WSSUtils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, null);
@@ -83,7 +84,8 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                     }
 
                     @Override
-                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                               String correlationID) throws XMLSecurityException {
                         return null;
                     }
 
@@ -114,6 +116,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         //fire a tokenSecurityEvent
         SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityContextTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        securityContextTokenSecurityEvent.setCorrelationID(securityContextTokenType.getId());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(securityContextTokenSecurityEvent);
 
         //also register a SecurityProvider with the identifier. @see SecurityContexTest#testSCTKDKTSignAbsolute

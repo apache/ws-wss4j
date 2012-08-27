@@ -97,11 +97,13 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     return false;
                 }
 
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws XMLSecurityException {
                     return symmetricKey;
                 }
 
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                           String correlationID) throws XMLSecurityException {
                     return null;
                 }
 
@@ -229,7 +231,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         Cipher cipher = Cipher.getInstance(jceid);
                         cipher.init(Cipher.WRAP_MODE, x509Certificate);
 
-                        Key secretKey = securityToken.getSecretKey(null, null);
+                        Key secretKey = securityToken.getSecretKey(null, null, null);
 
                         int blockSize = cipher.getBlockSize();
                         if (blockSize > 0 && blockSize < secretKey.getEncoded().length) {

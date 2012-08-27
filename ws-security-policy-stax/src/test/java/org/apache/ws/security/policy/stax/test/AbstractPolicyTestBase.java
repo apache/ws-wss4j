@@ -93,7 +93,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             }
 
             @Override
-            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
                 try {
                     return keyStore.getKey(keyAlias, "default".toCharArray());
                 } catch (Exception e) {
@@ -102,7 +102,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             }
 
             @Override
-            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
                 try {
                     return keyStore.getCertificate(keyAlias).getPublicKey();
                 } catch (Exception e) {

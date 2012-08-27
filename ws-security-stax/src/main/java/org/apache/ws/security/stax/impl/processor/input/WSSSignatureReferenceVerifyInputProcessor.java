@@ -150,8 +150,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     }
 
     @Override
-    protected void processElementPath(List<QName> elementPath,
-                                      InputProcessorChain inputProcessorChain, XMLSecEvent xmlSecEvent)
+    protected void processElementPath(List<QName> elementPath, InputProcessorChain inputProcessorChain,
+                                      XMLSecEvent xmlSecEvent, ReferenceType referenceType)
             throws XMLSecurityException {
         //fire a SecurityEvent:
         final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
@@ -160,12 +160,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     new SignedPartSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
             signedPartSecurityEvent.setElementPath(elementPath);
             signedPartSecurityEvent.setXmlSecEvent(xmlSecEvent);
+            signedPartSecurityEvent.setCorrelationID(referenceType.getId());
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
         } else {
             SignedElementSecurityEvent signedElementSecurityEvent =
                     new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
             signedElementSecurityEvent.setElementPath(elementPath);
             signedElementSecurityEvent.setXmlSecEvent(xmlSecEvent);
+            signedElementSecurityEvent.setCorrelationID(referenceType.getId());
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
         }
     }
@@ -244,6 +246,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
             algorithmSuiteSecurityEvent.setAlgorithmURI(algorithm);
             algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
+            algorithmSuiteSecurityEvent.setCorrelationID(referenceType.getId());
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
 
             InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);

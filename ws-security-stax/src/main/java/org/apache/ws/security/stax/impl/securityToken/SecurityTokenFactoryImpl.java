@@ -206,7 +206,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
-                    crypto.verifyTrust(getPubKey("", null));
+                    crypto.verifyTrust(getPubKey("", null, null));
                 }
             };
         }
@@ -217,7 +217,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
-                    crypto.verifyTrust(getPubKey("", null));
+                    crypto.verifyTrust(getPubKey("", null, null));
                 }
             };
         }
@@ -228,7 +228,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
-                    crypto.verifyTrust(getPubKey("", null));
+                    crypto.verifyTrust(getPubKey("", null, null));
                 }  
             };
         }

@@ -301,7 +301,8 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
     }
 
-    public static TokenSecurityEvent createTokenSecurityEvent(final SecurityToken securityToken) throws WSSecurityException {
+    public static TokenSecurityEvent createTokenSecurityEvent(final SecurityToken securityToken, String correlationID)
+            throws WSSecurityException {
         WSSConstants.TokenType tokenType = (WSSConstants.TokenType) securityToken.getTokenType();
 
         TokenSecurityEvent tokenSecurityEvent;
@@ -338,6 +339,7 @@ public class WSSUtils extends XMLSecurityUtils {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
         }
         tokenSecurityEvent.setSecurityToken(securityToken);
+        tokenSecurityEvent.setCorrelationID(correlationID);
         return tokenSecurityEvent;
     }
 

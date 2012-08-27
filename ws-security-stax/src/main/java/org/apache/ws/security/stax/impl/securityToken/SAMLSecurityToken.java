@@ -73,11 +73,13 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         return true;
     }
 
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                         String correlationID) throws XMLSecurityException {
         return samlKeyInfo.getPrivateKey();
     }
 
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws XMLSecurityException {
         PublicKey publicKey = samlKeyInfo.getPublicKey();
         if (publicKey == null) {
             publicKey = getX509Certificates()[0].getPublicKey();

@@ -27,6 +27,8 @@ import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.dom.message.*;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
+import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
@@ -38,6 +40,8 @@ import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.SecretKeyCallbackHandler;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -53,6 +57,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -177,6 +182,31 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            encryptedPartSecurityEvents.size() + 1 //plus one because of the
+                    // SecurityContextToken which can't be correlated that easy for this use case
+            );
         }
     }
 
@@ -284,6 +314,37 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             securityEventListener.compare();
+
+            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + 1 //plus one because of the
+                    // SecurityContextToken which can't be correlated that easy for this use case
+            );
         }
     }
 
@@ -409,6 +470,43 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
+
+            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size() + 1 //plus one because of the
+                    // SecurityContextToken which can't be correlated that easy for this use case
+            );
         }
     }
 
@@ -487,6 +585,43 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
+
+            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size() + 1 //plus one because of the
+                    // SecurityContextToken which can't be correlated that easy for this use case
+            );
         }
     }
 
@@ -550,6 +685,37 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             securityEventListener.compare();
+
+            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + 1 //plus one because of the
+                    // SecurityContextToken which can't be correlated that easy for this use case
+            );
         }
     }
 }

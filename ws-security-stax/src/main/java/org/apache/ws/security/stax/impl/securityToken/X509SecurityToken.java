@@ -56,14 +56,16 @@ public abstract class X509SecurityToken
     }
 
     @Override
-    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                      String correlationID) throws XMLSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         XMLSecurityUtils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }
     
     @Override
-    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                               String correlationID) throws XMLSecurityException {
         X509Certificate[] x509Certificates = getX509Certificates();
         if (x509Certificates == null || x509Certificates.length == 0) {
             return null;

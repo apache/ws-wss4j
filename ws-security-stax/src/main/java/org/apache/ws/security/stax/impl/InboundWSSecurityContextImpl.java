@@ -56,7 +56,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
         if (operationSecurityEventOccured) {
-            if (!this.messageEncryptionTokenOccured 
+            if (!this.messageEncryptionTokenOccured
                     && (securityEvent instanceof TokenSecurityEvent)) {
                 TokenSecurityEvent tokenSecurityEvent = ((TokenSecurityEvent) securityEvent);
                 if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.Encryption)) {
@@ -66,9 +66,9 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                         while (securityToken.getKeyWrappingToken() != null) {
                             securityToken = securityToken.getKeyWrappingToken();
                         }
-                        TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+                        TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
                         setTokenUsage(newTokenSecurityEvent, SecurityToken.TokenUsage.MainEncryption);
-                        forwardSecurityEvent(newTokenSecurityEvent);
+                        securityEvent = newTokenSecurityEvent;
                     } catch (XMLSecurityException e) {
                         throw new WSSecurityException(e.getMessage(), e);
                     }
@@ -160,7 +160,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                     securityToken = securityToken.getKeyWrappingToken();
                 }
                 if (!containsSecurityToken(supportingTokens, securityToken)) {
-                    TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
+                    TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
                     supportingTokens = addTokenSecurityEvent(newTokenSecurityEvent, supportingTokens);
                     securityEventDeque.offer(newTokenSecurityEvent);
                 }

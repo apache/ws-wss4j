@@ -26,6 +26,7 @@ import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -45,6 +46,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -170,6 +172,28 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
 
@@ -251,7 +275,6 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.Operation,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedKeyToken,
                     WSSecurityEventConstants.ContentEncrypted,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
@@ -336,6 +359,127 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(contentEncryptedElementSecurityEvent.getElementPath().get(contentEncryptedElementSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
+
+            List<ContentEncryptedElementSecurityEvent> contentEncryptedElementSecurityEventList = securityEventListener.getSecurityEvents(SecurityEventConstants.ContentEncrypted);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID1 = contentEncryptedElementSecurityEventList.get(0).getCorrelationID();
+            String encryptedPartCorrelationID2 = contentEncryptedElementSecurityEventList.get(1).getCorrelationID();
+            String encryptedPartCorrelationID3 = contentEncryptedElementSecurityEventList.get(2).getCorrelationID();
+            String encryptedPartCorrelationID4 = contentEncryptedElementSecurityEventList.get(3).getCorrelationID();
+            String encryptedPartCorrelationID5 = contentEncryptedElementSecurityEventList.get(4).getCorrelationID();
+            String encryptedPartCorrelationID6 = contentEncryptedElementSecurityEventList.get(5).getCorrelationID();
+            String encryptedPartCorrelationID7 = contentEncryptedElementSecurityEventList.get(6).getCorrelationID();
+            String encryptedPartCorrelationID8 = contentEncryptedElementSecurityEventList.get(7).getCorrelationID();
+            String encryptedPartCorrelationID9 = contentEncryptedElementSecurityEventList.get(8).getCorrelationID();
+            String encryptedPartCorrelationID10 = contentEncryptedElementSecurityEventList.get(9).getCorrelationID();
+            String encryptedPartCorrelationID11 = contentEncryptedElementSecurityEventList.get(10).getCorrelationID();
+            String encryptedPartCorrelationID12 = contentEncryptedElementSecurityEventList.get(11).getCorrelationID();
+            String encryptedPartCorrelationID13 = contentEncryptedElementSecurityEventList.get(12).getCorrelationID();
+            String encryptedPartCorrelationID14 = contentEncryptedElementSecurityEventList.get(13).getCorrelationID();
+            String encryptedPartCorrelationID15 = contentEncryptedElementSecurityEventList.get(14).getCorrelationID();
+            String encryptedPartCorrelationID16 = contentEncryptedElementSecurityEventList.get(15).getCorrelationID();
+            String encryptedPartCorrelationID17 = contentEncryptedElementSecurityEventList.get(16).getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents1 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents2 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents3 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents4 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents5 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents6 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents7 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents8 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents9 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents10 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents11 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents12 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents13 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents14 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents15 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents16 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents17 = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID1)) {
+                    encryptedPartSecurityEvents1.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID2)) {
+                    encryptedPartSecurityEvents2.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID3)) {
+                    encryptedPartSecurityEvents3.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID4)) {
+                    encryptedPartSecurityEvents4.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID5)) {
+                    encryptedPartSecurityEvents5.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID6)) {
+                    encryptedPartSecurityEvents6.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID7)) {
+                    encryptedPartSecurityEvents7.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID8)) {
+                    encryptedPartSecurityEvents8.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID9)) {
+                    encryptedPartSecurityEvents9.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID10)) {
+                    encryptedPartSecurityEvents10.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID11)) {
+                    encryptedPartSecurityEvents11.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID12)) {
+                    encryptedPartSecurityEvents12.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID13)) {
+                    encryptedPartSecurityEvents13.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID14)) {
+                    encryptedPartSecurityEvents14.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID15)) {
+                    encryptedPartSecurityEvents15.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID16)) {
+                    encryptedPartSecurityEvents16.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID17)) {
+                    encryptedPartSecurityEvents17.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents1.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents2.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents3.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents4.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents5.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents6.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents7.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents8.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents9.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents10.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents11.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents12.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents13.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents14.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents15.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents16.size());
+            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents17.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                    encryptedPartSecurityEvents1.size() +
+                    encryptedPartSecurityEvents2.size() +
+                    encryptedPartSecurityEvents3.size() +
+                    encryptedPartSecurityEvents4.size() +
+                    encryptedPartSecurityEvents5.size() +
+                    encryptedPartSecurityEvents6.size() +
+                    encryptedPartSecurityEvents7.size() +
+                    encryptedPartSecurityEvents8.size() +
+                    encryptedPartSecurityEvents9.size() +
+                    encryptedPartSecurityEvents10.size() +
+                    encryptedPartSecurityEvents11.size() +
+                    encryptedPartSecurityEvents12.size() +
+                    encryptedPartSecurityEvents13.size() +
+                    encryptedPartSecurityEvents14.size() +
+                    encryptedPartSecurityEvents15.size() +
+                    encryptedPartSecurityEvents16.size() +
+                    encryptedPartSecurityEvents17.size() + 1 //plus one because of the
+                    // X509TokenEvent which can't be correlated that easy for this use case
+            );
         }
     }
 
@@ -444,7 +588,6 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.Operation,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedKeyToken,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.EncryptedElement,
@@ -597,6 +740,28 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
 
@@ -1322,6 +1487,28 @@ public class EncDecryptionTest extends AbstractTestBase {
                     Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
                 }
             }
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
 }

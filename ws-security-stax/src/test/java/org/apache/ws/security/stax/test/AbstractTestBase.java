@@ -281,7 +281,7 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
-        
+
         // Disable PrefixList checking as the stax code doesn't support this yet
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
         ignoredRules.add(BSPRule.R5404);
@@ -290,7 +290,7 @@ public abstract class AbstractTestBase {
         ignoredRules.add(BSPRule.R5417);
         ignoredRules.add(BSPRule.R3063);
         requestData.setIgnoredBSPRules(ignoredRules);
-        
+
         wss4JHandler.doReceiver(messageContext, requestData, false);
 
         return messageContext;
@@ -606,8 +606,29 @@ public abstract class AbstractTestBase {
             return receivedSecurityEvents;
         }
 
+        public <T> T getSecurityEvent(SecurityEventConstants.Event securityEvent) {
+            for (SecurityEvent event : receivedSecurityEvents) {
+                if (event.getSecurityEventType() == securityEvent) {
+                    return (T)event;
+                }
+            }
+            return null;
+        }
+
+        public <T> List<T> getSecurityEvents(SecurityEventConstants.Event securityEvent) {
+            List<T> foundEvents = new ArrayList<T>();
+            for (SecurityEvent event : receivedSecurityEvents) {
+                if (event.getSecurityEventType() == securityEvent) {
+                    foundEvents.add((T)event);
+                }
+            }
+            return foundEvents;
+        }
+
         @Override
         public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+            Assert.assertNotNull(securityEvent.getCorrelationID());
+            Assert.assertNotEquals("", securityEvent.getCorrelationID());
             receivedSecurityEvents.add(securityEvent);
         }
 

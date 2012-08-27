@@ -23,11 +23,14 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.*;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -48,6 +51,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -957,6 +961,36 @@ public class SignatureTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             securityEventListener.compare();
+
+            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size()
+            );
         }
     }
 

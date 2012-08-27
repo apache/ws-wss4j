@@ -103,7 +103,8 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         return false;
                     }
 
-                    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+                    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                         String correlationID) throws XMLSecurityException {
                         byte[] secret;
                         SecurityToken referencedSecurityToken = getReferencedSecurityToken();
                         if (referencedSecurityToken != null) {
@@ -118,7 +119,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 SAMLSecurityToken samlSecurityToken = (SAMLSecurityToken) referencedSecurityToken;
                                 secret = samlSecurityToken.getSamlKeyInfo().getSecret();
                             } else {
-                                secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage).getEncoded();
+                                secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID).getEncoded();
                             }
                         } else {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId");
@@ -149,6 +150,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         algorithmSuiteSecurityEvent.setAlgorithmURI(derivedKeyAlgorithm);
                         algorithmSuiteSecurityEvent.setKeyUsage(derivedKeyUsage);
                         algorithmSuiteSecurityEvent.setKeyLength(keyBytes.length * 8);
+                        algorithmSuiteSecurityEvent.setCorrelationID(correlationID);
                         inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
                         String algo = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
@@ -156,7 +158,8 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     @Override
-                    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage)
+                    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                                  String correlationID)
                             throws XMLSecurityException {
                         return null;
                     }
@@ -183,6 +186,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
         //fire a tokenSecurityEvent
         DerivedKeyTokenSecurityEvent derivedKeyTokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
         derivedKeyTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        derivedKeyTokenSecurityEvent.setCorrelationID(derivedKeyTokenType.getId());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(derivedKeyTokenSecurityEvent);
     }
 }

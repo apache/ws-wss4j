@@ -28,6 +28,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -64,6 +65,7 @@ public class OperationInputProcessor extends AbstractInputProcessor {
             if (elementPath.size() == 3 && WSSUtils.isInSOAPBody(elementPath)) {
                 OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
                 operationSecurityEvent.setOperation(xmlSecEvent.asStartElement().getName());
+                operationSecurityEvent.setCorrelationID(IDGenerator.generateID(null));
                 ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(operationSecurityEvent);
                 inputProcessorChain.removeProcessor(this);
             }

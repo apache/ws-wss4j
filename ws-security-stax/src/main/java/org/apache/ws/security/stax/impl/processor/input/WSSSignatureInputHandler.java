@@ -74,17 +74,18 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             protected void handleSecurityToken(SecurityToken securityToken) throws XMLSecurityException {
                 //we have to emit a TokenSecurityEvent here too since it could be an embedded token
                 securityToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
-                TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken);
-                tokenSecurityEvent.setSecurityToken(securityToken);
+                TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, signatureType.getId());
                 securityContext.registerSecurityEvent(tokenSecurityEvent);
 
                 SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
                 signatureValueSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
+                signatureValueSecurityEvent.setCorrelationID(signatureType.getId());
                 securityContext.registerSecurityEvent(signatureValueSecurityEvent);
 
                 AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
                 algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
                 algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
+                algorithmSuiteSecurityEvent.setCorrelationID(signatureType.getId());
                 securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
                 super.handleSecurityToken(securityToken);
             }

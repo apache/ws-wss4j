@@ -257,6 +257,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
         usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
+        usernameTokenSecurityEvent.setCorrelationID(usernameTokenType.getId());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(usernameTokenSecurityEvent);
     }
 

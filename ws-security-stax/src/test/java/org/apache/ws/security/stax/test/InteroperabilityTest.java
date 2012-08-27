@@ -23,12 +23,13 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.*;
+import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.*;
@@ -105,6 +106,51 @@ public class InteroperabilityTest extends AbstractTestBase {
                 }
         ));
         securityEventListener.compare();
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+        String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
+        String signedElementCorrelationID2 = signedElementSecurityEventList.get(1).getCorrelationID();
+        String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+        String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+        List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+        for (int i = 0; i < securityEvents.size(); i++) {
+            SecurityEvent securityEvent = securityEvents.get(i);
+            if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                encryptedPartSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID1)) {
+                signedElementSecurityEvents1.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID2)) {
+                signedElementSecurityEvents2.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                signatureValueSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                operationSecurityEvents.add(securityEvent);
+            }
+        }
+
+        org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents2.size());
+        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                operationSecurityEvents.size() +
+                        encryptedPartSecurityEvents.size() +
+                        signedElementSecurityEvents1.size() +
+                        signedElementSecurityEvents2.size() +
+                        signatureValueSecurityEvents.size() +
+                        1 //the timestamp
+        );
     }
 
     @Test(invocationCount = 1)
@@ -223,6 +269,58 @@ public class InteroperabilityTest extends AbstractTestBase {
         ));
 
         securityEventListener.compare();
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedElement);
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        String encryptedElementCorrelationID = encryptedElementSecurityEvent.getCorrelationID();
+        String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+        String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
+        String signedElementCorrelationID2 = signedElementSecurityEventList.get(1).getCorrelationID();
+        String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+        String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> encryptedElementSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+        List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+        for (int i = 0; i < securityEvents.size(); i++) {
+            SecurityEvent securityEvent = securityEvents.get(i);
+            if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                encryptedPartSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(encryptedElementCorrelationID)) {
+                encryptedElementSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID1)) {
+                signedElementSecurityEvents1.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID2)) {
+                signedElementSecurityEvents2.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                signatureValueSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                operationSecurityEvents.add(securityEvent);
+            }
+        }
+
+        org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents.size());
+        org.junit.Assert.assertEquals(3, encryptedElementSecurityEvents.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents2.size());
+        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                operationSecurityEvents.size() +
+                        encryptedPartSecurityEvents.size() +
+                        encryptedElementSecurityEvents.size() +
+                        signedElementSecurityEvents1.size() +
+                        signedElementSecurityEvents2.size() +
+                        signatureValueSecurityEvents.size() +
+                        1 //the timestamp
+        );
     }
 
     //Not supported ATM: Timestamp encrypted and then Signed
@@ -313,6 +411,45 @@ public class InteroperabilityTest extends AbstractTestBase {
                 }
         ));
         securityEventListener.compare();
+
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+        String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
+        String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+        String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+        List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+        for (int i = 0; i < securityEvents.size(); i++) {
+            SecurityEvent securityEvent = securityEvents.get(i);
+            if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                encryptedPartSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID1)) {
+                signedElementSecurityEvents1.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                signatureValueSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                operationSecurityEvents.add(securityEvent);
+            }
+        }
+
+        org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                operationSecurityEvents.size() +
+                        encryptedPartSecurityEvents.size() +
+                        signedElementSecurityEvents1.size() +
+                        signatureValueSecurityEvents.size() +
+                        1 //the timestamp
+        );
     }
 
     @Test
@@ -439,6 +576,58 @@ public class InteroperabilityTest extends AbstractTestBase {
                 }
         ));
         securityEventListener.compare();
+
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedElement);
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        String encryptedElementCorrelationID = encryptedElementSecurityEvent.getCorrelationID();
+        String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+        String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
+        String signedElementCorrelationID2 = signedElementSecurityEventList.get(1).getCorrelationID();
+        String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+        String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> encryptedElementSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+        List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+        for (int i = 0; i < securityEvents.size(); i++) {
+            SecurityEvent securityEvent = securityEvents.get(i);
+            if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                encryptedPartSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(encryptedElementCorrelationID)) {
+                encryptedElementSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID1)) {
+                signedElementSecurityEvents1.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID2)) {
+                signedElementSecurityEvents2.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                signatureValueSecurityEvents.add(securityEvent);
+            } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                operationSecurityEvents.add(securityEvent);
+            }
+        }
+
+        org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents.size());
+        org.junit.Assert.assertEquals(3, encryptedElementSecurityEvents.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        org.junit.Assert.assertEquals(3, signedElementSecurityEvents2.size());
+        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                operationSecurityEvents.size() +
+                        encryptedPartSecurityEvents.size() +
+                        encryptedElementSecurityEvents.size() +
+                        signedElementSecurityEvents1.size() +
+                        signedElementSecurityEvents2.size() +
+                        signatureValueSecurityEvents.size() +
+                        1 //the timestamp
+        );
     }
 
     @Test

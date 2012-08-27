@@ -112,6 +112,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         //fire a tokenSecurityEvent
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         x509TokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        x509TokenSecurityEvent.setCorrelationID(binarySecurityTokenType.getId());
         securityContext.registerSecurityEvent(x509TokenSecurityEvent);
     }
 

@@ -116,7 +116,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                     secret = passwordCallback.getKey();
                 } else {
-                    secret = wrappingSecurityToken.getSecretKey(null, null).getEncoded();
+                    secret = wrappingSecurityToken.getSecretKey(null, null, null).getEncoded();
                 }
 
                 derivedKeyBytes = derivationAlgorithm.createKey(secret, seed, offset, length);
@@ -134,7 +134,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 @Override
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws WSSecurityException {
                     if (keyTable.containsKey(algorithmURI)) {
                         return keyTable.get(algorithmURI);
                     } else {
@@ -146,7 +147,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 @Override
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                           String correlationID) throws WSSecurityException {
                     return null;
                 }
 

@@ -49,11 +49,13 @@ public class SecureConversationSecurityToken extends AbstractSecurityToken {
         return false;
     }
 
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                         String correlationID) throws XMLSecurityException {
         return null;
     }
 
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws XMLSecurityException {
         return null;
     }
 

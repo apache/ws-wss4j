@@ -56,12 +56,14 @@ public class SecurityTokenReference extends AbstractSecurityToken {
         return securityToken.isAsymmetric();
     }
 
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        return securityToken.getSecretKey(algorithmURI, keyUsage);
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                         String correlationID) throws XMLSecurityException {
+        return securityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
     }
 
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
-        return securityToken.getPublicKey(algorithmURI, keyUsage);
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws XMLSecurityException {
+        return securityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
     }
 
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {

@@ -27,6 +27,7 @@ import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.securityEvent.TimestampSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
@@ -65,6 +66,9 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
         if (timestampType.getCreated() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "missingCreated");
+        }
+        if (timestampType.getId() == null) {
+            timestampType.setId(IDGenerator.generateID(null));
         }
 
         try {
@@ -119,6 +123,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
             timestampSecurityEvent.setCreated(crea);
             timestampSecurityEvent.setExpires(exp);
+            timestampSecurityEvent.setCorrelationID(timestampType.getId());
             ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(timestampSecurityEvent);
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
 
@@ -167,7 +172,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             }
             curIdx++;
         }
-        
+
         if (timestampType.getCreated() != null) {
             XMLGregorianCalendar createdCalendar;
             try {
@@ -191,7 +196,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         } else {
             securityContext.handleBSPRule(BSPRule.R3203);
         }
-        
+
         if (timestampType.getExpires() != null) {
             XMLGregorianCalendar expiresCalendar;
             try {

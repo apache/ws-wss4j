@@ -70,11 +70,13 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
         return true;
     }
 
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                         String correlationID) throws WSSecurityException {
         return null;
     }
 
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws WSSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                  String correlationID) throws WSSecurityException {
         if (x509Certificate != null) {
             return x509Certificate.getPublicKey();
         }

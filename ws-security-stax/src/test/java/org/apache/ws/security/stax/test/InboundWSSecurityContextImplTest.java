@@ -660,7 +660,8 @@ public class InboundWSSecurityContextImplTest {
             }
 
             @Override
-            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                    String correlationID) throws XMLSecurityException {
                 try {
                     return keyStore.getKey("transmitter", "default".toCharArray());
                 } catch (Exception e) {
@@ -669,7 +670,8 @@ public class InboundWSSecurityContextImplTest {
             }
 
             @Override
-            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage) throws XMLSecurityException {
+            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                                          String correlationID) throws XMLSecurityException {
                 try {
                     return keyStore.getCertificate("transmitter").getPublicKey();
                 } catch (Exception e) {

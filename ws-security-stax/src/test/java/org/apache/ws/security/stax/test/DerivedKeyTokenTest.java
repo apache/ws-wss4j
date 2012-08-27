@@ -27,6 +27,8 @@ import org.apache.ws.security.common.derivedKey.ConversationConstants;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.dom.message.*;
 import org.apache.ws.security.dom.message.token.SecurityTokenReference;
+import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.stax.WSSec;
@@ -38,6 +40,8 @@ import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -54,6 +58,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -173,6 +178,28 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(6, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(1, operationSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(), operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
 
@@ -664,6 +691,41 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
 
             securityEventListener.compare();
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(6, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(6, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() + encryptedPartSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size());
         }
     }
 
