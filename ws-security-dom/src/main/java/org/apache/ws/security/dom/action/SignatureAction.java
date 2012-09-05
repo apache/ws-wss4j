@@ -19,14 +19,21 @@
 
 package org.apache.ws.security.dom.action;
 
+import java.util.List;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSEncryptionPart;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.handler.WSHandler;
 import org.apache.ws.security.dom.message.WSSecSignature;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class SignatureAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
@@ -58,7 +65,40 @@ public class SignatureAction implements Action {
         }
 
         try {
-            wsSign.build(doc, reqData.getSigCrypto(), reqData.getSecHeader());
+            wsSign.prepare(doc, reqData.getSigCrypto(), reqData.getSecHeader());
+
+            Element siblingElementToPrepend = null;
+            for (WSEncryptionPart part : reqData.getSignatureParts()) {
+                if ("STRTransform".equals(part.getName()) && part.getId() == null) {
+                    part.setId(wsSign.getSecurityTokenReferenceURI());
+                } else if (reqData.isAppendSignatureAfterTimestamp()
+                        && WSConstants.WSU_NS.equals(part.getNamespace()) 
+                        && "Timestamp".equals(part.getName())) {
+                    List<Element> elements = 
+                        WSSecurityUtil.findElements(
+                            doc.getDocumentElement(), part.getName(), part.getNamespace()
+                        );
+                    if (elements != null && !elements.isEmpty()) {
+                        Element timestampElement = elements.get(0);
+                        Node child = timestampElement.getNextSibling();
+                        while (child != null && child.getNodeType() != Node.ELEMENT_NODE) {
+                            child = child.getNextSibling();
+                        }
+                        siblingElementToPrepend = (Element)child;
+                    }
+                }
+            }
+
+            List<javax.xml.crypto.dsig.Reference> referenceList = 
+                wsSign.addReferencesToSign(reqData.getSignatureParts(), reqData.getSecHeader());
+
+            if (reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
+                wsSign.computeSignature(referenceList, false, null);
+            } else {
+                wsSign.computeSignature(referenceList, true, siblingElementToPrepend);
+            }
+
+            wsSign.prependBSTElementToHeader(reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("Error during Signature: ", e);

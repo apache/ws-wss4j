@@ -43,6 +43,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,8 +143,8 @@ public abstract class WSHandler {
             }
             decodeSignatureParameter(reqData);
         }
-        /*
-         * If we need to handle zsigned SAML token then we may need the
+        /*7
+         * If we need to handle signed SAML token then we may need the
          * Signature parameters. The handle procedure loads the signature crypto
          * file on demand, thus don't do it here.
          */
@@ -185,11 +186,34 @@ public abstract class WSHandler {
                 wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
             }
         }
+        
+        // See if the Signature and Timestamp actions (in that order) are defined, and if
+        // the Timestamp is to be signed. In this case we need to swap the actions, as the 
+        // Timestamp must appear in the security header first for signature creation to work.
+        List<Integer> actionsToPerform = actions;
+        if (actions.contains(WSConstants.SIGN) && actions.contains(WSConstants.TS)
+            && (actions.indexOf(WSConstants.SIGN) < actions.indexOf(WSConstants.TS))) {
+            boolean signTimestamp = false;
+            for (WSEncryptionPart encP : reqData.getSignatureParts()) {
+                if (WSConstants.WSU_NS.equals(encP.getNamespace()) 
+                    && "Timestamp".equals(encP.getName())) {
+                    signTimestamp = true;
+                }
+            }
+            if (signTimestamp) {
+                actionsToPerform = new ArrayList<Integer>(actions);
+                Collections.copy(actionsToPerform, actions);
+                actionsToPerform.remove(actions.indexOf(WSConstants.SIGN));
+                actionsToPerform.add(WSConstants.SIGN);
+                reqData.setAppendSignatureAfterTimestamp(true);
+            }
+        }
+        
         /*
          * Here we have all necessary information to perform the requested
          * action(s).
          */
-        for (Integer actionToDo : actions) {
+        for (Integer actionToDo : actionsToPerform) {
             if (doDebug) {
                 log.debug("Performing Action: " + actionToDo);
             }

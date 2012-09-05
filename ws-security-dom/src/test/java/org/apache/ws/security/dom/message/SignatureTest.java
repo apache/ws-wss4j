@@ -681,6 +681,50 @@ public class SignatureTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(doc, null, null, passwordCrypto);
     }
+    
+    /**
+     * A test for "There is an issue with the position of the <Timestamp> element in the
+     * <Security> header when using WSS4J calling .NET Web Services with WS-Security."
+     */
+    @org.junit.Test
+    public void
+    testWSS231() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN | WSConstants.TS;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put("password", "security");
+        config.put(
+            WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
+        );
+        reqData.setMsgContext(config);
+        
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(Integer.valueOf(WSConstants.TS));
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(doc);
+        assertTrue(handler.checkResults(results, actions));
+    }
 
     /**
      * Verifies the soap envelope.

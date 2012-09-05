@@ -90,6 +90,7 @@ public class RequestData {
     private ReplayCache nonceReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
+    private boolean appendSignatureAfterTimestamp;
 
     public void clear() {
         soapConstants = null;
@@ -116,6 +117,7 @@ public class RequestData {
         nonceReplayCache = null;
         subjectDNPatterns.clear();
         ignoredBSPRules.clear();
+        appendSignatureAfterTimestamp = false;
     }
 
     public Object getMsgContext() {
@@ -538,6 +540,14 @@ public class RequestData {
     
     public BSPEnforcer getBSPEnforcer() {
         return new BSPEnforcer(ignoredBSPRules);
+    }
+
+    public boolean isAppendSignatureAfterTimestamp() {
+        return appendSignatureAfterTimestamp;
+    }
+
+    public void setAppendSignatureAfterTimestamp(boolean appendSignatureAfterTimestamp) {
+        this.appendSignatureAfterTimestamp = appendSignatureAfterTimestamp;
     }
 
 }
