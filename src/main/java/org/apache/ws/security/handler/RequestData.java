@@ -84,6 +84,7 @@ public class RequestData {
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
+    private boolean appendSignatureAfterTimestamp;
 
     public void clear() {
         soapConstants = null;
@@ -109,6 +110,7 @@ public class RequestData {
         timestampReplayCache = null;
         nonceReplayCache = null;
         subjectDNPatterns.clear();
+        appendSignatureAfterTimestamp = false;
     }
 
     public Object getMsgContext() {
@@ -510,6 +512,14 @@ public class RequestData {
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
+    }
+
+    public boolean isAppendSignatureAfterTimestamp() {
+        return appendSignatureAfterTimestamp;
+    }
+
+    public void setAppendSignatureAfterTimestamp(boolean appendSignatureAfterTimestamp) {
+        this.appendSignatureAfterTimestamp = appendSignatureAfterTimestamp;
     }
 
 }
