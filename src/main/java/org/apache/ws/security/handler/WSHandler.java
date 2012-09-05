@@ -143,7 +143,7 @@ public abstract class WSHandler {
             }
             decodeSignatureParameter(reqData);
         }
-        /*7
+        /*
          * If we need to handle signed SAML token then we may need the
          * Signature parameters. The handle procedure loads the signature crypto
          * file on demand, thus don't do it here.
