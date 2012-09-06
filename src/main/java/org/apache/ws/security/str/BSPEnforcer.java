@@ -52,14 +52,6 @@ public final class BSPEnforcer {
         if (secRef.containsReference()) {
             // Check the ValueType attributes
             String valueType = secRef.getReference().getValueType();
-            if ((valueType == null || "".equals(valueType)) && (token instanceof KerberosSecurity)) {
-                throw new WSSecurityException(
-                    WSSecurityException.INVALID_SECURITY_TOKEN, 
-                    "invalidValueType", 
-                    new Object[]{valueType}
-                );
-            }
-
             if (((token instanceof X509Security) && !X509Security.X509_V3_TYPE.equals(valueType))
                 || ((token instanceof PKIPathSecurity) && !PKIPathSecurity.PKI_TYPE.equals(valueType))
                 || ((token instanceof KerberosSecurity) 
