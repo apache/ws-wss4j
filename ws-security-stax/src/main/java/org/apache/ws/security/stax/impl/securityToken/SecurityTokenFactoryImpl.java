@@ -34,6 +34,7 @@ import org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.ECKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.RsaKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
+import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.util.Deque;
@@ -94,7 +95,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             if (securityTokenReferenceType.getAny().size() > 1) {
                 ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3061);
             }
-
+            
             //todo BSP.R3027 KeyName? not supported ATM
             //todo BSP.R3060,BSP.R3025,BSP.R3056 only one Embedded element? Not supported ATM
             final X509DataType x509DataType
@@ -104,6 +105,11 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         x509DataType, securityTokenReferenceType.getId(),
                         WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
             }
+            
+            String tokenType = 
+                    XMLSecurityUtils.getQNameAttribute(
+                        securityTokenReferenceType.getOtherAttributes(), 
+                        WSSConstants.ATT_wsse11_TokenType);
 
             final KeyIdentifierType keyIdentifierType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
@@ -123,6 +129,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     } else {
                         ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3071);
                     }
+                } else if (encodingType != null 
+                        && (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType))) {
+                    ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6604);
                 }
 
                 if (WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
@@ -138,6 +147,11 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             (WSSecurityContext) securityContext, crypto, callbackHandler, binaryContent,
                             securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
                 } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
+                    if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6617);
+                    } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6611);
+                    }
                     SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider == null) {
                         throw new WSSecurityException(
@@ -153,7 +167,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final org.apache.ws.security.binding.wss10.ReferenceType referenceType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
             if (referenceType != null) {
-                //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3058, BSP.R3059
+                //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3059
 
                 String uri = referenceType.getURI();
                 if (uri == null) {
@@ -186,7 +200,41 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 }
                 if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
                     ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3057);
-                }
+                } else if (securityTokenProvider.getSecurityToken() instanceof X509PKIPathv1SecurityToken) {
+                    String valueType = referenceType.getValueType();
+                    if (!WSSConstants.NS_X509PKIPathv1.equals(valueType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3058);
+                    }
+                    if (!WSSConstants.NS_X509PKIPathv1.equals(tokenType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R5215);
+                    }
+                } else if (securityTokenProvider.getSecurityToken() instanceof X509SecurityToken) {
+                    String valueType = referenceType.getValueType();
+                    if (!WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3058);
+                    }
+                } else if (securityTokenProvider.getSecurityToken() instanceof UsernameSecurityToken) {
+                    String valueType = referenceType.getValueType();
+                    if (!WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken.equals(valueType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R4214);
+                    }
+                } else if (securityTokenProvider.getSecurityToken() instanceof SAMLSecurityToken) {
+                    SAMLVersion samlVersion = 
+                            ((SAMLSecurityToken)securityTokenProvider.getSecurityToken()).getSamlVersion();
+                    if (samlVersion == SAMLVersion.VERSION_20) {
+                        String valueType = referenceType.getValueType();
+                        if (valueType != null && !"".equals(valueType)) {
+                            ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6614);
+                        }
+                        if (!WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                            ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6617);
+                        }
+                    } else if (samlVersion == SAMLVersion.VERSION_10 && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                        ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6611);
+                    }
+                } 
+                
+                
                 return securityTokenProvider.getSecurityToken();
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
