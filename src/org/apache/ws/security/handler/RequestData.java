@@ -66,6 +66,7 @@ public class RequestData {
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
     private boolean useSingleCert = true;
+    private boolean appendSignatureAfterTimestamp;
 
     public void clear() {
         soapConstants = null;
@@ -85,6 +86,7 @@ public class RequestData {
         derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
         useDerivedKeyForMAC = true;
         useSingleCert = true;
+        appendSignatureAfterTimestamp = false;
     }
 
     public Object getMsgContext() {
@@ -369,5 +371,13 @@ public class RequestData {
      */
     public boolean isUseSingleCert() {
         return useSingleCert;
+    }
+    
+    public boolean isAppendSignatureAfterTimestamp() {
+        return appendSignatureAfterTimestamp;
+    }
+
+    public void setAppendSignatureAfterTimestamp(boolean appendSignatureAfterTimestamp) {
+        this.appendSignatureAfterTimestamp = appendSignatureAfterTimestamp;
     }
 }

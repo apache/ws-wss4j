@@ -34,6 +34,8 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecSignature;
@@ -47,6 +49,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Vector;
 
 /**
  * WS-Security Test Case
@@ -267,7 +270,48 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
         
         verify(doc);
     }
+    
+    /**
+     * A test for "There is an issue with the position of the <Timestamp> element in the
+     * <Security> header when using WSS4J calling .NET Web Services with WS-Security."
+     */
+    public void testWSS231() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN | WSConstants.TS;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
 
+        java.util.Map config = new java.util.TreeMap();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put("password", "security");
+        config.put(
+                WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
+        );
+        reqData.setMsgContext(config);
+
+        final Vector actions = new Vector();
+        actions.add(new Integer(WSConstants.SIGN));
+        actions.add(new Integer(WSConstants.TS));
+        final Document doc = unsignedEnvelope.getAsDocument();
+        MyHandler handler = new MyHandler();
+        handler.send(
+                action, 
+                doc, 
+                reqData, 
+                actions,
+                true
+        );
+        String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+
+        Vector results = verify(doc);
+        assertTrue(handler.checkResults(results, actions));
+    }
 
     /**
      * Verifies the soap envelope
@@ -276,8 +320,8 @@ public class TestWSSecurityNew3 extends TestCase implements CallbackHandler {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private void verify(Document doc) throws Exception {
-        secEngine.processSecurityHeader(doc, null, this, crypto, null);
+    private Vector verify(Document doc) throws Exception {
+        return secEngine.processSecurityHeader(doc, null, this, crypto, null);
     }
 
     public void handle(Callback[] callbacks)

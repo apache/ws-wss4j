@@ -47,6 +47,7 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -185,13 +186,39 @@ public abstract class WSHandler {
                 wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
             }
         }
+        
+        // See if the Signature and Timestamp actions (in that order) are defined, and if
+        // the Timestamp is to be signed. In this case we need to swap the actions, as the 
+        // Timestamp must appear in the security header first for signature creation to work.
+        Vector actionsToPerform = actions;
+        if (actions.contains(new Integer(WSConstants.SIGN)) 
+                && actions.contains(new Integer(WSConstants.TS))
+                && (actions.indexOf(new Integer(WSConstants.SIGN)) 
+                        < actions.indexOf(new Integer(WSConstants.TS)))) {
+            boolean signTimestamp = false;
+            for (int i = 0; i < reqData.getSignatureParts().size(); i++) {
+                WSEncryptionPart encP = (WSEncryptionPart)reqData.getSignatureParts().get(i);
+                if (WSConstants.WSU_NS.equals(encP.getNamespace()) 
+                        && "Timestamp".equals(encP.getName())) {
+                    signTimestamp = true;
+                }
+            }
+            if (signTimestamp) {
+                actionsToPerform = new Vector(actions);
+                Collections.copy(actionsToPerform, actions);
+                actionsToPerform.remove(actions.indexOf(new Integer(WSConstants.SIGN)));
+                actionsToPerform.add(new Integer(WSConstants.SIGN));
+                reqData.setAppendSignatureAfterTimestamp(true);
+            }
+        }
+
         /*
          * Here we have all necessary information to perform the requested
          * action(s).
          */
-        for (int i = 0; i < actions.size(); i++) {
+        for (int i = 0; i < actionsToPerform.size(); i++) {
 
-            int actionToDo = ((Integer) actions.get(i)).intValue();
+            int actionToDo = ((Integer) actionsToPerform.get(i)).intValue();
             if (doDebug) {
                 log.debug("Performing Action: " + actionToDo);
             }
