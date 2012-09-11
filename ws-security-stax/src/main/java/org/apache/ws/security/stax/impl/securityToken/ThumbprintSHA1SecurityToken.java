@@ -41,6 +41,7 @@ public class ThumbprintSHA1SecurityToken extends X509SecurityToken {
         this.binaryContent = binaryContent;
     }
 
+    @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);

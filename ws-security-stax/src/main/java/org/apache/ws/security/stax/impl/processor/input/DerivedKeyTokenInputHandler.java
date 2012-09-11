@@ -19,11 +19,11 @@
 package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.binding.wssc.AbstractDerivedKeyTokenType;
+import org.apache.ws.security.common.derivedKey.DerivedKeyUtils;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.ws.security.common.derivedKey.DerivedKeyUtils;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
@@ -31,7 +31,7 @@ import org.apache.ws.security.stax.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 
@@ -39,7 +39,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.security.Key;
-import java.security.PublicKey;
 import java.util.Deque;
 import java.util.List;
 
@@ -70,16 +69,18 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private AbstractSecurityToken derivedKeySecurityToken = null;
+            private AbstractInboundSecurityToken derivedKeySecurityToken = null;
 
+            @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
 
                 if (this.derivedKeySecurityToken != null) {
                     return this.derivedKeySecurityToken;
                 }
 
-                this.derivedKeySecurityToken = new AbstractSecurityToken(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), null,
+                //todo implement interface to access all derivedKeys? The same would be needed in UserNameToken
+                this.derivedKeySecurityToken = new AbstractInboundSecurityToken(
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), securityProperties.getCallbackHandler(),
                         derivedKeyTokenType.getId(), null) {
 
                     private SecurityToken referencedSecurityToken = null;
@@ -91,7 +92,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
                         this.referencedSecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
                                 derivedKeyTokenType.getSecurityTokenReference(),
-                                ((WSSSecurityProperties)securityProperties).getDecryptionCrypto(),
+                                ((WSSSecurityProperties) securityProperties).getDecryptionCrypto(),
                                 securityProperties.getCallbackHandler(),
                                 inputProcessorChain.getSecurityContext()
                         );
@@ -99,10 +100,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         return this.referencedSecurityToken;
                     }
 
-                    public boolean isAsymmetric() {
-                        return false;
-                    }
-
+                    @Override
                     protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
                                          String correlationID) throws XMLSecurityException {
                         byte[] secret;
@@ -110,11 +108,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         if (referencedSecurityToken != null) {
                             if (referencedSecurityToken instanceof UsernameSecurityToken) {
                                 UsernameSecurityToken usernameSecurityToken = (UsernameSecurityToken) referencedSecurityToken;
-                                secret = usernameSecurityToken.generateDerivedKey(
-                                        usernameSecurityToken.getPassword(),
-                                        usernameSecurityToken.getSalt(),
-                                        usernameSecurityToken.getIteration()
-                                );
+                                secret = usernameSecurityToken.generateDerivedKey();
                             } else if (referencedSecurityToken instanceof SAMLSecurityToken) {
                                 SAMLSecurityToken samlSecurityToken = (SAMLSecurityToken) referencedSecurityToken;
                                 secret = samlSecurityToken.getSamlKeyInfo().getSecret();
@@ -158,16 +152,11 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     @Override
-                    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                                  String correlationID)
-                            throws XMLSecurityException {
-                        return null;
-                    }
-
                     public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
                         return getReferencedSecurityToken();
                     }
 
+                    @Override
                     public WSSConstants.TokenType getTokenType() {
                         return WSSConstants.DerivedKeyToken;
                     }
@@ -177,6 +166,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                 return this.derivedKeySecurityToken;
             }
 
+            @Override
             public String getId() {
                 return derivedKeyTokenType.getId();
             }
@@ -185,7 +175,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         //fire a tokenSecurityEvent
         DerivedKeyTokenSecurityEvent derivedKeyTokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
-        derivedKeyTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        derivedKeyTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         derivedKeyTokenSecurityEvent.setCorrelationID(derivedKeyTokenType.getId());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(derivedKeyTokenSecurityEvent);
     }

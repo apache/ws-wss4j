@@ -26,7 +26,8 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -58,7 +59,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
-            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
+            final OutboundSecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
@@ -66,51 +67,30 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             final String wsuId = IDGenerator.generateID(null);
             final String identifier = IDGenerator.generateID(null);
 
-            final AbstractSecurityToken securityContextSecurityToken = new AbstractSecurityToken(wsuId) {
+            final GenericOutboundSecurityToken securityContextSecurityToken = new GenericOutboundSecurityToken(wsuId, WSSConstants.SecurityContextToken) {
 
                 @Override
-                public boolean isAsymmetric() {
-                    return wrappingSecurityToken.isAsymmetric();
+                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    return wrappingSecurityToken.getSecretKey(algorithmURI);
                 }
 
                 @Override
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws XMLSecurityException {
-                    return wrappingSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
-                }
-
-                @Override
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                           String correlationID) throws XMLSecurityException {
-                    return wrappingSecurityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
+                public PublicKey getPublicKey() throws XMLSecurityException {
+                    return wrappingSecurityToken.getPublicKey();
                 }
 
                 @Override
                 public X509Certificate[] getX509Certificates() throws XMLSecurityException {
                     return wrappingSecurityToken.getX509Certificates();
                 }
-
-                @Override
-                public void verify() throws XMLSecurityException {
-                    wrappingSecurityToken.verify();
-                }
-
-                @Override
-                public SecurityToken getKeyWrappingToken() {
-                    return wrappingSecurityToken;
-                }
-
-                @Override
-                public WSSConstants.TokenType getTokenType() {
-                    return WSSConstants.SecurityContextToken;
-                }
             };
             wrappingSecurityToken.addWrappedToken(securityContextSecurityToken);
 
             SecurityTokenProvider securityContextSecurityTokenProvider = new SecurityTokenProvider() {
 
+                @SuppressWarnings("unchecked")
                 @Override
-                public SecurityToken getSecurityToken() throws WSSecurityException {
+                public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return securityContextSecurityToken;
                 }
 
@@ -120,7 +100,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 }
             };
 
-            FinalSecurityContextTokenOutputProcessor finalSecurityContextTokenOutputProcessor = new FinalSecurityContextTokenOutputProcessor(securityContextSecurityToken, identifier);
+            FinalSecurityContextTokenOutputProcessor finalSecurityContextTokenOutputProcessor =
+                    new FinalSecurityContextTokenOutputProcessor(securityContextSecurityToken, identifier);
             finalSecurityContextTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalSecurityContextTokenOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
@@ -152,10 +133,10 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
 
     class FinalSecurityContextTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private final SecurityToken securityToken;
+        private final OutboundSecurityToken securityToken;
         private final String identifier;
 
-        FinalSecurityContextTokenOutputProcessor(SecurityToken securityToken, String identifier) throws XMLSecurityException {
+        FinalSecurityContextTokenOutputProcessor(OutboundSecurityToken securityToken, String identifier) throws XMLSecurityException {
             super();
             this.securityToken = securityToken;
             this.identifier = identifier;

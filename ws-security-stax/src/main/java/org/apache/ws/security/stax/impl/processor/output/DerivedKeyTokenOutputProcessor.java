@@ -19,18 +19,21 @@
 package org.apache.ws.security.stax.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.ws.security.common.ext.WSPasswordCallback;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.ext.*;
 import org.apache.ws.security.common.derivedKey.AlgoFactory;
 import org.apache.ws.security.common.derivedKey.ConversationException;
 import org.apache.ws.security.common.derivedKey.DerivationAlgorithm;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -38,12 +41,9 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author $Author$
@@ -67,7 +67,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
-            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
+            final OutboundSecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
@@ -116,7 +116,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                     secret = passwordCallback.getKey();
                 } else {
-                    secret = wrappingSecurityToken.getSecretKey(null, null, null).getEncoded();
+                    secret = wrappingSecurityToken.getSecretKey("").getEncoded();
                 }
 
                 derivedKeyBytes = derivationAlgorithm.createKey(secret, seed, offset, length);
@@ -124,56 +124,34 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(e.getMessage(), e);
             }
 
-            final AbstractSecurityToken derivedKeySecurityToken = new AbstractSecurityToken(wsuIdDKT) {
-
-                private final Map<String, Key> keyTable = new Hashtable<String, Key>();
+            final GenericOutboundSecurityToken derivedKeySecurityToken = new GenericOutboundSecurityToken(wsuIdDKT, WSSConstants.DerivedKeyToken) {
 
                 @Override
-                public boolean isAsymmetric() {
-                    return false;
-                }
+                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
 
-                @Override
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws WSSecurityException {
-                    if (keyTable.containsKey(algorithmURI)) {
-                        return keyTable.get(algorithmURI);
-                    } else {
-                        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
-                        Key key = new SecretKeySpec(derivedKeyBytes, algoFamily);
-                        keyTable.put(algorithmURI, key);
+                    Key key = null;
+                    try {
+                        key = super.getSecretKey(algorithmURI);
+                    } catch (XMLSecurityException e) {
+                        throw new WSSecurityException(e.getMessage(), e);
+                    }
+                    if (key != null) {
                         return key;
                     }
-                }
-
-                @Override
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                           String correlationID) throws WSSecurityException {
-                    return null;
-                }
-
-                @Override
-                public X509Certificate[] getX509Certificates() throws WSSecurityException {
-                    return null;
-                }
-
-                @Override
-                public SecurityToken getKeyWrappingToken() {
-                    return wrappingSecurityToken;
-                }
-
-                @Override
-                public WSSConstants.TokenType getTokenType() {
-                    return null;
+                    String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+                    key = new SecretKeySpec(derivedKeyBytes, algoFamily);
+                    setSecretKey(algorithmURI, key);
+                    return key;
                 }
             };
 
+            derivedKeySecurityToken.setKeyWrappingToken(wrappingSecurityToken);
             wrappingSecurityToken.addWrappedToken(derivedKeySecurityToken);
 
             SecurityTokenProvider derivedKeysecurityTokenProvider = new SecurityTokenProvider() {
 
                 @Override
-                public SecurityToken getSecurityToken() throws WSSecurityException {
+                public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return derivedKeySecurityToken;
                 }
 
@@ -205,12 +183,12 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
     class FinalDerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private final SecurityToken securityToken;
+        private final OutboundSecurityToken securityToken;
         private final int offset;
         private final int length;
         private final String nonce;
 
-        FinalDerivedKeyTokenOutputProcessor(SecurityToken securityToken, int offset, int length, String nonce) throws XMLSecurityException {
+        FinalDerivedKeyTokenOutputProcessor(OutboundSecurityToken securityToken, int offset, int length, String nonce) throws XMLSecurityException {
 
             super();
             this.securityToken = securityToken;
@@ -253,7 +231,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
         protected void createSecurityTokenReferenceStructureForDerivedKey(
                 OutputProcessorChain outputProcessorChain,
-                SecurityToken securityToken,
+                OutboundSecurityToken securityToken,
                 WSSConstants.KeyIdentifierType keyIdentifierType,
                 WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference,
                 boolean useSingleCertificate)

@@ -24,7 +24,8 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
-import org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl;
+import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.ws.security.stax.impl.securityToken.SecurityTokenReference;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -129,16 +130,25 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
                             private SecurityToken securityToken = null;
 
+                            @Override
                             public SecurityToken getSecurityToken() throws XMLSecurityException {
                                 if (this.securityToken != null) {
                                     return this.securityToken;
                                 }
-                                this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(
-                                        attributeValue, xmlSecEventList, getSecurityProperties().getCallbackHandler(),
-                                        inputProcessorChain.getSecurityContext(), securityTokenReferenceId);
-                                return this.securityToken;
+
+                                SecurityTokenProvider securityTokenProvider =
+                                        inputProcessorChain.getSecurityContext().getSecurityTokenProvider(attributeValue);
+                                SecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                                return this.securityToken = new SecurityTokenReference(
+                                        securityToken,
+                                        xmlSecEventList,
+                                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
+                                        getSecurityProperties().getCallbackHandler(),
+                                        securityTokenReferenceId,
+                                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_REFERENCE);
                             }
 
+                            @Override
                             public String getId() {
                                 return securityTokenReferenceId;
                             }

@@ -18,13 +18,10 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
-import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
-import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -33,16 +30,13 @@ import java.security.Key;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class UsernameSecurityToken extends AbstractInboundSecurityToken {
+public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken {
 
     private final UsernameToken usernameToken;
-    private final WSSecurityContext wsSecurityContext;
 
-    public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
-                                 WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, null, id, keyIdentifierType);
-        this.usernameToken = new UsernameToken(username, password, created, nonce, salt, iteration);
-        this.wsSecurityContext = wsSecurityContext;
+    public OutboundUsernameSecurityToken(String username, String password, String created, byte[] nonce, String id) {
+        super(id, WSSConstants.UsernameToken);
+        this.usernameToken = new UsernameToken(username, password, created, nonce, null, null);
     }
 
     public String getUsername() {
@@ -69,40 +63,17 @@ public class UsernameSecurityToken extends AbstractInboundSecurityToken {
         return usernameToken.getIteration();
     }
 
-    /**
-     * This method generates a derived key as defined in WSS Username
-     * Token Profile.
-     *
-     * @return Returns the derived key a byte array
-     * @throws WSSecurityException
-     */
-    public byte[] generateDerivedKey() throws WSSecurityException {
-        return usernameToken.generateDerivedKey(wsSecurityContext);
-    }
-
     @Override
-    public boolean isAsymmetric() throws XMLSecurityException {
-        return false;
-    }
-
-    @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                         String correlationID) throws XMLSecurityException {
-
-        Key key = getSecretKey().get(algorithmURI);
+    public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+        Key key = super.getSecretKey(algorithmURI);
         if (key != null) {
             return key;
         }
 
-        byte[] secretToken = usernameToken.generateDerivedKey(wsSecurityContext);
+        byte[] secretToken = usernameToken.getSecretKey(getPassword(), WSSConstants.WSE_DERIVED_KEY_LEN, WSSConstants.LABEL_FOR_DERIVED_KEY);
         String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
         key = new SecretKeySpec(secretToken, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;
-    }
-
-    @Override
-    public WSSConstants.TokenType getTokenType() {
-        return WSSConstants.UsernameToken;
     }
 }

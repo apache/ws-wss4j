@@ -28,7 +28,8 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.crypto.Cipher;
@@ -40,7 +41,6 @@ import javax.xml.stream.XMLStreamException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
-            final SecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
+            final OutboundSecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
             }
@@ -91,40 +91,15 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             final String ekId = IDGenerator.generateID(null);
 
-            final AbstractSecurityToken encryptedKeySecurityToken = new AbstractSecurityToken(ekId) {
-
-                public boolean isAsymmetric() {
-                    return false;
-                }
-
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws XMLSecurityException {
-                    return symmetricKey;
-                }
-
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                           String correlationID) throws XMLSecurityException {
-                    return null;
-                }
-
-                public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-                    return null;
-                }
-
-                public SecurityToken getKeyWrappingToken() {
-                    return wrappingSecurityToken;
-                }
-
-                public WSSConstants.TokenType getTokenType() {
-                    return null;
-                }
-            };
+            final GenericOutboundSecurityToken encryptedKeySecurityToken = new GenericOutboundSecurityToken(ekId, WSSConstants.EncryptedKeyToken, symmetricKey);
+            encryptedKeySecurityToken.setKeyWrappingToken(wrappingSecurityToken);
             wrappingSecurityToken.addWrappedToken(encryptedKeySecurityToken);
 
             final SecurityTokenProvider encryptedKeySecurityTokenProvider = new SecurityTokenProvider() {
 
+                @SuppressWarnings("unchecked")
                 @Override
-                public SecurityToken getSecurityToken() throws XMLSecurityException {
+                public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
                     return encryptedKeySecurityToken;
                 }
 
@@ -171,9 +146,9 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
     class FinalEncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
-        private final SecurityToken securityToken;
+        private final OutboundSecurityToken securityToken;
 
-        FinalEncryptedKeyOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
+        FinalEncryptedKeyOutputProcessor(OutboundSecurityToken securityToken) throws XMLSecurityException {
             super();
             this.addAfterProcessor(FinalEncryptedKeyOutputProcessor.class.getName());
             this.securityToken = securityToken;
@@ -220,7 +195,11 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod);
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
-                    createSecurityTokenReferenceStructureForEncryptedKey(subOutputProcessorChain, securityToken, ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType(), getSecurityProperties().isUseSingleCert());
+                    createSecurityTokenReferenceStructureForEncryptedKey(
+                            subOutputProcessorChain, securityToken,
+                            ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType(),
+                            getSecurityProperties().isUseSingleCert()
+                    );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData, false, null);
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue, false, null);
@@ -231,7 +210,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         Cipher cipher = Cipher.getInstance(jceid);
                         cipher.init(Cipher.WRAP_MODE, x509Certificate);
 
-                        Key secretKey = securityToken.getSecretKey(null, null, null);
+                        Key secretKey = securityToken.getSecretKey("");
 
                         int blockSize = cipher.getBlockSize();
                         if (blockSize > 0 && blockSize < secretKey.getEncoded().length) {
@@ -269,7 +248,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
         protected void createSecurityTokenReferenceStructureForEncryptedKey(
                 OutputProcessorChain outputProcessorChain,
-                SecurityToken securityToken,
+                OutboundSecurityToken securityToken,
                 WSSConstants.KeyIdentifierType keyIdentifierType,
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {

@@ -30,8 +30,11 @@ import org.apache.ws.security.binding.wsu10.AttributedDateTime;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.ext.*;
-import org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.ws.security.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -85,10 +88,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         if (salt != null && (passwordType != null || iteration == null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
-        
+
         boolean handleCustomPasswordTypes = false;
-        handleCustomPasswordTypes = ((WSSSecurityProperties)securityProperties).getHandleCustomPasswordTypes();
-        
+        handleCustomPasswordTypes = ((WSSSecurityProperties) securityProperties).getHandleCustomPasswordTypes();
+
         final byte[] nonceVal;
         final String created;
 
@@ -169,7 +172,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
             passwordType.setValue(pwCb.getPassword());
         } else if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)
-            || (passwordType != null && passwordType.getValue() != null 
+                || (passwordType != null && passwordType.getValue() != null
                 && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE)) {
             nonceVal = null;
             created = null;
@@ -191,7 +194,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             passwordType.setValue(pwCb.getPassword());
-        } else if (passwordType != null && passwordType.getValue() != null && usernameTokenPasswordType == null) { 
+        } else if (passwordType != null && passwordType.getValue() != null && usernameTokenPasswordType == null) {
             if (!handleCustomPasswordTypes) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
@@ -232,15 +235,15 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private SecurityToken securityToken = null;
+            private UsernameSecurityToken securityToken = null;
 
             public SecurityToken getSecurityToken() throws WSSecurityException {
                 if (this.securityToken != null) {
                     return this.securityToken;
                 }
-                this.securityToken = SecurityTokenFactoryImpl.getSecurityToken(username.getValue(), password,
-                        created, nonceVal, salt, iteration, (WSSecurityContext) inputProcessorChain.getSecurityContext(),
-                        usernameTokenType.getId());
+                this.securityToken = new UsernameSecurityToken(username.getValue(), password, created, nonceVal, salt, iteration,
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), usernameTokenType.getId(),
+                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
                 this.securityToken.setElementPath(elementPath);
                 this.securityToken.setXMLSecEvent(responsibleStartXMLEvent);
                 return this.securityToken;
@@ -255,7 +258,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         //fire a tokenSecurityEvent
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
-        usernameTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        usernameTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         usernameTokenSecurityEvent.setCorrelationID(usernameTokenType.getId());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(usernameTokenSecurityEvent);

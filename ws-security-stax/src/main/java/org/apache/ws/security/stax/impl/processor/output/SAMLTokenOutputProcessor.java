@@ -18,34 +18,30 @@
  */
 package org.apache.ws.security.stax.impl.processor.output;
 
-import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
-import org.apache.ws.security.common.saml.OpenSAMLUtil;
-import org.apache.ws.security.common.saml.SAMLCallback;
-import org.apache.ws.security.common.saml.SAMLKeyInfo;
-import org.apache.ws.security.common.saml.SAMLUtil;
+import org.apache.ws.security.common.saml.*;
 import org.apache.ws.security.common.saml.bean.KeyInfoBean;
 import org.apache.ws.security.common.saml.bean.SubjectBean;
-import org.apache.ws.security.stax.ext.*;
-import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import java.security.Key;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +113,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     if (keyInfoBean != null) {
                         X509Certificate x509Certificate = keyInfoBean.getCertificate();
                         if (x509Certificate != null) {
-                            String alias = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getX509Identifier(x509Certificate);
+                            String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Identifier(x509Certificate);
                             if (alias == null) {
                                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
@@ -125,8 +121,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), wsPasswordCallback);
                             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                             cryptoType.setAlias(alias);
-                            certificates = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
-                            privateKey = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
+                            certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
+                            privateKey = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
                         }
                     }
                 }
@@ -145,43 +141,18 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
             final PrivateKey secretKey = privateKey;
 
-            final AbstractSecurityToken securityToken;
+            final GenericOutboundSecurityToken securityToken;
             SecurityTokenProvider securityTokenProvider;
             if (senderVouches) {
-                securityToken = new AbstractSecurityToken(binarySecurityTokenId) {
-
-                    public boolean isAsymmetric() {
-                        return true;
-                    }
-
-                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                      String correlationID) throws WSSecurityException {
-                        return secretKey;
-                    }
-
-                    public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                               String correlationID) throws WSSecurityException {
-                        return x509Certificates[0].getPublicKey();
-                    }
-
-                    public X509Certificate[] getX509Certificates() throws WSSecurityException {
-                        return x509Certificates;
-                    }
-
-                    public SecurityToken getKeyWrappingToken() {
-                        return null;
-                    }
-
-                    public WSSConstants.TokenType getTokenType() {
-                        //todo pkiPathToken etc?
-                        return WSSConstants.X509V3Token;
-                    }
-                };
+                securityToken = new GenericOutboundSecurityToken(binarySecurityTokenId,
+                        WSSConstants.X509V3Token, secretKey, x509Certificates);
             } else {
                 securityToken = null;
             }
 
-            final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper, securityTokenReferenceId, binarySecurityTokenId, senderVouches);
+            final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor =
+                    new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper,
+                            securityTokenReferenceId, binarySecurityTokenId, senderVouches);
             finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalSAMLTokenOutputProcessor.setAction(getAction());
             finalSAMLTokenOutputProcessor.init(outputProcessorChain);
@@ -190,8 +161,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 securityTokenProvider = new SecurityTokenProvider() {
 
+                    @SuppressWarnings("unchecked")
                     @Override
-                    public SecurityToken getSecurityToken() throws WSSecurityException {
+                    public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                         return securityToken;
                     }
 
@@ -207,16 +179,23 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             } else {
                 securityTokenProvider = new SecurityTokenProvider() {
 
-                    private SAMLSecurityToken samlSecurityToken;
+                    private GenericOutboundSecurityToken samlSecurityToken;
 
+                    @SuppressWarnings("unchecked")
                     @Override
-                    public SecurityToken getSecurityToken() throws XMLSecurityException {
+                    public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
                         if (this.samlSecurityToken != null) {
                             return this.samlSecurityToken;
                         }
-                        this.samlSecurityToken = new SAMLSecurityToken(
-                                samlCallback.getSamlVersion(), samlKeyInfo, (WSSecurityContext) outputProcessorChain.getSecurityContext(),
-                                ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto(), getSecurityProperties().getCallbackHandler(), tokenId);
+                        XMLSecurityConstants.TokenType tokenType;
+                        if (samlCallback.getSamlVersion() == SAMLVersion.VERSION_10) {
+                            tokenType = WSSConstants.Saml10Token;
+                        } else if (samlCallback.getSamlVersion() == SAMLVersion.VERSION_11) {
+                            tokenType = WSSConstants.Saml11Token;
+                        } else {
+                            tokenType = WSSConstants.Saml20Token;
+                        }
+                        this.samlSecurityToken = new GenericOutboundSecurityToken(tokenId, tokenType, samlKeyInfo.getPrivateKey(), samlKeyInfo.getCerts());
                         this.samlSecurityToken.setProcessor(finalSAMLTokenOutputProcessor);
                         return this.samlSecurityToken;
                     }
@@ -245,13 +224,13 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
     class FinalSAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private final SecurityToken securityToken;
+        private final OutboundSecurityToken securityToken;
         private final AssertionWrapper assertionWrapper;
         private final String securityTokenReferenceId;
         private final String binarySecurityTokenReferenceId;
         private boolean senderVouches = false;
 
-        FinalSAMLTokenOutputProcessor(SecurityToken securityToken, AssertionWrapper assertionWrapper,
+        FinalSAMLTokenOutputProcessor(OutboundSecurityToken securityToken, AssertionWrapper assertionWrapper,
                                       String securityTokenReferenceId, String binarySecurityTokenReferenceId,
                                       boolean senderVouches) throws XMLSecurityException {
             super();

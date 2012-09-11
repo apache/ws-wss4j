@@ -21,11 +21,14 @@ package org.apache.ws.security.stax.impl.processor.output;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.ext.*;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
@@ -33,7 +36,6 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.security.Key;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -59,17 +61,17 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     || action.equals(WSSConstants.SAML_TOKEN_SIGNED)
                     || action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
 
-                String alias = ((WSSSecurityProperties)getSecurityProperties()).getSignatureUser();
+                String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureUser();
                 WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                 WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
                 String password = pwCb.getPassword();
                 if (password == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
                 }
-                key = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
+                key = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(alias);
-                x509Certificates = ((WSSSecurityProperties)getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
+                x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
                 if (x509Certificates == null || x509Certificates.length == 0) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
                 }
@@ -88,11 +90,11 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     x509Certificates[0] = x509Certificate;
                 } else {
                     CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(((WSSSecurityProperties)getSecurityProperties()).getEncryptionUser());
-                    x509Certificates = ((WSSSecurityProperties)getSecurityProperties()).getEncryptionCrypto().getX509Certificates(cryptoType);
+                    cryptoType.setAlias(((WSSSecurityProperties) getSecurityProperties()).getEncryptionUser());
+                    x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getEncryptionCrypto().getX509Certificates(cryptoType);
                     if (x509Certificates == null || x509Certificates.length == 0) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound", 
-                                ((WSSSecurityProperties)getSecurityProperties()).getEncryptionUser());
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound",
+                                ((WSSSecurityProperties) getSecurityProperties()).getEncryptionUser());
                     }
                 }
                 key = null;
@@ -101,45 +103,13 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 key = null;
             }
 
-            final AbstractSecurityToken binarySecurityToken = new AbstractSecurityToken(bstId) {
-
-                @Override
-                public boolean isAsymmetric() {
-                    return true;
-                }
-
-                @Override
-                public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws WSSecurityException {
-                    return key;
-                }
-
-                @Override
-                public PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                           String correlationID) throws WSSecurityException {
-                    return x509Certificates[0].getPublicKey();
-                }
-
-                @Override
-                public X509Certificate[] getX509Certificates() throws WSSecurityException {
-                    return x509Certificates;
-                }
-
-                @Override
-                public SecurityToken getKeyWrappingToken() {
-                    return null;
-                }
-
-                @Override
-                public WSSConstants.TokenType getTokenType() {
-                    return null;
-                }
-            };
-
+            final GenericOutboundSecurityToken binarySecurityToken =
+                    new GenericOutboundSecurityToken(bstId, WSSConstants.X509V3Token, key, x509Certificates);
             final SecurityTokenProvider binarySecurityTokenProvider = new SecurityTokenProvider() {
 
+                @SuppressWarnings("unchecked")
                 @Override
-                public SecurityToken getSecurityToken() throws WSSecurityException {
+                public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return binarySecurityToken;
                 }
 
@@ -219,9 +189,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
     class FinalBinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private final SecurityToken securityToken;
+        private final OutboundSecurityToken securityToken;
 
-        FinalBinarySecurityTokenOutputProcessor(SecurityToken securityToken) throws XMLSecurityException {
+        FinalBinarySecurityTokenOutputProcessor(OutboundSecurityToken securityToken) throws XMLSecurityException {
             super();
             this.addAfterProcessor(BinarySecurityTokenOutputProcessor.class.getName());
             this.securityToken = securityToken;

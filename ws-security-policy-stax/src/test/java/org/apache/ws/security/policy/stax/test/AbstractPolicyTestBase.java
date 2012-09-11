@@ -25,7 +25,6 @@ import org.apache.ws.security.policy.stax.PolicyEnforcerFactory;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.impl.securityToken.X509SecurityToken;
 import org.apache.ws.security.stax.test.AbstractTestBase;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -39,9 +38,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.Key;
 import java.security.KeyStore;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -86,47 +83,29 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+        X509SecurityToken x509SecurityToken = new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return keyAlias;
             }
-
-            @Override
-            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
-                try {
-                    return keyStore.getKey(keyAlias, "default".toCharArray());
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
-                try {
-                    return keyStore.getCertificate(keyAlias).getPublicKey();
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-                Certificate[] certificates;
-                try {
-                    certificates = keyStore.getCertificateChain(keyAlias);
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-
-                X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
-                for (int i = 0; i < certificates.length; i++) {
-                    Certificate certificate = certificates[i];
-                    x509Certificates[i] = (X509Certificate) certificate;
-                }
-                return x509Certificates;
-            }
         };
+        x509SecurityToken.setSecretKey("", keyStore.getKey(keyAlias, "default".toCharArray()));
+        x509SecurityToken.setPublicKey(keyStore.getCertificate(keyAlias).getPublicKey());
+
+        Certificate[] certificates;
+        try {
+            certificates = keyStore.getCertificateChain(keyAlias);
+        } catch (Exception e) {
+            throw new XMLSecurityException(e.getMessage(), e);
+        }
+
+        X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
+        for (int i = 0; i < certificates.length; i++) {
+            Certificate certificate = certificates[i];
+            x509Certificates[i] = (X509Certificate) certificate;
+        }
+        x509SecurityToken.setX509Certificates(x509Certificates);
+        return x509SecurityToken;
     }
 
     protected String loadResourceAsString(String resource, String encoding) throws IOException {

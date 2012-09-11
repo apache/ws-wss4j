@@ -33,23 +33,17 @@ import java.security.cert.X509Certificate;
  */
 public class X509_V3SecurityToken extends X509SecurityToken {
     private String alias = null;
-    private final X509Certificate[] x509Certificates;
 
-    X509_V3SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent,
-                         String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
+    public X509_V3SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent,
+                                String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
         super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
-        this.x509Certificates = new X509Certificate[]{getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent))};
+        setX509Certificates(new X509Certificate[]{getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent))});
     }
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getX509Identifier(this.x509Certificates[0]);
+            this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);
         }
         return this.alias;
-    }
-
-    @Override
-    public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-        return this.x509Certificates;
     }
 }

@@ -18,24 +18,18 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
-import java.security.Key;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import javax.security.auth.callback.CallbackHandler;
-
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+
+import javax.security.auth.callback.CallbackHandler;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SecureConversationSecurityToken extends AbstractSecurityToken {
+public class SecureConversationSecurityToken extends AbstractInboundSecurityToken {
 
     //todo implement
 
@@ -45,31 +39,7 @@ public class SecureConversationSecurityToken extends AbstractSecurityToken {
         super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
     }
 
-    public boolean isAsymmetric() {
-        return false;
-    }
-
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                         String correlationID) throws XMLSecurityException {
-        return null;
-    }
-
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws XMLSecurityException {
-        return null;
-    }
-
-    public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-        return null;
-    }
-
-    public void verify() throws XMLSecurityException {
-    }
-
-    public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
+    @Override
     public XMLSecurityConstants.TokenType getTokenType() {
         return WSSConstants.SecureConversationToken;
     }

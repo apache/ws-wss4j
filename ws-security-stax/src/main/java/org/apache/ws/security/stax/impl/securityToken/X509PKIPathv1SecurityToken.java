@@ -40,10 +40,9 @@ import java.util.List;
 public class X509PKIPathv1SecurityToken extends X509SecurityToken {
 
     private String alias = null;
-    private X509Certificate[] x509Certificates;
 
-    X509PKIPathv1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                               byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
+    public X509PKIPathv1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                                      byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
         super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
 
         InputStream in = new ByteArrayInputStream(binaryContent);
@@ -56,7 +55,7 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
                 certs[i] = (X509Certificate) iterator.next();
             }
             if (certs.length > 0) {
-                this.x509Certificates = certs;
+                setX509Certificates(certs);
             }
         } catch (CertificateException e) {
             throw new XMLSecurityException(XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e);
@@ -65,13 +64,8 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
 
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            this.alias = getCrypto().getX509Identifier(this.x509Certificates[0]);
+            this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);
         }
         return this.alias;
-    }
-
-    @Override
-    public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-        return this.x509Certificates;
     }
 }

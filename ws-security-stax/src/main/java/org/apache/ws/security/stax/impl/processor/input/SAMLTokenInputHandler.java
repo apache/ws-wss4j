@@ -24,7 +24,9 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
-import org.apache.ws.security.stax.ext.*;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.securityEvent.SamlTokenSecurityEvent;
@@ -46,7 +48,6 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
-
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
@@ -85,16 +86,16 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             );
             // Verify trust on the signature
             final SAMLKeyInfo samlIssuerKeyInfo = assertionWrapper.getSignatureKeyInfo();
-            verifySignedAssertion(samlIssuerKeyInfo, 
+            verifySignedAssertion(samlIssuerKeyInfo,
                     (WSSSecurityProperties) securityProperties);
         }
         // Parse the HOK subject if it exists
         assertionWrapper.parseHOKSubject(
                 new WSSSAMLKeyInfoProcessor(),
-                ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto(),
+                ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto(),
                 securityProperties.getCallbackHandler()
         );
-        
+
         // TODO move this into a Validator eventually
         String confirmMethod = null;
         List<String> methods = assertionWrapper.getConfirmationMethods();
@@ -110,7 +111,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
-        
+
         final SAMLKeyInfo samlSubjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
 
         if (logger.isDebugEnabled()) {
@@ -122,7 +123,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private SecurityToken securityToken = null;
+            private SAMLSecurityToken securityToken = null;
 
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
@@ -132,8 +133,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
                 this.securityToken = new SAMLSecurityToken(assertionWrapper.getSamlVersion(), samlSubjectKeyInfo,
                         assertionWrapper.getIssuerString(),
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), 
-                        ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto(),
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
+                        ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto(),
                         securityProperties.getCallbackHandler(), assertionWrapper.getId(), null);
 
                 this.securityToken.setElementPath(elementPath);
@@ -150,7 +151,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         //fire a tokenSecurityEvent
         SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent();
-        samlTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
+        samlTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(samlTokenSecurityEvent);
     }
 
@@ -260,7 +261,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
         return currentNode;
     }
-    
+
     /**
      * Verify trust in the signature of a signed Assertion. This method is separate so that
      * the user can override if if they want.
@@ -329,7 +330,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             );
         }
     }
-    
+
     /**
      * Check to see if the certificate argument is in the keystore
      *
@@ -367,7 +368,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         return false;
     }
 
-    
+
     /**
      * Evaluate whether a given certificate should be trusted.
      * <p/>

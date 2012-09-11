@@ -18,28 +18,28 @@
  */
 package org.apache.ws.security.stax.test;
 
-import org.apache.ws.security.dom.WSConstants;
-import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.derivedKey.ConversationConstants;
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.dom.message.*;
 import org.apache.ws.security.dom.message.token.SecurityTokenReference;
-import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
-import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.OutboundWSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
@@ -675,7 +675,6 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -720,7 +719,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(6, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
             org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
             org.junit.Assert.assertEquals(6, signatureValueSecurityEvents.size());
             org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),

@@ -18,8 +18,10 @@
  */
 package org.apache.ws.security.stax.impl.processor.output;
 
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
@@ -28,11 +30,9 @@ import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.SignaturePartDef;
 import org.apache.xml.security.stax.impl.algorithms.SignatureAlgorithm;
 import org.apache.xml.security.stax.impl.processor.output.AbstractSignatureEndingOutputProcessor;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.apache.ws.security.stax.ext.WSSConstants;
-import org.apache.ws.security.stax.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.ext.WSSUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -90,7 +90,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
     @Override
     protected void createKeyInfoStructureForSignature(
             OutputProcessorChain outputProcessorChain,
-            SecurityToken securityToken,
+            OutboundSecurityToken securityToken,
             boolean useSingleCertificate)
             throws XMLStreamException, XMLSecurityException {
 

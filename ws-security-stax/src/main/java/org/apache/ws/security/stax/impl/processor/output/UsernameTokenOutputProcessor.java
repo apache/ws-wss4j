@@ -21,12 +21,15 @@ package org.apache.ws.security.stax.impl.processor.output;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.ext.*;
-import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.ws.security.stax.impl.securityToken.OutboundUsernameSecurityToken;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -69,22 +72,20 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
             final OutputProcessor outputProcessor = this;
 
-            final UsernameSecurityToken usernameSecurityToken =
-                    new UsernameSecurityToken(
-                            ((WSSSecurityProperties) getSecurityProperties()).getTokenUser(),
+            final OutboundUsernameSecurityToken usernameSecurityToken =
+                    new OutboundUsernameSecurityToken(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(),
                             password,
-                            created != null ? created.toXMLFormat() : null,
+                            created.toXMLFormat(),
                             nonceValue,
-                            null,
-                            null,
                             wsuId
                     );
             usernameSecurityToken.setProcessor(outputProcessor);
 
             SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
+                @SuppressWarnings("unchecked")
                 @Override
-                public SecurityToken getSecurityToken() throws WSSecurityException {
+                public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return usernameSecurityToken;
                 }
 

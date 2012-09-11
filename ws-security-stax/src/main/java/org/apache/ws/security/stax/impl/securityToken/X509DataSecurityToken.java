@@ -18,13 +18,13 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
-import org.apache.xml.security.binding.xmldsig.X509DataType;
-import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.xml.security.binding.xmldsig.X509DataType;
+import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 

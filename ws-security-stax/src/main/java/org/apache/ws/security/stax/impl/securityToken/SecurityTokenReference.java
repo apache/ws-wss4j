@@ -24,19 +24,20 @@ import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Deque;
+import java.util.Map;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SecurityTokenReference extends AbstractSecurityToken {
+public class SecurityTokenReference extends AbstractInboundSecurityToken {
 
     private final SecurityToken securityToken;
     private final Deque<XMLSecEvent> xmlSecEvents;
@@ -52,32 +53,49 @@ public class SecurityTokenReference extends AbstractSecurityToken {
         return xmlSecEvents;
     }
 
-    public boolean isAsymmetric() {
+    @Override
+    public boolean isAsymmetric() throws XMLSecurityException {
         return securityToken.isAsymmetric();
     }
 
+    @Override
+    public Map<String, Key> getSecretKey() throws XMLSecurityException {
+        return securityToken.getSecretKey();
+    }
+
+    @Override
     protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
                          String correlationID) throws XMLSecurityException {
         return securityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
     }
 
+    @Override
+    public PublicKey getPublicKey() throws XMLSecurityException {
+        return securityToken.getPublicKey();
+    }
+
+    @Override
     protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
                                   String correlationID) throws XMLSecurityException {
         return securityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
     }
 
+    @Override
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         return securityToken.getX509Certificates();
     }
 
+    @Override
     public void verify() throws XMLSecurityException {
         securityToken.verify();
     }
 
+    @Override
     public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
         return securityToken.getKeyWrappingToken();
     }
 
+    @Override
     public XMLSecurityConstants.TokenType getTokenType() {
         return securityToken.getTokenType();
     }

@@ -19,17 +19,18 @@
 package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
 import org.apache.ws.security.binding.wss10.KeyIdentifierType;
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.binding.xmldsig.*;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
-import org.apache.ws.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.ECKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.RsaKeyValueSecurityToken;
@@ -37,7 +38,6 @@ import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.util.Deque;
 
 /**
  * Factory to create SecurityToken Objects from keys in XML
@@ -51,14 +51,16 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     }
 
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, SecurityToken.KeyInfoUsage keyInfoUsage,
-                        XMLSecurityProperties securityProperties, SecurityContext securityContext) throws XMLSecurityException {
+                                          XMLSecurityProperties securityProperties, SecurityContext securityContext)
+            throws XMLSecurityException {
+
         Crypto crypto = null;
         if (keyInfoUsage == SecurityToken.KeyInfoUsage.SIGNATURE_VERIFICATION) {
-            crypto = ((WSSSecurityProperties)securityProperties).getSignatureVerificationCrypto();
+            crypto = ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto();
         } else if (keyInfoUsage == SecurityToken.KeyInfoUsage.DECRYPTION) {
-            crypto = ((WSSSecurityProperties)securityProperties).getDecryptionCrypto();
+            crypto = ((WSSSecurityProperties) securityProperties).getDecryptionCrypto();
         }
-        
+
         if (keyInfoType != null) {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
@@ -251,7 +253,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
             return new RsaKeyValueSecurityToken(rsaKeyValueType, (WSSecurityContext) securityContext,
-                            callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
@@ -277,50 +279,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
-                }  
+                }
             };
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
-    }
-
-    public static SecurityToken getSecurityToken(
-            BinarySecurityTokenType binarySecurityTokenType, SecurityContext securityContext,
-            Crypto crypto, CallbackHandler callbackHandler) throws XMLSecurityException {
-
-        //only Base64Encoding is supported
-        if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badEncoding", binarySecurityTokenType.getEncodingType());
-        }
-
-        byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
-
-        if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
-            return new X509_V3SecurityToken((WSSecurityContext) securityContext, crypto, callbackHandler,
-                    securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
-        } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
-            return new X509PKIPathv1SecurityToken((WSSecurityContext) securityContext, crypto, callbackHandler,
-                    securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
-        } else {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType", binarySecurityTokenType.getValueType());
-        }
-    }
-
-    public static SecurityToken getSecurityToken(String username, String password, String created, byte[] nonce,
-                                                   byte[] salt, Long iteration, WSSecurityContext wsSecurityContext,
-                                                   String id) throws WSSecurityException {
-        return new UsernameSecurityToken(username, password, created, nonce, salt, iteration, wsSecurityContext, id, WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
-    }
-
-    public static SecurityToken getSecurityToken(String referencedTokenId, Deque<XMLSecEvent> xmlSecEvents,
-                                                   CallbackHandler callbackHandler,
-                                                   SecurityContext securityContext, String id)
-            throws XMLSecurityException {
-
-        return new SecurityTokenReference(
-                securityContext.getSecurityTokenProvider(referencedTokenId).
-                        getSecurityToken(), xmlSecEvents,
-                (WSSecurityContext) securityContext, callbackHandler, id, WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_REFERENCE);
     }
 }

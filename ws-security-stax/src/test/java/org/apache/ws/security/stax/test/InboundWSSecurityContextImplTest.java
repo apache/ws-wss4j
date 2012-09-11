@@ -18,8 +18,8 @@
  */
 package org.apache.ws.security.stax.test;
 
-import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.InboundWSSecurityContextImpl;
@@ -32,19 +32,13 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
-import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.*;
+import org.opensaml.common.SAMLVersion;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
-import java.security.Key;
 import java.security.KeyStore;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -514,7 +508,8 @@ public class InboundWSSecurityContextImplTest {
 
         XMLSecEvent samlTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
-        SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, null, null, null, "1");
+        SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(
+                SAMLVersion.VERSION_20, new SAMLKeyInfo(getX509Token(WSSConstants.X509V3Token).getX509Certificates()), null, null, null, "1");
         samlSecurityToken.setElementPath(samlTokenPath);
         samlSecurityToken.setXMLSecEvent(samlTokenXmlEvent);
         samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);
@@ -653,48 +648,29 @@ public class InboundWSSecurityContextImplTest {
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        return new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+        X509SecurityToken x509SecurityToken = new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return "transmitter";
             }
-
-            @Override
-            public Key getSecretKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                    String correlationID) throws XMLSecurityException {
-                try {
-                    return keyStore.getKey("transmitter", "default".toCharArray());
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public PublicKey getPublicKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                          String correlationID) throws XMLSecurityException {
-                try {
-                    return keyStore.getCertificate("transmitter").getPublicKey();
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-                Certificate[] certificates;
-                try {
-                    certificates = keyStore.getCertificateChain("transmitter");
-                } catch (Exception e) {
-                    throw new XMLSecurityException(e.getMessage(), e);
-                }
-
-                X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
-                for (int i = 0; i < certificates.length; i++) {
-                    Certificate certificate = certificates[i];
-                    x509Certificates[i] = (X509Certificate) certificate;
-                }
-                return x509Certificates;
-            }
         };
+        x509SecurityToken.setSecretKey("", keyStore.getKey("transmitter", "default".toCharArray()));
+        x509SecurityToken.setPublicKey(keyStore.getCertificate("transmitter").getPublicKey());
+
+        Certificate[] certificates;
+        try {
+            certificates = keyStore.getCertificateChain("transmitter");
+        } catch (Exception e) {
+            throw new XMLSecurityException(e.getMessage(), e);
+        }
+
+        X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
+        for (int i = 0; i < certificates.length; i++) {
+            Certificate certificate = certificates[i];
+            x509Certificates[i] = (X509Certificate) certificate;
+        }
+        x509SecurityToken.setX509Certificates(x509Certificates);
+        return x509SecurityToken;
     }
 }

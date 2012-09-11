@@ -18,35 +18,6 @@
  */
 package org.apache.ws.security.stax.test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.common.bsp.BSPRule;
@@ -76,6 +47,27 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.testng.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  * @author $Author$
@@ -364,7 +356,8 @@ public abstract class AbstractTestBase {
 
         /**
          * Handles incoming web service requests and outgoing responses
-         * @throws TransformerException 
+         *
+         * @throws TransformerException
          */
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
                 throws WSSecurityException, TransformerException {
@@ -609,7 +602,7 @@ public abstract class AbstractTestBase {
         public <T> T getSecurityEvent(SecurityEventConstants.Event securityEvent) {
             for (SecurityEvent event : receivedSecurityEvents) {
                 if (event.getSecurityEventType() == securityEvent) {
-                    return (T)event;
+                    return (T) event;
                 }
             }
             return null;
@@ -619,7 +612,7 @@ public abstract class AbstractTestBase {
             List<T> foundEvents = new ArrayList<T>();
             for (SecurityEvent event : receivedSecurityEvents) {
                 if (event.getSecurityEventType() == securityEvent) {
-                    foundEvents.add((T)event);
+                    foundEvents.add((T) event);
                 }
             }
             return foundEvents;

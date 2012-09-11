@@ -21,22 +21,17 @@ package org.apache.ws.security.stax.impl.securityToken;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
-import java.security.Key;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class HttpsSecurityToken extends AbstractSecurityToken {
+public class HttpsSecurityToken extends AbstractInboundSecurityToken {
 
-    private X509Certificate x509Certificate;
     private String username;
     private final AuthenticationType authenticationType;
 
@@ -48,7 +43,7 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
 
     public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext) throws WSSecurityException {
         super(wsSecurityContext, null, IDGenerator.generateID(null), null);
-        this.x509Certificate = x509Certificate;
+        setX509Certificates(new X509Certificate[]{x509Certificate});
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
@@ -62,37 +57,9 @@ public class HttpsSecurityToken extends AbstractSecurityToken {
         this.username = username;
     }
 
-    public X509Certificate[] getX509Certificates() throws WSSecurityException {
-        return new X509Certificate[]{this.x509Certificate};
-    }
-
-    public boolean isAsymmetric() {
-        return true;
-    }
-
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                         String correlationID) throws WSSecurityException {
-        return null;
-    }
-
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws WSSecurityException {
-        if (x509Certificate != null) {
-            return x509Certificate.getPublicKey();
-        }
-        return null;
-    }
-
-    public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
+    @Override
     public WSSConstants.TokenType getTokenType() {
         return WSSConstants.HttpsToken;
-    }
-
-    public X509Certificate getX509Certificate() {
-        return x509Certificate;
     }
 
     public String getUsername() {

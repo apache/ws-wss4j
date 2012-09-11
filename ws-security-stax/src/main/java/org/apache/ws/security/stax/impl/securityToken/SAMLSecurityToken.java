@@ -18,19 +18,16 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
-import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.impl.securityToken.AbstractSecurityToken;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.security.Key;
-import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -39,12 +36,11 @@ import java.security.cert.X509Certificate;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SAMLSecurityToken extends AbstractSecurityToken {
+public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
     private final SAMLVersion samlVersion;
     private final SAMLKeyInfo samlKeyInfo;
     private String issuer;
-    private X509Certificate[] x509Certificate;
     private Crypto crypto;
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, String issuer,
@@ -55,50 +51,29 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         this.samlKeyInfo = samlKeyInfo;
         this.issuer = issuer;
         this.crypto = crypto;
+        if (samlKeyInfo != null) {
+            setSecretKey("", samlKeyInfo.getPrivateKey());
+            setPublicKey(samlKeyInfo.getPublicKey());
+            setX509Certificates(samlKeyInfo.getCerts());
+        }
     }
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, WSSecurityContext wsSecurityContext,
                              Crypto crypto, CallbackHandler callbackHandler, String id) {
-        super(wsSecurityContext, callbackHandler, id, null);
-        this.samlVersion = samlVersion;
-        this.samlKeyInfo = samlKeyInfo;
-        this.crypto = crypto;
+        this(samlVersion, samlKeyInfo, null, wsSecurityContext, crypto, callbackHandler, id, null);
     }
-    
+
     public Crypto getCrypto() {
         return crypto;
     }
 
-    public boolean isAsymmetric() {
-        return true;
-    }
-
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                         String correlationID) throws XMLSecurityException {
-        return samlKeyInfo.getPrivateKey();
-    }
-
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                  String correlationID) throws XMLSecurityException {
-        PublicKey publicKey = samlKeyInfo.getPublicKey();
-        if (publicKey == null) {
-            publicKey = getX509Certificates()[0].getPublicKey();
-        }
-        return publicKey;
-    }
-
-    public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-        if (this.x509Certificate == null) {
-            this.x509Certificate = samlKeyInfo.getCerts();
-        }
-        return this.x509Certificate;
-    }
-
+    @Override
     public void verify() throws XMLSecurityException {
         try {
             X509Certificate[] x509Certificates = getX509Certificates();
             if (x509Certificates != null && x509Certificates.length > 0) {
                 x509Certificates[0].checkValidity();
+                //todo deprecated method:
                 getCrypto().verifyTrust(x509Certificates);
             }
         } catch (CertificateExpiredException e) {
@@ -108,11 +83,7 @@ public class SAMLSecurityToken extends AbstractSecurityToken {
         }
     }
 
-    //todo move to super class?
-    public SecurityToken getKeyWrappingToken() {
-        return null;
-    }
-
+    @Override
     public XMLSecurityConstants.TokenType getTokenType() {
         if (samlVersion == SAMLVersion.VERSION_10) {
             return WSSConstants.Saml10Token;
