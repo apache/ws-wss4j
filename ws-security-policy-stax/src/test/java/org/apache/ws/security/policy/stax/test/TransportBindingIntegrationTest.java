@@ -22,11 +22,13 @@ import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.policy.stax.PolicyInputProcessor;
+import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.impl.securityToken.HttpsSecurityToken;
 import org.apache.ws.security.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.test.CallbackHandlerImpl;
+import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -1168,6 +1170,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            switchAllowMD5Algorithm(true);
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 
             //read the whole stream:
@@ -1186,6 +1190,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
                     "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
                     "Digest algorithm http://www.w3.org/2001/04/xmldsig-more#md5 does not meet policy");
+        } finally {
+            switchAllowMD5Algorithm(false);
         }
     }
 

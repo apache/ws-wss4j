@@ -286,7 +286,11 @@ public class WSSecurityException extends XMLSecurityException {
                 msg = xmlsecResources.getString(errorCodeString);
             }
             if (msgId != null) {
-                return msg += (" (" + MessageFormat.format(resources.getString(msgId), arguments) + ")");
+                if (resources.containsKey(msgId)) {
+                    return msg += (" (" + MessageFormat.format(resources.getString(msgId), arguments) + ")");
+                } else {
+                    return msg += (" (" + MessageFormat.format(xmlsecResources.getString(msgId), arguments) + ")");
+                }
             }
         } catch (MissingResourceException e) {
             throw new RuntimeException("Undefined '" + msgId + "' resource property", e);

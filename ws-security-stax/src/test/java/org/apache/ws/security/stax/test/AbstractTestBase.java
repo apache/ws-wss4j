@@ -41,6 +41,10 @@ import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.stax.impl.SecurityContextImpl;
+import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
+import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
+import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
@@ -64,6 +68,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -655,5 +661,85 @@ public abstract class AbstractTestBase {
                 System.out.println("SecurityEvent.Event." + securityEvent.getSecurityEventType() + ",");
             }
         }
+    }
+
+    //sometimes I really like reflection. We can fix jdk bugs which will never be fixed, we can do other funny things and
+    //we can also change "private static final" fields for testing:-)
+    //But keep in mind that this only works for Objects and not primitive types. Primitive types will be inlined...
+    public static void switchAllowNotSameDocumentReferences(Boolean value) throws NoSuchFieldException, IllegalAccessException {
+
+        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("allowNotSameDocumentReferences");
+        field.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        field.set(null, value);
+    }
+
+    public static void switchDoNotThrowExceptionForManifests(Boolean value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("doNotThrowExceptionForManifests");
+        field.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        field.set(null, value);
+    }
+
+    public static int changeValueOfMaximumAllowedReferencesPerManifest(Integer value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("maximumAllowedReferencesPerManifest");
+        field.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        Integer oldval = (Integer)field.get(null);
+        field.set(null, value);
+        return oldval;
+    }
+
+    public static int changeValueOfMaximumAllowedTransformsPerReference(Integer value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = AbstractSignatureReferenceVerifyInputProcessor.class.getDeclaredField("maximumAllowedTransformsPerReference");
+        field.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        Integer oldval = (Integer)field.get(null);
+        field.set(null, value);
+        return oldval;
+    }
+
+    public static void switchAllowMD5Algorithm(Boolean value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = SecurityContextImpl.class.getDeclaredField("allowMD5Algorithm");
+        field.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        field.set(null, value);
+    }
+
+    public static int changeValueOfMaximumAllowedXMLStructureDepth(Integer value) throws NoSuchFieldException, IllegalAccessException {
+        Field xmlEventReaderInputProcessorField = XMLEventReaderInputProcessor.class.getDeclaredField("maximumAllowedXMLStructureDepth");
+        xmlEventReaderInputProcessorField.setAccessible(true);
+        Field abstractDecryptInputProcessorField = AbstractDecryptInputProcessor.class.getDeclaredField("maximumAllowedXMLStructureDepth");
+        abstractDecryptInputProcessorField.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(xmlEventReaderInputProcessorField, xmlEventReaderInputProcessorField.getModifiers() & ~Modifier.FINAL);
+        modifiersField.setInt(abstractDecryptInputProcessorField, abstractDecryptInputProcessorField.getModifiers() & ~Modifier.FINAL);
+
+        Integer oldval = (Integer)xmlEventReaderInputProcessorField.get(null);
+        xmlEventReaderInputProcessorField.set(null, value);
+        abstractDecryptInputProcessorField.set(null, value);
+        return oldval;
     }
 }

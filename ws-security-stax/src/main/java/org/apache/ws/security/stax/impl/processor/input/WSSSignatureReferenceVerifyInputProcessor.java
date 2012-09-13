@@ -218,6 +218,13 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         }
         List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
 
+        if (transformTypeList.size() > maximumAllowedTransformsPerReference) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "secureProcessing.MaximumAllowedTransformsPerReference",
+                    transformTypeList.size(),
+                    maximumAllowedTransformsPerReference);
+        }
+
         String algorithm = null;
         Transformer parentTransformer = null;
         for (int i = transformTypeList.size() - 1; i >= 0; i--) {

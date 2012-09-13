@@ -18,6 +18,8 @@
  */
 package org.apache.ws.security.policy.stax.test;
 
+import org.apache.ws.security.stax.WSSec;
+import org.apache.xml.security.stax.config.Init;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
@@ -1207,6 +1209,8 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            switchAllowMD5Algorithm(true);
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 
             //read the whole stream:
@@ -1225,6 +1229,8 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
                     "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
                     "Digest algorithm http://www.w3.org/2001/04/xmldsig-more#md5 does not meet policy");
+        } finally {
+            switchAllowMD5Algorithm(false);
         }
     }
 

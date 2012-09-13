@@ -19,12 +19,15 @@
 package org.apache.ws.security.stax.test;
 
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
+import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -39,9 +42,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -308,6 +309,219 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The message has expired");
             }
+        }
+    }
+
+    @Test
+    public void testMaximumAllowedReferencesPerManifest() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://www.w3.org/1999/XMLSchema}complexType;{Element}{http://www.w3.org/1999/XMLSchema}simpleType;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
+        securityProperties.setDisableSchemaValidation(true);
+
+        try {
+            Document document = doInboundSecurity(securityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
+                    "header (43 references are contained in the Manifest, maximum 30 are allowed. You can raise the " +
+                    "maximum via the \"MaximumAllowedReferencesPerManifest\" property in the configuration.)");
+        }
+    }
+
+    @Test
+    public void testMaximumAllowedTransformsPerReference() throws Exception {
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
+        securityProperties.setDisableSchemaValidation(true);
+
+        int oldval = 0;
+        try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            oldval = changeValueOfMaximumAllowedTransformsPerReference(0);
+            Document document = doInboundSecurity(securityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
+                    "header (1 transforms are contained in the Reference, maximum 0 are allowed. You can raise the " +
+                    "maximum via the \"MaximumAllowedTransformsPerReference\" property in the configuration.)");
+        } finally {
+            changeValueOfMaximumAllowedTransformsPerReference(oldval);
+        }
+    }
+
+
+    @Test
+    public void testDisallowMD5Algorithm() throws Exception {
+        WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
+        outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outboundSecurityProperties.setEncryptionUser("receiver");
+        outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outboundSecurityProperties.setSignatureUser("transmitter");
+        outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outboundSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inboundsecurityProperties = new WSSSecurityProperties();
+        inboundsecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inboundsecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
+
+        try {
+            Document document = doInboundSecurity(inboundsecurityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getMessage(), "org.apache.xml.security.stax.ext.XMLSecurityException: " +
+                    "An error was discovered processing the <wsse:Security> header (The use of MD5 algorithm is " +
+                    "strongly discouraged. Nonetheless can it be enabled via the \"AllowMD5Algorithm\" property in the configuration.)");
+        }
+    }
+
+
+    @Test
+    public void testAllowMD5Algorithm() throws Exception {
+        WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
+        outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outboundSecurityProperties.setEncryptionUser("receiver");
+        outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outboundSecurityProperties.setSignatureUser("transmitter");
+        outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outboundSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inboundsecurityProperties = new WSSSecurityProperties();
+        inboundsecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inboundsecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
+
+        try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            switchAllowMD5Algorithm(true);
+            Document document = doInboundSecurity(inboundsecurityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+        } finally {
+            switchAllowMD5Algorithm(false);
+        }
+    }
+
+    @Test
+    public void testMaximumAllowedXMLStructureDepth() throws Exception {
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
+        securityProperties.setDisableSchemaValidation(true);
+
+        int oldval = 0;
+        try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
+            Document document = doInboundSecurity(securityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
+                    "header (Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
+                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.)");
+        } finally {
+            changeValueOfMaximumAllowedXMLStructureDepth(oldval);
+        }
+    }
+
+    @Test
+    public void testMaximumAllowedXMLStructureDepthInEncryptedContent() throws Exception {
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
+        securityProperties.setDisableSchemaValidation(true);
+
+        int oldval = 0;
+        try {
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
+            Document document = doInboundSecurity(securityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
+                    "header (Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
+                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.)");
+        } finally {
+            changeValueOfMaximumAllowedXMLStructureDepth(oldval);
         }
     }
 }
