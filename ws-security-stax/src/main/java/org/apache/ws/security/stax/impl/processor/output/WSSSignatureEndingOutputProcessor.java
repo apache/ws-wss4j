@@ -69,8 +69,16 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
     }
 
     @Override
-    protected SignedInfoProcessor newSignedInfoProcessor(SignatureAlgorithm signatureAlgorithm, OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
-        this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm);
+    protected SignedInfoProcessor newSignedInfoProcessor(
+            SignatureAlgorithm signatureAlgorithm, XMLSecStartElement xmlSecStartElement,
+            OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+
+        //we have to search for the SecurityHeaderElement for InclusiveNamespaces (same behavior as in wss-dom):
+        while (!WSSConstants.TAG_wsse_Security.equals(xmlSecStartElement.getName())) {
+            xmlSecStartElement = xmlSecStartElement.getParentXMLSecStartElement();
+        }
+
+        this.signedInfoProcessor = new SignedInfoProcessor(signatureAlgorithm, xmlSecStartElement);
         this.signedInfoProcessor.setXMLSecurityProperties(getSecurityProperties());
         this.signedInfoProcessor.setAction(getAction());
         this.signedInfoProcessor.addAfterProcessor(WSSSignatureEndingOutputProcessor.class.getName());
@@ -170,6 +178,14 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transform));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
+
+                    if (getSecurityProperties().isAddExcC14NInclusivePrefixes()) {
+                        attributes = new ArrayList<XMLSecAttribute>(1);
+                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, signaturePartDef.getInclusiveNamespacesPrefixes()));
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces, true, attributes);
+                        createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                    }
+
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
                 }
             }

@@ -32,7 +32,6 @@ import org.apache.xml.security.stax.impl.SignaturePartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractSignatureOutputProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
@@ -40,9 +39,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author $Author: coheigea $
@@ -80,6 +77,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     try {
                         SignaturePartDef signaturePartDef = new SignaturePartDef();
                         signaturePartDef.setTransforms(securePart.getTransforms());
+                        signaturePartDef.setExcludeVisibleC14Nprefixes(true);
                         String digestMethod = securePart.getDigestMethod();
                         if (digestMethod == null) {
                             digestMethod = getSecurityProperties().getSignatureDigestAlgorithm();
@@ -112,7 +110,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         }
 
                         getSignaturePartDefList().add(signaturePartDef);
-                        internalSignatureOutputProcessor = new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement.getName());
+                        internalSignatureOutputProcessor = new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement);
                         internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                         internalSignatureOutputProcessor.setAction(getAction());
                         internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
@@ -180,9 +178,12 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
     }
 
     @Override
-    protected Transformer buildTransformerChain(OutputStream outputStream, String[] transforms)
+    protected Transformer buildTransformerChain(
+            OutputStream outputStream, SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement)
             throws XMLSecurityException, NoSuchMethodException, InstantiationException,
             IllegalAccessException, InvocationTargetException {
+
+        String[] transforms = signaturePartDef.getTransforms();
 
         if (transforms == null || transforms.length == 0) {
             Transformer transformer = new TransformIdentity();
@@ -190,21 +191,43 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             return transformer;
         }
 
-        List<String> inclusiveNamespacesPrefixes = new ArrayList<String>();
+        List<String> inclusiveNamespacePrefixes = null;
         if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
-            inclusiveNamespacesPrefixes.add("#default");
+            inclusiveNamespacePrefixes = new ArrayList<String>();
+            inclusiveNamespacePrefixes.add("#default");
         }
 
         Transformer parentTransformer = null;
         for (int i = transforms.length - 1; i >= 0; i--) {
             String transform = transforms[i];
 
+            if (inclusiveNamespacePrefixes == null &&
+                    getSecurityProperties().isAddExcC14NInclusivePrefixes() &&
+                    XMLSecurityConstants.NS_C14N_EXCL.equals(transform)) {
+
+                Set<String> prefixSet = XMLSecurityUtils.getExcC14NInclusiveNamespacePrefixes(xmlSecStartElement, signaturePartDef.isExcludeVisibleC14Nprefixes());
+                inclusiveNamespacePrefixes = new ArrayList<String>(prefixSet.size());
+
+                StringBuilder prefixes = new StringBuilder();
+                for (Iterator<String> iterator = prefixSet.iterator(); iterator.hasNext(); ) {
+                    String prefix = iterator.next();
+                    if (!inclusiveNamespacePrefixes.contains(prefix)) {
+                        inclusiveNamespacePrefixes.add(prefix);
+                    }
+                    if (prefixes.length() != 0) {
+                        prefixes.append(" ");
+                    }
+                    prefixes.append(prefix);
+                }
+                signaturePartDef.setInclusiveNamespacesPrefixes(prefixes.toString());
+            }
+
             if (parentTransformer != null) {
                 parentTransformer = XMLSecurityUtils.getTransformer(
                         parentTransformer, null, transform, XMLSecurityConstants.DIRECTION.OUT);
             } else {
                 parentTransformer = XMLSecurityUtils.getTransformer(
-                        inclusiveNamespacesPrefixes, outputStream, transform, XMLSecurityConstants.DIRECTION.OUT);
+                        inclusiveNamespacePrefixes, outputStream, transform, XMLSecurityConstants.DIRECTION.OUT);
             }
         }
         return parentTransformer;
@@ -212,8 +235,8 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {
 
-        public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, QName startElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
-            super(signaturePartDef, startElement);
+        public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+            super(signaturePartDef, xmlSecStartElement);
             this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class.getName());
         }
     }

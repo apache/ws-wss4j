@@ -42,6 +42,10 @@ import org.apache.xml.security.stax.ext.XMLSecurityProperties;
  */
 public class WSSSecurityProperties extends XMLSecurityProperties {
 
+    public WSSSecurityProperties() {
+        setAddExcC14NInclusivePrefixes(true);
+    }
+
     private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
 
     /**
