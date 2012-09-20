@@ -34,7 +34,8 @@
     <name>Streaming WS Security CXF Integration</name>
 
     <properties>
-        <cxf.version>2.5.2</cxf.version>
+        <cxf.version>2.6.2</cxf.version>
+        <spring.version>3.0.7.RELEASE</spring.version>
     </properties>
 
     <dependencies>
@@ -101,6 +102,12 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>serializer</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
