@@ -105,6 +105,7 @@ public class BinarySecurityTokenProcessor implements Processor {
             } else if (certs != null && certs[0] != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, certs[0].getSubjectX500Principal());
             }
+            result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
         
         wsDocInfo.addResult(result);
