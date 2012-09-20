@@ -591,6 +591,9 @@ public abstract class WSHandler {
         
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
         reqData.setEncDigestAlgorithm(digestAlgo);
+
+        String mgfAlgo = getString(WSHandlerConstants.ENC_MGF_ALGO, mc);
+        reqData.setEncMGFAlgorithm(mgfAlgo);
         
         String encSymEncKey = getString(WSHandlerConstants.ENC_SYM_ENC_KEY, mc);
         if (encSymEncKey != null) {

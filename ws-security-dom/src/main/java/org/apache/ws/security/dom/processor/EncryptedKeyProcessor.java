@@ -107,17 +107,38 @@ public class EncryptedKeyProcessor implements Processor {
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
             OAEPParameterSpec oaepParameterSpec = null;
-            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)) {
+            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)
+                    || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
                 // Get the DigestMethod if it exists
                 String digestAlgorithm = getDigestAlgorithm(elem);
                 String jceDigestAlgorithm = "SHA-1";
                 if (digestAlgorithm != null && !"".equals(digestAlgorithm)) {
                     jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
                 }
+
+                String mgfAlgorithm = getMGFAlgorithm(elem);
+                MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
+                if (mgfAlgorithm != null) {
+                    if (WSConstants.MGF_SHA224.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-224");
+                    } else if (WSConstants.MGF_SHA256.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-256");
+                    } else if (WSConstants.MGF_SHA384.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-384");
+                    } else if (WSConstants.MGF_SHA512.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-512");
+                    }
+                }
+
+                PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
+                byte[] pSourceBytes = getPSource(elem);
+                if (pSourceBytes != null) {
+                    pSource = new PSource.PSpecified(pSourceBytes);
+                }
                 
                 oaepParameterSpec = 
                     new OAEPParameterSpec(
-                        jceDigestAlgorithm, "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                        jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource
                     );
             }
             if (oaepParameterSpec == null) {
@@ -229,6 +250,36 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityUtil.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
             if (digestElement != null) {
                 return digestElement.getAttribute("Algorithm");
+            }
+        }
+        return null;
+    }
+
+    private static String getMGFAlgorithm(Node encBodyData) throws WSSecurityException {
+        Element tmpE =
+                WSSecurityUtil.getDirectChildElement(
+                        encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+                );
+        if (tmpE != null) {
+            Element mgfElement =
+                    WSSecurityUtil.getDirectChildElement(tmpE, "MGF", WSConstants.ENC11_NS);
+            if (mgfElement != null) {
+                return mgfElement.getAttribute("Algorithm");
+            }
+        }
+        return null;
+    }
+
+    private static byte[] getPSource(Node encBodyData) throws WSSecurityException {
+        Element tmpE =
+                WSSecurityUtil.getDirectChildElement(
+                        encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+                );
+        if (tmpE != null) {
+            Element pSourceElement =
+                    WSSecurityUtil.getDirectChildElement(tmpE, "OAEPparams", WSConstants.ENC_NS);
+            if (pSourceElement != null) {
+                return getDecodedBase64EncodedData(pSourceElement);
             }
         }
         return null;

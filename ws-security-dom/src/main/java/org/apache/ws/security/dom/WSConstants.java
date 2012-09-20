@@ -57,6 +57,7 @@ public final class WSConstants {
 
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
+    public static final String ENC11_NS = "http://www.w3.org/2009/xmlenc11#";
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
     
@@ -100,6 +101,8 @@ public final class WSConstants {
         "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
     public static final String KEYTRANSPORT_RSAOEP = 
         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
+    public static final String KEYTRANSPORT_RSAOEP_XENC11 =
+            "http://www.w3.org/2009/xmlenc11#rsa-oaep";
     public static final String TRIPLE_DES = 
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
     public static final String AES_128 = 
@@ -124,6 +127,10 @@ public final class WSConstants {
         "http://www.w3.org/2000/09/xmldsig#sha1";
     public static final String SHA256 =
         "http://www.w3.org/2001/04/xmlenc#sha256";
+    public static final String SHA384 =
+        "http://www.w3.org/2001/04/xmldsig-more#sha384";
+    public static final String SHA512 =
+            "http://www.w3.org/2001/04/xmlenc#sha512";
     public static final String HMAC_SHA1 = 
         "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
     public static final String HMAC_SHA256 = 
@@ -134,7 +141,13 @@ public final class WSConstants {
         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
     public static final String HMAC_MD5 = 
         "http://www.w3.org/2001/04/xmldsig-more#hmac-md5";
-    
+
+    public static final String MGF_SHA1 = "http://www.w3.org/2009/xmlenc11#mgf1sha1";
+    public static final String MGF_SHA224 = "http://www.w3.org/2009/xmlenc11#mgf1sha224";
+    public static final String MGF_SHA256 = "http://www.w3.org/2009/xmlenc11#mgf1sha256";
+    public static final String MGF_SHA384 = "http://www.w3.org/2009/xmlenc11#mgf1sha384";
+    public static final String MGF_SHA512 = "http://www.w3.org/2009/xmlenc11#mgf1sha512";
+
     public static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     /**
      * WS-Trust 1.3 namespace
@@ -208,6 +221,7 @@ public final class WSConstants {
     public static final String DEFAULT_SOAP_PREFIX = "soapenv";
     public static final String SIG_PREFIX = "ds";
     public static final String ENC_PREFIX = "xenc";
+    public static final String ENC11_PREFIX = "xenc11";
     public static final String C14N_EXCL_OMIT_COMMENTS_PREFIX = "ec";
     
     

@@ -1002,6 +1002,12 @@ public final class WSSecurityUtil {
             return 24;
         } else if (algorithm.equals(WSConstants.AES_256)) {
             return 32;
+        } else if (algorithm.equals(WSConstants.AES_128_GCM)) {
+            return 16;
+        } else if (algorithm.equals(WSConstants.AES_192_GCM)) {
+            return 24;
+        } else if (algorithm.equals(WSConstants.AES_256_GCM)) {
+            return 32;
         } else if (WSConstants.HMAC_SHA1.equals(algorithm)) {
             return 20;
         } else if (WSConstants.HMAC_SHA256.equals(algorithm)) {

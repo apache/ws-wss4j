@@ -287,6 +287,7 @@ public abstract class AbstractTestBase {
         ignoredRules.add(BSPRule.R5407);
         ignoredRules.add(BSPRule.R5417);
         ignoredRules.add(BSPRule.R3063);
+        ignoredRules.add(BSPRule.R5621);
         requestData.setIgnoredBSPRules(ignoredRules);
 
         wss4JHandler.doReceiver(messageContext, requestData, false);
@@ -326,6 +327,8 @@ public abstract class AbstractTestBase {
                             return WSSConstants.NS_WSU10;
                         } else if (WSSConstants.PREFIX_XENC.equals(prefix)) {
                             return WSSConstants.NS_XMLENC;
+                        } else if (WSSConstants.PREFIX_XENC11.equals(prefix)) {
+                            return WSSConstants.NS_XMLENC11;
                         } else {
                             return null;
                         }
@@ -342,6 +345,8 @@ public abstract class AbstractTestBase {
                             return WSSConstants.PREFIX_WSU;
                         } else if (WSSConstants.NS_XMLENC.equals(namespaceURI)) {
                             return WSSConstants.PREFIX_XENC;
+                        } else if (WSSConstants.NS_XMLENC11.equals(namespaceURI)) {
+                            return WSSConstants.PREFIX_XENC11;
                         } else {
                             return null;
                         }

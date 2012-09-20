@@ -44,7 +44,20 @@ public class WSSConstants extends XMLSecurityConstants {
 
     static {
         try {
-            setJaxbContext(JAXBContext.newInstance("org.apache.ws.security.binding.wss10:org.apache.ws.security.binding.wss11:org.apache.ws.security.binding.wsu10:org.apache.ws.security.binding.wssc13:org.apache.ws.security.binding.wssc200502:org.apache.xml.security.binding.xmlenc:org.apache.xml.security.binding.xmldsig:org.apache.xml.security.binding.xmldsig11:org.apache.xml.security.binding.excc14n"));
+            setJaxbContext(
+                    JAXBContext.newInstance(
+                            "org.apache.ws.security.binding.wss10:" +
+                                    "org.apache.ws.security.binding.wss11:" +
+                                    "org.apache.ws.security.binding.wsu10:" +
+                                    "org.apache.ws.security.binding.wssc13:" +
+                                    "org.apache.ws.security.binding.wssc200502:" +
+                                    "org.apache.xml.security.binding.xmlenc:" +
+                                    "org.apache.xml.security.binding.xmlenc11:" +
+                                    "org.apache.xml.security.binding.xmldsig:" +
+                                    "org.apache.xml.security.binding.xmldsig11:" +
+                                    "org.apache.xml.security.binding.excc14n"
+                    )
+            );
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setResourceResolver(new LSResourceResolver() {
                 @Override
@@ -80,6 +93,7 @@ public class WSSConstants extends XMLSecurityConstants {
                             new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/exc-c14n.xsd")),
                             new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig-core-schema.xsd")),
                             new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xenc-schema.xsd")),
+                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xenc-schema-11.xsd")),
                             new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig11-schema.xsd")),
                             new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd")),
                             new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd")),

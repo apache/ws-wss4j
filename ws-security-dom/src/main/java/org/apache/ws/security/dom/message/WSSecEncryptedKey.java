@@ -106,6 +106,12 @@ public class WSSecEncryptedKey extends WSSecBase {
     private String digestAlgo = null;
 
     /**
+     * MGF Algorithm to be used with RSA-OAEP. The default is MGF-SHA-1 (which is not
+     * written out unless it is explicitly configured).
+     */
+    private String mgfAlgo = null;
+
+    /**
      * xenc:EncryptedKey element
      */
     protected Element encryptedKeyElement = null;
@@ -235,15 +241,29 @@ public class WSSecEncryptedKey extends WSSecBase {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
-            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)) {
+            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)
+                    || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo)) {
                 String jceDigestAlgorithm = "SHA-1";
                 if (digestAlgo != null) {
                     jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgo);
                 }
+
+                MGF1ParameterSpec mgf1ParameterSpec = new MGF1ParameterSpec("SHA-1");
+                if (mgfAlgo != null) {
+                    if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
+                    } if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-256");
+                    } else if (WSConstants.MGF_SHA384.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-384");
+                    } else if (WSConstants.MGF_SHA512.equals(mgfAlgo)) {
+                        mgf1ParameterSpec = new MGF1ParameterSpec("SHA-512");
+                    }
+                }
                 
                 oaepParameterSpec = 
                     new OAEPParameterSpec(
-                        jceDigestAlgorithm, "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                        jceDigestAlgorithm, "MGF1", mgf1ParameterSpec, PSource.PSpecified.DEFAULT
                     );
             }
             if (oaepParameterSpec == null) {
@@ -456,6 +476,12 @@ public class WSSecEncryptedKey extends WSSecBase {
                 XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_DIGESTMETHOD);
             digestElement.setAttributeNS(null, "Algorithm", digestAlgo);
             encryptionMethod.appendChild(digestElement);
+        }
+        if (mgfAlgo != null) {
+            Element mgfElement =
+                doc.createElementNS(WSConstants.ENC11_NS, WSConstants.ENC11_PREFIX + ":MGF");
+            mgfElement.setAttributeNS(null, "Algorithm", mgfAlgo);
+            encryptionMethod.appendChild(mgfElement);
         }
         
         encryptedKey.appendChild(encryptionMethod);
@@ -690,7 +716,25 @@ public class WSSecEncryptedKey extends WSSecBase {
     public String getDigestAlgorithm() {
         return digestAlgo;
     }
-    
+
+    /**
+     * Set the MGF algorithm to use with the RSA-OAEP key transport algorithm. The
+     * default is MGF-SHA-1.
+     *
+     * @param mgfAlgorithm the MGF algorithm to use with the RSA-OAEP key transport algorithm
+     */
+    public void setMGFAlgorithm(String mgfAlgorithm) {
+        this.mgfAlgo = mgfAlgorithm;
+    }
+
+    /**
+     * Get the MGF algorithm to use with the RSA-OAEP key transport algorithm. The
+     * default is MGF-SHA-1.
+     */
+    public String getMGFAlgorithm() {
+        return mgfAlgo;
+    }
+
     /**
      * @return The symmetric key
      */

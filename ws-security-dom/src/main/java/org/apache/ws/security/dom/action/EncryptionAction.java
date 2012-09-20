@@ -67,6 +67,10 @@ public class EncryptionAction implements Action {
         if (reqData.getEncDigestAlgorithm() != null) {
             wsEncrypt.setDigestAlgorithm(reqData.getEncDigestAlgorithm());
         }
+
+        if (reqData.getEncMGFAlgorithm() != null) {
+            wsEncrypt.setMGFAlgorithm(reqData.getEncMGFAlgorithm());
+        }
         
         wsEncrypt.setUserInfo(reqData.getEncUser());
         wsEncrypt.setUseThisCert(reqData.getEncCert());

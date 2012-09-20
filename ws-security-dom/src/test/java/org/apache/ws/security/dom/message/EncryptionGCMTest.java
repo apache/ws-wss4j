@@ -21,6 +21,7 @@ package org.apache.ws.security.dom.message;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSSConfig;
@@ -32,7 +33,11 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.util.DOM2Writer;
 import org.apache.ws.security.common.util.XMLUtils;
+import org.apache.ws.security.dom.handler.RequestData;
 import org.w3c.dom.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests using GCM. See:
@@ -107,11 +112,38 @@ public class EncryptionGCMTest extends org.junit.Assert {
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
 
+    @org.junit.Test
+    public void testAES192GCM_RSAOAEP_SHA256_MGFSHA256() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_192_GCM);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP_XENC11);
+        builder.setDigestAlgorithm(WSConstants.SHA256);
+        builder.setMGFAlgorithm(WSConstants.MGF_SHA256);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+
+        String outputString =
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message:");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.indexOf("http://www.w3.org/2009/xmlenc11#rsa-oaep") > 0);
+        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") > 0);
+        assertTrue(outputString.indexOf("http://www.w3.org/2009/xmlenc11#aes192-gcm") > 0);
+        assertTrue(outputString.indexOf("http://www.w3.org/2009/xmlenc11#mgf1sha256") > 0);
+        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
+    }
+
     /**
      * Verifies the soap envelope
      * <p/>
      * 
-     * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
@@ -120,8 +152,14 @@ public class EncryptionGCMTest extends org.junit.Assert {
         CallbackHandler handler,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
-        final java.util.List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, handler, null, crypto);
+        RequestData requestData = new RequestData();
+        List<BSPRule> bspRules = new ArrayList<BSPRule>();
+        bspRules.add(BSPRule.R5621);
+        requestData.setIgnoredBSPRules(bspRules);
+        requestData.setCallbackHandler(handler);
+        requestData.setDecCrypto(crypto);
+        final java.util.List<WSSecurityEngineResult> results =
+            secEngine.processSecurityHeader(doc, null, requestData);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {

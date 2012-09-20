@@ -65,6 +65,7 @@ public class RequestData {
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
     private String encryptionDigestAlgorithm = null;
+    private String encryptionMGFAlgorithm = null;
     private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
     private int encKeyId = 0;
     private String encSymmAlgo = null;
@@ -246,6 +247,14 @@ public class RequestData {
 
     public void setEncDigestAlgorithm(String encDigestAlgorithm) {
         this.encryptionDigestAlgorithm = encDigestAlgorithm;
+    }
+
+    public String getEncMGFAlgorithm() {
+        return encryptionMGFAlgorithm;
+    }
+
+    public void setEncMGFAlgorithm(String encMGFAlgorithm) {
+        this.encryptionMGFAlgorithm = encMGFAlgorithm;
     }
 
     public List<WSEncryptionPart> getSignatureParts() {

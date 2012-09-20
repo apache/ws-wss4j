@@ -678,6 +678,19 @@ public final class WSHandlerConstants {
     public static final String ENC_DIGEST_ALGO = "encryptionDigestAlgorithm";
 
     /**
+     * Defines which encryption mgf algorithm to use with the RSA OAEP Key Transport
+     * algorithm for encryption. The default is mgfsha1.
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(
+     *    WSHandlerConstants.ENC_MGF_ALGO, "http://www.w3.org/2009/xmlenc11#mgf1sha256"
+     * );
+     * </pre>
+     */
+    public static final String ENC_MGF_ALGO = "encryptionMGFAlgorithm";
+
+    /**
      * Time-To-Live is the time difference between creation and expiry time in
      * seconds in the WSS Timestamp. After this time the SOAP request is
      * invalid (at least the security data shall be treated this way).

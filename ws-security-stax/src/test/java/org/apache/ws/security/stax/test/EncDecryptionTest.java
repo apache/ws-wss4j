@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.test;
 
+import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
@@ -27,6 +28,7 @@ import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurit
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.utils.Base64;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -1069,6 +1071,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }*/
+
     @Test
     public void testEncDecryptionKeyIdentifierX509KeyOutbound() throws Exception {
 
@@ -1509,6 +1512,466 @@ public class EncDecryptionTest extends AbstractTestBase {
             org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
             org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
+        }
+    }
+
+    /**
+     * rsa-oaep-mgf1p, Digest:SHA256, MGF:SHA1, PSource: None
+     */
+    @Test
+    public void testKeyWrappingRSAOAEPMGF1AESGCM128Outbound() throws Exception {
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes128-gcm");
+            securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes128-gcm']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeType() == Node.TEXT_NODE) {
+                    Assert.assertEquals(child.getTextContent().trim(), "");
+                } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    Assert.assertEquals(child, nodeList.item(0));
+                } else {
+                    Assert.fail("Unexpected Node encountered");
+                }
+            }
+        }
+
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testKeyWrappingRSAOAEPMGF1AESGCM128Inbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2009/xmlenc11#aes128-gcm");
+            properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes128-gcm']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+        //test streaming decryption
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
+
+    /**
+    * rsa-oaep-mgf1p, Digest:SHA256, MGF:SHA1, PSource: None
+    */
+    @Test
+    public void testKeyWrappingRSAOAEPAESGCM192SHA256Outbound() throws Exception {
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes192-gcm");
+            securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+            securityProperties.setEncryptionKeyTransportDigestAlgorithm("http://www.w3.org/2001/04/xmlenc#sha256");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#sha256']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeType() == Node.TEXT_NODE) {
+                    Assert.assertEquals(child.getTextContent().trim(), "");
+                } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    Assert.assertEquals(child, nodeList.item(0));
+                } else {
+                    Assert.fail("Unexpected Node encountered");
+                }
+            }
+        }
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testKeyWrappingRSAOAEPAESGMC192SHA256Inbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2009/xmlenc11#aes192-gcm");
+            properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+            properties.put(WSHandlerConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#sha256']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+        //test streaming decryption
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.addIgnoreBSPRule(BSPRule.R5620);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
+
+    /**
+     * rsa-oaep, Digest:SHA384, MGF:SHA1, PSource: None
+     */
+    @Test
+    public void testKeyWrappingRSAOAEPAES192GCMSHA384MGF1sha384Outbound() throws Exception {
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes192-gcm");
+            securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2009/xmlenc11#rsa-oaep");
+            securityProperties.setEncryptionKeyTransportDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#sha384");
+            securityProperties.setEncryptionKeyTransportMGFAlgorithm("http://www.w3.org/2009/xmlenc11#mgf1sha384");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc11:MGF[@Algorithm='http://www.w3.org/2009/xmlenc11#mgf1sha384']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeType() == Node.TEXT_NODE) {
+                    Assert.assertEquals(child.getTextContent().trim(), "");
+                } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    Assert.assertEquals(child, nodeList.item(0));
+                } else {
+                    Assert.fail("Unexpected Node encountered");
+                }
+            }
+        }
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testKeyWrappingRSAOAEPAES192GCMSHA384MGF1sha1Inbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2009/xmlenc11#aes192-gcm");
+            properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2009/xmlenc11#rsa-oaep");
+            properties.put(WSHandlerConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmldsig-more#sha384");
+            properties.put(WSHandlerConstants.ENC_MGF_ALGO, "http://www.w3.org/2009/xmlenc11#mgf1sha1");
+
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+        //test streaming decryption
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.addIgnoreBSPRule(BSPRule.R5620);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5621);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
+
+    /**
+     * rsa-oaep, Digest:SHA512, MGF:SHA1, PSource: Specified 8 bytes
+     */
+
+    @Test
+    public void testKeyWrappingRSAOAEPAESGCM192SHA384MGF1SHA384PSourceOutbound() throws Exception {
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes192-gcm");
+            securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2009/xmlenc11#rsa-oaep");
+            securityProperties.setEncryptionKeyTransportDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#sha384");
+            securityProperties.setEncryptionKeyTransportMGFAlgorithm("http://www.w3.org/2009/xmlenc11#mgf1sha384");
+            securityProperties.setEncryptionKeyTransportOAEPParams(Base64.decode("ZHVtbXkxMjM=".getBytes("UTF-8")));
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            baos = doOutboundSecurity(securityProperties, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc11:MGF[@Algorithm='http://www.w3.org/2009/xmlenc11#mgf1sha384']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeType() == Node.TEXT_NODE) {
+                    Assert.assertEquals(child.getTextContent().trim(), "");
+                } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    Assert.assertEquals(child, nodeList.item(0));
+                } else {
+                    Assert.fail("Unexpected Node encountered");
+                }
+            }
+        }
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test(enabled = false) //WSS4J does not support OAEPParams atm
+    public void testKeyWrappingRSAOAEPAESGCM192SHA384MGF1SHA384PSourceInbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2009/xmlenc11#aes192-gcm");
+            properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2009/xmlenc11#rsa-oaep");
+            properties.put(WSHandlerConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmldsig-more#sha384");
+            properties.put(WSHandlerConstants.ENC_MGF_ALGO, "http://www.w3.org/2009/xmlenc11#mgf1sha384");
+            //properties.put(WSHandlerConstants.ENC_OAEP_PARAMS, Base64.decode("ZHVtbXkxMjM=".getBytes("UTF-8")));
+
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#rsa-oaep']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:DigestMethod[@Algorithm='http://www.w3.org/2001/04/xmldsig-more#sha384']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod/dsig:MGF[@Algorithm='http://www.w3.org/2009/xmlenc11#mgf1sha384']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2009/xmlenc11#aes192-gcm']");
+            node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+        //test streaming decryption
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.addIgnoreBSPRule(BSPRule.R5620);
+            securityProperties.addIgnoreBSPRule(BSPRule.R5621);
+
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
 }
