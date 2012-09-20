@@ -42,7 +42,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     /**
      * 
      */
-    private static final long serialVersionUID = 458604104267263765L;
+    private static final long serialVersionUID = 8877354445092724300L;
 
     /**
      * Tag denoting the SAML Assertion found, if applicable.
@@ -188,6 +188,13 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
      * The value under this tag is of type java.security.Principal.
      */
     public static final String TAG_PRINCIPAL = "principal";
+    
+    /**
+     * Tag denoting the security subject found, if applicable.
+     *
+     * The value under this tag is of type javax.security.auth.Subject.
+     */
+    public static final String TAG_SUBJECT = "subject";
     
     /**
      * Tag denoting references to a List of Data ref URIs.

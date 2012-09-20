@@ -209,6 +209,7 @@ public class KerberosTokenValidator implements Validator {
             );
         }
         credential.setPrincipal(principal);
+        credential.setSubject(subject);
         
         // Try to extract the session key from the token if a KerberosTokenDecoder implementation is
         // available

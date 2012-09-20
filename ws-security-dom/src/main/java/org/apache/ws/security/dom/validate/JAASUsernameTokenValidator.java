@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.validate;
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -102,7 +103,8 @@ public class JAASUsernameTokenValidator implements Validator {
             CallbackHandler handler = getCallbackHandler(user, password);  
             LoginContext ctx = new LoginContext(getContextName(), handler);  
             ctx.login();
-            ctx.getSubject();
+            Subject subject = ctx.getSubject();
+            credential.setSubject(subject);
 
         } catch (LoginException ex) {
             log.info("Authentication failed", ex);

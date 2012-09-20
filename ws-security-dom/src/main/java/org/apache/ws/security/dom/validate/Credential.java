@@ -23,6 +23,8 @@ import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.Subject;
+
 import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.dom.message.token.BinarySecurity;
 import org.apache.ws.security.dom.message.token.SecurityContextToken;
@@ -46,6 +48,7 @@ public class Credential {
     private SecurityContextToken securityContextToken;
     private Principal principal;
     private byte[] secretKey;
+    private Subject subject;
     
     /**
      * Set a SecurityContextToken to be validated
@@ -206,6 +209,22 @@ public class Credential {
      */
     public Principal getPrincipal() {
         return principal;
+    }
+    
+    /**
+     * Set the subject that may result from the Validation process
+     * @param subject the subject that may result from the Validation process
+     */
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+    
+    /**
+     * Get the subject that may result from the Validation process
+     * @return the subject that may result from the Validation process
+     */
+    public Subject getSubject() {
+        return subject;
     }
     
 }

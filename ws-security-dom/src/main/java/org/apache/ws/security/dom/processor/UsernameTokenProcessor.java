@@ -97,6 +97,7 @@ public class UsernameTokenProcessor implements Processor {
                 principal.setPasswordType(token.getPasswordType());
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, principal);
             }
+            result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
         
         wsDocInfo.addTokenElement(elem);
