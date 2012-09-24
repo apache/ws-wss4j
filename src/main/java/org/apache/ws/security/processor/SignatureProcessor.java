@@ -691,11 +691,13 @@ public class SignatureProcessor implements Processor {
         }
         
         // Must have InclusiveNamespaces with a PrefixList
+        /*
         parameterSpec = 
             xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
         if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "R5406");
         }
+        */
         
         // Check References
         for (Object refObject : xmlSignature.getSignedInfo().getReferences()) {
