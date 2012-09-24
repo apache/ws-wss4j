@@ -30,10 +30,7 @@ import org.apache.ws.security.stax.ext.WSSUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Processor buffers encrypted XMLEvents and forwards them when final is called
@@ -74,15 +71,15 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
 
     @Override
     public void flushBufferAndCallbackAfterTokenID(OutputProcessorChain outputProcessorChain,
-                                                   Iterator<XMLSecEvent> xmlSecEventIterator)
+                                                   Deque<XMLSecEvent> xmlSecEventDeque)
             throws XMLStreamException, XMLSecurityException {
 
         final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
 
         //loop until we reach our security header
         loop:
-        while (xmlSecEventIterator.hasNext()) {
-            XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
+        while (!xmlSecEventDeque.isEmpty()) {
+            XMLSecEvent xmlSecEvent = xmlSecEventDeque.pop();
             switch (xmlSecEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
                     XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
@@ -98,6 +95,6 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
             outputProcessorChain.reset();
             outputProcessorChain.processEvent(xmlSecEvent);
         }
-        super.flushBufferAndCallbackAfterTokenID(outputProcessorChain, xmlSecEventIterator);
+        super.flushBufferAndCallbackAfterTokenID(outputProcessorChain, xmlSecEventDeque);
     }
 }

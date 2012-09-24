@@ -236,7 +236,6 @@
                     </systemPropertyVariables>
                     <!--<debugForkedProcess>true</debugForkedProcess>-->
                     <excludes>
-                        <exclude>**/ProfilingTest.java</exclude>
                         <exclude>**/PerformanceMemoryTest.java</exclude>
                         <exclude>**/PerformanceTimingTest.java</exclude>
                     </excludes>
