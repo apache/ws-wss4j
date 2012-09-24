@@ -19,37 +19,19 @@
 
 package org.apache.ws.security.processor;
 
-import org.apache.ws.security.PublicKeyPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.cache.ReplayCache;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.DOMCallbackLookup;
-import org.apache.ws.security.message.CallbackLookup;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.message.token.Timestamp;
-import org.apache.ws.security.str.STRParser;
-import org.apache.ws.security.str.STRParser.REFERENCE_TYPE;
-import org.apache.ws.security.str.SignatureSTRParser;
-import org.apache.ws.security.transform.STRTransform;
-import org.apache.ws.security.transform.STRTransformUtil;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.Validator;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
+import java.security.Key;
+import java.security.NoSuchProviderException;
+import java.security.Principal;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
@@ -67,22 +49,37 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
-import java.security.Key;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.Principal;
-import java.security.cert.X509Certificate;
-import java.security.spec.AlgorithmParameterSpec;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.ws.security.PublicKeyPrincipal;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.cache.ReplayCache;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.message.CallbackLookup;
+import org.apache.ws.security.message.DOMCallbackLookup;
+import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.message.token.Timestamp;
+import org.apache.ws.security.str.STRParser;
+import org.apache.ws.security.str.STRParser.REFERENCE_TYPE;
+import org.apache.ws.security.str.SignatureSTRParser;
+import org.apache.ws.security.transform.STRTransform;
+import org.apache.ws.security.transform.STRTransformUtil;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.ws.security.validate.Credential;
+import org.apache.ws.security.validate.Validator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class SignatureProcessor implements Processor {
     private static final org.apache.commons.logging.Log LOG = 
@@ -724,12 +721,12 @@ public class SignatureProcessor implements Processor {
                     throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "R5412");
                 }
                 
-                if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)) {
+                /*if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)) {
                     parameterSpec = transform.getParameterSpec();
                     if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
                         throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "R5407");
                     }
-                } /*else if (STRTransform.TRANSFORM_URI.equals(algorithm)) {
+                } else if (STRTransform.TRANSFORM_URI.equals(algorithm)) {
                     parameterSpec = transform.getParameterSpec();
                     if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
                         bspEnforcer.handleBSPRule(BSPRule.R5413);
