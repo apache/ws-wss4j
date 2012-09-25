@@ -69,12 +69,12 @@
     </licenses>
     <scm>
         <connection>
-            scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/trunk/
+            scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes/
         </connection>
         <developerConnection>
-            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/trunk/
+            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes/
         </developerConnection>
-        <url>http://svn.apache.org/viewvc/webservices/wss4j/trunk</url>
+        <url>http://svn.apache.org/viewvc/webservices/wss4j/branches/1_6_x-fixes</url>
     </scm>
     <organization>
         <name>The Apache Software Foundation</name>
@@ -529,11 +529,9 @@
     
     <distributionManagement>
         <repository>
-            <id>apache-repo</id>
-            <name>Maven Central Repository</name>
-            <url>
-                scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository
-            </url>
+            <id>apache.releases.https</id>
+            <name>Apache Release Distribution Repository</name>
+            <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
             <id>apache.snapshots.https</id>
