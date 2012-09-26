@@ -156,6 +156,18 @@
                     <attach>true</attach>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <preparationGoals>clean install</preparationGoals>
+                    <goals>deploy</goals>
+                    <arguments>-Papache-release</arguments>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
