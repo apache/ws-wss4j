@@ -115,14 +115,18 @@
         <developerConnection>
             scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/branches/1_5_x-fixes/
         </developerConnection>
-        <url>http://svn.apache.org/viewvc/webservices/wss4j/branches/1_5_x-fixes</url>
+        <url>http://svn.apache.org/repos/asf/webservices/wss4j/branches/1_5_x-fixes</url>
     </scm>
     <organization>
         <name>The Apache Software Foundation</name>
         <url>http://www.apache.org/</url>
     </organization>
     
-
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>11</version>
+    </parent>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -222,6 +226,18 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <preparationGoals>clean install</preparationGoals>
+                    <goals>deploy</goals>
+                    <arguments>-Papache-release</arguments>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
             </plugin>
         </plugins>
 
