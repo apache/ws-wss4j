@@ -5,6 +5,14 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.5.13
+=============
+
+Bug
+
+    [WSS-231] - There is an issue with the position of the <Timestamp> element in the <Security> header when using WSS4J calling .NET Web Services with WS-Security.
+    [WSS-330] - CryptoBase.getAliasForX509CertThumb calculates hash wrongly, could only match first certificate correctly
+
 Release 1.5.12
 =============
 
