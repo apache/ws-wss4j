@@ -54,6 +54,7 @@ import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 import org.apache.ws.security.PublicKeyPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
@@ -61,6 +62,8 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.cache.ReplayCache;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
+import org.apache.ws.security.components.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
@@ -194,6 +197,35 @@ public class SignatureProcessor implements Processor {
             && secretKey == null
             && publicKey == null) {
             throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+        }
+        
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null ) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                    ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                );
+                algorithmSuiteValidator.checkSignatureDerivedKeyLength(
+                    ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                );
+            } else {
+                Key key = null;
+                if (certs != null && certs[0] != null) {
+                    key = certs[0].getPublicKey();
+                } else if (publicKey != null) {
+                    key = publicKey;
+                }
+
+                if (key instanceof PublicKey) {
+                    algorithmSuiteValidator.checkAsymmetricKeyLength((PublicKey)key);
+                } else {
+                    algorithmSuiteValidator.checkSymmetricKeyLength(secretKey.length);
+                }
+            }
         }
         
         XMLSignature xmlSignature = 
@@ -370,6 +402,14 @@ public class SignatureProcessor implements Processor {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             if (data.getWssConfig().isWsiBSPCompliant()) {
                 checkBSPCompliance(xmlSignature);
+            }
+            
+            // Check for compliance against the defined AlgorithmSuite
+            AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+            if (algorithmSuite != null) {
+                AlgorithmSuiteValidator algorithmSuiteValidator = new
+                    AlgorithmSuiteValidator(algorithmSuite);
+                algorithmSuiteValidator.checkSignatureAlgorithms(xmlSignature);
             }
             
             // Test for replay attacks

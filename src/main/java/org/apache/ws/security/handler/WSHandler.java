@@ -27,6 +27,7 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.action.Action;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.WSSecHeader;
@@ -537,6 +538,35 @@ public abstract class WSHandler {
         reqData.setUseSingleCert(useSingleCert);
     }
 
+    protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
+        AlgorithmSuite algorithmSuite = new AlgorithmSuite();
+        
+        Object mc = reqData.getMsgContext();
+        if (mc == null) {
+            return;
+        }
+        
+        String signatureAlgorithm = getString(WSHandlerConstants.SIG_ALGO, mc);
+        if (signatureAlgorithm != null && !"".equals(signatureAlgorithm)) {
+            algorithmSuite.addSignatureMethod(signatureAlgorithm);
+        }
+        String signatureDigestAlgorithm = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
+        if (signatureDigestAlgorithm != null && !"".equals(signatureDigestAlgorithm)) {
+            algorithmSuite.addDigestAlgorithm(signatureDigestAlgorithm);
+        }
+        
+        String encrAlgorithm = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
+        if (encrAlgorithm != null && !"".equals(encrAlgorithm)) {
+            algorithmSuite.addEncryptionMethod(encrAlgorithm);
+        }
+        String transportAlgorithm = getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
+        if (transportAlgorithm != null && !"".equals(transportAlgorithm)) {
+            algorithmSuite.addKeyWrapAlgorithm(transportAlgorithm);
+        }
+        
+        reqData.setAlgorithmSuite(algorithmSuite);
+    }
+    
     protected void decodeEncryptionParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();

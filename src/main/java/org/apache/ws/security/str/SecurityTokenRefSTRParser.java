@@ -61,6 +61,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
     public static final String SIGNATURE_METHOD = "signature_method";
     
     private byte[] secretKey;
+    private Principal principal;
     
     /**
      * Parse a SecurityTokenReference element and extract credentials.
@@ -198,7 +199,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
      * @return the Principal associated with this SecurityTokenReference
      */
     public Principal getPrincipal() {
-        return null;
+        return principal;
     }
     
     /**
@@ -319,6 +320,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             String algorithm = (String)parameters.get(SIGNATURE_METHOD);
             secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
+            principal = dkt.createPrincipal();
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
             AssertionWrapper assertion = 
                 (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);

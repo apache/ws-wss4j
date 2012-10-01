@@ -22,7 +22,9 @@ package org.apache.ws.security.handler;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -34,6 +36,7 @@ import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.cache.ReplayCache;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -85,6 +88,8 @@ public class RequestData {
     private ReplayCache nonceReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private boolean appendSignatureAfterTimestamp;
+    private AlgorithmSuite algorithmSuite;
+    private Map<QName, AlgorithmSuite> algorithmSuiteMap = Collections.emptyMap();
 
     public void clear() {
         soapConstants = null;
@@ -111,6 +116,8 @@ public class RequestData {
         nonceReplayCache = null;
         subjectDNPatterns.clear();
         appendSignatureAfterTimestamp = false;
+        algorithmSuite = null;
+        algorithmSuiteMap.clear();
     }
 
     public Object getMsgContext() {
@@ -522,4 +529,20 @@ public class RequestData {
         this.appendSignatureAfterTimestamp = appendSignatureAfterTimestamp;
     }
 
+    public Map<QName, AlgorithmSuite> getAlgorithmSuiteMap() {
+        return algorithmSuiteMap;
+    }
+
+    public void setAlgorithmSuiteMap(Map<QName, AlgorithmSuite> algorithmSuiteMap) {
+        this.algorithmSuiteMap = algorithmSuiteMap;
+    }
+
+    public AlgorithmSuite getAlgorithmSuite() {
+        return algorithmSuite;
+    }
+
+    public void setAlgorithmSuite(AlgorithmSuite algorithmSuite) {
+        this.algorithmSuite = algorithmSuite;
+    }
+        
 }

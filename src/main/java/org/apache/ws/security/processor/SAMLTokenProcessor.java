@@ -22,23 +22,51 @@ package org.apache.ws.security.processor;
 import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
+import org.apache.ws.security.components.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.saml.SAMLKeyInfo;
+import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 
+import org.opensaml.security.SAMLSignatureProfileValidator;
+import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.validation.ValidationException;
 import org.w3c.dom.Element;
 
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.util.List;
+
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.XMLValidateContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.namespace.QName;
 
 public class SAMLTokenProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(SAMLTokenProcessor.class);
-    
+    private XMLSignatureFactory signatureFactory;
+
+    public SAMLTokenProcessor() {
+        // Try to install the Santuario Provider - fall back to the JDK provider if this does
+        // not work
+        try {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            signatureFactory = XMLSignatureFactory.getInstance("DOM");
+        }
+    }
+
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 
         RequestData data, 
@@ -106,7 +134,67 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            assertion.verifySignature(data, docInfo);
+            Signature sig = assertion.getSignature();
+
+            SAMLSignatureProfileValidator profileValidator = new SAMLSignatureProfileValidator();
+            try {
+                profileValidator.validate(sig);
+            } catch (ValidationException ex) {
+                throw new WSSecurityException("SAML signature validation failed", ex);
+            }
+            
+            // Check for compliance against the defined AlgorithmSuite
+            AlgorithmSuite algorithmSuite = null;
+            if (assertion.getSaml2() != null) {
+                algorithmSuite = data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML2_TOKEN);
+            } else {
+                algorithmSuite = data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML_TOKEN);
+            }
+            
+            KeyInfo keyInfo = sig.getKeyInfo();
+            SAMLKeyInfo samlKeyInfo = 
+                SAMLUtil.getCredentialFromKeyInfo(
+                    keyInfo.getDOM(), 
+                    data, docInfo, data.getWssConfig().isWsiBSPCompliant(),
+                    algorithmSuite
+                );
+            
+            if (algorithmSuite != null) {
+                AlgorithmSuiteValidator algorithmSuiteValidator = new
+                    AlgorithmSuiteValidator(algorithmSuite);
+
+                PublicKey key = null;
+                if (samlKeyInfo.getCerts() != null && samlKeyInfo.getCerts()[0] != null) {
+                    key = samlKeyInfo.getCerts()[0].getPublicKey();
+                } else if (samlKeyInfo.getPublicKey() != null) {
+                    key = samlKeyInfo.getPublicKey();
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                        new Object[]{"cannot get certificate or key"}
+                    );
+                }
+            
+                // Not checking signature here, just marshalling into an XMLSignature
+                // structure for testing the transform/digest algorithms etc.
+                XMLValidateContext context = new DOMValidateContext(key, sig.getDOM());
+                context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
+
+                XMLSignature xmlSignature;
+                try {
+                    xmlSignature = signatureFactory.unmarshalXMLSignature(context);
+                } catch (MarshalException ex) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILED_CHECK, "invalidSAMLsecurity", 
+                        new Object[]{"cannot get certificate or key"}, ex
+                    );
+                }
+
+                algorithmSuiteValidator.checkSignatureAlgorithms(xmlSignature);
+                algorithmSuiteValidator.checkAsymmetricKeyLength(key);
+            }
+
+            assertion.verifySignature(samlKeyInfo);
         }
         // Parse the HOK subject if it exists
         assertion.parseHOKSubject(data, docInfo);

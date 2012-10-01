@@ -542,6 +542,21 @@ public class AssertionWrapper {
                 SAMLUtil.getCredentialFromKeyInfo(
                     keyInfo.getDOM(), data, docInfo, data.getWssConfig().isWsiBSPCompliant()
                 );
+            verifySignature(samlKeyInfo);
+        } else {
+            LOG.debug("AssertionWrapper: no signature to validate");
+        }
+
+    }
+    
+    /**
+     * Verify the signature of this assertion
+     *
+     * @throws ValidationException
+     */
+    public void verifySignature(SAMLKeyInfo samlKeyInfo) throws WSSecurityException {
+        Signature sig = getSignature();
+        if (sig != null) {
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE, "invalidSAMLsecurity",
@@ -577,6 +592,17 @@ public class AssertionWrapper {
             LOG.debug("AssertionWrapper: no signature to validate");
         }
     }
+    
+    public Signature getSignature() {
+        Signature sig = null;
+        if (saml2 != null && saml2.getSignature() != null) {
+            sig = saml2.getSignature();
+        } else if (saml1 != null && saml1.getSignature() != null) {
+            sig = saml1.getSignature();
+        }
+        return sig;
+    }
+
     
     /**
      * This method parses the KeyInfo of the Subject for the holder-of-key confirmation

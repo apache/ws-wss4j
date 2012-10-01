@@ -20,11 +20,14 @@
 package org.apache.ws.security.saml;
 
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
+import org.apache.ws.security.components.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -52,6 +55,7 @@ import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.namespace.QName;
 
 import java.security.NoSuchProviderException;
+import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -231,7 +235,8 @@ public final class SAMLUtil {
             Element keyInfoElement = 
                 WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
             if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant);
+                return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant,
+                        data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML_TOKEN));
             }
         }
 
@@ -276,11 +281,21 @@ public final class SAMLUtil {
             Element keyInfoElement = 
                 WSSecurityUtil.getDirectChildElement(sub, "KeyInfo", WSConstants.SIG_NS);
             if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant);
+                return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant,
+                        data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML2_TOKEN));
             }
         }
 
         return null;
+    }
+    
+    public static SAMLKeyInfo getCredentialFromKeyInfo(
+        Element keyInfoElement,
+        RequestData data,
+        WSDocInfo docInfo,
+        boolean bspCompliant
+    ) throws WSSecurityException {
+        return getCredentialFromKeyInfo(keyInfoElement, data, docInfo, bspCompliant, null);
     }
     
     /**
@@ -290,6 +305,7 @@ public final class SAMLUtil {
      * @param data The RequestData instance used to obtain configuration
      * @param docInfo A WSDocInfo instance
      * @param bspCompliant Whether to process tokens in compliance with the BSP spec or not
+     * @param algorithmSuite An AlgorithmSuite object to use
      * @return The credential (as a SAMLKeyInfo object)
      * @throws WSSecurityException
      */
@@ -297,7 +313,8 @@ public final class SAMLUtil {
         Element keyInfoElement,
         RequestData data,
         WSDocInfo docInfo,
-        boolean bspCompliant
+        boolean bspCompliant,
+        AlgorithmSuite algorithmSuite
     ) throws WSSecurityException {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
@@ -309,7 +326,7 @@ public final class SAMLUtil {
                 if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     List<WSSecurityEngineResult> result =
-                        proc.handleToken((Element)node, data, docInfo);
+                        proc.handleToken((Element)node, data, docInfo, algorithmSuite);
                     byte[] secret = 
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
@@ -326,6 +343,22 @@ public final class SAMLUtil {
                     SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
                     samlKeyInfo.setPublicKey(strParser.getPublicKey());
                     samlKeyInfo.setSecret(strParser.getSecretKey());
+                    
+                    Principal principal = strParser.getPrincipal();
+                    
+                    // Check for compliance against the defined AlgorithmSuite
+                    if (algorithmSuite != null && principal instanceof WSDerivedKeyTokenPrincipal) {
+                        AlgorithmSuiteValidator algorithmSuiteValidator = new
+                            AlgorithmSuiteValidator(algorithmSuite);
+
+                        algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                            ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                        );
+                        algorithmSuiteValidator.checkSignatureDerivedKeyLength(
+                            ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                        );
+                    }
+                    
                     return samlKeyInfo;
                 }
             }

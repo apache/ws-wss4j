@@ -495,6 +495,7 @@ public class DerivedKeyToken {
         principal.setLabel(getLabel());
         principal.setLength(getLength());
         principal.setOffset(getOffset());
+        principal.setAlgorithm(getAlgorithm());
         
         String basetokenId = null;
         SecurityTokenReference securityTokenReference = getSecurityTokenReference();

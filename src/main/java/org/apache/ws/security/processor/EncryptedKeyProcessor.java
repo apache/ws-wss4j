@@ -19,11 +19,26 @@
 
 package org.apache.ws.security.processor;
 
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.security.spec.MGF1ParameterSpec;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
+import org.apache.ws.security.components.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.RequestData;
@@ -38,19 +53,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.security.spec.MGF1ParameterSpec;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 public class EncryptedKeyProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(EncryptedKeyProcessor.class);
@@ -59,6 +61,15 @@ public class EncryptedKeyProcessor implements Processor {
         Element elem, 
         RequestData data,
         WSDocInfo wsDocInfo
+    ) throws WSSecurityException {
+        return handleToken(elem, data, wsDocInfo, data.getAlgorithmSuite());
+    }
+    
+    public List<WSSecurityEngineResult> handleToken(
+        Element elem, 
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        AlgorithmSuite algorithmSuite
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
@@ -103,6 +114,17 @@ public class EncryptedKeyProcessor implements Processor {
         X509Certificate[] certs = 
             getCertificatesFromEncryptedKey(elem, data, data.getDecCrypto(), wsDocInfo, strParser);
 
+        // Check for compliance against the defined AlgorithmSuite
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            algorithmSuiteValidator.checkAsymmetricKeyLength(certs[0]);
+            algorithmSuiteValidator.checkEncryptionKeyWrapAlgorithm(
+                encryptedKeyTransportMethod
+            );
+        }
+        
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
             OAEPParameterSpec oaepParameterSpec = null;
@@ -343,7 +365,8 @@ public class EncryptedKeyProcessor implements Processor {
         }
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (String dataRefURI : dataRefURIs) {
-            WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);
+            WSDataRef dataRef = 
+                decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);
             dataRefs.add(dataRef);
         }
         return dataRefs;
@@ -382,6 +405,16 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
                 new Object[]{symEncAlgo}, ex
             );
+        }
+        
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            algorithmSuiteValidator.checkSymmetricKeyLength(symmetricKey.getEncoded().length);
+            algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
 
         return ReferenceListProcessor.decryptEncryptedData(

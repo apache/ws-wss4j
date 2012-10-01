@@ -19,12 +19,25 @@
 
 package org.apache.ws.security.processor;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.SecretKey;
+import javax.xml.namespace.QName;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
+import org.apache.ws.security.components.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.str.STRParser;
 import org.apache.ws.security.str.SecurityTokenRefSTRParser;
@@ -33,15 +46,6 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import javax.crypto.SecretKey;
-import javax.xml.namespace.QName;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
@@ -92,6 +96,7 @@ public class EncryptedDataProcessor implements Processor {
         
         SecretKey key = null;
         List<WSSecurityEngineResult> encrKeyResults = null;
+        Principal principal = null;
         if (secRefToken != null) {
             STRParser strParser = new SecurityTokenRefSTRParser();
             Map<String, Object> parameters = new HashMap<String, Object>();
@@ -101,6 +106,7 @@ public class EncryptedDataProcessor implements Processor {
                 wsDocInfo, parameters
             );
             byte[] secretKey = strParser.getSecretKey();
+            principal = strParser.getPrincipal();
             key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
         } else if (encryptedKeyElement != null) {
             EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
@@ -112,6 +118,24 @@ public class EncryptedDataProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncKey"
             );
+        }
+        
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = request.getAlgorithmSuite();
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                    ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                );
+                algorithmSuiteValidator.checkEncryptionDerivedKeyLength(
+                    ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                );
+            }
+            algorithmSuiteValidator.checkSymmetricKeyLength(key.getEncoded().length);
+            algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
         
         // initialize Cipher ....

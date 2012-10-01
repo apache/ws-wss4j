@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.processor;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +29,12 @@ import javax.crypto.SecretKey;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.AlgorithmSuite;
+import org.apache.ws.security.components.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.CallbackLookup;
 import org.apache.ws.security.message.DOMCallbackLookup;
@@ -155,6 +159,7 @@ public class ReferenceListProcessor implements Processor {
                 keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         SecretKey symmetricKey = null;
+        Principal principal = null;
         if (secRefToken == null) {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
@@ -166,9 +171,29 @@ public class ReferenceListProcessor implements Processor {
                 wsDocInfo, parameters
             );
             byte[] secretKey = strParser.getSecretKey();
+            principal = strParser.getPrincipal();
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
         }
         
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                    ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                );
+                algorithmSuiteValidator.checkEncryptionDerivedKeyLength(
+                    ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                );
+            }
+
+            algorithmSuiteValidator.checkSymmetricKeyLength(symmetricKey.getEncoded().length);
+            algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
+        }
+
         return 
             decryptEncryptedData(
                 doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
