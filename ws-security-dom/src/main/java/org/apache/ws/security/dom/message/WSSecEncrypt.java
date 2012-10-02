@@ -519,16 +519,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
         } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             secToken.setKeyIdentifier(customReferenceValue, encKeyId, true);
             keyInfo.addUnknownElement(secToken.getElement());
