@@ -19,6 +19,21 @@
 
 package org.apache.ws.security.handler;
 
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
@@ -37,21 +52,6 @@ import org.apache.ws.security.util.StringUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 
 /**
  * Extracted from WSDoAllReceiver and WSDoAllSender
@@ -65,7 +65,7 @@ public abstract class WSHandler {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSHandler.class);
     protected WSSecurityEngine secEngine = new WSSecurityEngine();
-    protected Map<String, Crypto> cryptos = new HashMap<String, Crypto>();
+    protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
 
     private boolean doDebug = log.isDebugEnabled();
 
