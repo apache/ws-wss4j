@@ -18,14 +18,18 @@
  */
 package org.apache.ws.security.policy.stax.test;
 
+import org.apache.ws.security.common.crypto.WSProviderConfig;
 import org.apache.ws.security.policy.SPConstants;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.policy.stax.PolicyEnforcerFactory;
+import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.impl.securityToken.X509SecurityToken;
 import org.apache.ws.security.stax.test.AbstractTestBase;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.Init;
+import org.testng.annotations.BeforeClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -47,6 +51,12 @@ import java.security.cert.X509Certificate;
  * @version $Revision$ $Date$
  */
 public class AbstractPolicyTestBase extends AbstractTestBase {
+
+    @BeforeClass
+    public void setUp() throws Exception {
+        WSProviderConfig.init();
+        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+    }
 
     protected PolicyEnforcer buildAndStartPolicyEngine(String policyString) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         return this.buildAndStartPolicyEngine(policyString, false);

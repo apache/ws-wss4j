@@ -30,6 +30,7 @@ import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.binding.xmldsig.*;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.ECKeyValueSecurityToken;
@@ -175,7 +176,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 if (uri == null) {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
                     ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3062);
-                    throw new WSSecurityException("badReferenceURI");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI");
                 }
                 if (!uri.startsWith("#")) {
                     ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R5204);

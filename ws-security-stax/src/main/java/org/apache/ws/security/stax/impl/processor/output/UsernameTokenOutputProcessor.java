@@ -25,6 +25,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.impl.securityToken.OutboundUsernameSecurityToken;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;

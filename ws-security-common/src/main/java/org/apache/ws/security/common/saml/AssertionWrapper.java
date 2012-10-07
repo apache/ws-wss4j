@@ -132,7 +132,7 @@ public class AssertionWrapper {
      * Constructor AssertionWrapper creates a new AssertionWrapper instance.
      *
      * @param element of type Element
-     * @throws UnmarshallingException when
+     * @throws WSSecurityException
      */
     public AssertionWrapper(Element element) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
@@ -436,7 +436,7 @@ public class AssertionWrapper {
         cryptoType.setAlias(issuerKeyName);
         X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
-            throw new WSSecurityException(
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                     "No issuer certs were found to sign the SAML Assertion using issuer name: "
                             + issuerKeyName);
         }
@@ -454,7 +454,7 @@ public class AssertionWrapper {
         try {
             privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
         } catch (Exception ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
 
         signature.setSignatureAlgorithm(sigAlgo);
@@ -476,8 +476,8 @@ public class AssertionWrapper {
                     signingCredential);
             signature.setKeyInfo(keyInfo);
         } catch (org.opensaml.xml.security.SecurityException ex) {
-            throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
+                    "Error generating KeyInfo from signing credential");
         }
 
         // add the signature to the assertion
@@ -514,7 +514,8 @@ public class AssertionWrapper {
             try {
                 validator.validate(sig);
             } catch (ValidationException ex) {
-                throw new WSSecurityException("SAML signature validation failed", ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                        "empty", ex, "SAML signature validation failed");
             }
             
             BasicX509Credential credential = new BasicX509Credential();
@@ -532,7 +533,8 @@ public class AssertionWrapper {
             try {
                 sigValidator.validate(sig);
             } catch (ValidationException ex) {
-                throw new WSSecurityException("SAML signature validation failed", ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                        "empty", ex, "SAML signature validation failed");
             }
             signatureKeyInfo = samlKeyInfo;
         } else {
@@ -720,8 +722,8 @@ public class AssertionWrapper {
                     SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
                 saml1.setConditions(conditions);
             } catch (org.opensaml.xml.security.SecurityException ex) {
-                throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
+                        "Error generating KeyInfo from signing credential"
                 );
             }
 
@@ -762,8 +764,8 @@ public class AssertionWrapper {
                     SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
                 saml2.setSubject(subject);
             } catch (org.opensaml.xml.security.SecurityException ex) {
-                throw new WSSecurityException(
-                    "Error generating KeyInfo from signing credential", ex
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
+                        "Error generating KeyInfo from signing credential"
                 );
             }
             

@@ -122,6 +122,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "The security token could not be authenticated or authorized");
+                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
             }
         }
     }
@@ -161,7 +162,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                     if (securityEvent instanceof UsernameTokenSecurityEvent) {
                         UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                         if (!"username".equals(((UsernameSecurityToken) usernameTokenSecurityEvent.getSecurityToken()).getUsername())) {
-                            throw new WSSecurityException("Wrong username");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "Wrong username");
                         }
                     }
                 }
@@ -174,6 +175,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
+                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
             }
         }
     }
@@ -245,6 +247,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
     }
 

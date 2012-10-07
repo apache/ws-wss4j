@@ -25,12 +25,14 @@ import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.stax.ext.WSSConfigurationException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.X509PKIPathv1SecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.X509SecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.X509_V3SecurityToken;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -55,7 +57,6 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        final Deque<XMLSecEvent> eventQueue, final Integer index) throws XMLSecurityException {
-
         @SuppressWarnings("unchecked")
         final BinarySecurityTokenType binarySecurityTokenType =
                 ((JAXBElement<BinarySecurityTokenType>) parseStructure(eventQueue, index, securityProperties)).getValue();
@@ -81,7 +82,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 Crypto crypto = null;
                 try {
                     crypto = ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto();
-                } catch (XMLSecurityConfigurationException e) {
+                } catch (WSSConfigurationException e) {
                     log.debug(e.getMessage(), e);
                     //ignore
                 }

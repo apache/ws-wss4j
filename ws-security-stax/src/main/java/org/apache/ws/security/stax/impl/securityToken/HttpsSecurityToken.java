@@ -18,9 +18,9 @@
  */
 package org.apache.ws.security.stax.impl.securityToken;
 
-import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
@@ -41,13 +41,17 @@ public class HttpsSecurityToken extends AbstractInboundSecurityToken {
         httpDigestAuthentication,
     }
 
-    public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext) throws WSSecurityException {
+    public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext)
+            throws XMLSecurityException {
+
         super(wsSecurityContext, null, IDGenerator.generateID(null), null);
         setX509Certificates(new X509Certificate[]{x509Certificate});
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
-    public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext) throws WSSecurityException {
+    public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext)
+            throws XMLSecurityException {
+
         super(wsSecurityContext, null, IDGenerator.generateID(null), null);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;

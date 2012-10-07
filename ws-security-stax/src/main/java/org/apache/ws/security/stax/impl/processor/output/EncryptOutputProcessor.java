@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -31,14 +32,10 @@ import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputP
 import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
-import javax.crypto.NoSuchPaddingException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -77,34 +74,24 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 if (securePart != null) {
                     logger.debug("Matched encryptionPart for encryption");
                     InternalEncryptionOutputProcessor internalEncryptionOutputProcessor;
-                    try {
-                        String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
-                        SecurityTokenProvider securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
-                        OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
-                        EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
-                        encryptionPartDef.setModifier(securePart.getModifier());
-                        encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
-                        encryptionPartDef.setKeyId(securityTokenProvider.getId());
-                        encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
-                        outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
-                        internalEncryptionOutputProcessor =
-                                new InternalEncryptionOutputProcessor(
-                                        encryptionPartDef,
-                                        xmlSecStartElement,
-                                        outputProcessorChain.getDocumentContext().getEncoding()
-                                );
-                        internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                        internalEncryptionOutputProcessor.setAction(getAction());
-                        internalEncryptionOutputProcessor.init(outputProcessorChain);
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (NoSuchPaddingException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (InvalidKeyException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    } catch (IOException e) {
-                        throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                    }
+                    String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+                    SecurityTokenProvider securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+                    OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                    EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
+                    encryptionPartDef.setModifier(securePart.getModifier());
+                    encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
+                    encryptionPartDef.setKeyId(securityTokenProvider.getId());
+                    encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
+                    outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
+                    internalEncryptionOutputProcessor =
+                            new InternalEncryptionOutputProcessor(
+                                    encryptionPartDef,
+                                    xmlSecStartElement,
+                                    outputProcessorChain.getDocumentContext().getEncoding()
+                            );
+                    internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    internalEncryptionOutputProcessor.setAction(getAction());
+                    internalEncryptionOutputProcessor.init(outputProcessorChain);
 
                     setActiveInternalEncryptionOutputProcessor(internalEncryptionOutputProcessor);
 
@@ -129,7 +116,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         private boolean doEncryptedHeader = false;
 
         InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement, String encoding)
-                throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, XMLStreamException {
+                throws XMLSecurityException, XMLStreamException {
 
             super(encryptionPartDef, xmlSecStartElement, encoding);
             this.addBeforeProcessor(EncryptEndingOutputProcessor.class.getName());

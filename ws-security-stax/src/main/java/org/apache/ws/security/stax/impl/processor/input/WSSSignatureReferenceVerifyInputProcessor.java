@@ -29,6 +29,7 @@ import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
 import org.apache.xml.security.binding.xmldsig.ReferenceType;
 import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.apache.xml.security.binding.xmldsig.TransformType;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
@@ -42,7 +43,6 @@ import org.apache.ws.security.stax.securityEvent.TimestampSecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -145,8 +145,13 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             replayChecked = true;
             detectReplayAttack(inputProcessorChain);
         }
-
-        return super.processNextEvent(inputProcessorChain);
+        try {
+            return super.processNextEvent(inputProcessorChain);
+        } catch (WSSecurityException e) {
+            throw e;
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
     }
 
     @Override
@@ -200,7 +205,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             try {
                 cache.put(cacheKey, timestampSecurityEvent.getCreated(), elementAttributes);
             } catch (CacheException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
         }
     }
@@ -210,11 +215,10 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             ReferenceType referenceType, OutputStream outputStream,
             InputProcessorChain inputProcessorChain,
             AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier internalSignatureReferenceVerifier)
-            throws XMLSecurityException, XMLStreamException, NoSuchMethodException, InstantiationException,
-            IllegalAccessException, InvocationTargetException {
+            throws XMLSecurityException {
 
         if (referenceType.getTransforms() == null || referenceType.getTransforms().getTransform().size() == 0) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         List<TransformType> transformTypeList = referenceType.getTransforms().getTransform();
 
@@ -283,8 +287,12 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
             internalSignatureReferenceVerifier.setStartElement(securityTokenReference.getXmlSecEvents().getLast().asStartElement().getName());
             Iterator<XMLSecEvent> xmlSecEventIterator = securityTokenReference.getXmlSecEvents().descendingIterator();
-            while (xmlSecEventIterator.hasNext()) {
-                internalSignatureReferenceVerifier.processEvent(xmlSecEventIterator.next(), inputProcessorChain);
+            try {
+                while (xmlSecEventIterator.hasNext()) {
+                    internalSignatureReferenceVerifier.processEvent(xmlSecEventIterator.next(), inputProcessorChain);
+                }
+            } catch (XMLStreamException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
         }
         return parentTransformer;
@@ -296,6 +304,19 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                            ReferenceType referenceType, QName startElementName) throws XMLSecurityException {
             super(securityProperties, inputProcessorChain, referenceType, startElementName);
             this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
+        }
+
+        @Override
+        public void processEvent(XMLSecEvent xmlSecEvent, InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
+            try {
+                super.processEvent(xmlSecEvent, inputProcessorChain);
+            } catch (WSSecurityException e) {
+                throw e;
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            }
         }
     }
 }

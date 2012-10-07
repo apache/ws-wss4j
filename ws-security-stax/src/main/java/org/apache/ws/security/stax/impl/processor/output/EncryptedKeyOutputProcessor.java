@@ -23,6 +23,7 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
@@ -66,15 +67,15 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
             if (tokenId == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             final OutboundSecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
 
             //prepare the symmetric session key for all encryption parts
@@ -83,7 +84,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             try {
                 keyGen = KeyGenerator.getInstance(keyAlgorithm);
             } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
             //the sun JCE provider expects the real key size for 3DES (112 or 168 bit)
             //whereas bouncy castle expects the block size of 128 or 192 bits
@@ -285,15 +286,15 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
                     } catch (NoSuchPaddingException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     } catch (NoSuchAlgorithmException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     } catch (InvalidKeyException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     } catch (IllegalBlockSizeException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     } catch (InvalidAlgorithmParameterException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     }
 
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue);
@@ -342,7 +343,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 }
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
             } else {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedSecurityToken");
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }

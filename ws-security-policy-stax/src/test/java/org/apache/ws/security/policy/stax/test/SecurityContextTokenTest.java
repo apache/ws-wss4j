@@ -180,8 +180,9 @@ public class SecurityContextTokenTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "IssuerName in Policy (xs:anyURI) didn't match with the one in the SecurityContextToken (sss)");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

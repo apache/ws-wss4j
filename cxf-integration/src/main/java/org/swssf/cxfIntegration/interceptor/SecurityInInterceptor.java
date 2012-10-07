@@ -30,7 +30,6 @@ import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
@@ -82,13 +81,17 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
             final List<SecurityEvent> requestSecurityEvents = (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
             newXmlStreamReader = inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
-            //todo correct faults per WSS-spec
+
+            //Warning: The exceptions which can occur here are not security relevant exceptions but configuration-errors.
+            //To catch security relevant exceptions you have to catch them e.g.in the FaultOutInterceptor.
+            //Why? Because we do streaming security. This interceptor doesn't handle the ws-security stuff but just
+            //setup the relevant stuff for it. Exceptions will be thrown as a wrapped XMLStreamException during further
+            //processing in the WS-Stack.
+
         } catch (WSSecurityException e) {
-            throw new SoapFault("Invalid security", soapMessage.getVersion().getSender());
-        } catch (XMLSecurityException e) {
-            throw new SoapFault("Invalid security", soapMessage.getVersion().getSender());
+            throw new SoapFault("unexpected service error", SoapFault.FAULT_CODE_SERVER);
         } catch (XMLStreamException e) {
-            throw new SoapFault("Invalid security", soapMessage.getVersion().getReceiver());
+            throw new SoapFault("unexpected service error", SoapFault.FAULT_CODE_SERVER);
         }
     }
 

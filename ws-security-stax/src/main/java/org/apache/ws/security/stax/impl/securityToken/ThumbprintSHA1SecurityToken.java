@@ -22,7 +22,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
@@ -35,8 +35,8 @@ public class ThumbprintSHA1SecurityToken extends X509SecurityToken {
     private String alias = null;
     private final byte[] binaryContent;
 
-    ThumbprintSHA1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler, byte[] binaryContent,
-                                String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+    ThumbprintSHA1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                                byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
         super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
         this.binaryContent = binaryContent;
     }

@@ -28,7 +28,7 @@ import org.apache.ws.security.common.ext.WSSecurityException;
  */
 public class WSSConfigurationException extends WSSecurityException {
 
-    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object[] args, Throwable exception) {
+    public WSSConfigurationException(ErrorCode errorCode, String msgId, Throwable exception, Object ... args) {
         super(errorCode, msgId, exception, args);
     }
 
@@ -36,7 +36,7 @@ public class WSSConfigurationException extends WSSecurityException {
         super(errorCode, msgId, exception);
     }
 
-    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object[] args) {
+    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object ... args) {
         super(errorCode, msgId, args);
     }
 
@@ -46,13 +46,5 @@ public class WSSConfigurationException extends WSSecurityException {
 
     public WSSConfigurationException(ErrorCode errorCode) {
         super(errorCode);
-    }
-
-    public WSSConfigurationException(String errorMessage) {
-        super(errorMessage);
-    }
-
-    public WSSConfigurationException(String errorMessage, Throwable t) {
-        super(errorMessage, t);
     }
 }

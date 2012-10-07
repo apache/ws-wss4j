@@ -88,8 +88,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.WSSPolicyException: SOAPAction (emptyPolicyOperation) does not match with the current Operation: {http://schemas.xmlsoap.org/wsdl/}definitions");
+            Assert.assertEquals(throwable.getMessage(),
+                    "SOAPAction (emptyPolicyOperation) does not match with the current Operation: " +
+                            "{http://schemas.xmlsoap.org/wsdl/}definitions");
+            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -140,9 +142,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
             Assert.assertTrue(throwable instanceof WSSecurityException);
-            Assert.assertEquals(throwable.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(throwable.getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
+            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

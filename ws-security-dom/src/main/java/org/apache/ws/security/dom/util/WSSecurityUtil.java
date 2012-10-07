@@ -912,8 +912,8 @@ public final class WSSecurityUtil {
                 doAction |= WSConstants.SC;
                 actions.add(Integer.valueOf(WSConstants.SC));
             } else {
-                throw new WSSecurityException(
-                    "Unknown action defined: " + single[i]
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                        "Unknown action defined: " + single[i]
                 );
             }
         }
@@ -972,14 +972,14 @@ public final class WSSecurityUtil {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
                     if (wssConfig.getAction(parsedAction) == null) {
-                        throw new WSSecurityException(
-                            "Unknown action defined: " + single[i]
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                "Unknown action defined: " + single[i]
                         );
                     }
                     actions.add(Integer.valueOf(parsedAction));
                 } catch (NumberFormatException ex) {
-                    throw new WSSecurityException(
-                        "Unknown action defined: " + single[i]
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                            "Unknown action defined: " + single[i]
                     );
                 }
             }
@@ -1039,8 +1039,9 @@ public final class WSSecurityUtil {
             random.nextBytes(temp);
             return temp;
         } catch (Exception ex) {
-            throw new WSSecurityException(
-                "Error in generating nonce of length " + length, ex
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", ex,
+                    "Error in generating nonce of length " + length
             );
         }
     }
@@ -1059,8 +1060,8 @@ public final class WSSecurityUtil {
             }
             return digest.digest(inputBytes);
         } catch (Exception e) {
-            throw new WSSecurityException(
-                "Error in generating digest", e
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e,
+                    "Error in generating digest"
             );
         }
     }
@@ -1137,8 +1138,8 @@ public final class WSSecurityUtil {
         List<WSDataRef> signedElemsRefList = 
             (List<WSDataRef>)resultItem.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         if (signedElemsRefList == null) {
-            throw new WSSecurityException(
-                "WSSecurityEngineResult does not contain any references to signed elements"
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                    "WSSecurityEngineResult does not contain any references to signed elements"
             );
         }
 

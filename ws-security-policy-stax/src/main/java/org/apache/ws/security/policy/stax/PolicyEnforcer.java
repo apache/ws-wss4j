@@ -29,7 +29,7 @@ import org.apache.ws.security.policy.stax.assertionStates.*;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;

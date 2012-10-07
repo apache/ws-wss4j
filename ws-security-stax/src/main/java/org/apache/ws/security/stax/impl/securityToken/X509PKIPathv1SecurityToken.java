@@ -19,9 +19,10 @@
 package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.io.ByteArrayInputStream;
@@ -41,8 +42,9 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
 
     private String alias = null;
 
-    public X509PKIPathv1SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                      byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
+    public X509PKIPathv1SecurityToken(
+            WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+            byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
         super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
 
         InputStream in = new ByteArrayInputStream(binaryContent);
@@ -58,7 +60,7 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
                 setX509Certificates(certs);
             }
         } catch (CertificateException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "parseError", e);
         }
     }
 

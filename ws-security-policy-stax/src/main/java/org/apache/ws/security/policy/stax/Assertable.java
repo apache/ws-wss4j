@@ -19,7 +19,7 @@
 package org.apache.ws.security.policy.stax;
 
 import org.apache.ws.security.policy.WSSPolicyException;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 

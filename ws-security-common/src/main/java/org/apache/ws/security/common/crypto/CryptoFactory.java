@@ -111,7 +111,8 @@ public abstract class CryptoFactory {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(cryptoClassName + " Not Found", ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                        "empty", ex, cryptoClassName + " Not Found");
             }
         }
         return loadClass(cryptoClass, properties, classLoader);
@@ -172,7 +173,7 @@ public abstract class CryptoFactory {
     /**
      * This allows loading the classes with a custom class loader  
      * @param cryptoClass
-     * @param properties
+     * @param map
      * @param loader
      * @return
      * @throws WSSecurityException if there is an error in loading the crypto properties
@@ -193,14 +194,15 @@ public abstract class CryptoFactory {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
-            throw new WSSecurityException(cryptoClass + " cannot create instance", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e, cryptoClass + " cannot create instance");
         }
     }
     
     /**
      * This allows loading the classes with a custom class loader  
      * @param cryptoClass
-     * @param properties
+     * @param map
      * @param loader
      * @return
      * @throws WSSecurityException if there is an error in loading the crypto properties
@@ -221,7 +223,8 @@ public abstract class CryptoFactory {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
-            throw new WSSecurityException(cryptoClass + " cannot create instance", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e, cryptoClass + " cannot create instance");
         }
     }
     

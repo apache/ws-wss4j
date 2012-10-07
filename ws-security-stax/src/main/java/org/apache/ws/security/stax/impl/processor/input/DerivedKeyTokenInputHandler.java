@@ -28,6 +28,7 @@ import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.ws.security.stax.securityEvent.DerivedKeyTokenSecurityEvent;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -61,7 +62,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
             derivedKeyTokenType.setId(IDGenerator.generateID(null));
         }
         if (derivedKeyTokenType.getSecurityTokenReference() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noReference");
         }
 
         final List<QName> elementPath = getElementPath(eventQueue);
@@ -116,11 +117,11 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID).getEncoded();
                             }
                         } else {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedKeyId");
                         }
                         byte[] nonce = derivedKeyTokenType.getNonce();
                         if (nonce == null || nonce.length == 0) {
-                            throw new WSSecurityException("Missing wsc:Nonce value");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "empty", "Missing wsc:Nonce value");
                         }
                         String derivedKeyAlgorithm = derivedKeyTokenType.getAlgorithm();
                         if (derivedKeyAlgorithm == null) {

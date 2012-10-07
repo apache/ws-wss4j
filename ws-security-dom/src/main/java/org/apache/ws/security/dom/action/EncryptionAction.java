@@ -98,7 +98,7 @@ public class EncryptionAction implements Action {
         try {
             wsEncrypt.build(doc, reqData.getEncCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("Error during encryption: ", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error during encryption: ");
         }
     }
 }

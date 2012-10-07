@@ -127,7 +127,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on multiple elements with the same wsu:Id");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            assertTrue(ex.getMessage().startsWith("javax.xml.crypto.URIReferenceException: " +
+                    "org.apache.xml.security.utils.resolver.ResourceResolverException: " +
+                    "Cannot resolve element with ID "));
         }
     }
     
@@ -212,7 +214,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on bad wsu:Id");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            assertEquals("Element id-250 is not included in the signature", ex.getMessage());
         }
     }
     
@@ -394,7 +396,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified EncryptedData CipherValue");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            //the error message is not deterministic so we do not do a message comparison
         }
     }
     
@@ -442,7 +444,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified EncryptedData CipherValue");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            //the error message is not deterministic so we do not do a message comparison
         }
     }
 
@@ -492,7 +494,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified Signature Reference");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            assertEquals("The signature or decryption was invalid", ex.getMessage());
         }
     }
     
@@ -521,7 +523,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on an untrusted Certificate");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            assertEquals("The signature or decryption was invalid", ex.getMessage());
         }
     }
     
@@ -557,7 +559,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified Signature element");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            assertEquals("The signature or decryption was invalid", ex.getMessage());
         }
     }
 
@@ -565,7 +567,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * Verifies the soap envelope
      * <p/>
      * 
-     * @param env soap envelope
+     * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult>  verify(Document doc) throws Exception {

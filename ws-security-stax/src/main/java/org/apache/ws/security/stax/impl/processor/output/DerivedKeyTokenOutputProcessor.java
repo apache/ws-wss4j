@@ -27,6 +27,7 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
@@ -61,15 +62,15 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY);
             if (tokenId == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             final OutboundSecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
 
             final String wsuIdDKT = IDGenerator.generateID(null);
@@ -88,7 +89,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             try {
                 label = (WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL).getBytes("UTF-8");
             } catch (UnsupportedEncodingException e) {
-                throw new WSSecurityException("UTF-8 encoding is not supported", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "UTF-8 encoding is not supported", e);
             }
 
             byte[] nonce = new byte[16];
@@ -102,7 +103,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             try {
                 derivationAlgorithm = AlgoFactory.getInstance(WSSConstants.P_SHA_1);
             } catch (ConversationException e) {
-                throw new WSSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
 
             final byte[] derivedKeyBytes;
@@ -121,7 +122,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
                 derivedKeyBytes = derivationAlgorithm.createKey(secret, seed, offset, length);
             } catch (ConversationException e) {
-                throw new WSSecurityException(e.getMessage(), e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
 
             final GenericOutboundSecurityToken derivedKeySecurityToken = new GenericOutboundSecurityToken(wsuIdDKT, WSSConstants.DerivedKeyToken) {
@@ -133,7 +134,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     try {
                         key = super.getSecretKey(algorithmURI);
                     } catch (XMLSecurityException e) {
-                        throw new WSSecurityException(e.getMessage(), e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     }
                     if (key != null) {
                         return key;
@@ -266,7 +267,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 }
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
             } else {
-                throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_ENCRYPTION, "unsupportedSecurityToken");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedSecurityToken");
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }

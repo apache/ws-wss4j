@@ -26,6 +26,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.SecurityHeaderHandlerMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
@@ -91,7 +92,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
                     if (documentLevel == 1) {
                         if (WSSUtils.getSOAPMessageVersionNamespace(xmlSecStartElement) == null) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "notASOAPMessage");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "notASOAPMessage");
                         }
                     } else if (documentLevel == 3
                             && xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
@@ -156,7 +157,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 WSSUtils.getSOAPMessageVersionNamespace(xmlSecEvent.asStartElement()))
         ));
         //if we reach this state we didn't find a security header
-        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityHeader");
+        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityHeader");
     }
 
     @SuppressWarnings("unchecked")
@@ -177,11 +178,13 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             XMLSecurityHeaderHandler xmlSecurityHeaderHandler = clazz.newInstance();
             xmlSecurityHeaderHandler.handle(inputProcessorChain, securityProperties, eventQueue, index);
         } catch (InstantiationException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         } catch (IllegalAccessException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+        } catch (WSSecurityException e) {
+            throw e;
         } catch (XMLSecurityException e) {
-            throw new WSSecurityException(e.getMessage(), e.getCause());
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
     }
 

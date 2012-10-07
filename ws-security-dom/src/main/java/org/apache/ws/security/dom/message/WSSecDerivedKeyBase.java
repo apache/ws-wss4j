@@ -200,7 +200,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         try {
             label = (clientLabel + serviceLabel).getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException("UTF-8 encoding is not supported", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "UTF-8 encoding is not supported");
         }
         byte[] nonce = WSSecurityUtil.generateNonce(16);
         

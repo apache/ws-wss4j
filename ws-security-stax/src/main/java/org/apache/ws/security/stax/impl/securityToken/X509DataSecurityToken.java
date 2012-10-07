@@ -25,7 +25,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.binding.xmldsig.X509DataType;
 import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -53,7 +53,7 @@ public class X509DataSecurityToken extends X509SecurityToken {
             if (x509IssuerSerialType == null
                     || x509IssuerSerialType.getX509IssuerName() == null
                     || x509IssuerSerialType.getX509SerialNumber() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
             cryptoType.setIssuerSerial(
@@ -61,7 +61,7 @@ public class X509DataSecurityToken extends X509SecurityToken {
             );
             X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
             if (certs == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
             this.alias = getCrypto().getX509Identifier(certs[0]);
         }

@@ -144,8 +144,9 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Timestamp must not be present");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -187,8 +188,9 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Policy enforces EncryptBeforeSigning but the /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body was signed and then encrypted");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -241,8 +243,9 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://www.w3.org/2000/09/xmldsig#}Signature must be encrypted");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -306,8 +309,9 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

@@ -20,6 +20,7 @@ package org.apache.ws.security.stax.impl.processor.output;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -36,7 +37,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.*;
@@ -119,11 +119,11 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedKeyTransp",
                                 e, "No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()
                         );
                     } catch (NoSuchProviderException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSecProvider", e);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noSecProvider", e);
                     }
 
                     setActiveInternalSignatureOutputProcessor(internalSignatureOutputProcessor);
@@ -180,8 +180,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
     @Override
     protected Transformer buildTransformerChain(
             OutputStream outputStream, SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement)
-            throws XMLSecurityException, NoSuchMethodException, InstantiationException,
-            IllegalAccessException, InvocationTargetException {
+            throws XMLSecurityException {
 
         String[] transforms = signaturePartDef.getTransforms();
 

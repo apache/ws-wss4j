@@ -43,7 +43,7 @@ public class TimestampValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         if (data.getWssConfig() == null) {
-            throw new WSSecurityException("WSSConfig cannot be null");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSSConfig cannot be null");
         }
         WSSConfig wssConfig = data.getWssConfig();
         boolean timeStampStrict = true;

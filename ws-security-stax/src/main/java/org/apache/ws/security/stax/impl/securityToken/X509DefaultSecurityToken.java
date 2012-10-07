@@ -21,7 +21,7 @@ package org.apache.ws.security.stax.impl.securityToken;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
 

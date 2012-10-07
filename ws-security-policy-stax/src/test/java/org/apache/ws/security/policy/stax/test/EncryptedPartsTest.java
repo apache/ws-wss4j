@@ -103,8 +103,9 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://example.org}a must be encrypted");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -155,8 +156,9 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
             policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be encrypted");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -224,8 +226,9 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://example.org}a must be encrypted");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

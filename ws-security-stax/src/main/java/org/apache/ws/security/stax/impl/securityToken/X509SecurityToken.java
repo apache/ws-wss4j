@@ -21,11 +21,12 @@ package org.apache.ws.security.stax.impl.securityToken;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
-import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
@@ -55,7 +56,7 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
     public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
                       String correlationID) throws XMLSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
-        XMLSecurityUtils.doPasswordCallback(getCallbackHandler(), pwCb);
+        WSSUtils.doPasswordCallback(getCallbackHandler(), pwCb);
         return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
     }
 
@@ -79,9 +80,9 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
                 getCrypto().verifyTrust(x509Certificates);
             }
         } catch (CertificateExpiredException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         } catch (CertificateNotYetValidException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
     }
 

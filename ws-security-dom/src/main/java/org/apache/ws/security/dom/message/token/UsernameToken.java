@@ -106,7 +106,9 @@ public class UsernameToken {
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                "badUsernameToken"
+                "badElement",
+                TOKEN,
+                el
             );
         }
         elementUsername = 
@@ -136,7 +138,8 @@ public class UsernameToken {
         if (elementUsername == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                "badUsernameToken"
+                "badUsernameToken",
+                "Username is missing"
             );
         }
         
@@ -152,7 +155,8 @@ public class UsernameToken {
             if (elementPassword != null || elementIteration == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                    "badUsernameToken"
+                    "badUsernameToken",
+                    "Password is missing"
                 );
             }
             return;
@@ -166,7 +170,8 @@ public class UsernameToken {
                 if (iterInt < 0 || iterInt > 10000) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "badUsernameToken"
+                        "badUsernameToken",
+                        "Iteration is missing"
                     );
                 }
             }
@@ -198,7 +203,8 @@ public class UsernameToken {
             if (elementNonce == null || elementCreated == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                    "badUsernameToken"
+                    "badUsernameToken",
+                    "Nonce or Created is missing"
                 );
             }
         }
@@ -807,7 +813,8 @@ public class UsernameToken {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
             }
-            throw new WSSecurityException("Unable to convert password to UTF-8", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e, "Unable to convert password to UTF-8");
         }
     }
     

@@ -167,8 +167,9 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
-            Assert.assertEquals(e.getCause().getMessage(), "\n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a ECKeyValue");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 }

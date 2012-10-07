@@ -26,6 +26,7 @@ import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.SecurityTokenReference;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -111,7 +112,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                     Attribute attribute = xmlSecStartElement.getAttributeByName(this.attribute);
                     if (attribute != null && this.attributeValue.equals(attribute.getValue())) {
                         if (refFound) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "duplicateId");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "duplicateId");
                         }
                         refFound = true;
                         startElementName = xmlSecStartElement.getName();

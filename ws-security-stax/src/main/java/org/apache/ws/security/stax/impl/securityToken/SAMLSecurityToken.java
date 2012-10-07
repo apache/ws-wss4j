@@ -19,11 +19,12 @@
 package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.opensaml.common.SAMLVersion;
 
@@ -77,9 +78,9 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
                 getCrypto().verifyTrust(x509Certificates);
             }
         } catch (CertificateExpiredException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
         } catch (CertificateNotYetValidException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_CHECK, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
         }
     }
 

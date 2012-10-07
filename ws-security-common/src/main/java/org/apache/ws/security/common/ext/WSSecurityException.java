@@ -19,14 +19,10 @@
 
 package org.apache.ws.security.common.ext;
 
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.utils.I18n;
 
 import javax.xml.namespace.QName;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /**
  * Exception class for WS-Security.
@@ -80,79 +76,28 @@ public class WSSecurityException extends XMLSecurityException {
     public static final QName MESSAGE_EXPIRED = new QName(NS_WSSE10, "MessageExpired");
 
     public enum ErrorCode {
-        FAILURE,
-        UNSUPPORTED_SECURITY_TOKEN,
-        UNSUPPORTED_ALGORITHM,
-        INVALID_SECURITY,
-        INVALID_SECURITY_TOKEN,
-        FAILED_AUTHENTICATION,
-        FAILED_CHECK,
-        SECURITY_TOKEN_UNAVAILABLE,
-        MESSAGE_EXPIRED,
-        FAILED_ENCRYPTION,
-        FAILED_SIGNATURE,
-    }
+        FAILURE(null), //Non standard error message
+        UNSUPPORTED_SECURITY_TOKEN(WSSecurityException.UNSUPPORTED_SECURITY_TOKEN),
+        UNSUPPORTED_ALGORITHM(WSSecurityException.UNSUPPORTED_ALGORITHM),
+        INVALID_SECURITY(WSSecurityException.INVALID_SECURITY),
+        INVALID_SECURITY_TOKEN(WSSecurityException.INVALID_SECURITY_TOKEN),
+        FAILED_AUTHENTICATION(WSSecurityException.FAILED_AUTHENTICATION),
+        FAILED_CHECK(WSSecurityException.FAILED_CHECK),
+        SECURITY_TOKEN_UNAVAILABLE(WSSecurityException.SECURITY_TOKEN_UNAVAILABLE),
+        MESSAGE_EXPIRED(WSSecurityException.MESSAGE_EXPIRED),
+        FAILED_ENCRYPTION(null), //Non standard error message
+        FAILED_SIGNATURE(null), //Non standard error message
+        ;
 
-    private static final ResourceBundle xmlsecResources;
-    private static final ResourceBundle resources;
-    
-    /*
-     * This is an Integer -> QName map. Its function is to map the integer error codes
-     * given above to the QName fault codes as defined in the SOAP Message Security 1.1
-     * specification. A client application can simply call getFaultCode rather than do
-     * any parsing of the error code. Note that there are no mappings for "FAILURE",
-     * "FAILED_ENCRYPTION" and "FAILED_SIGNATURE" as these are not standard error messages.
-     */
-    private static final Map<ErrorCode, QName> FAULT_CODE_MAP = new HashMap<ErrorCode, QName>();
+        private QName qName;
 
-    static {
-        try {
-            xmlsecResources = ResourceBundle.getBundle("messages.errors");
-            resources = ResourceBundle.getBundle("messages.wss4j_errors");
-        } catch (MissingResourceException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        private ErrorCode(QName qName) {
+            this.qName = qName;
         }
 
-        FAULT_CODE_MAP.put(
-                ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                UNSUPPORTED_SECURITY_TOKEN
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.UNSUPPORTED_ALGORITHM,
-                UNSUPPORTED_ALGORITHM
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.INVALID_SECURITY,
-                INVALID_SECURITY
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.INVALID_SECURITY_TOKEN,
-                INVALID_SECURITY_TOKEN
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.FAILED_AUTHENTICATION,
-                FAILED_AUTHENTICATION
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.FAILED_CHECK,
-                FAILED_CHECK
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.FAILED_SIGNATURE,
-                FAILED_CHECK
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.FAILED_ENCRYPTION,
-                FAILED_CHECK
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
-                SECURITY_TOKEN_UNAVAILABLE
-        );
-        FAULT_CODE_MAP.put(
-                ErrorCode.MESSAGE_EXPIRED,
-                MESSAGE_EXPIRED
-        );
+        public QName getQName() {
+            return qName;
+        }
     }
 
     private ErrorCode errorCode;
@@ -166,8 +111,8 @@ public class WSSecurityException extends XMLSecurityException {
      * @param exception
      * @param arguments
      */
-    public WSSecurityException(ErrorCode errorCode, String msgId, Throwable exception, Object... arguments) {
-        super(getMessage(errorCode, msgId, arguments), exception);
+    public WSSecurityException(ErrorCode errorCode, String msgId, Exception exception, Object... arguments) {
+        super(msgId, arguments, exception);
         this.errorCode = errorCode;
     }
 
@@ -179,13 +124,13 @@ public class WSSecurityException extends XMLSecurityException {
      * @param msgId
      * @param exception
      */
-    public WSSecurityException(ErrorCode errorCode, String msgId, Throwable exception) {
-        super(getMessage(errorCode, msgId), exception);
+    public WSSecurityException(ErrorCode errorCode, String msgId, Exception exception) {
+        super(msgId, exception);
         this.errorCode = errorCode;
     }
 
-    public WSSecurityException(ErrorCode errorCode, Throwable exception) {
-        super(getMessage(errorCode, null), exception);
+    public WSSecurityException(ErrorCode errorCode, Exception exception) {
+        super(exception);
         this.errorCode = errorCode;
     }
 
@@ -198,20 +143,10 @@ public class WSSecurityException extends XMLSecurityException {
      * @param arguments
      */
     public WSSecurityException(ErrorCode errorCode, String msgId, Object... arguments) {
-        super(getMessage(errorCode, msgId, arguments));
+        super(msgId, arguments);
         this.errorCode = errorCode;
     }
 
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorCode
-     * @param msgId
-     */
-    public WSSecurityException(ErrorCode errorCode, String msgId) {
-        this(errorCode, msgId, (Object[]) null);
-    }
 
     /**
      * Constructor.
@@ -220,27 +155,7 @@ public class WSSecurityException extends XMLSecurityException {
      * @param errorCode
      */
     public WSSecurityException(ErrorCode errorCode) {
-        this(errorCode, null, (Object[]) null);
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorMessage
-     */
-    public WSSecurityException(String errorMessage) {
-        super(errorMessage);
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorMessage
-     */
-    public WSSecurityException(String errorMessage, Throwable t) {
-        super(errorMessage, t);
+        this(errorCode, "empty", I18n.getExceptionMessage(errorCode.name()));
     }
 
     /**
@@ -260,42 +175,6 @@ public class WSSecurityException extends XMLSecurityException {
      * @return the fault code QName of this exception
      */
     public javax.xml.namespace.QName getFaultCode() {
-        QName ret = FAULT_CODE_MAP.get(this.errorCode);
-        if (ret != null) {
-            return ret;
-        }
-        return null;
+        return this.errorCode.getQName();
     }
-
-    /**
-     * get the message from resource bundle.
-     * <p/>
-     *
-     * @param errorCode
-     * @param msgId
-     * @param arguments
-     * @return the message translated from the property (message) file.
-     */
-    private static String getMessage(ErrorCode errorCode, String msgId, Object... arguments) {
-        String msg = null;
-        String errorCodeString = String.valueOf(errorCode.ordinal());
-        try {
-            if (resources.containsKey(errorCodeString)) {
-                msg = resources.getString(errorCodeString);
-            } else {
-                msg = xmlsecResources.getString(errorCodeString);
-            }
-            if (msgId != null) {
-                if (resources.containsKey(msgId)) {
-                    return msg += (" (" + MessageFormat.format(resources.getString(msgId), arguments) + ")");
-                } else {
-                    return msg += (" (" + MessageFormat.format(xmlsecResources.getString(msgId), arguments) + ")");
-                }
-            }
-        } catch (MissingResourceException e) {
-            throw new RuntimeException("Undefined '" + msgId + "' resource property", e);
-        }
-        return msg;
-    }
-    
 }

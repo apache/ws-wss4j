@@ -27,6 +27,7 @@ import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -96,15 +97,15 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 cryptoType.setAlias(samlCallback.getIssuerKeyName());
                 certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
                 if (certificates == null) {
-                    throw new WSSecurityException(
-                            "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                            "empty", "No issuer certs were found to sign the SAML Assertion using issuer name: "
                                     + samlCallback.getIssuerKeyName()
                     );
                 }
                 try {
                     privateKey = samlCallback.getIssuerCrypto().getPrivateKey(samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword());
                 } catch (Exception ex) {
-                    throw new WSSecurityException(ex.getMessage(), ex);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
             } else {
                 SubjectBean subjectBean = samlCallback.getSubject();

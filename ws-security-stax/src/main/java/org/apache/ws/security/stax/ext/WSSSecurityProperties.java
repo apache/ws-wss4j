@@ -28,8 +28,6 @@ import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
-import org.apache.xml.security.stax.ext.XMLSecurityConfigurationException;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 
 /**
@@ -227,10 +225,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Crypto cachedSignatureCrypto;
     private KeyStore cachedSignatureKeyStore;
 
-    public Crypto getSignatureCrypto() throws XMLSecurityException {
+    public Crypto getSignatureCrypto() throws WSSConfigurationException {
 
         if (this.getSignatureKeyStore() == null) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
         }
 
         if (this.getSignatureKeyStore() == cachedSignatureKeyStore) {
@@ -248,7 +246,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             cachedSignatureKeyStore = this.getSignatureKeyStore();
             return signatureCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
         }
     }
     
@@ -280,10 +278,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Crypto cachedSignatureVerificationCrypto;
     private KeyStore cachedSignatureVerificationKeyStore;
 
-    public Crypto getSignatureVerificationCrypto() throws XMLSecurityException {
+    public Crypto getSignatureVerificationCrypto() throws WSSConfigurationException {
 
         if (this.getSignatureVerificationKeyStore() == null) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
         }
 
         if (this.getSignatureVerificationKeyStore() == cachedSignatureVerificationKeyStore) {
@@ -301,7 +299,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "signatureVerificationCryptoFailure", e);
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureVerificationCryptoFailure", e);
         }
     }
     
@@ -359,12 +357,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * returns the decryptionCrypto for the key-management
      *
      * @return A Crypto instance
-     * @throws XMLSecurityException thrown if something goes wrong
+     * @throws WSSConfigurationException thrown if something goes wrong
      */
-    public Crypto getDecryptionCrypto() throws XMLSecurityException {
+    public Crypto getDecryptionCrypto() throws WSSConfigurationException {
 
         if (this.getDecryptionKeyStore() == null) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "decryptionKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "decryptionKeyStoreNotSet");
         }
 
         if (this.getDecryptionKeyStore() == cachedDecryptionKeyStore) {
@@ -382,7 +380,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             cachedDecryptionKeyStore = this.getDecryptionKeyStore();
             return decryptionCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "decryptionCryptoFailure", e);
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "decryptionCryptoFailure", e);
         }
     }
     
@@ -441,12 +439,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * returns the encryptionCrypto for the key-management
      *
      * @return A Crypto instance
-     * @throws XMLSecurityException thrown if something goes wrong
+     * @throws WSSConfigurationException thrown if something goes wrong
      */
-    public Crypto getEncryptionCrypto() throws XMLSecurityException {
+    public Crypto getEncryptionCrypto() throws WSSConfigurationException {
 
         if (this.getEncryptionKeyStore() == null) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
         }
 
         if (this.getEncryptionKeyStore() == cachedEncryptionKeyStore) {
@@ -464,7 +462,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;
         } catch (Exception e) {
-            throw new XMLSecurityConfigurationException(XMLSecurityException.ErrorCode.FAILURE, "encryptionCryptoFailure", e);
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionCryptoFailure", e);
         }
     }
     

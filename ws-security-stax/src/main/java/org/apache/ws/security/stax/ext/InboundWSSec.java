@@ -20,13 +20,14 @@ package org.apache.ws.security.stax.ext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.ws.security.stax.impl.processor.input.OperationInputProcessor;
 import org.apache.ws.security.stax.impl.processor.input.SecurityHeaderInputProcessor;
 import org.apache.ws.security.stax.impl.processor.input.SignatureConfirmationInputProcessor;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessor;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.InputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
@@ -91,7 +92,8 @@ public class InboundWSSec {
      * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws XMLSecurityException 
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader) throws XMLStreamException, XMLSecurityException {
+    public XMLStreamReader processInMessage(
+            XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
         return this.processInMessage(xmlStreamReader, null, null);
     }
 
@@ -113,7 +115,9 @@ public class InboundWSSec {
      * @throws XMLStreamException  thrown when a streaming error occurs
      * @throws XMLSecurityException 
      */
-    public XMLStreamReader processInMessage(XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws XMLStreamException, XMLSecurityException {
+    public XMLStreamReader processInMessage(
+            XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,
+            SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
 
         if (requestSecurityEvents == null) {
             requestSecurityEvents = Collections.emptyList();
@@ -125,14 +129,18 @@ public class InboundWSSec {
         securityContextImpl.ignoredBSPRules(this.securityProperties.getIgnoredBSPRules());
 
         if (!requestSecurityEvents.isEmpty()) {
-            Iterator<SecurityEvent> securityEventIterator = requestSecurityEvents.iterator();
-            while (securityEventIterator.hasNext()) {
-                SecurityEvent securityEvent = securityEventIterator.next();
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
-                    securityContextImpl.registerSecurityEvent(securityEvent);
-                    securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
-                    break;
+            try {
+                Iterator<SecurityEvent> securityEventIterator = requestSecurityEvents.iterator();
+                while (securityEventIterator.hasNext()) {
+                    SecurityEvent securityEvent = securityEventIterator.next();
+                    if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
+                        securityContextImpl.registerSecurityEvent(securityEvent);
+                        securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
+                        break;
+                    }
                 }
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
 

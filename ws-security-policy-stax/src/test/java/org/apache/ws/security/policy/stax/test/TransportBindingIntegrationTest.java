@@ -253,9 +253,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.WSSPolicyException: \n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -483,8 +483,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.WSSPolicyException: Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied");
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -838,9 +839,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "IssuerName in Policy (CN=transmitter,OU=swssf,C=CH) didn't match with the one in the HttpsToken (CN=example,OU=swssf,C=CH)");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -953,9 +954,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Asymmetric algorithm http://www.w3.org/2001/04/xmldsig-more#rsa-sha512 does not meet policy");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1070,9 +1071,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "C14N algorithm http://www.w3.org/2006/12/xml-c14n11 does not meet policy");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -1187,9 +1188,9 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Digest algorithm http://www.w3.org/2001/04/xmldsig-more#md5 does not meet policy");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         } finally {
             switchAllowMD5Algorithm(false);
         }
@@ -1303,10 +1304,10 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
             Assert.fail("Exception expected");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getCause().getMessage(),
                     "Encryption algorithm http://www.w3.org/2001/04/xmlenc#tripledes-cbc does not meet policy\n" +
                     "Symmetric encryption algorithm key length 192 does not meet policy");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 

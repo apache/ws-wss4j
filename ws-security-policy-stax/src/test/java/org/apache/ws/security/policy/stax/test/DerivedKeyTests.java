@@ -183,9 +183,9 @@ public class DerivedKeyTests extends AbstractPolicyTestBase {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getMessage(),
                     "Derived key must be used");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -257,9 +257,9 @@ public class DerivedKeyTests extends AbstractPolicyTestBase {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.stax.PolicyViolationException: \n" +
+            Assert.assertEquals(e.getMessage(),
                     "Derived key must be used");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 
@@ -323,9 +323,9 @@ public class DerivedKeyTests extends AbstractPolicyTestBase {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.WSSPolicyException: \n" +
+            Assert.assertEquals(e.getMessage(),
                     "Derived key must be used");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 

@@ -25,10 +25,14 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.Provider;
 import java.security.Security;
+import java.util.*;
 
 import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.ws.security.common.util.Loader;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.I18n;
 import org.apache.xml.security.utils.XMLUtils;
+import sun.util.ResourceBundleEnumeration;
 
 /**
  * Configure Crypto providers.
@@ -56,6 +60,7 @@ public final class WSProviderConfig {
     
     public static synchronized void init() {
         if (!staticallyInitialized) {
+            initializeResourceBundles();
             setXmlSecIgnoreLineBreak();
             if (addJceProviders) {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
@@ -118,6 +123,36 @@ public final class WSProviderConfig {
     
     private static void addXMLDSigRIInternal() {
         addJceProvider("ApacheXMLDSig", new XMLDSigRI());
+    }
+
+    private static void initializeResourceBundles() {
+
+        ResourceBundle resourceBundle = new ResourceBundle() {
+
+            private final ResourceBundle wss4jSecResourceBundle = ResourceBundle.getBundle("messages.wss4j_errors");
+            private final ResourceBundle xmlSecResourceBundle = ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase);
+
+            @Override
+            protected Object handleGetObject(String key) {
+                Object value = null;
+                try {
+                    value = wss4jSecResourceBundle.getObject(key);
+                } catch (MissingResourceException e) {
+                    try {
+                        value = xmlSecResourceBundle.getObject(key);
+                    } catch (MissingResourceException ex) { //NOPMD
+                        //ignore
+                    }
+                }
+                return value;
+            }
+
+            @Override
+            public Enumeration<String> getKeys() {
+                return new ResourceBundleEnumeration(wss4jSecResourceBundle.keySet(), xmlSecResourceBundle.getKeys());
+            }
+        };
+        I18n.init(resourceBundle);
     }
 
     /**

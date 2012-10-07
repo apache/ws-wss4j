@@ -25,10 +25,9 @@ import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Attr;
@@ -109,11 +108,12 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
+            Assert.assertTrue(throwable instanceof WSSecurityException);
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
             //Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");
-            Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");
+            Assert.assertEquals(throwable.getMessage(), "Recursive key reference detected.");
+            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -197,9 +197,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            //todo exception should be a WSSecurityException
-            Assert.assertTrue(throwable instanceof XMLSecurityException);
-            Assert.assertTrue(throwable.getMessage().contains("The signature or decryption was invalid (Digest verification failed for URI"));
+            Assert.assertTrue(throwable instanceof WSSecurityException);
+            Assert.assertTrue(throwable.getMessage().contains("Invalid digest of reference "));
+            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -308,6 +308,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The message has expired");
+                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
     }
@@ -340,9 +341,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
-                    "header (43 references are contained in the Manifest, maximum 30 are allowed. You can raise the " +
-                    "maximum via the \"MaximumAllowedReferencesPerManifest\" property in the configuration.)");
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "43 references are contained in the Manifest, maximum 30 are allowed. You can raise the " +
+                    "maximum via the \"MaximumAllowedReferencesPerManifest\" property in the configuration.");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -376,9 +378,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
-                    "header (1 transforms are contained in the Reference, maximum 0 are allowed. You can raise the " +
-                    "maximum via the \"MaximumAllowedTransformsPerReference\" property in the configuration.)");
+            Assert.assertEquals(e.getCause().getMessage(), "1 transforms are contained in the Reference, maximum 0 are allowed. You can raise the " +
+                    "maximum via the \"MaximumAllowedTransformsPerReference\" property in the configuration.");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         } finally {
             changeValueOfMaximumAllowedTransformsPerReference(oldval);
         }
@@ -412,9 +414,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.xml.security.stax.ext.XMLSecurityException: " +
-                    "An error was discovered processing the <wsse:Security> header (The use of MD5 algorithm is " +
-                    "strongly discouraged. Nonetheless can it be enabled via the \"AllowMD5Algorithm\" property in the configuration.)");
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "The use of MD5 algorithm is " +
+                    "strongly discouraged. Nonetheless can it be enabled via the \"AllowMD5Algorithm\" property in the configuration.");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -480,9 +484,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
-                    "header (Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
-                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.)");
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
+                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
         } finally {
             changeValueOfMaximumAllowedXMLStructureDepth(oldval);
         }
@@ -517,9 +521,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> " +
-                    "header (Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
-                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.)");
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
+                    "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         } finally {
             changeValueOfMaximumAllowedXMLStructureDepth(oldval);
         }

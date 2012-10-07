@@ -185,7 +185,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertEquals(e.getCause().getMessage(), "General security error (SAML token security failure)");
+                Assert.assertEquals(e.getCause().getMessage(), "SAML token security failure");
             }
         }
     }

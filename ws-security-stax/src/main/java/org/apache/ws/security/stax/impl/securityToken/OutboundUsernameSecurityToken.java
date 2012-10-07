@@ -19,8 +19,8 @@
 package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;

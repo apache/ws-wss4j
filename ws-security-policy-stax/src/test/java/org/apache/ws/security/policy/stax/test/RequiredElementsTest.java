@@ -82,7 +82,7 @@ public class RequiredElementsTest extends AbstractPolicyTestBase {
             policyEnforcer.doFinal();
             Assert.fail("Exception expected");
         } catch (WSSPolicyException e) {
-            Assert.assertEquals(e.getMessage(), "\nElement /{http://example.org}a must be present");
+            Assert.assertEquals(e.getMessage(), "Element /{http://example.org}a must be present");
         }
     }
 }

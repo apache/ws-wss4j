@@ -36,6 +36,7 @@ import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.ws.security.stax.securityEvent.UsernameTokenSecurityEvent;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -133,14 +134,14 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             try {
                 cache.put(nonce, created, elementAttributes);
             } catch (CacheException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
 
             XMLGregorianCalendar xmlGregorianCalendar;
             try {
                 xmlGregorianCalendar = WSSConstants.datatypeFactory.newXMLGregorianCalendar(created);
             } catch (IllegalArgumentException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             GregorianCalendar createdCal = xmlGregorianCalendar.toGregorianCalendar();
             GregorianCalendar now = new GregorianCalendar();
@@ -237,7 +238,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
             private UsernameSecurityToken securityToken = null;
 
-            public SecurityToken getSecurityToken() throws WSSecurityException {
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
                 if (this.securityToken != null) {
                     return this.securityToken;
                 }

@@ -56,7 +56,7 @@ public class BSPEnforcer {
         }
         
         if (!ignoredBSPRules.contains(bspRule)) {
-            throw new WSSecurityException(
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
                 "BSP:" + bspRule.name() + ": " + bspRule.getMsg()
             );
         } else {

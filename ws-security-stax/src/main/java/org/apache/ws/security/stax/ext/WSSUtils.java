@@ -19,6 +19,7 @@
 package org.apache.ws.security.stax.ext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -39,9 +40,13 @@ import org.apache.ws.security.stax.securityEvent.SecurityContextTokenSecurityEve
 import org.apache.ws.security.stax.securityEvent.SpnegoContextTokenSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.UsernameTokenSecurityEvent;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,6 +68,49 @@ public class WSSUtils extends XMLSecurityUtils {
 
     protected WSSUtils() {
         super();
+    }
+
+    /**
+     * Executes the Callback handling. Typically used to fetch passwords
+     *
+     * @param callbackHandler
+     * @param callback
+     * @throws XMLSecurityException if the callback couldn't be executed
+     */
+    public static void doPasswordCallback(CallbackHandler callbackHandler, Callback callback)
+            throws WSSecurityException {
+
+        if (callbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+        }
+        try {
+            callbackHandler.handle(new Callback[]{callback});
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+    }
+
+    /**
+     * Try to get the secret key from a CallbackHandler implementation
+     *
+     * @param callbackHandler a CallbackHandler implementation
+     * @return An array of bytes corresponding to the secret key (can be null)
+     * @throws XMLSecurityException
+     */
+    public static void doSecretKeyCallback(CallbackHandler callbackHandler, Callback callback, String id)
+            throws WSSecurityException {
+
+        if (callbackHandler != null) {
+            try {
+                callbackHandler.handle(new Callback[]{callback});
+            } catch (IOException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+            }
+        }
     }
 
     public static String doPasswordDigest(byte[] nonce, String created, String password) throws WSSecurityException {
@@ -194,13 +242,13 @@ public class WSSUtils extends XMLSecurityUtils {
                     List<X509Certificate> certificates = Arrays.asList(x509Certificates);
                     abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
                 } catch (CertificateException e) {
-                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 } catch (NoSuchProviderException e) {
-                    throw new XMLSecurityException(XMLSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
             }
         } catch (CertificateEncodingException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
     }
@@ -211,7 +259,7 @@ public class WSSUtils extends XMLSecurityUtils {
             throws XMLSecurityException, XMLStreamException {
         // As per the 1.1 specification, SKI can only be used for a V3 certificate
         if (x509Certificates[0].getVersion() != 3) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, "invalidCertForSKI");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertForSKI");
         }
 
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
@@ -234,7 +282,7 @@ public class WSSUtils extends XMLSecurityUtils {
         try {
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
         } catch (CertificateEncodingException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
@@ -256,9 +304,9 @@ public class WSSUtils extends XMLSecurityUtils {
 
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
         } catch (CertificateEncodingException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (NoSuchAlgorithmException e) {
-            throw new XMLSecurityException(XMLSecurityException.ErrorCode.FAILED_SIGNATURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }

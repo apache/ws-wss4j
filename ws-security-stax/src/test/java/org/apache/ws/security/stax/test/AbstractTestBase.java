@@ -40,7 +40,7 @@ import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.SecurityContextImpl;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
@@ -380,7 +380,7 @@ public abstract class AbstractTestBase {
              */
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new WSSecurityException("WSS4JHandler: No action defined");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSS4JHandler: No action defined");
             }
             List<Integer> actions = new ArrayList<Integer>();
             int doAction = WSSecurityUtil.decodeAction(action, actions);
@@ -408,7 +408,7 @@ public abstract class AbstractTestBase {
                  * We need a username - if none throw a WSSecurityException. For encryption
                  * there is a specific parameter to get a username.
                  */
-                throw new WSSecurityException(
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: Empty username for specified action"
                 );
             }
@@ -424,7 +424,7 @@ public abstract class AbstractTestBase {
             */
             Document doc = (Document) mc.get(SECURED_DOCUMENT);
             if (doc == null) {
-                throw new WSSecurityException(
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: cannot get SOAP envlope from message"
                 );
             }
@@ -444,7 +444,7 @@ public abstract class AbstractTestBase {
                 throws WSSecurityException {
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new WSSecurityException("WSS4JHandler: No action defined");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSS4JHandler: No action defined");
             }
             List<Integer> actions = new ArrayList<Integer>();
             int doAction = WSSecurityUtil.decodeAction(action, actions);
@@ -486,7 +486,7 @@ public abstract class AbstractTestBase {
                 if (doDebug) {
                     log.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: security processing failed", ex
                 );
             }
@@ -495,7 +495,7 @@ public abstract class AbstractTestBase {
                 if (doAction == WSConstants.NO_SECURITY) {
                     return true;
                 } else {
-                    throw new WSSecurityException(
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
                             "WSS4JHandler: Request does not contain required Security header"
                     );
                 }
@@ -512,7 +512,7 @@ public abstract class AbstractTestBase {
              * now check the security actions: do they match, in right order?
              */
             if (!checkReceiverResults(wsResult, actions)) {
-                throw new WSSecurityException(
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: security processing failed (actions mismatch)"
                 );
             }

@@ -326,7 +326,8 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "The signature or decryption was invalid");
+                Assert.assertEquals(e.getCause().getMessage(), "An error was discovered processing the <wsse:Security> header");
+                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
             }
         }
     }

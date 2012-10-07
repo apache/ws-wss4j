@@ -140,7 +140,7 @@ public class UsernameTokenProcessor implements Processor {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badUsernameToken",
-                    new Object[] {"A replay attack has been detected"}
+                    "A replay attack has been detected"
                 );
             }
             replayCache.add(ut.getNonce());

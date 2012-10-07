@@ -25,6 +25,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.securityEvent.TimestampSecurityEvent;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -128,7 +129,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
 
         } catch (IllegalArgumentException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
     }
 

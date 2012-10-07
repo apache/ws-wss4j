@@ -100,9 +100,9 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
             policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
-            Assert.assertEquals(e.getMessage(), "An error was discovered processing the <wsse:Security> header; nested exception is: \n" +
-                    "\torg.apache.ws.security.policy.WSSPolicyException: \n" +
+            Assert.assertEquals(e.getMessage(),
                     "X509Certificate Version 3 mismatch; Policy enforces WssX509V3Token11");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 

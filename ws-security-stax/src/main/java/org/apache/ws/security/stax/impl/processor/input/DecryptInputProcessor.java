@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.ws.security.common.bsp.BSPRule;
@@ -31,14 +32,15 @@ import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.DocumentContext;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurityContext;
 import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
@@ -91,8 +93,34 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
     }
 
-    protected void handleEncryptedContent(InputProcessorChain inputProcessorChain, XMLSecStartElement parentStartXMLEvent,
-                                          SecurityToken securityToken, EncryptedDataType encryptedDataType) throws XMLSecurityException {
+    @Override
+    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+
+        try {
+            return super.processNextHeaderEvent(inputProcessorChain);
+        } catch (WSSecurityException e) {
+            throw e;
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
+    }
+
+    @Override
+    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        try {
+            return super.processNextEvent(inputProcessorChain);
+        } catch (WSSecurityException e) {
+            throw e;
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
+    }
+
+    protected void handleEncryptedContent(
+            InputProcessorChain inputProcessorChain, XMLSecStartElement parentStartXMLEvent,
+            SecurityToken securityToken, EncryptedDataType encryptedDataType) throws XMLSecurityException {
 
         final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
         List<QName> elementPath = parentStartXMLEvent.getElementPath();
@@ -117,7 +145,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     @Override
     protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProcessor(
             boolean encryptedHeader, XMLSecStartElement xmlSecStartElement, EncryptedDataType encryptedDataType,
-            SecurityToken securityToken, SecurityContext securityContext) throws WSSecurityException {
+            SecurityToken securityToken, SecurityContext securityContext) throws XMLSecurityException {
 
         String encryptionAlgorithm = encryptedDataType.getEncryptionMethod().getAlgorithm();
         if (!WSSConstants.NS_XENC_TRIPLE_DES.equals(encryptionAlgorithm)
@@ -175,8 +203,34 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
 
         @Override
-        protected void handleEncryptedElement(InputProcessorChain inputProcessorChain, XMLSecStartElement xmlSecStartElement,
-                                              SecurityToken securityToken, EncryptedDataType encryptedDataType) throws XMLSecurityException {
+        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, WSSecurityException {
+            try {
+                return super.processNextHeaderEvent(inputProcessorChain);
+            } catch (WSSecurityException e) {
+                throw e;
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            }
+        }
+
+        @Override
+        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, WSSecurityException {
+            try {
+                return super.processNextEvent(inputProcessorChain);
+            } catch (WSSecurityException e) {
+                throw e;
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            }
+        }
+
+        @Override
+        protected void handleEncryptedElement(
+                InputProcessorChain inputProcessorChain, XMLSecStartElement xmlSecStartElement,
+                SecurityToken securityToken, EncryptedDataType encryptedDataType) throws XMLSecurityException {
+
             //fire a SecurityEvent:
             final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
             List<QName> elementPath = xmlSecStartElement.getElementPath();

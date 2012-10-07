@@ -22,6 +22,7 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -49,19 +50,20 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
         try {
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN);
             if (tokenId == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             final OutboundSecurityToken wrappingSecurityToken = wrappingSecurityTokenProvider.getSecurityToken();
             if (wrappingSecurityToken == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
 
             final String wsuId = IDGenerator.generateID(null);

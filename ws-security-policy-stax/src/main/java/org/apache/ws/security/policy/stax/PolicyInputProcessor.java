@@ -28,6 +28,7 @@ import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.RequiredElementSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.RequiredPartSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;

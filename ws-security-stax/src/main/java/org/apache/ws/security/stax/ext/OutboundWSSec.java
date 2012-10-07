@@ -21,9 +21,9 @@ package org.apache.ws.security.stax.ext;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.impl.WSSecurityContextImpl;
 import org.apache.ws.security.stax.impl.processor.output.*;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessor;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.OutputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamWriter;
@@ -58,7 +58,9 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(
+            OutputStream outputStream, String encoding,
+            List<SecurityEvent> requestSecurityEvents) throws WSSecurityException {
         return processOutMessage(outputStream, encoding, requestSecurityEvents, null);
     }
 
@@ -70,7 +72,9 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(XMLStreamWriter xmlStreamWriter, String encoding, List<SecurityEvent> requestSecurityEvents) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(
+            XMLStreamWriter xmlStreamWriter, String encoding,
+            List<SecurityEvent> requestSecurityEvents) throws WSSecurityException {
         return processOutMessage(xmlStreamWriter, encoding, requestSecurityEvents, null);
     }
 
@@ -82,7 +86,9 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(
+            OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents,
+            SecurityEventListener securityEventListener) throws WSSecurityException {
         return processOutMessage((Object) outputStream, encoding, requestSecurityEvents, securityEventListener);
     }
 
@@ -94,11 +100,15 @@ public class OutboundWSSec {
      * @return A new XMLStreamWriter which does transparently the security processing.
      * @throws WSSecurityException thrown when a Security failure occurs
      */
-    public XMLStreamWriter processOutMessage(XMLStreamWriter xmlStreamWriter, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
+    public XMLStreamWriter processOutMessage(
+            XMLStreamWriter xmlStreamWriter, String encoding, List<SecurityEvent> requestSecurityEvents,
+            SecurityEventListener securityEventListener) throws WSSecurityException {
         return processOutMessage((Object) xmlStreamWriter, encoding, requestSecurityEvents, securityEventListener);
     }
 
-    private XMLStreamWriter processOutMessage(Object output, String encoding, List<SecurityEvent> requestSecurityEvents, SecurityEventListener securityEventListener) throws WSSecurityException {
+    private XMLStreamWriter processOutMessage(
+            Object output, String encoding, List<SecurityEvent> requestSecurityEvents,
+            SecurityEventListener securityEventListener) throws WSSecurityException {
         final WSSecurityContextImpl securityContextImpl = new WSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.addSecurityEventListener(securityEventListener);
@@ -119,14 +129,16 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, timestampOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SIGNATURE)) {
-                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                            new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
                     WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.ENCRYPT)) {
-                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                            new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
                     final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
@@ -147,11 +159,13 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
-                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor = new SignatureConfirmationOutputProcessor();
+                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
+                            new SignatureConfirmationOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
-                    BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                            new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
                     if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
@@ -159,7 +173,8 @@ public class OutboundWSSec {
                         initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
 
                     } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
-                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor = new SecurityContextTokenOutputProcessor();
+                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
+                                new SecurityContextTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
 
                     }
@@ -170,7 +185,8 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
-                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor = new BinarySecurityTokenOutputProcessor();
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                            new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
                     if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
@@ -178,7 +194,8 @@ public class OutboundWSSec {
                         initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
 
                     } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
-                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor = new SecurityContextTokenOutputProcessor();
+                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
+                                new SecurityContextTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
 
                     }
@@ -212,12 +229,14 @@ public class OutboundWSSec {
                 throw new IllegalArgumentException(output + " is not supported as output");
             }
         } catch (XMLSecurityException e) {
-            throw new WSSecurityException(e.getMessage(), e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         return new XMLSecurityStreamWriter(outputProcessorChain);
     }
 
-    private void initializeOutputProcessor(OutputProcessorChainImpl outputProcessorChain, OutputProcessor outputProcessor, XMLSecurityConstants.Action action) throws XMLSecurityException {
+    private void initializeOutputProcessor(
+            OutputProcessorChainImpl outputProcessorChain, OutputProcessor outputProcessor,
+            XMLSecurityConstants.Action action) throws XMLSecurityException {
         outputProcessor.setXMLSecurityProperties(securityProperties);
         outputProcessor.setAction(action);
         outputProcessor.init(outputProcessorChain);

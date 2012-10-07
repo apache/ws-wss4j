@@ -377,7 +377,7 @@ public class Merlin extends CryptoBase {
      * <p/>
      *
      * @param input <code>InputStream</code> to read from
-     * @throws CredentialException
+     * @throws WSSecurityException
      */
     public KeyStore load(InputStream input, String storepass, String provider, String type) 
         throws WSSecurityException {
@@ -664,10 +664,10 @@ public class Merlin extends CryptoBase {
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
         if (keystore == null) {
-            throw new WSSecurityException("The keystore is null");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "The keystore is null");
         }
         if (callbackHandler == null) {
-            throw new WSSecurityException("The CallbackHandler is null");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "The CallbackHandler is null");
         }
         
         String identifier = getIdentifier(certificate, keystore);
@@ -676,7 +676,7 @@ public class Merlin extends CryptoBase {
                 String msg = "Cannot find key for alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
-                throw new WSSecurityException(msg);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             String password = getPassword(identifier, callbackHandler);
             if (password == null && privatePasswordSet) {
@@ -691,7 +691,7 @@ public class Merlin extends CryptoBase {
                 String msg = "Key is not a private key, alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
-                throw new WSSecurityException(msg);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             return (PrivateKey) keyTmp;
         } catch (KeyStoreException ex) {
@@ -721,14 +721,14 @@ public class Merlin extends CryptoBase {
         String password
     ) throws WSSecurityException {
         if (keystore == null) {
-            throw new WSSecurityException("The keystore is null");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "The keystore is null");
         }
         try {
             if (identifier == null || !keystore.isKeyEntry(identifier)) {
                 String msg = "Cannot find key for alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
-                throw new WSSecurityException(msg);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             if (password == null && privatePasswordSet) {
                 password = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
@@ -742,7 +742,7 @@ public class Merlin extends CryptoBase {
                 String msg = "Key is not a private key, alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
-                throw new WSSecurityException(msg);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             return (PrivateKey) keyTmp;
         } catch (KeyStoreException ex) {
@@ -963,7 +963,7 @@ public class Merlin extends CryptoBase {
     
     /**
      * Get an X509 Certificate (chain) of the X500Principal argument in the supplied KeyStore 
-     * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
+     * @param issuerRDN either an X500Principal or a BouncyCastle X509Name instance.
      * @param store The KeyStore
      * @return an X509 Certificate (chain)
      * @throws WSSecurityException
@@ -1047,7 +1047,7 @@ public class Merlin extends CryptoBase {
 
     /**
      * Get an X509 Certificate (chain) of the X500Principal argument in the supplied KeyStore 
-     * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
+     * @param thumbprint
      * @param store The KeyStore
      * @return an X509 Certificate (chain)
      * @throws WSSecurityException
@@ -1127,7 +1127,7 @@ public class Merlin extends CryptoBase {
     
     /**
      * Get an X509 Certificate (chain) of the X500Principal argument in the supplied KeyStore 
-     * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
+     * @param skiBytes
      * @param store The KeyStore
      * @return an X509 Certificate (chain)
      * @throws WSSecurityException

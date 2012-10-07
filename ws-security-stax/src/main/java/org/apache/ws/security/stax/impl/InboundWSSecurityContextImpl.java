@@ -26,8 +26,8 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -62,16 +62,12 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
                 if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.Encryption)) {
                     SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
 
-                    try {
-                        while (securityToken.getKeyWrappingToken() != null) {
-                            securityToken = securityToken.getKeyWrappingToken();
-                        }
-                        TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
-                        setTokenUsage(newTokenSecurityEvent, SecurityToken.TokenUsage.MainEncryption);
-                        securityEvent = newTokenSecurityEvent;
-                    } catch (XMLSecurityException e) {
-                        throw new WSSecurityException(e.getMessage(), e);
+                    while (securityToken.getKeyWrappingToken() != null) {
+                        securityToken = securityToken.getKeyWrappingToken();
                     }
+                    TokenSecurityEvent newTokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
+                    setTokenUsage(newTokenSecurityEvent, SecurityToken.TokenUsage.MainEncryption);
+                    securityEvent = newTokenSecurityEvent;
                     this.messageEncryptionTokenOccured = true;
                 }
             }
@@ -83,11 +79,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
             operationSecurityEventOccured = true;
 
-            try {
-                identifySecurityTokenDepenedenciesAndUsage(securityEventQueue);
-            } catch (XMLSecurityException e) {
-                throw new WSSecurityException(e.getMessage(), e);
-            }
+            identifySecurityTokenDepenedenciesAndUsage(securityEventQueue);
 
             Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
             while (securityEventIterator.hasNext()) {
@@ -102,6 +94,17 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         }
 
         securityEventQueue.push(securityEvent);
+    }
+
+    @Override
+    protected void forwardSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+        try {
+            super.forwardSecurityEvent(securityEvent);
+        } catch (WSSecurityException e) {
+            throw e;
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
     }
 
     private void identifySecurityTokenDepenedenciesAndUsage(
@@ -500,7 +503,10 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
         if (!ignoredBSPRules.contains(bspRule)) {
-            throw new WSSecurityException("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty",
+                    "BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         } else {
             logger.warn("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         }

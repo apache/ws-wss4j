@@ -30,10 +30,10 @@ import org.apache.ws.security.stax.ext.OutboundWSSec;
 import org.apache.ws.security.stax.ext.WSSConfigurationException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 
 /**
  * This is the central class of the streaming webservice-security framework.<br/>
@@ -49,6 +49,7 @@ public class WSSec {
     //todo outgoing client setup per policy
 
     static {
+        WSProviderConfig.init();
         try {
             Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
         } catch (XMLSecurityException e) {
@@ -56,7 +57,6 @@ public class WSSec {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        WSProviderConfig.init();
     }
 
     /**
@@ -64,14 +64,14 @@ public class WSSec {
      *
      * @param securityProperties The user-defined security configuration
      * @return A new OutboundWSSec
-     * @throws org.apache.ws.security.stax.ext.WSSecurityException
+     * @throws WSSecurityException
      *          if the initialisation failed
      * @throws org.apache.ws.security.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static OutboundWSSec getOutboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
         if (securityProperties == null) {
-            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
 
         securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
@@ -83,14 +83,14 @@ public class WSSec {
      *
      * @param securityProperties The user-defined security configuration
      * @return A new InboundWSSec
-     * @throws org.apache.ws.security.stax.ext.WSSecurityException
+     * @throws WSSecurityException
      *          if the initialisation failed
      * @throws org.apache.ws.security.stax.ext.WSSConfigurationException
      *          if the configuration is invalid
      */
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
         if (securityProperties == null) {
-            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "missingSecurityProperties");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
 
         securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
@@ -107,7 +107,7 @@ public class WSSec {
      */
     public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getOutAction() == null) {
-            throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noOutputAction");
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
         }
 
         //todo encrypt sigconf when original signature was encrypted
@@ -128,13 +128,13 @@ public class WSSec {
                 }
             } else if (action.equals(WSSConstants.SIGNATURE)) {
                 if (securityProperties.getSignatureKeyStore() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
                 }
                 if (securityProperties.getSignatureUser() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noSignatureUser");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSignatureUser");
                 }
                 if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
@@ -152,12 +152,12 @@ public class WSSec {
                 if (securityProperties.getEncryptionUseThisCertificate() == null
                         && securityProperties.getEncryptionKeyStore() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
                 if (securityProperties.getEncryptionUser() == null
                         && securityProperties.getEncryptionUseThisCertificate() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noEncryptionUser");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
@@ -173,20 +173,20 @@ public class WSSec {
                 }
             } else if (action.equals(WSSConstants.USERNAMETOKEN)) {
                 if (securityProperties.getTokenUser() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noTokenUser");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
                 }
                 if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getUsernameTokenPasswordType() == null) {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
             } else if (action.equals(WSSConstants.USERNAMETOKEN_SIGNED)) {
                 if (securityProperties.getTokenUser() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noTokenUser");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
                 }
                 if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
@@ -205,7 +205,7 @@ public class WSSec {
                 securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
             } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
@@ -240,17 +240,17 @@ public class WSSec {
                 }
             } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
                 if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getEncryptionUseThisCertificate() == null
                         && securityProperties.getEncryptionKeyStore() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
                 if (securityProperties.getEncryptionUser() == null
                         && securityProperties.getEncryptionUseThisCertificate() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noEncryptionUser");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
@@ -275,7 +275,7 @@ public class WSSec {
                 }
             } else if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
                 if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
@@ -291,7 +291,7 @@ public class WSSec {
                 }
             } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED) && 
                     (securityProperties.getCallbackHandler() == null)) {
-                throw new WSSConfigurationException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
             }
         }
         //todo clone securityProperties

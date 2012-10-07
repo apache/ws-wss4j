@@ -20,6 +20,7 @@
 package org.apache.ws.security.dom.misc;
 
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.common.SOAPUtil;
@@ -53,6 +54,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     
     public FaultCodeTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
+        WSSConfig.init();
     }
 
     /**
@@ -74,7 +76,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected with a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertTrue(ex.getMessage().startsWith("The signature or decryption was invalid"));
+            assertEquals("The private key for the supplied alias does not exist in the keystore", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "FailedCheck");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
@@ -92,8 +94,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
-            assertTrue(ex.getMessage().startsWith(
-                "An unsupported signature or encryption algorithm was used"));
+            assertEquals("unsupported key transport encryption algorithm: No such algorithm: Bad Algorithm", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "UnsupportedAlgorithm");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
@@ -118,8 +119,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on an expired message");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
-            assertTrue(ex.getMessage().startsWith(
-                "The message has expired"));
+            assertEquals("Invalid timestamp: The security semantics of the message have expired", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
@@ -146,8 +146,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on a bad password");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            assertTrue(ex.getMessage().startsWith(
-                "The security token could not be authenticated or authorized"));
+            assertEquals("The security token could not be authenticated or authorized", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "FailedAuthentication");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
@@ -174,8 +173,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on an invalid security token");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
-            assertTrue(ex.getMessage().startsWith(
-                "An invalid security token was provided"));
+            assertEquals("Bad element, expected \"{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken\" while got \"{http://schemas.xmlsoap.org/soap/envelope/}Envelope\"", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurityToken");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
@@ -191,8 +189,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on processing the security header");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
-            assertTrue(ex.getMessage().startsWith(
-                "An error was discovered processing the <wsse:Security> header"));
+            assertEquals("<Reference> token could not be retrieved", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurity");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
@@ -202,7 +199,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     /**
      * Verifies the soap envelope.
      * 
-     * @param env soap envelope
+     * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {

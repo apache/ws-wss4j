@@ -21,9 +21,9 @@ package org.apache.ws.security.stax.impl.processor.input;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
-import org.apache.xml.security.stax.ext.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 

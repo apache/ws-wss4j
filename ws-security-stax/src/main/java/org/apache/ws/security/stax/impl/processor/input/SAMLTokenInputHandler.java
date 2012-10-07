@@ -30,6 +30,7 @@ import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.securityEvent.SamlTokenSecurityEvent;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -104,11 +105,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
             if (assertionWrapper.getSubjectKeyInfo() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeyInSAMLToken");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
             }
             // The assertion must have been signed for HOK
             if (!assertionWrapper.isSigned()) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidSAMLsecurity");
             }
         }
 
@@ -257,7 +258,10 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 ((Element) currentNode).setAttributeNodeNS(namespaceNode);
                 break;
             default:
-                throw new WSSecurityException("Illegal XMLEvent received: " + xmlSecEvent.getEventType());
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
+                        "empty",
+                        "Illegal XMLEvent received: " + xmlSecEvent.getEventType());
         }
         return currentNode;
     }
@@ -269,7 +273,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      * @return A Credential instance
      * @throws WSSecurityException
      */
-    public void verifySignedAssertion(SAMLKeyInfo samlKeyInfo, WSSSecurityProperties securityProperties) throws XMLSecurityException {
+    public void verifySignedAssertion(SAMLKeyInfo samlKeyInfo, WSSSecurityProperties securityProperties)
+            throws WSSecurityException {
         validate(samlKeyInfo.getCerts(), samlKeyInfo.getPublicKey(), securityProperties);
     }
 
@@ -282,10 +287,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      *
      * @throws WSSecurityException on a failed validation
      */
-    protected void validate(X509Certificate[] certs, PublicKey publicKey, WSSSecurityProperties securityProperties) throws XMLSecurityException {
+    protected void validate(X509Certificate[] certs, PublicKey publicKey, WSSSecurityProperties securityProperties)
+            throws WSSecurityException {
         Crypto crypto = securityProperties.getSignatureVerificationCrypto();
         if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "noSigCryptoFile");
         }
 
         if (certs != null && certs.length > 0) {
@@ -314,19 +320,18 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      *
      * @throws WSSecurityException
      */
-    protected void validateCertificates(X509Certificate[] certificates)
-            throws WSSecurityException {
+    protected void validateCertificates(X509Certificate[] certificates) throws WSSecurityException {
         try {
             for (int i = 0; i < certificates.length; i++) {
                 certificates[i].checkValidity();
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
+                    WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "invalidCert", e
             );
         } catch (CertificateNotYetValidException e) {
             throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
+                    WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "invalidCert", e
             );
         }
     }
@@ -339,7 +344,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      * @return true if cert is in the keystore
      * @throws WSSecurityException
      */
-    protected boolean isCertificateInKeyStore(Crypto crypto, X509Certificate cert) throws XMLSecurityException {
+    protected boolean isCertificateInKeyStore(Crypto crypto, X509Certificate cert) throws WSSecurityException {
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
 
@@ -384,7 +389,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      * @return true if the certificate is trusted, false if not
      * @throws WSSecurityException
      */
-    protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto) throws XMLSecurityException {
+    protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto) throws WSSecurityException {
         String subjectString = cert.getSubjectX500Principal().getName();
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
@@ -471,7 +476,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      * @return true if the certificate chain is trusted, false if not
      * @throws WSSecurityException
      */
-    protected boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto) throws XMLSecurityException {
+    protected boolean verifyTrustInCerts(X509Certificate[] certificates, Crypto crypto) throws WSSecurityException {
         //
         // Use the validation method from the crypto to check whether the subjects'
         // certificate was really signed by the issuer stated in the certificate
@@ -488,9 +493,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      *
      * @throws WSSecurityException
      */
-    protected boolean validatePublicKey(PublicKey publicKey, Crypto crypto) throws XMLSecurityException {
+    protected boolean validatePublicKey(PublicKey publicKey, Crypto crypto) throws WSSecurityException {
         return crypto.verifyTrust(publicKey);
     }
-
-
 }

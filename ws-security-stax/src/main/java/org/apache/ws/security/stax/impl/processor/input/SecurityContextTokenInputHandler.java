@@ -25,6 +25,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.securityEvent.SecurityContextTokenSecurityEvent;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -87,7 +88,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                         WSPasswordCallback passwordCallback = new WSPasswordCallback(identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
                         WSSUtils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, null);
                         if (passwordCallback.getKey() == null) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", securityContextTokenType.getId());
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noKey", securityContextTokenType.getId());
                         }
                         key = new SecretKeySpec(passwordCallback.getKey(), algo);
                         setSecretKey(algorithmURI, key);
@@ -107,7 +108,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
             @Override
-            public SecurityToken getSecurityToken() throws WSSecurityException {
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
                 return securityContextToken;
             }
 
@@ -128,7 +129,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         SecurityTokenProvider securityTokenProviderDirectReference = new SecurityTokenProvider() {
 
             @Override
-            public SecurityToken getSecurityToken() throws WSSecurityException {
+            public SecurityToken getSecurityToken() throws XMLSecurityException {
                 return securityContextToken;
             }
 

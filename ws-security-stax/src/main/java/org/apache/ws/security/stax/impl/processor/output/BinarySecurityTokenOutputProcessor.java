@@ -24,6 +24,7 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
@@ -80,7 +81,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 X509Certificate x509Certificate = getReqSigCert(outputProcessorChain.getSecurityContext());
                 if (((WSSSecurityProperties) getSecurityProperties()).isUseReqSigCertForEncryption()) {
                     if (x509Certificate == null) {
-                        throw new WSSecurityException("noCert");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noCert");
                     }
                     x509Certificates = new X509Certificate[1];
                     x509Certificates[0] = x509Certificate;

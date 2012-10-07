@@ -62,7 +62,10 @@ public class AssertionState {
     }
 
     public void setErrorMessage(String errorMessage) {
-        this.errorMessage.append("\n").append(errorMessage);
+        if (this.errorMessage.length() > 0) {
+            this.errorMessage.append("\n");
+        }
+        this.errorMessage.append(errorMessage);
     }
 
     public String getErrorMessage() {

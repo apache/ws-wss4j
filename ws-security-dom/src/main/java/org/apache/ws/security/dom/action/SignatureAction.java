@@ -72,9 +72,9 @@ public class SignatureAction implements Action {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(wsSign.getSecurityTokenReferenceURI());
                 } else if (reqData.isAppendSignatureAfterTimestamp()
-                        && WSConstants.WSU_NS.equals(part.getNamespace()) 
+                        && WSConstants.WSU_NS.equals(part.getNamespace())
                         && "Timestamp".equals(part.getName())) {
-                    List<Element> elements = 
+                    List<Element> elements =
                         WSSecurityUtil.findElements(
                             doc.getDocumentElement(), part.getName(), part.getNamespace()
                         );
@@ -89,7 +89,7 @@ public class SignatureAction implements Action {
                 }
             }
 
-            List<javax.xml.crypto.dsig.Reference> referenceList = 
+            List<javax.xml.crypto.dsig.Reference> referenceList =
                 wsSign.addReferencesToSign(reqData.getSignatureParts(), reqData.getSecHeader());
 
             if (reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
@@ -101,7 +101,7 @@ public class SignatureAction implements Action {
             wsSign.prependBSTElementToHeader(reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException("Error during Signature: ", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error during Signature: ");
         }
     }
 
