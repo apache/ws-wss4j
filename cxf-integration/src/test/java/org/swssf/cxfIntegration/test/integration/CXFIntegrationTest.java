@@ -18,17 +18,31 @@
  */
 package org.swssf.cxfIntegration.test.integration;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.xml.security.stax.impl.util.KeyValue;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import javax.xml.stream.XMLInputFactory;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author $Author$
@@ -37,7 +51,18 @@ import org.testng.annotations.Test;
 public class CXFIntegrationTest {
 
     private Greeter greeterStream;
-    private Greeter greeterWSS4J;
+    private Greeter greeterDOM;
+
+    static {
+        try {
+            Field xmlInputFactoryField = StaxUtils.class.getDeclaredField("SAFE_INPUT_FACTORY");
+            xmlInputFactoryField.setAccessible(true);
+            XMLInputFactory xmlInputFactory = (XMLInputFactory)xmlInputFactoryField.get(null);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.FALSE);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @BeforeClass()
     public void setUp() {
@@ -68,8 +93,8 @@ public class CXFIntegrationTest {
 
         {
             SOAPService soapService = new SOAPService(this.getClass().getClassLoader().getResource("integration/helloWorld.wsdl"));
-            greeterWSS4J = soapService.getSoapPort();
-            final Client client = ClientProxy.getClient(greeterWSS4J);
+            greeterDOM = soapService.getSoapPort();
+            final Client client = ClientProxy.getClient(greeterDOM);
             WSS4JOutInterceptor wss4JOutInterceptor = new WSS4JOutInterceptor();
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ACTION, "Timestamp Signature Encrypt");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.USER, "transmitter");
@@ -88,51 +113,87 @@ public class CXFIntegrationTest {
             client.getInInterceptors().add(wss4JInInterceptor);
 
             client.getRequestContext().put(Message.ENDPOINT_ADDRESS, "http://localhost:9001/GreeterServiceWSS4J");
-            greeterWSS4J.greetMe("Cold start");
+
+            greeterDOM.greetMe("Cold start");
         }
     }
 
-    private long starttime;
+    private static final int invocationCount = 100;
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private ExecutorCompletionService executorCompletionService = new ExecutorCompletionService(executorService);
+    private List<KeyValue<Integer, Long>> streamingTimes = new ArrayList<KeyValue<Integer, Long>>();
+    private List<KeyValue<Integer, Long>> domTimes = new ArrayList<KeyValue<Integer, Long>>();
 
-    @Test(alwaysRun = true)
-    public void startTiming() {
-        System.gc();
-        System.out.println("startTiming");
-        starttime = System.currentTimeMillis();
+    @DataProvider
+    public Object[][] payload() {
+        Object[][] objects = new Object[10][1];
+        for (int i = 0; i < objects.length; i++) {
+            objects[i][0] = RandomStringUtils.randomAlphanumeric((int)Math.pow((i + 1), 6));
+        }
+        return objects;
     }
 
-    @Test(dependsOnMethods = "testCXF", alwaysRun = true)
-    public void stopTiming() {
-        System.out.println("Streaming: 100 invocations took " + (System.currentTimeMillis() - starttime) + " milliseconds");
-        System.out.flush();
-        System.gc();
+    @Test(timeOut = 120000, dataProvider = "payload")
+    public void testStreamingPerformance(String payload) throws Exception {
+
+        long startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < invocationCount; i++) {
+            executorCompletionService.submit(new Invoker(greeterStream, payload));
+        }
+
+        for (int i = 0; i < invocationCount; i++) {
+            executorCompletionService.take().get();
+        }
+
+        streamingTimes.add(new KeyValue<Integer, Long>(payload.length(), System.currentTimeMillis() - startTime));
     }
 
-    @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = {"startTiming"})
-    public void testCXF() throws Exception {
-        String resp = greeterStream.greetMe("Hey Service. It's me, the client. Nice to meet you...");
-        //System.out.println(resp);
+    @Test(timeOut = 120000, dataProvider = "payload")
+    public void testDOMPerformance(String payload) throws Exception {
+
+        long startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < invocationCount; i++) {
+            executorCompletionService.submit(new Invoker(greeterDOM, payload));
+        }
+
+        for (int i = 0; i < invocationCount; i++) {
+            executorCompletionService.take().get();
+        }
+
+        domTimes.add(new KeyValue<Integer, Long>(payload.length(), System.currentTimeMillis() - startTime));
     }
 
-    private long starttimeWSS4J;
+    @AfterClass
+    public void tearDown() throws Exception {
 
-    @Test(alwaysRun = true, dependsOnMethods = {"stopTiming"})
-    public void startTimingWSS4J() {
-        System.gc();
-        System.out.println("startTiming");
-        starttimeWSS4J = System.currentTimeMillis();
+        System.out.println("Payload size\tStreaming\tDOM");
+
+        for (int i = 0; i < streamingTimes.size(); i++) {
+            KeyValue<Integer, Long> streamingValues = streamingTimes.get(i);
+            KeyValue<Integer, Long> domValues = domTimes.get(i);
+
+            if (!streamingValues.getKey().equals(domValues.getKey())) {
+                throw new Exception("Different payload sizes: Streaming has: " + streamingValues.getKey() + " but DOM has: " + domValues.getKey());
+            }
+            System.out.println(streamingValues.getKey() + "\t\t" + streamingValues.getValue() + "\t\t" + domValues.getValue());
+        }
     }
 
-    @Test(dependsOnMethods = "testCXFWSS4J", alwaysRun = true)
-    public void stopTimingWSS4J() {
-        System.out.println("DOM: 100 invocations took " + (System.currentTimeMillis() - starttimeWSS4J) + " milliseconds");
-        System.out.flush();
-        System.gc();
-    }
+    class Invoker implements Callable {
 
-    @Test(invocationCount = 100, threadPoolSize = 10, dependsOnMethods = "startTimingWSS4J")
-    public void testCXFWSS4J() throws Exception {
-        String resp = greeterWSS4J.greetMe("Hey Service. It's me, the client. Nice to meet you...");
-        //System.out.println(resp);
+        private Greeter greeter;
+        private String payload;
+
+        Invoker(Greeter greeter, String payload) {
+            this.greeter = greeter;
+            this.payload = payload;
+        }
+
+        @Override
+        public Object call() throws Exception {
+            return greeter.greetMe(payload);
+        }
     }
 }
