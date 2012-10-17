@@ -68,7 +68,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         final AbstractInboundSecurityToken securityContextToken =
                 new AbstractInboundSecurityToken(
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(),
-                        securityProperties.getCallbackHandler(), securityContextTokenType.getId(), null) {
+                        securityContextTokenType.getId(), null) {
 
                     @Override
                     public boolean isAsymmetric() {

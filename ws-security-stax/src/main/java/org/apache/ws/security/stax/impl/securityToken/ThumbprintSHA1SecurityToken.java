@@ -32,6 +32,7 @@ import java.security.cert.X509Certificate;
  * @version $Revision$ $Date$
  */
 public class ThumbprintSHA1SecurityToken extends X509SecurityToken {
+
     private String alias = null;
     private final byte[] binaryContent;
 

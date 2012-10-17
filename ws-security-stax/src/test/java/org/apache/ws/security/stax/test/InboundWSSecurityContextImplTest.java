@@ -509,7 +509,7 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent samlTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(
-                SAMLVersion.VERSION_20, new SAMLKeyInfo(getX509Token(WSSConstants.X509V3Token).getX509Certificates()), null, null, null, "1");
+                SAMLVersion.VERSION_20, new SAMLKeyInfo(getX509Token(WSSConstants.X509V3Token).getX509Certificates()), null, null, "1");
         samlSecurityToken.setElementPath(samlTokenPath);
         samlSecurityToken.setXMLSecEvent(samlTokenXmlEvent);
         samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);

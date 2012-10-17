@@ -40,7 +40,7 @@ public class UsernameSecurityToken extends AbstractInboundSecurityToken {
 
     public UsernameSecurityToken(String username, String password, String created, byte[] nonce, byte[] salt, Long iteration,
                                  WSSecurityContext wsSecurityContext, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, null, id, keyIdentifierType);
+        super(wsSecurityContext, id, keyIdentifierType);
         this.usernameToken = new UsernameToken(username, password, created, nonce, salt, iteration);
         this.wsSecurityContext = wsSecurityContext;
     }

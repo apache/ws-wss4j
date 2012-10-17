@@ -26,7 +26,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -43,8 +42,8 @@ public class SecurityTokenReference extends AbstractInboundSecurityToken {
     private final Deque<XMLSecEvent> xmlSecEvents;
 
     public SecurityTokenReference(SecurityToken securityToken, Deque<XMLSecEvent> xmlSecEvents, WSSecurityContext wsSecurityContext,
-                                  CallbackHandler callbackHandler, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
+                                  String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, id, keyIdentifierType);
         this.securityToken = securityToken;
         this.xmlSecEvents = xmlSecEvents;
     }

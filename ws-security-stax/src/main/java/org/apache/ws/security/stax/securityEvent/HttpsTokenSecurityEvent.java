@@ -65,7 +65,7 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
     public SecurityToken getSecurityToken() {
         SecurityToken securityToken = super.getSecurityToken();
         if (securityToken == null) {
-            securityToken = new AbstractInboundSecurityToken(null, null, null, null) {
+            securityToken = new AbstractInboundSecurityToken(null, null, null) {
                 @Override
                 public XMLSecurityConstants.TokenType getTokenType() {
                     return WSSConstants.HttpsToken;

@@ -30,6 +30,7 @@ import javax.security.auth.callback.CallbackHandler;
  * @version $Revision$ $Date$
  */
 public class X509DefaultSecurityToken extends X509SecurityToken {
+
     private String alias = null;
 
     X509DefaultSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,

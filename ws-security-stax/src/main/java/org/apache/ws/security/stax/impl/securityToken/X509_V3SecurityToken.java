@@ -32,6 +32,7 @@ import java.security.cert.X509Certificate;
  * @version $Revision$ $Date$
  */
 public class X509_V3SecurityToken extends X509SecurityToken {
+
     private String alias = null;
 
     public X509_V3SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,

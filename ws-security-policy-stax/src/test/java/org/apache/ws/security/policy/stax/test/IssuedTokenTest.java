@@ -79,13 +79,13 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SamlTokenSecurityEvent initiatorTokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);

@@ -44,7 +44,7 @@ public class HttpsSecurityToken extends AbstractInboundSecurityToken {
     public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext)
             throws XMLSecurityException {
 
-        super(wsSecurityContext, null, IDGenerator.generateID(null), null);
+        super(wsSecurityContext, IDGenerator.generateID(null), null);
         setX509Certificates(new X509Certificate[]{x509Certificate});
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
@@ -52,7 +52,7 @@ public class HttpsSecurityToken extends AbstractInboundSecurityToken {
     public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext)
             throws XMLSecurityException {
 
-        super(wsSecurityContext, null, IDGenerator.generateID(null), null);
+        super(wsSecurityContext, IDGenerator.generateID(null), null);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;
         } else {

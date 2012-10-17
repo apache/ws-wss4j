@@ -81,7 +81,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
                 //todo implement interface to access all derivedKeys? The same would be needed in UserNameToken
                 this.derivedKeySecurityToken = new AbstractInboundSecurityToken(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(), securityProperties.getCallbackHandler(),
+                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
                         derivedKeyTokenType.getId(), null) {
 
                     private SecurityToken referencedSecurityToken = null;

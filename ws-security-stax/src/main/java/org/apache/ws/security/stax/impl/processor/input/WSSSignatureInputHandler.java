@@ -66,18 +66,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
     protected SignatureVerifier newSignatureVerifier(
             final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
             final SignatureType signatureType) throws XMLSecurityException {
-        if (signatureType.getSignedInfo() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
-        }
-        if (signatureType.getSignedInfo().getSignatureMethod() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
-        }
-        if (signatureType.getSignedInfo().getCanonicalizationMethod() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
-        }
-        if (signatureType.getSignatureValue() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
-        }
+
         if (signatureType.getKeyInfo() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }

@@ -23,7 +23,6 @@ import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-import javax.security.auth.callback.CallbackHandler;
 
 /**
  * @author $Author$
@@ -33,10 +32,9 @@ public class SecureConversationSecurityToken extends AbstractInboundSecurityToke
 
     //todo implement
 
-    public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext,
-                                           CallbackHandler callbackHandler, String id,
+    public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext, String id,
                                            WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
+        super(wsSecurityContext, id, keyIdentifierType);
     }
 
     @Override

@@ -28,7 +28,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.opensaml.common.SAMLVersion;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -45,9 +44,9 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
     private Crypto crypto;
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, String issuer,
-                             WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                             WSSecurityContext wsSecurityContext, Crypto crypto,
                              String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, callbackHandler, id, keyIdentifierType);
+        super(wsSecurityContext, id, keyIdentifierType);
         this.samlVersion = samlVersion;
         this.samlKeyInfo = samlKeyInfo;
         this.issuer = issuer;
@@ -60,8 +59,8 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
     }
 
     public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, WSSecurityContext wsSecurityContext,
-                             Crypto crypto, CallbackHandler callbackHandler, String id) {
-        this(samlVersion, samlKeyInfo, null, wsSecurityContext, crypto, callbackHandler, id, null);
+                             Crypto crypto, String id) {
+        this(samlVersion, samlKeyInfo, null, wsSecurityContext, crypto, id, null);
     }
 
     public Crypto getCrypto() {

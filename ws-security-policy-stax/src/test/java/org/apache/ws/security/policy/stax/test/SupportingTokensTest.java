@@ -1165,13 +1165,13 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, null, "1", null);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1198,13 +1198,13 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1235,13 +1235,13 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1268,13 +1268,13 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, null, "1", null);
+        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);

@@ -254,7 +254,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
             return new RsaKeyValueSecurityToken(rsaKeyValueType, (WSSecurityContext) securityContext,
-                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                    WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
@@ -265,7 +265,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
         if (dsaKeyValueType != null) {
             return new DsaKeyValueSecurityToken(dsaKeyValueType, (WSSecurityContext) securityContext,
-                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                    WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
@@ -276,7 +276,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
         if (ecKeyValueType != null) {
             return new ECKeyValueSecurityToken(ecKeyValueType, (WSSecurityContext) securityContext,
-                    callbackHandler, WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
+                    WSSConstants.WSSKeyIdentifierType.KEY_VALUE) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));

@@ -39,17 +39,24 @@ import java.security.cert.X509Certificate;
  * @version $Revision$ $Date$
  */
 public abstract class X509SecurityToken extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken {
+
+    private CallbackHandler callbackHandler;
     private Crypto crypto;
 
     protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
                                 Crypto crypto, CallbackHandler callbackHandler, String id,
                                 WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(tokenType, wsSecurityContext, callbackHandler, id, keyIdentifierType);
+        super(tokenType, wsSecurityContext, id, keyIdentifierType);
         this.crypto = crypto;
+        this.callbackHandler = callbackHandler;
     }
 
     protected Crypto getCrypto() {
         return crypto;
+    }
+
+    public CallbackHandler getCallbackHandler() {
+        return callbackHandler;
     }
 
     @Override
