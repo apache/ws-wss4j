@@ -55,9 +55,7 @@ public class P_SHA1 implements DerivationAlgorithm {
 
             byte[] key = new byte[(int) length];
 
-            for (int i = 0; i < key.length; i++) {
-                key[i] = tempBytes[i + offset];
-            }
+            System.arraycopy(tempBytes, offset, key, 0, key.length);
 
             return key;
         } catch (Exception ex) {
