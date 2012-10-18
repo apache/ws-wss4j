@@ -51,8 +51,7 @@ import java.util.List;
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private static final transient Log log =
-            LogFactory.getLog(BinarySecurityTokenInputHandler.class);
+    private static final transient Log log = LogFactory.getLog(BinarySecurityTokenInputHandler.class);
 
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,

@@ -18,6 +18,8 @@
  */
 package org.apache.ws.security.stax.impl.processor.input;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -66,6 +68,7 @@ import java.util.List;
  */
 public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
+    private static final transient Log log = LogFactory.getLog(SAMLTokenInputHandler.class);
     private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
     static {
@@ -115,8 +118,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         final SAMLKeyInfo samlSubjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("SAML Assertion issuer " + assertionWrapper.getIssuerString());
+        if (log.isDebugEnabled()) {
+            log.debug("SAML Assertion issuer " + assertionWrapper.getIssuerString());
         }
 
         final List<QName> elementPath = getElementPath(eventQueue);
@@ -357,15 +360,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         // to ensure against phony DNs (compare encoded form including signature)
         //
         if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(cert)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                         "Direct trust for certificate with " + cert.getSubjectX500Principal().getName()
                 );
             }
             return true;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                     "No certificate found for subject from issuer with " + issuerString
                             + " (serial " + issuerSerial + ")"
             );
@@ -394,9 +397,9 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         String issuerString = cert.getIssuerX500Principal().getName();
         BigInteger issuerSerial = cert.getSerialNumber();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Transmitted certificate has subject " + subjectString);
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug("Transmitted certificate has subject " + subjectString);
+            log.debug(
                     "Transmitted certificate has issuer " + issuerString + " (serial "
                             + issuerSerial + ")"
             );
@@ -420,8 +423,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         // If the certs have not been found, the issuer is not in the keystore/truststore
         // As a direct result, do not trust the transmitted certificate
         if (foundCerts == null || foundCerts.length < 1) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                         "No certs found in keystore for issuer " + issuerString
                                 + " of certificate for " + subjectString
                 );
@@ -433,8 +436,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         // THIRD step
         // Check the certificate trust path for the issuer cert chain
         //
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                     "Preparing to validate certificate path for issuer " + issuerString
             );
         }
@@ -451,8 +454,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         // certificate was really signed by the issuer stated in the certificate
         //
         if (crypto.verifyTrust(x509certs)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                         "Certificate path has been verified for certificate with subject "
                                 + subjectString
                 );
@@ -460,8 +463,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             return true;
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                     "Certificate path could not be verified for certificate with subject "
                             + subjectString
             );

@@ -18,6 +18,8 @@
  */
 package org.apache.ws.security.stax.impl.processor.input;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.binding.wsu10.TimestampType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -44,6 +46,8 @@ import java.util.Iterator;
  * @version $Revision$ $Date$
  */
 public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
+
+    private static final transient Log log = LogFactory.getLog(TimestampInputHandler.class);
 
     //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
     @Override
@@ -83,7 +87,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                logger.debug("Timestamp created: " + created);
+                log.debug("Timestamp created: " + created);
                 crea = created.toGregorianCalendar();
             }
 
@@ -95,7 +99,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                logger.debug("Timestamp expires: " + expires);
+                log.debug("Timestamp expires: " + expires);
                 exp = expires.toGregorianCalendar();
             }
 
@@ -104,19 +108,19 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             ttl.add(Calendar.SECOND, -wssSecurityProperties.getTimestampTTL());
 
             if (exp != null && wssSecurityProperties.isStrictTimestampCheck() && exp.before(rightNow)) {
-                logger.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                         "The security semantics of the message have expired");
             }
 
             if (crea != null && wssSecurityProperties.isStrictTimestampCheck() && crea.before(ttl)) {
-                logger.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                         "The security semantics of the message have expired");
             }
 
             if (crea != null && crea.after(rightNow)) {
-                logger.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                         "The security semantics of the message is invalid");
             }
