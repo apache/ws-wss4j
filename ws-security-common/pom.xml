@@ -30,7 +30,7 @@
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j-ws-security-common</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache WSS4J DOM WS-Security</name>
+    <name>Apache WSS4J WS-Security Common</name>
     <version>2.0-SNAPSHOT</version>
     
     <build>
