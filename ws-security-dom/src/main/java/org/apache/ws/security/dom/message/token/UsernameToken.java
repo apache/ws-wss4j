@@ -19,6 +19,10 @@
 
 package org.apache.ws.security.dom.message.token;
 
+import org.apache.ws.security.common.derivedKey.AlgoFactory;
+import org.apache.ws.security.common.derivedKey.ConversationConstants;
+import org.apache.ws.security.common.derivedKey.ConversationException;
+import org.apache.ws.security.common.derivedKey.DerivationAlgorithm;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSUsernameTokenPrincipal;
 import org.apache.ws.security.common.bsp.BSPRule;
@@ -36,13 +40,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -676,7 +679,7 @@ public class UsernameToken {
      * @return a secret key constructed from information contained in this
      *         username token
      */
-    public byte[] getSecretKey() {
+    public byte[] getSecretKey() throws WSSecurityException {
         return getSecretKey(WSConstants.WSE_DERIVED_KEY_LEN, WSConstants.LABEL_FOR_DERIVED_KEY);
     }
     
@@ -688,7 +691,7 @@ public class UsernameToken {
      * @return a secret key constructed from information contained in this
      *         username token
      */
-    public byte[] getSecretKey(int keylen) {
+    public byte[] getSecretKey(int keylen) throws WSSecurityException {
         return getSecretKey(keylen, WSConstants.LABEL_FOR_DERIVED_KEY);
     }
 
@@ -700,10 +703,8 @@ public class UsernameToken {
      * @return a secret key constructed from information contained in this
      *         username token
      */
-    public byte[] getSecretKey(int keylen, String labelString) {
-        byte[] key = null;
+    public byte[] getSecretKey(int keylen, String labelString) throws WSSecurityException {
         try {
-            Mac mac = Mac.getInstance("HMACSHA1");
             byte[] password;
             if (passwordsAreEncoded) {
                 password = Base64.decode(rawPassword);
@@ -723,8 +724,10 @@ public class UsernameToken {
             offset += nonce.length;
 
             System.arraycopy(created, 0, seed, offset, created.length);
-            
-            key = P_hash(password, seed, mac, keylen);
+
+            DerivationAlgorithm algo =
+                    AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
+            byte[] key = algo.createKey(password, seed, 0, keylen);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("label      :" + Base64.encode(label));
@@ -733,13 +736,15 @@ public class UsernameToken {
                 LOG.debug("seed       :" + Base64.encode(seed));
                 LOG.debug("Key        :" + Base64.encode(key));
             }
-        } catch (Exception e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-            return null;
+            return key;
+
+        } catch (Base64DecodingException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (ConversationException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-        return key;
     }
     
     
@@ -993,57 +998,7 @@ public class UsernameToken {
         }
         return true;
     }
-    
-    /**
-     * P_hash as defined in RFC 2246 for TLS.
-     * 
-     * @param secret is the key for the HMAC
-     * @param seed the seed value to start the generation - A(0)
-     * @param mac the HMAC algorithm
-     * @param required number of bytes to generate
-     * @return a byte array that contains a secret key
-     * @throws Exception
-     */
-    private static byte[] P_hash(
-        byte[] secret, 
-        byte[] seed, 
-        Mac mac, 
-        int required
-    ) throws Exception {
-        byte[] out = new byte[required];
-        int offset = 0, tocpy;
-        byte[] a, tmp;
-        //
-        // a(0) is the seed
-        //
-        a = seed;
-        SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
-        mac.init(key);
-        while (required > 0) {
-            mac.update(a);
-            a = mac.doFinal();
-            mac.update(a);
-            mac.update(seed);
-            tmp = mac.doFinal();
-            tocpy = min(required, tmp.length);
-            System.arraycopy(tmp, 0, out, offset, tocpy);
-            offset += tocpy;
-            required -= tocpy;
-        }
-        return out;
-    }
 
-    /**
-     * helper method.
-     *
-     * @param a
-     * @param b
-     * @return
-     */
-    private static int min(int a, int b) {
-        return (a > b) ? b : a;
-    }
-    
     /**
      * A method to check that the UsernameToken is compliant with the BSP spec.
      * @throws WSSecurityException

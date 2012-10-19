@@ -19,13 +19,14 @@
 package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.derivedKey.AlgoFactory;
+import org.apache.ws.security.common.derivedKey.ConversationConstants;
+import org.apache.ws.security.common.derivedKey.ConversationException;
+import org.apache.ws.security.common.derivedKey.DerivationAlgorithm;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -138,9 +139,7 @@ public class UsernameToken {
      *         username token
      */
     protected byte[] getSecretKey(String rawPassword, int keylen, String labelString) throws WSSecurityException {
-        byte[] key;
         try {
-            Mac mac = Mac.getInstance("HmacSHA1");
             byte[] password = rawPassword.getBytes("UTF-8");
             byte[] label = labelString.getBytes("UTF-8");
             byte[] nonce = getNonce();
@@ -156,51 +155,14 @@ public class UsernameToken {
 
             System.arraycopy(created, 0, seed, offset, created.length);
 
-            key = P_hash(password, seed, mac, keylen);
+            DerivationAlgorithm algo =
+                    AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
+            return algo.createKey(password, seed, 0, keylen);
 
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noHMACSHA1available", e);
         } catch (UnsupportedEncodingException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-        }
-        return key;
-    }
-
-    /**
-     * P_hash as defined in RFC 2246 for TLS.
-     *
-     * @param secret   is the key for the HMAC
-     * @param seed     the seed value to start the generation - A(0)
-     * @param mac      the HMAC algorithm
-     * @param required number of bytes to generate
-     * @return a byte array that contains a secret key
-     * @throws Exception
-     */
-    private byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required) throws WSSecurityException {
-        byte[] out = new byte[required];
-        int offset = 0;
-        int toCopy;
-        byte[] a, tmp;
-
-        try {
-            // a(0) is the seed
-            a = seed;
-            SecretKeySpec key = new SecretKeySpec(secret, "HmacSHA1");
-            mac.init(key);
-            while (required > 0) {
-                mac.update(a);
-                a = mac.doFinal();
-                mac.update(a);
-                mac.update(seed);
-                tmp = mac.doFinal();
-                toCopy = Math.min(required, tmp.length);
-                System.arraycopy(tmp, 0, out, offset, toCopy);
-                offset += toCopy;
-                required -= toCopy;
-            }
-        } catch (InvalidKeyException e) {
+        } catch (ConversationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
-        return out;
     }
 }

@@ -43,11 +43,14 @@ package org.apache.ws.security.common.derivedKey;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class P_SHA1 implements DerivationAlgorithm {
 
-    public byte[] createKey(byte[] secret, byte[] seed, int offset,
-            long length) throws ConversationException {
+    public byte[] createKey(byte[] secret, byte[] seed, int offset, long length)
+            throws ConversationException {
+
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
 
@@ -58,46 +61,45 @@ public class P_SHA1 implements DerivationAlgorithm {
             System.arraycopy(tempBytes, offset, key, 0, key.length);
 
             return key;
-        } catch (Exception ex) {
-            throw new ConversationException("errorInKeyDerivation", null, ex);
+        } catch (NoSuchAlgorithmException e) {
+            throw new ConversationException("errorInKeyDerivation", null, e);
+        } catch (InvalidKeyException e) {
+            throw new ConversationException("errorInKeyDerivation", null, e);
         }
     }
-    
+
     /**
-     * From WSUsernameToken  :-)
+     * P_hash as defined in RFC 2246 for TLS.
      *
-     * @param secret
-     * @param seed
-     * @param mac
-     * @param required
-     * @return
-     * @throws java.lang.Exception
+     * @param secret is the key for the HMAC
+     * @param seed the seed value to start the generation - A(0)
+     * @param mac the HMAC algorithm
+     * @param required number of bytes to generate
+     * @return a byte array that contains a secret key
+     * @throws InvalidKeyException
      */
-    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required) throws Exception {
+    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required)
+            throws InvalidKeyException {
+
         byte[] out = new byte[required];
         int offset = 0, tocpy;
-        byte[] a, tmp;
-        a = seed;
+        byte[] a = seed; // a(0) is the seed
+        byte[] tmp;
+
+        SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
+        mac.init(key);
+
         while (required > 0) {
-            SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
-            mac.init(key);
             mac.update(a);
             a = mac.doFinal();
-            mac.reset();
-            mac.init(key);
             mac.update(a);
             mac.update(seed);
             tmp = mac.doFinal();
-            tocpy = min(required, tmp.length);
+            tocpy = Math.min(required, tmp.length);
             System.arraycopy(tmp, 0, out, offset, tocpy);
             offset += tocpy;
             required -= tocpy;
         }
         return out;
     }
-
-    private static int min(int a, int b) {
-        return (a > b) ? b : a;
-    }
-
 }
