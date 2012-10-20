@@ -30,6 +30,8 @@ import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 
+import javax.security.auth.callback.CallbackHandler;
+
 /**
  * Main configuration class to supply keys etc.
  * This class is subject to change in the future.
@@ -40,11 +42,111 @@ import org.apache.xml.security.stax.ext.XMLSecurityProperties;
  */
 public class WSSSecurityProperties extends XMLSecurityProperties {
 
+    private String actor;
+    private CallbackHandler callbackHandler;
+    private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
+
+    private Integer timestampTTL = 300;
+    private boolean strictTimestampCheck = true;
+
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens.
+     *
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    private boolean handleCustomPasswordTypes = false;
+    private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
+    private String tokenUser;
+
+    private WSSConstants.KeyIdentifierType derivedKeyKeyIdentifierType;
+    private WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference;
+
+    private Class<? extends Merlin> signatureCryptoClass;
+    private Crypto cachedSignatureCrypto;
+    private KeyStore cachedSignatureKeyStore;
+    private KeyStore signatureKeyStore;
+    private String signatureUser;
+    private boolean enableSignatureConfirmationVerification = false;
+
+    private Class<? extends Merlin> signatureVerificationCryptoClass;
+    private KeyStore signatureVerificationKeyStore;
+    private Crypto cachedSignatureVerificationCrypto;
+    private KeyStore cachedSignatureVerificationKeyStore;
+    private Class<? extends Merlin> decryptionCryptoClass;
+
+    private KeyStore decryptionKeyStore;
+    private Crypto cachedDecryptionCrypto;
+    private KeyStore cachedDecryptionKeyStore;
+    private Class<? extends Merlin> encryptionCryptoClass;
+
+    private KeyStore encryptionKeyStore;
+    private Crypto cachedEncryptionCrypto;
+    private KeyStore cachedEncryptionKeyStore;
+    private String encryptionUser;
+    private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
+    private boolean useReqSigCertForEncryption = false;
+
     public WSSSecurityProperties() {
+        super();
         setAddExcC14NInclusivePrefixes(true);
     }
 
-    private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
+    public WSSSecurityProperties(WSSSecurityProperties wssSecurityProperties) {
+        super(wssSecurityProperties);
+
+        this.actor = wssSecurityProperties.actor;
+        this.callbackHandler = wssSecurityProperties.callbackHandler;
+        this.ignoredBSPRules.addAll(wssSecurityProperties.ignoredBSPRules);
+        this.timestampTTL = wssSecurityProperties.timestampTTL;
+        this.strictTimestampCheck = wssSecurityProperties.strictTimestampCheck;
+        this.handleCustomPasswordTypes = wssSecurityProperties.handleCustomPasswordTypes;
+        this.usernameTokenPasswordType = wssSecurityProperties.usernameTokenPasswordType;
+        this.tokenUser = wssSecurityProperties.tokenUser;
+        this.derivedKeyKeyIdentifierType = wssSecurityProperties.derivedKeyKeyIdentifierType;
+        this.derivedKeyTokenReference = wssSecurityProperties.derivedKeyTokenReference;
+        this.signatureCryptoClass = wssSecurityProperties.signatureCryptoClass;
+        this.cachedSignatureCrypto = wssSecurityProperties.cachedSignatureCrypto;
+        this.cachedSignatureKeyStore = wssSecurityProperties.cachedSignatureKeyStore;
+        this.signatureKeyStore = wssSecurityProperties.signatureKeyStore;
+        this.signatureUser = wssSecurityProperties.signatureUser;
+        this.enableSignatureConfirmationVerification = wssSecurityProperties.enableSignatureConfirmationVerification;
+        this.signatureVerificationCryptoClass = wssSecurityProperties.signatureVerificationCryptoClass;
+        this.signatureVerificationKeyStore = wssSecurityProperties.signatureVerificationKeyStore;
+        this.cachedSignatureVerificationCrypto = wssSecurityProperties.cachedSignatureVerificationCrypto;
+        this.cachedSignatureVerificationKeyStore = wssSecurityProperties.cachedSignatureVerificationKeyStore;
+        this.decryptionCryptoClass = wssSecurityProperties.decryptionCryptoClass;
+        this.decryptionKeyStore = wssSecurityProperties.decryptionKeyStore;
+        this.cachedDecryptionCrypto = wssSecurityProperties.cachedDecryptionCrypto;
+        this.cachedDecryptionKeyStore = wssSecurityProperties.cachedDecryptionKeyStore;
+        this.encryptionCryptoClass = wssSecurityProperties.encryptionCryptoClass;
+        this.encryptionKeyStore = wssSecurityProperties.encryptionKeyStore;
+        this.cachedEncryptionCrypto = wssSecurityProperties.cachedEncryptionCrypto;
+        this.cachedEncryptionKeyStore = wssSecurityProperties.cachedEncryptionKeyStore;
+        this.encryptionUser = wssSecurityProperties.encryptionUser;
+        this.encryptionKeyIdentifierType = wssSecurityProperties.encryptionKeyIdentifierType;
+        this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
+    }
+
+    /**
+     * returns the password callback handler
+     *
+     * @return
+     */
+    public CallbackHandler getCallbackHandler() {
+        return callbackHandler;
+    }
+
+
+    /**
+     * sets the password callback handler
+     *
+     * @param callbackHandler
+     */
+    public void setCallbackHandler(CallbackHandler callbackHandler) {
+        this.callbackHandler = callbackHandler;
+    }
 
     /**
      * returns the KeyIdentifierType which will be used in the secured document
@@ -64,8 +166,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.encryptionKeyIdentifierType = encryptionKeyIdentifierType;
     }
 
-    private Integer timestampTTL = 300;
-
     public Integer getTimestampTTL() {
         return timestampTTL;
     }
@@ -74,43 +174,29 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.timestampTTL = timestampTTL;
     }
 
-    private boolean strictTimestampCheck = true;
-
     public boolean isStrictTimestampCheck() {
         return strictTimestampCheck;
     }
 
+
     public void setStrictTimestampCheck(boolean strictTimestampCheck) {
         this.strictTimestampCheck = strictTimestampCheck;
     }
-    
 
     /**
-     * This variable controls whether types other than PasswordDigest or PasswordText
-     * are allowed when processing UsernameTokens. 
-     * 
-     * By default this is set to false so that the user doesn't have to explicitly
-     * reject custom token types in the callback handler.
-     */
-    private boolean handleCustomPasswordTypes = false;
-    
-    /**
-     * @param handleCustomTypes 
+     * @param handleCustomTypes
      * whether to handle custom UsernameToken password types or not
      */
     public void setHandleCustomPasswordTypes(boolean handleCustomTypes) {
         this.handleCustomPasswordTypes = handleCustomTypes;
     }
-    
+
     /**
      * @return whether custom UsernameToken password types are allowed or not
      */
     public boolean getHandleCustomPasswordTypes() {
         return handleCustomPasswordTypes;
     }
-
-    private String tokenUser;
-    private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
 
     public String getTokenUser() {
         return tokenUser;
@@ -128,8 +214,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.usernameTokenPasswordType = usernameTokenPasswordType;
     }
 
-    private boolean enableSignatureConfirmationVerification = false;
-
     public boolean isEnableSignatureConfirmationVerification() {
         return enableSignatureConfirmationVerification;
     }
@@ -137,8 +221,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setEnableSignatureConfirmationVerification(boolean enableSignatureConfirmationVerification) {
         this.enableSignatureConfirmationVerification = enableSignatureConfirmationVerification;
     }
-
-    private boolean useReqSigCertForEncryption = false;
 
     public boolean isUseReqSigCertForEncryption() {
         return useReqSigCertForEncryption;
@@ -148,19 +230,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.useReqSigCertForEncryption = useReqSigCertForEncryption;
     }
 
-    private String actor;
-
     public String getActor() {
         return actor;
     }
 
+
     public void setActor(String actor) {
         this.actor = actor;
     }
-
-
-    private WSSConstants.KeyIdentifierType derivedKeyKeyIdentifierType;
-    private WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference;
 
     public WSSConstants.KeyIdentifierType getDerivedKeyKeyIdentifierType() {
         return derivedKeyKeyIdentifierType;
@@ -178,8 +255,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.derivedKeyTokenReference = derivedKeyTokenReference;
     }
 
-    private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
-
     public void addIgnoreBSPRule(BSPRule bspRule) {
         ignoredBSPRules.add(bspRule);
     }
@@ -187,11 +262,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public List<BSPRule> getIgnoredBSPRules() {
         return Collections.unmodifiableList(ignoredBSPRules);
     }
-    
-    private Class<? extends Merlin> signatureCryptoClass;
-    private KeyStore signatureKeyStore;
-    private String signatureUser;
-    
+
     public void setSignatureUser(String signatureUser) {
         this.signatureUser = signatureUser;
     }
@@ -199,7 +270,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public String getSignatureUser() {
         return signatureUser;
     }
-    
+
     public KeyStore getSignatureKeyStore() {
         return signatureKeyStore;
     }
@@ -221,9 +292,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setSignatureCryptoClass(Class<? extends Merlin> signatureCryptoClass) {
         this.signatureCryptoClass = signatureCryptoClass;
     }
-    
-    private Crypto cachedSignatureCrypto;
-    private KeyStore cachedSignatureKeyStore;
 
     public Crypto getSignatureCrypto() throws WSSConfigurationException {
 
@@ -249,9 +317,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
         }
     }
-    
-    private Class<? extends Merlin> signatureVerificationCryptoClass;
-    private KeyStore signatureVerificationKeyStore;
 
     public KeyStore getSignatureVerificationKeyStore() {
         return signatureVerificationKeyStore;
@@ -274,9 +339,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setSignatureVerificationCryptoClass(Class<? extends Merlin> signatureVerificationCryptoClass) {
         this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
     }
-
-    private Crypto cachedSignatureVerificationCrypto;
-    private KeyStore cachedSignatureVerificationKeyStore;
 
     public Crypto getSignatureVerificationCrypto() throws WSSConfigurationException {
 
@@ -302,9 +364,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureVerificationCryptoFailure", e);
         }
     }
-    
-    private Class<? extends Merlin> decryptionCryptoClass;
-    private KeyStore decryptionKeyStore;
 
     /**
      * Returns the decryption keystore
@@ -350,9 +409,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.decryptionCryptoClass = decryptionCryptoClass;
     }
 
-    private Crypto cachedDecryptionCrypto;
-    private KeyStore cachedDecryptionKeyStore;
-
     /**
      * returns the decryptionCrypto for the key-management
      *
@@ -383,11 +439,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "decryptionCryptoFailure", e);
         }
     }
-    
-    private Class<? extends Merlin> encryptionCryptoClass;
-    private KeyStore encryptionKeyStore;
-    private String encryptionUser;
-    
+
     /**
      * Returns the encryption keystore
      *
@@ -431,9 +483,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setEncryptionCryptoClass(Class<? extends Merlin> encryptionCryptoClass) {
         this.encryptionCryptoClass = encryptionCryptoClass;
     }
-
-    private Crypto cachedEncryptionCrypto;
-    private KeyStore cachedEncryptionKeyStore;
 
     /**
      * returns the encryptionCrypto for the key-management
@@ -483,5 +532,4 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setEncryptionUser(String encryptionUser) {
         this.encryptionUser = encryptionUser;
     }
-
 }

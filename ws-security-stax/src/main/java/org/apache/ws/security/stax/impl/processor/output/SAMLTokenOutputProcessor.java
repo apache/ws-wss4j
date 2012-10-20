@@ -62,7 +62,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
-            SAMLUtil.doSAMLCallback(getSecurityProperties().getCallbackHandler(), samlCallback);
+            SAMLUtil.doSAMLCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), samlCallback);
             AssertionWrapper samlAssertionWrapper = new AssertionWrapper(samlCallback);
 
             // todo support setting signature and c14n algorithms
@@ -119,7 +119,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
                             WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
-                            WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), wsPasswordCallback);
+                            WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), wsPasswordCallback);
                             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                             cryptoType.setAlias(alias);
                             certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);

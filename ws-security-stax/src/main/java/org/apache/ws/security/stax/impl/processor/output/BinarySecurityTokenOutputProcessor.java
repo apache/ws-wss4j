@@ -64,7 +64,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
                 String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureUser();
                 WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
-                WSSUtils.doPasswordCallback(getSecurityProperties().getCallbackHandler(), pwCb);
+                WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), pwCb);
                 String password = pwCb.getPassword();
                 if (password == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);

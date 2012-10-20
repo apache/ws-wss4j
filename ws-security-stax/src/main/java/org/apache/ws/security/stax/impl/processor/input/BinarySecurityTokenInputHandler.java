@@ -99,12 +99,12 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
                 if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                     this.binarySecurityToken = new X509_V3SecurityToken(
-                            (WSSecurityContext) securityContext, crypto, securityProperties.getCallbackHandler(),
+                            (WSSecurityContext) securityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
                             securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
                     );
                 } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
                     this.binarySecurityToken = new X509PKIPathv1SecurityToken(
-                            (WSSecurityContext) securityContext, crypto, securityProperties.getCallbackHandler(),
+                            (WSSecurityContext) securityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
                             securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
                     );
                 } else {

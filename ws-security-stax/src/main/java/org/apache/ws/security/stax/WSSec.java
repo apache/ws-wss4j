@@ -294,8 +294,7 @@ public class WSSec {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
             }
         }
-        //todo clone securityProperties
-        return securityProperties;
+        return new WSSSecurityProperties(securityProperties);
     }
 
     /**
@@ -307,7 +306,6 @@ public class WSSec {
      *          if the configuration is invalid
      */
     public static WSSSecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
-        //todo clone securityProperties
-        return securityProperties;
+        return new WSSSecurityProperties(securityProperties);
     }
 }

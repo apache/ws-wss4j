@@ -22,6 +22,7 @@ import org.apache.ws.security.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.securityEvent.SecurityContextTokenSecurityEvent;
@@ -86,7 +87,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
 
                         String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
                         WSPasswordCallback passwordCallback = new WSPasswordCallback(identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
-                        WSSUtils.doSecretKeyCallback(securityProperties.getCallbackHandler(), passwordCallback, null);
+                        WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), passwordCallback, null);
                         if (passwordCallback.getKey() == null) {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noKey", securityContextTokenType.getId());
                         }

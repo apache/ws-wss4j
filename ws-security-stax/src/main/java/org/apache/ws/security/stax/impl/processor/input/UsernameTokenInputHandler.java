@@ -158,7 +158,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                     passwordType.getType(),
                     WSPasswordCallback.Usage.USERNAME_TOKEN);
             try {
-                WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
+                WSSUtils.doPasswordCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
             }
@@ -182,7 +182,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                     passwordType.getType(),
                     WSPasswordCallback.Usage.USERNAME_TOKEN);
             try {
-                WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
+                WSSUtils.doPasswordCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
             }
@@ -206,7 +206,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                     passwordType.getType(),
                     WSPasswordCallback.Usage.USERNAME_TOKEN);
             try {
-                WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
+                WSSUtils.doPasswordCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
             }

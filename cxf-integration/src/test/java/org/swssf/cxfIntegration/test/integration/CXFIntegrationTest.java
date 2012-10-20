@@ -133,7 +133,7 @@ public class CXFIntegrationTest {
         return objects;
     }
 
-    @Test(timeOut = 120000, dataProvider = "payload")
+    @Test(timeOut = 300000, dataProvider = "payload")
     public void testStreamingPerformance(String payload) throws Exception {
 
         long startTime = System.currentTimeMillis();
@@ -149,7 +149,7 @@ public class CXFIntegrationTest {
         streamingTimes.add(new KeyValue<Integer, Long>(payload.length(), System.currentTimeMillis() - startTime));
     }
 
-    @Test(timeOut = 120000, dataProvider = "payload")
+    @Test(timeOut = 300000, dataProvider = "payload")
     public void testDOMPerformance(String payload) throws Exception {
 
         long startTime = System.currentTimeMillis();

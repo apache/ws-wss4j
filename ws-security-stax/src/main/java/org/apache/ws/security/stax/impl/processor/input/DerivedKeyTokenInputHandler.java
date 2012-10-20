@@ -94,7 +94,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         this.referencedSecurityToken = SecurityTokenFactoryImpl.getSecurityToken(
                                 derivedKeyTokenType.getSecurityTokenReference(),
                                 ((WSSSecurityProperties) securityProperties).getDecryptionCrypto(),
-                                securityProperties.getCallbackHandler(),
+                                ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
                                 inputProcessorChain.getSecurityContext()
                         );
                         this.referencedSecurityToken.addWrappedToken(this);

@@ -97,7 +97,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         assertionWrapper.parseHOKSubject(
                 new WSSSAMLKeyInfoProcessor(),
                 ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto(),
-                securityProperties.getCallbackHandler()
+                ((WSSSecurityProperties)securityProperties).getCallbackHandler()
         );
 
         // TODO move this into a Validator eventually

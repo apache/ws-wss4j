@@ -66,17 +66,17 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
             if (securityTokenReferenceType != null) {
-                return getSecurityToken(securityTokenReferenceType, crypto, securityProperties.getCallbackHandler(), securityContext);
+                return getSecurityToken(securityTokenReferenceType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), securityContext);
             }
             final KeyValueType keyValueType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
             if (keyValueType != null) {
-                return getSecurityToken(keyValueType, crypto, securityProperties.getCallbackHandler(), securityContext);
+                return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), securityContext);
             }
 
         } else if (crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityToken(
-                    (WSSecurityContext) securityContext, crypto, securityProperties.getCallbackHandler(), crypto.getDefaultX509Identifier(),
+                    (WSSecurityContext) securityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), crypto.getDefaultX509Identifier(),
                     crypto.getDefaultX509Identifier(), null
             );
         }
