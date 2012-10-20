@@ -47,6 +47,7 @@ public class SecureConversationToken extends SecurityContextToken {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getSecureConversationToken();
     }

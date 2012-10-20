@@ -115,8 +115,8 @@ public class InboundWSSecurityContextImplTest {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -304,8 +304,8 @@ public class InboundWSSecurityContextImplTest {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -538,8 +538,8 @@ public class InboundWSSecurityContextImplTest {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         usernameSecurityToken.setElementPath(usernamePath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);

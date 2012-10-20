@@ -63,18 +63,22 @@ public class Layout extends AbstractSecurityAssertion implements PolicyContainin
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public Policy getPolicy() {
         return nestedPolicy;
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getLayout();
     }
 
+    @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         super.serialize(writer, getPolicy());
     }

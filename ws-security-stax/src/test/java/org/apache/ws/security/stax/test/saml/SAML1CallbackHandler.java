@@ -46,7 +46,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
             certs = crypto.getX509Certificates(cryptoType);
             issuerKeyName = "samlissuer";
             issuerKeyPassword = "default";
-            issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");;
+            issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
         }
 
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
@@ -55,6 +55,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
         issuer = "www.example.com";
     }
 
+    @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

@@ -60,6 +60,7 @@ public class RelToken extends AbstractToken {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getRelToken();
     }

@@ -118,6 +118,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
     }
 
+    @Override
     protected void handleEncryptedContent(
             InputProcessorChain inputProcessorChain, XMLSecStartElement parentStartXMLEvent,
             SecurityToken securityToken, EncryptedDataType encryptedDataType) throws XMLSecurityException {
@@ -131,14 +132,14 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             encryptedPartSecurityEvent.setElementPath(elementPath);
             encryptedPartSecurityEvent.setXmlSecEvent(parentStartXMLEvent);
             encryptedPartSecurityEvent.setCorrelationID(encryptedDataType.getId());
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
         } else {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
                     new ContentEncryptedElementSecurityEvent(securityToken, true, documentContext.getProtectionOrder());
             contentEncryptedElementSecurityEvent.setElementPath(elementPath);
             contentEncryptedElementSecurityEvent.setXmlSecEvent(parentStartXMLEvent);
             contentEncryptedElementSecurityEvent.setCorrelationID(encryptedDataType.getId());
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(contentEncryptedElementSecurityEvent);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(contentEncryptedElementSecurityEvent);
         }
     }
 
@@ -240,14 +241,14 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 encryptedPartSecurityEvent.setElementPath(elementPath);
                 encryptedPartSecurityEvent.setXmlSecEvent(xmlSecStartElement);
                 encryptedPartSecurityEvent.setCorrelationID(encryptedDataType.getId());
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedPartSecurityEvent);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
             } else {
                 EncryptedElementSecurityEvent encryptedElementSecurityEvent =
                         new EncryptedElementSecurityEvent(securityToken, true, documentContext.getProtectionOrder());
                 encryptedElementSecurityEvent.setElementPath(elementPath);
                 encryptedElementSecurityEvent.setXmlSecEvent(xmlSecStartElement);
                 encryptedElementSecurityEvent.setCorrelationID(encryptedDataType.getId());
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(encryptedElementSecurityEvent);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedElementSecurityEvent);
             }
         }
     }

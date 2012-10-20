@@ -447,6 +447,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     //multiple threads can call this method concurrently -> synchronize access
+    @Override
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
         if (operationSecurityEventOccured) {

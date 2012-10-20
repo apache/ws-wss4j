@@ -72,6 +72,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
             private AbstractInboundSecurityToken derivedKeySecurityToken = null;
 
+            @SuppressWarnings("unchecked")
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
 
@@ -178,6 +179,6 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
         DerivedKeyTokenSecurityEvent derivedKeyTokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
         derivedKeyTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         derivedKeyTokenSecurityEvent.setCorrelationID(derivedKeyTokenType.getId());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(derivedKeyTokenSecurityEvent);
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(derivedKeyTokenSecurityEvent);
     }
 }

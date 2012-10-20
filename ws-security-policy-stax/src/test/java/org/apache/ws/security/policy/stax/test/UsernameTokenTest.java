@@ -84,8 +84,8 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         initiatorTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         SecurityToken securityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
@@ -94,8 +94,8 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
@@ -158,8 +158,8 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         usernameTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         SecurityToken securityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
@@ -168,8 +168,8 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         recipientTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         securityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], Long.valueOf(10),
-                (WSSecurityContext) null, null, null);
+                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+                null, null, null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);

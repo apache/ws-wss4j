@@ -33,9 +33,11 @@ import java.util.List;
  */
 public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
 
+    @Override
     public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
     }
 
+    @Override
     public void ignoredBSPRules(List<BSPRule> bspRules) {
     }
 }

@@ -298,7 +298,7 @@ public abstract class CryptoBase implements Crypto {
     protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
              try {
-                 return BC_509CLASS_CONS.newInstance(new Object[] {s});
+                 return BC_509CLASS_CONS.newInstance(s);
              } catch (Exception e) {
                  //ignore
              }

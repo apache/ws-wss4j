@@ -42,6 +42,7 @@ public class Wss11 extends Wss10 {
         parseNestedWss11Policy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getWss11();
     }

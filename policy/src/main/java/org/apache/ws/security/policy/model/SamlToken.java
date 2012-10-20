@@ -61,6 +61,7 @@ public class SamlToken extends AbstractToken {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getSamlToken();
     }

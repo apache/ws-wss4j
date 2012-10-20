@@ -67,7 +67,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey");
         Element encryptedKeyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         encryptedKeyElement.removeAttribute("Id");
-        encryptedKeyElement.setAttribute("Id", "2");
+        encryptedKeyElement.setAttribute("Id", "G2");
 
         xPathExpression = getXPath(".//dsig:X509Data");
         Element keyIdentifierElement = (Element) xPathExpression.evaluate(encryptedKeyElement, XPathConstants.NODE);
@@ -75,17 +75,17 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityTokenReferenceElement.removeChild(keyIdentifierElement);
         //wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398"/>
         Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_wsse_Reference.getNamespaceURI(), WSSConstants.TAG_wsse_Reference.getLocalPart());
-        referenceElement.setAttribute("URI", "#1");
+        referenceElement.setAttribute("URI", "#G1");
         securityTokenReferenceElement.appendChild(referenceElement);
 
         Element clonedEncryptedElement = (Element) encryptedKeyElement.cloneNode(true);
         clonedEncryptedElement.removeAttribute("Id");
-        clonedEncryptedElement.setAttribute("Id", "1");
+        clonedEncryptedElement.setAttribute("Id", "G1");
 
         xPathExpression = getXPath(".//wsse:Reference");
         Element newReferenceElement = (Element) xPathExpression.evaluate(clonedEncryptedElement, XPathConstants.NODE);
         newReferenceElement.removeAttribute("URI");
-        newReferenceElement.setAttribute("URI", "#2");
+        newReferenceElement.setAttribute("URI", "#G2");
 
         Element securityHeaderNode = (Element) encryptedKeyElement.getParentNode();
         securityHeaderNode.insertBefore(clonedEncryptedElement, encryptedKeyElement);
@@ -99,8 +99,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         try {
             doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -188,8 +186,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         inSecurityProperties.addIgnoreBSPRule(BSPRule.R3006);
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        inSecurityProperties.setDisableSchemaValidation(true);
 
         try {
             doInboundSecurity(inSecurityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -295,8 +291,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-            securityProperties.setDisableSchemaValidation(true);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -331,8 +325,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         try {
             Document document = doInboundSecurity(securityProperties,
@@ -365,8 +357,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         int oldval = 0;
         try {
@@ -472,8 +462,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         int oldval = 0;
         try {
@@ -509,8 +497,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         int oldval = 0;
         try {

@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -54,6 +55,7 @@ public class AsymmetricBindingBuilder implements AssertionBuilder<Element> {
         return asymmetricBinding;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.ASYMMETRIC_BINDING, SP11Constants.ASYMMETRIC_BINDING};
     }

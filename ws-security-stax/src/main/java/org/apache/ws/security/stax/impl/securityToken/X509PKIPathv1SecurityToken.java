@@ -23,9 +23,9 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -47,7 +47,7 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
             byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
         super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
 
-        InputStream in = new ByteArrayInputStream(binaryContent);
+        InputStream in = new UnsynchronizedByteArrayInputStream(binaryContent);
         try {
             CertPath certPath = getCrypto().getCertificateFactory().generateCertPath(in);
             List<? extends Certificate> l = certPath.getCertificates();
@@ -64,6 +64,7 @@ public class X509PKIPathv1SecurityToken extends X509SecurityToken {
         }
     }
 
+    @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
             this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);

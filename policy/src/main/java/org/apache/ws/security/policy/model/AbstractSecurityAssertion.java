@@ -45,6 +45,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         this.version = version;
     }
 
+    @Override
     public boolean isOptional() {
         return isOptional;
     }
@@ -53,6 +54,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         this.isOptional = isOptional;
     }
 
+    @Override
     public boolean isIgnorable() {
         return isIgnorable;
     }
@@ -61,10 +63,12 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         this.isIgnorable = isIgnorable;
     }
 
+    @Override
     public short getType() {
         return org.apache.neethi.Constants.TYPE_ASSERTION;
     }
 
+    @Override
     public boolean equal(PolicyComponent policyComponent) {
         throw new UnsupportedOperationException();
     }
@@ -77,6 +81,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         return this.normalized;
     }
 
+    @Override
     public PolicyComponent normalize() {
         Policy policy = new Policy();
         ExactlyOne exactlyOne = new ExactlyOne();

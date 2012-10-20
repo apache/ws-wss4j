@@ -46,7 +46,7 @@ public interface STRParser {
      */
     enum REFERENCE_TYPE {
         ISSUER_SERIAL, THUMBPRINT_SHA1, KEY_IDENTIFIER, DIRECT_REF
-    };
+    }
     
     /**
      * Parse a SecurityTokenReference element and extract credentials.

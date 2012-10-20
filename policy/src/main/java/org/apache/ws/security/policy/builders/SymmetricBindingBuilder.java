@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -54,6 +55,7 @@ public class SymmetricBindingBuilder implements AssertionBuilder<Element> {
         return symmetricBinding;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.SYMMETRIC_BINDING, SP11Constants.SYMMETRIC_BINDING};
     }

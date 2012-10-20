@@ -38,7 +38,7 @@ public class CryptoType {
      */
     public enum TYPE {
         ISSUER_SERIAL, THUMBPRINT_SHA1, SKI_BYTES, SUBJECT_DN, ALIAS
-    };
+    }
     
     private TYPE type;
     private String issuer;

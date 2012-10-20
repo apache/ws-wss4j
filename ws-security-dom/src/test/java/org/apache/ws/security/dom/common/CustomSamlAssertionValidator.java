@@ -63,7 +63,7 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
             if (samlSubject == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
-                    new Object[] {"for Signature (no Subject)"}
+                    "for Signature (no Subject)"
                 );
             }
             String nameIdentifier = samlSubject.getNameIdentifier().getNameIdentifier();

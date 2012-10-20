@@ -33,6 +33,7 @@ public class InitiatorToken extends AbstractTokenWrapper {
         super(version, nestedPolicy);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getInitiatorToken();
     }

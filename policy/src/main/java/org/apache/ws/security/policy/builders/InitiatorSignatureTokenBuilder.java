@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
  */
 public class InitiatorSignatureTokenBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -50,6 +51,7 @@ public class InitiatorSignatureTokenBuilder implements AssertionBuilder<Element>
         return initiatorSignatureToken;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.INITIATOR_SIGNATURE_TOKEN};
     }

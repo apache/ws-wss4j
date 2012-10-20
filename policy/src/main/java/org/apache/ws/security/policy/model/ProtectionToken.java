@@ -33,6 +33,7 @@ public class ProtectionToken extends AbstractTokenWrapper {
         super(version, nestedPolicy);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getProtectionToken();
     }

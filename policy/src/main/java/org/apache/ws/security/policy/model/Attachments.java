@@ -42,6 +42,7 @@ public class Attachments extends AbstractSecurityAssertion {
         this.attachmentCompleteSignatureTransform = attachmentCompleteSignatureTransform;
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getAttachments();
     }
@@ -51,6 +52,7 @@ public class Attachments extends AbstractSecurityAssertion {
         return new Attachments(getVersion(), isContentSignatureTransform(), isAttachmentCompleteSignatureTransform());
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());

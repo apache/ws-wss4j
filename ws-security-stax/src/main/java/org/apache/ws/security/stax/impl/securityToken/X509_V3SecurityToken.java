@@ -22,9 +22,9 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.io.ByteArrayInputStream;
 import java.security.cert.X509Certificate;
 
 /**
@@ -40,9 +40,10 @@ public class X509_V3SecurityToken extends X509SecurityToken {
             throws XMLSecurityException {
 
         super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
-        setX509Certificates(new X509Certificate[]{getCrypto().loadCertificate(new ByteArrayInputStream(binaryContent))});
+        setX509Certificates(new X509Certificate[]{getCrypto().loadCertificate(new UnsynchronizedByteArrayInputStream(binaryContent))});
     }
 
+    @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
             this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);

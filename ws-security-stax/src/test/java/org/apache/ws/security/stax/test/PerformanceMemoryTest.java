@@ -434,6 +434,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             this.parentThread = Thread.currentThread();
         }
 
+        @Override
         public void run() {
 
             int sleepTime = 100;

@@ -238,6 +238,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
             private UsernameSecurityToken securityToken = null;
 
+            @SuppressWarnings("unchecked")
+            @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
                 if (this.securityToken != null) {
                     return this.securityToken;
@@ -250,6 +252,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 return this.securityToken;
             }
 
+            @Override
             public String getId() {
                 return usernameTokenType.getId();
             }
@@ -262,7 +265,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         usernameTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         usernameTokenSecurityEvent.setCorrelationID(usernameTokenType.getId());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(usernameTokenSecurityEvent);
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(usernameTokenSecurityEvent);
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, UsernameTokenType usernameTokenType,

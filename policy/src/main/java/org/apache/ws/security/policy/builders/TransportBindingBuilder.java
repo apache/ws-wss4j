@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class TransportBindingBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -54,6 +55,7 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
         return transportBinding;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.TRANSPORT_BINDING, SP11Constants.TRANSPORT_BINDING};
     }

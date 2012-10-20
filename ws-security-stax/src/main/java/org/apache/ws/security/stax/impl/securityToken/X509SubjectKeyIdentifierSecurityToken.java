@@ -42,6 +42,7 @@ public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
         this.binaryContent = binaryContent;
     }
 
+    @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);

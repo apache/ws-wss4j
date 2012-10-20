@@ -189,7 +189,7 @@ public abstract class CryptoFactory {
         try {
             Class<?>[] classes = new Class[]{Map.class, ClassLoader.class};
             Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
-            return c.newInstance(new Object[] {map, loader});
+            return c.newInstance(map, loader);
         } catch (java.lang.Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
@@ -218,7 +218,7 @@ public abstract class CryptoFactory {
         try {
             Class<?>[] classes = new Class[]{Properties.class, ClassLoader.class};
             Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
-            return c.newInstance(new Object[] {map, loader});
+            return c.newInstance(map, loader);
         } catch (java.lang.Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);

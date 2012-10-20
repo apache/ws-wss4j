@@ -38,6 +38,7 @@ import java.util.List;
  */
 public class RequiredPartsBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -73,6 +74,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
         return headers;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.REQUIRED_PARTS};
     }

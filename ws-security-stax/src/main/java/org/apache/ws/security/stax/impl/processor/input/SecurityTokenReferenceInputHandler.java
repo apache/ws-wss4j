@@ -131,6 +131,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
                             private SecurityToken securityToken = null;
 
+                            @SuppressWarnings("unchecked")
                             @Override
                             public SecurityToken getSecurityToken() throws XMLSecurityException {
                                 if (this.securityToken != null) {

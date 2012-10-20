@@ -37,6 +37,7 @@ import java.util.List;
  */
 public class RequiredElementsBuilder extends SignedElementsBuilder {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -48,6 +49,7 @@ public class RequiredElementsBuilder extends SignedElementsBuilder {
         return requiredElements;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.REQUIRED_ELEMENTS, SP11Constants.REQUIRED_ELEMENTS};
     }

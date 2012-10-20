@@ -316,6 +316,7 @@ public abstract class AbstractTestBase {
         XPath xPath = xPathFactory.newXPath();
         xPath.setNamespaceContext(
                 new NamespaceContext() {
+                    @Override
                     public String getNamespaceURI(String prefix) {
                         if (WSSConstants.PREFIX_DSIG.equals(prefix)) {
                             return WSSConstants.NS_DSIG;
@@ -334,6 +335,7 @@ public abstract class AbstractTestBase {
                         }
                     }
 
+                    @Override
                     public String getPrefix(String namespaceURI) {
                         if (WSSConstants.NS_DSIG.equals(namespaceURI)) {
                             return WSSConstants.PREFIX_DSIG;
@@ -352,6 +354,7 @@ public abstract class AbstractTestBase {
                         }
                     }
 
+                    @Override
                     public Iterator<String> getPrefixes(String namespaceURI) {
                         return null;
                     }
@@ -536,6 +539,7 @@ public abstract class AbstractTestBase {
             return true;
         }
 
+        @Override
         protected boolean checkReceiverResults(
                 List<WSSecurityEngineResult> wsResult, List<Integer> actions
         ) {
@@ -555,8 +559,7 @@ public abstract class AbstractTestBase {
             int size = actions.size();
             int ai = 0;
             for (WSSecurityEngineResult result : wsSecurityEngineResults) {
-                final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-                int act = actInt.intValue();
+                final Integer act = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
                 if (act == WSConstants.SC || act == WSConstants.BST || act == WSConstants.DKT || act == WSConstants.SCT || act == WSConstants.UT_NOPASSWORD) {
                     continue;
                 }
@@ -573,26 +576,31 @@ public abstract class AbstractTestBase {
             return true;
         }
 
+        @Override
         public Object getOption(String key) {
             return null;
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public Object getProperty(Object msgContext, String key) {
             return ((Map<String, Object>) msgContext).get(key);
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public void setProperty(Object msgContext, String key, Object value) {
             ((Map<String, Object>) msgContext).put(key, value);
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public String getPassword(Object msgContext) {
             return (String) ((Map<String, Object>) msgContext).get("password");
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public void setPassword(Object msgContext, String password) {
             ((Map<String, Object>) msgContext).put("password", password);
         }
@@ -610,6 +618,7 @@ public abstract class AbstractTestBase {
             return receivedSecurityEvents;
         }
 
+        @SuppressWarnings("unchecked")
         public <T> T getSecurityEvent(SecurityEventConstants.Event securityEvent) {
             for (SecurityEvent event : receivedSecurityEvents) {
                 if (event.getSecurityEventType() == securityEvent) {
@@ -619,6 +628,7 @@ public abstract class AbstractTestBase {
             return null;
         }
 
+        @SuppressWarnings("unchecked")
         public <T> List<T> getSecurityEvents(SecurityEventConstants.Event securityEvent) {
             List<T> foundEvents = new ArrayList<T>();
             for (SecurityEvent event : receivedSecurityEvents) {

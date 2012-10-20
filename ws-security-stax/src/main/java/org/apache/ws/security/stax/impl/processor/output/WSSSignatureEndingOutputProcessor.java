@@ -100,7 +100,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             boolean useSingleCertificate)
             throws XMLStreamException, XMLSecurityException {
 
-        WSSConstants.KeyIdentifierType keyIdentifierType = ((WSSSecurityProperties) getSecurityProperties()).getSignatureKeyIdentifierType();
+        WSSConstants.KeyIdentifierType keyIdentifierType = getSecurityProperties().getSignatureKeyIdentifierType();
 
         X509Certificate[] x509Certificates = securityToken.getX509Certificates();
 
@@ -151,6 +151,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         }
     }
 
+    @Override
     protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) throws XMLStreamException, XMLSecurityException {
         String[] transforms = signaturePartDef.getTransforms();
         if (transforms != null && transforms.length > 0) {
@@ -191,6 +192,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         }
     }
 
+    @Override
     protected List<QName> getAppendAfterOneOfThisAttributes() {
         return appendAfterOneOfThisAttributes;
     }

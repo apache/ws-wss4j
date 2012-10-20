@@ -272,7 +272,7 @@ public class Merlin extends CryptoBase {
             if (loadCacerts != null) {
                 loadCacerts = loadCacerts.trim();
             }
-            if (Boolean.valueOf(loadCacerts).booleanValue()) {
+            if (Boolean.valueOf(loadCacerts)) {
                 String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
                 if (cacertsPath != null) {
                     cacertsPath = cacertsPath.trim();

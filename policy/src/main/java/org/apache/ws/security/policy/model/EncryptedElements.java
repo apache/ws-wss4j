@@ -34,6 +34,7 @@ public class EncryptedElements extends RequiredElements {
         super(version, xPathVersion, xPaths);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getEncryptedElements();
     }

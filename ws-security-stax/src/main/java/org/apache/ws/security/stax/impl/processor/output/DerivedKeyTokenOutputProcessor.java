@@ -151,6 +151,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             SecurityTokenProvider derivedKeysecurityTokenProvider = new SecurityTokenProvider() {
 
+                @SuppressWarnings("unchecked")
                 @Override
                 public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return derivedKeySecurityToken;

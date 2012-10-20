@@ -94,6 +94,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
         this.secret = secret;
     }
 
+    @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         if (callbacks[0] instanceof WSPasswordCallback) {
             WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];

@@ -43,6 +43,7 @@ import java.util.Map;
  */
 public class SignedElementsBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -113,6 +114,7 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
         }
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.SIGNED_ELEMENTS, SP11Constants.SIGNED_ELEMENTS};
     }

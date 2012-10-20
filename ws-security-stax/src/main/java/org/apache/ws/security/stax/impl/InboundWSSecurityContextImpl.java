@@ -53,6 +53,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     private List<BSPRule> ignoredBSPRules = Collections.emptyList();
 
+    @Override
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
         if (operationSecurityEventOccured) {
@@ -501,6 +502,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         return false;
     }
 
+    @Override
     public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
         if (!ignoredBSPRules.contains(bspRule)) {
             throw new WSSecurityException(
@@ -512,6 +514,7 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
         }
     }
 
+    @Override
     public void ignoredBSPRules(List<BSPRule> bspRules) {
         ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
     }

@@ -33,7 +33,7 @@ public class MemoryReplayCache implements ReplayCache {
     
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private Set<ReplayCacheIdentifier> cache = 
+    private final Set<ReplayCacheIdentifier> cache =
         Collections.synchronizedSet(new HashSet<ReplayCacheIdentifier>());
     
     /**

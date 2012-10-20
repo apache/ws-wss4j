@@ -166,14 +166,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             signedPartSecurityEvent.setElementPath(elementPath);
             signedPartSecurityEvent.setXmlSecEvent(xmlSecEvent);
             signedPartSecurityEvent.setCorrelationID(referenceType.getId());
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedPartSecurityEvent);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(signedPartSecurityEvent);
         } else {
             SignedElementSecurityEvent signedElementSecurityEvent =
                     new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
             signedElementSecurityEvent.setElementPath(elementPath);
             signedElementSecurityEvent.setXmlSecEvent(xmlSecEvent);
             signedElementSecurityEvent.setCorrelationID(referenceType.getId());
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(signedElementSecurityEvent);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(signedElementSecurityEvent);
         }
     }
 
@@ -258,7 +258,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             algorithmSuiteSecurityEvent.setAlgorithmURI(algorithm);
             algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
             algorithmSuiteSecurityEvent.setCorrelationID(referenceType.getId());
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(algorithmSuiteSecurityEvent);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
             InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
             List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;

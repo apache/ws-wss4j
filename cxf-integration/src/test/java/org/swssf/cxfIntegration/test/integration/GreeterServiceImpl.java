@@ -36,16 +36,20 @@ public class GreeterServiceImpl implements Greeter {
     @Resource
     WebServiceContext context;
 
+    @Override
     public void pingMe() throws PingMeFault {
     }
 
+    @Override
     public String sayHi() {
         return "Hi";
     }
 
+    @Override
     public void greetMeOneWay(@WebParam(name = "requestType", targetNamespace = "http://apache.org/hello_world_soap_http/types") String requestType) {
     }
 
+    @Override
     public String greetMe(@WebParam(name = "requestType", targetNamespace = "http://apache.org/hello_world_soap_http/types") String requestType) {
         return requestType;
     }

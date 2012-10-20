@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class WSS11Builder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -51,6 +52,7 @@ public class WSS11Builder implements AssertionBuilder<Element> {
         return wss11;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.WSS11, SP11Constants.WSS10};
     }

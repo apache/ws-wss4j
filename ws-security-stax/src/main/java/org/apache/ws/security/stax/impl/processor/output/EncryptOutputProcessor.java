@@ -185,6 +185,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);
         }
 
+        @Override
         protected void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
             super.doFinalInternal(outputProcessorChain);

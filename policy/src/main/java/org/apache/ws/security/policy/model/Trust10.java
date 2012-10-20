@@ -50,18 +50,22 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
         parseNestedTrust10Policy(nestedPolicy, this);
     }
 
+    @Override
     public Policy getPolicy() {
         return nestedPolicy;
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getTrust10();
     }
 
+    @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         super.serialize(writer, getPolicy());
     }

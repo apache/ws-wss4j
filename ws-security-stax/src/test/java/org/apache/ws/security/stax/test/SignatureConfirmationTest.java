@@ -81,11 +81,10 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-            securityProperties.setDisableSchemaValidation(true);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {
+                @Override
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     securityEventList.add(securityEvent);
                 }
@@ -162,6 +161,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {
+                @Override
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     securityEventList.add(securityEvent);
                 }
@@ -187,7 +187,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
-            Map<String, Object> messageContext = doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            Map<String, Object> messageContext = doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
             wsHandlerResult = (List<WSHandlerResult>) messageContext.get(WSHandlerConstants.RECV_RESULTS);
         }
 
@@ -225,8 +225,6 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setEnableSignatureConfirmationVerification(true);
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-            securityProperties.setDisableSchemaValidation(true);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
@@ -258,6 +256,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {
+                @Override
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     securityEventList.add(securityEvent);
                 }
@@ -314,8 +313,6 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setEnableSignatureConfirmationVerification(true);
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-            securityProperties.setDisableSchemaValidation(true);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventList, null);

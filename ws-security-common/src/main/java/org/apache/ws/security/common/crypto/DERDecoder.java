@@ -208,7 +208,7 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] { "Invalid DER format" }
+                    "Invalid DER format"
              );
         } else if (length < 0) {
             throw new WSSecurityException(

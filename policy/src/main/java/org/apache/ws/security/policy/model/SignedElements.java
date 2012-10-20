@@ -34,6 +34,7 @@ public class SignedElements extends RequiredElements {
         super(version, xPathVersion, xPaths);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getSignedElements();
     }

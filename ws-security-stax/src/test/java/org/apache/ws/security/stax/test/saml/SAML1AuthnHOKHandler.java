@@ -60,6 +60,7 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
         issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
     }
 
+    @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
  */
 public class Trust10Builder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -50,6 +51,7 @@ public class Trust10Builder implements AssertionBuilder<Element> {
         return trust10;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP11Constants.TRUST_10};
     }

@@ -20,7 +20,6 @@ package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSUtils;
-import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractInputProcessor;
@@ -66,7 +65,7 @@ public class OperationInputProcessor extends AbstractInputProcessor {
                 OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
                 operationSecurityEvent.setOperation(xmlSecEvent.asStartElement().getName());
                 operationSecurityEvent.setCorrelationID(IDGenerator.generateID(null));
-                ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(operationSecurityEvent);
+                inputProcessorChain.getSecurityContext().registerSecurityEvent(operationSecurityEvent);
                 inputProcessorChain.removeProcessor(this);
             }
         }

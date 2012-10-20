@@ -73,10 +73,12 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         this.claims = claims;
     }
 
+    @Override
     public Policy getPolicy() {
         return nestedPolicy;
     }
 
+    @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }
@@ -129,6 +131,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         this.parentAssertion = parentAssertion;
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());

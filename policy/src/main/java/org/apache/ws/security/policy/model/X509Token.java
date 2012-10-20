@@ -67,6 +67,7 @@ public class X509Token extends AbstractToken {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getX509Token();
     }

@@ -55,6 +55,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
         issuer = "www.example.com";
     }
 
+    @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

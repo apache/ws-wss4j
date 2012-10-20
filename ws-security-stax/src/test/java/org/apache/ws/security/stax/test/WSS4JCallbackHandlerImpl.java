@@ -40,6 +40,7 @@ public class WSS4JCallbackHandlerImpl implements CallbackHandler {
         this.secret = secret;
     }
 
+    @Override
     public void handle(javax.security.auth.callback.Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
 

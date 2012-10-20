@@ -42,6 +42,7 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getSymmetricBinding();
     }

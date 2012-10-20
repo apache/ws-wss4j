@@ -34,6 +34,7 @@ public class EncryptedParts extends SignedParts {
         super(version, body, attachments, headers, false);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getEncryptedParts();
     }

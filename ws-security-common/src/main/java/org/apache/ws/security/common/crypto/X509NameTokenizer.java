@@ -58,7 +58,7 @@ public class X509NameTokenizer {
 
     public String nextToken() {
         if (hasMoreTokens()) {
-            return (String) tokens.get(index++);
+            return tokens.get(index++);
         } else {
             return "";
         }

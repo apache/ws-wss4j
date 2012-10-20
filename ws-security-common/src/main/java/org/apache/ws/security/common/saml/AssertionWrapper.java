@@ -507,7 +507,7 @@ public class AssertionWrapper {
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate or key"}
+                    "cannot get certificate or key"
                 );
             }
             SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
@@ -526,7 +526,7 @@ public class AssertionWrapper {
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                    new Object[]{"cannot get certificate or key"}
+                    "cannot get certificate or key"
                 );
             }
             SignatureValidator sigValidator = new SignatureValidator(credential);

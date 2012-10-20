@@ -42,6 +42,7 @@ public class TransportBinding extends AbstractBinding {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getTransportBinding();
     }
@@ -74,6 +75,7 @@ public class TransportBinding extends AbstractBinding {
         }
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         super.serialize(writer, getPolicy());
     }

@@ -355,10 +355,6 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> sigPath = new ArrayList<QName>();
-        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-        sigPath.add(WSSConstants.TAG_dsig_Signature);
-
         List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
         for (SecurityToken.TokenUsage tokenUsage : EnumSet.allOf(SecurityToken.TokenUsage.class)) {

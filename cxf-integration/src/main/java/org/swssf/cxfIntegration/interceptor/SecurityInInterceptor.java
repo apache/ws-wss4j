@@ -63,6 +63,7 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         inboundWSSec = WSSec.getInboundWSSec(securityProperties);
     }
 
+    @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
 
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
@@ -70,6 +71,7 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
 
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
+            @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                 incomingSecurityEventList.add(securityEvent);
             }
@@ -95,6 +97,7 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         }
     }
 
+    @Override
     public Set<QName> getUnderstoodHeaders() {
         return HEADERS;
     }

@@ -65,6 +65,7 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
         }
     }
 
+    @Override
     protected List<QName> getAppendAfterOneOfThisAttributes() {
         return appendAfterOneOfThisAttributes;
     }

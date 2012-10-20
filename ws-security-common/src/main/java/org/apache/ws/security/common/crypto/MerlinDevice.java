@@ -137,7 +137,7 @@ public class MerlinDevice extends Merlin {
                     is.close();
                 }
             }
-        } else if (Boolean.valueOf(loadCacerts).booleanValue()) {
+        } else if (Boolean.valueOf(loadCacerts)) {
             String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
             if (cacertsPath != null) {
                 cacertsPath = cacertsPath.trim();

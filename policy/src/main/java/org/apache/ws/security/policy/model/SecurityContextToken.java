@@ -44,6 +44,7 @@ public class SecurityContextToken extends AbstractToken {
         parseNestedSecurityContextTokenPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getSecurityContextToken();
     }

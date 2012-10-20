@@ -129,7 +129,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             timestampSecurityEvent.setCreated(crea);
             timestampSecurityEvent.setExpires(exp);
             timestampSecurityEvent.setCorrelationID(timestampType.getId());
-            ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(timestampSecurityEvent);
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(timestampSecurityEvent);
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
 
         } catch (IllegalArgumentException e) {

@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
  */
 public class SupportingTokensBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -54,6 +55,7 @@ public class SupportingTokensBuilder implements AssertionBuilder<Element> {
         return supportingTokens;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{
                 SP13Constants.SUPPORTING_TOKENS,

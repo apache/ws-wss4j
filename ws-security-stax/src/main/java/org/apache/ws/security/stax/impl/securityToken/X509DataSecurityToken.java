@@ -46,6 +46,7 @@ public class X509DataSecurityToken extends X509SecurityToken {
         this.x509DataType = x509DataType;
     }
 
+    @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
             X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(

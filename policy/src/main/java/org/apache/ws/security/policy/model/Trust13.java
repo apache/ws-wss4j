@@ -43,6 +43,7 @@ public class Trust13 extends Trust10 {
         parseNestedTrust13Policy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getTrust13();
     }

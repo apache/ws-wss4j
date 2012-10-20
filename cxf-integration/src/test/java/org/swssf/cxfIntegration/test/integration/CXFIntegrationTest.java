@@ -133,6 +133,7 @@ public class CXFIntegrationTest {
         return objects;
     }
 
+    @SuppressWarnings("unchecked")
     @Test(timeOut = 300000, dataProvider = "payload")
     public void testStreamingPerformance(String payload) throws Exception {
 
@@ -149,6 +150,7 @@ public class CXFIntegrationTest {
         streamingTimes.add(new KeyValue<Integer, Long>(payload.length(), System.currentTimeMillis() - startTime));
     }
 
+    @SuppressWarnings("unchecked")
     @Test(timeOut = 300000, dataProvider = "payload")
     public void testDOMPerformance(String payload) throws Exception {
 

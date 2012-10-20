@@ -39,6 +39,7 @@ public class X509DefaultSecurityToken extends X509SecurityToken {
         this.alias = alias;
     }
 
+    @Override
     protected String getAlias() throws XMLSecurityException {
         return this.alias;
     }

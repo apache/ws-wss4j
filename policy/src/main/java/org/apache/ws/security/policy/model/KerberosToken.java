@@ -57,6 +57,7 @@ public class KerberosToken extends AbstractToken {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getKerberosToken();
     }

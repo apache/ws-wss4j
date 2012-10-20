@@ -41,10 +41,12 @@ public class RequiredParts extends AbstractSecurityAssertion {
         this.headers.addAll(headers);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getRequiredParts();
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());

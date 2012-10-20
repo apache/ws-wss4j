@@ -158,6 +158,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {
+                @Override
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     if (securityEvent instanceof UsernameTokenSecurityEvent) {
                         UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;

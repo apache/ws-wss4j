@@ -129,6 +129,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             private SAMLSecurityToken securityToken = null;
 
+            @SuppressWarnings("unchecked")
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
                 if (this.securityToken != null) {
@@ -156,7 +157,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         //fire a tokenSecurityEvent
         SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent();
         samlTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(samlTokenSecurityEvent);
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(samlTokenSecurityEvent);
     }
 
     @SuppressWarnings("unchecked")

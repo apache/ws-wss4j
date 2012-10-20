@@ -62,6 +62,7 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
         outboundWSSec = WSSec.getOutboundWSSec(securityProperties);
     }
 
+    @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
 
         OutputStream os = soapMessage.getContent(OutputStream.class);
@@ -70,6 +71,7 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
 
         final List<SecurityEvent> outgoingSecurityEventList = new ArrayList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
+            @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                 outgoingSecurityEventList.add(securityEvent);
             }
@@ -126,6 +128,7 @@ public class SecurityOutInterceptor extends AbstractSoapInterceptor {
             getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
         }
 
+        @Override
         public void handleMessage(Message message) throws Fault {
             try {
                 XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);

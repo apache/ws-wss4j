@@ -54,18 +54,22 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public Policy getPolicy() {
         return nestedPolicy;
     }
 
+    @Override
     public QName getName() {
         return getSupportingTokenType().getName();
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         super.serialize(writer, getPolicy());
     }
 
+    @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }

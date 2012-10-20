@@ -34,6 +34,7 @@ public class ContentEncryptedElements extends EncryptedElements {
         super(version, xPathVersion, xPaths);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getContentEncryptedElements();
     }

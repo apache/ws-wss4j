@@ -39,6 +39,7 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
     private Map<String, byte[]> secrets = new HashMap<String, byte[]>();
     private byte[] outboundSecret = null;
 
+    @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

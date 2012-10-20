@@ -74,6 +74,8 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
             private X509SecurityToken binarySecurityToken = null;
 
+            @SuppressWarnings("unchecked")
+            @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
                 if (this.binarySecurityToken != null) {
                     return this.binarySecurityToken;
@@ -117,6 +119,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 return this.binarySecurityToken;
             }
 
+            @Override
             public String getId() {
                 return binarySecurityTokenType.getId();
             }

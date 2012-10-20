@@ -37,6 +37,7 @@ import java.util.List;
  */
 public class EncryptedElementsBuilder extends SignedElementsBuilder {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -48,6 +49,7 @@ public class EncryptedElementsBuilder extends SignedElementsBuilder {
         return encryptedElements;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.ENCRYPTED_ELEMENTS, SP11Constants.ENCRYPTED_ELEMENTS};
     }

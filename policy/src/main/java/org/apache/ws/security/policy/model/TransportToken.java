@@ -33,6 +33,7 @@ public class TransportToken extends AbstractTokenWrapper {
         super(version, nestedPolicy);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getTransportToken();
     }

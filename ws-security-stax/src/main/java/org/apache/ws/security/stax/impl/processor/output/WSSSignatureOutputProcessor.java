@@ -139,6 +139,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
         outputProcessorChain.processEvent(xmlSecEvent);
     }
 
+    @Override
     protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
         SecurePart securePart = secureParts.get(xmlSecStartElement.getName());
         if (securePart == null) {

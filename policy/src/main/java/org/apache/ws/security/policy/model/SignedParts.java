@@ -45,10 +45,12 @@ public class SignedParts extends RequiredParts {
         this.signAllHeaders = signAllHeaders;
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getSignedParts();
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());

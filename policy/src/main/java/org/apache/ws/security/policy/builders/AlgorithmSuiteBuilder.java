@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
@@ -54,6 +55,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
         return algorithmSuite;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.ALGORITHM_SUITE, SP11Constants.ALGORITHM_SUITE};
     }

@@ -40,8 +40,6 @@
         <!--<property name="encryptionUser" value="transmitter"/>-->
         <property name="useReqSigCertForEncryption" value="true"/>
         <property name="skipDocumentEvents" value="true"/>
-        <!-- disable schema validation until wss4j is fixed -->
-        <property name="disableSchemaValidation" value="true"/>
     </bean>
 
     <bean name="outSecurityProperties" class="org.apache.ws.security.stax.ext.WSSSecurityProperties">

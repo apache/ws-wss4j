@@ -42,7 +42,8 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         new QName(WST_NS, "BinarySecret");
     private static final QName BINARY_SECRET_05_12 = 
         new QName(WST_NS_05_12, "BinarySecret");
-    
+
+    @Override
     public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM

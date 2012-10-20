@@ -702,6 +702,7 @@ public class SP11Constants extends SPConstants {
             this.name = name;
         }
 
+        @Override
         public QName getName() {
             return name;
         }

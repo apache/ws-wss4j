@@ -45,6 +45,7 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
         };
     }
 
+    @Override
     public boolean assertEvent(SecurityEvent securityEvent) {
         // TimestampSecurityEvent timestampSecurityEvent = (TimestampSecurityEvent) securityEvent;
         boolean isIncludeTimestamp = ((AbstractBinding) getAssertion()).isIncludeTimestamp();

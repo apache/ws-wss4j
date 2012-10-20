@@ -39,6 +39,7 @@ public class SecurityContextTokenSecurityEvent extends IssuedTokenSecurityEvent 
         this.externalUriRef = externalUriRef;
     }
 
+    @Override
     public String getIssuerName() {
         return issuerName;
     }

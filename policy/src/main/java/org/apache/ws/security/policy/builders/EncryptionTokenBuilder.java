@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class EncryptionTokenBuilder implements AssertionBuilder<Element> {
 
+    @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
@@ -50,6 +51,7 @@ public class EncryptionTokenBuilder implements AssertionBuilder<Element> {
         return encryptionToken;
     }
 
+    @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.ENCRYPTION_TOKEN, SP11Constants.ENCRYPTION_TOKEN};
     }

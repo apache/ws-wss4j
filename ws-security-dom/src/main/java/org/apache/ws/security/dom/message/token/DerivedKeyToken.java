@@ -265,6 +265,7 @@ public class DerivedKeyToken {
 
     public Map<String, String> getProperties() {
         if (elementProperties != null) {
+            //todo Bug:? Contents of collection table are updated, but never queried
             Map<String, String> table = new HashMap<String, String>();
             Node node = elementProperties.getFirstChild();
             while (node != null) {

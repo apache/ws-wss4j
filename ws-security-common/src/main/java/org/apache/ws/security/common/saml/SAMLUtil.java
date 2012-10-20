@@ -145,7 +145,7 @@ public final class SAMLUtil {
             if (samlSubject == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
-                    new Object[] {"for Signature (no Subject)"}
+                    "for Signature (no Subject)"
                 );
             }
 
@@ -188,7 +188,7 @@ public final class SAMLUtil {
         if (samlSubject == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
-                new Object[]{"for Signature (no Subject)"}
+                "for Signature (no Subject)"
             );
         }
         List<org.opensaml.saml2.core.SubjectConfirmation> subjectConfList = 
@@ -277,7 +277,7 @@ public final class SAMLUtil {
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
                                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                                    new Object[]{"cannot get certificate or key"}
+                                    "cannot get certificate or key"
                                 );
                             }
                             return new SAMLKeyInfo(certs);

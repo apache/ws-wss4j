@@ -46,14 +46,17 @@ public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion imp
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public Policy getPolicy() {
         return nestedPolicy;
     }
 
+    @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         super.serialize(writer, getPolicy());
     }

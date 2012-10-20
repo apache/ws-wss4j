@@ -58,6 +58,7 @@ public class HttpsToken extends AbstractToken {
         parseNestedPolicy(nestedPolicy, this);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getHttpsToken();
     }

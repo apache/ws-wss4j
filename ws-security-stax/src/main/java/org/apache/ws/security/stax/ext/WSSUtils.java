@@ -351,7 +351,7 @@ public class WSSUtils extends XMLSecurityUtils {
 
     public static TokenSecurityEvent createTokenSecurityEvent(final SecurityToken securityToken, String correlationID)
             throws WSSecurityException {
-        WSSConstants.TokenType tokenType = (WSSConstants.TokenType) securityToken.getTokenType();
+        WSSConstants.TokenType tokenType = securityToken.getTokenType();
 
         TokenSecurityEvent tokenSecurityEvent;
         if (tokenType == WSSConstants.X509V1Token

@@ -239,7 +239,7 @@ public final class OpenSAMLUtil {
             return null;
         }
         return 
-            (Signature)builder.buildObject(
+            builder.buildObject(
                  qName.getNamespaceURI(), qName.getLocalPart(), qName.getPrefix()
              );
     }

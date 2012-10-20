@@ -108,6 +108,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
+            @SuppressWarnings("unchecked")
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
                 return securityContextToken;
@@ -124,11 +125,12 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityContextTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         securityContextTokenSecurityEvent.setCorrelationID(securityContextTokenType.getId());
-        ((WSSecurityContext) inputProcessorChain.getSecurityContext()).registerSecurityEvent(securityContextTokenSecurityEvent);
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(securityContextTokenSecurityEvent);
 
         //also register a SecurityProvider with the identifier. @see SecurityContexTest#testSCTKDKTSignAbsolute
         SecurityTokenProvider securityTokenProviderDirectReference = new SecurityTokenProvider() {
 
+            @SuppressWarnings("unchecked")
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
                 return securityContextToken;

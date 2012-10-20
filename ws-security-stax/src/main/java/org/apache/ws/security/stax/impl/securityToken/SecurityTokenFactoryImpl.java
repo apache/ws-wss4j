@@ -51,6 +51,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     public SecurityTokenFactoryImpl() {
     }
 
+    @Override
     public SecurityToken getSecurityToken(KeyInfoType keyInfoType, SecurityToken.KeyInfoUsage keyInfoUsage,
                                           XMLSecurityProperties securityProperties, SecurityContext securityContext)
             throws XMLSecurityException {

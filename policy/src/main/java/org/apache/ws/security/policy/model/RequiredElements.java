@@ -46,6 +46,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
         this.xPaths.addAll(xPaths);
     }
 
+    @Override
     public QName getName() {
         return getVersion().getSPConstants().getRequiredElements();
     }
@@ -55,6 +56,7 @@ public class RequiredElements extends AbstractSecurityAssertion {
         return new RequiredElements(getVersion(), getXPathVersion(), getXPaths());
     }
 
+    @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());

@@ -69,8 +69,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -171,8 +169,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -229,8 +225,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -377,8 +371,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -538,8 +530,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -657,11 +647,10 @@ public class InteroperabilityTest extends AbstractTestBase {
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new org.apache.ws.security.stax.test.CallbackHandlerImpl());
-            //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-            securityProperties.setDisableSchemaValidation(true);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {
+                @Override
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     securityEventList.add(securityEvent);
                 }
@@ -931,8 +920,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setActor("test");
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -1030,8 +1017,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setActor("test");
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
@@ -1094,8 +1079,6 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.setActor("test");
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-        //we have to disable the schema validation until WSS4J-DOM is fixed. WSS4J generates an empty PrefixList which is not schema valid!
-        securityProperties.setDisableSchemaValidation(true);
 
         Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
