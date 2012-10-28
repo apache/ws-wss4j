@@ -3,6 +3,7 @@
 <Configuration target="org.apache.xml.security" xmlns="http://www.xmlsecurity.org/NS/configuration" xmlns:xi="http://www.w3.org/2001/XInclude">
     <Properties>
         <Property NAME="securityTokenFactory" VAL="org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl"/>
+        <Property NAME="MaximumAllowedDecompressedBytes" VAL="104857600"/>
         <xi:include href="security-config.xml" xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:Properties/c:Property[@NAME!='securityTokenFactory'])"/>
     </Properties>
     <SecurityHeaderHandlers>
@@ -53,6 +54,27 @@
        <!-- STR-Transformer -->
        <TransformAlgorithm URI="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform"
                           JAVACLASS="org.apache.ws.security.stax.impl.transformer.STRTransformer" />
+
+       <!-- The compress-transformations are disabled by default because its not standard
+       and could introduce potential security issues -->
+       <!--
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/gzip" INOUT="IN"
+                           JAVACLASS="org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/bzip2" INOUT="IN"
+                           JAVACLASS="org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/xz" INOUT="IN"
+                           JAVACLASS="org.apache.commons.compress.compressors.xz.XZCompressorInputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/pack200" INOUT="IN"
+                           JAVACLASS="org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/gzip" INOUT="OUT"
+                           JAVACLASS="org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/bzip2" INOUT="OUT"
+                           JAVACLASS="org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/xz" INOUT="OUT"
+                           JAVACLASS="org.apache.commons.compress.compressors.xz.XZCompressorOutputStream" />
+       <TransformAlgorithm URI="http://www.apache.org/2012/04/xmlsec/pack200" INOUT="OUT"
+                           JAVACLASS="org.apache.commons.compress.compressors.pack200.Pack200CompressorOutputStream" />
+       -->
 
        <xi:include href="security-config.xml" xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:TransformAlgorithms/c:TransformAlgorithm[@URI!='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform'])"/>
    </TransformAlgorithms>

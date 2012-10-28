@@ -24,6 +24,7 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.EncryptionPartDef;
 import org.apache.xml.security.stax.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
@@ -347,6 +348,49 @@ public class WSSUtils extends XMLSecurityUtils {
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
+    }
+
+    public static void createReferenceListStructureForEncryption(AbstractOutputProcessor abstractOutputProcessor,
+                                                             OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        List<EncryptionPartDef> encryptionPartDefs =
+                outputProcessorChain.getSecurityContext().getAsList(EncryptionPartDef.class);
+        if (encryptionPartDefs == null) {
+            return;
+        }
+        List<XMLSecAttribute> attributes;
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(
+                outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList, true, null);
+        //output the references to the encrypted data:
+        Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefs.iterator();
+        while (encryptionPartDefIterator.hasNext()) {
+            EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
+
+            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(
+                    XMLSecurityConstants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId()));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(
+                    outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference, false, attributes);
+            final String compressionAlgorithm =
+                    ((WSSSecurityProperties)abstractOutputProcessor.getSecurityProperties()).getEncryptionCompressionAlgorithm();
+            if (compressionAlgorithm != null) {
+                abstractOutputProcessor.createStartElementAndOutputAsEvent(
+                        outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, true, null);
+                attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(abstractOutputProcessor.createAttribute(
+                        XMLSecurityConstants.ATT_NULL_Algorithm, compressionAlgorithm));
+                abstractOutputProcessor.createStartElementAndOutputAsEvent(
+                        outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform, false, attributes);
+                abstractOutputProcessor.createEndElementAndOutputAsEvent(
+                        outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform);
+                abstractOutputProcessor.createEndElementAndOutputAsEvent(
+                        outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms);
+            }
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(
+                    outputProcessorChain, XMLSecurityConstants.TAG_xenc_DataReference);
+        }
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(
+                outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList);
     }
 
     public static TokenSecurityEvent createTokenSecurityEvent(final SecurityToken securityToken, String correlationID)

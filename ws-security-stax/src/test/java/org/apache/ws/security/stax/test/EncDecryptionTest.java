@@ -18,11 +18,18 @@
  */
 package org.apache.ws.security.stax.test;
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
+import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.securityEvent.*;
+import org.apache.xml.security.stax.config.Init;
+import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
@@ -46,10 +53,12 @@ import javax.xml.xpath.XPathExpression;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -1400,6 +1409,16 @@ public class EncDecryptionTest extends AbstractTestBase {
 
     @Test
     public void testCompressedEncDecryption() throws Exception {
+
+        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+        Field algorithmsClassMapField = TransformerAlgorithmMapper.class.getDeclaredField("algorithmsClassMapOut");
+        algorithmsClassMapField.setAccessible(true);
+        Map<String, Class<?>> map = (Map<String, Class<?>>)algorithmsClassMapField.get(null);
+        map.put("http://www.apache.org/2012/04/xmlsec/gzip", GzipCompressorOutputStream.class);
+        algorithmsClassMapField = TransformerAlgorithmMapper.class.getDeclaredField("algorithmsClassMapIn");
+        algorithmsClassMapField.setAccessible(true);
+        map = (Map<String, Class<?>>)algorithmsClassMapField.get(null);
+        map.put("http://www.apache.org/2012/04/xmlsec/gzip", GzipCompressorInputStream.class);
 
         ByteArrayOutputStream baos;
         {

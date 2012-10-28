@@ -301,7 +301,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData);
 
                     if (getAction() == WSSConstants.ENCRYPT) {
-                        createReferenceListStructure(subOutputProcessorChain);
+                        WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                     }
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptedKey);
                     outputProcessorChain.removeProcessor(this);

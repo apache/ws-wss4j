@@ -87,6 +87,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private String encryptionUser;
     private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
     private boolean useReqSigCertForEncryption = false;
+    private String encryptionCompressionAlgorithm;
 
     public WSSSecurityProperties() {
         super();
@@ -127,6 +128,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.encryptionUser = wssSecurityProperties.encryptionUser;
         this.encryptionKeyIdentifierType = wssSecurityProperties.encryptionKeyIdentifierType;
         this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
+        this.encryptionCompressionAlgorithm = wssSecurityProperties.encryptionCompressionAlgorithm;
     }
 
     /**
@@ -531,5 +533,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public void setEncryptionUser(String encryptionUser) {
         this.encryptionUser = encryptionUser;
+    }
+
+    public String getEncryptionCompressionAlgorithm() {
+        return encryptionCompressionAlgorithm;
+    }
+
+    public void setEncryptionCompressionAlgorithm(String encryptionCompressionAlgorithm) {
+        this.encryptionCompressionAlgorithm = encryptionCompressionAlgorithm;
     }
 }

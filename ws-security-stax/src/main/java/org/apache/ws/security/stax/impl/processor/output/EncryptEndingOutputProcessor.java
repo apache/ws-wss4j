@@ -61,7 +61,7 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
     public void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
         if (getAction() == WSSConstants.ENCRYPT_WITH_DERIVED_KEY) {
-            createReferenceListStructure(subOutputProcessorChain);
+            WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
         }
     }
 

@@ -18,6 +18,9 @@
  */
 package org.apache.ws.security.stax.impl.processor.input;
 
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,20 +32,19 @@ import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
+import org.apache.xml.security.binding.xmldsig.TransformType;
+import org.apache.xml.security.binding.xmldsig.TransformsType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.DocumentContext;
-import org.apache.xml.security.stax.ext.InputProcessorChain;
-import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.ext.SecurityContext;
-import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.XMLSecurityProperties;
-import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.config.ConfigurationProperties;
+import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
+import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
+import org.apache.xml.security.stax.impl.util.LimitingInputStream;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
@@ -59,6 +61,9 @@ import org.apache.ws.security.stax.securityEvent.EncryptedPartSecurityEvent;
  * @version $Revision$ $Date$
  */
 public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
+
+    private static final Long maximumAllowedDecompressedBytes =
+            Long.valueOf(ConfigurationProperties.getProperty("MaximumAllowedDecompressedBytes"));
 
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties, WSSecurityContext securityContext)
@@ -96,7 +101,6 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     @Override
     public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
-
         try {
             return super.processNextHeaderEvent(inputProcessorChain);
         } catch (WSSecurityException e) {
@@ -116,6 +120,41 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
+    }
+
+    @Override
+    protected InputStream applyTransforms(ReferenceType referenceType, InputStream inputStream) throws XMLSecurityException {
+        if (referenceType != null) {
+            TransformsType transformsType =
+                    XMLSecurityUtils.getQNameType(referenceType.getAny(), XMLSecurityConstants.TAG_dsig_Transforms);
+            if (transformsType != null) {
+                List<TransformType> transformTypes = transformsType.getTransform();
+                //to do don't forget to limit the count of transformations if more transformations will be supported!
+                if (transformTypes.size() > 1) {
+                    throw new XMLSecurityException("stax.encryption.Transforms.NotYetImplemented");
+                }
+                TransformType transformType = transformTypes.get(0);
+                @SuppressWarnings("unchecked")
+                Class<InputStream> transformerClass =
+                        (Class<InputStream>) TransformerAlgorithmMapper.getTransformerClass(
+                                transformType.getAlgorithm(), XMLSecurityConstants.DIRECTION.IN);
+                try {
+                    Constructor<InputStream> constructor = transformerClass.getConstructor(InputStream.class);
+                    inputStream = new LimitingInputStream(
+                            constructor.newInstance(inputStream),
+                            maximumAllowedDecompressedBytes);
+                } catch (InvocationTargetException e) {
+                    throw new XMLSecurityException(e);
+                } catch (NoSuchMethodException e) {
+                    throw new XMLSecurityException(e);
+                } catch (InstantiationException e) {
+                    throw new XMLSecurityException(e);
+                } catch (IllegalAccessException e) {
+                    throw new XMLSecurityException(e);
+                }
+            }
+        }
+        return inputStream;
     }
 
     @Override

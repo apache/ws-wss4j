@@ -37,6 +37,7 @@ import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.OutboundWSSec;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.impl.processor.input.DecryptInputProcessor;
 import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
@@ -755,6 +756,19 @@ public abstract class AbstractTestBase {
         Integer oldval = (Integer)xmlEventReaderInputProcessorField.get(null);
         xmlEventReaderInputProcessorField.set(null, value);
         abstractDecryptInputProcessorField.set(null, value);
+        return oldval;
+    }
+
+    public static long changeValueOfMaximumAllowedDecompressedBytes(Long value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = DecryptInputProcessor.class.getDeclaredField("maximumAllowedDecompressedBytes");
+        field.setAccessible(true);
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        Long oldval = (Long) field.get(null);
+        field.set(null, value);
         return oldval;
     }
 }

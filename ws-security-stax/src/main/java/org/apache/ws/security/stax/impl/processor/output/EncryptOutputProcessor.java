@@ -21,8 +21,10 @@ package org.apache.ws.security.stax.impl.processor.output;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -36,6 +38,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -122,6 +127,30 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             this.addBeforeProcessor(EncryptEndingOutputProcessor.class.getName());
             this.addBeforeProcessor(InternalEncryptionOutputProcessor.class.getName());
             this.addAfterProcessor(EncryptOutputProcessor.class.getName());
+        }
+
+        protected OutputStream applyTransforms(OutputStream outputStream) throws XMLSecurityException {
+            String compressionAlgorithm = ((WSSSecurityProperties)getSecurityProperties()).getEncryptionCompressionAlgorithm();
+            if (compressionAlgorithm != null) {
+                @SuppressWarnings("unchecked")
+                Class<OutputStream> transformerClass =
+                        (Class<OutputStream>) TransformerAlgorithmMapper.getTransformerClass(
+                                compressionAlgorithm, XMLSecurityConstants.DIRECTION.OUT
+                        );
+                try {
+                    Constructor<OutputStream> constructor = transformerClass.getConstructor(OutputStream.class);
+                    outputStream = constructor.newInstance(outputStream);
+                } catch (InvocationTargetException e) {
+                    throw new XMLSecurityException(e);
+                } catch (NoSuchMethodException e) {
+                    throw new XMLSecurityException(e);
+                } catch (InstantiationException e) {
+                    throw new XMLSecurityException(e);
+                } catch (IllegalAccessException e) {
+                    throw new XMLSecurityException(e);
+                }
+            }
+            return outputStream;
         }
 
         /**
