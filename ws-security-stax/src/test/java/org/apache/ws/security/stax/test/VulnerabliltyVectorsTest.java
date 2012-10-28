@@ -562,7 +562,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            e.printStackTrace();
             Assert.assertTrue(e.getCause() instanceof IOException);
             Assert.assertEquals(e.getCause().getMessage(),
                     "Maximum byte count (101) reached.");
