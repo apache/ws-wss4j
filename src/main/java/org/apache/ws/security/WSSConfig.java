@@ -30,7 +30,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
@@ -397,8 +396,8 @@ public class WSSConfig {
     
     public static synchronized void init() {
         if (!staticallyInitialized) {
-            setXmlSecIgnoreLineBreak();
             if (addJceProviders) {
+                setXmlSecIgnoreLineBreak();
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         addXMLDSigRI();
@@ -426,7 +425,7 @@ public class WSSConfig {
     }
     
     public static void addXMLDSigRIInternal() {
-        addJceProvider("ApacheXMLDSig", new XMLDSigRI());
+        addJceProvider("ApacheXMLDSig", "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI");
     }
 
     /**
