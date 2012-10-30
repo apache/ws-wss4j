@@ -21,8 +21,8 @@ package org.apache.ws.security.dom.message.token;
 
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.common.util.DOM2Writer;
+import org.apache.ws.security.common.util.RFC2253Parser;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.RFC2253Parser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

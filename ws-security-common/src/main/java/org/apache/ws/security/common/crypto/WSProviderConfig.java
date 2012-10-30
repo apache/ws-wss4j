@@ -25,13 +25,15 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.Provider;
 import java.security.Security;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
 import org.apache.ws.security.common.util.Loader;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.I18n;
 import org.apache.xml.security.utils.XMLUtils;
+
 import sun.util.ResourceBundleEnumeration;
 
 /**
@@ -60,9 +62,9 @@ public final class WSProviderConfig {
     
     public static synchronized void init() {
         if (!staticallyInitialized) {
-            initializeResourceBundles();
-            setXmlSecIgnoreLineBreak();
             if (addJceProviders) {
+                initializeResourceBundles();
+                setXmlSecIgnoreLineBreak();
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         addXMLDSigRIInternal();
@@ -122,7 +124,7 @@ public final class WSProviderConfig {
     }
     
     private static void addXMLDSigRIInternal() {
-        addJceProvider("ApacheXMLDSig", new XMLDSigRI());
+        addJceProvider("ApacheXMLDSig", "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI");
     }
 
     private static void initializeResourceBundles() {

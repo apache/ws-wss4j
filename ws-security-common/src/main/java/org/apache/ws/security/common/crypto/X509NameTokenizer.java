@@ -21,7 +21,7 @@ package org.apache.ws.security.common.crypto;
 
 import java.util.ArrayList;
 
-import org.apache.xml.security.utils.RFC2253Parser;
+import org.apache.ws.security.common.util.RFC2253Parser;
 
 /**
  * class for breaking up an X500 Name into it's component tokens, ala
