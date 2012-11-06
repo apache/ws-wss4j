@@ -844,7 +844,7 @@ public class Merlin extends CryptoBase {
         } catch (java.security.NoSuchProviderException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    new Object[] { e.getMessage() }, e
+                    e
                 );
         } catch (java.security.NoSuchAlgorithmException e) {
                 throw new WSSecurityException(
@@ -855,28 +855,28 @@ public class Merlin extends CryptoBase {
         } catch (java.security.cert.CertificateException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", 
-                    new Object[] { e.getMessage() }, e
+                    e
                 );
         } catch (java.security.InvalidAlgorithmParameterException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    new Object[] { e.getMessage() }, e
+                    e
                 );
         } catch (java.security.cert.CertPathValidatorException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    new Object[] { e.getMessage() }, e
+                    WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "certpath",
+                    e
                 );
         } catch (java.security.KeyStoreException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    new Object[] { e.getMessage() }, e
+                    e
                 );
         } catch (NullPointerException e) {
                 // NPE thrown by JDK 1.7 for one of the test cases
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    new Object[] { e.getMessage() }, e
+                    e
                 );
         }
     }

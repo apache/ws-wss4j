@@ -24,7 +24,6 @@ import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.ws.security.stax.securityEvent.DerivedKeyTokenSecurityEvent;
@@ -111,9 +110,6 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                             if (referencedSecurityToken instanceof UsernameSecurityToken) {
                                 UsernameSecurityToken usernameSecurityToken = (UsernameSecurityToken) referencedSecurityToken;
                                 secret = usernameSecurityToken.generateDerivedKey();
-                            } else if (referencedSecurityToken instanceof SAMLSecurityToken) {
-                                SAMLSecurityToken samlSecurityToken = (SAMLSecurityToken) referencedSecurityToken;
-                                secret = samlSecurityToken.getSamlKeyInfo().getSecret();
                             } else {
                                 secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID).getEncoded();
                             }

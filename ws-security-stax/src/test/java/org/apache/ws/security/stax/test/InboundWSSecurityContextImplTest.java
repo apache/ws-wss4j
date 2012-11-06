@@ -46,8 +46,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author $Author: giger $
- * @version $Revision: 1297086 $ $Date: 2012-03-05 16:25:08 +0100 (Mon, 05 Mar 2012) $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class InboundWSSecurityContextImplTest {
 
@@ -509,7 +509,7 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent samlTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(
-                SAMLVersion.VERSION_20, new SAMLKeyInfo(getX509Token(WSSConstants.X509V3Token).getX509Certificates()), null, null, "1");
+                SAMLVersion.VERSION_20, getX509Token(WSSConstants.X509V3Token), null, null, null, "1", WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
         samlSecurityToken.setElementPath(samlTokenPath);
         samlSecurityToken.setXMLSecEvent(samlTokenXmlEvent);
         samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);

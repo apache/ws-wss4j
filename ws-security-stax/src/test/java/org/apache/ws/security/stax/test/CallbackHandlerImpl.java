@@ -225,6 +225,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(doc, null);
             ephemeralKey = encrKey.getEphemeralKey();
+            keyInfo.setEphemeralKey(ephemeralKey);
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
             // Append the EncryptedKey to a KeyInfo element

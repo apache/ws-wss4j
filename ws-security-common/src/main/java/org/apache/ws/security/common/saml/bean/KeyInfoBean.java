@@ -37,6 +37,7 @@ public class KeyInfoBean {
     private X509Certificate cert;
     private CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
     private PublicKey publicKey;
+    private byte[] ephemeralKey;
     private Element keyInfoElement;
 
     /**
@@ -98,7 +99,15 @@ public class KeyInfoBean {
     public void setCertIdentifer(CERT_IDENTIFIER certIdentifier) {
         this.certIdentifier = certIdentifier;
     }
-    
+
+    public byte[] getEphemeralKey() {
+        return ephemeralKey;
+    }
+
+    public void setEphemeralKey(byte[] ephemeralKey) {
+        this.ephemeralKey = ephemeralKey;
+    }
+
     /**
      * Method getElement returns the DOM Element of this KeyInfoBean object.
      *

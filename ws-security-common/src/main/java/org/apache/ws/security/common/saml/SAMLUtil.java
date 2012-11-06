@@ -86,7 +86,7 @@ public final class SAMLUtil {
      * @return An array of bytes corresponding to the secret key (can be null)
      * @throws WSSecurityException
      */
-    private static byte[] getSecretKeyFromCallbackHandler(
+    public static byte[] getSecretKeyFromCallbackHandler(
         String id,
         CallbackHandler cb
     ) throws WSSecurityException {

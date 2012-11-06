@@ -657,6 +657,16 @@ public class AssertionWrapper {
         }
         return null;
     }
+
+    public Signature getSignature() throws WSSecurityException {
+        Signature sig = null;
+        if (saml2 != null && saml2.getSignature() != null) {
+            sig = saml2.getSignature();
+        } else if (saml1 != null && saml1.getSignature() != null) {
+            sig = saml1.getSignature();
+        }
+        return sig;
+    }
     
     /**
      * Parse the DOM Element into Opensaml objects.

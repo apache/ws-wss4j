@@ -19,6 +19,7 @@
 package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.binding.wss10.KeyIdentifierType;
+import org.apache.ws.security.binding.wss10.ReferenceType;
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
@@ -57,22 +58,38 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         final SecurityTokenReferenceType securityTokenReferenceType =
                 ((JAXBElement<SecurityTokenReferenceType>) parseStructure(eventQueue, index, securityProperties)).getValue();
 
+        QName attributeName = null;
+        String attributeValue = null;
+
         final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(
                 securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
         if (keyIdentifierType != null) {
+            attributeValue = keyIdentifierType.getValue().trim();
             if (WSSConstants.NS_SAML10_TYPE.equals(keyIdentifierType.getValueType())) {
-                InternalSecurityTokenReferenceInputProcessor internalSecurityTokenReferenceInputHandler
-                        = new InternalSecurityTokenReferenceInputProcessor(
-                        securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_AssertionID,
-                        keyIdentifierType.getValue().trim(), (WSSSecurityProperties) securityProperties);
-                inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
+                attributeName = WSSConstants.ATT_NULL_AssertionID;
             } else if (WSSConstants.NS_SAML20_TYPE.equals(keyIdentifierType.getValueType())) {
-                InternalSecurityTokenReferenceInputProcessor internalSecurityTokenReferenceInputHandler
-                        = new InternalSecurityTokenReferenceInputProcessor(
-                        securityTokenReferenceType.getId(), WSSConstants.ATT_NULL_ID,
-                        keyIdentifierType.getValue().trim(), (WSSSecurityProperties) securityProperties);
-                inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
+                attributeName = WSSConstants.ATT_NULL_ID;
             }
+        }
+        final ReferenceType referenceType = XMLSecurityUtils.getQNameType(
+                securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
+        if (referenceType != null) {
+            attributeValue = WSSUtils.dropReferenceMarker(referenceType.getURI());
+            if (WSSConstants.NS_SAML10_TYPE.equals(referenceType.getValueType())) {
+                attributeName = WSSConstants.ATT_NULL_AssertionID;
+            } else if (WSSConstants.NS_SAML20_TYPE.equals(referenceType.getValueType())) {
+                attributeName = WSSConstants.ATT_NULL_ID;
+            }
+        }
+
+        if (attributeName != null) {
+            InternalSecurityTokenReferenceInputProcessor internalSecurityTokenReferenceInputHandler
+                    = new InternalSecurityTokenReferenceInputProcessor(
+                    securityTokenReferenceType.getId(), attributeName,
+                    attributeValue, (WSSSecurityProperties) securityProperties);
+            inputProcessorChain.addProcessor(internalSecurityTokenReferenceInputHandler);
+        } else {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
         }
     }
 

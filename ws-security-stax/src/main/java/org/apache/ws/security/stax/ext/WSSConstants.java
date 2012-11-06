@@ -124,6 +124,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_SOAP12 = "http://www.w3.org/2003/05/soap-envelope";
 
     public static final String NS_WST = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+    public static final String NS_WST_05_12 = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
     public static final String NS_WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
 
     public static final String NS_SAML = "urn:oasis:names:tc:SAML:1.0:assertion";
@@ -200,6 +201,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String PREFIX_C14N_EXCL = "c14nEx";
 
     public static final QName TAG_wst_BinarySecret = new QName(NS_WST, "BinarySecret");
+    public static final QName TAG_wst0512_BinarySecret = new QName(NS_WST_05_12, "BinarySecret");
 
     public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
     public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS = "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";

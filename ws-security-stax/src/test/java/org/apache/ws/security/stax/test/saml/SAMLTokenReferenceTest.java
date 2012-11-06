@@ -18,23 +18,19 @@
  */
 package org.apache.ws.security.stax.test.saml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.Properties;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
+import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.message.WSSecHeader;
+import org.apache.ws.security.dom.saml.WSSecSignatureSAML;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
 import org.apache.ws.security.stax.ext.OutboundWSSec;
@@ -42,6 +38,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.test.AbstractTestBase;
 import org.apache.ws.security.stax.test.CallbackHandlerImpl;
+import org.apache.ws.security.stax.test.utils.SOAPUtil;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
 import org.apache.ws.security.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -49,7 +46,19 @@ import org.opensaml.common.SAMLVersion;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * @author $Author$
@@ -84,6 +93,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier");
         }
 
         //done signature; now test sig-verification:
@@ -115,6 +130,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -155,6 +176,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             cryptoType.setAlias("transmitter");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
 
@@ -167,6 +189,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
         }
 
         //done signature; now test sig-verification:
@@ -196,6 +224,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -266,7 +300,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
      * }
      */
 
-    /*
+/*
      @Test
     public void testSAML1HOKEKKeyIdentifierInbound() throws Exception {
 
@@ -277,26 +311,53 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.ENCRYPT;
-            Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-signed.properties");
-            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
-            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            SAMLCallback samlCallback = new SAMLCallback();
+            SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
-            //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
+            assertion.signAssertion("samlissuer", "default", issuerCrypto, false);
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader();
+            Node assertionNode = assertion.toDOM(doc);
+            secHeader.insertSecurityHeader(doc);
+            secHeader.getSecurityHeader().appendChild(assertionNode);
+
+            // Encrypt the SOAP body
+            WSSecEncrypt builder = new WSSecEncrypt();
+            builder.setUserInfo("receiver");
+            builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+            builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+            builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            builder.setCustomEKTokenId(assertion.getId());
+
+            Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+            builder.prepare(doc, userCrypto);
+
+            List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+            WSEncryptionPart encP =
+                    new WSEncryptionPart(
+                            "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+                    );
+            parts.add(encP);
+            Element refElement = builder.encryptForRef(null, parts);
+            builder.addInternalRefElement(refElement);
+            builder.appendToHeader(secHeader);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
+            transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
-
+         System.out.println(baos.toString());
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            Crypto crypto = CryptoFactory.getInstance("receiver-crypto.properties");
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            callbackHandler.setSecret(crypto.getPrivateKey("receiver", "default").getEncoded());
+            securityProperties.setCallbackHandler(callbackHandler);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -307,9 +368,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 2);
         }
     }
-
-    */
-
+  */
     /*
      @Test
     public void testSAML1HOKEKDirectReferenceInbound() throws Exception {
@@ -387,6 +446,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
         }
 
         //done signature; now test sig-verification:
@@ -418,6 +483,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -472,6 +543,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
         }
 
         //done signature; now test sig-verification:
@@ -501,6 +578,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -518,6 +601,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
 
@@ -576,16 +661,38 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
-            Properties properties = new Properties();
-            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
-            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+            SAMLCallback samlCallback = new SAMLCallback();
+            SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+
+            Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
+            assertion.signAssertion("samlissuer", "default", issuerCrypto, false);
+
+            WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+            wsSign.setUserInfo("transmitter", "default");
+            wsSign.setUseDirectReferenceToAssertion(true);
+            wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+            Document securedDocument = wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            nodeList = securedDocument.getElementsByTagNameNS(
+                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "SecurityTokenReference");
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(
+                    ((Element) nodeList.item(0)).
+                            getAttributeNS("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", "TokenType"),
+                    "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

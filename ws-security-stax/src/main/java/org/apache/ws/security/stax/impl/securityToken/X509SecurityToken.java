@@ -70,9 +70,12 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
     @Override
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         if (super.getX509Certificates() == null) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(getAlias());
-            setX509Certificates(getCrypto().getX509Certificates(cryptoType));
+            String alias = getAlias();
+            if (alias != null) {
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(alias);
+                setX509Certificates(getCrypto().getX509Certificates(cryptoType));
+            }
         }
         return super.getX509Certificates();
     }
@@ -82,6 +85,8 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
         try {
             X509Certificate[] x509Certificates = getX509Certificates();
             if (x509Certificates != null && x509Certificates.length > 0) {
+                //todo I don't think the checkValidity is necessary because the CertPathChecker
+                // in crypto-verify trust should already do the job
                 x509Certificates[0].checkValidity();
                 //todo deprecated method:
                 getCrypto().verifyTrust(x509Certificates);

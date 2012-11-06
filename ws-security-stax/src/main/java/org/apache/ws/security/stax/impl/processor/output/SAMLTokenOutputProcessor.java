@@ -28,6 +28,7 @@ import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -39,9 +40,11 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.*;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -59,6 +62,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
     @Override
     public void processEvent(XMLSecEvent xmlSecEvent, final OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+
+        //todo refactor/cleanup/simplify
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
@@ -90,6 +95,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
             PrivateKey privateKey = null;
             X509Certificate[] certificates = null;
+            byte[] ephemeralKey = null;
 
             if (senderVouches) {
                 // prepare to sign the SAML token
@@ -124,14 +130,19 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             cryptoType.setAlias(alias);
                             certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
                             privateKey = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
+                        } else {
+                            ephemeralKey = keyInfoBean.getEphemeralKey();
                         }
                     }
                 }
             }
 
             final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(certificates);
-            samlKeyInfo.setPublicKey(certificates[0].getPublicKey());
+            if (certificates != null && certificates.length > 0) {
+                samlKeyInfo.setPublicKey(certificates[0].getPublicKey());
+            }
             samlKeyInfo.setPrivateKey(privateKey);
+            samlKeyInfo.setSecret(ephemeralKey);
 
             final X509Certificate[] x509Certificates;
             if (certificates != null && certificates.length > 0) {
@@ -196,7 +207,32 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         } else {
                             tokenType = WSSConstants.Saml20Token;
                         }
-                        this.samlSecurityToken = new GenericOutboundSecurityToken(tokenId, tokenType, samlKeyInfo.getPrivateKey(), samlKeyInfo.getCerts());
+                        if (samlKeyInfo.getPrivateKey() != null) {
+                            this.samlSecurityToken = new GenericOutboundSecurityToken(
+                                    tokenId, tokenType, samlKeyInfo.getPrivateKey(), samlKeyInfo.getCerts());
+                        } else {
+                            this.samlSecurityToken = new GenericOutboundSecurityToken(
+                                    tokenId, tokenType) {
+
+                                @Override
+                                public Key getSecretKey(String algorithmURI) throws WSSecurityException {
+
+                                    Key key = null;
+                                    try {
+                                        key = super.getSecretKey(algorithmURI);
+                                    } catch (XMLSecurityException e) {
+                                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                                    }
+                                    if (key != null) {
+                                        return key;
+                                    }
+                                    String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+                                    key = new SecretKeySpec(samlKeyInfo.getSecret(), algoFamily);
+                                    setSecretKey(algorithmURI, key);
+                                    return key;
+                                }
+                            };
+                        }
                         this.samlSecurityToken.setProcessor(finalSAMLTokenOutputProcessor);
                         return this.samlSecurityToken;
                     }

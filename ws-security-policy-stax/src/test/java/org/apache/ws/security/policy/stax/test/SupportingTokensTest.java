@@ -23,7 +23,6 @@ import org.apache.ws.security.policy.WSSPolicyException;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.stax.ext.WSSConstants;
-import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.X509SecurityToken;
@@ -38,8 +37,8 @@ import javax.xml.namespace.QName;
 import java.util.Date;
 
 /**
- * @author $Author: $
- * @version $Revision: $ $Date: $
+ * @author $Author$
+ * @version $Revision$ $Date$
  */
 public class SupportingTokensTest extends AbstractPolicyTestBase {
 

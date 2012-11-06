@@ -20,14 +20,16 @@ package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.opensaml.common.SAMLVersion;
 
+import java.security.Key;
+import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -39,28 +41,77 @@ import java.security.cert.X509Certificate;
 public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
     private final SAMLVersion samlVersion;
-    private final SAMLKeyInfo samlKeyInfo;
+    private SecurityToken subjectSecurityToken;
     private String issuer;
     private Crypto crypto;
 
-    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, String issuer,
+    public SAMLSecurityToken(SAMLVersion samlVersion, SecurityToken subjectSecurityToken, String issuer,
                              WSSecurityContext wsSecurityContext, Crypto crypto,
                              String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
         super(wsSecurityContext, id, keyIdentifierType);
         this.samlVersion = samlVersion;
-        this.samlKeyInfo = samlKeyInfo;
         this.issuer = issuer;
         this.crypto = crypto;
-        if (samlKeyInfo != null) {
-            setSecretKey("", samlKeyInfo.getPrivateKey());
-            setPublicKey(samlKeyInfo.getPublicKey());
-            setX509Certificates(samlKeyInfo.getCerts());
+        this.subjectSecurityToken = subjectSecurityToken;
+    }
+
+    public SAMLSecurityToken(SAMLVersion samlVersion, Key secretKey, PublicKey publicKey,
+                             X509Certificate[] x509Certificates, String issuer,
+                             WSSecurityContext wsSecurityContext, Crypto crypto,
+                             String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+        super(wsSecurityContext, id, keyIdentifierType);
+        this.samlVersion = samlVersion;
+        this.issuer = issuer;
+        this.crypto = crypto;
+        if (secretKey != null) {
+            setSecretKey("", secretKey);
+        }
+        if (publicKey != null) {
+            setPublicKey(publicKey);
+        }
+        if (x509Certificates != null) {
+            setX509Certificates(x509Certificates);
         }
     }
 
-    public SAMLSecurityToken(SAMLVersion samlVersion, SAMLKeyInfo samlKeyInfo, WSSecurityContext wsSecurityContext,
-                             Crypto crypto, String id) {
-        this(samlVersion, samlKeyInfo, null, wsSecurityContext, crypto, id, null);
+    @Override
+    public boolean isAsymmetric() throws XMLSecurityException {
+        if (this.subjectSecurityToken != null && this.subjectSecurityToken.isAsymmetric()) {
+            return true;
+        }
+        return super.isAsymmetric();
+    }
+
+    @Override
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
+        if (this.subjectSecurityToken != null) {
+            return subjectSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
+        }
+        return super.getKey(algorithmURI, keyUsage, correlationID);
+    }
+
+    @Override
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
+        if (this.subjectSecurityToken != null) {
+            return subjectSecurityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
+        }
+        return super.getPubKey(algorithmURI, keyUsage, correlationID);
+    }
+
+    @Override
+    public PublicKey getPublicKey() throws XMLSecurityException {
+        if (this.subjectSecurityToken != null) {
+            return subjectSecurityToken.getPublicKey();
+        }
+        return super.getPublicKey();
+    }
+
+    @Override
+    public X509Certificate[] getX509Certificates() throws XMLSecurityException {
+        if (this.subjectSecurityToken != null) {
+            return subjectSecurityToken.getX509Certificates();
+        }
+        return super.getX509Certificates();
     }
 
     public Crypto getCrypto() {
@@ -69,9 +120,13 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
     @Override
     public void verify() throws XMLSecurityException {
+        //todo verify public key if exists
+        //todo revisit verify for every security token incl. public-key
+        //todo should we call verify implicit when accessing the keys?
         try {
             X509Certificate[] x509Certificates = getX509Certificates();
             if (x509Certificates != null && x509Certificates.length > 0) {
+                //todo I don't think the checkValidity is necessary because the CertPathChecker
                 x509Certificates[0].checkValidity();
                 //todo deprecated method:
                 getCrypto().verifyTrust(x509Certificates);
@@ -91,11 +146,6 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
             return WSSConstants.Saml11Token;
         }
         return WSSConstants.Saml20Token;
-    }
-
-    public SAMLKeyInfo getSamlKeyInfo() {
-        //todo AlgoSecEvent?
-        return samlKeyInfo;
     }
 
     public SAMLVersion getSamlVersion() {

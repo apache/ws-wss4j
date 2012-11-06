@@ -21,6 +21,8 @@ package org.apache.ws.security.stax.test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.WSConstants;
@@ -94,6 +96,7 @@ public abstract class AbstractTestBase {
     static {
         LogManager.getLogManager().addLogger(Logger.getLogger("org.jcp.xml.dsig.internal.dom"));
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
+        WSSConfig.init();
     }
 
     public AbstractTestBase() {
@@ -237,40 +240,11 @@ public abstract class AbstractTestBase {
             messageContext.put(WSHandlerConstants.USER, "receiver");
         }
 
-        //handlerInfo.getHandlerConfig().put(WSHandlerConstants.ACTOR, "receiver");
-        Properties sigProperties = new Properties();
-        sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-        if (client) {
-            sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
-        } else {
-            sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
-        }
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
-        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "default");
-
-        messageContext.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "" + sigProperties.hashCode());
-        messageContext.put("" + sigProperties.hashCode(), sigProperties);
         if (properties.get(WSHandlerConstants.PW_CALLBACK_REF) != null) {
             messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, properties.get(WSHandlerConstants.PW_CALLBACK_REF));
         } else {
             messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
         }
-
-        Properties decProperties = new Properties();
-        decProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-        if (client) {
-            decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
-        } else {
-            decProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "receiver.jks");
-        }
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
-        decProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
-        wss4JHandler.setPassword(messageContext, "default");
-        messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + decProperties.hashCode());
-        messageContext.put("" + decProperties.hashCode(), decProperties);
 
         Enumeration<?> enumeration = properties.propertyNames();
         while (enumeration.hasMoreElements()) {
@@ -280,6 +254,15 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
+        if (client) {
+            final Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+            requestData.setDecCrypto(crypto);
+            requestData.setSigVerCrypto(crypto);
+        } else {
+            final Crypto crypto = CryptoFactory.getInstance("receiver-crypto.properties");
+            requestData.setDecCrypto(crypto);
+            requestData.setSigVerCrypto(crypto);
+        }
 
         // Disable PrefixList checking as the stax code doesn't support this yet
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();

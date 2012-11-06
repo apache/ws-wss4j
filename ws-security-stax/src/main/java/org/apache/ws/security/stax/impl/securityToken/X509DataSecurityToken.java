@@ -27,6 +27,7 @@ import org.apache.xml.security.binding.xmldsig.X509DataType;
 import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
@@ -51,20 +52,33 @@ public class X509DataSecurityToken extends X509SecurityToken {
         if (this.alias == null) {
             X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
                     x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
-            if (x509IssuerSerialType == null
-                    || x509IssuerSerialType.getX509IssuerName() == null
-                    || x509IssuerSerialType.getX509SerialNumber() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            if (x509IssuerSerialType != null) {
+                if (x509IssuerSerialType.getX509IssuerName() == null
+                        || x509IssuerSerialType.getX509SerialNumber() == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                }
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+                cryptoType.setIssuerSerial(
+                        x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber()
+                );
+                X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+                setX509Certificates(certs);
+                if (certs == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+                }
+                return this.alias = getCrypto().getX509Identifier(certs[0]);
             }
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
-            cryptoType.setIssuerSerial(
-                    x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber()
-            );
-            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
-            if (certs == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            byte[] x509CertificateBytes = XMLSecurityUtils.getQNameType(
+                    x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509Certificate);
+            if (x509CertificateBytes != null) {
+                X509Certificate[] certs =
+                        new X509Certificate[]{
+                                getCrypto().loadCertificate(
+                                        new UnsynchronizedByteArrayInputStream(x509CertificateBytes))
+                        };
+                setX509Certificates(certs);
+                return this.alias = getCrypto().getX509Identifier(certs[0]);
             }
-            this.alias = getCrypto().getX509Identifier(certs[0]);
         }
         return this.alias;
     }
