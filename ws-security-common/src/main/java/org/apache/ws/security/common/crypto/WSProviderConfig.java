@@ -34,7 +34,6 @@ import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.I18n;
 import org.apache.xml.security.utils.XMLUtils;
 
-import sun.util.ResourceBundleEnumeration;
 
 /**
  * Configure Crypto providers.
@@ -151,7 +150,7 @@ public final class WSProviderConfig {
 
             @Override
             public Enumeration<String> getKeys() {
-                return new ResourceBundleEnumeration(wss4jSecResourceBundle.keySet(), xmlSecResourceBundle.getKeys());
+                throw new UnsupportedOperationException("getKeys not supported");
             }
         };
         I18n.init(resourceBundle);
