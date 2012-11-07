@@ -28,6 +28,7 @@ import org.apache.xml.security.binding.xmlenc.EncryptionMethodType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.processor.input.XMLEncryptedKeyInputHandler;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
@@ -40,6 +41,12 @@ import org.apache.ws.security.stax.ext.WSSecurityContext;
  * @version $Revision$ $Date$
  */
 public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
+
+    @Override
+    public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType, XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties) throws XMLSecurityException {
+        checkBSPCompliance(inputProcessorChain, encryptedKeyType);
+        super.handle(inputProcessorChain, encryptedKeyType, responsibleXMLSecStartXMLEvent, securityProperties);
+    }
 
     //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
     //and add it to the chain
@@ -61,7 +68,6 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
                 );
     }
 
-    @Override
     protected void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType)
             throws XMLSecurityException {
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
