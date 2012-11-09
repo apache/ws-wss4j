@@ -28,7 +28,9 @@ import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSEncryptionPart;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
+import org.apache.ws.security.dom.message.WSSecEncrypt;
 import org.apache.ws.security.dom.message.WSSecHeader;
 import org.apache.ws.security.dom.saml.WSSecSignatureSAML;
 import org.apache.ws.security.stax.WSSec;
@@ -47,6 +49,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
@@ -58,6 +61,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -250,63 +254,65 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         }
     }
 
-    /**
-     * todo doesn't work atm
-     *
-     * @Test public void testAssertionBelowSTRInbound() throws Exception {
-     * <p/>
-     * ByteArrayOutputStream baos = new ByteArrayOutputStream();
-     * {
-     * SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-     * callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-     * callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-     * callbackHandler.setIssuer("www.example.com");
-     * <p/>
-     * InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-     * String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
-     * Properties properties = new Properties();
-     * properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-signed.properties");
-     * properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
-     * properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-     * Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-     * <p/>
-     * //some test that we can really sure we get what we want from WSS4J
-     * NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-     * Assert.assertEquals(nodeList.getLength(), 2);
-     * Element securityHeader = (Element)nodeList.item(1).getParentNode();
-     * nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_saml_Assertion.getNamespaceURI(), WSSConstants.TAG_saml_Assertion.getLocalPart());
-     * Node assertionNode = nodeList.item(0);
-     * securityHeader.removeChild(assertionNode);
-     * securityHeader.appendChild(assertionNode);
-     * <p/>
-     * javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-     * transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-     * transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
-     * }
-     * <p/>
-     * //done signature; now test sig-verification:
-     * {
-     * WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-     * securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-     * InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-     * XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-     * <p/>
-     * Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-     * <p/>
-     * //header element must still be there
-     * NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-     * Assert.assertEquals(nodeList.getLength(), 2);
-     * }
-     * }
-     */
+    /* todo doesn't work atm
+    @Test
+    public void testAssertionBelowSTRInbound() throws Exception {
 
-/*
-     @Test
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+            callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+            callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+            callbackHandler.setIssuer("www.example.com");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            properties.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+            Element securityHeader = (Element) nodeList.item(1).getParentNode();
+            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_saml_Assertion.getNamespaceURI(), WSSConstants.TAG_saml_Assertion.getLocalPart());
+            Node assertionNode = nodeList.item(0);
+            securityHeader.removeChild(assertionNode);
+            securityHeader.appendChild(assertionNode);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
+        }
+
+        //done signature; now test sig-verification:
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 2);
+        }
+    }
+*/
+
+    @Test
     public void testSAML1HOKEKKeyIdentifierInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+            //we set here the receiver's certificate just to test EncryptedKey references.
+            //in real life this wont work that way.
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("receiver");
+            callbackHandler.setCerts(CryptoFactory.getInstance("transmitter-crypto.properties").getX509Certificates(cryptoType));
             callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
@@ -332,7 +338,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
             builder.setCustomEKTokenId(assertion.getId());
 
-            Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+            Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
             builder.prepare(doc, userCrypto);
 
             List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
@@ -348,16 +354,15 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
-         System.out.println(baos.toString());
+
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            Crypto crypto = CryptoFactory.getInstance("receiver-crypto.properties");
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setSecret(crypto.getPrivateKey("receiver", "default").getEncoded());
             securityProperties.setCallbackHandler(callbackHandler);
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -365,52 +370,82 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+            Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
-  */
-    /*
+
      @Test
     public void testSAML1HOKEKDirectReferenceInbound() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        {
-            SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
-            callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
-            callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
-            callbackHandler.setIssuer("www.example.com");
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         {
+             SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+             //we set here the receiver's certificate just to test EncryptedKey references.
+             //in real life this wont work that way.
+             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+             cryptoType.setAlias("receiver");
+             callbackHandler.setCerts(CryptoFactory.getInstance("transmitter-crypto.properties").getX509Certificates(cryptoType));
+             callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+             callbackHandler.setIssuer("www.example.com");
 
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.SAML_TOKEN_SIGNED + " " + WSHandlerConstants.ENCRYPT;
-            Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SAML_PROP_FILE, "saml/saml-signed.properties");
-            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
-            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+             SAMLCallback samlCallback = new SAMLCallback();
+             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+             AssertionWrapper assertion = new AssertionWrapper(samlCallback);
 
-            //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
+             Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
+             assertion.signAssertion("samlissuer", "default", issuerCrypto, false);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(System.out));
-        }
+             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+             WSSecHeader secHeader = new WSSecHeader();
+             Node assertionNode = assertion.toDOM(doc);
+             secHeader.insertSecurityHeader(doc);
+             secHeader.getSecurityHeader().appendChild(assertionNode);
 
-        //done signature; now test sig-verification:
-        {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+             // Encrypt the SOAP body
+             WSSecEncrypt builder = new WSSecEncrypt();
+             builder.setUserInfo("receiver");
+             builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+             builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
+             builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+             builder.setCustomEKTokenId(assertion.getId());
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+             Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
+             builder.prepare(doc, userCrypto);
 
-            //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 2);
-        }
+             List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+             WSEncryptionPart encP =
+                     new WSEncryptionPart(
+                             "add", "http://ws.apache.org/counter/counter_port_type", "Element"
+                     );
+             parts.add(encP);
+             Element refElement = builder.encryptForRef(null, parts);
+             builder.addInternalRefElement(refElement);
+             builder.appendToHeader(secHeader);
+
+             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+             transformer.transform(new DOMSource(doc), new StreamResult(baos));
+         }
+
+         //done signature; now test sig-verification:
+         {
+             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+             securityProperties.setCallbackHandler(callbackHandler);
+
+             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+             //header element must still be there
+             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+             Assert.assertEquals(nodeList.getLength(), 1);
+         }
     }
-    */
+
     @Test
     public void testSAML2SVKeyIdentifierOutbound() throws Exception {
 

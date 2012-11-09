@@ -209,8 +209,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 if (subjectKeyInfoIndex < 0) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
                 }
-                subjectSecurityToken = parseKeyInfo(inputProcessorChain, securityProperties, eventQueue, subjectKeyInfoIndex);
 
+                subjectSecurityToken = parseKeyInfo(inputProcessorChain, securityProperties, eventQueue, subjectKeyInfoIndex);
                 if (subjectSecurityToken == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
                 }
@@ -372,7 +372,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 }
 
                 @Override
-                protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
+                protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID)
+                        throws XMLSecurityException {
                     Key key = super.getKey(algorithmURI, keyUsage, correlationID);
                     if (key == null) {
                         String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
@@ -414,7 +415,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 keyInfoType = new KeyInfoType();
                 keyInfoType.getContent().add(securityTokenReferenceTypeJAXBElement);
             } else if (object instanceof KeyValueType) {
-                JAXBElement<KeyValueType> keyValueTypeJAXBElement = new org.apache.xml.security.binding.xmldsig.ObjectFactory().createKeyValue((KeyValueType) object);
+                JAXBElement<KeyValueType> keyValueTypeJAXBElement =
+                        new org.apache.xml.security.binding.xmldsig.ObjectFactory().createKeyValue((KeyValueType) object);
                 keyInfoType = new KeyInfoType();
                 keyInfoType.getContent().add(keyValueTypeJAXBElement);
             } else {
@@ -569,12 +571,14 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             DateTime currentTime = new DateTime();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (validFrom.isAfter(currentTime)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "SAML Token condition (Not Before) not met");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                        "empty", "SAML Token condition (Not Before) not met");
             }
         }
 
         if (validTill != null && validTill.isBeforeNow()) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "SAML Token condition (Not On Or After) not met");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", "SAML Token condition (Not On Or After) not met");
         }
     }
 

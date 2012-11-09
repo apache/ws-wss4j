@@ -47,7 +47,10 @@ public class SAMLKeyInfo {
      * The private key
      */
     private PrivateKey privateKey;
-    
+
+    public SAMLKeyInfo() {
+    }
+
     public SAMLKeyInfo(X509Certificate[] certs) {
         this.certs = certs;
     }

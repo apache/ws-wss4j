@@ -61,13 +61,12 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, final OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-
-        //todo refactor/cleanup/simplify
+    public void processEvent(XMLSecEvent xmlSecEvent, final OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
-            SAMLUtil.doSAMLCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), samlCallback);
+            SAMLUtil.doSAMLCallback(((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(), samlCallback);
             AssertionWrapper samlAssertionWrapper = new AssertionWrapper(samlCallback);
 
             // todo support setting signature and c14n algorithms
@@ -90,88 +89,41 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
             final String securityTokenReferenceId = IDGenerator.generateID(null);
-            final String binarySecurityTokenId = IDGenerator.generateID(null);
             final String tokenId = samlAssertionWrapper.getId();
 
-            PrivateKey privateKey = null;
-            X509Certificate[] certificates = null;
-            byte[] ephemeralKey = null;
+            final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
 
             if (senderVouches) {
-                // prepare to sign the SAML token
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(samlCallback.getIssuerKeyName());
-                certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
+                X509Certificate[] certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
                 if (certificates == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                             "empty", "No issuer certs were found to sign the SAML Assertion using issuer name: "
-                                    + samlCallback.getIssuerKeyName()
+                            + samlCallback.getIssuerKeyName()
                     );
                 }
+
+                PrivateKey privateKey;
                 try {
-                    privateKey = samlCallback.getIssuerCrypto().getPrivateKey(samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword());
+                    privateKey = samlCallback.getIssuerCrypto().getPrivateKey(
+                            samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword());
                 } catch (Exception ex) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
-            } else {
-                SubjectBean subjectBean = samlCallback.getSubject();
-                if (subjectBean != null) {
-                    KeyInfoBean keyInfoBean = subjectBean.getKeyInfo();
-                    if (keyInfoBean != null) {
-                        X509Certificate x509Certificate = keyInfoBean.getCertificate();
-                        if (x509Certificate != null) {
-                            String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Identifier(x509Certificate);
-                            if (alias == null) {
-                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
-                            }
-                            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
-                            WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), wsPasswordCallback);
-                            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                            cryptoType.setAlias(alias);
-                            certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
-                            privateKey = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword());
-                        } else {
-                            ephemeralKey = keyInfoBean.getEphemeralKey();
-                        }
-                    }
-                }
-            }
 
-            final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(certificates);
-            if (certificates != null && certificates.length > 0) {
-                samlKeyInfo.setPublicKey(certificates[0].getPublicKey());
-            }
-            samlKeyInfo.setPrivateKey(privateKey);
-            samlKeyInfo.setSecret(ephemeralKey);
+                final String binarySecurityTokenId = IDGenerator.generateID(null);
 
-            final X509Certificate[] x509Certificates;
-            if (certificates != null && certificates.length > 0) {
-                x509Certificates = certificates;
-            } else {
-                x509Certificates = null;
-            }
+                final GenericOutboundSecurityToken securityToken =
+                        new GenericOutboundSecurityToken(binarySecurityTokenId, WSSConstants.X509V3Token,
+                                privateKey, certificates);
 
-            final PrivateKey secretKey = privateKey;
+                finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper,
+                        securityTokenReferenceId, senderVouches);
 
-            final GenericOutboundSecurityToken securityToken;
-            SecurityTokenProvider securityTokenProvider;
-            if (senderVouches) {
-                securityToken = new GenericOutboundSecurityToken(binarySecurityTokenId,
-                        WSSConstants.X509V3Token, secretKey, x509Certificates);
-            } else {
-                securityToken = null;
-            }
+                securityToken.setProcessor(finalSAMLTokenOutputProcessor);
 
-            final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor =
-                    new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper,
-                            securityTokenReferenceId, binarySecurityTokenId, senderVouches);
-            finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            finalSAMLTokenOutputProcessor.setAction(getAction());
-            finalSAMLTokenOutputProcessor.init(outputProcessorChain);
-
-            if (senderVouches) {
-
-                securityTokenProvider = new SecurityTokenProvider() {
+                SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
                     @SuppressWarnings("unchecked")
                     @Override
@@ -188,17 +140,52 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, binarySecurityTokenId);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, securityTokenReferenceId);
+
             } else {
-                securityTokenProvider = new SecurityTokenProvider() {
+                final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo();
+
+                SubjectBean subjectBean = samlCallback.getSubject();
+                if (subjectBean != null) {
+                    KeyInfoBean keyInfoBean = subjectBean.getKeyInfo();
+                    if (keyInfoBean != null) {
+                        X509Certificate x509Certificate = keyInfoBean.getCertificate();
+                        if (x509Certificate != null) {
+                            String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().
+                                    getX509Identifier(x509Certificate);
+                            if (alias == null) {
+                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
+                            }
+                            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
+                            WSSUtils.doPasswordCallback(
+                                    ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
+                                    wsPasswordCallback);
+                            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                            cryptoType.setAlias(alias);
+                            samlKeyInfo.setCerts(((WSSSecurityProperties) getSecurityProperties()).
+                                    getSignatureCrypto().getX509Certificates(cryptoType));
+                            samlKeyInfo.setPrivateKey(((WSSSecurityProperties) getSecurityProperties()).
+                                    getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword()));
+                        } else {
+                            samlKeyInfo.setSecret(keyInfoBean.getEphemeralKey());
+                        }
+                    }
+                }
+
+                finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
+                        securityTokenReferenceId, senderVouches);
+
+                SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
                     private GenericOutboundSecurityToken samlSecurityToken;
 
                     @SuppressWarnings("unchecked")
                     @Override
                     public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
+
                         if (this.samlSecurityToken != null) {
                             return this.samlSecurityToken;
                         }
+
                         XMLSecurityConstants.TokenType tokenType;
                         if (samlCallback.getSamlVersion() == SAMLVersion.VERSION_10) {
                             tokenType = WSSConstants.Saml10Token;
@@ -217,7 +204,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                 @Override
                                 public Key getSecretKey(String algorithmURI) throws WSSecurityException {
 
-                                    Key key = null;
+                                    Key key;
                                     try {
                                         key = super.getSecretKey(algorithmURI);
                                     } catch (XMLSecurityException e) {
@@ -248,11 +235,19 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, tokenId);
             }
 
+            finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalSAMLTokenOutputProcessor.setAction(getAction());
+            finalSAMLTokenOutputProcessor.init(outputProcessorChain);
+
             XMLSecurityConstants.Action action = getAction();
             if (action.equals(WSSConstants.SAML_TOKEN_SIGNED) && senderVouches) {
-                SecurePart securePart = new SecurePart(new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform), tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
+                SecurePart securePart =
+                        new SecurePart(
+                                new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform),
+                                tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
                 outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
             }
+
         } finally {
             outputProcessorChain.removeProcessor(this);
         }
@@ -264,36 +259,41 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private final OutboundSecurityToken securityToken;
         private final AssertionWrapper assertionWrapper;
         private final String securityTokenReferenceId;
-        private final String binarySecurityTokenReferenceId;
         private boolean senderVouches = false;
 
         FinalSAMLTokenOutputProcessor(OutboundSecurityToken securityToken, AssertionWrapper assertionWrapper,
-                                      String securityTokenReferenceId, String binarySecurityTokenReferenceId,
-                                      boolean senderVouches) throws XMLSecurityException {
+                                      String securityTokenReferenceId, boolean senderVouches) throws XMLSecurityException {
             super();
             this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
             this.addAfterProcessor(SAMLTokenOutputProcessor.class.getName());
             this.assertionWrapper = assertionWrapper;
             this.securityTokenReferenceId = securityTokenReferenceId;
             this.senderVouches = senderVouches;
-            this.binarySecurityTokenReferenceId = binarySecurityTokenReferenceId;
             this.securityToken = securityToken;
         }
 
         @Override
-        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
             outputProcessorChain.processEvent(xmlSecEvent);
             if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
                 XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
                 if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+                        && WSSUtils.isInSecurityHeader(xmlSecStartElement,
+                        ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                    if (senderVouches && getSecurityProperties().getSignatureKeyIdentifierType() == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
-                        WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, binarySecurityTokenReferenceId, securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
+                    if (senderVouches && getSecurityProperties().getSignatureKeyIdentifierType() ==
+                            WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+
+                        WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, securityToken.getId(),
+                                securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
                     }
                     outputSamlAssertion(assertionWrapper.toDOM(null), subOutputProcessorChain);
                     if (senderVouches) {
-                        outputSecurityTokenReference(subOutputProcessorChain, assertionWrapper, securityTokenReferenceId, assertionWrapper.getId());
+                        outputSecurityTokenReference(subOutputProcessorChain, assertionWrapper,
+                                securityTokenReferenceId, assertionWrapper.getId());
                     }
                     outputProcessorChain.removeProcessor(this);
                 }
@@ -301,7 +301,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
     }
 
-    private void outputSecurityTokenReference(OutputProcessorChain outputProcessorChain, AssertionWrapper assertionWrapper, String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
+    private void outputSecurityTokenReference(
+            OutputProcessorChain outputProcessorChain, AssertionWrapper assertionWrapper,
+            String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
+
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
         if (assertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
@@ -323,7 +326,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     //todo serialize directly from SAML XMLObject?
-    private void outputSamlAssertion(Element element, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    private void outputSamlAssertion(Element element, OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
 
         NamedNodeMap namedNodeMap = element.getAttributes();
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(namedNodeMap.getLength());
@@ -331,11 +335,16 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         for (int i = 0; i < namedNodeMap.getLength(); i++) {
             Attr attribute = (Attr) namedNodeMap.item(i);
             if (attribute.getPrefix() == null) {
-                attributes.add(createAttribute(new QName(attribute.getNamespaceURI(), attribute.getLocalName()), attribute.getValue()));
+                attributes.add(
+                        createAttribute(
+                                new QName(attribute.getNamespaceURI(), attribute.getLocalName()), attribute.getValue()));
             } else if ("xmlns".equals(attribute.getPrefix()) || "xmlns".equals(attribute.getLocalName())) {
                 namespaces.add(createNamespace(attribute.getLocalName(), attribute.getValue()));
             } else {
-                attributes.add(createAttribute(new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix()), attribute.getValue()));
+                attributes.add(
+                        createAttribute(
+                                new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix()),
+                                attribute.getValue()));
             }
         }
 
