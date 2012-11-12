@@ -77,7 +77,9 @@ public class SAMLTokenSignedAction implements Action {
                 samlCallback.getIssuerKeyName(),
                 samlCallback.getIssuerKeyPassword(), 
                 samlCallback.getIssuerCrypto(),
-                samlCallback.isSendKeyValue()
+                samlCallback.isSendKeyValue(),
+                samlCallback.getCanonicalizationAlgorithm(),
+                samlCallback.getSignatureAlgorithm()
             );
         }
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getWssConfig());

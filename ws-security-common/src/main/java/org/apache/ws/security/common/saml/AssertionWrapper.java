@@ -429,8 +429,12 @@ public class AssertionWrapper {
         // Create the signature
         //
         Signature signature = OpenSAMLUtil.buildSignature();
-        signature.setCanonicalizationAlgorithm(canonicalizationAlgorithm);
-        LOG.debug("Using Canonicalization algorithm " + canonicalizationAlgorithm);
+        String c14nAlgo = canonicalizationAlgorithm;
+        if (c14nAlgo == null) {
+            c14nAlgo = defaultCanonicalizationAlgorithm;
+        }
+        signature.setCanonicalizationAlgorithm(c14nAlgo);
+        LOG.debug("Using Canonicalization algorithm " + c14nAlgo);
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
@@ -442,6 +446,9 @@ public class AssertionWrapper {
         }
 
         String sigAlgo = signatureAlgorithm;
+        if (sigAlgo == null) {
+            sigAlgo = defaultRSASignatureAlgorithm;
+        }
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         if (LOG.isDebugEnabled()) {
             LOG.debug("automatic sig algo detection: " + pubKeyAlgo);

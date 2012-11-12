@@ -91,6 +91,10 @@ public class SAMLCallback implements Callback {
 
     private boolean sendKeyValue;
 
+    private String canonicalizationAlgorithm;
+
+    private String signatureAlgorithm;
+
     /**
      * Constructor SAMLCallback creates a new SAMLCallback instance.
      */
@@ -294,4 +298,19 @@ public class SAMLCallback implements Callback {
         this.sendKeyValue = sendKeyValue;
     }
 
+    public String getCanonicalizationAlgorithm() {
+        return canonicalizationAlgorithm;
+    }
+
+    public void setCanonicalizationAlgorithm(String canonicalizationAlgorithm) {
+        this.canonicalizationAlgorithm = canonicalizationAlgorithm;
+    }
+
+    public String getSignatureAlgorithm() {
+        return signatureAlgorithm;
+    }
+
+    public void setSignatureAlgorithm(String signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
+    }
 }
