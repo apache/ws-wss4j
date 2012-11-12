@@ -23,10 +23,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.saml.SAMLCallback;
-import org.apache.ws.security.common.saml.bean.KeyInfoBean;
-import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
-import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -36,61 +33,48 @@ import java.io.IOException;
  * A Callback Handler implementation for a SAML 1.1 assertion. By default it creates an
  * authentication assertion using Sender Vouches.
  */
-public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
+public class SAML1CallbackHandler extends org.apache.ws.security.dom.common.SAML1CallbackHandler {
+
+    private String issuerKeyName;
+    private String issuerKeyPassword;
+    private Crypto issuerCrypto;
+    private boolean signAssertion = true;
 
     public SAML1CallbackHandler() throws Exception {
-        if (certs == null) {
-            Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias("transmitter");
-            certs = crypto.getX509Certificates(cryptoType);
-            issuerKeyName = "samlissuer";
-            issuerKeyPassword = "default";
-            issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
-        }
+        Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("transmitter");
+        certs = crypto.getX509Certificates(cryptoType);
+        issuerKeyName = "samlissuer";
+        issuerKeyPassword = "default";
+        issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
 
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
         issuer = "www.example.com";
+
+
+    }
+
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
     }
 
     @Override
     public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
+
+        super.handle(callbacks);
+
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(SAMLVersion.VERSION_11);
-                callback.setIssuer(issuer);
                 callback.setIssuerKeyName(issuerKeyName);
                 callback.setIssuerKeyPassword(issuerKeyPassword);
                 callback.setIssuerCrypto(issuerCrypto);
                 callback.setSignAssertion(signAssertion);
-                if (conditions != null) {
-                    callback.setConditions(conditions);
-                }
-
-                SubjectBean subjectBean =
-                        new SubjectBean(
-                                subjectName, subjectQualifier, confirmationMethod
-                        );
-                if (subjectNameIDFormat != null) {
-                    subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
-                }
-                if (SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
-                    try {
-                        KeyInfoBean keyInfo = createKeyInfo();
-                        subjectBean.setKeyInfo(keyInfo);
-                    } catch (Exception ex) {
-                        throw new IOException("Problem creating KeyInfo: " + ex.getMessage());
-                    }
-                }
-                createAndSetStatement(subjectBean, callback);
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
     }
-
 }
