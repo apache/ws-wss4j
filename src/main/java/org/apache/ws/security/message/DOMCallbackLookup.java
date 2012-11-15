@@ -54,17 +54,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         String id, String valueType, boolean checkMultipleElements
     ) throws WSSecurityException {
         //
-        // Try to find a SAML Assertion Element if the ValueType corresponds to a SAML Assertion
-        //
-        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
-            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
-            return 
-                WSSecurityUtil.findSAMLAssertionElementById(
-                    doc.getDocumentElement(), id
-                );
-        }
-        //
-        // Try the SOAP Body next
+        // Try the SOAP Body first
         //
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement != null) {
@@ -74,7 +64,27 @@ public class DOMCallbackLookup implements CallbackLookup {
             }
         }
         // Otherwise do a general search
-        return WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
+        Element foundElement = 
+            WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
+        if (foundElement != null) {
+            return foundElement;
+        }
+        
+        //
+        // Try to find a SAML Assertion Element if the ValueType corresponds to a SAML Assertion
+        // (or is empty)
+        //
+        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
+            || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
+            || "".equals(valueType)
+            || valueType == null) {
+            return 
+                WSSecurityUtil.findSAMLAssertionElementById(
+                    doc.getDocumentElement(), id
+                );
+        }
+        
+        return null;
     }
     
     /**
