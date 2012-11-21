@@ -147,9 +147,8 @@ public class SAMLTokenProcessor implements Processor {
             
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
-                SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), 
-                    data, docInfo, data.getWssConfig().isWsiBSPCompliant()
+                SAMLUtil.getCredentialDirectlyFromKeyInfo(
+                    keyInfo.getDOM(), data
                 );
             
             if (algorithmSuite != null) {

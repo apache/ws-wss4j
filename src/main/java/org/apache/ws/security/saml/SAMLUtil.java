@@ -353,6 +353,21 @@ public final class SAMLUtil {
             node = node.getNextSibling();
         }
         
+        return getCredentialDirectlyFromKeyInfo(keyInfoElement, data);
+    }
+        
+    /**
+     * This method returns a SAMLKeyInfo corresponding to the credential found in the
+     * KeyInfo (DOM Element) argument.
+     * @param keyInfoElement The KeyInfo as a DOM Element
+     * @param data The RequestData instance used to obtain configuration
+     * @return The credential (as a SAMLKeyInfo object)
+     * @throws WSSecurityException
+     */
+    public static SAMLKeyInfo getCredentialDirectlyFromKeyInfo(
+        Element keyInfoElement,
+        RequestData data
+    ) throws WSSecurityException {
         //
         // Next marshal the KeyInfo DOM element into a javax KeyInfo object and get the
         // (public key) credential
