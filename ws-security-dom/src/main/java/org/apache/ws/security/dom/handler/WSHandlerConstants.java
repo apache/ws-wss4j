@@ -598,7 +598,7 @@ public final class WSHandlerConstants {
 
     /**
      * Defines which symmetric encryption algorithm to use. WSS4J supports the
-     * following alorithms: {@link WSConstants#TRIPLE_DES},
+     * following algorithms: {@link WSConstants#TRIPLE_DES},
      * {@link WSConstants#AES_128}, {@link WSConstants#AES_256},
      * and {@link WSConstants#AES_192}. Except for AES 192 all of these
      * algorithms are required by the XML Encryption specification.
@@ -612,7 +612,6 @@ public final class WSHandlerConstants {
 
     /**
      * Defines which algorithm to use to encrypt the generated symmetric key.
-     * Currently WSS4J supports {@link WSConstants#KEYTRANSPORT_RSA15} only.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>

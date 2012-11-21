@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.processor;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,11 +27,19 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
+import org.apache.ws.security.dom.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
+import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.handler.RequestData;
@@ -40,12 +49,9 @@ import org.apache.ws.security.dom.message.token.SecurityTokenReference;
 import org.apache.ws.security.dom.str.STRParser;
 import org.apache.ws.security.dom.str.SecurityTokenRefSTRParser;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
+
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class ReferenceListProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -156,6 +162,7 @@ public class ReferenceListProcessor implements Processor {
                 keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         SecretKey symmetricKey = null;
+        Principal principal = null;
         if (secRefToken == null) {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
@@ -167,9 +174,29 @@ public class ReferenceListProcessor implements Processor {
                 wsDocInfo, parameters
             );
             byte[] secretKey = strParser.getSecretKey();
+            principal = strParser.getPrincipal();
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
         }
         
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                    ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                );
+                algorithmSuiteValidator.checkEncryptionDerivedKeyLength(
+                    ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                );
+            }
+
+            algorithmSuiteValidator.checkSymmetricKeyLength(symmetricKey.getEncoded().length);
+            algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
+        }
+
         return 
             decryptEncryptedData(
                 doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo

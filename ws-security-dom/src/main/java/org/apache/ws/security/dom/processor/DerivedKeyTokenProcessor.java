@@ -19,18 +19,20 @@
 
 package org.apache.ws.security.dom.processor;
 
+import java.util.List;
+
+import org.w3c.dom.Element;
+
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
+import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.token.DerivedKeyToken;
 import org.apache.ws.security.dom.str.DerivedKeyTokenSTRParser;
 import org.apache.ws.security.dom.str.STRParser;
-import org.w3c.dom.Element;
-
-
-import java.util.List;
 
 /**
  * The processor to process <code>wsc:DerivedKeyToken</code>.
@@ -46,6 +48,17 @@ public class DerivedKeyTokenProcessor implements Processor {
     ) throws WSSecurityException {
         // Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem, data.getBSPEnforcer());
+        
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+            algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                dkt.getAlgorithm()
+            );
+        }
+        
         byte[] secret = null;
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {

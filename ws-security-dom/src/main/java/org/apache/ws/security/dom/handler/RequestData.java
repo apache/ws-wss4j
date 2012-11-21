@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -37,6 +38,7 @@ import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.dom.cache.ReplayCache;
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.message.WSSecHeader;
@@ -92,6 +94,8 @@ public class RequestData {
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
     private boolean appendSignatureAfterTimestamp;
+    private AlgorithmSuite algorithmSuite;
+    private Map<QName, AlgorithmSuite> algorithmSuiteMap = Collections.emptyMap();
 
     public void clear() {
         soapConstants = null;
@@ -119,6 +123,8 @@ public class RequestData {
         subjectDNPatterns.clear();
         ignoredBSPRules.clear();
         appendSignatureAfterTimestamp = false;
+        algorithmSuite = null;
+        algorithmSuiteMap.clear();
     }
 
     public Object getMsgContext() {
@@ -559,4 +565,20 @@ public class RequestData {
         this.appendSignatureAfterTimestamp = appendSignatureAfterTimestamp;
     }
 
+    public Map<QName, AlgorithmSuite> getAlgorithmSuiteMap() {
+        return algorithmSuiteMap;
+    }
+
+    public void setAlgorithmSuiteMap(Map<QName, AlgorithmSuite> algorithmSuiteMap) {
+        this.algorithmSuiteMap = algorithmSuiteMap;
+    }
+
+    public AlgorithmSuite getAlgorithmSuite() {
+        return algorithmSuite;
+    }
+
+    public void setAlgorithmSuite(AlgorithmSuite algorithmSuite) {
+        this.algorithmSuite = algorithmSuite;
+    }
+        
 }

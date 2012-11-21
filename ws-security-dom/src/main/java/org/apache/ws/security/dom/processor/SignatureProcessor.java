@@ -52,13 +52,20 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
+import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.PublicKeyPrincipal;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
+import org.apache.ws.security.dom.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
@@ -79,9 +86,6 @@ import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.ws.security.dom.util.XmlSchemaDateFormat;
 import org.apache.ws.security.dom.validate.Credential;
 import org.apache.ws.security.dom.validate.Validator;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class SignatureProcessor implements Processor {
     private static final org.apache.commons.logging.Log LOG = 
@@ -195,6 +199,35 @@ public class SignatureProcessor implements Processor {
             && secretKey == null
             && publicKey == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+        
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null ) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            if (principal instanceof WSDerivedKeyTokenPrincipal) {
+                algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                    ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                );
+                algorithmSuiteValidator.checkSignatureDerivedKeyLength(
+                    ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                );
+            } else {
+                Key key = null;
+                if (certs != null && certs[0] != null) {
+                    key = certs[0].getPublicKey();
+                } else if (publicKey != null) {
+                    key = publicKey;
+                }
+
+                if (key instanceof PublicKey) {
+                    algorithmSuiteValidator.checkAsymmetricKeyLength((PublicKey)key);
+                } else {
+                    algorithmSuiteValidator.checkSymmetricKeyLength(secretKey.length);
+                }
+            }
         }
         
         XMLSignature xmlSignature = 
@@ -370,6 +403,14 @@ public class SignatureProcessor implements Processor {
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             checkBSPCompliance(xmlSignature, data.getBSPEnforcer());
+            
+            // Check for compliance against the defined AlgorithmSuite
+            AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+            if (algorithmSuite != null) {
+                AlgorithmSuiteValidator algorithmSuiteValidator = new
+                    AlgorithmSuiteValidator(algorithmSuite);
+                algorithmSuiteValidator.checkSignatureAlgorithms(xmlSignature);
+            }
             
             // Test for replay attacks
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), data, wsDocInfo);

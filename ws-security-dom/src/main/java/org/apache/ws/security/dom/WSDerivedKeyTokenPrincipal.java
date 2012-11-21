@@ -31,6 +31,7 @@ import java.security.Principal;
  */
 public class WSDerivedKeyTokenPrincipal implements Principal {
 
+    private String algorithm;
     private String id;
     private String nonce;
     private String label;
@@ -94,5 +95,14 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
     public void setBasetokenId(String basetokenId) {
         this.basetokenId = basetokenId;
     }
+    
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
 
 }

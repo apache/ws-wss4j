@@ -32,7 +32,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+
 import org.apache.ws.security.common.bsp.BSPRule;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
+import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
@@ -46,10 +53,6 @@ import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 public class EncryptedKeyProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -59,6 +62,15 @@ public class EncryptedKeyProcessor implements Processor {
         Element elem, 
         RequestData data,
         WSDocInfo wsDocInfo
+    ) throws WSSecurityException {
+        return handleToken(elem, data, wsDocInfo, data.getAlgorithmSuite());
+    }
+    
+    public List<WSSecurityEngineResult> handleToken(
+        Element elem, 
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        AlgorithmSuite algorithmSuite
     ) throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
@@ -104,6 +116,17 @@ public class EncryptedKeyProcessor implements Processor {
         X509Certificate[] certs = 
             getCertificatesFromEncryptedKey(elem, data, wsDocInfo, strParser);
 
+        // Check for compliance against the defined AlgorithmSuite
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            algorithmSuiteValidator.checkAsymmetricKeyLength(certs[0]);
+            algorithmSuiteValidator.checkEncryptionKeyWrapAlgorithm(
+                encryptedKeyTransportMethod
+            );
+        }
+        
         try {
             PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
             OAEPParameterSpec oaepParameterSpec = null;
@@ -377,7 +400,8 @@ public class EncryptedKeyProcessor implements Processor {
         }
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (String dataRefURI : dataRefURIs) {
-            WSDataRef dataRef = decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);
+            WSDataRef dataRef = 
+                decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);
             dataRefs.add(dataRef);
         }
         return dataRefs;
@@ -416,6 +440,16 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
                 ex, new Object[]{symEncAlgo}
             );
+        }
+        
+        // Check for compliance against the defined AlgorithmSuite
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
+        if (algorithmSuite != null) {
+            AlgorithmSuiteValidator algorithmSuiteValidator = new
+                AlgorithmSuiteValidator(algorithmSuite);
+
+            algorithmSuiteValidator.checkSymmetricKeyLength(symmetricKey.getEncoded().length);
+            algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
 
         return ReferenceListProcessor.decryptEncryptedData(

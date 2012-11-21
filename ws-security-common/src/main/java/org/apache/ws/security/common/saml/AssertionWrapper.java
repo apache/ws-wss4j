@@ -511,6 +511,21 @@ public class AssertionWrapper {
                 SAMLUtil.getCredentialFromKeyInfo(
                     keyInfo.getDOM(), keyInfoProcessor, sigCrypto
                 );
+            verifySignature(samlKeyInfo);
+        } else {
+            LOG.debug("AssertionWrapper: no signature to validate");
+        }
+
+    }
+    
+    /**
+     * Verify the signature of this assertion
+     *
+     * @throws ValidationException
+     */
+    public void verifySignature(SAMLKeyInfo samlKeyInfo) throws WSSecurityException {
+        Signature sig = getSignature();
+        if (sig != null) {
             if (samlKeyInfo == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",

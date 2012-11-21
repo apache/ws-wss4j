@@ -19,26 +19,6 @@
 
 package org.apache.ws.security.dom.handler;
 
-import org.apache.ws.security.dom.WSConstants;
-import org.apache.ws.security.dom.WSEncryptionPart;
-import org.apache.ws.security.dom.WSSConfig;
-import org.apache.ws.security.dom.WSSecurityEngine;
-import org.apache.ws.security.dom.WSSecurityEngineResult;
-import org.apache.ws.security.dom.action.Action;
-import org.apache.ws.security.common.crypto.Crypto;
-import org.apache.ws.security.common.crypto.CryptoFactory;
-import org.apache.ws.security.common.ext.WSPasswordCallback;
-import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.util.Loader;
-import org.apache.ws.security.dom.message.WSSecHeader;
-import org.apache.ws.security.dom.message.token.SignatureConfirmation;
-import org.apache.ws.security.dom.util.StringUtil;
-import org.apache.ws.security.dom.util.WSSecurityUtil;
-import org.w3c.dom.Document;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -51,6 +31,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.ws.security.dom.WSConstants;
+import org.apache.ws.security.dom.WSEncryptionPart;
+import org.apache.ws.security.dom.WSSConfig;
+import org.apache.ws.security.dom.WSSecurityEngine;
+import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.dom.action.Action;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
+import org.apache.ws.security.common.crypto.Crypto;
+import org.apache.ws.security.common.crypto.CryptoFactory;
+import org.apache.ws.security.common.ext.WSPasswordCallback;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.util.Loader;
+import org.apache.ws.security.dom.message.WSSecHeader;
+import org.apache.ws.security.dom.message.token.SignatureConfirmation;
+import org.apache.ws.security.dom.util.StringUtil;
+import org.apache.ws.security.dom.util.WSSecurityUtil;
+import org.w3c.dom.Document;
 
 /**
  * Extracted from WSDoAllReceiver and WSDoAllSender
@@ -539,6 +539,35 @@ public abstract class WSHandler {
         reqData.setUseSingleCert(useSingleCert);
     }
 
+    protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
+        AlgorithmSuite algorithmSuite = new AlgorithmSuite();
+        
+        Object mc = reqData.getMsgContext();
+        if (mc == null) {
+            return;
+        }
+        
+        String signatureAlgorithm = getString(WSHandlerConstants.SIG_ALGO, mc);
+        if (signatureAlgorithm != null && !"".equals(signatureAlgorithm)) {
+            algorithmSuite.addSignatureMethod(signatureAlgorithm);
+        }
+        String signatureDigestAlgorithm = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
+        if (signatureDigestAlgorithm != null && !"".equals(signatureDigestAlgorithm)) {
+            algorithmSuite.addDigestAlgorithm(signatureDigestAlgorithm);
+        }
+        
+        String encrAlgorithm = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
+        if (encrAlgorithm != null && !"".equals(encrAlgorithm)) {
+            algorithmSuite.addEncryptionMethod(encrAlgorithm);
+        }
+        String transportAlgorithm = getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
+        if (transportAlgorithm != null && !"".equals(transportAlgorithm)) {
+            algorithmSuite.addKeyWrapAlgorithm(transportAlgorithm);
+        }
+        
+        reqData.setAlgorithmSuite(algorithmSuite);
+    }
+    
     protected void decodeEncryptionParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
