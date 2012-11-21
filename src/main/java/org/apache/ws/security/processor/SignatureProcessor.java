@@ -201,7 +201,7 @@ public class SignatureProcessor implements Processor {
         
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
-        if (algorithmSuite != null ) {
+        if (algorithmSuite != null) {
             AlgorithmSuiteValidator algorithmSuiteValidator = new
                 AlgorithmSuiteValidator(algorithmSuite);
 

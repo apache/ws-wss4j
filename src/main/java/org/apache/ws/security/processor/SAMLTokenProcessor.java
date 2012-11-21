@@ -22,7 +22,6 @@ package org.apache.ws.security.processor;
 import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.AlgorithmSuite;
@@ -144,19 +143,13 @@ public class SAMLTokenProcessor implements Processor {
             }
             
             // Check for compliance against the defined AlgorithmSuite
-            AlgorithmSuite algorithmSuite = null;
-            if (assertion.getSaml2() != null) {
-                algorithmSuite = data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML2_TOKEN);
-            } else {
-                algorithmSuite = data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML_TOKEN);
-            }
+            AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
             
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialFromKeyInfo(
                     keyInfo.getDOM(), 
-                    data, docInfo, data.getWssConfig().isWsiBSPCompliant(),
-                    algorithmSuite
+                    data, docInfo, data.getWssConfig().isWsiBSPCompliant()
                 );
             
             if (algorithmSuite != null) {
