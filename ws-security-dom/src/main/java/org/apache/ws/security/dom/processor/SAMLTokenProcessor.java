@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
 import org.apache.ws.security.dom.SAMLTokenPrincipal;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
-import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.common.crypto.AlgorithmSuite;
 import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
@@ -147,12 +146,7 @@ public class SAMLTokenProcessor implements Processor {
             }
             
             // Check for compliance against the defined AlgorithmSuite
-            AlgorithmSuite algorithmSuite = null;
-            if (assertion.getSaml2() != null) {
-                algorithmSuite = data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML2_TOKEN);
-            } else {
-                algorithmSuite = data.getAlgorithmSuiteMap().get(WSSecurityEngine.SAML_TOKEN);
-            }
+            AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
             
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 

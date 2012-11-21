@@ -207,13 +207,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setSigVerCrypto(sigVerCrypto);
-        Map<QName, AlgorithmSuite> algorithmSuiteMap = new HashMap<QName, AlgorithmSuite>();
-        if (saml2) {
-            algorithmSuiteMap.put(WSSecurityEngine.SAML2_TOKEN, algorithmSuite);
-        } else {
-            algorithmSuiteMap.put(WSSecurityEngine.SAML_TOKEN, algorithmSuite);
-        }
-        data.setAlgorithmSuiteMap(algorithmSuiteMap);
+        data.setSamlAlgorithmSuite(algorithmSuite);
         
         return secEngine.processSecurityHeader(securityHeader, data);
     }

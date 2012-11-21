@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -95,7 +94,7 @@ public class RequestData {
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
     private boolean appendSignatureAfterTimestamp;
     private AlgorithmSuite algorithmSuite;
-    private Map<QName, AlgorithmSuite> algorithmSuiteMap = Collections.emptyMap();
+    private AlgorithmSuite samlAlgorithmSuite;
 
     public void clear() {
         soapConstants = null;
@@ -124,7 +123,7 @@ public class RequestData {
         ignoredBSPRules.clear();
         appendSignatureAfterTimestamp = false;
         algorithmSuite = null;
-        algorithmSuiteMap.clear();
+        samlAlgorithmSuite = null;
     }
 
     public Object getMsgContext() {
@@ -565,20 +564,20 @@ public class RequestData {
         this.appendSignatureAfterTimestamp = appendSignatureAfterTimestamp;
     }
 
-    public Map<QName, AlgorithmSuite> getAlgorithmSuiteMap() {
-        return algorithmSuiteMap;
-    }
-
-    public void setAlgorithmSuiteMap(Map<QName, AlgorithmSuite> algorithmSuiteMap) {
-        this.algorithmSuiteMap = algorithmSuiteMap;
-    }
-
     public AlgorithmSuite getAlgorithmSuite() {
         return algorithmSuite;
     }
 
     public void setAlgorithmSuite(AlgorithmSuite algorithmSuite) {
         this.algorithmSuite = algorithmSuite;
+    }
+    
+    public AlgorithmSuite getSamlAlgorithmSuite() {
+        return samlAlgorithmSuite;
+    }
+
+    public void setSamlAlgorithmSuite(AlgorithmSuite samlAlgorithmSuite) {
+        this.samlAlgorithmSuite = samlAlgorithmSuite;
     }
         
 }

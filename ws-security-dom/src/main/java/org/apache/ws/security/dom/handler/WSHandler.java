@@ -540,12 +540,12 @@ public abstract class WSHandler {
     }
 
     protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
-        AlgorithmSuite algorithmSuite = new AlgorithmSuite();
-        
         Object mc = reqData.getMsgContext();
-        if (mc == null) {
+        if (mc == null || reqData.getAlgorithmSuite() != null) {
             return;
         }
+        
+        AlgorithmSuite algorithmSuite = new AlgorithmSuite();
         
         String signatureAlgorithm = getString(WSHandlerConstants.SIG_ALGO, mc);
         if (signatureAlgorithm != null && !"".equals(signatureAlgorithm)) {

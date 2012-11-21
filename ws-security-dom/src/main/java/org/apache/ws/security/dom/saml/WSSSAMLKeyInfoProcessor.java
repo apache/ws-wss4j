@@ -19,14 +19,18 @@
 
 package org.apache.ws.security.dom.saml;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.ws.security.dom.WSDerivedKeyTokenPrincipal;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngine;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
+import org.apache.ws.security.common.crypto.AlgorithmSuite;
+import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLKeyInfoProcessor;
@@ -73,7 +77,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                 if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     List<WSSecurityEngineResult> result =
-                        proc.handleToken((Element)node, data, docInfo);
+                        proc.handleToken((Element)node, data, docInfo, data.getSamlAlgorithmSuite());
                     byte[] secret = 
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
@@ -95,6 +99,23 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
                     samlKeyInfo.setPublicKey(strParser.getPublicKey());
                     samlKeyInfo.setSecret(strParser.getSecretKey());
+                    
+                    Principal principal = strParser.getPrincipal();
+                    
+                    // Check for compliance against the defined AlgorithmSuite
+                    AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite(); 
+                    if (algorithmSuite != null && principal instanceof WSDerivedKeyTokenPrincipal) {
+                        AlgorithmSuiteValidator algorithmSuiteValidator = new
+                            AlgorithmSuiteValidator(algorithmSuite);
+
+                        algorithmSuiteValidator.checkDerivedKeyAlgorithm(
+                            ((WSDerivedKeyTokenPrincipal)principal).getAlgorithm()
+                        );
+                        algorithmSuiteValidator.checkSignatureDerivedKeyLength(
+                            ((WSDerivedKeyTokenPrincipal)principal).getLength()
+                        );
+                    }
+                    
                     return samlKeyInfo;
                 }
             }
