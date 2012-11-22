@@ -48,10 +48,8 @@ import org.apache.ws.security.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.ws.security.dom.validate.Credential;
 import org.apache.ws.security.dom.validate.Validator;
 
-import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.validation.ValidationException;
 
 public class SAMLTokenProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -135,19 +133,10 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            Signature sig = assertion.getSignature();
-
-            SAMLSignatureProfileValidator profileValidator = new SAMLSignatureProfileValidator();
-            try {
-                profileValidator.validate(sig);
-            } catch (ValidationException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                                              "empty", ex, "SAML signature validation failed");
-            }
-            
             // Check for compliance against the defined AlgorithmSuite
             AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
             
+            Signature sig = assertion.getSignature();
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialDirectlyFromKeyInfo(
