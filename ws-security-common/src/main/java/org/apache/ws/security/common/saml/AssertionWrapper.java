@@ -508,9 +508,7 @@ public class AssertionWrapper {
         if (sig != null) {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
-                SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), keyInfoProcessor, sigCrypto
-                );
+                SAMLUtil.getCredentialDirectlyFromKeyInfo(keyInfo.getDOM(), sigCrypto);
             verifySignature(samlKeyInfo);
         } else {
             LOG.debug("AssertionWrapper: no signature to validate");
