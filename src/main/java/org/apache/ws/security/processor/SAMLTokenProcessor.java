@@ -34,10 +34,8 @@ import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
 
-import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.validation.ValidationException;
 import org.w3c.dom.Element;
 
 import java.security.NoSuchProviderException;
@@ -133,18 +131,10 @@ public class SAMLTokenProcessor implements Processor {
     ) throws WSSecurityException {
         AssertionWrapper assertion = new AssertionWrapper(token);
         if (assertion.isSigned()) {
-            Signature sig = assertion.getSignature();
-
-            SAMLSignatureProfileValidator profileValidator = new SAMLSignatureProfileValidator();
-            try {
-                profileValidator.validate(sig);
-            } catch (ValidationException ex) {
-                throw new WSSecurityException("SAML signature validation failed", ex);
-            }
-            
             // Check for compliance against the defined AlgorithmSuite
             AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
             
+            Signature sig = assertion.getSignature();
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialDirectlyFromKeyInfo(
