@@ -520,7 +520,11 @@ public final class WSHandlerConstants {
 
     /**
      * Defines which signature algorithm to use. The default is set by the data in the 
-     * certificate.
+     * certificate, i.e. one of the following:
+     * 
+     * "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+     * "http://www.w3.org/2000/09/xmldsig#dsa-sha1"
+     * 
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -533,7 +537,10 @@ public final class WSHandlerConstants {
     public static final String SIG_ALGO = "signatureAlgorithm";
     
     /**
-     * Defines which signature digest algorithm to use. The default is SHA-1.
+     * Defines which signature digest algorithm to use. The default is:
+     * 
+     * "http://www.w3.org/2000/09/xmldsig#sha1"
+     * 
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -602,6 +609,10 @@ public final class WSHandlerConstants {
      * {@link WSConstants#AES_128}, {@link WSConstants#AES_256},
      * and {@link WSConstants#AES_192}. Except for AES 192 all of these
      * algorithms are required by the XML Encryption specification.
+     * The default algorithm is:
+     * 
+     * "http://www.w3.org/2001/04/xmlenc#aes128-cbc"
+     * 
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -612,10 +623,14 @@ public final class WSHandlerConstants {
 
     /**
      * Defines which algorithm to use to encrypt the generated symmetric key.
+     * The default algorithm is:
+     * 
+     * "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"
+     * 
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "RSA15");
+     * call.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, WSConstants.KEYTRANSPORT_RSA15);
      * </pre>
      */
     public static final String ENC_KEY_TRANSPORT = "encryptionKeyTransportAlgorithm";
