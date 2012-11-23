@@ -136,7 +136,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         final java.util.List<WSDataRef> refs =
             (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
-        assertEquals(WSConstants.KEYTRANSPORT_RSA15, 
+        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
         
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);
@@ -188,7 +188,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         final java.util.List<WSDataRef> refs =
             (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
-        assertEquals(WSConstants.KEYTRANSPORT_RSA15, 
+        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
         
         WSDataRef wsDataRef = (WSDataRef)refs.get(0);

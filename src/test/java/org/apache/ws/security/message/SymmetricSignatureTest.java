@@ -61,7 +61,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     
     public SymmetricSignatureTest() throws Exception {
         WSSConfig.init();
-        crypto = CryptoFactory.getInstance();
+        crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
     /**
@@ -123,7 +123,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        encrKey.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);
         
@@ -164,7 +164,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        encrKey.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);   
         
