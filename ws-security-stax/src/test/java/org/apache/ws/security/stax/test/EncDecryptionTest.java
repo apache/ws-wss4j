@@ -131,7 +131,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-1_5']");
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
@@ -1381,7 +1381,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securedDocument = doOutboundSecurityWithWSS4J(new ByteArrayInputStream(baos.toByteArray()), action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-1_5']");
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
             NodeList nodeList = (NodeList) xPathExpression.evaluate(securedDocument, XPathConstants.NODESET);
             Assert.assertEquals(nodeList.getLength(), 2);
 

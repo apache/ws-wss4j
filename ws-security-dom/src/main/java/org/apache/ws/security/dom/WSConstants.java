@@ -102,7 +102,7 @@ public final class WSConstants {
     public static final String KEYTRANSPORT_RSAOEP = 
         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
     public static final String KEYTRANSPORT_RSAOEP_XENC11 =
-            "http://www.w3.org/2009/xmlenc11#rsa-oaep";
+        "http://www.w3.org/2009/xmlenc11#rsa-oaep";
     public static final String TRIPLE_DES = 
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
     public static final String AES_128 = 
