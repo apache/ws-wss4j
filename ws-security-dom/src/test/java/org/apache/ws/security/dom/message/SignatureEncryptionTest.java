@@ -84,7 +84,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SignatureEncryptionTest() throws Exception {
-        crypto = CryptoFactory.getInstance();
+        crypto = CryptoFactory.getInstance("wss40.properties");
         WSSConfig.init();
     }
 
@@ -100,8 +100,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     public void testEncryptionSigning() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setUserInfo("wss40");
+        sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
@@ -142,8 +142,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     public void testEncryptionElementSigning() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setUserInfo("wss40");
+        sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
@@ -230,8 +230,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     public void testSigningEncryption() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setUserInfo("wss40");
+        sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
@@ -254,8 +254,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     public void testWSS198() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setUserInfo("wss40");
+        sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
@@ -294,12 +294,12 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     @org.junit.Test
     public void testSigningEncryptionIS3DES() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        encrypt.setUserInfo("wss40");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         LOG.info("Before Sign/Encryption....");
@@ -334,12 +334,12 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
         
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        encrypt.setUserInfo("wss40");
         encrypt.setKeyIdentifierType(WSConstants.EMBEDDED_KEYNAME);
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);        
         encrypt.setKey(key);
 
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         encrypt.setDocument(doc);
@@ -389,7 +389,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        encrKey.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);   
 

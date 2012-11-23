@@ -55,13 +55,13 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     
     public EncryptionAlgorithmSuiteTest() throws Exception {
         WSSConfig.init();
-        crypto = CryptoFactory.getInstance();
+        crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
     @org.junit.Test
     public void testEncryption() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         
@@ -93,7 +93,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     }
     
     @org.junit.Test
-    public void testEncryptionKeyTransportRSAOAEP() throws Exception {
+    public void testEncryptionKeyTransportRSA15() throws Exception {
         
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
         
@@ -101,7 +101,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -120,12 +120,12 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         
         try {
             verify(securityHeader, algorithmSuite, wssCrypto);
-            fail("Expected failure as RSA OAEP is not allowed");
+            fail("Expected failure as RSA 15 is not allowed");
         } catch (WSSecurityException ex) {
             // expected
         }
         
-        algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOEP);
+        algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSA15);
         verify(securityHeader, algorithmSuite, wssCrypto);
     }
     
@@ -230,7 +230,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     private AlgorithmSuite createAlgorithmSuite() {
         AlgorithmSuite algorithmSuite = new AlgorithmSuite();
         algorithmSuite.setMinimumAsymmetricKeyLength(512);
-        algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSA15);
+        algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOEP);
         algorithmSuite.addEncryptionMethod(WSConstants.TRIPLE_DES);
         
         return algorithmSuite;

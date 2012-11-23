@@ -106,7 +106,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Sets the algorithm to encode the symmetric key.
      * 
-     * Default is the <code>WSConstants.KEYTRANSPORT_RSA15</code> algorithm.
+     * Default is the <code>WSConstants.KEYTRANSPORT_RSAOEP</code> algorithm.
      * 
      * @param keyEnc specifies the key encoding algorithm.
      * @see WSConstants#KEYTRANSPORT_RSA15

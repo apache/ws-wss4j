@@ -492,7 +492,7 @@ by default.</td>
 <tr>
 <td>ENC_KEY_TRANSPORT</td>
 <td>encryptionKeyTransportAlgorithm</td>
-<td>The algorithm to use to encrypt the generated symmetric key. The default is RSA-15.</td>
+<td>The algorithm to use to encrypt the generated symmetric key. The default is RSA-OAEP.</td>
 </tr>
 <tr>
 <td>ENC_DIGEST_ALGO</td>
