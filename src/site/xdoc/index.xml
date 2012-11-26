@@ -9,7 +9,7 @@ The <b>Apache WSS4J&#8482;</b> project provides a Java implementation of the pri
 standards for Web Services, namely the OASIS Web Services Security (WS-Security) specifications from 
 the <a href="http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss">OASIS Web Services 
 Security TC</a>. WSS4J provides an implementation of the following WS-Security standards:
-</p>
+/p>
 <ul>
 <li>
 <a href="http://docs.oasis-open.org/wss/v1.1/wss-v1.1-spec-os-SOAPMessageSecurity.pdf">
@@ -43,11 +43,11 @@ Foundation.
 <subsection name="News">
 <ul>
 <li>
-<p> <b>July 2012</b> - 
-The Apache WSS4J team are pleased to announce the release of version 1.6.7. 
+<p> <b>November 2012</b> - 
+The Apache WSS4J team are pleased to announce the release of version 1.6.8. 
 </p>
 <p>
-Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12321642">
+Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12322514">
 release notes</a> for more information.
 </p>
 </li>

@@ -5,6 +5,27 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.8
+=============
+
+Sub-task
+
+    [WSS-410] - Reduce dependency on xmlsec library
+
+Bug
+
+    [WSS-231] - There is an issue with the position of the <Timestamp> element in the <Security> header when using WSS4J calling .NET Web Services with WS-Security.
+    [WSS-399] - WSS4J: cannot set DigestMethod for KEYTRANSPORT_RSAOEP though requested by W3C
+    [WSS-407] - Error when signing a SOAP Body that is encrypted with a reference to a SAML Token
+    [WSS-409] - explicit dependency on XMLDSigRI in WSSConfig causes java.lang.ClassNotFoundException: org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI on WAS 8.5
+
+Improvement
+
+    [WSS-404] - Store Subject from JAAS LoginContext in WSSecurityEngineResult
+    [WSS-406] - Add the ability to define which algorithms are acceptable when processing a security header
+    [WSS-411] - STRTransform does not work in certain circumstances
+
+
 Release 1.6.7
 =============
 
