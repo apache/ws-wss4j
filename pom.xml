@@ -16,15 +16,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.ws.security</groupId>
     <artifactId>wss4j</artifactId>
     <packaging>bundle</packaging>
     <name>Apache WSS4J</name>
-    <version>1.6.8-SNAPSHOT</version>
+    <version>1.6.8</version>
     <description>
         The Apache WSS4J project provides a Java implementation of the primary security standards 
         for Web Services, namely the OASIS Web Services Security (WS-Security) specifications 
@@ -69,12 +67,12 @@
     </licenses>
     <scm>
         <connection>
-            scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes/
+            scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/tags/1_6_8
         </connection>
         <developerConnection>
-            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes/
+            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/tags/1_6_8
         </developerConnection>
-        <url>http://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes</url>
+        <url>http://svn.apache.org/repos/asf/webservices/wss4j/tags/1_6_8</url>
     </scm>
     <organization>
         <name>The Apache Software Foundation</name>
@@ -290,7 +288,7 @@
             <activation>
                 <property>
                     <name>release</name>
-                    <value></value>
+                    <value />
                 </property>
             </activation>
             <build>
@@ -311,7 +309,7 @@
             <activation>
                 <property>
                     <name>deploy</name>
-                    <value></value>
+                    <value />
                 </property>
             </activation>
             <build>
