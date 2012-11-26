@@ -15,6 +15,7 @@
       <item name="Using WSS4J" href="using.html"/>
       <item name="WSS4J Configuration" href="config.html"/>
       <item name="Special Topics" href="topics.html"/>
+      <item name="Security Best Practices" href="best_practice.html"/>
       <item name="WSS4J 1.6 Release Notes" href="wss4j16.html"/>
     </menu>
 
