@@ -133,7 +133,7 @@ public class OutboundWSSec {
                             new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
-                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.ENCRYPT)) {
@@ -148,23 +148,23 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.USERNAMETOKEN)) {
-                    UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
+                    final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.USERNAMETOKEN_SIGNED)) {
                     final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
 
-                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
-                    SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
+                    final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
                             new SignatureConfirmationOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
-                    BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
@@ -181,7 +181,7 @@ public class OutboundWSSec {
                     final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
 
-                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
@@ -209,12 +209,26 @@ public class OutboundWSSec {
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
 
-                    WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED)) {
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
+                } else if (action.equals(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
+                    final KerberosSecurityTokenOutputProcessor kerberosTokenOutputProcessor =
+                            new KerberosSecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
+
+                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+                } else if (action.equals(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
+                    final KerberosSecurityTokenOutputProcessor kerberosTokenOutputProcessor =
+                            new KerberosSecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
+
+                    final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
                 }
             }
             if (output instanceof OutputStream) {

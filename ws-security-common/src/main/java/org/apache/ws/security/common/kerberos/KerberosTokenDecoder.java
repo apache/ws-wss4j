@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.dom.validate;
+package org.apache.ws.security.common.kerberos;
 
 import javax.security.auth.Subject;
 

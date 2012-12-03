@@ -292,6 +292,32 @@ public class WSSec {
             } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED) && 
                     (securityProperties.getCallbackHandler() == null)) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+            } else if (action.equals(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
+                if (securityProperties.getCallbackHandler() == null) {
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+                }
+                if (securityProperties.getSignatureAlgorithm() == null) {
+                    securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
+                }
+                if (securityProperties.getSignatureDigestAlgorithm() == null) {
+                    securityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2000/09/xmldsig#sha1");
+                }
+                if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+                    securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+                }
+                if (securityProperties.getSignatureKeyIdentifierType() == null) {
+                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                }
+            } else if (action.equals(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
+                if (securityProperties.getCallbackHandler() == null) {
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+                }
+                if (securityProperties.getEncryptionSymAlgorithm() == null) {
+                    securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+                }
+                if (securityProperties.getSignatureKeyIdentifierType() == null) {
+                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                }
             }
         }
         return new WSSSecurityProperties(securityProperties);

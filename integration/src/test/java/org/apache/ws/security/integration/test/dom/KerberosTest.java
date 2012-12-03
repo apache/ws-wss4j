@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.dom.message.token;
+package org.apache.ws.security.integration.test.dom;
 
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
@@ -29,54 +29,100 @@ import org.apache.ws.security.common.util.XMLUtils;
 import org.apache.ws.security.dom.message.WSSecEncrypt;
 import org.apache.ws.security.dom.message.WSSecHeader;
 import org.apache.ws.security.dom.message.WSSecSignature;
+import org.apache.ws.security.dom.message.token.BinarySecurity;
+import org.apache.ws.security.dom.message.token.KerberosSecurity;
 import org.apache.ws.security.dom.spnego.SpnegoTokenContext;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
-// import org.apache.ws.security.dom.validate.KerberosTokenDecoderImpl;
 import org.apache.ws.security.dom.validate.KerberosTokenValidator;
+import org.apache.ws.security.integration.test.common.KerberosServiceStarter;
 import org.apache.xml.security.utils.Base64;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.xml.crypto.dsig.SignatureMethod;
 
+
 /**
  * This is a test for a WSS4J client retrieving a service ticket from a KDC, and inserting
- * it into the security header of a request, to be processed by WSS4J. The tests are @Ignored by
- * default, as a KDC is needed. To replicate the test scenario, set up a KDC with user principal
- * "alice" (keytab in "/etc/alice.keytab"), and host service "bob@service.ws.apache.org" 
- * (keytab in "/etc/bob.keytab").
- * The test can be run with:
- * 
- * mvn -Djava.security.auth.login.config=src/test/resources/kerberos.jaas test -Dtest=KerberosTest
- * 
+ * it into the security header of a request, to be processed by WSS4J.
  * To see the Kerberos stuff add "-Dsun.security.krb5.debug=true".
  */
-public class KerberosTest extends org.junit.Assert {
+public class KerberosTest {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(KerberosTest.class);
-    
-    public KerberosTest() throws Exception {
+
+    private static boolean kerberosServerStarted = false;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+
         WSSConfig.init();
+
+        kerberosServerStarted = KerberosServiceStarter.startKerberosServer();
+
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        } else {
+            basedir += "/..";
+        }
+
+        //System.setProperty("sun.security.krb5.debug", "true");
+        System.setProperty("java.security.auth.login.config", basedir + "/integration/src/test/resources/kerberos/kerberos.jaas");
+        System.setProperty("java.security.krb5.conf", basedir + "/integration/src/test/resources/kerberos/krb5.conf");
+
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (kerberosServerStarted) {
+            KerberosServiceStarter.stopKerberosServer();
+        }
     }
 
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and process it.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosCreationAndProcessing() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                if (passwordCallback.getPrompt().contains("alice")) {
+                    passwordCallback.setPassword("alice".toCharArray());
+                } else if (passwordCallback.getPrompt().contains("bob")) {
+                    passwordCallback.setPassword("bob".toCharArray());
+                }
+            }
+        };
+        bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
         if (LOG.isDebugEnabled()) {
@@ -93,65 +139,96 @@ public class KerberosTest extends org.junit.Assert {
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
-        
-        List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, null, null);
+
+        List<WSSecurityEngineResult> results =
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        Assert.assertTrue(token != null);
         
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof KerberosPrincipal);
-        assertTrue(principal.getName().contains("alice"));
+        Assert.assertTrue(principal instanceof KerberosPrincipal);
+        Assert.assertTrue(principal.getName().contains("alice"));
     }
     
     /**
      * Get and validate a SPNEGO token.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testSpnego() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
-        spnegoToken.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                if (passwordCallback.getPrompt().contains("alice")) {
+                    passwordCallback.setPassword("alice".toCharArray());
+                } else if (passwordCallback.getPrompt().contains("bob")) {
+                    passwordCallback.setPassword("bob".toCharArray());
+                }
+            }
+        };
+        spnegoToken.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         
         byte[] token = spnegoToken.getToken();
-        assertNotNull(token);
+        Assert.assertNotNull(token);
         
         spnegoToken = new SpnegoTokenContext();
-        spnegoToken.validateServiceTicket("bob", null, "bob@service.ws.apache.org", token);
-        assertTrue(spnegoToken.isEstablished());
+        spnegoToken.validateServiceTicket("bob", callbackHandler, "bob@service.ws.apache.org", token);
+        Assert.assertTrue(spnegoToken.isEstablished());
     }
     
     /**
      * Various unit tests for a kerberos client
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosClient() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                if (passwordCallback.getPrompt().contains("alice")) {
+                    passwordCallback.setPassword("alice".toCharArray());
+                } else if (passwordCallback.getPrompt().contains("bob")) {
+                    passwordCallback.setPassword("bob".toCharArray());
+                }
+            }
+        };
+
         try {
             KerberosSecurity bst = new KerberosSecurity(doc);
-            bst.retrieveServiceTicket("alice2", null, "bob@service");
-            fail("Failure expected on an unknown user");
+            bst.retrieveServiceTicket("alice2", callbackHandler, "bob@service");
+            Assert.fail("Failure expected on an unknown user");
         } catch (WSSecurityException ex) {
-            // expected
+            Assert.assertEquals(ex.getMessage(), "An error occurred in trying to obtain a TGT: No LoginModules configured for alice2");
         }
         
         
         try {
             KerberosSecurity bst = new KerberosSecurity(doc);
-            bst.retrieveServiceTicket("alice", null, "bob2@service");
-            fail("Failure expected on an unknown user");
+            bst.retrieveServiceTicket("alice", callbackHandler, "bob2@service");
+            Assert.fail("Failure expected on an unknown user");
         } catch (WSSecurityException ex) {
-            // expected
+            Assert.assertEquals(ex.getMessage(), "An error occurred in trying to obtain a service ticket");
         }
         
     }
@@ -160,16 +237,33 @@ public class KerberosTest extends org.junit.Assert {
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to sign the SOAP Body.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosSignature() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                if (callbacks[0] instanceof PasswordCallback) {
+                    PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                    if (passwordCallback.getPrompt().contains("alice")) {
+                        passwordCallback.setPassword("alice".toCharArray());
+                    } else if (passwordCallback.getPrompt().contains("bob")) {
+                        passwordCallback.setPassword("bob".toCharArray());
+                    }
+                }
+            }
+        };
+        bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
@@ -195,22 +289,21 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, null, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        Assert.assertTrue(token != null);
         
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof KerberosPrincipal);
-        assertTrue(principal.getName().contains("alice"));
+        Assert.assertTrue(principal instanceof KerberosPrincipal);
+        Assert.assertTrue(principal.getName().contains("alice"));
     }
     
     
@@ -218,16 +311,33 @@ public class KerberosTest extends org.junit.Assert {
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to sign the SOAP Body.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosSignatureKI() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                if (callbacks[0] instanceof PasswordCallback) {
+                    PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                    if (passwordCallback.getPrompt().contains("alice")) {
+                        passwordCallback.setPassword("alice".toCharArray());
+                    } else if (passwordCallback.getPrompt().contains("bob")) {
+                        passwordCallback.setPassword("bob".toCharArray());
+                    }
+                }
+            }
+        };
+        bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         
         WSSecSignature sign = new WSSecSignature();
@@ -257,22 +367,21 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(doc, null, null, null);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        Assert.assertTrue(token != null);
         
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof KerberosPrincipal);
-        assertTrue(principal.getName().contains("alice"));
+        Assert.assertTrue(principal instanceof KerberosPrincipal);
+        Assert.assertTrue(principal.getName().contains("alice"));
     }
     
     
@@ -280,16 +389,33 @@ public class KerberosTest extends org.junit.Assert {
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosEncryption() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                if (callbacks[0] instanceof PasswordCallback) {
+                    PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                    if (passwordCallback.getPrompt().contains("alice")) {
+                        passwordCallback.setPassword("alice".toCharArray());
+                    } else if (passwordCallback.getPrompt().contains("bob")) {
+                        passwordCallback.setPassword("bob".toCharArray());
+                    }
+                }
+            }
+        };
+        bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
@@ -314,38 +440,54 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(encryptedDoc, null, null, null);
+            secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        Assert.assertTrue(token != null);
         
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof KerberosPrincipal);
-        assertTrue(principal.getName().contains("alice"));
+        Assert.assertTrue(principal instanceof KerberosPrincipal);
+        Assert.assertTrue(principal.getName().contains("alice"));
     }
     
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosEncryptionBSTFirst() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                if (callbacks[0] instanceof PasswordCallback) {
+                    PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                    if (passwordCallback.getPrompt().contains("alice")) {
+                        passwordCallback.setPassword("alice".toCharArray());
+                    } else if (passwordCallback.getPrompt().contains("bob")) {
+                        passwordCallback.setPassword("bob".toCharArray());
+                    }
+                }
+            }
+        };
+        bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -371,38 +513,54 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(encryptedDoc, null, null, null);
+            secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        Assert.assertTrue(token != null);
         
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof KerberosPrincipal);
-        assertTrue(principal.getName().contains("alice"));
+        Assert.assertTrue(principal instanceof KerberosPrincipal);
+        Assert.assertTrue(principal.getName().contains("alice"));
     }
     
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
      */
-    @org.junit.Test
-    @org.junit.Ignore
+    @Test
     public void testKerberosEncryptionKI() throws Exception {
+        if (!kerberosServerStarted) {
+            System.out.println("Skipping test because kerberos server could not be started");
+            return;
+        }
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         KerberosSecurity bst = new KerberosSecurity(doc);
-        bst.retrieveServiceTicket("alice", null, "bob@service.ws.apache.org");
+        CallbackHandler callbackHandler = new CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                if (callbacks[0] instanceof PasswordCallback) {
+                    PasswordCallback passwordCallback = (PasswordCallback)callbacks[0];
+                    if (passwordCallback.getPrompt().contains("alice")) {
+                        passwordCallback.setPassword("alice".toCharArray());
+                    } else if (passwordCallback.getPrompt().contains("bob")) {
+                        passwordCallback.setPassword("bob".toCharArray());
+                    }
+                }
+            }
+        };
+        bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -430,24 +588,20 @@ public class KerberosTest extends org.junit.Assert {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        // validator.setKerberosTokenDecoder(new KerberosTokenDecoderImpl());
         wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
         List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(encryptedDoc, null, null, null);
+            secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-        assertTrue(token != null);
+        Assert.assertTrue(token != null);
         
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof KerberosPrincipal);
-        assertTrue(principal.getName().contains("alice"));
-    
+        Assert.assertTrue(principal instanceof KerberosPrincipal);
+        Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
-    
 }

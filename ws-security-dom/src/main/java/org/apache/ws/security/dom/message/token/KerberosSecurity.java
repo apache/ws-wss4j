@@ -29,6 +29,7 @@ import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.apache.ws.security.common.kerberos.KerberosClientAction;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.bsp.BSPEnforcer;
 import org.apache.ws.security.common.bsp.BSPRule;
@@ -146,7 +147,7 @@ public class KerberosSecurity extends BinarySecurity {
         KerberosTicket tgt = getKerberosTicket(clientSubject, null);
         
         // Get the service ticket
-        KerberosClientAction action = 
+        KerberosClientAction action =
             new KerberosClientAction(clientPrincipals.iterator().next(), serviceName);
         byte[] ticket = (byte[])Subject.doAs(clientSubject, action);
         if (ticket == null) {

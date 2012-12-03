@@ -28,10 +28,12 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.kerberos.KerberosTokenDecoder;
+import org.apache.ws.security.common.kerberos.KerberosTokenDecoderImpl;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.token.BinarySecurity;
 import org.apache.ws.security.dom.message.token.KerberosSecurity;
-import org.apache.ws.security.dom.message.token.KerberosServiceAction;
+import org.apache.ws.security.common.kerberos.KerberosServiceAction;
 
 /**
  */
@@ -162,10 +164,12 @@ public class KerberosTokenValidator implements Validator {
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
-            if (callbackHandler == null) {
-                loginContext = new LoginContext(getContextName());
-            } else {
+            if (callbackHandler != null) {
                 loginContext = new LoginContext(getContextName(), callbackHandler);
+            } else if (data.getCallbackHandler() != null) {
+                loginContext = new LoginContext(getContextName(), data.getCallbackHandler());
+            } else {
+                loginContext = new LoginContext(getContextName());
             }
             loginContext.login();
         } catch (LoginException ex) {
@@ -202,7 +206,7 @@ public class KerberosTokenValidator implements Validator {
         
         // Validate the ticket
         KerberosServiceAction action = new KerberosServiceAction(token, service);
-        Principal principal = (Principal)Subject.doAs(subject, action);
+        Principal principal = Subject.doAs(subject, action);
         if (principal == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "kerberosTicketValidationError"
@@ -211,21 +215,21 @@ public class KerberosTokenValidator implements Validator {
         credential.setPrincipal(principal);
         credential.setSubject(subject);
         
-        // Try to extract the session key from the token if a KerberosTokenDecoder implementation is
-        // available
-        if (kerberosTokenDecoder != null) {
-            kerberosTokenDecoder.clear();
-            kerberosTokenDecoder.setToken(token);
-            kerberosTokenDecoder.setSubject(subject);
-            byte[] sessionKey = kerberosTokenDecoder.getSessionKey();
-            credential.setSecretKey(sessionKey);
+        KerberosTokenDecoder kerberosTokenDecoder = this.kerberosTokenDecoder;
+        if (kerberosTokenDecoder == null) {
+            kerberosTokenDecoder = new KerberosTokenDecoderImpl();
         }
-        
+
+        kerberosTokenDecoder.clear();
+        kerberosTokenDecoder.setToken(token);
+        kerberosTokenDecoder.setSubject(subject);
+        byte[] sessionKey = kerberosTokenDecoder.getSessionKey();
+        credential.setSecretKey(sessionKey);
+
         if (log.isDebugEnabled()) {
             log.debug("Successfully validated a ticket");
         }
         
         return credential;
     }
-    
 }

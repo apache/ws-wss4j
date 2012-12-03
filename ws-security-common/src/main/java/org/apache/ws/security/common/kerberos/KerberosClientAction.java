@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.dom.message.token;
+package org.apache.ws.security.common.kerberos;
 
 import java.security.Principal;
 import java.security.PrivilegedAction;

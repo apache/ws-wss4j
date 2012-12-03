@@ -111,6 +111,7 @@
         <module>ws-security-common</module>
         <module>ws-security-dom</module>
         <module>ws-security-stax</module>
+        <module>integration</module>
         <module>ws-security-policy-stax</module>
         <module>cxf-integration</module>
     </modules>

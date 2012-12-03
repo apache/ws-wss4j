@@ -217,6 +217,10 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_SAML11_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV1.1";
     public static final String NS_SAML20_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV2.0";
 
+    public static final String NS_KERBEROS11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#";
+    public static final String NS_GSS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ";
+    public static final String NS_Kerberos5_AP_REQ_SHA1 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5APREQSHA1";
+
     public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
     public static final QName ATT_NULL_ID = new QName(null, "ID");
 
@@ -272,6 +276,8 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action ENCRYPT_WITH_DERIVED_KEY = new Action("ENCRYPT_WITH_DERIVED_KEY");
     public static final Action SAML_TOKEN_SIGNED = new Action("SAML_TOKEN_SIGNED");
     public static final Action SAML_TOKEN_UNSIGNED = new Action("SAML_TOKEN_UNSIGNED");
+    public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SIGNATURE_WITH_KERBEROS_TOKEN");
+    public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("ENCRYPT_WITH_KERBEROS_TOKEN");
 
     public static class Action extends XMLSecurityConstants.Action {
         protected Action(String name) {

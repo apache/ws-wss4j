@@ -42,6 +42,7 @@ import org.w3c.dom.Node;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -286,9 +287,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     ) throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
+        //the sun ähm oracle jce provider doesn't like a foreign SecretKey impl.
+        //this occurs e.g. with a kerberos session-key. It doesn't matter for the bouncy-castle provider
+        //so create a new secretKeySpec to make everybody happy.
+        SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs = 
             doEncryption(
-                document, getWsConfig(), keyInfo, symmetricKey, symEncAlgo, references, callbackLookup
+                document, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup
             );
         if (dataRef == null) {
             dataRef = 

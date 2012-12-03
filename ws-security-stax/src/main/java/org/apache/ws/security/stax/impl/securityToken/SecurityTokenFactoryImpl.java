@@ -39,6 +39,10 @@ import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.opensaml.common.SAMLVersion;
 
 import javax.security.auth.callback.CallbackHandler;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Factory to create SecurityToken Objects from keys in XML
@@ -162,6 +166,34 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
                     }
                     return securityTokenProvider.getSecurityToken();
+                } else if (WSSConstants.NS_Kerberos5_AP_REQ_SHA1.equals(valueType)) {
+                    SecurityTokenProvider securityTokenProvider = securityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
+                    if (securityTokenProvider != null) {
+                        return securityTokenProvider.getSecurityToken();
+                    }
+
+                    MessageDigest messageDigest = null;
+                    try {
+                        messageDigest = MessageDigest.getInstance("SHA-1");
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                    }
+
+                    //ok we have to find the token via digesting...
+                    List<SecurityTokenProvider> securityTokenProviders = securityContext.getRegisteredSecurityTokenProviders();
+                    for (int i = 0; i < securityTokenProviders.size(); i++) {
+                        SecurityTokenProvider tokenProvider = securityTokenProviders.get(i);
+                        SecurityToken securityToken = tokenProvider.getSecurityToken();
+                        if (securityToken instanceof KerberosServiceSecurityToken) {
+                            KerberosServiceSecurityToken kerberosSecurityToken = (KerberosServiceSecurityToken)securityToken;
+                            byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
+                            if (Arrays.equals(tokenDigest, binaryContent)) {
+                                return securityToken;
+                            }
+                        }
+                    }
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
                 } else {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
                     ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R3063);
