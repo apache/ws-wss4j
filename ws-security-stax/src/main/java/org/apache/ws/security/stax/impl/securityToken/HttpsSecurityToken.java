@@ -41,6 +41,7 @@ public class HttpsSecurityToken extends AbstractInboundSecurityToken {
         httpDigestAuthentication,
     }
 
+    //todo the HttpsToken and the HttpsTokenSecEvent will be instantiated outside of wss4j so remove WSSecurityContext?
     public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext)
             throws XMLSecurityException {
 
@@ -49,6 +50,7 @@ public class HttpsSecurityToken extends AbstractInboundSecurityToken {
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
+    //todo the HttpsToken and the HttpsTokenSecEvent will be instantiated outside of wss4j so remove WSSecurityContext?
     public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext)
             throws XMLSecurityException {
 

@@ -50,15 +50,17 @@ public class KerberosServiceSecurityToken extends AbstractInboundSecurityToken {
 
     private CallbackHandler callbackHandler;
     private byte[] binaryContent;
+    private String kerberosTokenValueType;
 
     private KerberosTokenDecoder kerberosTokenDecoder;
 
     public KerberosServiceSecurityToken(WSSecurityContext wsSecurityContext, CallbackHandler callbackHandler,
-                                        byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType)
-            throws XMLSecurityException {
+                                        byte[] binaryContent, String kerberosTokenValueType, String id,
+                                        WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
         super(wsSecurityContext, id, keyIdentifierType);
         this.callbackHandler = callbackHandler;
         this.binaryContent = binaryContent;
+        this.kerberosTokenValueType = kerberosTokenValueType;
     }
 
     @Override
@@ -146,5 +148,9 @@ public class KerberosServiceSecurityToken extends AbstractInboundSecurityToken {
 
     public byte[] getBinaryContent() {
         return binaryContent;
+    }
+
+    public String getKerberosTokenValueType() {
+        return kerberosTokenValueType;
     }
 }

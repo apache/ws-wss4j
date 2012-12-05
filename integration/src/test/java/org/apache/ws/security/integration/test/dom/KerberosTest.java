@@ -31,7 +31,7 @@ import org.apache.ws.security.dom.message.WSSecHeader;
 import org.apache.ws.security.dom.message.WSSecSignature;
 import org.apache.ws.security.dom.message.token.BinarySecurity;
 import org.apache.ws.security.dom.message.token.KerberosSecurity;
-import org.apache.ws.security.dom.spnego.SpnegoTokenContext;
+import org.apache.ws.security.common.spnego.SpnegoTokenContext;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.apache.ws.security.dom.validate.KerberosTokenValidator;
 import org.apache.ws.security.integration.test.common.KerberosServiceStarter;

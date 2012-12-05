@@ -32,11 +32,13 @@ import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.KerberosServiceSecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.X509PKIPathv1SecurityToken;
 import org.apache.ws.security.stax.impl.securityToken.X509_V3SecurityToken;
+import org.apache.ws.security.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 
 import javax.xml.bind.JAXBElement;
@@ -105,7 +107,8 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
                 } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                     this.securityToken = new KerberosServiceSecurityToken(
                             (WSSecurityContext) securityContext, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
-                            securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
+                            securityTokenData, binarySecurityTokenType.getValueType(),
+                            binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
                     );
                 } else {
                     throw new WSSecurityException(
@@ -125,12 +128,19 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
         securityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
 
-        //todo most probably wrong in case of a kerberos token
+        TokenSecurityEvent tokenSecurityEvent;
         //fire a tokenSecurityEvent
-        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        x509TokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
-        x509TokenSecurityEvent.setCorrelationID(binarySecurityTokenType.getId());
-        securityContext.registerSecurityEvent(x509TokenSecurityEvent);
+        if (binarySecurityTokenType.getValueType().startsWith(WSSConstants.NS_X509TOKEN_PROFILE)) {
+            tokenSecurityEvent = new X509TokenSecurityEvent();
+        } else if (binarySecurityTokenType.getValueType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
+            tokenSecurityEvent = new KerberosTokenSecurityEvent();
+        } else {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType", binarySecurityTokenType.getValueType());
+        }
+        tokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
+        tokenSecurityEvent.setCorrelationID(binarySecurityTokenType.getId());
+        securityContext.registerSecurityEvent(tokenSecurityEvent);
     }
 
     private Crypto getCrypto(WSSSecurityProperties securityProperties) throws WSSConfigurationException {

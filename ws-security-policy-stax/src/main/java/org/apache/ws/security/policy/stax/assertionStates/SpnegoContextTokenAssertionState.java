@@ -60,7 +60,7 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
             setErrorMessage("IssuerName in Policy (" + spnegoContextToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + spnegoContextTokenSecurityEvent.getIssuerName() + ")");
             return false;
         }
-        //todo MustNotSend*
+        //todo MustNotSend* ?
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
         return true;

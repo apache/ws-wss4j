@@ -18,6 +18,8 @@
  */
 package org.apache.ws.security.stax.securityEvent;
 
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.impl.securityToken.KerberosServiceSecurityToken;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
@@ -33,7 +35,7 @@ public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
     }
 
     public String getIssuerName() {
-        return issuerName;
+        return issuerName; //todo return ((KerberosServiceSecurityToken)getSecurityToken()).???();
     }
 
     public void setIssuerName(String issuerName) {
@@ -41,12 +43,22 @@ public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
     }
 
     public boolean isKerberosV5ApReqToken11() {
-        //todo
-        return true;
+        String type = ((KerberosServiceSecurityToken)getSecurityToken()).getKerberosTokenValueType();
+        if (WSSConstants.NS_Kerberos5_AP_REQ.equals(type)
+                || WSSConstants.NS_Kerberos5_AP_REQ1510.equals(type)
+                || WSSConstants.NS_Kerberos5_AP_REQ4120.equals(type)) {
+            return true;
+        }
+        return false;
     }
 
     public boolean isGssKerberosV5ApReqToken11() {
-        //todo
+        String type = ((KerberosServiceSecurityToken)getSecurityToken()).getKerberosTokenValueType();
+        if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(type)
+                || WSSConstants.NS_GSS_Kerberos5_AP_REQ1510.equals(type)
+                || WSSConstants.NS_GSS_Kerberos5_AP_REQ4120.equals(type)) {
+            return true;
+        }
         return false;
     }
 }

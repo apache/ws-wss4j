@@ -22,6 +22,8 @@ import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.model.AbstractSecurityAssertion;
 import org.apache.ws.security.policy.model.AbstractToken;
 import org.apache.ws.security.policy.model.KerberosToken;
+import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.KerberosTokenSecurityEvent;
@@ -55,9 +57,15 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
 
         KerberosToken kerberosToken = (KerberosToken) abstractToken;
         KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) tokenSecurityEvent;
+        AbstractInboundSecurityToken securityToken = (AbstractInboundSecurityToken) tokenSecurityEvent.getSecurityToken();
+
         if ((kerberosToken.getIssuerName() != null) &&
             !kerberosToken.getIssuerName().equals(kerberosTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + kerberosToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + kerberosTokenSecurityEvent.getIssuerName() + ")");
+            return false;
+        }
+        if (kerberosToken.isRequireKeyIdentifierReference() && securityToken.getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF) {
+            setErrorMessage("Policy enforces KeyIdentifierReference but we got " + securityToken.getKeyIdentifierType());
             return false;
         }
         if (kerberosToken.getApReqTokenType() != null) {
@@ -76,7 +84,6 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
                     break;
             }
         }
-        //todo
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
         return true;

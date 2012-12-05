@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.dom.spnego;
+package org.apache.ws.security.common.spnego;
 
 import java.security.Principal;
 import java.util.Set;

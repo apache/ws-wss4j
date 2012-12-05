@@ -573,6 +573,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "transmitter", null);
+        //todo token usage hard-coded in httpsSecurityToken?
         httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 

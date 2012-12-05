@@ -17,30 +17,30 @@
  * under the License.
  */
 
-package org.apache.ws.security.dom.spnego;
+package org.apache.ws.security.common.spnego;
 
 import java.security.PrivilegedAction;
 
 import org.ietf.jgss.GSSContext;
 
 /**
- * This interface represents a PrivilegedAction implementation to validate a received (SPNEGO) 
- * ticket to a KDC.
+ * This interface represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket 
+ * from a Kerberos Key Distribution Center.
  */
-public interface SpnegoServiceAction extends PrivilegedAction<byte[]> {
+public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
     
     /**
-     * Set the ticket to validate
+     * Whether to enable mutual authentication or not.
      */
-    void setTicket(byte[] ticket);
+    void setMutualAuth(boolean mutualAuthentication);
     
     /**
      * The Service Name
      */
     void setServiceName(String serviceName);
-    
+
     /**
-     * Validate a service ticket
+     * Obtain a service ticket
      */
     byte[] run();
     

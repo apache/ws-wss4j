@@ -270,7 +270,7 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            Assert.assertEquals(1, kerberosTokenSecurityEvents.size());
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
         }
     }
 
@@ -363,7 +363,7 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            Assert.assertEquals(1, kerberosTokenSecurityEvents.size());
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
         }
     }
 
@@ -532,7 +532,7 @@ public class KerberosTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
 
-            Assert.assertEquals(1, kerberosTokenSecurityEvents.size());
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
         }
     }
 
@@ -628,7 +628,7 @@ public class KerberosTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
 
-            Assert.assertEquals(1, kerberosTokenSecurityEvents.size());
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
         }
     }
 }

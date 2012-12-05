@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.ws.security.dom.spnego;
+package org.apache.ws.security.common.spnego;
 
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;

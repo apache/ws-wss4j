@@ -48,6 +48,8 @@ public class KerberosToken extends AbstractToken {
         }
     }
 
+    private boolean requireKeyIdentifierReference;
+
     private ApReqTokenType apReqTokenType;
 
     public KerberosToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
@@ -77,12 +79,21 @@ public class KerberosToken extends AbstractToken {
             for (int i = 0; i < assertions.size(); i++) {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
                 DerivedKeys derivedKeys = DerivedKeys.lookUp(assertionName);
                 if (derivedKeys != null) {
                     if (kerberosToken.getDerivedKeys() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     kerberosToken.setDerivedKeys(derivedKeys);
+                    continue;
+                }
+                if (getVersion().getSPConstants().getRequireKeyIdentifierReference().getLocalPart().equals(assertionName)
+                        && getVersion().getSPConstants().getRequireKeyIdentifierReference().getNamespaceURI().equals(assertionNamespace)) {
+                    if (kerberosToken.isRequireKeyIdentifierReference()) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    kerberosToken.setRequireKeyIdentifierReference(true);
                     continue;
                 }
                 ApReqTokenType apReqTokenType = ApReqTokenType.lookUp(assertionName);
@@ -95,6 +106,14 @@ public class KerberosToken extends AbstractToken {
                 }
             }
         }
+    }
+
+    public boolean isRequireKeyIdentifierReference() {
+        return requireKeyIdentifierReference;
+    }
+
+    protected void setRequireKeyIdentifierReference(boolean requireKeyIdentifierReference) {
+        this.requireKeyIdentifierReference = requireKeyIdentifierReference;
     }
 
     public ApReqTokenType getApReqTokenType() {

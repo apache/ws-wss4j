@@ -219,7 +219,13 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final String NS_KERBEROS11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#";
     public static final String NS_GSS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ";
+    public static final String NS_GSS_Kerberos5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ1510";
+    public static final String NS_GSS_Kerberos5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ4120";
+    public static final String NS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ";
     public static final String NS_Kerberos5_AP_REQ_SHA1 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5APREQSHA1";
+    public static final String NS_Kerberos5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ1510";
+    public static final String NS_Kerberos5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ4120";
+
 
     public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
     public static final QName ATT_NULL_ID = new QName(null, "ID");
@@ -306,6 +312,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final TokenType RelToken = new TokenType("RelToken");
     public static final TokenType DerivedKeyToken = new TokenType("DerivedKeyToken");
 
+    //todo correct/cleanup/rename/revisit KeyIdentifierTypes over the whole framework. I messed it up...
     public enum WSSKeyIdentifierType implements KeyIdentifierType {
         ISSUER_SERIAL,
         SECURITY_TOKEN_DIRECT_REFERENCE,
