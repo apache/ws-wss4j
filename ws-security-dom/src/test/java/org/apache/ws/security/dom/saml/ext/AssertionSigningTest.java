@@ -26,7 +26,7 @@ import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.Merlin;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
@@ -37,17 +37,17 @@ import org.opensaml.xml.signature.SignatureConstants;
 
 /**
  * A list of test-cases to test the functionality of signing with
- * AssertionWrapper class implementation.
+ * SamlAssertionWrapper class implementation.
  */
 
 public class AssertionSigningTest extends org.junit.Assert {
 
     private Crypto issuerCrypto = null;
-    // Default Canonicalization algorithm used by AssertionWrapper class.
+    // Default Canonicalization algorithm used by SamlAssertionWrapper class.
     private final String defaultCanonicalizationAlgorithm = SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
-    // Default RSA Signature algorithm used by AssertionWrapper class.
+    // Default RSA Signature algorithm used by SamlAssertionWrapper class.
     private final String defaultRSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
-    // Default DSA Signature algorithm used by AssertionWrapper class.
+    // Default DSA Signature algorithm used by SamlAssertionWrapper class.
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
     // Custom Signature algorithm
     private final String customSignatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
@@ -67,7 +67,7 @@ public class AssertionSigningTest extends org.junit.Assert {
     }
 
     /**
-     * Test that creates an AssertionWrapper object and signs using default
+     * Test that creates an SamlAssertionWrapper object and signs using default
      * signature and canonicalization algorithms. The defaults should match
      * otherwise the test-case fails.
      */
@@ -81,11 +81,11 @@ public class AssertionSigningTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("client_certchain", "password", issuerCrypto,
+        samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false);
-        Signature signature = assertion.getSaml2().getSignature();
+        Signature signature = samlAssertion.getSaml2().getSignature();
         Assert.assertTrue(signature.getSignatureAlgorithm().equalsIgnoreCase(
                 defaultRSASignatureAlgorithm)
                 || signature.getSignatureAlgorithm().equalsIgnoreCase(
@@ -95,7 +95,7 @@ public class AssertionSigningTest extends org.junit.Assert {
     }
 
     /**
-     * Test that creates an AssertionWrapper object and signs using custom
+     * Test that creates an SamlAssertionWrapper object and signs using custom
      * signature and canonicalization algorithms.
      */
     @org.junit.Test
@@ -108,12 +108,12 @@ public class AssertionSigningTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("client_certchain", "password", issuerCrypto,
+        samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false, customCanonicalizationAlgorithm,
                 customSignatureAlgorithm);
-        Signature signature = assertion.getSaml2().getSignature();
+        Signature signature = samlAssertion.getSaml2().getSignature();
         Assert.assertEquals(customSignatureAlgorithm,
                 signature.getSignatureAlgorithm());
         Assert.assertEquals(customCanonicalizationAlgorithm,

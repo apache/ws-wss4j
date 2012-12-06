@@ -58,24 +58,24 @@ public final class SAMLUtil {
      * Parse a SAML Assertion to obtain a SAMLKeyInfo object from
      * the Subject of the assertion
      * 
-     * @param assertion The SAML Assertion
+     * @param samlAssertion The SAML Assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
      * @return a SAMLKeyInfo object
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
-        AssertionWrapper assertion, 
+        SamlAssertionWrapper samlAssertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        if (assertion.getSaml1() != null) {
+        if (samlAssertion.getSaml1() != null) {
             return getCredentialFromSubject(
-                assertion.getSaml1(), keyInfoProcessor, sigCrypto, callbackHandler
+                samlAssertion.getSaml1(), keyInfoProcessor, sigCrypto, callbackHandler
             );
         } else {
             return getCredentialFromSubject(
-                assertion.getSaml2(), keyInfoProcessor, sigCrypto, callbackHandler
+                samlAssertion.getSaml2(), keyInfoProcessor, sigCrypto, callbackHandler
             );
         }
     }

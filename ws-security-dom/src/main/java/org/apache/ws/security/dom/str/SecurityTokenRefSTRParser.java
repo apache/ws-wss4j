@@ -31,7 +31,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.dom.WSConstants;
@@ -130,12 +130,12 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 secretKey = 
                     getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
                 if (secretKey == null) {
-                    AssertionWrapper assertion = 
+                    SamlAssertionWrapper samlAssertion =
                         STRParserUtil.getAssertionFromKeyIdentifier(
                             secRef, strElement, 
                             data, wsDocInfo
                         );
-                    secretKey = getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo);
+                    secretKey = getSecretKeyFromAssertion(samlAssertion, secRef, data, wsDocInfo);
                 }
             } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
                 secretKey = 
@@ -269,14 +269,14 @@ public class SecurityTokenRefSTRParser implements STRParser {
      * Get a SecretKey from a SAML Assertion
      */
     private byte[] getSecretKeyFromAssertion(
-        AssertionWrapper assertion, 
+        SamlAssertionWrapper samlAssertion,
         SecurityTokenReference secRef,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+        STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
         SAMLKeyInfo samlKi = 
-            SAMLUtil.getCredentialFromSubject(assertion, 
+            SAMLUtil.getCredentialFromSubject(samlAssertion,
                     new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                     data.getSigVerCrypto(), data.getCallbackHandler());
         if (samlKi == null) {
@@ -310,9 +310,9 @@ public class SecurityTokenRefSTRParser implements STRParser {
             secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
             principal = dkt.createPrincipal();
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-            AssertionWrapper assertion = 
-                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            secretKey = getSecretKeyFromAssertion(assertion, secRef, data, wsDocInfo);
+            SamlAssertionWrapper samlAssertion =
+                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            secretKey = getSecretKeyFromAssertion(samlAssertion, secRef, data, wsDocInfo);
         } else if (WSConstants.SCT == action || WSConstants.BST == action) {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {

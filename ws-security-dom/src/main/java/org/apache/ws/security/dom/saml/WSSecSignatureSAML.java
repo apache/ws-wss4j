@@ -33,6 +33,7 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSEncryptionPart;
@@ -40,7 +41,6 @@ import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLUtil;
@@ -97,7 +97,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      *            The unsigned SOAP envelope as <code>Document</code>
      * @param uCrypto
      *            The user's Crypto instance
-     * @param assertion
+     * @param samlAssertion
      *            the complete SAML assertion
      * @param iCrypto
      *            An instance of the Crypto API to handle keystore SAML token
@@ -112,11 +112,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @throws WSSecurityException
      */
     public Document build(
-        Document doc, Crypto uCrypto, AssertionWrapper assertion, 
+        Document doc, Crypto uCrypto, SamlAssertionWrapper samlAssertion,
         Crypto iCrypto, String iKeyName, String iKeyPW, WSSecHeader secHeader
     ) throws WSSecurityException {
 
-        prepare(doc, uCrypto, assertion, iCrypto, iKeyName, iKeyPW, secHeader);
+        prepare(doc, uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW, secHeader);
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
@@ -180,7 +180,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      *            The SOAP envelope as <code>Document</code>
      * @param uCrypto
      *            The user's Crypto instance
-     * @param assertion
+     * @param samlAssertion
      *            the complete SAML assertion
      * @param iCrypto
      *            An instance of the Crypto API to handle keystore SAML token
@@ -194,7 +194,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @throws WSSecurityException
      */
     public void prepare(
-        Document doc, Crypto uCrypto, AssertionWrapper assertion, Crypto iCrypto, 
+        Document doc, Crypto uCrypto, SamlAssertionWrapper samlAssertion, Crypto iCrypto,
         String iKeyName, String iKeyPW, WSSecHeader secHeader
     ) throws WSSecurityException {
 
@@ -208,7 +208,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         issuerKeyName = iKeyName;
         issuerKeyPW = iKeyPW;
         
-        samlToken = (Element) assertion.toDOM(doc);
+        samlToken = (Element) samlAssertion.toDOM(doc);
 
         //
         // Get some information about the SAML token content. This controls how
@@ -217,7 +217,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // thats if "senderVouches" is true.
         //
         String confirmMethod = null;
-        List<String> methods = assertion.getConfirmationMethods();
+        List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
@@ -246,7 +246,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // token must be signed (by the issuer).
         //
         else {
-            if (userCrypto == null || !assertion.isSigned()) {
+            if (userCrypto == null || !samlAssertion.isSigned()) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "invalidSAMLsecurity",
@@ -259,7 +259,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 data.setWssConfig(getWsConfig());
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
-                        assertion, new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                            samlAssertion, new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
                         data.getSigCrypto(), data.getCallbackHandler()
                     );
                 publicKey = samlKeyInfo.getPublicKey();
@@ -348,28 +348,28 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
                 if (useDirectReferenceToAssertion) {
                     Reference ref = new Reference(doc);
-                    ref.setURI("#" + assertion.getId());
-                    if (assertion.getSaml1() != null) {
+                    ref.setURI("#" + samlAssertion.getId());
+                    if (samlAssertion.getSaml1() != null) {
                         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                    } else if (assertion.getSaml2() != null) {
+                    } else if (samlAssertion.getSaml2() != null) {
                         secRefSaml.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
                     }
                     secRefSaml.setReference(ref);
                 } else {
                     Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
                     String valueType = null;
-                    if (assertion.getSaml1() != null) {
+                    if (samlAssertion.getSaml1() != null) {
                         valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
                         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                    } else if (assertion.getSaml2() != null) {
+                    } else if (samlAssertion.getSaml2() != null) {
                         valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
                         secRefSaml.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
                     }
                     keyId.setAttributeNS(
                         null, "ValueType", valueType
                     );
-                    keyId.appendChild(doc.createTextNode(assertion.getId()));
+                    keyId.appendChild(doc.createTextNode(samlAssertion.getId()));
                     Element elem = secRefSaml.getElement();
                     elem.appendChild(keyId);
                 }
@@ -422,28 +422,28 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         } else if (useDirectReferenceToAssertion) {
             Reference ref = new Reference(doc);
-            ref.setURI("#" + assertion.getId());
-            if (assertion.getSaml1() != null) {
+            ref.setURI("#" + samlAssertion.getId());
+            if (samlAssertion.getSaml1() != null) {
                 ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
                 secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            } else if (assertion.getSaml2() != null) {
+            } else if (samlAssertion.getSaml2() != null) {
                 secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             }
             secRef.setReference(ref);
         } else {
             Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
             String valueType = null;
-            if (assertion.getSaml1() != null) {
+            if (samlAssertion.getSaml1() != null) {
                 valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
                 secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            } else if (assertion.getSaml2() != null) {
+            } else if (samlAssertion.getSaml2() != null) {
                 valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
                 secRef.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             }
             keyId.setAttributeNS(
                 null, "ValueType", valueType
             );
-            keyId.appendChild(doc.createTextNode(assertion.getId()));
+            keyId.appendChild(doc.createTextNode(samlAssertion.getId()));
             Element elem = secRef.getElement();
             elem.appendChild(keyId);
         }

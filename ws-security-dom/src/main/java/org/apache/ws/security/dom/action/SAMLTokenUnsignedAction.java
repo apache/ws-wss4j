@@ -22,7 +22,7 @@ package org.apache.ws.security.dom.action;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.dom.handler.RequestData;
@@ -52,9 +52,9 @@ public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
 
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         // add the SAMLAssertion Token to the SOAP Envelope
-        builder.build(doc, assertion, reqData.getSecHeader());
+        builder.build(doc, samlAssertion, reqData.getSecHeader());
     }
 }

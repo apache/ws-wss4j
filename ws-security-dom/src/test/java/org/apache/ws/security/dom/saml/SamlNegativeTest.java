@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.saml;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
@@ -33,7 +34,6 @@ import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.bean.SubjectBean;
@@ -103,7 +103,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -114,7 +114,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         Document signedDoc = 
             wsSign.build(
-                doc, null, assertion, userCrypto, "wss40", "security", secHeader
+                doc, null, samlAssertion, userCrypto, "wss40", "security", secHeader
             );
         
         //
@@ -155,9 +155,9 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -165,7 +165,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         //
         // Modify the assertion
@@ -207,9 +207,9 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -217,7 +217,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
         //
         // Modify the assertion
         //
@@ -254,16 +254,16 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
@@ -293,7 +293,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         samlCallback.setIssuer("www.example.com");
         samlCallback.setIssuerCrypto(issuerCrypto);
@@ -306,7 +306,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
@@ -336,9 +336,9 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion(
+        samlAssertion.signAssertion(
             "16c73ab6-b892-458f-abf5-2f875f74882e", "security", 
             CryptoFactory.getInstance("crypto.properties"), false
         );
@@ -354,7 +354,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         Document signedDoc = 
-            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);

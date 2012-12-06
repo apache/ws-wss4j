@@ -12,10 +12,10 @@
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
     </appender>
-    <logger name="org.apache.ws.security.xmlsec.impl.util.SignerOutputStream">
+    <logger name="org.apache.xml.security.utils.SignerOutputStream">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.xmlsec.impl.util.DigestOutputStream">
+    <logger name="org.apache.xml.security.utils.DigesterOutputStream">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.jcp.xml.dsig.internal.DigesterOutputStream">
@@ -27,16 +27,13 @@
     <logger name="org.apache.xml.security.encryption.XMLCipher">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.xmlsec.impl.InputProcessorChainImpl">
+    <logger name="org.apache.xml.security.stax.impl.InputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.xmlsec.impl.OutputProcessorChainImpl">
+    <logger name="org.apache.xml.security.stax.impl.OutputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.ws.security.stax.impl.processor.input">
-        <level value="INFO"/>
-    </logger>
-    <logger name="org.apache.ws.security.stax.impl.saml.SAMLAssertionWrapper">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.ws.security.stax.test.AbstractTestBase$CustomWSS4JHandler">

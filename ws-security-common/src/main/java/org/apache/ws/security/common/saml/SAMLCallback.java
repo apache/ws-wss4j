@@ -34,7 +34,7 @@ import java.util.List;
 
 
 /**
- * Class SAMLCallback will be called by the <code>AssertionWrapper</code> during the creation
+ * Class SAMLCallback will be called by the <code>SamlAssertionWrapper</code> during the creation
  * of SAML statements (authentication, attribute, and authz decision). Alternatively, the
  * "assertionElement" member of this class can be set instead, for a pre-existing SAML
  * Assertion.

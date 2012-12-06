@@ -30,7 +30,7 @@ import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -230,7 +230,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -241,10 +241,10 @@ public class ModifiedRequestTest extends org.junit.Assert {
         
         Document signedDoc = 
             wsSign.build(
-                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security", secHeader
             );
-        Element assertionElement = (Element)assertion.getElement().cloneNode(true);
+        Element assertionElement = (Element) samlAssertion.getElement().cloneNode(true);
         assertionElement.removeChild(assertionElement.getFirstChild());
         secHeader.getSecurityHeader().appendChild(assertionElement);
 

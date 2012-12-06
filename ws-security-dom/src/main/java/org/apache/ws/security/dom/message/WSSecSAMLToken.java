@@ -19,9 +19,9 @@
 
 package org.apache.ws.security.dom.message;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.dom.util.WSSecurityUtil;
 
 import org.w3c.dom.Document;
@@ -40,7 +40,7 @@ public class WSSecSAMLToken extends WSSecBase {
     
     private Document document = null;
     
-    private AssertionWrapper saml = null;
+    private SamlAssertionWrapper saml = null;
 
     public WSSecSAMLToken() {
         super();
@@ -61,9 +61,9 @@ public class WSSecSAMLToken extends WSSecBase {
      * @param doc
      *            The SOAP envelope as W3C document
      */
-    public void prepare(Document doc, AssertionWrapper assertion) {
+    public void prepare(Document doc, SamlAssertionWrapper samlAssertion) {
         document = doc;
-        saml = assertion;
+        saml = samlAssertion;
     }
 
     /**
@@ -108,13 +108,13 @@ public class WSSecSAMLToken extends WSSecBase {
      * <code>wsse:Security</code> header.
      *
      * @param doc      The SOAP envelope as W3C document
-     * @param assertion TODO
+     * @param samlAssertion TODO
      * @return Document with UsernameToken added
      */
-    public Document build(Document doc, AssertionWrapper assertion, WSSecHeader secHeader) {
+    public Document build(Document doc, SamlAssertionWrapper samlAssertion, WSSecHeader secHeader) {
         log.debug("Begin add SAMLAssertion token...");
         
-        prepare(doc, assertion);
+        prepare(doc, samlAssertion);
         prependToHeader(secHeader);
         
         return doc;

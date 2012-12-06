@@ -30,6 +30,7 @@ import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.namespace.QName;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.w3c.dom.Element;
 
 import org.apache.ws.security.dom.SAMLTokenPrincipal;
@@ -39,7 +40,6 @@ import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.common.crypto.AlgorithmSuite;
 import org.apache.ws.security.common.crypto.AlgorithmSuiteValidator;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.util.DOM2Writer;
@@ -78,14 +78,14 @@ public class SAMLTokenProcessor implements Processor {
         Validator validator = 
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
         Credential credential = handleSAMLToken(elem, data, validator, wsDocInfo);
-        AssertionWrapper assertion = credential.getAssertion();
+        SamlAssertionWrapper samlAssertion = credential.getSamlAssertion();
         if (log.isDebugEnabled()) {
-            log.debug("SAML Assertion issuer " + assertion.getIssuerString());
+            log.debug("SAML Assertion issuer " + samlAssertion.getIssuerString());
             log.debug(DOM2Writer.nodeToString(elem));
         }
         
         // See if the token has been previously processed
-        String id = assertion.getId();
+        String id = samlAssertion.getId();
         Element foundElement = wsDocInfo.getTokenElement(id);
         if (elem.equals(foundElement)) {
             WSSecurityEngineResult result = wsDocInfo.getResult(id);
@@ -98,13 +98,13 @@ public class SAMLTokenProcessor implements Processor {
 
         wsDocInfo.addTokenElement(elem);
         WSSecurityEngineResult result = null;
-        if (assertion.isSigned()) {
-            result = new WSSecurityEngineResult(WSConstants.ST_SIGNED, assertion);
+        if (samlAssertion.isSigned()) {
+            result = new WSSecurityEngineResult(WSConstants.ST_SIGNED, samlAssertion);
         } else {
-            result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
+            result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, samlAssertion);
         }
         
-        result.put(WSSecurityEngineResult.TAG_ID, assertion.getId());
+        result.put(WSSecurityEngineResult.TAG_ID, samlAssertion.getId());
 
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
@@ -118,7 +118,7 @@ public class SAMLTokenProcessor implements Processor {
             } else if (credential.getPrincipal() != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
             } else {
-                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipal(assertion));
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipal(samlAssertion));
             }
         }
         wsDocInfo.addResult(result);
@@ -131,12 +131,12 @@ public class SAMLTokenProcessor implements Processor {
         Validator validator,
         WSDocInfo docInfo
     ) throws WSSecurityException {
-        AssertionWrapper assertion = new AssertionWrapper(token);
-        if (assertion.isSigned()) {
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(token);
+        if (samlAssertion.isSigned()) {
             // Check for compliance against the defined AlgorithmSuite
             AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
             
-            Signature sig = assertion.getSignature();
+            Signature sig = samlAssertion.getSignature();
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialDirectlyFromKeyInfo(
@@ -178,17 +178,17 @@ public class SAMLTokenProcessor implements Processor {
                 algorithmSuiteValidator.checkAsymmetricKeyLength(key);
             }
 
-            assertion.verifySignature(samlKeyInfo);
+            samlAssertion.verifySignature(samlKeyInfo);
         }
         // Parse the HOK subject if it exists
-        assertion.parseHOKSubject( 
+        samlAssertion.parseHOKSubject(
             new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(), 
             data.getCallbackHandler()
         );
             
         // Now delegate the rest of the verification to the Validator
         Credential credential = new Credential();
-        credential.setAssertion(assertion);
+        credential.setSamlAssertion(samlAssertion);
         if (validator != null) {
             return validator.validate(credential, data);
         }

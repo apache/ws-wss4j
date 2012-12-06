@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.saml;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSEncryptionPart;
@@ -32,7 +33,6 @@ import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.Merlin;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -100,7 +100,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -110,7 +110,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document signedDoc = 
             wsSign.build(
-                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security", secHeader
             );
 
@@ -126,9 +126,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -163,7 +163,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -174,7 +174,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setUseDirectReferenceToAssertion(true);
         Document signedDoc = 
             wsSign.build(
-                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security", secHeader
             );
 
@@ -190,9 +190,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -227,9 +227,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -241,7 +241,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         Document signedDoc = 
-            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -255,10 +255,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -290,9 +290,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -306,7 +306,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         Document signedDoc = 
-            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -320,10 +320,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -361,12 +361,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         Crypto crypto = CryptoFactory.getInstance("crypto.properties");
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document samlDoc = 
-            wsSign.build(doc, null, assertion, crypto, 
+            wsSign.build(doc, null, samlAssertion, crypto,
                 "16c73ab6-b892-458f-abf5-2f875f74882e", "security", secHeader
             );
         
@@ -414,13 +414,13 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
-        Node assertionNode = assertion.toDOM(doc);
+        Node assertionNode = samlAssertion.toDOM(doc);
         secHeader.insertSecurityHeader(doc);
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
@@ -430,7 +430,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        builder.setCustomEKTokenId(assertion.getId());
+        builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
@@ -455,10 +455,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -492,12 +492,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
-        Node assertionNode = assertion.toDOM(doc);
+        Node assertionNode = samlAssertion.toDOM(doc);
         secHeader.insertSecurityHeader(doc);
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
@@ -507,7 +507,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        builder.setCustomEKTokenId(assertion.getId());
+        builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
@@ -532,10 +532,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -565,7 +565,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -575,7 +575,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document signedDoc = 
             wsSign.build(
-                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security", secHeader
             );
 
@@ -591,9 +591,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -627,7 +627,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -638,7 +638,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setUseDirectReferenceToAssertion(true);
         Document signedDoc = 
             wsSign.build(
-                doc, null, assertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", 
+                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security", secHeader
             );
 
@@ -654,9 +654,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -691,9 +691,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -705,7 +705,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         Document signedDoc = 
-            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -719,10 +719,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -754,9 +754,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setUserInfo("wss40", "security");
@@ -770,7 +770,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
 
         Document signedDoc = 
-            wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -784,10 +784,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -819,13 +819,13 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
-        Node assertionNode = assertion.toDOM(doc);
+        Node assertionNode = samlAssertion.toDOM(doc);
         secHeader.insertSecurityHeader(doc);
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
@@ -835,7 +835,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        builder.setCustomEKTokenId(assertion.getId());
+        builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
@@ -860,10 +860,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -896,13 +896,13 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
-        Node assertionNode = assertion.toDOM(doc);
+        Node assertionNode = samlAssertion.toDOM(doc);
         secHeader.insertSecurityHeader(doc);
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
@@ -912,7 +912,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-        builder.setCustomEKTokenId(assertion.getId());
+        builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
@@ -937,10 +937,10 @@ public class SamlReferenceTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed an encrypted element
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);

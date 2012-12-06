@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.message;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.SOAPConstants;
 import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSEncryptionPart;
@@ -32,7 +33,6 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.Merlin;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -187,8 +187,8 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         samlCallback.setIssuer("www.example.com");
         
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
-        assertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -207,7 +207,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         //
         // set up for keyHolder
         //
-        Document signedDoc = wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+        Document signedDoc = wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message (key holder):");
@@ -227,10 +227,10 @@ public class SignaturePartsTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, trustCrypto);
         WSSecurityEngineResult stUnsignedActionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.isSigned());
         
         WSSecurityEngineResult signActionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);

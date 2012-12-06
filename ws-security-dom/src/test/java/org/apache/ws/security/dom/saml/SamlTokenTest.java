@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.saml;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngine;
@@ -30,7 +31,6 @@ import org.apache.ws.security.dom.common.SAML2CallbackHandler;
 import org.apache.ws.security.dom.common.SAMLElementCallbackHandler;
 import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.bean.SubjectConfirmationDataBean;
@@ -83,7 +83,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -91,7 +91,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
@@ -103,17 +103,17 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
-        assertTrue(receivedAssertion.getSignatureValue() == null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
+        assertTrue(receivedSamlAssertion.getSignatureValue() == null);
     }
     
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion.
      * It set a DOM Element on the CallbackHandler rather than creating a set of beans for
-     * AssertionWrapper to parse.
+     * SamlAssertionWrapper to parse.
      */
     @org.junit.Test
     public void testSAML1AuthnAssertionViaElement() throws Exception {
@@ -122,7 +122,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -130,7 +130,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches - from an Element):");
@@ -142,11 +142,11 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
-        assertTrue(receivedAssertion.getSignatureValue() == null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
+        assertTrue(receivedSamlAssertion.getSignatureValue() == null);
     }
     
     /**
@@ -160,7 +160,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -168,7 +168,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Attr Assertion (sender vouches):");
@@ -180,10 +180,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -198,7 +198,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -206,7 +206,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authz Assertion (sender vouches):");
@@ -218,10 +218,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -235,7 +235,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -243,7 +243,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
@@ -255,10 +255,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -272,14 +272,14 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (sender vouches):");
@@ -291,10 +291,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -309,7 +309,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -317,7 +317,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authz Assertion (sender vouches):");
@@ -329,10 +329,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
 
     /**
@@ -371,10 +371,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(doc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -390,7 +390,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -398,7 +398,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
@@ -428,7 +428,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -436,7 +436,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
@@ -466,7 +466,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -474,7 +474,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(unsignedDoc);
@@ -487,10 +487,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -506,7 +506,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -514,7 +514,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(unsignedDoc);
@@ -527,10 +527,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -546,7 +546,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -554,7 +554,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(unsignedDoc);
@@ -568,10 +568,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -587,7 +587,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -595,7 +595,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(unsignedDoc);
@@ -609,10 +609,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -628,7 +628,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -636,7 +636,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(unsignedDoc);
@@ -649,10 +649,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -684,7 +684,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -692,7 +692,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (sender vouches):");
@@ -704,10 +704,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**
@@ -729,7 +729,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -737,7 +737,7 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(unsignedDoc);
@@ -750,10 +750,10 @@ public class SamlTokenTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
-        assertTrue(!receivedAssertion.isSigned());
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(!receivedSamlAssertion.isSigned());
     }
     
     /**

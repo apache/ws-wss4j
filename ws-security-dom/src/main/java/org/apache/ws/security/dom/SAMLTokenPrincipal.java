@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.dom;
 
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.opensaml.common.SAMLVersion;
 
 import java.io.Serializable;
@@ -33,18 +33,18 @@ public class SAMLTokenPrincipal implements Principal, Serializable {
     private static final long serialVersionUID = 1L;
     
     private String name;
-    private AssertionWrapper assertion;
+    private SamlAssertionWrapper samlAssertion;
     
-    public SAMLTokenPrincipal(AssertionWrapper assertion) {
-        this.assertion = assertion;
-        if (assertion.getSamlVersion() == SAMLVersion.VERSION_20) {
-            org.opensaml.saml2.core.Subject subject = assertion.getSaml2().getSubject();
+    public SAMLTokenPrincipal(SamlAssertionWrapper samlAssertion) {
+        this.samlAssertion = samlAssertion;
+        if (samlAssertion.getSamlVersion() == SAMLVersion.VERSION_20) {
+            org.opensaml.saml2.core.Subject subject = samlAssertion.getSaml2().getSubject();
             if (subject != null && subject.getNameID() != null) {
                 name = subject.getNameID().getValue();
             }
         } else {
             org.opensaml.saml1.core.Subject samlSubject = null;
-            for (org.opensaml.saml1.core.Statement stmt : assertion.getSaml1().getStatements()) {
+            for (org.opensaml.saml1.core.Statement stmt : samlAssertion.getSaml1().getStatements()) {
                 if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
                     org.opensaml.saml1.core.AttributeStatement attrStmt = 
                         (org.opensaml.saml1.core.AttributeStatement) stmt;
@@ -68,8 +68,8 @@ public class SAMLTokenPrincipal implements Principal, Serializable {
         }
     }
     
-    public AssertionWrapper getToken() {
-        return assertion;
+    public SamlAssertionWrapper getToken() {
+        return samlAssertion;
     }
 
     public String getName() {
@@ -77,8 +77,8 @@ public class SAMLTokenPrincipal implements Principal, Serializable {
     }
 
     public String getId() {
-        if (assertion != null) {
-            return assertion.getId();
+        if (samlAssertion != null) {
+            return samlAssertion.getId();
         }
         return null;
     }

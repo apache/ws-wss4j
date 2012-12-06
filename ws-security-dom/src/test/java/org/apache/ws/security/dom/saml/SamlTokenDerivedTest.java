@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.saml;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDataRef;
 import org.apache.ws.security.dom.WSEncryptionPart;
@@ -32,7 +33,6 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -83,15 +83,15 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
         SecurityTokenReference secRefSaml = 
-            createSamlSTR(doc, assertion, WSSConfig.getNewInstance());
-        secHeader.getSecurityHeader().appendChild(assertion.toDOM(doc));
+            createSamlSTR(doc, samlAssertion, WSSConfig.getNewInstance());
+        secHeader.getSecurityHeader().appendChild(samlAssertion.toDOM(doc));
         secHeader.getSecurityHeader().appendChild(secRefSaml.getElement());
         
         //
@@ -111,9 +111,9 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
@@ -137,7 +137,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
      */
     private SecurityTokenReference createSamlSTR(
         Document doc, 
-        AssertionWrapper assertion,
+        SamlAssertionWrapper samlAssertion,
         WSSConfig wssConfig
     ) {
         SecurityTokenReference secRefSaml = new SecurityTokenReference(doc);
@@ -146,7 +146,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
 
         org.apache.ws.security.dom.message.token.Reference ref = 
             new org.apache.ws.security.dom.message.token.Reference(doc);
-        ref.setURI("#" + assertion.getId());
+        ref.setURI("#" + samlAssertion.getId());
         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
         secRefSaml.setReference(ref);

@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.dom.WSConstants;
@@ -96,14 +96,14 @@ public class EncryptedKeySTRParser implements STRParser {
         } else if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                AssertionWrapper assertion = 
+                SamlAssertionWrapper samlAssertion =
                     STRParserUtil.getAssertionFromKeyIdentifier(
                         secRef, strElement, data, wsDocInfo
                     );
-                STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+                STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
                 
                 SAMLKeyInfo samlKi = 
-                    SAMLUtil.getCredentialFromSubject(assertion, 
+                    SAMLUtil.getCredentialFromSubject(samlAssertion,
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                             data.getSigVerCrypto(), data.getCallbackHandler());
                 certs = samlKi.getCerts();
@@ -209,12 +209,12 @@ public class EncryptedKeySTRParser implements STRParser {
                     WSSecurityEngineResult.TAG_X509_CERTIFICATES
                 );
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-            AssertionWrapper assertion = 
-                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+            SamlAssertionWrapper samlAssertion =
+                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
           
             SAMLKeyInfo keyInfo = 
-                SAMLUtil.getCredentialFromSubject(assertion, 
+                SAMLUtil.getCredentialFromSubject(samlAssertion,
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                         data.getSigVerCrypto(), data.getCallbackHandler());
             certs = keyInfo.getCerts();

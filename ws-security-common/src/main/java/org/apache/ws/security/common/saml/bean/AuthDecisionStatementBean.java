@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 
 /**
- * Class SamlDecision represents the raw data to be used by the <code>AssertionWrapper</code> when
+ * Class SamlDecision represents the raw data to be used by the <code>SamlAssertionWrapper</code> when
  * creating SAML Authorization Decision Statements.
  *
  * Created on May 19, 2009

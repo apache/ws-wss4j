@@ -31,7 +31,7 @@ import javax.security.auth.callback.Callback;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.dom.WSConstants;
@@ -254,12 +254,12 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         } else if (WSConstants.SCT == action || WSConstants.BST == action) {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-            AssertionWrapper assertion = 
-                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+            SamlAssertionWrapper samlAssertion =
+                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
            
             SAMLKeyInfo keyInfo = 
-                SAMLUtil.getCredentialFromSubject(assertion, 
+                SAMLUtil.getCredentialFromSubject(samlAssertion,
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                         data.getSigVerCrypto(), data.getCallbackHandler());
             // TODO Handle malformed SAML tokens where they don't have the 

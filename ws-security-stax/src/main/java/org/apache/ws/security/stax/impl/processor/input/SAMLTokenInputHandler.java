@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.binding.wss10.ObjectFactory;
 import org.apache.ws.security.binding.wss10.SecurityTokenReferenceType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.stax.ext.WSSConstants;
@@ -102,11 +102,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         final Document samlTokenDocument = (Document) parseStructure(eventQueue, index, securityProperties);
 
-        final AssertionWrapper assertionWrapper = new AssertionWrapper(samlTokenDocument.getDocumentElement());
+        final SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlTokenDocument.getDocumentElement());
 
         //important: check the signature before we do other processing...
-        if (assertionWrapper.isSigned()) {
-            Signature signature = assertionWrapper.getSignature();
+        if (samlAssertionWrapper.isSigned()) {
+            Signature signature = samlAssertionWrapper.getSignature();
             if (signature == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "empty", "no signature to validate");
@@ -152,11 +152,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         // TODO move the following into a Validator eventually
 
-        checkConditions(assertionWrapper);
-        validateAssertion(assertionWrapper);
+        checkConditions(samlAssertionWrapper);
+        validateAssertion(samlAssertionWrapper);
 
         String confirmMethod = null;
-        List<String> methods = assertionWrapper.getConfirmationMethods();
+        List<String> methods = samlAssertionWrapper.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
@@ -169,7 +169,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             // First try to get the credential from a CallbackHandler
             final byte[] subjectSecretKey = SAMLUtil.getSecretKeyFromCallbackHandler(
-                    assertionWrapper.getId(), ((WSSSecurityProperties) securityProperties).getCallbackHandler());
+                    samlAssertionWrapper.getId(), ((WSSSecurityProperties) securityProperties).getCallbackHandler());
 
             if (subjectSecretKey != null && subjectSecretKey.length > 0) {
 
@@ -201,7 +201,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 };
             } else {
                 // The assertion must have been signed for HOK
-                if (!assertionWrapper.isSigned()) {
+                if (!samlAssertionWrapper.isSigned()) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidSAMLsecurity");
                 }
 
@@ -220,7 +220,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("SAML Assertion issuer " + assertionWrapper.getIssuerString());
+            log.debug("SAML Assertion issuer " + samlAssertionWrapper.getIssuerString());
         }
 
         final List<QName> elementPath = getElementPath(eventQueue);
@@ -237,11 +237,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     return this.securityToken;
                 }
 
-                this.securityToken = new SAMLSecurityToken(assertionWrapper.getSamlVersion(), subjectSecurityToken,
-                        assertionWrapper.getIssuerString(),
+                this.securityToken = new SAMLSecurityToken(samlAssertionWrapper.getSamlVersion(), subjectSecurityToken,
+                        samlAssertionWrapper.getIssuerString(),
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(),
                         ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto(),
-                        assertionWrapper.getId(), null);
+                        samlAssertionWrapper.getId(), null);
 
                 this.securityToken.setElementPath(elementPath);
                 this.securityToken.setXMLSecEvent(responsibleStartXMLEvent);
@@ -250,15 +250,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             @Override
             public String getId() {
-                return assertionWrapper.getId();
+                return samlAssertionWrapper.getId();
             }
         };
-        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(assertionWrapper.getId(), securityTokenProvider);
+        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(samlAssertionWrapper.getId(), securityTokenProvider);
 
         //fire a tokenSecurityEvent
         SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent();
         samlTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
-        samlTokenSecurityEvent.setCorrelationID(assertionWrapper.getId());
+        samlTokenSecurityEvent.setCorrelationID(samlAssertionWrapper.getId());
         inputProcessorChain.getSecurityContext().registerSecurityEvent(samlTokenSecurityEvent);
     }
 
@@ -554,17 +554,17 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
     /**
      * Check the Conditions of the Assertion.
      */
-    protected void checkConditions(AssertionWrapper assertion) throws WSSecurityException {
+    protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         DateTime validFrom = null;
         DateTime validTill = null;
-        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
-                && assertion.getSaml2().getConditions() != null) {
-            validFrom = assertion.getSaml2().getConditions().getNotBefore();
-            validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
-                && assertion.getSaml1().getConditions() != null) {
-            validFrom = assertion.getSaml1().getConditions().getNotBefore();
-            validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+        if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+                && samlAssertion.getSaml2().getConditions() != null) {
+            validFrom = samlAssertion.getSaml2().getConditions().getNotBefore();
+            validTill = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
+        } else if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
+                && samlAssertion.getSaml1().getConditions() != null) {
+            validFrom = samlAssertion.getSaml1().getConditions().getNotBefore();
+            validTill = samlAssertion.getSaml1().getConditions().getNotOnOrAfter();
         }
 
         if (validFrom != null) {
@@ -585,28 +585,28 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
     /**
      * Validate the assertion against schemas/profiles
      */
-    protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
-        if (assertion.getSaml1() != null) {
+    protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
+        if (samlAssertion.getSaml1() != null) {
             ValidatorSuite schemaValidators =
                     org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
             ValidatorSuite specValidators =
                     org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
             try {
-                schemaValidators.validate(assertion.getSaml1());
-                specValidators.validate(assertion.getSaml1());
+                schemaValidators.validate(samlAssertion.getSaml1());
+                specValidators.validate(samlAssertion.getSaml1());
             } catch (ValidationException e) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "empty", e, "Saml Validation error: "
                 );
             }
-        } else if (assertion.getSaml2() != null) {
+        } else if (samlAssertion.getSaml2() != null) {
             ValidatorSuite schemaValidators =
                     org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
             ValidatorSuite specValidators =
                     org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
             try {
-                schemaValidators.validate(assertion.getSaml2());
-                specValidators.validate(assertion.getSaml2());
+                schemaValidators.validate(samlAssertion.getSaml2());
+                specValidators.validate(samlAssertion.getSaml2());
             } catch (ValidationException e) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e, "Saml Validation error: "

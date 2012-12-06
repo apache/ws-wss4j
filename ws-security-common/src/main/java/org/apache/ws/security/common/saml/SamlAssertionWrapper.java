@@ -61,17 +61,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Class AssertionWrapper can generate, sign, and validate both SAML v1.1
+ * Class SamlAssertionWrapper can generate, sign, and validate both SAML v1.1
  * and SAML v2.0 assertions.
  * <p/>
  * Created on May 18, 2009
  */
-public class AssertionWrapper {
+public class SamlAssertionWrapper {
     /**
      * Field log
      */
     private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(AssertionWrapper.class);
+        org.apache.commons.logging.LogFactory.getLog(SamlAssertionWrapper.class);
 
     /**
      * Raw SAML assertion data
@@ -129,12 +129,12 @@ public class AssertionWrapper {
     private final boolean fromDOM;
     
     /**
-     * Constructor AssertionWrapper creates a new AssertionWrapper instance.
+     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      *
      * @param element of type Element
      * @throws WSSecurityException
      */
-    public AssertionWrapper(Element element) throws WSSecurityException {
+    public SamlAssertionWrapper(Element element) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
         
         parseElement(element);
@@ -142,32 +142,32 @@ public class AssertionWrapper {
     }
 
     /**
-     * Constructor AssertionWrapper creates a new AssertionWrapper instance.
+     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      *
      * @param saml2 of type Assertion
      */
-    public AssertionWrapper(org.opensaml.saml2.core.Assertion saml2) {
+    public SamlAssertionWrapper(org.opensaml.saml2.core.Assertion saml2) {
         this((XMLObject)saml2);
     }
 
     /**
-     * Constructor AssertionWrapper creates a new AssertionWrapper instance.
+     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      *
      * @param saml1 of type Assertion
      */
-    public AssertionWrapper(org.opensaml.saml1.core.Assertion saml1) {
+    public SamlAssertionWrapper(org.opensaml.saml1.core.Assertion saml1) {
         this((XMLObject)saml1);
     }
 
     /**
-     * Constructor AssertionWrapper creates a new AssertionWrapper instance.
+     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      * This is the primary constructor.  All other constructor calls should
      * be routed to this method to ensure that the wrapper is initialized
      * correctly.
      *
      * @param xmlObject of type XMLObject
      */
-    public AssertionWrapper(XMLObject xmlObject) {
+    public SamlAssertionWrapper(XMLObject xmlObject) {
         OpenSAMLUtil.initSamlEngine();
         
         this.xmlObject = xmlObject;
@@ -179,7 +179,7 @@ public class AssertionWrapper {
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
-                "AssertionWrapper: found unexpected type " 
+                "SamlAssertionWrapper: found unexpected type "
                 + (xmlObject != null ? xmlObject.getClass().getName() : null)
             );
         }
@@ -187,13 +187,13 @@ public class AssertionWrapper {
     }
     
     /**
-     * Constructor AssertionWrapper creates a new AssertionWrapper instance.
+     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      * This constructor is primarily called on the client side to initialize
      * the wrapper from a configuration file. <br>
      *
      * @param samlCallback of type SAMLCallback
      */
-    public AssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {
+    public SamlAssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
 
         if (samlCallback.getAssertionElement() != null) {
@@ -207,36 +207,36 @@ public class AssertionWrapper {
     }
 
     /**
-     * Method getSaml1 returns the saml1 of this AssertionWrapper object.
+     * Method getSaml1 returns the saml1 of this SamlAssertionWrapper object.
      *
-     * @return the saml1 (type Assertion) of this AssertionWrapper object.
+     * @return the saml1 (type Assertion) of this SamlAssertionWrapper object.
      */
     public org.opensaml.saml1.core.Assertion getSaml1() {
         return saml1;
     }
 
     /**
-     * Method getSaml2 returns the saml2 of this AssertionWrapper object.
+     * Method getSaml2 returns the saml2 of this SamlAssertionWrapper object.
      *
-     * @return the saml2 (type Assertion) of this AssertionWrapper object.
+     * @return the saml2 (type Assertion) of this SamlAssertionWrapper object.
      */
     public org.opensaml.saml2.core.Assertion getSaml2() {
         return saml2;
     }
 
     /**
-     * Method getXmlObject returns the xmlObject of this AssertionWrapper object.
+     * Method getXmlObject returns the xmlObject of this SamlAssertionWrapper object.
      *
-     * @return the xmlObject (type XMLObject) of this AssertionWrapper object.
+     * @return the xmlObject (type XMLObject) of this SamlAssertionWrapper object.
      */
     public XMLObject getXmlObject() {
         return xmlObject;
     }
 
     /**
-     * Method isCreated returns the created of this AssertionWrapper object.
+     * Method isCreated returns the created of this SamlAssertionWrapper object.
      *
-     * @return the created (type boolean) of this AssertionWrapper object.
+     * @return the created (type boolean) of this SamlAssertionWrapper object.
      */
     public boolean isCreated() {
         return saml1 != null || saml2 != null;
@@ -276,9 +276,9 @@ public class AssertionWrapper {
     }
 
     /**
-     * Method getId returns the id of this AssertionWrapper object.
+     * Method getId returns the id of this SamlAssertionWrapper object.
      *
-     * @return the id (type String) of this AssertionWrapper object.
+     * @return the id (type String) of this SamlAssertionWrapper object.
      */
     public String getId() {
         String id = null;
@@ -287,10 +287,10 @@ public class AssertionWrapper {
         } else if (saml1 != null) {
             id = saml1.getID();
         } else {
-            LOG.error("AssertionWrapper: unable to return ID - no saml assertion object");
+            LOG.error("SamlAssertionWrapper: unable to return ID - no saml assertion object");
         }
         if (id == null || id.length() == 0) {
-            LOG.error("AssertionWrapper: ID was null, seeting a new ID value");
+            LOG.error("SamlAssertionWrapper: ID was null, seeting a new ID value");
             id = IDGenerator.generateID("_");
             if (saml2 != null) {
                 saml2.setID(id);
@@ -302,9 +302,9 @@ public class AssertionWrapper {
     }
 
     /**
-     * Method getIssuerString returns the issuerString of this AssertionWrapper object.
+     * Method getIssuerString returns the issuerString of this SamlAssertionWrapper object.
      *
-     * @return the issuerString (type String) of this AssertionWrapper object.
+     * @return the issuerString (type String) of this SamlAssertionWrapper object.
      */
     public String getIssuerString() {
         if (saml2 != null && saml2.getIssuer() != null) {
@@ -313,7 +313,7 @@ public class AssertionWrapper {
             return saml1.getIssuer();
         }
         LOG.error(
-            "AssertionWrapper: unable to return Issuer string - no saml assertion "
+            "SamlAssertionWrapper: unable to return Issuer string - no saml assertion "
             + "object or issuer is null"
         );
         return null;
@@ -321,9 +321,9 @@ public class AssertionWrapper {
 
     /**
      * Method getConfirmationMethods returns the confirmationMethods of this 
-     * AssertionWrapper object.
+     * SamlAssertionWrapper object.
      *
-     * @return the confirmationMethods of this AssertionWrapper object.
+     * @return the confirmationMethods of this SamlAssertionWrapper object.
      */
     public List<String> getConfirmationMethods() {
         List<String> methods = new ArrayList<String>();
@@ -363,9 +363,9 @@ public class AssertionWrapper {
     }
 
     /**
-     * Method isSigned returns the signed of this AssertionWrapper object.
+     * Method isSigned returns the signed of this SamlAssertionWrapper object.
      *
-     * @return the signed (type boolean) of this AssertionWrapper object.
+     * @return the signed (type boolean) of this SamlAssertionWrapper object.
      */
     public boolean isSigned() {
         if (saml2 != null) {
@@ -377,9 +377,9 @@ public class AssertionWrapper {
     }
 
     /**
-     * Method setSignature sets the signature of this AssertionWrapper object.
+     * Method setSignature sets the signature of this SamlAssertionWrapper object.
      *
-     * @param signature the signature of this AssertionWrapper object.
+     * @param signature the signature of this SamlAssertionWrapper object.
      */
     public void setSignature(Signature signature) {
         if (xmlObject instanceof SignableSAMLObject) {
@@ -511,7 +511,7 @@ public class AssertionWrapper {
                 SAMLUtil.getCredentialDirectlyFromKeyInfo(keyInfo.getDOM(), sigCrypto);
             verifySignature(samlKeyInfo);
         } else {
-            LOG.debug("AssertionWrapper: no signature to validate");
+            LOG.debug("SamlAssertionWrapper: no signature to validate");
         }
 
     }
@@ -558,7 +558,7 @@ public class AssertionWrapper {
             }
             signatureKeyInfo = samlKeyInfo;
         } else {
-            LOG.debug("AssertionWrapper: no signature to validate");
+            LOG.debug("SamlAssertionWrapper: no signature to validate");
         }
     }
     
@@ -595,9 +595,9 @@ public class AssertionWrapper {
     
 
     /**
-     * Method getSamlVersion returns the samlVersion of this AssertionWrapper object.
+     * Method getSamlVersion returns the samlVersion of this SamlAssertionWrapper object.
      *
-     * @return the samlVersion (type SAMLVersion) of this AssertionWrapper object.
+     * @return the samlVersion (type SAMLVersion) of this SamlAssertionWrapper object.
      */
     public SAMLVersion getSamlVersion() {
         if (samlVersion == null) {
@@ -701,7 +701,7 @@ public class AssertionWrapper {
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
-                "AssertionWrapper: found unexpected type " 
+                "SamlAssertionWrapper: found unexpected type "
                 + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
             );
         }

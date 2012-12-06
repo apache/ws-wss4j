@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.dom.str;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.CustomTokenPrincipal;
 import org.apache.ws.security.dom.SAMLTokenPrincipal;
 import org.apache.ws.security.dom.WSConstants;
@@ -29,7 +30,6 @@ import org.apache.ws.security.dom.WSSecurityEngineResult;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.common.saml.SAMLUtil;
@@ -163,30 +163,30 @@ public class SignatureSTRParser implements STRParser {
                             strElement.getOwnerDocument(), wsDocInfo, 
                             data.getCallbackHandler(), uri, secRef.getReference().getValueType()
                         );
-                    AssertionWrapper assertion = null;
+                    SamlAssertionWrapper samlAssertion = null;
                     if (processedToken == null) {
                         List<WSSecurityEngineResult> samlResult =
                             proc.handleToken(token, data, wsDocInfo);
-                        assertion = 
-                            (AssertionWrapper)samlResult.get(0).get(
+                        samlAssertion =
+                            (SamlAssertionWrapper)samlResult.get(0).get(
                                 WSSecurityEngineResult.TAG_SAML_ASSERTION
                             );
                     } else {
-                        assertion = new AssertionWrapper(processedToken);
-                        assertion.parseHOKSubject(
+                        samlAssertion = new SamlAssertionWrapper(processedToken);
+                        samlAssertion.parseHOKSubject(
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                             data.getSigVerCrypto(), data.getCallbackHandler()
                         );
                     }
-                    STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+                    STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
                     
-                    SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+                    SAMLKeyInfo keyInfo = samlAssertion.getSubjectKeyInfo();
                     X509Certificate[] foundCerts = keyInfo.getCerts();
                     if (foundCerts != null && foundCerts.length > 0) {
                         certs = new X509Certificate[]{foundCerts[0]};
                     }
                     secretKey = keyInfo.getSecret();
-                    principal = createPrincipalFromSAML(assertion);
+                    principal = createPrincipalFromSAML(samlAssertion);
                 } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
                     STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
                     Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
@@ -283,19 +283,19 @@ public class SignatureSTRParser implements STRParser {
     
     /**
      * A method to create a Principal from a SAML Assertion
-     * @param assertion An AssertionWrapper object
+     * @param samlAssertion An SamlAssertionWrapper object
      * @return A principal
      */
     private Principal createPrincipalFromSAML(
-        AssertionWrapper assertion
+        SamlAssertionWrapper samlAssertion
     ) {
-        SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
+        SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(samlAssertion);
         String confirmMethod = null;
-        List<String> methods = assertion.getConfirmationMethods();
+        List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && assertion.isSigned()) {
+        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && samlAssertion.isSigned()) {
             trustedCredential = true;
         }
         return samlPrincipal;
@@ -348,14 +348,14 @@ public class SignatureSTRParser implements STRParser {
         String valueType = secRef.getKeyIdentifierValueType();
         secretKey = getSecretKeyFromToken(secRef.getKeyIdentifierValue(), valueType, data);
         if (secretKey == null) {
-            AssertionWrapper assertion = 
+            SamlAssertionWrapper samlAssertion =
                 STRParserUtil.getAssertionFromKeyIdentifier(
                     secRef, secRef.getElement(), data, wsDocInfo
                 );
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
             
             SAMLKeyInfo samlKi = 
-                SAMLUtil.getCredentialFromSubject(assertion,  
+                SAMLUtil.getCredentialFromSubject(samlAssertion,
                         new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                         data.getSigVerCrypto(), data.getCallbackHandler());
             X509Certificate[] foundCerts = samlKi.getCerts();
@@ -364,7 +364,7 @@ public class SignatureSTRParser implements STRParser {
             }
             secretKey = samlKi.getSecret();
             publicKey = samlKi.getPublicKey();
-            principal = createPrincipalFromSAML(assertion);
+            principal = createPrincipalFromSAML(samlAssertion);
         }
     }
     
@@ -520,11 +520,11 @@ public class SignatureSTRParser implements STRParser {
             principal = dkt.createPrincipal();
             ((WSDerivedKeyTokenPrincipal)principal).setSecret(secret);
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
-            AssertionWrapper assertion = 
-                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            STRParserUtil.checkSamlTokenBSPCompliance(secRef, assertion, data.getBSPEnforcer());
+            SamlAssertionWrapper samlAssertion =
+                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
             
-            SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+            SAMLKeyInfo keyInfo = samlAssertion.getSubjectKeyInfo();
             if (keyInfo == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
@@ -536,7 +536,7 @@ public class SignatureSTRParser implements STRParser {
             }
             secretKey = keyInfo.getSecret();
             publicKey = keyInfo.getPublicKey();
-            principal = createPrincipalFromSAML(assertion);
+            principal = createPrincipalFromSAML(samlAssertion);
         }
     }
     

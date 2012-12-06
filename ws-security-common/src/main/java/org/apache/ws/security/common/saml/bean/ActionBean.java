@@ -21,7 +21,7 @@ package org.apache.ws.security.common.saml.bean;
 
 
 /**
- * Class SamlAction represents the raw data required by the <code>AssertionWrapper</code> when
+ * Class SamlAction represents the raw data required by the <code>SamlAssertionWrapper</code> when
  * creating the <code>Action</code> element of the SAML Authorization Decision Statement.
  *
  * Created on May 19, 2009

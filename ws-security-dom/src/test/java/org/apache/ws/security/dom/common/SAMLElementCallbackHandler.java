@@ -25,7 +25,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 
 /**
  * A Callback Handler implementation for a SAML 1.1 assertion. Rather than create a set of beans
- * that AssertionWrapper will use to create a SAML Assertion, it sets a DOM Element directly on
+ * that SamlAssertionWrapper will use to create a SAML Assertion, it sets a DOM Element directly on
  * the SAMLCallback object.
  */
 public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
@@ -73,10 +73,10 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         
-        AssertionWrapper assertionWrapper = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
         
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        return assertionWrapper.toDOM(factory.newDocumentBuilder().newDocument());
+        return samlAssertionWrapper.toDOM(factory.newDocumentBuilder().newDocument());
     }
     
 }

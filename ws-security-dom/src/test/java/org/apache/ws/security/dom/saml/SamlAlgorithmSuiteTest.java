@@ -19,12 +19,9 @@
 
 package org.apache.ws.security.dom.saml;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.xml.namespace.QName;
-
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,7 +38,6 @@ import org.apache.ws.security.dom.common.SOAPUtil;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.message.WSSecHeader;
 import org.apache.ws.security.dom.message.WSSecSAMLToken;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -71,9 +67,9 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
+        samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -81,7 +77,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -115,9 +111,9 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion("wss40DSA", "security", dsaCrypto, false);
+        samlAssertion.signAssertion("wss40DSA", "security", dsaCrypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -125,7 +121,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -156,9 +152,9 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
-        assertion.signAssertion(
+        samlAssertion.signAssertion(
             "16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false,
             WSConstants.C14N_EXCL_WITH_COMMENTS, WSConstants.RSA_SHA1);
 
@@ -168,7 +164,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document signedDoc = wsSign.build(doc, assertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = 

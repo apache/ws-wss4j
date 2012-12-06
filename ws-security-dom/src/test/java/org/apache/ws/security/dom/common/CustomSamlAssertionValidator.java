@@ -20,7 +20,7 @@
 package org.apache.ws.security.dom.common;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.validate.Credential;
 import org.apache.ws.security.dom.validate.SamlAssertionValidator;
@@ -34,13 +34,13 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
         //
         // Do some custom validation on the assertion
         //
-        AssertionWrapper assertion = credential.getAssertion();
-        if (!"www.example.com".equals(assertion.getIssuerString())) {
+        SamlAssertionWrapper samlAssertion = credential.getSamlAssertion();
+        if (!"www.example.com".equals(samlAssertion.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        if (assertion.getSaml1() != null) {
+        if (samlAssertion.getSaml1() != null) {
             // Get the SAML subject and validate it
-            org.opensaml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
+            org.opensaml.saml1.core.Assertion saml1Assertion = samlAssertion.getSaml1();
             org.opensaml.saml1.core.Subject samlSubject = null;
             for (org.opensaml.saml1.core.Statement stmt : saml1Assertion.getStatements()) {
                 if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
@@ -71,7 +71,7 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         } else {
-            org.opensaml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
+            org.opensaml.saml2.core.Assertion saml2Assertion = samlAssertion.getSaml2();
             org.opensaml.saml2.core.Subject subject = saml2Assertion.getSubject();
             String nameIdentifier = subject.getNameID().getValue();
             if (nameIdentifier == null || !nameIdentifier.contains("uid=joe")) {

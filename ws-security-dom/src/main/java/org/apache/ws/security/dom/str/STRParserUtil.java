@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSDocInfo;
 import org.apache.ws.security.dom.WSSecurityEngine;
@@ -48,17 +48,17 @@ public final class STRParserUtil {
     }
     
     /**
-     * Get an AssertionWrapper object from parsing a SecurityTokenReference that uses
+     * Get an SamlAssertionWrapper object from parsing a SecurityTokenReference that uses
      * a KeyIdentifier that points to a SAML Assertion.
      * 
      * @param secRef the SecurityTokenReference to the SAML Assertion
      * @param strElement The SecurityTokenReference DOM element
      * @param request The RequestData instance used to obtain configuration
      * @param wsDocInfo The WSDocInfo object that holds previous results
-     * @return an AssertionWrapper object
+     * @return an SamlAssertionWrapper object
      * @throws WSSecurityException
      */
-    public static AssertionWrapper getAssertionFromKeyIdentifier(
+    public static SamlAssertionWrapper getAssertionFromKeyIdentifier(
         SecurityTokenReference secRef,
         Element strElement,
         RequestData request,
@@ -68,12 +68,12 @@ public final class STRParserUtil {
         String type = secRef.getKeyIdentifierValueType();
         WSSecurityEngineResult result = wsDocInfo.getResult(keyIdentifierValue);
 
-        AssertionWrapper assertion = null;
+        SamlAssertionWrapper samlAssertion = null;
         Element token = null;
         if (result != null) {
-            assertion = 
-                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            return assertion;
+            samlAssertion =
+                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            return samlAssertion;
         } else {
             token = 
                 secRef.findProcessedTokenElement(
@@ -87,7 +87,7 @@ public final class STRParserUtil {
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
                     );
                 }
-                return new AssertionWrapper(token);
+                return new SamlAssertionWrapper(token);
             }
             token = 
                 secRef.findUnprocessedTokenElement(
@@ -104,7 +104,7 @@ public final class STRParserUtil {
             List<WSSecurityEngineResult> samlResult =
                 proc.handleToken(token, request, wsDocInfo);
             return 
-                (AssertionWrapper)samlResult.get(0).get(
+                (SamlAssertionWrapper)samlResult.get(0).get(
                     WSSecurityEngineResult.TAG_SAML_ASSERTION
                 );
         }
@@ -179,23 +179,23 @@ public final class STRParserUtil {
      * Check that the SAML token referenced by the SecurityTokenReference argument 
      * is BSP compliant.
      * @param secRef The SecurityTokenReference to the SAML token
-     * @param assertion The SAML Token AssertionWrapper object
+     * @param samlAssertion The SAML Token SamlAssertionWrapper object
      * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
      */
     public static void checkSamlTokenBSPCompliance(
         SecurityTokenReference secRef,
-        AssertionWrapper assertion,
+        SamlAssertionWrapper samlAssertion,
         BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
         // Check the KeyIdentifier ValueType attributes
         if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
-            if (assertion.getSaml1() != null 
+            if (samlAssertion.getSaml1() != null
                 && !WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R6603);
             }
-            if (assertion.getSaml2() != null 
+            if (samlAssertion.getSaml2() != null
                 && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R6616);
             }
@@ -207,15 +207,15 @@ public final class STRParserUtil {
         
         // Check the TokenType attribute
         String tokenType = secRef.getTokenType();
-        if (assertion.getSaml1() != null && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
+        if (samlAssertion.getSaml1() != null && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
             bspEnforcer.handleBSPRule(BSPRule.R6611);
         }
-        if (assertion.getSaml2() != null && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
+        if (samlAssertion.getSaml2() != null && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
             bspEnforcer.handleBSPRule(BSPRule.R6617);
         }
         
         // Check the ValueType attribute of the Reference for SAML2
-        if (assertion.getSaml2() != null && secRef.containsReference()) {
+        if (samlAssertion.getSaml2() != null && secRef.containsReference()) {
             String valueType = secRef.getReference().getValueType();
             if (valueType != null && !"".equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R6614);

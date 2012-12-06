@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.Subject;
 
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.message.token.BinarySecurity;
 import org.apache.ws.security.dom.message.token.SecurityContextToken;
 import org.apache.ws.security.dom.message.token.Timestamp;
@@ -43,8 +43,8 @@ public class Credential {
     private Timestamp timestamp;
     private UsernameToken usernametoken;
     private BinarySecurity binarySecurityToken;
-    private AssertionWrapper assertion;
-    private AssertionWrapper transformedToken;
+    private SamlAssertionWrapper samlAssertion;
+    private SamlAssertionWrapper transformedToken;
     private SecurityContextToken securityContextToken;
     private Principal principal;
     private byte[] secretKey;
@@ -164,34 +164,34 @@ public class Credential {
     }
     
     /**
-     * Set an AssertionWrapper to be validated
-     * @param assertion an AssertionWrapper to be validated
+     * Set an SamlAssertionWrapper to be validated
+     * @param samlAssertion an SamlAssertionWrapper to be validated
      */
-    public void setAssertion(AssertionWrapper assertion) {
-        this.assertion = assertion;
+    public void setSamlAssertion(SamlAssertionWrapper samlAssertion) {
+        this.samlAssertion = samlAssertion;
     }
     
     /**
-     * Get an AssertionWrapper to be validated
-     * @return an AssertionWrapper to be validated
+     * Get an SamlAssertionWrapper to be validated
+     * @return an SamlAssertionWrapper to be validated
      */
-    public AssertionWrapper getAssertion() {
-        return assertion;
+    public SamlAssertionWrapper getSamlAssertion() {
+        return samlAssertion;
     }
     
     /**
-     * Set an AssertionWrapper instance which corresponds to a Transformed Token.
-     * @param transformedToken a transformed AssertionWrapper instance
+     * Set an SamlAssertionWrapper instance which corresponds to a Transformed Token.
+     * @param transformedToken a transformed SamlAssertionWrapper instance
      */
-    public void setTransformedToken(AssertionWrapper transformedToken) {
+    public void setTransformedToken(SamlAssertionWrapper transformedToken) {
         this.transformedToken = transformedToken;
     }
     
     /**
-     * Get an AssertionWrapper instance which corresponds to a Transformed Token.
-     * @return a transformed AssertionWrapper instance
+     * Get an SamlAssertionWrapper instance which corresponds to a Transformed Token.
+     * @return a transformed SamlAssertionWrapper instance
      */
-    public AssertionWrapper getTransformedToken() {
+    public SamlAssertionWrapper getTransformedToken() {
         return transformedToken;
     }
     

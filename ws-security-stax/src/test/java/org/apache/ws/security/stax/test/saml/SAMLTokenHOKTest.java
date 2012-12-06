@@ -22,7 +22,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.bean.KeyInfoBean;
@@ -468,10 +468,10 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             SAMLCallback samlCallback = new SAMLCallback();
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+            SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
             Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
-            assertion.signAssertion("transmitter", "default", crypto, false);
+            samlAssertion.signAssertion("transmitter", "default", crypto, false);
 
             WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -479,7 +479,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
-            Document securedDocument = wsSign.build(doc, assertion, secHeader);
+            Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -903,10 +903,10 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             SAMLCallback samlCallback = new SAMLCallback();
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+            SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
             Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
-            assertion.signAssertion("transmitter", "default", crypto, false);
+            samlAssertion.signAssertion("transmitter", "default", crypto, false);
 
             WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -914,7 +914,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
-            Document securedDocument = wsSign.build(doc, assertion, secHeader);
+            Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());

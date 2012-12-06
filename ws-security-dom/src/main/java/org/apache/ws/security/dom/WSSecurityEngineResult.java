@@ -19,7 +19,7 @@
 
 package org.apache.ws.security.dom;
 
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.message.token.BinarySecurity;
 import org.apache.ws.security.dom.message.token.SecurityContextToken;
 import org.apache.ws.security.dom.message.token.SignatureConfirmation;
@@ -47,7 +47,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     /**
      * Tag denoting the SAML Assertion found, if applicable.
      *
-     * The value under this tag is of type AssertionWrapper.
+     * The value under this tag is of type SamlAssertionWrapper.
      */
     public static final String TAG_SAML_ASSERTION = "saml-assertion";
     
@@ -95,13 +95,13 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     
     /**
      * Tag denoting a Transformed Token. For certain tokens, the Validator may return
-     * an AssertionWrapper instance which corresponds to a transformed version of the
+     * an SamlAssertionWrapper instance which corresponds to a transformed version of the
      * initial token. For example, a Username Token credential might be validated
      * by an STS and transformed into a SAML Assertion. This tag then holds the 
-     * transformed AssertionWrapper instance, as a component of the Result corresponding
+     * transformed SamlAssertionWrapper instance, as a component of the Result corresponding
      * to the Username Token.
      * 
-     * The value under this tag is of type AssertionWrapper.
+     * The value under this tag is of type SamlAssertionWrapper.
      */
     public static final String TAG_TRANSFORMED_TOKEN = "transformed-token";
     
@@ -235,7 +235,7 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     
     public WSSecurityEngineResult(
         int act, 
-        AssertionWrapper ass
+        SamlAssertionWrapper ass
     ) {
         put(TAG_ACTION, Integer.valueOf(act));
         put(TAG_SAML_ASSERTION, ass);

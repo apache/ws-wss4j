@@ -22,7 +22,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.crypto.Merlin;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -319,14 +319,14 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             SAMLCallback samlCallback = new SAMLCallback();
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+            SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
             Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
-            assertion.signAssertion("samlissuer", "default", issuerCrypto, false);
+            samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
 
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
-            Node assertionNode = assertion.toDOM(doc);
+            Node assertionNode = samlAssertion.toDOM(doc);
             secHeader.insertSecurityHeader(doc);
             secHeader.getSecurityHeader().appendChild(assertionNode);
 
@@ -336,7 +336,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
             builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-            builder.setCustomEKTokenId(assertion.getId());
+            builder.setCustomEKTokenId(samlAssertion.getId());
 
             Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
             builder.prepare(doc, userCrypto);
@@ -391,14 +391,14 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
              SAMLCallback samlCallback = new SAMLCallback();
              SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-             AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+             SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
              Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
-             assertion.signAssertion("samlissuer", "default", issuerCrypto, false);
+             samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
 
              Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
              WSSecHeader secHeader = new WSSecHeader();
-             Node assertionNode = assertion.toDOM(doc);
+             Node assertionNode = samlAssertion.toDOM(doc);
              secHeader.insertSecurityHeader(doc);
              secHeader.getSecurityHeader().appendChild(assertionNode);
 
@@ -408,7 +408,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
              builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
              builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-             builder.setCustomEKTokenId(assertion.getId());
+             builder.setCustomEKTokenId(samlAssertion.getId());
 
              Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
              builder.prepare(doc, userCrypto);
@@ -698,10 +698,10 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             SAMLCallback samlCallback = new SAMLCallback();
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+            SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
             Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
-            assertion.signAssertion("samlissuer", "default", issuerCrypto, false);
+            samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
 
             WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
             wsSign.setUserInfo("transmitter", "default");
@@ -713,7 +713,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             secHeader.insertSecurityHeader(doc);
 
             Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            Document securedDocument = wsSign.build(doc, userCrypto, assertion, null, null, null, secHeader);
+            Document securedDocument = wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());

@@ -22,7 +22,7 @@ package org.apache.ws.security.dom.validate;
 import java.util.List;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
 import org.apache.ws.security.dom.handler.RequestData;
@@ -32,8 +32,8 @@ import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.ValidatorSuite;
 
 /**
- * This class validates a SAML Assertion, which is wrapped in an "AssertionWrapper" instance.
- * It assumes that the AssertionWrapper instance has already verified the signature on the
+ * This class validates a SAML Assertion, which is wrapped in an "SamlAssertionWrapper" instance.
+ * It assumes that the SamlAssertionWrapper instance has already verified the signature on the
  * assertion (done by the SAMLTokenProcessor). It verifies trust in the signature, and also
  * checks that the Subject contains a KeyInfo (and processes it) for the holder-of-key case,
  * and verifies that the Assertion is signed as well for holder-of-key. 
@@ -58,7 +58,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     }
     
     /**
-     * Validate the credential argument. It must contain a non-null AssertionWrapper. 
+     * Validate the credential argument. It must contain a non-null SamlAssertionWrapper.
      * A Crypto and a CallbackHandler implementation is also required to be set.
      * 
      * @param credential the Credential to be validated
@@ -66,38 +66,38 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * @throws WSSecurityException on a failed validation
      */
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        if (credential == null || credential.getAssertion() == null) {
+        if (credential == null || credential.getSamlAssertion() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
-        AssertionWrapper assertion = credential.getAssertion();
+        SamlAssertionWrapper samlAssertion = credential.getSamlAssertion();
         
         // Check HOK requirements
         String confirmMethod = null;
-        List<String> methods = assertion.getConfirmationMethods();
+        List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
         if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
-            if (assertion.getSubjectKeyInfo() == null) {
+            if (samlAssertion.getSubjectKeyInfo() == null) {
                 LOG.debug("There is no Subject KeyInfo to match the holder-of-key subject conf method");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeyInSAMLToken");
             }
             // The assertion must have been signed for HOK
-            if (!assertion.isSigned()) {
+            if (!samlAssertion.isSigned()) {
                 LOG.debug("A holder-of-key assertion must be signed");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
         
         // Check conditions
-        checkConditions(assertion);
+        checkConditions(samlAssertion);
         
         // Validate the assertion against schemas/profiles
-        validateAssertion(assertion);
+        validateAssertion(samlAssertion);
 
         // Verify trust on the signature
-        if (assertion.isSigned()) {
-            verifySignedAssertion(assertion, data);
+        if (samlAssertion.isSigned()) {
+            verifySignedAssertion(samlAssertion, data);
         }
         return credential;
     }
@@ -105,17 +105,17 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     /**
      * Verify trust in the signature of a signed Assertion. This method is separate so that
      * the user can override if if they want.
-     * @param assertion The signed Assertion
+     * @param samlAssertion The signed Assertion
      * @param data The RequestData context
      * @return A Credential instance
      * @throws WSSecurityException
      */
     protected Credential verifySignedAssertion(
-        AssertionWrapper assertion,
+        SamlAssertionWrapper samlAssertion,
         RequestData data
     ) throws WSSecurityException {
         Credential trustCredential = new Credential();
-        SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
+        SAMLKeyInfo samlKeyInfo = samlAssertion.getSignatureKeyInfo();
         trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
         trustCredential.setCertificates(samlKeyInfo.getCerts());
         return super.validate(trustCredential, data);
@@ -124,17 +124,17 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     /**
      * Check the Conditions of the Assertion.
      */
-    protected void checkConditions(AssertionWrapper assertion) throws WSSecurityException {
+    protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         DateTime validFrom = null;
         DateTime validTill = null;
-        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
-            && assertion.getSaml2().getConditions() != null) {
-            validFrom = assertion.getSaml2().getConditions().getNotBefore();
-            validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
-            && assertion.getSaml1().getConditions() != null) {
-            validFrom = assertion.getSaml1().getConditions().getNotBefore();
-            validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+        if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && samlAssertion.getSaml2().getConditions() != null) {
+            validFrom = samlAssertion.getSaml2().getConditions().getNotBefore();
+            validTill = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
+        } else if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && samlAssertion.getSaml1().getConditions() != null) {
+            validFrom = samlAssertion.getSaml1().getConditions().getNotBefore();
+            validTill = samlAssertion.getSaml1().getConditions().getNotOnOrAfter();
         }
         
         if (validFrom != null) {
@@ -153,31 +153,31 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     }
     
     /**
-     * Validate the assertion against schemas/profiles
+     * Validate the samlAssertion against schemas/profiles
      */
-    protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
-        if (assertion.getSaml1() != null) {
+    protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
+        if (samlAssertion.getSaml1() != null) {
             ValidatorSuite schemaValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
             ValidatorSuite specValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
             try {
-                schemaValidators.validate(assertion.getSaml1());
-                specValidators.validate(assertion.getSaml1());
+                schemaValidators.validate(samlAssertion.getSaml1());
+                specValidators.validate(samlAssertion.getSaml1());
             } catch (ValidationException e) {
                 LOG.debug("Saml Validation error: " + e.getMessage(), e);
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
                 );
             }
-        } else if (assertion.getSaml2() != null) {
+        } else if (samlAssertion.getSaml2() != null) {
             ValidatorSuite schemaValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
             ValidatorSuite specValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
             try {
-                schemaValidators.validate(assertion.getSaml2());
-                specValidators.validate(assertion.getSaml2());
+                schemaValidators.validate(samlAssertion.getSaml2());
+                specValidators.validate(samlAssertion.getSaml2());
             } catch (ValidationException e) {
                 LOG.debug("Saml Validation error: " + e.getMessage(), e);
                 throw new WSSecurityException(

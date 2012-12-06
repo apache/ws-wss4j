@@ -24,7 +24,7 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.dom.handler.RequestData;
@@ -71,9 +71,9 @@ public class SAMLTokenSignedAction implements Action {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
 
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         if (samlCallback.isSignAssertion()) {
-            assertion.signAssertion(
+            samlAssertion.signAssertion(
                 samlCallback.getIssuerKeyName(),
                 samlCallback.getIssuerKeyPassword(), 
                 samlCallback.getIssuerCrypto(),
@@ -114,7 +114,7 @@ public class SAMLTokenSignedAction implements Action {
             wsSign.build(
                     doc,
                     crypto,
-                    assertion,
+                    samlAssertion,
                     samlCallback.getIssuerCrypto(),
                     samlCallback.getIssuerKeyName(),
                     samlCallback.getIssuerKeyPassword(),

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.WSConstants;
 import org.apache.ws.security.dom.WSSConfig;
 import org.apache.ws.security.dom.WSSecurityEngineResult;
@@ -37,7 +38,6 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.util.XMLUtils;
@@ -213,9 +213,9 @@ public class ValidatorTest extends org.junit.Assert {
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
         
-        AssertionWrapper assertion = 
-            (AssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
-        assertTrue(assertion != null);
+        SamlAssertionWrapper samlAssertion =
+            (SamlAssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
+        assertTrue(samlAssertion != null);
     }
     
     /**
@@ -296,9 +296,9 @@ public class ValidatorTest extends org.junit.Assert {
                 
                 SAMLCallback samlCallback = new SAMLCallback();
                 SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-                AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+                SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
     
-                credential.setTransformedToken(assertion);
+                credential.setTransformedToken(samlAssertion);
                 return credential;
             } catch (Exception ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);

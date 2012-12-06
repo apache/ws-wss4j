@@ -22,7 +22,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
@@ -82,15 +82,15 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
 
             SAMLCallback samlCallback = new SAMLCallback();
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-            AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+            SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader();
             secHeader.insertSecurityHeader(doc);
 
             SecurityTokenReference secRefSaml =
-                    createSamlSTR(doc, assertion, WSSConfig.getNewInstance());
-            Element samlTokenElement = assertion.toDOM(doc);
+                    createSamlSTR(doc, samlAssertion, WSSConfig.getNewInstance());
+            Element samlTokenElement = samlAssertion.toDOM(doc);
             Element secRefElement = secRefSaml.getElement();
             secHeader.getSecurityHeader().appendChild(samlTokenElement);
             secHeader.getSecurityHeader().appendChild(secRefElement);
@@ -153,7 +153,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
      */
     private SecurityTokenReference createSamlSTR(
             Document doc,
-            AssertionWrapper assertion,
+            SamlAssertionWrapper samlAssertion,
             WSSConfig wssConfig
     ) {
         SecurityTokenReference secRefSaml = new SecurityTokenReference(doc);
@@ -162,7 +162,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
 
         org.apache.ws.security.dom.message.token.Reference ref =
                 new org.apache.ws.security.dom.message.token.Reference(doc);
-        ref.setURI("#" + assertion.getId());
+        ref.setURI("#" + samlAssertion.getId());
         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
         secRefSaml.setReference(ref);

@@ -33,7 +33,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoFactory;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.AssertionWrapper;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.common.util.XMLUtils;
@@ -132,7 +132,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -140,7 +140,7 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -151,9 +151,9 @@ public class PrincipalTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -173,7 +173,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -181,7 +181,7 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -192,9 +192,9 @@ public class PrincipalTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(unsignedDoc, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -215,7 +215,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -223,7 +223,7 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -235,9 +235,9 @@ public class PrincipalTest extends org.junit.Assert {
             verify(unsignedDoc, new DummyValidator(), WSSecurityEngine.SAML_TOKEN, null);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        AssertionWrapper receivedAssertion = 
-            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedAssertion != null);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
         
         Principal principal = 
             (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -329,9 +329,9 @@ public class PrincipalTest extends org.junit.Assert {
                 
                 SAMLCallback samlCallback = new SAMLCallback();
                 SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-                AssertionWrapper assertion = new AssertionWrapper(samlCallback);
+                SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
     
-                credential.setTransformedToken(assertion);
+                credential.setTransformedToken(samlAssertion);
                 return credential;
             } catch (Exception ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
