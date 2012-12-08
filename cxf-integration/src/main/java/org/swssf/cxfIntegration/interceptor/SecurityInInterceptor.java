@@ -22,8 +22,10 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 
+import org.apache.cxf.phase.Phase;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.InboundWSSec;
@@ -83,6 +85,23 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
             final List<SecurityEvent> requestSecurityEvents = (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
             newXmlStreamReader = inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
+
+            //workaround: CXF seems not to call xmlstreamReader.close() which is essential to complete
+            //security processing. So we add another interceptor which does it.
+            AbstractSoapInterceptor abstractSoapInterceptor = new AbstractSoapInterceptor(Phase.PRE_INVOKE) {
+
+                @Override
+                public void handleMessage(SoapMessage message) throws Fault {
+                    XMLStreamReader xmlStreamReader = message.getContent(XMLStreamReader.class);
+                    try {
+                        xmlStreamReader.close();
+                    } catch (XMLStreamException e) {
+                        throw new SoapFault("unexpected service error", SoapFault.FAULT_CODE_SERVER);
+                    }
+                }
+            };
+            abstractSoapInterceptor.addBefore(ServiceInvokerInterceptor.class.getName());
+            soapMessage.getInterceptorChain().add(abstractSoapInterceptor);
 
             //Warning: The exceptions which can occur here are not security relevant exceptions but configuration-errors.
             //To catch security relevant exceptions you have to catch them e.g.in the FaultOutInterceptor.
