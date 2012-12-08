@@ -117,6 +117,9 @@ public final class STRTransformUtil {
             );
         }
         String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
+        if (prefix == null) {
+            prefix = WSConstants.WSSE_PREFIX;
+        }
         Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix + ":BinarySecurityToken");
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
