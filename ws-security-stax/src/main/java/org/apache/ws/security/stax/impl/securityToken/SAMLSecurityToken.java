@@ -55,25 +55,6 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
         this.subjectSecurityToken = subjectSecurityToken;
     }
 
-    public SAMLSecurityToken(SAMLVersion samlVersion, Key secretKey, PublicKey publicKey,
-                             X509Certificate[] x509Certificates, String issuer,
-                             WSSecurityContext wsSecurityContext, Crypto crypto,
-                             String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, id, keyIdentifierType);
-        this.samlVersion = samlVersion;
-        this.issuer = issuer;
-        this.crypto = crypto;
-        if (secretKey != null) {
-            setSecretKey("", secretKey);
-        }
-        if (publicKey != null) {
-            setPublicKey(publicKey);
-        }
-        if (x509Certificates != null) {
-            setX509Certificates(x509Certificates);
-        }
-    }
-
     @Override
     public boolean isAsymmetric() throws XMLSecurityException {
         if (this.subjectSecurityToken != null && this.subjectSecurityToken.isAsymmetric()) {

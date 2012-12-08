@@ -29,6 +29,7 @@ import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLUtil;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
+import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.ws.security.stax.securityEvent.SamlTokenSecurityEvent;
@@ -46,6 +47,10 @@ import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.XMLSecurityEventReader;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.security.SAMLSignatureProfileValidator;
@@ -67,13 +72,14 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
 import java.security.Key;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.*;
 
 /**
  * Processor for the SAML Assertion XML Structure
@@ -86,8 +92,13 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
     private static final transient Log log = LogFactory.getLog(SAMLTokenInputHandler.class);
     private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
+    private static final List<QName> saml1TokenPath = new ArrayList<QName>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> saml2TokenPath = new ArrayList<QName>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+
     static {
         documentBuilderFactory.setNamespaceAware(true);
+        saml1TokenPath.add(WSSConstants.TAG_saml_Assertion);
+        saml2TokenPath.add(WSSConstants.TAG_saml2_Assertion);
     }
 
     /**
@@ -260,6 +271,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         samlTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
         samlTokenSecurityEvent.setCorrelationID(samlAssertionWrapper.getId());
         inputProcessorChain.getSecurityContext().registerSecurityEvent(samlTokenSecurityEvent);
+
+        SAMLTokenVerifierInputProcessor samlTokenVerifierInputProcessor =
+                new SAMLTokenVerifierInputProcessor(securityProperties, samlAssertionWrapper, securityTokenProvider, subjectSecurityToken);
+        inputProcessorChain.getSecurityContext().addSecurityEventListener(samlTokenVerifierInputProcessor);
+        inputProcessorChain.addProcessor(samlTokenVerifierInputProcessor);
     }
 
     private int getSubjectKeyInfoIndex(Deque<XMLSecEvent> eventQueue) {
@@ -612,6 +628,192 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e, "Saml Validation error: "
                 );
             }
+        }
+    }
+
+    /**
+     * Processor to check the holder-of-key or sender-vouches requirements against the received assertion
+     * which can not be done until the whole soap-header is processed and we now that the whole soap-body
+     * is signed.
+     */
+    class SAMLTokenVerifierInputProcessor extends AbstractInputProcessor implements SecurityEventListener {
+
+        private SamlAssertionWrapper samlAssertionWrapper;
+        private SecurityTokenProvider securityTokenProvider;
+        private SecurityToken subjectSecurityToken;
+        private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<SignedElementSecurityEvent>();
+        private SignedElementSecurityEvent bodySignedElementSecurityEvent;
+
+        SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, SamlAssertionWrapper samlAssertionWrapper,
+                                        SecurityTokenProvider securityTokenProvider, SecurityToken subjectSecurityToken) {
+            super(securityProperties);
+            this.setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
+            this.addAfterProcessor(OperationInputProcessor.class.getName());
+            this.samlAssertionWrapper = samlAssertionWrapper;
+            this.securityTokenProvider = securityTokenProvider;
+            this.subjectSecurityToken = subjectSecurityToken;
+        }
+
+        @Override
+        public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+            if (securityEvent.getSecurityEventType() == SecurityEventConstants.SignedElement) {
+                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent)securityEvent;
+
+                List<QName> elementPath = signedElementSecurityEvent.getElementPath();
+                if (elementPath.equals(WSSConstants.SOAP_11_BODY_PATH)) {
+                    bodySignedElementSecurityEvent = signedElementSecurityEvent;
+                } else if (elementPath.equals(saml2TokenPath) || elementPath.equals(saml1TokenPath)) {
+                    samlTokenSignedElementSecurityEvents.add(signedElementSecurityEvent);
+                }
+            }
+        }
+
+        @Override
+        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+            return inputProcessorChain.processHeaderEvent();
+        }
+
+        @Override
+        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
+            XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
+            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+                List<QName> elementPath = xmlSecStartElement.getElementPath();
+                if (elementPath.size() == 3 && WSSUtils.isInSOAPBody(elementPath)) {
+                    inputProcessorChain.removeProcessor(this);
+                    checkPossessionOfKey(inputProcessorChain, samlAssertionWrapper, subjectSecurityToken);
+                }
+            }
+            return xmlSecEvent;
+        }
+
+        private void checkPossessionOfKey(
+                InputProcessorChain inputProcessorChain, SamlAssertionWrapper samlAssertionWrapper,
+                SecurityToken subjectSecurityToken) throws WSSecurityException {
+
+            try {
+                SecurityToken httpsSecurityToken = getHttpsSecurityToken(inputProcessorChain);
+
+                List<SecurityTokenProvider> securityTokenProviders =
+                        inputProcessorChain.getSecurityContext().getRegisteredSecurityTokenProviders();
+
+                List<String> confirmationMethods = samlAssertionWrapper.getConfirmationMethods();
+                for (int i = 0; i < confirmationMethods.size(); i++) {
+                    String confirmationMethod = confirmationMethods.get(i);
+                    if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
+
+                        X509Certificate[] subjectCertificates = subjectSecurityToken.getX509Certificates();
+                        PublicKey subjectPublicKey = subjectSecurityToken.getPublicKey();
+                        Key subjectSecretKey = null;
+                        Map<String, Key> subjectKeyMap = subjectSecurityToken.getSecretKey();
+                        if (subjectKeyMap.size() > 0) {
+                            subjectSecretKey = subjectKeyMap.values().toArray(new Key[subjectKeyMap.size()])[0];
+                        }
+
+                        /**
+                         * Check the holder-of-key requirements against the received assertion. The subject
+                         * credential of the SAML Assertion must have been used to sign some portion of
+                         * the message, thus showing proof-of-possession of the private/secret key. Alternatively,
+                         * the subject credential of the SAML Assertion must match a client certificate credential
+                         * when 2-way TLS is used.
+                         */
+
+                        //compare https token first:
+                        if (httpsSecurityToken != null
+                                && httpsSecurityToken.getX509Certificates() != null
+                                && httpsSecurityToken.getX509Certificates().length > 0) {
+
+                            X509Certificate httpsCertificate = httpsSecurityToken.getX509Certificates()[0];
+
+                            //compare certificates:
+                            if (subjectCertificates != null && subjectCertificates.length > 0
+                                    && httpsCertificate.equals(subjectCertificates[0])) {
+                                    return;
+                                //compare public keys:
+                            } else if (httpsCertificate.getPublicKey().equals(subjectPublicKey)) {
+                                    return;
+                            }
+                        } else {
+                            for (int j = 0; j < securityTokenProviders.size(); j++) {
+                                SecurityTokenProvider securityTokenProvider = securityTokenProviders.get(j);
+                                SecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                                if (securityToken == httpsSecurityToken) {
+                                    continue;
+                                }
+                                X509Certificate[] x509Certificates = securityToken.getX509Certificates();
+                                PublicKey publicKey = securityToken.getPublicKey();
+                                Map<String, Key> keyMap = securityToken.getSecretKey();
+                                if (x509Certificates != null && x509Certificates.length > 0
+                                        && subjectCertificates != null && subjectCertificates.length > 0 &&
+                                        subjectCertificates[0].equals(x509Certificates[0])) {
+                                        return;
+                                }
+                                if (publicKey != null && publicKey.equals(subjectPublicKey)) {
+                                    return;
+                                }
+                                 Iterator<Map.Entry<String,Key>> iterator = keyMap.entrySet().iterator();
+                                 while(iterator.hasNext()){
+                                     Map.Entry<String,Key> next = iterator.next();
+                                     if (next.getValue().equals(subjectSecretKey)) {
+                                         return;
+                                     }
+                                 }
+                            }
+                        }
+                    }
+                    else if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
+                        /**
+                         * Check the sender-vouches requirements against the received assertion. The SAML
+                         * Assertion and the SOAP Body must be signed by the same signature.
+                         */
+
+                        //
+                        // If we have a 2-way TLS connection, then we don't have to check that the
+                        // assertion + SOAP body are signed
+                        if (httpsSecurityToken != null
+                                && httpsSecurityToken.getX509Certificates() != null
+                                && httpsSecurityToken.getX509Certificates().length > 0) {
+                            return;
+                        }
+
+                        SignedElementSecurityEvent samlTokenSignedElementSecurityEvent = null;
+                        for (int j = 0; j < samlTokenSignedElementSecurityEvents.size(); j++) {
+                            SignedElementSecurityEvent signedElementSecurityEvent = samlTokenSignedElementSecurityEvents.get(j);
+                            if (((SecurityToken)securityTokenProvider.getSecurityToken()).getXMLSecEvent() ==
+                                    signedElementSecurityEvent.getXmlSecEvent()) {
+
+                                samlTokenSignedElementSecurityEvent = signedElementSecurityEvent;
+                            }
+                        }
+                        if (bodySignedElementSecurityEvent != null &&
+                                samlTokenSignedElementSecurityEvent != null &&
+                                bodySignedElementSecurityEvent.getSecurityToken() ==
+                                        samlTokenSignedElementSecurityEvent.getSecurityToken()) {
+                            return;
+                        }
+                    }
+                }
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
+                    "empty", "SAML proof-of-possession of the private/secret key failed");
+        }
+
+        private SecurityToken getHttpsSecurityToken(InputProcessorChain inputProcessorChain) throws XMLSecurityException {
+            List<SecurityTokenProvider> securityTokenProviders =
+                    inputProcessorChain.getSecurityContext().getRegisteredSecurityTokenProviders();
+            for (int i = 0; i < securityTokenProviders.size(); i++) {
+                SecurityTokenProvider securityTokenProvider = securityTokenProviders.get(i);
+                SecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                if (securityToken.getTokenType() == WSSConstants.HttpsToken) {
+                    return securityToken;
+                }
+            }
+            return null;
         }
     }
 }

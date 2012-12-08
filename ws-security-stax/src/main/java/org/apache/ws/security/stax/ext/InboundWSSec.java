@@ -28,13 +28,17 @@ import org.apache.ws.security.stax.impl.processor.input.SignatureConfirmationInp
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessor;
+import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.ext.SecurityTokenProvider;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.InputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
 import org.apache.xml.security.stax.impl.processor.input.LogInputProcessor;
 import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -133,10 +137,36 @@ public class InboundWSSec {
                 Iterator<SecurityEvent> securityEventIterator = requestSecurityEvents.iterator();
                 while (securityEventIterator.hasNext()) {
                     SecurityEvent securityEvent = securityEventIterator.next();
-                    if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
-                        securityContextImpl.registerSecurityEvent(securityEvent);
-                        securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
-                        break;
+                    if (securityEvent instanceof TokenSecurityEvent) {
+                        final TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent)securityEvent;
+
+                        if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
+                            securityContextImpl.registerSecurityEvent(securityEvent);
+                            securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
+                        }
+
+                        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+
+                            private String id;
+
+                            @SuppressWarnings("unchecked")
+                            @Override
+                            public SecurityToken getSecurityToken() throws XMLSecurityException {
+                                return tokenSecurityEvent.getSecurityToken();
+                            }
+
+                            @Override
+                            public String getId() {
+                                if (this.id == null) {
+                                    this.id = tokenSecurityEvent.getSecurityToken().getId();
+                                    if (this.id == null) {
+                                        this.id = IDGenerator.generateID(null);
+                                    }
+                                }
+                                return this.id;
+                            }
+                        };
+                        securityContextImpl.registerSecurityTokenProvider(securityTokenProvider.getId(), securityTokenProvider);
                     }
                 }
             } catch (XMLSecurityException e) {

@@ -18,11 +18,14 @@
  */
 package org.apache.ws.security.stax.test.saml;
 
+import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.saml.builder.SAML1Constants;
 import org.apache.ws.security.common.saml.builder.SAML2Constants;
 import org.apache.ws.security.dom.handler.WSHandlerConstants;
 import org.apache.ws.security.stax.WSSec;
 import org.apache.ws.security.stax.ext.*;
+import org.apache.ws.security.stax.impl.securityToken.HttpsSecurityToken;
+import org.apache.ws.security.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.test.AbstractTestBase;
 import org.apache.ws.security.stax.test.CallbackHandlerImpl;
 import org.apache.ws.security.stax.test.utils.StAX2DOM;
@@ -43,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -311,6 +315,60 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+        }
+    }
+
+    @Test
+    public void testSAMLAssertionSVTransportSecurityInbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+            callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setResource("http://resource.org");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        //done signature; now test sig-verification:
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+
+            HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+            httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("transmitter");
+            HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(
+                    securityProperties.getSignatureVerificationCrypto().getX509Certificates(cryptoType)[0], null);
+            httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+            List<SecurityEvent> requestSecurityEvents = new ArrayList<SecurityEvent>();
+            requestSecurityEvents.add(httpsTokenSecurityEvent);
+
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())),
+                    requestSecurityEvents, null);
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
 

@@ -32,6 +32,7 @@ import org.apache.xml.security.binding.xmldsig.TransformType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
@@ -180,14 +181,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     @Override
     protected InternalSignatureReferenceVerifier getSignatureReferenceVerifier(
             XMLSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
-            ReferenceType referenceType, QName startElement) throws XMLSecurityException {
+            ReferenceType referenceType, XMLSecStartElement startElement) throws XMLSecurityException {
         return new InternalSignatureReferenceVerifier((WSSSecurityProperties) securityProperties,
-                inputProcessorChain, referenceType,
-                startElement);
+                inputProcessorChain, referenceType, startElement);
     }
 
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
-        TimestampSecurityEvent timestampSecurityEvent = inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
+        TimestampSecurityEvent timestampSecurityEvent =
+                inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
         if (timestampSecurityEvent != null) {
             final String cacheKey = String.valueOf(
                     timestampSecurityEvent.getCreated().getTimeInMillis()) +
@@ -285,7 +286,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
             //todo analyse and fix me: the following statement could be problematic
             inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
-            internalSignatureReferenceVerifier.setStartElement(securityTokenReference.getXmlSecEvents().getLast().asStartElement().getName());
+            XMLSecStartElement xmlSecStartElement = securityTokenReference.getXmlSecEvents().getLast().asStartElement();
+            internalSignatureReferenceVerifier.setStartElement(xmlSecStartElement);
             Iterator<XMLSecEvent> xmlSecEventIterator = securityTokenReference.getXmlSecEvents().descendingIterator();
             try {
                 while (xmlSecEventIterator.hasNext()) {
@@ -301,8 +303,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     class InternalSignatureReferenceVerifier extends AbstractSignatureReferenceVerifyInputProcessor.InternalSignatureReferenceVerifier {
 
         InternalSignatureReferenceVerifier(WSSSecurityProperties securityProperties, InputProcessorChain inputProcessorChain,
-                                           ReferenceType referenceType, QName startElementName) throws XMLSecurityException {
-            super(securityProperties, inputProcessorChain, referenceType, startElementName);
+                                           ReferenceType referenceType, XMLSecStartElement startElement) throws XMLSecurityException {
+            super(securityProperties, inputProcessorChain, referenceType, startElement);
             this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
         }
 
