@@ -34,7 +34,7 @@
     <name>Streaming WS Security CXF Integration</name>
 
     <properties>
-        <cxf.version>2.6.2</cxf.version>
+        <cxf.version>2.6.3</cxf.version>
         <spring.version>3.0.7.RELEASE</spring.version>
     </properties>
 
