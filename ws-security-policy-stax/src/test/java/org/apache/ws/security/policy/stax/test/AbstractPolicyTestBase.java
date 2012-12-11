@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.policy.stax.test;
 
+import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.ws.security.common.crypto.WSProviderConfig;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.SAMLCallback;
@@ -49,6 +50,8 @@ import java.io.InputStreamReader;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -62,16 +65,25 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
     }
 
-    protected PolicyEnforcer buildAndStartPolicyEngine(String policyString) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
+    protected PolicyEnforcer buildAndStartPolicyEngine(String policyString)
+            throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         return this.buildAndStartPolicyEngine(policyString, false);
     }
 
-    protected PolicyEnforcer buildAndStartPolicyEngine(String policyString, boolean replacePolicyElement) throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
+    protected PolicyEnforcer buildAndStartPolicyEngine(String policyString, boolean replacePolicyElement)
+            throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
+        return buildAndStartPolicyEngine(policyString, replacePolicyElement, null);
+    }
+
+    protected PolicyEnforcer buildAndStartPolicyEngine(
+            String policyString, boolean replacePolicyElement, List<AssertionBuilder> customAssertionBuilders)
+            throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setValidating(false);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse(this.getClass().getClassLoader().getResourceAsStream("testdata/wsdl/wsdl-template.wsdl"));
+        Document document = documentBuilder.parse(
+                this.getClass().getClassLoader().getResourceAsStream("testdata/wsdl/wsdl-template.wsdl"));
         NodeList nodeList = document.getElementsByTagNameNS("*", SPConstants.P_LOCALNAME);
 
         Document policyDocument = documentBuilder.parse(new ByteArrayInputStream(policyString.getBytes("UTF-8")));
@@ -82,7 +94,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         } else {
             element.appendChild(policyNode);
         }
-        PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(document);
+        PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(document, customAssertionBuilders);
         PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("");
 
         return policyEnforcer;

@@ -35,135 +35,140 @@ import java.util.*;
  */
 public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
-    public enum AlgorithmSuiteType {
-        Basic256(
+    protected static final Map<String, AlgorithmSuiteType> algorithmSuiteTypes = new HashMap<String, AlgorithmSuiteType>();
+
+    static {
+        algorithmSuiteTypes.put("Basic256", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 256, 1024, 4096),
-        Basic192(
+                256, 192, 256, 256, 1024, 4096));
+        algorithmSuiteTypes.put("Basic192", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic128(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic128", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 128, 1024, 4096),
-        TripleDes(
+                128, 128, 128, 128, 1024, 4096));
+        algorithmSuiteTypes.put("TripleDes", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic256Rsa15(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic256Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 256, 1024, 4096),
-        Basic192Rsa15(
+                256, 192, 256, 256, 1024, 4096));
+        algorithmSuiteTypes.put("Basic192Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic128Rsa15(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic128Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 128, 1024, 4096),
-        TripleDesRsa15(
+                128, 128, 128, 128, 1024, 4096));
+        algorithmSuiteTypes.put("TripleDesRsa15", new AlgorithmSuiteType(
                 SPConstants.SHA1,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic256Sha256(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic256Sha256", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 256, 256, 256, 1024, 4096),
-        Basic192Sha256(
+                256, 256, 256, 256, 1024, 4096));
+        algorithmSuiteTypes.put("Basic192Sha256", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic128Sha256(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic128Sha256", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 128, 1024, 4096),
-        TripleDesSha256(
+                128, 128, 128, 128, 1024, 4096));
+        algorithmSuiteTypes.put("TripleDesSha256", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic256Sha256Rsa15(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic256Sha256Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 256, 1024, 4096),
-        Basic192Sha256Rsa15(
+                256, 192, 256, 256, 1024, 4096));
+        algorithmSuiteTypes.put("Basic192Sha256Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096),
-        Basic128Sha256Rsa15(
+                192, 192, 192, 192, 1024, 4096));
+        algorithmSuiteTypes.put("Basic128Sha256Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 192, 1024, 4096),
-        TripleDesSha256Rsa15(
+                128, 128, 128, 192, 1024, 4096));
+        algorithmSuiteTypes.put("TripleDesSha256Rsa15", new AlgorithmSuiteType(
                 SPConstants.SHA256,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 192, 1024, 4096);
+                192, 192, 192, 192, 1024, 4096));
+    }
+
+    public static final class AlgorithmSuiteType {
 
         private String digest;
         private String encryption;
@@ -178,18 +183,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private int minimumAsymmetricKeyLength;
         private int maximumAsymmetricKeyLength;
 
-        private static final Map<String, AlgorithmSuiteType> lookup = new HashMap<String, AlgorithmSuiteType>();
-
-        static {
-            for (AlgorithmSuiteType u : EnumSet.allOf(AlgorithmSuiteType.class))
-                lookup.put(u.name(), u);
-        }
-
-        public static AlgorithmSuiteType lookUp(String name) {
-            return lookup.get(name);
-        }
-
-        AlgorithmSuiteType(String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
+        public AlgorithmSuiteType(String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
                            String encryptionKeyDerivation, String signatureKeyDerivation, int encryptionDerivedKeyLength,
                            int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
                            int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength, int maximumAsymmetricKeyLength) {
@@ -416,7 +410,12 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             for (int i = 0; i < assertions.size(); i++) {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
-                AlgorithmSuiteType algorithmSuiteType = AlgorithmSuiteType.lookUp(assertionName);
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (!getVersion().getNamespace().equals(assertionNamespace)) {
+                    parseCustomAssertion(assertion);
+                    continue;
+                }
+                AlgorithmSuiteType algorithmSuiteType = algorithmSuiteTypes.get(assertionName);
                 if (algorithmSuiteType != null) {
                     if (algorithmSuite.getAlgorithmSuiteType() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
@@ -458,6 +457,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 }
             }
         }
+    }
+
+    protected void parseCustomAssertion(Assertion assertion) {
     }
 
     public AlgorithmSuiteType getAlgorithmSuiteType() {

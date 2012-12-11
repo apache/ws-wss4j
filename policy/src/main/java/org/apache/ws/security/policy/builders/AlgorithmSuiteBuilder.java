@@ -22,10 +22,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.ws.security.policy.SP11Constants;
-import org.apache.ws.security.policy.SP13Constants;
-import org.apache.ws.security.policy.SPConstants;
-import org.apache.ws.security.policy.SPUtils;
+import org.apache.ws.security.policy.*;
 import org.apache.ws.security.policy.model.AlgorithmSuite;
 import org.w3c.dom.Element;
 
@@ -46,7 +43,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
             throw new IllegalArgumentException("sp:AlgorithmSuite must have an inner wsp:Policy element");
         }
         final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
-        AlgorithmSuite algorithmSuite = new AlgorithmSuite(
+        AlgorithmSuite algorithmSuite = createAlgorithmSuite(
                 spVersion,
                 nestedPolicy
         );
@@ -58,5 +55,9 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
     @Override
     public QName[] getKnownElements() {
         return new QName[]{SP13Constants.ALGORITHM_SUITE, SP11Constants.ALGORITHM_SUITE};
+    }
+
+    protected AlgorithmSuite createAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
+        return new AlgorithmSuite(version, nestedPolicy);
     }
 }

@@ -20,9 +20,12 @@ package org.apache.ws.security.policy.stax;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyBuilder;
+import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.ws.security.policy.WSSPolicyException;
+import org.apache.ws.security.policy.builders.*;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,22 +53,83 @@ public class PolicyEnforcerFactory {
 
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcerFactory.class);
 
+    private final List<AssertionBuilder> assertionBuilders;
+
     private Definition wsdlDefinition;
     private List<OperationPolicy> operationPolicies;
     private final Map<Element, Policy> elementPolicyCache;
 
-    private PolicyEnforcerFactory() {
+    private PolicyEnforcerFactory(List<AssertionBuilder> customAssertionBuilders) {
         elementPolicyCache = new HashMap<Element, Policy>();
+
+        assertionBuilders = new ArrayList<AssertionBuilder>();
+        assertionBuilders.add(new AlgorithmSuiteBuilder());
+        assertionBuilders.add(new AsymmetricBindingBuilder());
+        assertionBuilders.add(new ContentEncryptedElementsBuilder());
+        assertionBuilders.add(new EncryptedElementsBuilder());
+        assertionBuilders.add(new EncryptedPartsBuilder());
+        assertionBuilders.add(new EncryptionTokenBuilder());
+        assertionBuilders.add(new HttpsTokenBuilder());
+        assertionBuilders.add(new InitiatorEncryptionTokenBuilder());
+        assertionBuilders.add(new InitiatorSignatureTokenBuilder());
+        assertionBuilders.add(new InitiatorTokenBuilder());
+        assertionBuilders.add(new IssuedTokenBuilder());
+        assertionBuilders.add(new KerberosTokenBuilder());
+        assertionBuilders.add(new KeyValueTokenBuilder());
+        assertionBuilders.add(new LayoutBuilder());
+        assertionBuilders.add(new ProtectionTokenBuilder());
+        assertionBuilders.add(new RecipientEncryptionTokenBuilder());
+        assertionBuilders.add(new RecipientSignatureTokenBuilder());
+        assertionBuilders.add(new RecipientTokenBuilder());
+        assertionBuilders.add(new RelTokenBuilder());
+        assertionBuilders.add(new RequiredElementsBuilder());
+        assertionBuilders.add(new RequiredPartsBuilder());
+        assertionBuilders.add(new SamlTokenBuilder());
+        assertionBuilders.add(new SecureConversationTokenBuilder());
+        assertionBuilders.add(new SecurityContextTokenBuilder());
+        assertionBuilders.add(new SignatureTokenBuilder());
+        assertionBuilders.add(new SignedElementsBuilder());
+        assertionBuilders.add(new SignedPartsBuilder());
+        assertionBuilders.add(new SpnegoContextTokenBuilder());
+        assertionBuilders.add(new SupportingTokensBuilder());
+        assertionBuilders.add(new SymmetricBindingBuilder());
+        assertionBuilders.add(new TransportBindingBuilder());
+        assertionBuilders.add(new TransportTokenBuilder());
+        assertionBuilders.add(new Trust10Builder());
+        assertionBuilders.add(new Trust13Builder());
+        assertionBuilders.add(new UsernameTokenBuilder());
+        assertionBuilders.add(new WSS10Builder());
+        assertionBuilders.add(new WSS11Builder());
+        assertionBuilders.add(new X509TokenBuilder());
+
+        if (customAssertionBuilders != null) {
+            for (int i = 0; i < customAssertionBuilders.size(); i++) {
+                AssertionBuilder customAssertionBuilder = customAssertionBuilders.get(i);
+                assertionBuilders.add(customAssertionBuilder);
+            }
+        }
     }
 
     public static PolicyEnforcerFactory newInstance(URL wsdlUrl) throws WSSPolicyException {
-        PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory();
+        return newInstance(wsdlUrl, null);
+    }
+
+    public static PolicyEnforcerFactory newInstance(URL wsdlUrl, List<AssertionBuilder> customAssertionBuilders)
+            throws WSSPolicyException {
+
+        PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory(customAssertionBuilders);
         policyEnforcerFactory.parseWsdl(wsdlUrl);
         return policyEnforcerFactory;
     }
 
     public static PolicyEnforcerFactory newInstance(Document document) throws WSSPolicyException {
-        PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory();
+        return newInstance(document, null);
+    }
+
+    public static PolicyEnforcerFactory newInstance(Document document, List<AssertionBuilder> customAssertionBuilders)
+            throws WSSPolicyException {
+
+        PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory(customAssertionBuilders);
         policyEnforcerFactory.parseWsdl(document);
         return policyEnforcerFactory;
     }
@@ -291,9 +355,17 @@ public class PolicyEnforcerFactory {
             return elementPolicyCache.get(element);
         }
         PolicyBuilder policyBuilder = new PolicyBuilder();
+        registerDefaultBuilders(policyBuilder.getAssertionBuilderFactory());
         Policy policy = policyBuilder.getPolicy(element);
         elementPolicyCache.put(element, policy);
         return policy;
+    }
+
+    private void registerDefaultBuilders(AssertionBuilderFactory assertionBuilderFactory) {
+        for (int i = 0; i < assertionBuilders.size(); i++) {
+            AssertionBuilder assertionBuilder = assertionBuilders.get(i);
+            assertionBuilderFactory.registerBuilder(assertionBuilder);
+        }
     }
 
     public PolicyEnforcer newPolicyEnforcer(String soapAction) throws WSSPolicyException {

@@ -20,6 +20,7 @@ package org.apache.ws.security.policy.tests;
 
 import org.apache.neethi.*;
 import org.apache.ws.security.policy.SP12Constants;
+import org.apache.ws.security.policy.SPConstants;
 import org.apache.ws.security.policy.model.AlgorithmSuite;
 
 import java.util.Iterator;
@@ -52,7 +53,7 @@ public class AlgorithmSuiteTest extends AbstractTestBase {
             assertTrue(algorithmSuite.isOptional());
             assertEquals(Constants.TYPE_ASSERTION, algorithmSuite.getType());
             assertEquals(SP12Constants.ALGORITHM_SUITE, algorithmSuite.getName());
-            assertEquals(AlgorithmSuite.AlgorithmSuiteType.TripleDesSha256Rsa15, algorithmSuite.getAlgorithmSuiteType());
+            assertEquals(algorithmSuite.getAlgorithmSuiteType().getEncryption(), SPConstants.TRIPLE_DES);
             assertEquals(AlgorithmSuite.C14NType.InclusiveC14N, algorithmSuite.getC14n());
             assertEquals(AlgorithmSuite.SOAPNormType.SOAPNormalization10, algorithmSuite.getSoapNormType());
             assertEquals(AlgorithmSuite.STRType.STRTransform10, algorithmSuite.getStrType());
@@ -89,7 +90,7 @@ public class AlgorithmSuiteTest extends AbstractTestBase {
         assertFalse(algorithmSuite.isOptional());
         assertEquals(Constants.TYPE_ASSERTION, algorithmSuite.getType());
         assertEquals(SP12Constants.ALGORITHM_SUITE, algorithmSuite.getName());
-        assertEquals(AlgorithmSuite.AlgorithmSuiteType.TripleDesSha256Rsa15, algorithmSuite.getAlgorithmSuiteType());
+        assertEquals(algorithmSuite.getAlgorithmSuiteType().getEncryption(), SPConstants.TRIPLE_DES);
         assertEquals(AlgorithmSuite.C14NType.InclusiveC14N, algorithmSuite.getC14n());
         assertEquals(AlgorithmSuite.SOAPNormType.SOAPNormalization10, algorithmSuite.getSoapNormType());
         assertEquals(AlgorithmSuite.STRType.STRTransform10, algorithmSuite.getStrType());

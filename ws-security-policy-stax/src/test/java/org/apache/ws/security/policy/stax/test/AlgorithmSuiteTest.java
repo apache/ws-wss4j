@@ -18,7 +18,14 @@
  */
 package org.apache.ws.security.policy.stax.test;
 
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.policy.SPConstants;
+import org.apache.ws.security.policy.builders.AlgorithmSuiteBuilder;
+import org.apache.ws.security.policy.model.AbstractSecurityAssertion;
+import org.apache.ws.security.policy.model.AlgorithmSuite;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
 import org.apache.ws.security.policy.stax.PolicyViolationException;
 import org.apache.ws.security.stax.ext.WSSConstants;
@@ -28,6 +35,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author $Author$
@@ -174,6 +183,99 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                     "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes128-cbc does not meet policy\n" +
                     "Symmetric encryption algorithm key length 128 does not meet policy");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+        }
+    }
+
+    @Test
+    public void testAES256GCMAlgorithmSuitePolicy() throws Exception {
+        String policyString =
+                "<sp:AlgorithmSuite xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "<cxf:Basic256GCM xmlns:cxf=\"http://cxf.apache.org/custom/security-policy\"/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:AlgorithmSuite>";
+
+        class GCMAlgorithmSuite extends AlgorithmSuite {
+
+            GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
+                super(version, nestedPolicy);
+            }
+
+            @Override
+            protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+                return new GCMAlgorithmSuite(getVersion(), nestedPolicy);
+            }
+
+            @Override
+            protected void parseCustomAssertion(Assertion assertion) {
+                String assertionName = assertion.getName().getLocalPart();
+                String assertionNamespace = assertion.getName().getNamespaceURI();
+                if (!"http://cxf.apache.org/custom/security-policy".equals(assertionNamespace)) {
+                    return;
+                }
+
+                if ("Basic128GCM".equals(assertionName)) {
+                    setAlgorithmSuiteType(new AlgorithmSuiteType(
+                            SPConstants.SHA1,
+                            WSSConstants.NS_XENC11_AES128_GCM,
+                            SPConstants.KW_AES128,
+                            SPConstants.KW_RSA_OAEP,
+                            SPConstants.P_SHA1_L128,
+                            SPConstants.P_SHA1_L128,
+                            128, 128, 128, 256, 1024, 4096
+                    ));
+                } else if ("Basic192GCM".equals(assertionName)) {
+                    setAlgorithmSuiteType(new AlgorithmSuiteType(SPConstants.SHA1,
+                            WSSConstants.NS_XENC11_AES192_GCM,
+                            SPConstants.KW_AES192,
+                            SPConstants.KW_RSA_OAEP,
+                            SPConstants.P_SHA1_L192,
+                            SPConstants.P_SHA1_L192,
+                            192, 192, 192, 256, 1024, 4096));
+                } else if ("Basic256GCM".equals(assertionName)) {
+                    setAlgorithmSuiteType(new AlgorithmSuiteType(
+                            SPConstants.SHA1,
+                            WSSConstants.NS_XENC11_AES256_GCM,
+                            SPConstants.KW_AES256,
+                            SPConstants.KW_RSA_OAEP,
+                            SPConstants.P_SHA1_L256,
+                            SPConstants.P_SHA1_L192,
+                            256, 192, 256, 256, 1024, 4096));
+                }
+            }
+        }
+
+        class GCMAlgorithmSuiteBuilder extends AlgorithmSuiteBuilder {
+            @Override
+            protected AlgorithmSuite createAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
+                return new GCMAlgorithmSuite(version, nestedPolicy);
+            }
+        }
+
+        List<AssertionBuilder> customAssertionBuilders = new ArrayList<AssertionBuilder>();
+        customAssertionBuilders.add(new GCMAlgorithmSuiteBuilder());
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString, false, customAssertionBuilders);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
+        algorithmSuiteSecurityEvent.setAlgorithmURI(WSSConstants.NS_XENC11_AES256_GCM);
+        algorithmSuiteSecurityEvent.setKeyLength(256);
+        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
+
+        algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
+        algorithmSuiteSecurityEvent.setAlgorithmURI(WSSConstants.NS_XENC_AES256);
+        algorithmSuiteSecurityEvent.setKeyLength(256);
+        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+
+        try {
+            policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
+            Assert.fail("Exception expected");
+        } catch (Exception e) {
+            Assert.assertEquals(e.getCause().getMessage(), "Encryption algorithm http://www.w3.org/2001/04/xmlenc#aes256-cbc does not meet policy");
         }
     }
 }

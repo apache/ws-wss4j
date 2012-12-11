@@ -29,8 +29,10 @@ import javax.xml.stream.XMLStreamWriter;
 
 import junit.framework.TestCase;
 
+import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyBuilder;
+import org.apache.ws.security.policy.builders.*;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -73,7 +75,49 @@ public abstract class AbstractTestBase extends TestCase {
     }
 
     protected Policy loadPolicy(String policy) throws Exception {
-        return loadPolicy(policy, new PolicyBuilder());
+        PolicyBuilder policyBuilder = new PolicyBuilder();
+
+        AssertionBuilderFactory assertionBuilderFactory = policyBuilder.getAssertionBuilderFactory();
+        assertionBuilderFactory.registerBuilder(new AlgorithmSuiteBuilder());
+        assertionBuilderFactory.registerBuilder(new AsymmetricBindingBuilder());
+        assertionBuilderFactory.registerBuilder(new ContentEncryptedElementsBuilder());
+        assertionBuilderFactory.registerBuilder(new EncryptedElementsBuilder());
+        assertionBuilderFactory.registerBuilder(new EncryptedPartsBuilder());
+        assertionBuilderFactory.registerBuilder(new EncryptionTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new HttpsTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new InitiatorEncryptionTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new InitiatorSignatureTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new InitiatorTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new IssuedTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new KerberosTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new KeyValueTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new LayoutBuilder());
+        assertionBuilderFactory.registerBuilder(new ProtectionTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new RecipientEncryptionTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new RecipientSignatureTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new RecipientTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new RelTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new RequiredElementsBuilder());
+        assertionBuilderFactory.registerBuilder(new RequiredPartsBuilder());
+        assertionBuilderFactory.registerBuilder(new SamlTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new SecureConversationTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new SecurityContextTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new SignatureTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new SignedElementsBuilder());
+        assertionBuilderFactory.registerBuilder(new SignedPartsBuilder());
+        assertionBuilderFactory.registerBuilder(new SpnegoContextTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new SupportingTokensBuilder());
+        assertionBuilderFactory.registerBuilder(new SymmetricBindingBuilder());
+        assertionBuilderFactory.registerBuilder(new TransportBindingBuilder());
+        assertionBuilderFactory.registerBuilder(new TransportTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new Trust10Builder());
+        assertionBuilderFactory.registerBuilder(new Trust13Builder());
+        assertionBuilderFactory.registerBuilder(new UsernameTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new WSS10Builder());
+        assertionBuilderFactory.registerBuilder(new WSS11Builder());
+        assertionBuilderFactory.registerBuilder(new X509TokenBuilder());
+
+        return loadPolicy(policy, policyBuilder);
     }
     
     protected Policy loadPolicy(String policy, PolicyBuilder policyBuilder) throws Exception {
