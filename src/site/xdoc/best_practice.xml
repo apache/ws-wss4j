@@ -41,7 +41,7 @@ and enforce this decision. For WS-SecurityPolicy, this means to avoid using any 
 that ends with "Rsa15" (e.g. "Basic128Rsa15"). For the direct configuration case, you should
 explicitly configure WSHandlerConstants.ENC_KEY_TRANSPORT ("encryptionKeyTransportAlgorithm")
 to be "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p". This latter point requires the
-web services stack to set this property on the Request (is it known that Apache CXF does this).
+web services stack to set this property on the Request (it is known that Apache CXF does this).
 </p>
 </subsection>
 <subsection name="Avoid using a cbc Symmetric Encryption Algorithm">
@@ -70,7 +70,7 @@ approach), you should specify a signature algorithm to use on the receiving side
 can be done via WSHandlerConstants.SIG_ALGO ("signatureAlgorithm"). Setting this property
 to (e.g.) "http://www.w3.org/2000/09/xmldsig#rsa-sha1" will ensure that the signature
 algorithm allowed is RSA-SHA1 and not (e.g.) HMAC-SHA1. This latter point requires the
-web services stack to set this property on the Request (is it known that Apache CXF does 
+web services stack to set this property on the Request (it is known that Apache CXF does 
 this). See also the previous point about setting the key encryption transport algorithm.
 </p>
 </subsection>
