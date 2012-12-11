@@ -20,6 +20,7 @@ package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -40,17 +41,15 @@ import java.security.cert.X509Certificate;
  */
 public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
-    private final SAMLVersion samlVersion;
+    private final SamlAssertionWrapper samlAssertionWrapper;
     private SecurityToken subjectSecurityToken;
-    private String issuer;
     private Crypto crypto;
 
-    public SAMLSecurityToken(SAMLVersion samlVersion, SecurityToken subjectSecurityToken, String issuer,
+    public SAMLSecurityToken(SamlAssertionWrapper samlAssertionWrapper, SecurityToken subjectSecurityToken,
                              WSSecurityContext wsSecurityContext, Crypto crypto,
                              String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
         super(wsSecurityContext, id, keyIdentifierType);
-        this.samlVersion = samlVersion;
-        this.issuer = issuer;
+        this.samlAssertionWrapper = samlAssertionWrapper;
         this.crypto = crypto;
         this.subjectSecurityToken = subjectSecurityToken;
     }
@@ -121,19 +120,23 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
     @Override
     public XMLSecurityConstants.TokenType getTokenType() {
-        if (samlVersion == SAMLVersion.VERSION_10) {
+        if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_10) {
             return WSSConstants.Saml10Token;
-        } else if (samlVersion == SAMLVersion.VERSION_11) {
+        } else if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             return WSSConstants.Saml11Token;
         }
         return WSSConstants.Saml20Token;
     }
 
     public SAMLVersion getSamlVersion() {
-        return samlVersion;
+        return samlAssertionWrapper.getSamlVersion();
     }
 
     public String getIssuer() {
-        return issuer;
+        return samlAssertionWrapper.getIssuerString();
+    }
+
+    public SamlAssertionWrapper getSamlAssertionWrapper() {
+        return samlAssertionWrapper;
     }
 }

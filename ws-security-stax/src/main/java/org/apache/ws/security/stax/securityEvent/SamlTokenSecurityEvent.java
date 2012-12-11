@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.securityEvent;
 
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 
@@ -31,12 +32,16 @@ public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent {
         super(WSSecurityEventConstants.SamlToken);
     }
 
+    @Override
+    public String getIssuerName() {
+        return ((SAMLSecurityToken) getSecurityToken()).getIssuer();
+    }
+
     public SAMLVersion getSamlVersion() {
         return ((SAMLSecurityToken) getSecurityToken()).getSamlVersion();
     }
 
-    @Override
-    public String getIssuerName() {
-        return ((SAMLSecurityToken) getSecurityToken()).getIssuer();
+    public SamlAssertionWrapper getSamlAssertionWrapper() {
+        return ((SAMLSecurityToken) getSecurityToken()).getSamlAssertionWrapper();
     }
 }

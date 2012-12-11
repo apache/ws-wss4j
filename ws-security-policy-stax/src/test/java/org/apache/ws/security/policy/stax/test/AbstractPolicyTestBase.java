@@ -19,6 +19,9 @@
 package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.common.crypto.WSProviderConfig;
+import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.policy.SPConstants;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
@@ -29,6 +32,7 @@ import org.apache.ws.security.stax.impl.securityToken.X509SecurityToken;
 import org.apache.ws.security.stax.test.AbstractTestBase;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
+import org.opensaml.common.SAMLVersion;
 import org.testng.annotations.BeforeClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -127,5 +131,9 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             stringBuilder.append(buffer, 0, read);
         }
         return stringBuilder.toString();
+    }
+
+    public static SamlAssertionWrapper createSamlAssertionWrapper(SAMLCallback samlCallback) throws WSSecurityException {
+        return new SamlAssertionWrapper(samlCallback);
     }
 }

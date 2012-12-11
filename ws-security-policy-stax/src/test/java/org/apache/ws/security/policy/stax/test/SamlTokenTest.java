@@ -18,6 +18,9 @@
  */
 package org.apache.ws.security.policy.stax.test;
 
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
@@ -77,14 +80,22 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("xs:anyURI");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent initiatorTokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
@@ -141,14 +152,25 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("xs:anyURI");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent initiatorTokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
+        samlCallback.setIssuer("xs:otherURI");
+        samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:otherURI", null, null, "1", null);
+        securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);

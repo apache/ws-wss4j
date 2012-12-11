@@ -19,6 +19,9 @@
 package org.apache.ws.security.policy.stax.test;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.SAMLCallback;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.policy.WSSPolicyException;
 import org.opensaml.common.SAMLVersion;
 import org.apache.ws.security.policy.stax.PolicyEnforcer;
@@ -1163,14 +1166,21 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("CN=transmitter,OU=swssf,C=CH");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
+        securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1196,14 +1206,21 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("xs:anyURI");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1233,14 +1250,24 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("CN=transmitter,OU=swssf,C=CH");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
+        samlCallback.setIssuer("xs:anyURI");
+        samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
@@ -1266,14 +1293,24 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("xs:anyURI");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         SamlTokenSecurityEvent tokenSecurityEvent = new SamlTokenSecurityEvent();
-        SecurityToken securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "CN=transmitter,OU=swssf,C=CH", null, null, "1", null);
+        SecurityToken securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
+        samlCallback.setIssuer("CN=transmitter,OU=swssf,C=CH");
+        samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
+
         tokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = new SAMLSecurityToken(SAMLVersion.VERSION_20, null, "xs:anyURI", null, null, "1", null);
+        securityToken = new SAMLSecurityToken(samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", null);
         securityToken.addTokenUsage(SecurityToken.TokenUsage.SupportingTokens);
         tokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);

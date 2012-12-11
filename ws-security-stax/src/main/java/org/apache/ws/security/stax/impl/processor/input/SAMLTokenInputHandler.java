@@ -248,8 +248,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     return this.securityToken;
                 }
 
-                this.securityToken = new SAMLSecurityToken(samlAssertionWrapper.getSamlVersion(), subjectSecurityToken,
-                        samlAssertionWrapper.getIssuerString(),
+                this.securityToken = new SAMLSecurityToken(samlAssertionWrapper, subjectSecurityToken,
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(),
                         ((WSSSecurityProperties) securityProperties).getSignatureVerificationCrypto(),
                         samlAssertionWrapper.getId(), null);

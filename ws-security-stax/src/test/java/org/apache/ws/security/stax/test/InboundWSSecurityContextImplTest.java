@@ -19,7 +19,10 @@
 package org.apache.ws.security.stax.test;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
+import org.apache.ws.security.common.saml.SAMLCallback;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
+import org.apache.ws.security.common.saml.bean.SubjectBean;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.impl.InboundWSSecurityContextImpl;
@@ -508,8 +511,15 @@ public class InboundWSSecurityContextImplTest {
 
         XMLSecEvent samlTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setIssuer("xs:anyURI");
+        SubjectBean subjectBean = new SubjectBean();
+        samlCallback.setSubject(subjectBean);
+        SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
+
         SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(
-                SAMLVersion.VERSION_20, getX509Token(WSSConstants.X509V3Token), null, null, null, "1", WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
         samlSecurityToken.setElementPath(samlTokenPath);
         samlSecurityToken.setXMLSecEvent(samlTokenXmlEvent);
         samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);

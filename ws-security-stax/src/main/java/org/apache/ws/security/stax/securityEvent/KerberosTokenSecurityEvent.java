@@ -20,13 +20,12 @@ package org.apache.ws.security.stax.securityEvent;
 
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.impl.securityToken.KerberosServiceSecurityToken;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
+public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     private String issuerName;
 
@@ -60,5 +59,9 @@ public class KerberosTokenSecurityEvent extends TokenSecurityEvent {
             return true;
         }
         return false;
+    }
+
+    public String getKerberosTokenValueType() {
+        return ((KerberosServiceSecurityToken)getSecurityToken()).getKerberosTokenValueType();
     }
 }
