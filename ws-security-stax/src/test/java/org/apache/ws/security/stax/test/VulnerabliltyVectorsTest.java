@@ -569,4 +569,49 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             changeValueOfMaximumAllowedDecompressedBytes(oldval);
         }
     }
+
+    @Test
+    public void testModifiedEncryptedKeyCipherValue() throws Exception {
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+        String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+        Properties properties = new Properties();
+        properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        NodeList cipherValues = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_CipherValue.getNamespaceURI(), WSSConstants.TAG_xenc_CipherValue.getLocalPart());
+        Element cipherValueElement = (Element)cipherValues.item(0);
+        Assert.assertEquals(cipherValueElement.getParentNode().getParentNode().getLocalName(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+
+        String cipherValue = cipherValueElement.getTextContent();
+        StringBuilder stringBuilder = new StringBuilder(cipherValue);
+        int index = stringBuilder.length() / 2;
+        char ch = stringBuilder.charAt(index);
+        if (ch != 'A') {
+            ch = 'A';
+        } else {
+            ch = 'B';
+        }
+        stringBuilder.setCharAt(index, ch);
+        cipherValueElement.setTextContent(stringBuilder.toString());
+
+        javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+
+        WSSSecurityProperties inboundsecurityProperties = new WSSSecurityProperties();
+        inboundsecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inboundsecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        try {
+            Document document = doInboundSecurity(inboundsecurityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertFalse(e.getMessage().contains("data hash wrong"));
+        }
+    }
 }
