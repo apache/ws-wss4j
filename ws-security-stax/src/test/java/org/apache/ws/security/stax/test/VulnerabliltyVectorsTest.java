@@ -614,4 +614,43 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertFalse(e.getMessage().contains("data hash wrong"));
         }
     }
+
+    /**
+     * Test if the RSA 1.5 key transport algorithm will be rejected by default.
+     * Standard key transport algorithm is RSA-OAEP
+     */
+    @Test
+    public void testDisallowRSA15Algorithm() throws Exception {
+        WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
+        outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outboundSecurityProperties.setEncryptionUser("receiver");
+        outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outboundSecurityProperties.setSignatureUser("transmitter");
+        outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outboundSecurityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outboundSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inboundsecurityProperties = new WSSSecurityProperties();
+        inboundsecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inboundsecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
+
+        try {
+            Document document = doInboundSecurity(inboundsecurityProperties,
+                    xmlInputFactory.createXMLStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "The use of RSAv1.5 key transport algorithm is discouraged. " +
+                            "Nonetheless can it be enabled via the \"AllowRSA15KeyTransportAlgorithm\" property in the configuration.");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
+        }
+    }
 }

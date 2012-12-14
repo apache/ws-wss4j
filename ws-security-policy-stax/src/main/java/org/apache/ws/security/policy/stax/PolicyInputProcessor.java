@@ -51,6 +51,8 @@ import java.util.List;
 public class PolicyInputProcessor extends AbstractInputProcessor {
 
     private final PolicyEnforcer policyEnforcer;
+    private boolean initDone = false;
+    private boolean transportSecurityActive = false;
 
     public PolicyInputProcessor(PolicyEnforcer policyEnforcer, XMLSecurityProperties securityProperties) {
         super(securityProperties);
@@ -63,7 +65,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
         XMLSecEvent xmlSecEvent = inputProcessorChain.processHeaderEvent();
         //test if non encrypted element have to be encrypted per policy
-        boolean transportSecurityActive = Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
+        init(inputProcessorChain);
         //if transport security is active, every element is encrypted/signed
         //WSP1.3, 4.2.1 EncryptedParts Assertion
         List<QName> elementPath = null;
@@ -130,7 +132,6 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 break;
         }
 
-        boolean transportSecurityActive = Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
         //if transport security is active, every element is encrypted/signed
         //WSP1.3, 4.2.1 EncryptedParts Assertion
         //test if non encrypted element have to be encrypted per policy
@@ -217,6 +218,14 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 contentEncryptedElementSecurityEvent.setElementPath(xmlSecEvent.getElementPath());
                 policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
                 break;
+        }
+    }
+
+    protected void init(InputProcessorChain inputProcessorChain) {
+        if (!this.initDone) {
+            this.initDone = true;
+            this.transportSecurityActive = Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
+            inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
         }
     }
 }

@@ -27,12 +27,9 @@ import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.ws.security.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.*;
 
 import javax.xml.namespace.QName;
 import java.util.*;
@@ -46,6 +43,7 @@ import java.util.*;
 public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     private static final transient Log logger = LogFactory.getLog(WSSecurityContextImpl.class);
+    private static final Boolean allowRSA15KeyTransportAlgorithm = Boolean.valueOf(ConfigurationProperties.getProperty("AllowRSA15KeyTransportAlgorithm"));
 
     private final Deque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
@@ -99,6 +97,15 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 
     @Override
     protected void forwardSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+
+        if (!allowRSA15KeyTransportAlgorithm && SecurityEventConstants.AlgorithmSuite.equals(securityEvent.getSecurityEventType())) {
+            AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = (AlgorithmSuiteSecurityEvent)securityEvent;
+            Boolean allowRSA15 = get(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM);
+            if ((allowRSA15 == null || !allowRSA15) && WSSConstants.NS_XENC_RSA15.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM);
+            }
+        }
+
         try {
             super.forwardSecurityEvent(securityEvent);
         } catch (WSSecurityException e) {

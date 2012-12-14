@@ -78,6 +78,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
                     @Override
                     protected void handleSecurityToken(SecurityToken securityToken) throws XMLSecurityException {
+                        //todo element path?
                         //we have to emit a TokenSecurityEvent here too since it could be an embedded token
                         securityToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
                         TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, signatureType.getId());

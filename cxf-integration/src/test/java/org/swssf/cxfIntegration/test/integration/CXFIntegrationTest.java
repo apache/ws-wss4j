@@ -79,6 +79,7 @@ public class CXFIntegrationTest {
             wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
             client.getOutInterceptors().add(wss4JOutInterceptor);
 
             WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
@@ -103,6 +104,7 @@ public class CXFIntegrationTest {
             wss4JOutInterceptor.setProperty(WSHandlerConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
             wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
+            wss4JOutInterceptor.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
             client.getOutInterceptors().add(wss4JOutInterceptor);
 
             WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
