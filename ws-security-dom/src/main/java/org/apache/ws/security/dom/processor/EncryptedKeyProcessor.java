@@ -165,9 +165,9 @@ public class EncryptedKeyProcessor implements Processor {
                     );
             }
             if (oaepParameterSpec == null) {
-                cipher.init(Cipher.DECRYPT_MODE, privateKey);
+                cipher.init(Cipher.UNWRAP_MODE, privateKey);
             } else {
-                cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParameterSpec);
+                cipher.init(Cipher.UNWRAP_MODE, privateKey, oaepParameterSpec);
             }
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
@@ -179,7 +179,8 @@ public class EncryptedKeyProcessor implements Processor {
         byte[] decryptedBytes = null;
         try {
             encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
-            decryptedBytes = cipher.doFinal(encryptedEphemeralKey);
+            String keyAlgorithm = JCEMapper.translateURItoJCEID(encryptedKeyTransportMethod);
+            decryptedBytes = cipher.unwrap(encryptedEphemeralKey, keyAlgorithm, Cipher.SECRET_KEY).getEncoded();
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         } catch (Exception ex) {
