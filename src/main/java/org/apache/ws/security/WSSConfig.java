@@ -425,7 +425,7 @@ public class WSSConfig {
     }
     
     public static void addXMLDSigRIInternal() {
-        addJceProvider("ApacheXMLDSig", "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        addJceProvider("ApacheXMLDSig", SantuarioUtil.getSantuarioProvider());
     }
 
     /**
