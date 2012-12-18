@@ -123,7 +123,7 @@ public final class WSProviderConfig {
     }
     
     private static void addXMLDSigRIInternal() {
-        addJceProvider("ApacheXMLDSig", "org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        addJceProvider("ApacheXMLDSig", SantuarioUtil.getSantuarioProvider());
     }
 
     private static void initializeResourceBundles() {

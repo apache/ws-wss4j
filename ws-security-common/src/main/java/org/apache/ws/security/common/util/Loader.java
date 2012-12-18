@@ -51,21 +51,37 @@ public class Loader {
      * @return TODO
      */
     public static URL getResource(String resource) {
-        ClassLoader classLoader = null;
         URL url = null;
         try {
-            classLoader = getTCL();
+            ClassLoader classLoader = getTCL();
             if (classLoader != null) {
                 log.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
                 url = classLoader.getResource(resource);
+                if (url == null && resource.startsWith("/")) {
+                    //certain classloaders need it without the leading /
+                    url = classLoader.getResource(resource.substring(1));
+                }
                 if (url != null) {
                     return url;
-                }
+                } 
             }
         } catch (Throwable t) {
             log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", t);
         }
-
+    
+        ClassLoader cluClassloader = Loader.class.getClassLoader();
+        if (cluClassloader == null) {
+            cluClassloader = ClassLoader.getSystemClassLoader();
+        }
+        url = cluClassloader.getResource(resource);
+        if (url == null && resource.startsWith("/")) {
+            //certain classloaders need it without the leading /
+            url = cluClassloader.getResource(resource.substring(1));
+        }
+        if (url != null) {
+            return url;
+        }
+        
         // Last ditch attempt: get the resource from the class path. It
         // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
@@ -98,6 +114,10 @@ public class Loader {
             if (loader != null) {
                 log.debug("Trying to find [" + resource + "] using " + loader + " class loader.");
                 url = loader.getResource(resource);
+                if (url == null && resource.startsWith("/")) {
+                    //certain classloaders need it without the leading /
+                    url = loader.getResource(resource.substring(1));
+                }
                 if (url != null) {
                     return url;
                 }
@@ -240,9 +260,25 @@ public class Loader {
                 log.debug(e.getMessage(), e);
             }
         }
-        // we reached here because tcl was null or because of a
-        // security exception, or because clazz could not be loaded...
-        // In any case we now try one more time
-        return Class.forName(clazz);
+
+        return loadClass2(clazz, null);
+    }
+    
+    private static Class<?> loadClass2(String className, Class<?> callingClass)
+        throws ClassNotFoundException {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException ex) {
+            try {
+                if (Loader.class.getClassLoader() != null) {
+                    return Loader.class.getClassLoader().loadClass(className);
+                }
+            } catch (ClassNotFoundException exc) {
+                if (callingClass != null && callingClass.getClassLoader() != null) {
+                    return callingClass.getClassLoader().loadClass(className);
+                }
+            }
+            throw ex;
+        }
     }
 }
