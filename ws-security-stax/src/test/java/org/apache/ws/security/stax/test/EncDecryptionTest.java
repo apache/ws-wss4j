@@ -145,10 +145,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -713,9 +713,9 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new org.apache.ws.security.stax.test.CallbackHandlerImpl());
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.EncryptedPart,
                     WSSecurityEventConstants.Operation,
             };
@@ -1471,10 +1471,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);

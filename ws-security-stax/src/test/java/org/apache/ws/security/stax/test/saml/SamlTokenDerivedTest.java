@@ -118,18 +118,18 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] securityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
             };

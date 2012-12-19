@@ -25,7 +25,7 @@
                     <wsp12:Policy>
                         <sp:AlgorithmSuite>
                             <wsp12:Policy>
-                                <sp:Basic256Rsa15/>
+                                <sp:Basic256/>
                             </wsp12:Policy>
                         </sp:AlgorithmSuite>
                         <sp:IncludeTimestamp/>

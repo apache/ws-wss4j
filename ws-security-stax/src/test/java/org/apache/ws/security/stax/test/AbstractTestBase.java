@@ -754,4 +754,12 @@ public abstract class AbstractTestBase {
         field.set(null, value);
         return oldval;
     }
+
+    public static Double getJavaSpecificationVersion() {
+        String jsv = System.getProperty("java.specification.version");
+        if (jsv != null) {
+            return Double.parseDouble(jsv);
+        }
+        return 0.0d;
+    }
 }

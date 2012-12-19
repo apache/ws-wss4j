@@ -54,6 +54,13 @@ public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
     @Override
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
 
+        if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.AlgorithmSuite) {
+            //do not cache AlgorithmSuite securityEvents and forward them directly to allow
+            //the user to check them before they are used internally.
+            forwardSecurityEvent(securityEvent);
+            return;
+        }
+
         if (operationSecurityEventOccured) {
             if (!this.messageEncryptionTokenOccured
                     && (securityEvent instanceof TokenSecurityEvent)) {

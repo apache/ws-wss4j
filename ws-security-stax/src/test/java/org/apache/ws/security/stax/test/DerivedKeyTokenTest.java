@@ -159,12 +159,12 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             SecurityEventConstants.Event[] expectedSecurityEvents = new SecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -661,20 +661,20 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);

@@ -420,6 +420,12 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     @Test
     public void testAllowMD5Algorithm() throws Exception {
+
+        if (getJavaSpecificationVersion() >= 1.7) {
+            System.out.println("testAllowMD5Algorithm skipped");
+            return;
+        }
+
         WSSSecurityProperties outboundSecurityProperties = new WSSSecurityProperties();
         outboundSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
         outboundSecurityProperties.setEncryptionUser("receiver");
@@ -452,6 +458,12 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     @Test
     public void testMaximumAllowedXMLStructureDepth() throws Exception {
+
+        if (getJavaSpecificationVersion() >= 1.7) {
+            System.out.println("testAllowMD5Algorithm skipped");
+            return;
+        }
+
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE;
@@ -487,6 +499,12 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     @Test
     public void testMaximumAllowedXMLStructureDepthInEncryptedContent() throws Exception {
+
+        if (getJavaSpecificationVersion() >= 1.7) {
+            System.out.println("testAllowMD5Algorithm skipped");
+            return;
+        }
+
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;

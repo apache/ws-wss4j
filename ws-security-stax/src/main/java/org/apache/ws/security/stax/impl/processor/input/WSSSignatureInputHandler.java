@@ -73,6 +73,18 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         checkBSPCompliance(inputProcessorChain, signatureType);
 
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+
+        SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
+        signatureValueSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
+        signatureValueSecurityEvent.setCorrelationID(signatureType.getId());
+        securityContext.registerSecurityEvent(signatureValueSecurityEvent);
+
+        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
+        algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
+        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
+        algorithmSuiteSecurityEvent.setCorrelationID(signatureType.getId());
+        securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
+
         final SignatureVerifier signatureVerifier =
                 new WSSSignatureVerifier(signatureType, inputProcessorChain.getSecurityContext(), securityProperties) {
 
@@ -84,16 +96,6 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
                         TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, signatureType.getId());
                         securityContext.registerSecurityEvent(tokenSecurityEvent);
 
-                        SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
-                        signatureValueSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
-                        signatureValueSecurityEvent.setCorrelationID(signatureType.getId());
-                        securityContext.registerSecurityEvent(signatureValueSecurityEvent);
-
-                        AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
-                        algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
-                        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
-                        algorithmSuiteSecurityEvent.setCorrelationID(signatureType.getId());
-                        securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
                         super.handleSecurityToken(securityToken);
                     }
         };
