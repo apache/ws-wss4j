@@ -707,20 +707,63 @@ public final class WSSecurityUtil {
         String actor, 
         boolean doCreate
     ) throws WSSecurityException {
-        Element wsseSecurity = getSecurityHeader(doc, actor);
-        if (wsseSecurity != null) {
-            return wsseSecurity;
-        } else if (doCreate) {
-            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
-            Element header = 
-                getDirectChildElement(envelope, WSConstants.ELEM_HEADER, soapNamespace);
-            if (header == null) {
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        Element header = 
+            getDirectChildElement(
+                doc.getDocumentElement(), 
+                WSConstants.ELEM_HEADER, 
+                soapNamespace
+            );
+        if (header == null) { // no SOAP header at all
+            if (doCreate) {
                 header = createElementInSameNamespace(envelope, WSConstants.ELEM_HEADER);
                 header = prependChildElement(envelope, header);
+            } else {
+                return null;
             }
-            wsseSecurity = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
-            wsseSecurity.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
-            return prependChildElement(header, wsseSecurity);
+        }
+        
+        String actorLocal = WSConstants.ATTR_ACTOR;
+        if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+            actorLocal = WSConstants.ATTR_ROLE;
+        }
+        
+        //
+        // Iterate through the security headers
+        //
+        Element foundSecurityHeader = null;
+        for (
+            Node currentChild = header.getFirstChild(); 
+            currentChild != null; 
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                && WSConstants.WSSE_LN.equals(currentChild.getLocalName())
+                && WSConstants.WSSE_NS.equals(currentChild.getNamespaceURI())) {
+                
+                Element elem = (Element)currentChild;
+                Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
+                String hActor = (attr != null) ? attr.getValue() : null;
+
+                if (WSSecurityUtil.isActorEqual(actor, hActor)) {
+                    if (foundSecurityHeader != null) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(
+                                "Two or more security headers have the same actor name: " + actor
+                            );
+                        }
+                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                    }
+                    foundSecurityHeader = elem;
+                }
+            }
+        }
+        if (foundSecurityHeader != null) {
+            return foundSecurityHeader;
+        } else if (doCreate) {
+            foundSecurityHeader = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
+            foundSecurityHeader.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
+            return prependChildElement(header, foundSecurityHeader);
         }
         return null;
     }

@@ -50,7 +50,7 @@ public class SecurityContextToken {
      */
     private Element elementIdentifier = null;
     
-    private WSSConfig wssConfig = WSSConfig.getNewInstance();
+    private WSSConfig wssConfig = null;
     
     private String tokenType = WSConstants.WSC_SCT;
     
@@ -95,7 +95,7 @@ public class SecurityContextToken {
         
         elementIdentifier.appendChild(doc.createTextNode(uuid));
         
-        setID(wssConfig.getIdAllocator().createSecureId("sctId-", element));
+        setID(getWSSConfig().getIdAllocator().createSecureId("sctId-", element));
     }
 
     /**
@@ -274,4 +274,10 @@ public class SecurityContextToken {
         return true;
     }
 
+    private WSSConfig getWSSConfig() {
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        return wssConfig;
+    }
 }
