@@ -752,7 +752,7 @@ public final class WSSecurityUtil {
                                 "Two or more security headers have the same actor name: " + actor
                             );
                         }
-                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
                     }
                     foundSecurityHeader = elem;
                 }
