@@ -296,11 +296,8 @@ public abstract class WSHandler {
         wssConfig.setWsiBSPCompliant(decodeBSPCompliance(reqData));
         reqData.setWssConfig(wssConfig);
 
-        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            decodeSignatureParameter2(reqData);
-        }
-        
-        if (((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED)
+        if (((doAction & WSConstants.SIGN) == WSConstants.SIGN)
+            || ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED)
             || ((doAction & WSConstants.ST_UNSIGNED) == WSConstants.ST_UNSIGNED)) {
             decodeSignatureParameter2(reqData);
         }
