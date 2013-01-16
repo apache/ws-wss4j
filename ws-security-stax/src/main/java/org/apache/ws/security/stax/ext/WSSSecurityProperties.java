@@ -20,17 +20,17 @@ package org.apache.ws.security.stax.ext;
 
 import java.net.URL;
 import java.security.KeyStore;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.ws.security.common.bsp.BSPRule;
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.Merlin;
+import org.apache.ws.security.stax.validate.Validator;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 /**
  * Main configuration class to supply keys etc.
@@ -45,6 +45,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private String actor;
     private CallbackHandler callbackHandler;
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
+    private final Map<QName, Validator> validators = new HashMap<QName, Validator>();
 
     private Integer timestampTTL = 300;
     private boolean strictTimestampCheck = true;
@@ -100,6 +101,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.actor = wssSecurityProperties.actor;
         this.callbackHandler = wssSecurityProperties.callbackHandler;
         this.ignoredBSPRules.addAll(wssSecurityProperties.ignoredBSPRules);
+        this.validators.putAll(wssSecurityProperties.validators);
         this.timestampTTL = wssSecurityProperties.timestampTTL;
         this.strictTimestampCheck = wssSecurityProperties.strictTimestampCheck;
         this.handleCustomPasswordTypes = wssSecurityProperties.handleCustomPasswordTypes;
@@ -263,6 +265,15 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public List<BSPRule> getIgnoredBSPRules() {
         return Collections.unmodifiableList(ignoredBSPRules);
+    }
+
+    public void addValidator(QName qName, Validator validator) {
+        validators.put(qName, validator);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Validator> T getValidator(QName qName) {
+        return (T)validators.get(qName);
     }
 
     public void setSignatureUser(String signatureUser) {

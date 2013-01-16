@@ -82,6 +82,7 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
 
     @Override
     public void verify() throws XMLSecurityException {
+        //todo overall call verify on wrapping tokens for non top-level SecurityTokens!?
         try {
             X509Certificate[] x509Certificates = getX509Certificates();
             if (x509Certificates != null && x509Certificates.length > 0) {

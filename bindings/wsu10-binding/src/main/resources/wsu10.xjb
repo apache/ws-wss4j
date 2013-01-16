@@ -1,10 +1,16 @@
 <bindings xmlns="http://java.sun.com/xml/ns/jaxb"
+          xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
           xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
+          jaxb:extensionBindingPrefixes="inheritance"
           version="2.1">
     <bindings schemaLocation="schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd" version="1.0">
         <schemaBindings>
             <package name="org.apache.ws.security.binding.wsu10"/>
         </schemaBindings>
+        <bindings node="//xs:complexType[@name='AttributedDateTime']">
+            <inheritance:extends>org.apache.ws.security.binding.wsu10.AbstractAttributedDateTime</inheritance:extends>
+        </bindings>
     </bindings>
 </bindings>

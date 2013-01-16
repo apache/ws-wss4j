@@ -19,24 +19,20 @@
 package org.apache.ws.security.stax.impl.processor.input;
 
 import org.apache.ws.security.binding.wssc.AbstractSecurityContextTokenType;
-import org.apache.ws.security.common.ext.WSPasswordCallback;
-import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
-import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.ws.security.stax.securityEvent.SecurityContextTokenSecurityEvent;
+import org.apache.ws.security.stax.validate.SecurityContextTokenValidator;
+import org.apache.ws.security.stax.validate.SecurityContextTokenValidatorImpl;
+import org.apache.ws.security.stax.validate.TokenContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import java.security.Key;
 import java.util.Deque;
 import java.util.List;
 
@@ -60,51 +56,24 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
             securityContextTokenType.setId(IDGenerator.generateID(null));
         }
 
+        final QName elementName = new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(),
+                WSSConstants.TAG_wsc0502_Identifier.getLocalPart());
         final String identifier = (String) XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),
-                new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(), WSSConstants.TAG_wsc0502_Identifier.getLocalPart()));
+                elementName);
 
+        final WSSecurityContext wsSecurityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
+        final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
         final List<QName> elementPath = getElementPath(eventQueue);
-        final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
-        final AbstractInboundSecurityToken securityContextToken =
-                new AbstractInboundSecurityToken(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
-                        securityContextTokenType.getId(), null) {
+        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsSecurityContext, xmlSecEvents, elementPath);
 
-                    @Override
-                    public boolean isAsymmetric() {
-                        return false;
-                    }
-
-                    @Override
-                    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
-                                      String correlationID) throws XMLSecurityException {
-
-                        Key key = getSecretKey().get(algorithmURI);
-                        if (key != null) {
-                            return key;
-                        }
-
-                        String algo = JCEAlgorithmMapper.translateURItoJCEID(algorithmURI);
-                        WSPasswordCallback passwordCallback = new WSPasswordCallback(identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
-                        WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), passwordCallback, null);
-                        if (passwordCallback.getKey() == null) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noKey", securityContextTokenType.getId());
-                        }
-                        key = new SecretKeySpec(passwordCallback.getKey(), algo);
-                        setSecretKey(algorithmURI, key);
-                        return key;
-                    }
-
-                    @Override
-                    public WSSConstants.TokenType getTokenType() {
-                        //todo and set externalUriRef
-                        return WSSConstants.SecurityContextToken;
-                    }
-                };
-
-        securityContextToken.setElementPath(elementPath);
-        securityContextToken.setXMLSecEvent(responsibleXMLSecStartXMLEvent);
+        SecurityContextTokenValidator securityContextTokenValidator = wssSecurityProperties.getValidator(elementName);
+        if (securityContextTokenValidator == null) {
+            securityContextTokenValidator = new SecurityContextTokenValidatorImpl();
+        }
+        final SecurityToken securityContextToken =
+                securityContextTokenValidator.validate(securityContextTokenType, identifier, tokenContext);
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
@@ -119,13 +88,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                 return securityContextTokenType.getId();
             }
         };
-        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(securityContextTokenType.getId(), securityTokenProvider);
-
-        //fire a tokenSecurityEvent
-        SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
-        securityContextTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
-        securityContextTokenSecurityEvent.setCorrelationID(securityContextTokenType.getId());
-        inputProcessorChain.getSecurityContext().registerSecurityEvent(securityContextTokenSecurityEvent);
+        wsSecurityContext.registerSecurityTokenProvider(securityContextTokenType.getId(), securityTokenProvider);
 
         //also register a SecurityProvider with the identifier. @see SecurityContexTest#testSCTKDKTSignAbsolute
         SecurityTokenProvider securityTokenProviderDirectReference = new SecurityTokenProvider() {
@@ -141,6 +104,12 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
                 return identifier;
             }
         };
-        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(identifier, securityTokenProviderDirectReference);
+        wsSecurityContext.registerSecurityTokenProvider(identifier, securityTokenProviderDirectReference);
+
+        //fire a tokenSecurityEvent
+        SecurityContextTokenSecurityEvent securityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
+        securityContextTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
+        securityContextTokenSecurityEvent.setCorrelationID(securityContextTokenType.getId());
+        wsSecurityContext.registerSecurityEvent(securityContextTokenSecurityEvent);
     }
 }

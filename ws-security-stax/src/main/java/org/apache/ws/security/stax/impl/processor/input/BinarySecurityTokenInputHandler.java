@@ -18,25 +18,19 @@
  */
 package org.apache.ws.security.stax.impl.processor.input;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.binding.wss10.BinarySecurityTokenType;
 import org.apache.ws.security.common.bsp.BSPRule;
-import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.stax.ext.WSSConfigurationException;
 import org.apache.ws.security.stax.ext.WSSConstants;
 import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
-import org.apache.ws.security.stax.impl.securityToken.KerberosServiceSecurityToken;
-import org.apache.ws.security.stax.impl.securityToken.X509PKIPathv1SecurityToken;
-import org.apache.ws.security.stax.impl.securityToken.X509_V3SecurityToken;
 import org.apache.ws.security.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.ws.security.stax.validate.BinarySecurityTokenValidator;
+import org.apache.ws.security.stax.validate.BinarySecurityTokenValidatorImpl;
+import org.apache.ws.security.stax.validate.TokenContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
@@ -54,8 +48,6 @@ import java.util.List;
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private static final transient Log log = LogFactory.getLog(BinarySecurityTokenInputHandler.class);
-
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        final Deque<XMLSecEvent> eventQueue, final Integer index) throws XMLSecurityException {
@@ -69,64 +61,34 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             binarySecurityTokenType.setId(IDGenerator.generateID(null));
         }
 
+        final WSSecurityContext wsSecurityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<QName> elementPath = getElementPath(eventQueue);
-        final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
 
-        final SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsSecurityContext, xmlSecEvents, elementPath);
 
-            private AbstractInboundSecurityToken securityToken = null;
+        BinarySecurityTokenValidator binarySecurityTokenValidator =
+                wssSecurityProperties.getValidator(WSSConstants.TAG_wsse_BinarySecurityToken);
+        if (binarySecurityTokenValidator == null) {
+            binarySecurityTokenValidator = new BinarySecurityTokenValidatorImpl();
+        }
+        final SecurityToken binarySecurityToken =
+                binarySecurityTokenValidator.validate(binarySecurityTokenType, tokenContext);
 
-            @SuppressWarnings("unchecked")
+        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
             @Override
             public SecurityToken getSecurityToken() throws XMLSecurityException {
-                if (this.securityToken != null) {
-                    return this.securityToken;
-                }
-
-                //only Base64Encoding is supported
-                if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badEncoding", binarySecurityTokenType.getEncodingType());
-                }
-
-                byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
-
-                if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
-                    Crypto crypto = getCrypto((WSSSecurityProperties) securityProperties);
-                    this.securityToken = new X509_V3SecurityToken(
-                            (WSSecurityContext) securityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
-                            securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
-                    );
-                } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
-                    Crypto crypto = getCrypto((WSSSecurityProperties) securityProperties);
-                    this.securityToken = new X509PKIPathv1SecurityToken(
-                            (WSSecurityContext) securityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
-                            securityTokenData, binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
-                    );
-                } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
-                    this.securityToken = new KerberosServiceSecurityToken(
-                            (WSSecurityContext) securityContext, ((WSSSecurityProperties)securityProperties).getCallbackHandler(),
-                            securityTokenData, binarySecurityTokenType.getValueType(),
-                            binarySecurityTokenType.getId(), WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
-                    );
-                } else {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType", binarySecurityTokenType.getValueType());
-                }
-
-                this.securityToken.setElementPath(elementPath);
-                this.securityToken.setXMLSecEvent(responsibleXMLSecStartXMLEvent);
-                return this.securityToken;
+                return binarySecurityToken;
             }
 
             @Override
             public String getId() {
-                return binarySecurityTokenType.getId();
+                return binarySecurityToken.getId();
             }
         };
 
-        securityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
+        wsSecurityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
 
         TokenSecurityEvent tokenSecurityEvent;
         //fire a tokenSecurityEvent
@@ -136,29 +98,17 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             tokenSecurityEvent = new KerberosTokenSecurityEvent();
         } else {
             throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType", binarySecurityTokenType.getValueType());
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType",
+                    binarySecurityTokenType.getValueType());
         }
-        tokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
+        tokenSecurityEvent.setSecurityToken((SecurityToken) binarySecurityToken);
         tokenSecurityEvent.setCorrelationID(binarySecurityTokenType.getId());
-        securityContext.registerSecurityEvent(tokenSecurityEvent);
-    }
-
-    private Crypto getCrypto(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
-        Crypto crypto = null;
-        try {
-            crypto = securityProperties.getSignatureVerificationCrypto();
-        } catch (WSSConfigurationException e) {
-            log.debug(e.getMessage(), e);
-            //ignore
-        }
-        if (crypto == null) {
-            crypto = securityProperties.getDecryptionCrypto();
-        }
-        return crypto;
+        wsSecurityContext.registerSecurityEvent(tokenSecurityEvent);
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, BinarySecurityTokenType binarySecurityTokenType)
             throws WSSecurityException {
+
         final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         if (binarySecurityTokenType.getEncodingType() == null) {
             securityContext.handleBSPRule(BSPRule.R3029);

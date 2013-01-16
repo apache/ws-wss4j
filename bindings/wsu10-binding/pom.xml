@@ -78,6 +78,16 @@
                             <!-- disable schema validation since the validation code
                             doesn't respect the catalog and will do online lookups :-( -->
                             <strict>false</strict>
+                            <args>
+                                <arg>-Xinheritance</arg>
+                            </args>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.jvnet.jaxb2_commons</groupId>
+                                    <artifactId>jaxb2-basics</artifactId>
+                                    <version>0.6.3</version>
+                                </plugin>
+                            </plugins>
                         </configuration>
                     </execution>
                 </executions>

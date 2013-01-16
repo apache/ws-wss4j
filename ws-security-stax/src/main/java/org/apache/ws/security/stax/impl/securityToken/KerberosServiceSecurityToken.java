@@ -73,7 +73,7 @@ public class KerberosServiceSecurityToken extends AbstractInboundSecurityToken {
         return WSSConstants.KerberosToken;
     }
 
-    private KerberosTokenDecoder getTGT() throws WSSecurityException {
+    protected KerberosTokenDecoder getTGT() throws WSSecurityException {
         try {
             KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
