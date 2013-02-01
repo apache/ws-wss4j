@@ -157,6 +157,13 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         }
         
         verify(encryptedDoc);
+        
+        try {
+            verify(encryptedDoc, false);
+            fail("Failure expected on deriving keys from a UsernameToken not allowed");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     /**
@@ -202,6 +209,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.getWssConfig().setPasswordsAreEncoded(true);
+        newEngine.getWssConfig().setAllowUsernameTokenNoPassword(true);
         newEngine.processSecurityHeader(
             encryptedDoc, null, new EncodedPasswordCallbackHandler(), null
         );
@@ -403,6 +411,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.getWssConfig().setPasswordsAreEncoded(true);
+        newEngine.getWssConfig().setAllowUsernameTokenNoPassword(true);
         List<WSSecurityEngineResult> results =  newEngine.processSecurityHeader(
             signedDoc, null, new EncodedPasswordCallbackHandler(), null
         );
@@ -661,6 +670,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         config.setWsiBSPCompliant(false);
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.setWssConfig(config);
+        config.setAllowUsernameTokenNoPassword(true);
         newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
@@ -718,6 +728,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         // Turn off BSP compliance and it should work
         WSSConfig config = WSSConfig.getNewInstance();
         config.setWsiBSPCompliant(false);
+        config.setAllowUsernameTokenNoPassword(true);
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.setWssConfig(config);
         newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
@@ -781,6 +792,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         // Turn off BSP compliance and it should work
         WSSConfig config = WSSConfig.getNewInstance();
         config.setWsiBSPCompliant(false);
+        config.setAllowUsernameTokenNoPassword(true);
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.setWssConfig(config);
         newEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
@@ -794,7 +806,17 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        return verify(doc, true);
+    }
+    
+    private List<WSSecurityEngineResult> verify(
+        Document doc, 
+        boolean allowUsernameTokenDerivedKeys
+    ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
+        secEngine.setWssConfig(config);
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 

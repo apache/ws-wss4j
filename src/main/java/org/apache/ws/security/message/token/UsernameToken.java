@@ -414,6 +414,13 @@ public class UsernameToken {
         }
         return password;
     }
+    
+    /**
+     * Return true if this UsernameToken contains a Password element
+     */
+    public boolean containsPasswordElement() {
+        return elementPassword != null;
+    }
 
     /**
      * Get the Salt value of this UsernameToken.

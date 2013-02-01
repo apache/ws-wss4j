@@ -234,6 +234,13 @@ public class WSSConfig {
     protected String requiredPasswordType = null;
     
     /**
+     * This variable controls whether a UsernameToken with no password element is allowed. 
+     * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
+     * or to support UsernameTokens for purposes other than authentication.
+     */
+    protected boolean allowUsernameTokenNoPassword = false;
+    
+    /**
      * The time in seconds between creation and expiry for a Timestamp. The default
      * is 300 seconds (5 minutes).
      */
@@ -953,6 +960,14 @@ public class WSSConfig {
             }
         }
         return currentProvider.getName();
+    }
+
+    public boolean isAllowUsernameTokenNoPassword() {
+        return allowUsernameTokenNoPassword;
+    }
+
+    public void setAllowUsernameTokenNoPassword(boolean allowUsernameTokenNoPassword) {
+        this.allowUsernameTokenNoPassword = allowUsernameTokenNoPassword;
     }
     
 }

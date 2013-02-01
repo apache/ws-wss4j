@@ -206,14 +206,27 @@ public class UsernameTokenValidator implements Validator {
     }
     
     /**
-     * Verify a UsernameToken containing no password. This does nothing - but is in a separate
-     * method to allow the end-user to override validation easily. 
+     * Verify a UsernameToken containing no password. An exception is thrown unless the user
+     * has explicitly allowed this use-case via WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
      */
     protected void verifyUnknownPassword(UsernameToken usernameToken,
                                          RequestData data) throws WSSecurityException {
-        //
+        
+        boolean allowUsernameTokenDerivedKeys = false;
+        WSSConfig wssConfig = data.getWssConfig();
+        if (wssConfig != null) {
+            allowUsernameTokenDerivedKeys = wssConfig.isAllowUsernameTokenNoPassword();
+        }
+        
+        if (!(allowUsernameTokenDerivedKeys || usernameToken.containsPasswordElement())) {
+            if (log.isDebugEnabled()) {
+                log.debug("Authentication failed as the received UsernameToken does not "
+                    + "contain any password element");
+            }
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+        }
     }
    
 }
