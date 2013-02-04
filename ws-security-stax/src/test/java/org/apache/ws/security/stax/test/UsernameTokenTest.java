@@ -316,7 +316,11 @@ public class UsernameTokenTest extends AbstractTestBase {
         //done UsernameToken; now verification:
         {
             String action = WSHandlerConstants.USERNAME_TOKEN;
-            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+            
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
+            doInboundSecurityWithWSS4J_1(document, action, properties, false);
         }
     }
 

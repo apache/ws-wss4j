@@ -263,6 +263,11 @@ public abstract class AbstractTestBase {
             requestData.setDecCrypto(crypto);
             requestData.setSigVerCrypto(crypto);
         }
+        
+        if (properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD) != null) {
+            messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, 
+                               properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD));
+        }
 
         // Disable PrefixList checking as the stax code doesn't support this yet
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();

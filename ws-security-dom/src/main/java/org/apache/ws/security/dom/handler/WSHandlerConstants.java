@@ -376,6 +376,13 @@ public final class WSHandlerConstants {
     public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
     
     /**
+     * This variable controls whether a UsernameToken with no password element is allowed. 
+     * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
+     * or to support UsernameTokens for purposes other than authentication.
+     */
+    public static final String ALLOW_USERNAMETOKEN_NOPASSWORD = "allowUsernameTokenNoPassword";
+    
+    /**
      * Set the value of this parameter to true to enable strict Username Token password type
      * handling. The default value is "false".
      * 

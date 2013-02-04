@@ -50,7 +50,6 @@ import java.util.List;
 public class UTSignatureTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(UTSignatureTest.class);
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;
     
@@ -98,6 +97,13 @@ public class UTSignatureTest extends org.junit.Assert {
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().indexOf("bob") != -1);
+        
+        try {
+            verify(signedDoc, false);
+            fail("Failure expected on deriving keys from a UsernameToken not allowed");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     
@@ -242,6 +248,17 @@ public class UTSignatureTest extends org.junit.Assert {
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        return verify(doc, true);
+    }
+    
+    private List<WSSecurityEngineResult> verify(
+        Document doc, 
+        boolean allowUsernameTokenDerivedKeys
+    ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
+        secEngine.setWssConfig(config);
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 

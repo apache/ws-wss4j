@@ -291,6 +291,10 @@ public abstract class WSHandler {
         wssConfig.setAllowNamespaceQualifiedPasswordTypes(
             decodeNamespaceQualifiedPasswordTypes(reqData)
         );
+        wssConfig.setAllowUsernameTokenNoPassword(
+            decodeAllowUsernameTokenNoPassword(reqData)
+        );
+        
         wssConfig.setSecretKeyLength(reqData.getSecretKeyLength());
         reqData.setWssConfig(wssConfig);
 
@@ -724,6 +728,14 @@ public abstract class WSHandler {
         );
     }
     
+    protected boolean decodeAllowUsernameTokenNoPassword(
+        RequestData reqData
+        ) throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, false
+        );
+    }
+
     protected boolean decodeUseEncodedPasswords(RequestData reqData) 
         throws WSSecurityException {
         return decodeBooleanConfigValue(

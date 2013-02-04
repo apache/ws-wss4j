@@ -106,7 +106,6 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         + "<value xmlns=\"\">15</value>" + "</add>" 
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
-    private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**
@@ -409,7 +408,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc, true);
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_NOPASSWORD);
         UsernameToken receivedToken = 
@@ -435,6 +434,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(doc, null, this, null);
     }
     
@@ -451,6 +451,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(doc, null, this, null);
     }
     
@@ -476,6 +477,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         try {
+            WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.processSecurityHeader(signedDoc, null, this, null);
             fail("Custom token types are not permitted");
         } catch (WSSecurityException ex) {
@@ -511,14 +513,9 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         WSSConfig cfg = WSSConfig.getNewInstance();
         cfg.setHandleCustomPasswordTypes(true);
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(cfg);
-        verify(signedDoc);
-        
-        //
-        // Go back to default for other tests
-        //
-        cfg.setHandleCustomPasswordTypes(false);
-        secEngine.setWssConfig(cfg);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
     
@@ -881,13 +878,21 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         newEngine.processSecurityHeader(doc, "", data);
     }
     
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        return verify(doc, false);
+    }
+    
     /**
      * Verifies the soap envelope
      * 
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
+        secEngine.setWssConfig(config);
         return secEngine.processSecurityHeader(doc, null, callbackHandler, null);
     }
     
