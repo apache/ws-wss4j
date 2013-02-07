@@ -499,12 +499,7 @@ public class SamlAssertionWrapper {
     public void verifySignature(
         SAMLKeyInfoProcessor keyInfoProcessor, Crypto sigCrypto
     ) throws WSSecurityException {
-        Signature sig = null;
-        if (saml2 != null && saml2.getSignature() != null) {
-            sig = saml2.getSignature();
-        } else if (saml1 != null && saml1.getSignature() != null) {
-            sig = saml1.getSignature();
-        }
+        Signature sig = getSignature();
         if (sig != null) {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
@@ -530,14 +525,7 @@ public class SamlAssertionWrapper {
                     "cannot get certificate or key"
                 );
             }
-            SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
-            try {
-                validator.validate(sig);
-            } catch (ValidationException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", ex, "SAML signature validation failed");
-            }
-            
+
             BasicX509Credential credential = new BasicX509Credential();
             if (samlKeyInfo.getCerts() != null) {
                 credential.setEntityCertificate(samlKeyInfo.getCerts()[0]);
@@ -559,6 +547,24 @@ public class SamlAssertionWrapper {
             signatureKeyInfo = samlKeyInfo;
         } else {
             LOG.debug("SamlAssertionWrapper: no signature to validate");
+        }
+    }
+    
+    /**
+     * Validate the signature of the Assertion against the Profile. This does not actually
+     * verify the signature itself (see the verifySignature method for this)
+     * @throws WSSecurityException
+     */
+    public void validateSignatureAgainstProfile() throws WSSecurityException {
+        Signature sig = getSignature();
+        if (sig != null) {
+            SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
+            try {
+                validator.validate(sig);
+            } catch (ValidationException ex) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                    "empty", ex, "SAML signature validation failed");
+            }
         }
     }
     
