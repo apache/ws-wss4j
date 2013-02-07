@@ -108,6 +108,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     private X509Certificate useThisCert = null;
     private Element securityHeader = null;
     private boolean useCustomSecRef;
+    private boolean bstAddedToSecurityHeader = false;
 
     public WSSecSignature() {
         super();
@@ -443,10 +444,10 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @param secHeader The security header
      */
     public void prependBSTElementToHeader(WSSecHeader secHeader) {
-        if (bstToken != null) {
+        if (bstToken != null && !bstAddedToSecurityHeader) {
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bstToken.getElement());
+            bstAddedToSecurityHeader = true;
         }
-        bstToken = null;
     }
 
     /**
@@ -454,11 +455,11 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @param secHeader The security header
      */
     public void appendBSTElementToHeader(WSSecHeader secHeader) {
-        if (bstToken != null) {
+        if (bstToken != null && !bstAddedToSecurityHeader) {
             Element secHeaderElement = secHeader.getSecurityHeader();
             secHeaderElement.appendChild(bstToken.getElement());
+            bstAddedToSecurityHeader = true;
         }
-        bstToken = null;
     }
     
     /**
