@@ -105,6 +105,8 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      */
     //todo shoudn't we move this into the SamlAssertionWrapper? Then it could be reused by StAX and DOM impl.
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
+        samlAssertion.validateSignatureAgainstProfile();
+        
         if (samlAssertion.getSaml1() != null) {
             ValidatorSuite schemaValidators =
                     org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
