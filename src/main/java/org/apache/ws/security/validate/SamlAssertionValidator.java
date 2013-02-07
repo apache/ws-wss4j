@@ -50,6 +50,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     private int futureTTL = 60;
     
     /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    private boolean validateSignatureAgainstProfile = true;
+    
+    /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming 
      * Assertion is valid. The default is 60 seconds.
      */
@@ -156,6 +162,10 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * Validate the assertion against schemas/profiles
      */
     protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
+        if (validateSignatureAgainstProfile) {
+            assertion.validateSignatureAgainstProfile();
+        }
+        
         if (assertion.getSaml1() != null) {
             ValidatorSuite schemaValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
@@ -185,6 +195,22 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
                 );
             }
         }
+    }
+
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    public boolean isValidateSignatureAgainstProfile() {
+        return validateSignatureAgainstProfile;
+    }
+
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    public void setValidateSignatureAgainstProfile(boolean validateSignatureAgainstProfile) {
+        this.validateSignatureAgainstProfile = validateSignatureAgainstProfile;
     }
     
 }

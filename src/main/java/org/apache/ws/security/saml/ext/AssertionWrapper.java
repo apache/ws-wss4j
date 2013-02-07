@@ -530,12 +530,7 @@ public class AssertionWrapper {
     public void verifySignature(
         RequestData data, WSDocInfo docInfo
     ) throws WSSecurityException {
-        Signature sig = null;
-        if (saml2 != null && saml2.getSignature() != null) {
-            sig = saml2.getSignature();
-        } else if (saml1 != null && saml1.getSignature() != null) {
-            sig = saml1.getSignature();
-        }
+        Signature sig = getSignature();
         if (sig != null) {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
@@ -561,12 +556,6 @@ public class AssertionWrapper {
                     new Object[]{"cannot get certificate or key"}
                 );
             }
-            SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
-            try {
-                validator.validate(sig);
-            } catch (ValidationException ex) {
-                throw new WSSecurityException("SAML signature validation failed", ex);
-            }
             
             BasicX509Credential credential = new BasicX509Credential();
             if (samlKeyInfo.getCerts() != null) {
@@ -588,6 +577,23 @@ public class AssertionWrapper {
             signatureKeyInfo = samlKeyInfo;
         } else {
             LOG.debug("AssertionWrapper: no signature to validate");
+        }
+    }
+    
+    /**
+     * Validate the signature of the Assertion against the Profile. This does not actually
+     * verify the signature itself (see the verifySignature method for this)
+     * @throws WSSecurityException
+     */
+    public void validateSignatureAgainstProfile() throws WSSecurityException {
+        Signature sig = getSignature();
+        if (sig != null) {
+            SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
+            try {
+                validator.validate(sig);
+            } catch (ValidationException ex) {
+                throw new WSSecurityException("SAML signature validation failed", ex);
+            }
         }
     }
     
