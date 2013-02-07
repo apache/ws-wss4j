@@ -226,6 +226,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             this.initDone = true;
             this.transportSecurityActive = Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
+            inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD, Boolean.TRUE.toString());
         }
     }
 }

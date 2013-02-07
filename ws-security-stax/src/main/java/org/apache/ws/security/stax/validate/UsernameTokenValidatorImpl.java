@@ -56,6 +56,9 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
 
         boolean handleCustomPasswordTypes = tokenContext.getWssSecurityProperties().getHandleCustomPasswordTypes();
+        boolean allowUsernameTokenNoPassword = 
+            tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword() 
+                || Boolean.parseBoolean((String)tokenContext.getWsSecurityContext().get(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD));
 
         final byte[] nonceVal;
         final String created;
@@ -172,6 +175,9 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             }
             passwordType.setValue(pwCb.getPassword());
         } else {
+            if (!allowUsernameTokenNoPassword) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
             nonceVal = null;
             created = null;
         }

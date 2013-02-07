@@ -118,6 +118,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String TIMESTAMP_PROCESSED = "TimestampProcessed";
 
     public static final String PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM = "secureProcessing.AllowRSA15KeyTransportAlgorithm";
+    public static final String PROP_ALLOW_USERNAMETOKEN_NOPASSWORD = "secureProcessing.AllowUsernameTokenNoPassword";
 
     public static final String NS_WSSE10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static final String NS_WSSE11 = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";

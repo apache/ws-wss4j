@@ -434,8 +434,26 @@ public class UsernameTokenTest extends AbstractTestBase {
         }
 
         //done UsernameToken; now verification:
+        
+        // Failure expected on no password
+        try {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            
+            xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getMessage(), "org.apache.ws.security.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
+        }
+        
+        // Now set the appropriate boolean and it should pass
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setAllowUsernameTokenNoPassword(true);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));

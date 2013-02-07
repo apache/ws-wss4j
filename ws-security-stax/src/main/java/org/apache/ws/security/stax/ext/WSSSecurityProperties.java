@@ -58,6 +58,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * reject custom token types in the callback handler.
      */
     private boolean handleCustomPasswordTypes = false;
+    private boolean allowUsernameTokenNoPassword = false;
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String tokenUser;
 
@@ -106,6 +107,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.strictTimestampCheck = wssSecurityProperties.strictTimestampCheck;
         this.handleCustomPasswordTypes = wssSecurityProperties.handleCustomPasswordTypes;
         this.usernameTokenPasswordType = wssSecurityProperties.usernameTokenPasswordType;
+        this.allowUsernameTokenNoPassword = wssSecurityProperties.allowUsernameTokenNoPassword;
         this.tokenUser = wssSecurityProperties.tokenUser;
         this.derivedKeyKeyIdentifierType = wssSecurityProperties.derivedKeyKeyIdentifierType;
         this.derivedKeyTokenReference = wssSecurityProperties.derivedKeyTokenReference;
@@ -552,5 +554,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setEncryptionCompressionAlgorithm(String encryptionCompressionAlgorithm) {
         this.encryptionCompressionAlgorithm = encryptionCompressionAlgorithm;
+    }
+
+    public boolean isAllowUsernameTokenNoPassword() {
+        return allowUsernameTokenNoPassword;
+    }
+
+    public void setAllowUsernameTokenNoPassword(boolean allowUsernameTokenNoPassword) {
+        this.allowUsernameTokenNoPassword = allowUsernameTokenNoPassword;
     }
 }
