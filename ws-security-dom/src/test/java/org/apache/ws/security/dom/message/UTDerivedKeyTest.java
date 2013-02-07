@@ -444,7 +444,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.prepare(doc);
         
         byte[] derivedKey = builder.getDerivedKey();
-        derivedKey[5] = 12;
+        if (derivedKey[5] != 12) {
+            derivedKey[5] = 12;
+        } else {
+            derivedKey[5] = 13;
+        }
         assertTrue(derivedKey.length == 20);
         
         String tokenIdentifier = builder.getId();
