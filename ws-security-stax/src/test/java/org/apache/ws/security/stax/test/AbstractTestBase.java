@@ -165,9 +165,8 @@ public abstract class AbstractTestBase {
         messageContext.put(WSHandlerConstants.USER, "transmitter");
 
         Properties sigProperties = new Properties();
-        sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
+        sigProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.common.crypto.Merlin");
+        sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.file", "transmitter.jks");
         sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
         wss4JHandler.setPassword(messageContext, "default");
@@ -175,9 +174,8 @@ public abstract class AbstractTestBase {
         messageContext.put("" + sigProperties.hashCode(), sigProperties);
 
         Properties encProperties = new Properties();
-        encProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-        encProperties.setProperty("org.apache.ws.security.crypto.merlin.file", "transmitter.jks");
-        //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.alias.password", "default");
+        encProperties.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.common.crypto.Merlin");
+        encProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.file", "transmitter.jks");
         encProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", "default");
         //sigProperties.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", "transmitter");
         wss4JHandler.setPassword(messageContext, "default");
