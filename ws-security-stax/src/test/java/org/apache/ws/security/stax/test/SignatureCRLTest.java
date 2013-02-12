@@ -162,24 +162,6 @@ public class SignatureCRLTest extends AbstractTestBase {
         requestData.setMsgContext(messageContext);
         requestData.setNoSerialization(true);
         requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
-        //we have to set a custom IDAllocator until WSS4J-DOM is fixed. WSS4J generates invalid id's. (wsu:id's must start with a letter)
-        requestData.setWssConfig(WSSConfig.getNewInstance());
-        requestData.getWssConfig().setIdAllocator(new WsuIdAllocator() {
-            @Override
-            public String createId(String prefix, Object o) {
-                return createSecureId(prefix, o);
-            }
-
-            @Override
-            public String createSecureId(String prefix, Object o) {
-                String id = UUID.randomUUID().toString();
-                if (prefix != null) {
-                    return prefix + id;
-                } else {
-                    return "G" + id;
-                }
-            }
-        });
 
         wss4JHandler.doSender(messageContext, requestData, true);
 
