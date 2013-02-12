@@ -298,7 +298,7 @@ public class WSSConfig {
         }
         public String createId(String prefix, Object o) {
             if (prefix == null) {
-                return next();
+                return "_" + next();
             }
             return prefix + next();
         }
