@@ -20,6 +20,7 @@ package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
@@ -34,8 +35,9 @@ public class X509DefaultSecurityToken extends X509SecurityToken {
     private String alias = null;
 
     X509DefaultSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                             String alias, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
+                             String alias, String id, WSSConstants.KeyIdentifierType keyIdentifierType,
+                             WSSSecurityProperties securityProperties) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, securityProperties);
         this.alias = alias;
     }
 

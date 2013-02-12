@@ -22,6 +22,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.binding.xmldsig.X509DataType;
 import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
@@ -42,8 +43,9 @@ public class X509DataSecurityToken extends X509SecurityToken {
     private final X509DataType x509DataType;
 
     X509DataSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                          X509DataType x509DataType, String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
+                          X509DataType x509DataType, String id, WSSConstants.KeyIdentifierType keyIdentifierType,
+                          WSSSecurityProperties securityProperties) {
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, securityProperties);
         this.x509DataType = x509DataType;
     }
 

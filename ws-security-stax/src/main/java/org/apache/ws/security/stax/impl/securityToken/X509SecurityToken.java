@@ -23,6 +23,7 @@ import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSUtils;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -42,13 +43,16 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
 
     private CallbackHandler callbackHandler;
     private Crypto crypto;
+    private WSSSecurityProperties securityProperties;
 
     protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
                                 Crypto crypto, CallbackHandler callbackHandler, String id,
-                                WSSConstants.KeyIdentifierType keyIdentifierType) {
+                                WSSConstants.KeyIdentifierType keyIdentifierType,
+                                WSSSecurityProperties securityProperties) {
         super(tokenType, wsSecurityContext, id, keyIdentifierType);
         this.crypto = crypto;
         this.callbackHandler = callbackHandler;
+        this.securityProperties = securityProperties;
     }
 
     protected Crypto getCrypto() {
@@ -89,8 +93,12 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
                 //todo I don't think the checkValidity is necessary because the CertPathChecker
                 // in crypto-verify trust should already do the job
                 x509Certificates[0].checkValidity();
-                //todo deprecated method:
-                getCrypto().verifyTrust(x509Certificates);
+                
+                boolean enableRevocation = false;
+                if (securityProperties != null) {
+                    enableRevocation = securityProperties.isEnableRevocation();
+                }
+                getCrypto().verifyTrust(x509Certificates, enableRevocation);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);

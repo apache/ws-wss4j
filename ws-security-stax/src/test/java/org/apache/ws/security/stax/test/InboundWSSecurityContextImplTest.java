@@ -658,7 +658,7 @@ public class InboundWSSecurityContextImplTest {
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        X509SecurityToken x509SecurityToken = new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+        X509SecurityToken x509SecurityToken = new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER, null) {
 
             @Override
             protected String getAlias() throws XMLSecurityException {

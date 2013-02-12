@@ -20,6 +20,7 @@ package org.apache.ws.security.stax.impl.securityToken;
 
 import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
@@ -36,10 +37,11 @@ public class X509_V3SecurityToken extends X509SecurityToken {
     private String alias = null;
 
     public X509_V3SecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType)
+                                byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType,
+                                WSSSecurityProperties securityProperties)
             throws XMLSecurityException {
 
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType);
+        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, securityProperties);
         setX509Certificates(new X509Certificate[]{getCrypto().loadCertificate(new UnsynchronizedByteArrayInputStream(binaryContent))});
     }
 

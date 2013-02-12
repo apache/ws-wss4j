@@ -39,9 +39,8 @@ import org.apache.ws.security.dom.handler.WSHandlerConstants;
 /**
  * This is a test for Certificate Revocation List checking before encryption. 
  * 
- * This test reuse the revoked certificate from SignatureCRLTest
- * 
-  */
+ * This test reuses the revoked certificate from SignatureCRLTest
+ */
 public class EncryptionCRLTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(EncryptionCRLTest.class);

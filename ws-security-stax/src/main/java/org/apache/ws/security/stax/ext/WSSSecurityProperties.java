@@ -20,6 +20,10 @@ package org.apache.ws.security.stax.ext;
 
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.cert.CertStore;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.X509CRL;
 import java.util.*;
 
 import org.apache.ws.security.common.bsp.BSPRule;
@@ -74,6 +78,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     private Class<? extends Merlin> signatureVerificationCryptoClass;
     private KeyStore signatureVerificationKeyStore;
+    private CertStore crlCertStore;
     private Crypto cachedSignatureVerificationCrypto;
     private KeyStore cachedSignatureVerificationKeyStore;
     private Class<? extends Merlin> decryptionCryptoClass;
@@ -90,6 +95,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
     private boolean useReqSigCertForEncryption = false;
     private String encryptionCompressionAlgorithm;
+    private boolean enableRevocation = false;
 
     public WSSSecurityProperties() {
         super();
@@ -133,6 +139,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.encryptionKeyIdentifierType = wssSecurityProperties.encryptionKeyIdentifierType;
         this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
         this.encryptionCompressionAlgorithm = wssSecurityProperties.encryptionCompressionAlgorithm;
+        this.enableRevocation = wssSecurityProperties.enableRevocation;
+        this.crlCertStore = wssSecurityProperties.crlCertStore;
     }
 
     /**
@@ -342,6 +350,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         keyStore.load(url.openStream(), keyStorePassword);
         this.signatureVerificationKeyStore = keyStore;
     }
+    
+    public void loadCRLCertStore(URL url) throws Exception {
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509CRL crl = (X509CRL)cf.generateCRL(url.openStream());
+        this.crlCertStore =
+            CertStore.getInstance(
+                "Collection",
+                new CollectionCertStoreParameters(Collections.singletonList(crl))
+            );
+    }
 
     public Class<? extends Merlin> getSignatureVerificationCryptoClass() {
         if (signatureVerificationCryptoClass != null) {
@@ -372,6 +390,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
             signatureVerificationCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
             signatureVerificationCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
+            signatureVerificationCrypto.setCRLCertStore(this.getCrlCertStore());
             cachedSignatureVerificationCrypto = signatureVerificationCrypto;
             cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
             return signatureVerificationCrypto;
@@ -522,6 +541,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
             encryptionCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
             encryptionCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
+            encryptionCrypto.setCRLCertStore(this.getCrlCertStore());
             cachedEncryptionCrypto = encryptionCrypto;
             cachedEncryptionKeyStore = this.getEncryptionKeyStore();
             return encryptionCrypto;
@@ -562,5 +582,21 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setAllowUsernameTokenNoPassword(boolean allowUsernameTokenNoPassword) {
         this.allowUsernameTokenNoPassword = allowUsernameTokenNoPassword;
+    }
+
+    public boolean isEnableRevocation() {
+        return enableRevocation;
+    }
+
+    public void setEnableRevocation(boolean enableRevocation) {
+        this.enableRevocation = enableRevocation;
+    }
+
+    public CertStore getCrlCertStore() {
+        return crlCertStore;
+    }
+
+    public void setCrlCertStore(CertStore crlCertStore) {
+        this.crlCertStore = crlCertStore;
     }
 }

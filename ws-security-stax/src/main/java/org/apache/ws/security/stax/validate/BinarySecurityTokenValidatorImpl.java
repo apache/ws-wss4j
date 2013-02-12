@@ -65,7 +65,8 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                         crypto,
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getId(),
-                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
+                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE,
+                        tokenContext.getWssSecurityProperties()
                 );
             } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
                 Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
@@ -74,7 +75,8 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                         crypto,
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getId(),
-                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
+                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE,
+                        tokenContext.getWssSecurityProperties()
                 );
             } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                 abstractInboundSecurityToken = new KerberosServiceSecurityToken(

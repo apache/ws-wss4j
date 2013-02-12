@@ -71,7 +71,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final SecurityTokenReferenceType securityTokenReferenceType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
             if (securityTokenReferenceType != null) {
-                return getSecurityToken(securityTokenReferenceType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), securityContext);
+                return getSecurityToken(securityTokenReferenceType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), securityContext,
+                                        ((WSSSecurityProperties)securityProperties));
             }
             final KeyValueType keyValueType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
@@ -82,14 +83,15 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         } else if (crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityToken(
                     (WSSecurityContext) securityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), crypto.getDefaultX509Identifier(),
-                    crypto.getDefaultX509Identifier(), null
+                    crypto.getDefaultX509Identifier(), null, ((WSSSecurityProperties)securityProperties)
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
     }
 
     public static SecurityToken getSecurityToken(SecurityTokenReferenceType securityTokenReferenceType, Crypto crypto,
-                                                 final CallbackHandler callbackHandler, SecurityContext securityContext)
+                                                 final CallbackHandler callbackHandler, SecurityContext securityContext,
+                                                 WSSSecurityProperties securityProperties)
             throws XMLSecurityException {
 
         //BSP.R5205 is a joke. In real life we have a lot of cases which prevents a one pass processing.
@@ -111,7 +113,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             if (x509DataType != null) {
                 return new X509DataSecurityToken((WSSecurityContext) securityContext, crypto, callbackHandler,
                         x509DataType, securityTokenReferenceType.getId(),
-                        WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
+                        WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL,
+                        securityProperties);
             }
             
             String tokenType = 
@@ -145,15 +148,18 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 if (WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
                     return new X509_V3SecurityToken(
                             (WSSecurityContext) securityContext, crypto, callbackHandler,
-                            binaryContent, securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                            binaryContent, securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER,
+                            securityProperties);
                 } else if (WSSConstants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
                     return new X509SubjectKeyIdentifierSecurityToken(
                             (WSSecurityContext) securityContext, crypto, callbackHandler, binaryContent,
-                            securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER);
+                            securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER,
+                            securityProperties);
                 } else if (WSSConstants.NS_THUMBPRINT.equals(valueType)) {
                     return new ThumbprintSHA1SecurityToken(
                             (WSSecurityContext) securityContext, crypto, callbackHandler, binaryContent,
-                            securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
+                            securityTokenReferenceType.getId(), WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER,
+                            securityProperties);
                 } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
                     if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                         ((WSSecurityContext) securityContext).handleBSPRule(BSPRule.R6617);

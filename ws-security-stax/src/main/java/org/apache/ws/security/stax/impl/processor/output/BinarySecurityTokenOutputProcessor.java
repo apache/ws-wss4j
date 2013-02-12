@@ -18,6 +18,7 @@
  */
 package org.apache.ws.security.stax.impl.processor.output;
 
+import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.crypto.CryptoType;
 import org.apache.ws.security.common.ext.WSPasswordCallback;
 import org.apache.ws.security.common.ext.WSSecurityException;
@@ -91,13 +92,28 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     x509Certificates[0] = x509Certificate;
                 } else {
                     CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(((WSSSecurityProperties) getSecurityProperties()).getEncryptionUser());
-                    x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getEncryptionCrypto().getX509Certificates(cryptoType);
+                    WSSSecurityProperties securityProperties = ((WSSSecurityProperties) getSecurityProperties());
+                    cryptoType.setAlias(securityProperties.getEncryptionUser());
+                    Crypto crypto = securityProperties.getEncryptionCrypto();
+                    x509Certificates = crypto.getX509Certificates(cryptoType);
                     if (x509Certificates == null || x509Certificates.length == 0) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound",
                                 ((WSSSecurityProperties) getSecurityProperties()).getEncryptionUser());
                     }
+                    if (securityProperties.isEnableRevocation()) {
+                        crypto.verifyTrust(x509Certificates, true);
+                    }
                 }
+                
+                // Check for Revocation
+                if (x509Certificates != null) {
+                    WSSSecurityProperties securityProperties = ((WSSSecurityProperties) getSecurityProperties());
+                    if (securityProperties.isEnableRevocation()) {
+                        Crypto crypto = securityProperties.getEncryptionCrypto();
+                        crypto.verifyTrust(x509Certificates, true);
+                    }
+                }
+                
                 key = null;
             } else {
                 x509Certificates = null;

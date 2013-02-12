@@ -284,7 +284,7 @@ public abstract class AbstractTestBase {
         return messageContext;
     }
 
-    private Map<String, Object> getMessageContext(InputStream inputStream) {
+    protected Map<String, Object> getMessageContext(InputStream inputStream) {
         Map<String, Object> context = new HashMap<String, Object>();
         try {
             context.put(SECURED_DOCUMENT, SOAPUtil.toSOAPPart(inputStream));
