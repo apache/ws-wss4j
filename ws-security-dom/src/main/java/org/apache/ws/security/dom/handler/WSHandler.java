@@ -203,9 +203,11 @@ public abstract class WSHandler {
             if (signTimestamp) {
                 actionsToPerform = new ArrayList<Integer>(actions);
                 Collections.copy(actionsToPerform, actions);
-                actionsToPerform.remove(actions.indexOf(WSConstants.SIGN));
+                int signatureIndex = actions.indexOf(WSConstants.SIGN);
+                actionsToPerform.remove(signatureIndex);
                 actionsToPerform.add(WSConstants.SIGN);
                 reqData.setAppendSignatureAfterTimestamp(true);
+                reqData.setOriginalSignatureActionPosition(signatureIndex);
             }
         }
         

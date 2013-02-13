@@ -30,7 +30,6 @@ import org.apache.ws.security.dom.WSEncryptionPart;
 import org.apache.ws.security.dom.handler.RequestData;
 import org.apache.ws.security.dom.handler.WSHandler;
 import org.apache.ws.security.dom.message.WSSecSignature;
-import org.apache.ws.security.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -74,17 +73,22 @@ public class SignatureAction implements Action {
                 } else if (reqData.isAppendSignatureAfterTimestamp()
                         && WSConstants.WSU_NS.equals(part.getNamespace())
                         && "Timestamp".equals(part.getName())) {
-                    List<Element> elements =
-                        WSSecurityUtil.findElements(
-                            doc.getDocumentElement(), part.getName(), part.getNamespace()
-                        );
-                    if (elements != null && !elements.isEmpty()) {
-                        Element timestampElement = elements.get(0);
-                        Node child = timestampElement.getNextSibling();
-                        while (child != null && child.getNodeType() != Node.ELEMENT_NODE) {
-                            child = child.getNextSibling();
+                    int originalSignatureActionIndex = 
+                        reqData.getOriginalSignatureActionPosition();
+                    // Need to figure out where to put the Signature Element in the header
+                    if (originalSignatureActionIndex > 0) {
+                        Element secHeader = reqData.getSecHeader().getSecurityHeader();
+                        Node lastChild = secHeader.getLastChild();
+                        int count = 0;
+                        while (lastChild != null && count < originalSignatureActionIndex) {
+                            while (lastChild != null && lastChild.getNodeType() != Node.ELEMENT_NODE) {
+                                lastChild = lastChild.getPreviousSibling();
+                            }
+                            count++;
                         }
-                        siblingElementToPrepend = (Element)child;
+                        if (lastChild instanceof Element) {
+                            siblingElementToPrepend = (Element)lastChild;
+                        }
                     }
                 }
             }
