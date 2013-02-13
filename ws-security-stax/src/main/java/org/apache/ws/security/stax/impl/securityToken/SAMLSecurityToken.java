@@ -22,6 +22,7 @@ import org.apache.ws.security.common.crypto.Crypto;
 import org.apache.ws.security.common.ext.WSSecurityException;
 import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.stax.ext.WSSConstants;
+import org.apache.ws.security.stax.ext.WSSSecurityProperties;
 import org.apache.ws.security.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurityToken;
@@ -44,14 +45,17 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
     private final SamlAssertionWrapper samlAssertionWrapper;
     private SecurityToken subjectSecurityToken;
     private Crypto crypto;
+    private WSSSecurityProperties securityProperties;
 
     public SAMLSecurityToken(SamlAssertionWrapper samlAssertionWrapper, SecurityToken subjectSecurityToken,
                              WSSecurityContext wsSecurityContext, Crypto crypto,
-                             String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
+                             String id, WSSConstants.KeyIdentifierType keyIdentifierType,
+                             WSSSecurityProperties securityProperties) {
         super(wsSecurityContext, id, keyIdentifierType);
         this.samlAssertionWrapper = samlAssertionWrapper;
         this.crypto = crypto;
         this.subjectSecurityToken = subjectSecurityToken;
+        this.securityProperties = securityProperties;
     }
 
     @Override
@@ -100,7 +104,6 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
     @Override
     public void verify() throws XMLSecurityException {
-        //todo verify public key if exists
         //todo revisit verify for every security token incl. public-key
         //todo should we call verify implicit when accessing the keys?
         try {
@@ -108,8 +111,15 @@ public class SAMLSecurityToken extends AbstractInboundSecurityToken {
             if (x509Certificates != null && x509Certificates.length > 0) {
                 //todo I don't think the checkValidity is necessary because the CertPathChecker
                 x509Certificates[0].checkValidity();
-                //todo deprecated method:
-                getCrypto().verifyTrust(x509Certificates);
+                boolean enableRevocation = false;
+                if (securityProperties != null) {
+                    enableRevocation = securityProperties.isEnableRevocation();
+                }
+                getCrypto().verifyTrust(x509Certificates, enableRevocation);
+            }
+            PublicKey publicKey = getPublicKey();
+            if (publicKey != null) {
+                getCrypto().verifyTrust(publicKey);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);

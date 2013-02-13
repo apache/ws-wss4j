@@ -61,7 +61,8 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                 samlAssertionWrapper, subjectSecurityToken,
                 tokenContext.getWsSecurityContext(),
                 tokenContext.getWssSecurityProperties().getSignatureVerificationCrypto(),
-                samlAssertionWrapper.getId(), null);
+                samlAssertionWrapper.getId(), null,
+                tokenContext.getWssSecurityProperties());
 
         securityToken.setElementPath(tokenContext.getElementPath());
         securityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());

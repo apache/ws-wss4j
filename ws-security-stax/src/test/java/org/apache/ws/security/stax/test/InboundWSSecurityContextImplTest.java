@@ -519,7 +519,8 @@ public class InboundWSSecurityContextImplTest {
         SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
 
         SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(
-                samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER,
+                null);
         samlSecurityToken.setElementPath(samlTokenPath);
         samlSecurityToken.setXMLSecEvent(samlTokenXmlEvent);
         samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);
