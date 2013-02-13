@@ -86,6 +86,7 @@ public class RequestData {
     private ReplayCache nonceReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private boolean appendSignatureAfterTimestamp;
+    private int originalSignatureActionPosition;
     private AlgorithmSuite algorithmSuite;
     private AlgorithmSuite samlAlgorithmSuite;
 
@@ -116,6 +117,7 @@ public class RequestData {
         appendSignatureAfterTimestamp = false;
         algorithmSuite = null;
         samlAlgorithmSuite = null;
+        setOriginalSignatureActionPosition(0);
     }
 
     public Object getMsgContext() {
@@ -541,6 +543,14 @@ public class RequestData {
 
     public void setSamlAlgorithmSuite(AlgorithmSuite samlAlgorithmSuite) {
         this.samlAlgorithmSuite = samlAlgorithmSuite;
+    }
+
+    public int getOriginalSignatureActionPosition() {
+        return originalSignatureActionPosition;
+    }
+
+    public void setOriginalSignatureActionPosition(int originalSignatureActionPosition) {
+        this.originalSignatureActionPosition = originalSignatureActionPosition;
     }
         
 }
