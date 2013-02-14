@@ -79,7 +79,6 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         final AttributedDateTime attributedDateTimeCreated =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
 
-        // TODO revisit this once we add in Validators
         if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
             if (encodedNonce == null || attributedDateTimeCreated == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
@@ -108,72 +107,22 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
 
-            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
-                    null,
-                    passwordType.getType(),
-                    WSPasswordCallback.Usage.USERNAME_TOKEN);
-            try {
-                WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
-            } catch (WSSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
-            }
-
-            if (pwCb.getPassword() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-
-            String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
-            if (!passwordType.getValue().equals(passDigest)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-            passwordType.setValue(pwCb.getPassword());
+            verifyDigestPassword(username.getValue(), passwordType, nonceVal, created, tokenContext);
         } else if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)
                 || (passwordType != null && passwordType.getValue() != null
                 && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE)) {
             nonceVal = null;
             created = null;
-            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
-                    null,
-                    passwordType.getType(),
-                    WSPasswordCallback.Usage.USERNAME_TOKEN);
-            try {
-                WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
-            } catch (WSSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
-            }
-
-            if (pwCb.getPassword() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-
-            if (!passwordType.getValue().equals(pwCb.getPassword())) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-            passwordType.setValue(pwCb.getPassword());
-        } else if (passwordType != null && passwordType.getValue() != null && usernameTokenPasswordType == null) {
+            
+            verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
+        } else if (passwordType != null && passwordType.getValue() != null) {
             if (!handleCustomPasswordTypes) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             nonceVal = null;
             created = null;
-            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
-                    null,
-                    passwordType.getType(),
-                    WSPasswordCallback.Usage.USERNAME_TOKEN);
-            try {
-                WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
-            } catch (WSSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
-            }
-
-            if (pwCb.getPassword() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-
-            if (!passwordType.getValue().equals(pwCb.getPassword())) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-            passwordType.setValue(pwCb.getPassword());
+            
+            verifyCustomPassword(username.getValue(), passwordType, tokenContext);
         } else {
             if (!allowUsernameTokenNoPassword) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
@@ -197,5 +146,76 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
 
         return usernameSecurityToken;
+    }
+    
+    /**
+     * Verify a UsernameToken containing a password digest.
+     */
+    protected void verifyDigestPassword(
+        String username,
+        PasswordString passwordType,
+        byte[] nonceVal,
+        String created,
+        TokenContext tokenContext
+    ) throws WSSecurityException {
+        WSPasswordCallback pwCb = new WSPasswordCallback(username,
+                null,
+                passwordType.getType(),
+                WSPasswordCallback.Usage.USERNAME_TOKEN);
+        try {
+            WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
+        } catch (WSSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+        }
+
+        if (pwCb.getPassword() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+
+        String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
+        if (!passwordType.getValue().equals(passDigest)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+        passwordType.setValue(pwCb.getPassword());
+    }
+    
+    /**
+     * Verify a UsernameToken containing a plaintext password.
+     */
+    protected void verifyPlaintextPassword(
+        String username,
+        PasswordString passwordType,
+        TokenContext tokenContext
+    ) throws WSSecurityException {
+        WSPasswordCallback pwCb = new WSPasswordCallback(username,
+                null,
+                passwordType.getType(),
+                WSPasswordCallback.Usage.USERNAME_TOKEN);
+        try {
+            WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
+        } catch (WSSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+        }
+
+        if (pwCb.getPassword() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+
+        if (!passwordType.getValue().equals(pwCb.getPassword())) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+        passwordType.setValue(pwCb.getPassword());
+    }
+    
+    /**
+     * Verify a UsernameToken containing a password of some unknown (but specified) password
+     * type.
+     */
+    protected void verifyCustomPassword(
+        String username,
+        PasswordString passwordType,
+        TokenContext tokenContext
+    ) throws WSSecurityException {
+        verifyPlaintextPassword(username, passwordType, tokenContext);
     }
 }
