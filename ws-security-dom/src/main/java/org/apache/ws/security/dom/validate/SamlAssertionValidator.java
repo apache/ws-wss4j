@@ -22,14 +22,10 @@ package org.apache.ws.security.dom.validate;
 import java.util.List;
 
 import org.apache.ws.security.common.ext.WSSecurityException;
-import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.common.saml.OpenSAMLUtil;
 import org.apache.ws.security.common.saml.SAMLKeyInfo;
+import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.dom.handler.RequestData;
-import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.xml.validation.ValidationException;
-import org.opensaml.xml.validation.ValidatorSuite;
 
 /**
  * This class validates a SAML Assertion, which is wrapped in an "SamlAssertionWrapper" instance.
@@ -131,70 +127,14 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * Check the Conditions of the Assertion.
      */
     protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        DateTime validFrom = null;
-        DateTime validTill = null;
-        if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
-            && samlAssertion.getSaml2().getConditions() != null) {
-            validFrom = samlAssertion.getSaml2().getConditions().getNotBefore();
-            validTill = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
-            && samlAssertion.getSaml1().getConditions() != null) {
-            validFrom = samlAssertion.getSaml1().getConditions().getNotBefore();
-            validTill = samlAssertion.getSaml1().getConditions().getNotOnOrAfter();
-        }
-        
-        if (validFrom != null) {
-            DateTime currentTime = new DateTime();
-            currentTime = currentTime.plusSeconds(futureTTL);
-            if (validFrom.isAfter(currentTime)) {
-                LOG.debug("SAML Token condition (Not Before) not met");
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-            }
-        }
-
-        if (validTill != null && validTill.isBeforeNow()) {
-            LOG.debug("SAML Token condition (Not On Or After) not met");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        }
+        samlAssertion.checkConditions(futureTTL);
     }
     
     /**
      * Validate the samlAssertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        if (validateSignatureAgainstProfile) {
-            samlAssertion.validateSignatureAgainstProfile();
-        }
-        
-        if (samlAssertion.getSaml1() != null) {
-            ValidatorSuite schemaValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
-            ValidatorSuite specValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
-            try {
-                schemaValidators.validate(samlAssertion.getSaml1());
-                specValidators.validate(samlAssertion.getSaml1());
-            } catch (ValidationException e) {
-                LOG.debug("Saml Validation error: " + e.getMessage(), e);
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
-                );
-            }
-        } else if (samlAssertion.getSaml2() != null) {
-            ValidatorSuite schemaValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
-            ValidatorSuite specValidators = 
-                org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
-            try {
-                schemaValidators.validate(samlAssertion.getSaml2());
-                specValidators.validate(samlAssertion.getSaml2());
-            } catch (ValidationException e) {
-                LOG.debug("Saml Validation error: " + e.getMessage(), e);
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
-                );
-            }
-        }
+        samlAssertion.validateAssertion(validateSignatureAgainstProfile);
     }
 
     /**

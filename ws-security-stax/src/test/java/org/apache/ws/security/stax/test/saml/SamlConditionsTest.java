@@ -203,7 +203,7 @@ public class SamlConditionsTest extends AbstractTestBase {
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertEquals(e.getCause().getMessage(), "SAML Token condition (Not On Or After) not met");
+                Assert.assertEquals(e.getCause().getMessage(), "SAML token security failure");
             }
         }
     }
@@ -249,7 +249,7 @@ public class SamlConditionsTest extends AbstractTestBase {
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertEquals(e.getCause().getMessage(), "SAML Token condition (Not Before) not met");
+                Assert.assertEquals(e.getCause().getMessage(), "SAML token security failure");
             }
         }
     }

@@ -91,7 +91,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertNotNull(e.getCause().getCause());
-                Assert.assertEquals(e.getCause().getCause().getMessage(), "Signature did not validate against the credential's key");
             }
         }
     }
@@ -143,7 +142,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertNotNull(e.getCause().getCause());
-                Assert.assertEquals(e.getCause().getCause().getMessage(), "Transforms did not contain the required enveloped transform");
             }
         }
     }

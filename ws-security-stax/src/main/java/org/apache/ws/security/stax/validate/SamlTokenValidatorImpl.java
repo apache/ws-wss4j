@@ -23,22 +23,24 @@ import org.apache.ws.security.common.saml.SamlAssertionWrapper;
 import org.apache.ws.security.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
-import org.joda.time.DateTime;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.xml.validation.ValidationException;
-import org.opensaml.xml.validation.ValidatorSuite;
 
 /**
  * @author $Author$
  * @version $Revision$ $Date$
  */
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
-
+    
     /**
      * The time in seconds in the future within which the NotBefore time of an incoming
      * Assertion is valid. The default is 60 seconds.
      */
     private int futureTTL = 60;
+    
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    private boolean validateSignatureAgainstProfile = true;
 
     /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming
@@ -46,6 +48,22 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      */
     public void setFutureTTL(int newFutureTTL) {
         futureTTL = newFutureTTL;
+    }
+    
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    public boolean isValidateSignatureAgainstProfile() {
+        return validateSignatureAgainstProfile;
+    }
+
+    /**
+     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * relevant profile. Default is true.
+     */
+    public void setValidateSignatureAgainstProfile(boolean validateSignatureAgainstProfile) {
+        this.validateSignatureAgainstProfile = validateSignatureAgainstProfile;
     }
 
     @Override
@@ -69,71 +87,19 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         return securityToken;
     }
 
+    
     /**
      * Check the Conditions of the Assertion.
      */
-    //todo shoudn't we move this into the SamlAssertionWrapper? Then it could be reused by StAX and DOM impl.
     protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        DateTime validFrom = null;
-        DateTime validTill = null;
-        if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
-                && samlAssertion.getSaml2().getConditions() != null) {
-            validFrom = samlAssertion.getSaml2().getConditions().getNotBefore();
-            validTill = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
-                && samlAssertion.getSaml1().getConditions() != null) {
-            validFrom = samlAssertion.getSaml1().getConditions().getNotBefore();
-            validTill = samlAssertion.getSaml1().getConditions().getNotOnOrAfter();
-        }
-
-        if (validFrom != null) {
-            DateTime currentTime = new DateTime();
-            currentTime = currentTime.plusSeconds(futureTTL);
-            if (validFrom.isAfter(currentTime)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", "SAML Token condition (Not Before) not met");
-            }
-        }
-
-        if (validTill != null && validTill.isBeforeNow()) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", "SAML Token condition (Not On Or After) not met");
-        }
+        samlAssertion.checkConditions(futureTTL);
     }
-
+    
     /**
-     * Validate the assertion against schemas/profiles
+     * Validate the samlAssertion against schemas/profiles
      */
-    //todo shoudn't we move this into the SamlAssertionWrapper? Then it could be reused by StAX and DOM impl.
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        samlAssertion.validateSignatureAgainstProfile();
-        
-        if (samlAssertion.getSaml1() != null) {
-            ValidatorSuite schemaValidators =
-                    org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
-            ValidatorSuite specValidators =
-                    org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
-            try {
-                schemaValidators.validate(samlAssertion.getSaml1());
-                specValidators.validate(samlAssertion.getSaml1());
-            } catch (ValidationException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "empty", e, "Saml Validation error: "
-                );
-            }
-        } else if (samlAssertion.getSaml2() != null) {
-            ValidatorSuite schemaValidators =
-                    org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
-            ValidatorSuite specValidators =
-                    org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
-            try {
-                schemaValidators.validate(samlAssertion.getSaml2());
-                specValidators.validate(samlAssertion.getSaml2());
-            } catch (ValidationException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e, "Saml Validation error: "
-                );
-            }
-        }
+        samlAssertion.validateAssertion(validateSignatureAgainstProfile);
     }
+    
 }

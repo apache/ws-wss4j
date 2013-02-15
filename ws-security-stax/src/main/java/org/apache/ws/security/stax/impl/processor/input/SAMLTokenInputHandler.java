@@ -51,7 +51,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xml.security.x509.BasicX509Credential;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureValidator;
@@ -119,13 +118,6 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             if (signature == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "empty", "no signature to validate");
-            }
-            SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
-            try {
-                validator.validate(signature);
-            } catch (ValidationException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", ex, "SAML signature validation failed");
             }
 
             int sigKeyInfoIdx = getSignatureKeyInfoIndex(eventQueue);

@@ -36,6 +36,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml1.core.AttributeStatement;
@@ -57,6 +58,7 @@ import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
+import org.opensaml.xml.validation.ValidatorSuite;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -693,6 +695,77 @@ public class SamlAssertionWrapper {
         }
         return sig;
     }
+    
+    /**
+     * Check the Conditions of the Assertion.
+     */
+    public void checkConditions(int futureTTL) throws WSSecurityException {
+        DateTime validFrom = null;
+        DateTime validTill = null;
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && getSaml2().getConditions() != null) {
+            validFrom = getSaml2().getConditions().getNotBefore();
+            validTill = getSaml2().getConditions().getNotOnOrAfter();
+        } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && getSaml1().getConditions() != null) {
+            validFrom = getSaml1().getConditions().getNotBefore();
+            validTill = getSaml1().getConditions().getNotOnOrAfter();
+        }
+        
+        if (validFrom != null) {
+            DateTime currentTime = new DateTime();
+            currentTime = currentTime.plusSeconds(futureTTL);
+            if (validFrom.isAfter(currentTime)) {
+                LOG.debug("SAML Token condition (Not Before) not met");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            }
+        }
+
+        if (validTill != null && validTill.isBeforeNow()) {
+            LOG.debug("SAML Token condition (Not On Or After) not met");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+    }
+    
+    /**
+     * Validate the samlAssertion against schemas/profiles
+     */
+    public void validateAssertion(boolean validateSignatureAgainstProfile) throws WSSecurityException {
+        if (validateSignatureAgainstProfile) {
+            validateSignatureAgainstProfile();
+        }
+        
+        if (getSaml1() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
+            try {
+                schemaValidators.validate(getSaml1());
+                specValidators.validate(getSaml1());
+            } catch (ValidationException e) {
+                LOG.debug("Saml Validation error: " + e.getMessage(), e);
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
+                );
+            }
+        } else if (getSaml2() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
+            try {
+                schemaValidators.validate(getSaml2());
+                specValidators.validate(getSaml2());
+            } catch (ValidationException e) {
+                LOG.debug("Saml Validation error: " + e.getMessage(), e);
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
+                );
+            }
+        }
+    }
+
     
     /**
      * Parse the DOM Element into Opensaml objects.
