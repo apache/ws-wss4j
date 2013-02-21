@@ -99,7 +99,7 @@ more information on this. Some changes to be aware of are:
 <ol>
 <li>
 The way of creating SAML assertions via a properties file has completely changed. For example, see a
-<a href="xref-test/org.apache.ws.security.dom.saml/SamlTokenTest.html">SAML Token Test</a>.
+<a href="xref-test/org.apache.wss4j.dom.saml/SamlTokenTest.html">SAML Token Test</a>.
 </li>
 <li>
 WSS4J 1.5.x ignored (enveloped) signatures on SAML (1.1) assertions - this is no longer the case, so 

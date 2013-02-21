@@ -28,13 +28,13 @@
     </cxf:bus>
     -->
     
-    <bean name="inSecurityProperties" class="org.apache.ws.security.stax.ext.WSSSecurityProperties">
+    <bean name="inSecurityProperties" class="org.apache.wss4j.stax.ext.WSSSecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <util:constant static-field="org.apache.ws.security.stax.ext.WSSConstants.TIMESTAMP"/>
-                <util:constant static-field="org.apache.ws.security.stax.ext.WSSConstants.SIGNATURE"/>
-                <util:constant static-field="org.apache.ws.security.stax.ext.WSSConstants.ENCRYPT"/>
+                <util:constant static-field="org.apache.wss4j.stax.ext.WSSConstants.TIMESTAMP"/>
+                <util:constant static-field="org.apache.wss4j.stax.ext.WSSConstants.SIGNATURE"/>
+                <util:constant static-field="org.apache.wss4j.stax.ext.WSSConstants.ENCRYPT"/>
             </list>
         </property>
         <!--<property name="encryptionUser" value="transmitter"/>-->
@@ -42,13 +42,13 @@
         <property name="skipDocumentEvents" value="true"/>
     </bean>
 
-    <bean name="outSecurityProperties" class="org.apache.ws.security.stax.ext.WSSSecurityProperties">
+    <bean name="outSecurityProperties" class="org.apache.wss4j.stax.ext.WSSSecurityProperties">
         <property name="callbackHandler" ref="callbackHandler"/>
         <property name="outAction">
             <list>
-                <util:constant static-field="org.apache.ws.security.stax.ext.WSSConstants.TIMESTAMP"/>
-                <util:constant static-field="org.apache.ws.security.stax.ext.WSSConstants.SIGNATURE"/>
-                <util:constant static-field="org.apache.ws.security.stax.ext.WSSConstants.ENCRYPT"/>
+                <util:constant static-field="org.apache.wss4j.stax.ext.WSSConstants.TIMESTAMP"/>
+                <util:constant static-field="org.apache.wss4j.stax.ext.WSSConstants.SIGNATURE"/>
+                <util:constant static-field="org.apache.wss4j.stax.ext.WSSConstants.ENCRYPT"/>
             </list>
         </property>
         <property name="signatureUser" value="receiver"/>
@@ -106,7 +106,7 @@
     </bean>
     -->
 
-    <bean id="greeterServiceImpl" class="org.swssf.cxfIntegration.test.integration.GreeterServiceImpl">
+    <bean id="greeterServiceImpl" class="org.apache.wss4j.cxfIntegration.test.integration.GreeterServiceImpl">
     </bean>
 
     <jaxws:endpoint id="greeterService" implementor="#greeterServiceImpl"
@@ -120,17 +120,17 @@
         </jaxws:outInterceptors>
     </jaxws:endpoint>
 
-    <bean name="securityInInterceptor" class="org.swssf.cxfIntegration.interceptor.SecurityInInterceptor">
+    <bean name="securityInInterceptor" class="org.apache.wss4j.cxfIntegration.interceptor.SecurityInInterceptor">
         <constructor-arg index="0" value="post-stream"/>
         <constructor-arg index="1" ref="inSecurityProperties"/>
     </bean>
 
-    <bean name="securityOutInterceptor" class="org.swssf.cxfIntegration.interceptor.SecurityOutInterceptor">
+    <bean name="securityOutInterceptor" class="org.apache.wss4j.cxfIntegration.interceptor.SecurityOutInterceptor">
         <constructor-arg index="0" value="pre-stream"/>
         <constructor-arg index="1" ref="outSecurityProperties"/>
     </bean>
 
-    <bean name="callbackHandler" class="org.apache.ws.security.stax.test.CallbackHandlerImpl">
+    <bean name="callbackHandler" class="org.apache.wss4j.stax.test.CallbackHandlerImpl">
     </bean>
 
     <jaxws:endpoint id="greeterServiceWSS4J" implementor="#greeterServiceImpl"
@@ -170,7 +170,7 @@
         </property>
     </bean>
 
-    <bean name="passwordCallbackHandlerWSS4J" class="org.swssf.cxfIntegration.test.integration.WSS4JCallbackHandlerImpl">
+    <bean name="passwordCallbackHandlerWSS4J" class="org.apache.wss4j.cxfIntegration.test.integration.WSS4JCallbackHandlerImpl">
     </bean>
 
     <httpj:engine-factory bus="cxf">

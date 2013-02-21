@@ -8,30 +8,30 @@
           version="2.1">
     <bindings schemaLocation="schemas/ws-secureconversation-1.3.xsd" node="/xs:schema" version="1.0">
         <schemaBindings>
-            <package name="org.apache.ws.security.binding.wssc13"/>
+            <package name="org.apache.wss4j.binding.wssc13"/>
         </schemaBindings>
         <bindings node="//xs:complexType[@name='DerivedKeyTokenType']">
-            <inheritance:extends>org.apache.ws.security.binding.wssc.AbstractDerivedKeyTokenType</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wssc.AbstractDerivedKeyTokenType</inheritance:extends>
         </bindings>
         <bindings node="//xs:complexType[@name='SecurityContextTokenType']">
-            <inheritance:extends>org.apache.ws.security.binding.wssc.AbstractSecurityContextTokenType</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType</inheritance:extends>
         </bindings>
         <bindings node="//xs:complexType[@name='PropertiesType']">
-            <inheritance:extends>org.apache.ws.security.binding.wssc.AbstractPropertiesType</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wssc.AbstractPropertiesType</inheritance:extends>
         </bindings>
     </bindings>
     <bindings schemaLocation="schemas/ws-secureconversation-200502.xsd" node="/xs:schema" version="1.0">
         <schemaBindings>
-            <package name="org.apache.ws.security.binding.wssc200502"/>
+            <package name="org.apache.wss4j.binding.wssc200502"/>
         </schemaBindings>
         <bindings node="//xs:complexType[@name='DerivedKeyTokenType']">
-            <inheritance:extends>org.apache.ws.security.binding.wssc.AbstractDerivedKeyTokenType</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wssc.AbstractDerivedKeyTokenType</inheritance:extends>
         </bindings>
         <bindings node="//xs:complexType[@name='SecurityContextTokenType']">
-            <inheritance:extends>org.apache.ws.security.binding.wssc.AbstractSecurityContextTokenType</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType</inheritance:extends>
         </bindings>
         <bindings node="//xs:complexType[@name='PropertiesType']">
-            <inheritance:extends>org.apache.ws.security.binding.wssc.AbstractPropertiesType</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wssc.AbstractPropertiesType</inheritance:extends>
         </bindings>
     </bindings>
 </bindings>

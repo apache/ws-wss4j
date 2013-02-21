@@ -28,20 +28,20 @@ General properties:
 <th>Property value</th>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.provider</td>
+<td>org.apache.wss4j.crypto.provider</td>
 <td>WSS4J specific provider used to create Crypto instances. Defaults to 
-"org.apache.ws.security.common.crypto.Merlin".</td>
+"org.apache.wss4j.common.crypto.Merlin".</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.keystore.provider</td>
+<td>org.apache.wss4j.crypto.merlin.keystore.provider</td>
 <td>The provider used to load keystores. Defaults to installed provider.</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.cert.provider</td>
+<td>org.apache.wss4j.crypto.merlin.cert.provider</td>
 <td>The provider used to load certificates. Defaults to keystore provider.</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.x509crl.file</td>
+<td>org.apache.wss4j.crypto.merlin.x509crl.file</td>
 <td>The location of an (X509) CRL file to use.</td>
 </tr>
 </table>
@@ -54,23 +54,23 @@ Keystore properties:
 <th>Property value</th>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.keystore.file</td>
+<td>org.apache.wss4j.crypto.merlin.keystore.file</td>
 <td>The location of the keystore</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.keystore.password</td>
+<td>org.apache.wss4j.crypto.merlin.keystore.password</td>
 <td>The password used to load the keystore. Default value is "security".</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.keystore.type</td>
+<td>org.apache.wss4j.crypto.merlin.keystore.type</td>
 <td>Type of keystore. Defaults to: java.security.KeyStore.getDefaultType())</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.keystore.alias</td>
+<td>org.apache.wss4j.crypto.merlin.keystore.alias</td>
 <td>The default keystore alias to use, if none is specified.</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.keystore.private.password</td>
+<td>org.apache.wss4j.crypto.merlin.keystore.private.password</td>
 <td>The default password used to load the private key.</td>
 </tr>
 </table>
@@ -83,19 +83,19 @@ TrustStore properties:
 <th>Property value</th>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.load.cacerts</td>
+<td>org.apache.wss4j.crypto.merlin.load.cacerts</td>
 <td>Whether or not to load the CA certs in ${java.home}/lib/security/cacerts (default is false)</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.truststore.file</td>
+<td>org.apache.wss4j.crypto.merlin.truststore.file</td>
 <td>The location of the truststore</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.truststore.password </td>
+<td>org.apache.wss4j.crypto.merlin.truststore.password </td>
 <td>The truststore password. Defaults to "changeit".</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.crypto.merlin.truststore.type</td>
+<td>org.apache.wss4j.crypto.merlin.truststore.type</td>
 <td>The truststore type. Defaults to: java.security.KeyStore.getDefaultType().</td>
 </tr>
 </table>
@@ -114,37 +114,37 @@ The property values are as follows:
 <th>Property value</th>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuerClass</td>
-<td>The SAML Issuer implementation (defaults to "org.apache.ws.security.dom.saml.SAMLIssuerImpl").</td>
+<td>org.apache.wss4j.dom.saml.issuerClass</td>
+<td>The SAML Issuer implementation (defaults to "org.apache.wss4j.dom.saml.SAMLIssuerImpl").</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuer.cryptoProp.file</td>
+<td>org.apache.wss4j.dom.saml.issuer.cryptoProp.file</td>
 <td>The crypto properties file corresponding to the issuer crypto instance, if the assertion is to
 be signed.</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuer.key.name</td>
+<td>org.apache.wss4j.dom.saml.issuer.key.name</td>
 <td>The KeyStore alias for the issuer key.</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuer.key.password</td>
+<td>org.apache.wss4j.dom.saml.issuer.key.password</td>
 <td>The KeyStore password for the issuer key.</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuer</td>
+<td>org.apache.wss4j.dom.saml.issuer</td>
 <td>The issuer name</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuer.sendKeyValue</td>
+<td>org.apache.wss4j.dom.saml.issuer.sendKeyValue</td>
 <td>Whether to send the key value or the X509Certificate. Default is "false".</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.issuer.signAssertion</td>
+<td>org.apache.wss4j.dom.saml.issuer.signAssertion</td>
 <td>Whether the SAMLIssuer implementation will sign the assertion or not. Defaults is 
 "false".</td>
 </tr>
 <tr>
-<td>org.apache.ws.security.dom.saml.callback</td>
+<td>org.apache.wss4j.dom.saml.callback</td>
 <td>The name of the SAML CallbackHandler implementation used to populate the SAML Assertion.</td>
 </tr>
 </table>
@@ -153,7 +153,7 @@ be signed.</td>
 <p>
 Apache WSS4J provides a set of configuration tags for the WSHandler object used for the creation
 and processing of WS-Security enabled messages. For more information see the 
-<a href="apidocs/org.apache.ws.security.dom.handler/WSHandlerConstants.html">WSHandlerConstants Javadoc</a>.
+<a href="apidocs/org.apache.wss4j.dom.handler/WSHandlerConstants.html">WSHandlerConstants Javadoc</a>.
 </p>
 <p>
 The configuration tags for WSHandler Actions are as follows:
@@ -528,7 +528,7 @@ with the certificate. </td>
 </table>
 <p>
 The configuration values for setting the KeyIdentifiers for signature or encryption 
-are shown below. See the <a href="http://ws.apache.org/wss4j/apidocs/org.apache.ws.security.dom.handler/WSHandlerConstants.html">Javadoc</a> 
+are shown below. See the <a href="http://ws.apache.org/wss4j/apidocs/org.apache.wss4j.dom.handler/WSHandlerConstants.html">Javadoc</a> 
 for SIG_KEY_ID and ENC_KEY_ID for more details:
 </p>
 <table name="WSHandler KeyIdentifier values">

@@ -177,7 +177,7 @@ javax.security.auth.callback.CallbackHandler;</span><br style="color: rgb(0, 0, 
     <span style="color: rgb(0, 0, 153);">import
 javax.security.auth.callback.UnsupportedCallbackException;</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">import
-org.apache.ws.security.dom.WSPasswordCallback;</span><br style="color: rgb(0, 0, 153);"></br>
+org.apache.wss4j.dom.WSPasswordCallback;</span><br style="color: rgb(0, 0, 153);"></br>
     <br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">public class PWCallback
 implements CallbackHandler {</span><span style="color: rgb(0, 0, 153);"></span><span style="color: rgb(0, 0, 153);"></span><br style="color: rgb(0, 0, 153);"></br>
@@ -276,7 +276,7 @@ javax.security.auth.callback.CallbackHandler;</span><br style="color: rgb(0, 0, 
     <span style="color: rgb(0, 0, 153);">import
 javax.security.auth.callback.UnsupportedCallbackException;</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">import
-org.apache.ws.security.dom.WSPasswordCallback;</span><br style="color: rgb(0, 0, 153);"></br>
+org.apache.wss4j.dom.WSPasswordCallback;</span><br style="color: rgb(0, 0, 153);"></br>
     <br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);">/**</span><br style="color: rgb(0, 0, 153);"></br>
     <span style="color: rgb(0, 0, 153);"> * PWCallback for the

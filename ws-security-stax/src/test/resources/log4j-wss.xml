@@ -33,10 +33,10 @@
     <logger name="org.apache.xml.security.stax.impl.OutputProcessorChainImpl">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.stax.impl.processor.input">
+    <logger name="org.apache.wss4j.stax.impl.processor.input">
         <level value="INFO"/>
     </logger>
-    <logger name="org.apache.ws.security.stax.test.AbstractTestBase$CustomWSS4JHandler">
+    <logger name="org.apache.wss4j.stax.test.AbstractTestBase$CustomWSS4JHandler">
         <level value="INFO"/>
     </logger>
     <root>

@@ -4,7 +4,7 @@
           version="2.1">
     <bindings schemaLocation="schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd" node="/xs:schema" version="1.0">
         <schemaBindings>
-            <package name="org.apache.ws.security.binding.wss10"/>
+            <package name="org.apache.wss4j.binding.wss10"/>
         </schemaBindings>
     </bindings>
 </bindings>

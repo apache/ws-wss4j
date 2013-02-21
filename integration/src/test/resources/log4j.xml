@@ -12,7 +12,7 @@
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
     </appender>
-    <logger name="org.apache.ws.security">
+    <logger name="org.apache.wss4j">
         <level value="INFO"/>
     </logger>
     <root>

@@ -4,7 +4,7 @@
           version="2.1">
     <bindings schemaLocation="schemas/oasis-wss-wssecurity-secext-1.1.xsd" version="1.0">
         <schemaBindings>
-            <package name="org.apache.ws.security.binding.wss11"/>
+            <package name="org.apache.wss4j.binding.wss11"/>
         </schemaBindings>
         <bindings node="//xs:complexType[@name='EncryptedHeaderType']">
             <bindings node="xs:attribute[@ref='soap11:mustUnderstand']">

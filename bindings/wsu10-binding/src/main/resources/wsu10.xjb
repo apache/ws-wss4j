@@ -7,10 +7,10 @@
           version="2.1">
     <bindings schemaLocation="schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd" version="1.0">
         <schemaBindings>
-            <package name="org.apache.ws.security.binding.wsu10"/>
+            <package name="org.apache.wss4j.binding.wsu10"/>
         </schemaBindings>
         <bindings node="//xs:complexType[@name='AttributedDateTime']">
-            <inheritance:extends>org.apache.ws.security.binding.wsu10.AbstractAttributedDateTime</inheritance:extends>
+            <inheritance:extends>org.apache.wss4j.binding.wsu10.AbstractAttributedDateTime</inheritance:extends>
         </bindings>
     </bindings>
 </bindings>
