@@ -227,7 +227,7 @@ public class UsernameTokenValidator implements Validator {
             allowUsernameTokenDerivedKeys = wssConfig.isAllowUsernameTokenNoPassword();
         }
         
-        if (!(allowUsernameTokenDerivedKeys || usernameToken.containsPasswordElement())) {
+        if (!allowUsernameTokenDerivedKeys) {
             if (log.isDebugEnabled()) {
                 log.debug("Authentication failed as the received UsernameToken does not "
                     + "contain any password element");
