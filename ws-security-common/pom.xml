@@ -82,14 +82,14 @@
                         <Specification-Version>${project.version}</Specification-Version>
 
                         <Export-Package>
-                              org.apache.wss4j.*;version="${project.version}"
+                              org.apache.wss4j.common.*;version="${project.version}"
                         </Export-Package>
                         <Import-Package>
-                              !org.apache.wss4j.*,
+                              !org.apache.wss4j.common.*,
                               javax.xml.crypto.*,
                               org.apache.xml.security.*,
                               org.bouncycastle.*;resolution:=optional,
-                              org.apache.jcp.xml.dsig.internal.dom.*,
+                              org.apache.jcp.xml.dsig.internal.*,
                               org.opensaml.*;resolution:=optional,
                               *;resolution:=optional
                         </Import-Package>
