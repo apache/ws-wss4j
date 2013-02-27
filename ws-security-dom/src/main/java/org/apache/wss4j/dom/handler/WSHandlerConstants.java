@@ -713,6 +713,34 @@ public final class WSHandlerConstants {
 
     /**
      * Time-To-Live is the time difference between creation and expiry time in
+     * seconds of the UsernameToken Created value. After this time the SOAP request 
+     * is invalid (at least the security data shall be treated this way).
+     * <p/>
+     * If this parameter is not defined, contains a value less or equal
+     * zero, or an illegal format the handlers use a default TTL of
+     * 300 seconds (5 minutes).
+     */
+    public static final String TTL_USERNAMETOKEN = "utTimeToLive";
+    
+    /**
+     * This configuration tag specifies the time in seconds in the future within which
+     * the Created time of an incoming UsernameToken is valid. The default value is "60",
+     * to avoid problems where clocks are slightly askew. To reject all future-created
+     * UsernameTokens, set this value to "0". 
+     */
+    public static final String TTL_FUTURE_USERNAMETOKEN = "utFutureTimeToLive";
+    
+    /**
+     * This configuration tag is a comma separated String of regular expressions which
+     * will be applied to the subject DN of the certificate used for signature
+     * validation, after trust verification of the certificate chain associated with the 
+     * certificate. These constraints are not used when the certificate is contained in
+     * the keystore (direct trust).
+     */
+    public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
+    
+    /**
+     * Time-To-Live is the time difference between creation and expiry time in
      * seconds in the WSS Timestamp. After this time the SOAP request is
      * invalid (at least the security data shall be treated this way).
      * <p/>
@@ -729,15 +757,6 @@ public final class WSHandlerConstants {
      * Timestamps, set this value to "0". 
      */
     public static final String TTL_FUTURE_TIMESTAMP = "futureTimeToLive";
-    
-    /**
-     * This configuration tag is a comma separated String of regular expressions which
-     * will be applied to the subject DN of the certificate used for signature
-     * validation, after trust verification of the certificate chain associated with the 
-     * certificate. These constraints are not used when the certificate is contained in
-     * the keystore (direct trust).
-     */
-    public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
     
     
     //

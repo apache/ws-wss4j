@@ -267,6 +267,18 @@ public class WSSConfig {
     protected int timeStampFutureTTL = 60;
     
     /**
+     * The time in seconds between creation and expiry for a UsernameToken Created
+     * element. The default is 300 seconds (5 minutes).
+     */
+    protected int utTTL = 300;
+    
+    /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * UsernameToken is valid. The default is 60 seconds.
+     */
+    protected int utFutureTTL = 60;
+    
+    /**
      * This variable controls whether types other than PasswordDigest or PasswordText
      * are allowed when processing UsernameTokens. 
      * 
@@ -742,6 +754,22 @@ public class WSSConfig {
 
     public void setAllowUsernameTokenNoPassword(boolean allowUsernameTokenNoPassword) {
         this.allowUsernameTokenNoPassword = allowUsernameTokenNoPassword;
+    }
+
+    public int getUtTTL() {
+        return utTTL;
+    }
+
+    public void setUtTTL(int utTTL) {
+        this.utTTL = utTTL;
+    }
+
+    public int getUtFutureTTL() {
+        return utFutureTTL;
+    }
+
+    public void setUtFutureTTL(int utFutureTTL) {
+        this.utFutureTTL = utFutureTTL;
     }
     
 }

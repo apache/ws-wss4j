@@ -24,11 +24,13 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -42,6 +44,7 @@ import org.w3c.dom.Text;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import java.io.IOException;
@@ -87,6 +90,7 @@ public class UsernameToken {
     private boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded = false;
+    private Date createdDate;
     
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
@@ -209,6 +213,24 @@ public class UsernameToken {
                     "badUsernameToken",
                     "Nonce or Created is missing"
                 );
+            }
+        }
+        
+        if (elementCreated != null) {
+            String createdString = getCreated();
+            if (createdString != null && !"".equals(createdString)) {
+                XMLGregorianCalendar createdCalendar = null;
+                try {
+                    createdCalendar = 
+                        WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdString);
+                } catch (IllegalArgumentException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
+                        "badUsernameToken",
+                        "Error parsing UsernameToken Created value"
+                    );
+                }
+                createdDate = createdCalendar.toGregorianCalendar().getTime();
             }
         }
     }
@@ -395,6 +417,14 @@ public class UsernameToken {
      */
     public String getCreated() {
         return nodeString(elementCreated);
+    }
+    
+    /**
+     * Return the Created Element as a Date object
+     * @return the Created Date
+     */
+    public Date getCreatedDate() {
+       return createdDate;
     }
 
     /**
@@ -896,6 +926,21 @@ public class UsernameToken {
         principal.setPassword(getPassword());
         principal.setCreatedTime(getCreated());
         return principal;
+    }
+    
+    /**
+     * Return true if the "Created" value is before the current time minus the timeToLive
+     * argument, and if the Created value is not "in the future".
+     * 
+     * @param timeToLive the value in seconds for the validity of the Created time
+     * @param futureTimeToLive the value in seconds for the future validity of the Created time
+     * @return true if the UsernameToken is before (now-timeToLive), false otherwise
+     */
+    public boolean verifyCreated(
+        int timeToLive,
+        int futureTimeToLive
+    ) {
+        return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
     
     /**

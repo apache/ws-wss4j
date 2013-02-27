@@ -32,6 +32,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -50,9 +51,6 @@ import org.w3c.dom.Text;
  */
 public class Timestamp {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(Timestamp.class);
-
     private Element element = null;
     private List<Element> customElements = null;
     private Date createdDate;
@@ -310,35 +308,7 @@ public class Timestamp {
         int timeToLive,
         int futureTimeToLive
     ) {
-        Date validCreation = new Date();
-        long currentTime = validCreation.getTime();
-        if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + ((long)futureTimeToLive * 1000L));
-        }
-        // Check to see if the created time is in the future
-        if (createdDate != null && createdDate.after(validCreation)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Validation of Timestamp: The message was created in the future!");
-            }
-            return false;
-        }
-        
-        // Calculate the time that is allowed for the message to travel
-        currentTime -= ((long)timeToLive * 1000L);
-        validCreation.setTime(currentTime);
-
-        // Validate the time it took the message to travel
-        if (createdDate != null && createdDate.before(validCreation)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Validation of Timestamp: The message was created too long ago");
-            }
-            return false;
-        }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Validation of Timestamp: Everything is ok");
-        }
-        return true;
+        return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
 
     
