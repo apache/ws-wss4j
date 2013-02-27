@@ -32,9 +32,10 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.Validator;
-import org.w3c.dom.Element;
-
+import java.util.Date;
 import java.util.List;
+
+import org.w3c.dom.Element;
 
 public class UsernameTokenProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 
@@ -113,7 +114,7 @@ public class UsernameTokenProcessor implements Processor {
      * @return a Credential object corresponding to the (validated) Username Token
      * @throws WSSecurityException
      */
-    public Credential 
+    private Credential 
     handleUsernameToken(
         Element token, 
         Validator validator,
@@ -122,10 +123,14 @@ public class UsernameTokenProcessor implements Processor {
         boolean allowNamespaceQualifiedPasswordTypes = false;
         boolean bspCompliant = true;
         WSSConfig wssConfig = data.getWssConfig();
+        int utTTL = 300;
+        int futureTimeToLive = 60;
         if (wssConfig != null) {
             allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
             bspCompliant = wssConfig.isWsiBSPCompliant();
+            utTTL = wssConfig.getUtTTL();
+            futureTimeToLive = wssConfig.getUtFutureTTL();
         }
         
         //
@@ -144,7 +149,21 @@ public class UsernameTokenProcessor implements Processor {
                     new Object[] {"A replay attack has been detected"}
                 );
             }
-            replayCache.add(ut.getNonce());
+            
+            // If no Created, then just cache for the default time
+            // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
+            // older token will just get rejected anyway
+            Date created = ut.getCreatedDate();
+            if (created == null || utTTL <= 0) {
+                replayCache.add(ut.getNonce());
+            } else {
+                replayCache.add(ut.getNonce(), utTTL + 1L);
+            }
+        }
+        
+        // Validate whether the security semantics have expired
+        if (!ut.verifyCreated(utTTL, futureTimeToLive)) {
+            throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED);
         }
         
         Credential credential = new Credential();

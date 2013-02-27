@@ -287,8 +287,11 @@ public abstract class WSHandler {
             String passwordType = decodePasswordType(reqData);
             wssConfig.setRequiredPasswordType(passwordType);
         }
-        wssConfig.setTimeStampTTL(decodeTimeToLive(reqData));
-        wssConfig.setTimeStampFutureTTL(decodeFutureTimeToLive(reqData));
+        wssConfig.setTimeStampTTL(decodeTimeToLive(reqData, true));
+        wssConfig.setTimeStampFutureTTL(decodeFutureTimeToLive(reqData, true));
+        wssConfig.setUtTTL(decodeTimeToLive(reqData, false));
+        wssConfig.setUtFutureTTL(decodeFutureTimeToLive(reqData, false));
+        
         wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
         wssConfig.setAllowNamespaceQualifiedPasswordTypes(
@@ -638,26 +641,41 @@ public abstract class WSHandler {
         }
     }
 
-    public int decodeTimeToLive(RequestData reqData) {
-        String ttl = 
-            getString(WSHandlerConstants.TTL_TIMESTAMP, reqData.getMsgContext());
-        int ttlI = 0;
+    /**
+     * Decode the TimeToLive parameter for either a Timestamp or a UsernameToken Created element,
+     * depending on the boolean argument
+     */
+    public int decodeTimeToLive(RequestData reqData, boolean timestamp) {
+        String tag = WSHandlerConstants.TTL_TIMESTAMP;
+        if (!timestamp) {
+            tag = WSHandlerConstants.TTL_USERNAMETOKEN;
+        }
+        String ttl = getString(tag, reqData.getMsgContext());
+        int defaultTimeToLive = 300;
         if (ttl != null) {
             try {
-                ttlI = Integer.parseInt(ttl);
+                int ttlI = Integer.parseInt(ttl);
+                if (ttlI < 0) {
+                    return defaultTimeToLive;
+                }
+                return ttlI;
             } catch (NumberFormatException e) {
-                ttlI = reqData.getTimeToLive();
+                return defaultTimeToLive;
             }
         }
-        if (ttlI <= 0) {
-            ttlI = reqData.getTimeToLive();
-        }
-        return ttlI;
+        return defaultTimeToLive;
     }
     
-    protected int decodeFutureTimeToLive(RequestData reqData) {
-        String ttl = 
-            getString(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, reqData.getMsgContext());
+    /**
+     * Decode the FutureTimeToLive parameter for either a Timestamp or a UsernameToken Created 
+     * element, depending on the boolean argument
+     */
+    protected int decodeFutureTimeToLive(RequestData reqData, boolean timestamp) {
+        String tag = WSHandlerConstants.TTL_FUTURE_TIMESTAMP;
+        if (!timestamp) {
+            tag = WSHandlerConstants.TTL_FUTURE_USERNAMETOKEN;
+        }
+        String ttl = getString(tag, reqData.getMsgContext());
         int defaultFutureTimeToLive = 60;
         if (ttl != null) {
             try {

@@ -34,13 +34,18 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
+
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -240,7 +245,161 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
+    
+    /**
+     * This is a test for processing an "old" UsernameToken, i.e. one with a "Created" element that is
+     * out of date
+     */
+    @org.junit.Test
+    public void testOldUsernameToken() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("wernerd", "verySecret");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, secHeader);
 
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setUtTTL(-1);
+        secEngine.setWssConfig(config);
+        
+        try {
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("The UsernameToken validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }  
+    }
+
+    /** 
+     * This is a test for processing a UsernameToken where the "Created" element is in the (near)
+     * future. It should be accepted by default when it is created 30 seconds in the future, 
+     * and then rejected once we configure "0 seconds" for future-time-to-live.
+     */
+    @org.junit.Test
+    public void testNearFutureCreated() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element usernameTokenElement = 
+            doc.createElementNS(
+                WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_TOKEN_LN
+            );
+        Element usernameElement = 
+            doc.createElementNS(
+                WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_LN
+            );
+        usernameElement.appendChild(doc.createTextNode("wernerd"));
+        usernameTokenElement.appendChild(usernameElement);
+        
+        Element passwordElement = 
+            doc.createElementNS(
+                WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.PASSWORD_LN
+            );
+        passwordElement.setAttributeNS(null, "Type", WSConstants.PASSWORD_TEXT);
+        passwordElement.appendChild(doc.createTextNode("verySecret"));
+        usernameTokenElement.appendChild(passwordElement);
+
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 30000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        usernameTokenElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(usernameTokenElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        // This should work
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        
+        // This should not
+        try {
+            WSSConfig config = WSSConfig.getNewInstance();
+            config.setUtFutureTTL(0);
+            secEngine.setWssConfig(config);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("The UsernameToken validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }  
+    }
+    
+    /** 
+     * This is a test for processing a UsernameToken where the "Created" element is in the future.
+     * A UsernameToken that is 120 seconds in the future should be rejected by default.
+     */
+    @org.junit.Test
+    public void testFutureCreated() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Element usernameTokenElement = 
+            doc.createElementNS(
+                WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_TOKEN_LN
+            );
+        Element usernameElement = 
+            doc.createElementNS(
+                WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_LN
+            );
+        usernameElement.appendChild(doc.createTextNode("wernerd"));
+        usernameTokenElement.appendChild(usernameElement);
+        
+        Element passwordElement = 
+            doc.createElementNS(
+                WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.PASSWORD_LN
+            );
+        passwordElement.setAttributeNS(null, "Type", WSConstants.PASSWORD_TEXT);
+        passwordElement.appendChild(doc.createTextNode("verySecret"));
+        usernameTokenElement.appendChild(passwordElement);
+
+        Element elementCreated =
+            doc.createElementNS(
+                WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
+            );
+        DateFormat zulu = new XmlSchemaDateFormat();
+        Date createdDate = new Date();
+        long currentTime = createdDate.getTime() + 120000;
+        createdDate.setTime(currentTime);
+        elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
+        usernameTokenElement.appendChild(elementCreated);
+
+        secHeader.getSecurityHeader().appendChild(usernameTokenElement);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("The UsernameToken validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }  
+    }
+    
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */

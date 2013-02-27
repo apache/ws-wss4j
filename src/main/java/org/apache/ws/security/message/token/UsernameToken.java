@@ -25,6 +25,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.util.DateUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.ws.security.util.Base64;
@@ -43,6 +44,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -82,6 +84,7 @@ public class UsernameToken {
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded = false;
     private boolean bspCompliantDerivedKey = true;
+    private Date createdDate;
     
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
@@ -211,6 +214,23 @@ public class UsernameToken {
                     WSSecurityException.INVALID_SECURITY_TOKEN,
                     "badUsernameToken"
                 );
+            }
+        }
+        
+        if (elementCreated != null) {
+            String createdString = getCreated();
+            if (createdString != null && !"".equals(createdString)) {
+                DateFormat zulu = new XmlSchemaDateFormat();
+                if (bspCompliant) {
+                    zulu.setLenient(false);
+                }
+                try {
+                    createdDate = zulu.parse(createdString);
+                } catch (ParseException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.INVALID_SECURITY, "invalidTimestamp", null, e
+                    );
+                }
             }
         }
     }
@@ -397,6 +417,14 @@ public class UsernameToken {
      */
     public String getCreated() {
         return nodeString(elementCreated);
+    }
+    
+    /**
+     * Return the Created Element as a Date object
+     * @return the Created Date
+     */
+    public Date getCreatedDate() {
+       return createdDate;
     }
 
     /**
@@ -868,6 +896,21 @@ public class UsernameToken {
         principal.setPassword(getPassword());
         principal.setCreatedTime(getCreated());
         return principal;
+    }
+    
+    /**
+     * Return true if the "Created" value is before the current time minus the timeToLive
+     * argument, and if the Created value is not "in the future".
+     * 
+     * @param timeToLive the value in seconds for the validity of the Created time
+     * @param futureTimeToLive the value in seconds for the future validity of the Created time
+     * @return true if the UsernameToken is before (now-timeToLive), false otherwise
+     */
+    public boolean verifyCreated(
+        int timeToLive,
+        int futureTimeToLive
+    ) {
+        return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
     
     /**

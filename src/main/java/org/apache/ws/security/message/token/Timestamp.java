@@ -22,6 +22,7 @@ package org.apache.ws.security.message.token;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.util.DateUtil;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
@@ -313,35 +314,7 @@ public class Timestamp {
         int timeToLive,
         int futureTimeToLive
     ) {
-        Date validCreation = new Date();
-        long currentTime = validCreation.getTime();
-        if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + ((long)futureTimeToLive * 1000L));
-        }
-        // Check to see if the created time is in the future
-        if (createdDate != null && createdDate.after(validCreation)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Validation of Timestamp: The message was created in the future!");
-            }
-            return false;
-        }
-        
-        // Calculate the time that is allowed for the message to travel
-        currentTime -= ((long)timeToLive * 1000L);
-        validCreation.setTime(currentTime);
-
-        // Validate the time it took the message to travel
-        if (createdDate != null && createdDate.before(validCreation)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Validation of Timestamp: The message was created too long ago");
-            }
-            return false;
-        }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Validation of Timestamp: Everything is ok");
-        }
-        return true;
+        return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
 
     
