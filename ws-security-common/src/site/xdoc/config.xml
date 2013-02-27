@@ -519,6 +519,18 @@ default is "300".</td>
 valid. The default is "60".</td>
 </tr>
 <tr>
+<td>TTL_USERNAMETOKEN</td>
+<td>utTimeToLive</td>
+<td>The time difference between creation and expiry time in seconds in the WSS UsernameToken created element. The 
+default is "300".</td>
+</tr>
+<tr>
+<td>TTL_FUTURE_USERNAMETOKEN</td>
+<td>utFutureTimeToLive</td>
+<td>The time in seconds in the future within which the Created time of an incoming UsernameToken is 
+valid. The default is "60".</td>
+</tr>
+<tr>
 <td>SIG_SUBJECT_CERT_CONSTRAINTS</td>
 <td>sigSubjectCertConstraints</td>
 <td>A comma separated String of regular expressions which will be applied to the subject DN of the
