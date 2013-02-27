@@ -24,8 +24,10 @@ import org.apache.jcs.engine.ElementAttributes;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
+import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSecurityContext;
@@ -39,8 +41,11 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
+
+import java.util.Date;
 import java.util.Deque;
 import java.util.List;
 
@@ -103,7 +108,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         final WSSecurityContext wsSecurityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<QName> elementPath = getElementPath(eventQueue);
-
+        
+        // Verify Created
+        verifyCreated(wssSecurityProperties, usernameTokenType);
+        
         final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsSecurityContext, xmlSecEvents, elementPath);
 
         UsernameTokenValidator usernameTokenValidator =
@@ -195,5 +203,33 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
         }
 
+    }
+    
+    private void verifyCreated(
+        WSSSecurityProperties wssSecurityProperties,
+        UsernameTokenType usernameTokenType
+    ) throws WSSecurityException {
+        // Verify Created
+        int ttl = wssSecurityProperties.getUtTTL();
+        int futureTTL = wssSecurityProperties.getUtFutureTTL();
+        
+        final AttributedDateTime attributedDateTimeCreated =
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
+        
+        if (attributedDateTimeCreated != null) {
+            // Parse the Date
+            XMLGregorianCalendar created;
+            try {
+                created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(attributedDateTimeCreated.getValue());
+            } catch (IllegalArgumentException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+            Date createdDate = created.toGregorianCalendar().getTime();
+            
+            // Validate whether the security semantics have expired
+            if (!DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+            }
+        }
     }
 }

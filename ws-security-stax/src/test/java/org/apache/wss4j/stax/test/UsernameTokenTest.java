@@ -35,6 +35,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -44,6 +45,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 
 /**
@@ -220,15 +223,24 @@ public class UsernameTokenTest extends AbstractTestBase {
 
     @Test
     public void testReusedNonce() throws Exception {
+        
+        XMLGregorianCalendar created = 
+            WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
+        String createdString = created.toXMLFormat();
+        String digest = 
+            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
+                "Ex2YESUvsa1qne1m6TM8XA==", createdString, "default"
+            );
+        
         String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
                 "           <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">" +
                 "               <wsse:Username>transmitter</wsse:Username>" +
-                "               <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">HJuU+E+LKyZyC7k1BX7GF7kyACY=</wsse:Password>" +
+                "               <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">" + digest + "</wsse:Password>" +
                 "               <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">Ex2YESUvsa1qne1m6TM8XA==</wsse:Nonce>" +
-                "               <wsu:Created>2011-05-21T17:14:42.545Z</wsu:Created>" +
+                "               <wsu:Created>" + createdString + "</wsu:Created>" +
                 "           </wsse:UsernameToken>" +
                 "       </wsse:Security>\n" +
                 "    </env:Header>\n" +
@@ -251,7 +263,144 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
     }
+    
+    /**
+     * This is a test for processing an "old" UsernameToken, i.e. one with a "Created" element that is
+     * out of date
+     */
+    @Test
+    public void testOldUsernameToken() throws Exception {
+        
+        GregorianCalendar createdCalendar = new GregorianCalendar();
+        createdCalendar.add(Calendar.SECOND, -301);
+        XMLGregorianCalendar created = 
+            WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
+        String createdString = created.toXMLFormat();
+        
+        String digest = 
+            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
+                "Ex2YEKVvsa1qne1m6TM8XA==", createdString, "default"
+            );
+        
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "    <env:Header>" +
+                "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
+                "           <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">" +
+                "               <wsse:Username>transmitter</wsse:Username>" +
+                "               <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">" + digest + "</wsse:Password>" +
+                "               <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">Ex2YEKVvsa1qne1m6TM8XA==</wsse:Nonce>" +
+                "               <wsu:Created>" + createdString + "</wsu:Created>" +
+                "           </wsse:UsernameToken>" +
+                "       </wsse:Security>\n" +
+                "    </env:Header>\n" +
+                "    <env:Body>\n" +
+                "    </env:Body>\n" +
+                "</env:Envelope>";
 
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+
+        try {
+            XMLStreamReader xmlStreamReader = 
+                wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The message has expired");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
+        }
+    }
+
+    /** 
+     * This is a test for processing a UsernameToken where the "Created" element is in the (near)
+     * future. It should be accepted by default when it is created 30 seconds in the future.
+     */
+    @Test
+    public void testNearFutureCreated() throws Exception {
+        GregorianCalendar createdCalendar = new GregorianCalendar();
+        createdCalendar.add(Calendar.SECOND, 30);
+        XMLGregorianCalendar created = 
+            WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
+        String createdString = created.toXMLFormat();
+        
+        String digest = 
+            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
+                "Ex2YEKVvSa1qne1m6TM8XA==", createdString, "default"
+            );
+        
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "    <env:Header>" +
+                "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
+                "           <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">" +
+                "               <wsse:Username>transmitter</wsse:Username>" +
+                "               <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">" + digest + "</wsse:Password>" +
+                "               <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">Ex2YEKVvSa1qne1m6TM8XA==</wsse:Nonce>" +
+                "               <wsu:Created>" + createdString + "</wsu:Created>" +
+                "           </wsse:UsernameToken>" +
+                "       </wsse:Security>\n" +
+                "    </env:Header>\n" +
+                "    <env:Body>\n" +
+                "    </env:Body>\n" +
+                "</env:Envelope>";
+
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
+        StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+    }
+    
+    /** 
+     * This is a test for processing a UsernameToken where the "Created" element is in the future.
+     * A UsernameToken that is 120 seconds in the future should be rejected by default.
+     */
+    @Test
+    public void testFutureCreated() throws Exception {
+        GregorianCalendar createdCalendar = new GregorianCalendar();
+        createdCalendar.add(Calendar.SECOND, 120);
+        XMLGregorianCalendar created = 
+            WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
+        String createdString = created.toXMLFormat();
+        
+        String digest = 
+            org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
+                "Ex2YEKVvsa1Qne1m6TM8XA==", createdString, "default"
+            );
+        
+        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "    <env:Header>" +
+                "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
+                "           <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">" +
+                "               <wsse:Username>transmitter</wsse:Username>" +
+                "               <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">" + digest + "</wsse:Password>" +
+                "               <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">Ex2YEKVvsa1Qne1m6TM8XA==</wsse:Nonce>" +
+                "               <wsu:Created>" + createdString + "</wsu:Created>" +
+                "           </wsse:UsernameToken>" +
+                "       </wsse:Security>\n" +
+                "    </env:Header>\n" +
+                "    <env:Body>\n" +
+                "    </env:Body>\n" +
+                "</env:Envelope>";
+
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+
+        try {
+            XMLStreamReader xmlStreamReader = 
+                wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.fail("Expected XMLStreamException");
+        } catch (XMLStreamException e) {
+            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The message has expired");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
+        }
+    }
+    
     @Test
     public void testDefaultConfigurationOutbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

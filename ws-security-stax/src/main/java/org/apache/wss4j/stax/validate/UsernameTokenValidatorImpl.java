@@ -32,10 +32,6 @@ import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 /**
  * @author $Author$
  * @version $Revision$ $Date$
@@ -61,7 +57,6 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 || Boolean.parseBoolean((String)tokenContext.getWsSecurityContext().get(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD));
 
         final byte[] nonceVal;
-        final String created;
 
         WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
         if (passwordType != null && passwordType.getType() != null) {
@@ -78,6 +73,12 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         final AttributedDateTime attributedDateTimeCreated =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
+        final String created;
+        if (attributedDateTimeCreated != null) {
+            created = attributedDateTimeCreated.getValue();
+        } else {
+            created = null;
+        }
 
         if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
             if (encodedNonce == null || attributedDateTimeCreated == null) {
@@ -89,30 +90,12 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             }
 
             nonceVal = Base64.decodeBase64(encodedNonce.getValue());
-            created = attributedDateTimeCreated.getValue();
-
-            XMLGregorianCalendar xmlGregorianCalendar;
-            try {
-                xmlGregorianCalendar = attributedDateTimeCreated.getAsXMLGregorianCalendar();
-            } catch (IllegalArgumentException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-            GregorianCalendar createdCal = xmlGregorianCalendar.toGregorianCalendar();
-            GregorianCalendar now = new GregorianCalendar();
-            if (createdCal.after(now)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
-            now.add(Calendar.MINUTE, 5);
-            if (createdCal.after(now)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            }
 
             verifyDigestPassword(username.getValue(), passwordType, nonceVal, created, tokenContext);
         } else if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)
                 || (passwordType != null && passwordType.getValue() != null
                 && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE)) {
             nonceVal = null;
-            created = null;
             
             verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
         } else if (passwordType != null && passwordType.getValue() != null) {
@@ -120,7 +103,6 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             nonceVal = null;
-            created = null;
             
             verifyCustomPassword(username.getValue(), passwordType, tokenContext);
         } else {
@@ -128,7 +110,6 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             nonceVal = null;
-            created = null;
         }
 
         final String password;

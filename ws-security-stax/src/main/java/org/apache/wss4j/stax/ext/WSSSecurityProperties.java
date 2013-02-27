@@ -54,6 +54,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Integer timestampTTL = 300;
     private Integer timeStampFutureTTL = 60;
     private boolean strictTimestampCheck = true;
+    private Integer utTTL = 300;
+    private Integer utFutureTTL = 60;
 
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
@@ -112,6 +114,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.validators.putAll(wssSecurityProperties.validators);
         this.timestampTTL = wssSecurityProperties.timestampTTL;
         this.timeStampFutureTTL = wssSecurityProperties.timeStampFutureTTL;
+        this.utTTL = wssSecurityProperties.utTTL;
+        this.utFutureTTL = wssSecurityProperties.utFutureTTL;
         this.strictTimestampCheck = wssSecurityProperties.strictTimestampCheck;
         this.handleCustomPasswordTypes = wssSecurityProperties.handleCustomPasswordTypes;
         this.usernameTokenPasswordType = wssSecurityProperties.usernameTokenPasswordType;
@@ -608,5 +612,21 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setTimeStampFutureTTL(Integer timeStampFutureTTL) {
         this.timeStampFutureTTL = timeStampFutureTTL;
+    }
+
+    public Integer getUtTTL() {
+        return utTTL;
+    }
+
+    public void setUtTTL(Integer utTTL) {
+        this.utTTL = utTTL;
+    }
+
+    public Integer getUtFutureTTL() {
+        return utFutureTTL;
+    }
+
+    public void setUtFutureTTL(Integer utFutureTTL) {
+        this.utFutureTTL = utFutureTTL;
     }
 }

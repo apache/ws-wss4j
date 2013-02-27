@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.binding.wsu10.TimestampType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -81,7 +82,7 @@ public class TimestampValidatorImpl implements TimestampValidator {
                         "The security semantics of the message have expired");
             }
 
-            if (createdDate != null && !verifyCreated(createdDate, ttl, futureTTL)) {
+            if (createdDate != null && !DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
                 log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                         "The security semantics of the message have expired");
@@ -92,38 +93,4 @@ public class TimestampValidatorImpl implements TimestampValidator {
         }
     }
     
-    /**
-     * Return true if the "Created" value is before the current time minus the timeToLive
-     * argument, and if the Created value is not "in the future".
-     */
-    private boolean verifyCreated(
-        Date createdDate,
-        int timeToLive,
-        int futureTimeToLive
-    ) {
-        Date validCreation = new Date();
-        long currentTime = validCreation.getTime();
-        if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + ((long)futureTimeToLive * 1000L));
-        }
-        // Check to see if the created time is in the future
-        if (createdDate.after(validCreation)) {
-            log.debug("Validation of Timestamp: The message was created in the future!");
-            return false;
-        }
-
-        // Calculate the time that is allowed for the message to travel
-        currentTime -= ((long)timeToLive * 1000L);
-        validCreation.setTime(currentTime);
-
-        // Validate the time it took the message to travel
-        if (createdDate.before(validCreation)) {
-            log.debug("Validation of Timestamp: The message was created too long ago");
-            return false;
-        }
-
-        log.debug("Validation of Timestamp: Everything is ok");
-        
-        return true;
-    }
 }
