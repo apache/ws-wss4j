@@ -38,13 +38,14 @@ public class WSSecSAMLToken extends WSSecBase {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecSAMLToken.class);
     
-    private Document document = null;
+    private Document document;
     
-    private SamlAssertionWrapper saml = null;
+    private SamlAssertionWrapper saml;
 
     public WSSecSAMLToken() {
         super();
     }
+    
     public WSSecSAMLToken(WSSConfig config) {
         super(config);
     }

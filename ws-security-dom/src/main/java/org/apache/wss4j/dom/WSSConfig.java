@@ -221,16 +221,16 @@ public class WSSConfig {
      * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
      * The default is true.
      */
-    protected boolean addInclusivePrefixes = true;
+    private boolean addInclusivePrefixes = true;
 
     /**
      * Set the timestamp precision mode. If set to <code>true</code> then use
      * timestamps with milliseconds, otherwise omit the milliseconds. As per XML
      * Date/Time specification the default is to include the milliseconds.
      */
-    protected boolean precisionInMilliSeconds = true;
+    private boolean precisionInMilliSeconds = true;
 
-    protected boolean enableSignatureConfirmation = false;
+    private boolean enableSignatureConfirmation;
 
     /**
      * If set to true then the timestamp handling will throw an exception if the
@@ -239,44 +239,44 @@ public class WSSConfig {
      * If set to false, no exception will be thrown, even if the semantics are
      * expired.
      */
-    protected boolean timeStampStrict = true;
+    private boolean timeStampStrict = true;
     
     /**
      * If this value is not null, then username token handling will throw an 
      * exception if the password type of the Username Token does not match this value
      */
-    protected String requiredPasswordType = null;
+    private String requiredPasswordType;
     
     /**
      * This variable controls whether a UsernameToken with no password element is allowed. 
      * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
      * or to support UsernameTokens for purposes other than authentication.
      */
-    protected boolean allowUsernameTokenNoPassword = false;
+    private boolean allowUsernameTokenNoPassword;
     
     /**
      * The time in seconds between creation and expiry for a Timestamp. The default
      * is 300 seconds (5 minutes).
      */
-    protected int timeStampTTL = 300;
+    private int timeStampTTL = 300;
     
     /**
      * The time in seconds in the future within which the Created time of an incoming 
      * Timestamp is valid. The default is 60 seconds.
      */
-    protected int timeStampFutureTTL = 60;
+    private int timeStampFutureTTL = 60;
     
     /**
      * The time in seconds between creation and expiry for a UsernameToken Created
      * element. The default is 300 seconds (5 minutes).
      */
-    protected int utTTL = 300;
+    private int utTTL = 300;
     
     /**
      * The time in seconds in the future within which the Created time of an incoming 
      * UsernameToken is valid. The default is 60 seconds.
      */
-    protected int utFutureTTL = 60;
+    private int utFutureTTL = 60;
     
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
@@ -285,7 +285,7 @@ public class WSSConfig {
      * By default this is set to false so that the user doesn't have to explicitly
      * reject custom token types in the callback handler.
      */
-    protected boolean handleCustomPasswordTypes = false;
+    private boolean handleCustomPasswordTypes;
     
     /**
      * This variable controls whether (wsse) namespace qualified password types are
@@ -293,12 +293,12 @@ public class WSSConfig {
      * 
      * By default this is set to false.
      */
-    protected boolean allowNamespaceQualifiedPasswordTypes = false;
+    private boolean allowNamespaceQualifiedPasswordTypes;
     
     /**
      * The secret key length to be used for UT_SIGN.
      */
-    protected int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
+    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
 
     /**
      * Whether the password should be treated as a binary value.  This
@@ -311,7 +311,7 @@ public class WSSConfig {
      *
      * See https://issues.apache.org/jira/browse/WSS-239
      */
-    protected boolean passwordsAreEncoded = false;
+    private boolean passwordsAreEncoded;
     
     /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"

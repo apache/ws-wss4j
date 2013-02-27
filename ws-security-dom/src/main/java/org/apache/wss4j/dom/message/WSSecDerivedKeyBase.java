@@ -56,17 +56,17 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     /**
      * DerivedKeyToken of this builder
      */
-    protected DerivedKeyToken dkt = null;
+    protected DerivedKeyToken dkt;
     
     /**
      * Raw bytes of the derived key
      */
-    protected byte[] derivedKeyBytes = null; 
+    protected byte[] derivedKeyBytes; 
     
     /**
      * wsu:Id of the wsc:DerivedKeyToken
      */
-    protected String dktId = null;
+    protected String dktId;
     
     /**
      * Client's label value
@@ -81,13 +81,13 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     /**
      * soap:Envelope element
      */
-    protected Element envelope = null;
+    protected Element envelope;
     
     /**
      * The Token identifier of the token that the <code>DerivedKeyToken</code> 
      * is (or to be) derived from.
      */
-    private String tokenIdentifier = null;
+    private String tokenIdentifier;
     
     /**
      * True if the tokenIdentifier is a direct reference to a key identifier

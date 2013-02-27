@@ -59,14 +59,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecEncrypt.class);
     
-    private byte[] embeddedKey = null;
+    private byte[] embeddedKey;
 
-    private String embeddedKeyName = null;
+    private String embeddedKeyName;
 
     /**
      * SecurityTokenReference to be inserted into EncryptedData/keyInfo element.
      */
-    private SecurityTokenReference securityTokenReference = null;
+    private SecurityTokenReference securityTokenReference ;
 
     /**
      * Indicates whether to encrypt the symmetric key into an EncryptedKey 

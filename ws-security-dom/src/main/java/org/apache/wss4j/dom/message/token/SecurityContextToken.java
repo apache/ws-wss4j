@@ -43,14 +43,14 @@ public class SecurityContextToken {
     /**
      * Security context token element
      */
-    private Element element = null;
+    private Element element;
 
     /**
      * Identifier element
      */
-    private Element elementIdentifier = null;
+    private Element elementIdentifier;
     
-    private WSSConfig wssConfig = null;
+    private WSSConfig wssConfig;
     
     private String tokenType = WSConstants.WSC_SCT;
     

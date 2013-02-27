@@ -36,11 +36,11 @@ import org.w3c.dom.Node;
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecHeader {
-    private String actor = null;
+    private String actor;
 
     private boolean mustunderstand = true;
 
-    private Element securityHeader = null;
+    private Element securityHeader;
 
     /**
      * Constructor.

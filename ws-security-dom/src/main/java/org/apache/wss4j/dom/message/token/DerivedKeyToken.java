@@ -63,14 +63,14 @@ public class DerivedKeyToken {
         org.apache.commons.logging.LogFactory.getLog(DerivedKeyToken.class);
 
     // These are the elements that are used to create the SecurityContextToken
-    private Element element = null;
-    private Element elementSecurityTokenReference = null;
-    private Element elementProperties = null;
-    private Element elementGeneration = null;
-    private Element elementOffset = null;
-    private Element elementLength = null;
-    private Element elementLabel = null;
-    private Element elementNonce = null;
+    private Element element;
+    private Element elementSecurityTokenReference;
+    private Element elementProperties;
+    private Element elementGeneration;
+    private Element elementOffset;
+    private Element elementLength;
+    private Element elementLabel;
+    private Element elementNonce;
     
     private String ns;
     

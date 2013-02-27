@@ -54,11 +54,10 @@ public class XMLUtils {
         if (parentNode == null) {
             return null;
         }
-        for (
-                Node currentChild = parentNode.getFirstChild();
-                currentChild != null;
-                currentChild = currentChild.getNextSibling()
-                ) {
+        for (Node currentChild = parentNode.getFirstChild();
+            currentChild != null;
+            currentChild = currentChild.getNextSibling()
+        ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()
                     && localName.equals(currentChild.getLocalName())
                     && namespace.equals(currentChild.getNamespaceURI())) {

@@ -82,33 +82,33 @@ public class WSSecSignature extends WSSecSignatureBase {
         org.apache.commons.logging.LogFactory.getLog(WSSecSignature.class);
 
     protected boolean useSingleCert = true;
-    protected String sigAlgo = null;
+    protected String sigAlgo;
     protected String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
-    protected byte[] signatureValue = null;
-    protected Document document = null;
-    protected WSDocInfo wsDocInfo = null;
-    protected String certUri = null;
-    protected String keyInfoUri = null;
-    protected SecurityTokenReference secRef = null;
-    protected String strUri = null;
-    protected BinarySecurity bstToken = null;
+    protected byte[] signatureValue;
+    protected Document document;
+    protected WSDocInfo wsDocInfo;
+    protected String certUri;
+    protected String keyInfoUri;
+    protected SecurityTokenReference secRef;
+    protected String strUri;
+    protected BinarySecurity bstToken;
     
     protected KeyInfoFactory keyInfoFactory;
     protected XMLSignatureFactory signatureFactory;
     protected KeyInfo keyInfo;
     protected CanonicalizationMethod c14nMethod;
     protected XMLSignature sig;
-    protected byte[] secretKey = null;
+    protected byte[] secretKey;
     protected String customTokenValueType;
     protected String customTokenId;
     
-    private String encrKeySha1value = null;
-    private Crypto crypto = null;
+    private String encrKeySha1value;
+    private Crypto crypto;
     private String digestAlgo = WSConstants.SHA1;
-    private X509Certificate useThisCert = null;
-    private Element securityHeader = null;
+    private X509Certificate useThisCert;
+    private Element securityHeader;
     private boolean useCustomSecRef;
-    private boolean bstAddedToSecurityHeader = false;
+    private boolean bstAddedToSecurityHeader;
 
     public WSSecSignature() {
         super();

@@ -45,7 +45,7 @@ public class X509Security extends BinarySecurity {
      * Stores the associated X.509 Certificate. This saves numerous
      * crypto loadCertificate operations
      */
-    private X509Certificate cachedCert = null;
+    private X509Certificate cachedCert;
 
     /**
      * This constructor creates a new X509 certificate object and initializes

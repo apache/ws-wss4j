@@ -44,7 +44,7 @@ import java.util.List;
  * @author Sam Ruby (rubys@us.ibm.com)
  */
 public class NSStack {
-    protected static final org.apache.commons.logging.Log log =
+    private static final org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(NSStack.class);
 
     private Mapping[] stack;

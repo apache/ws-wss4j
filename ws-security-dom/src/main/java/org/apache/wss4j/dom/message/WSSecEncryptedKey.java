@@ -72,7 +72,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * soap:Envelope element
      */
-    protected Element envelope = null;
+    protected Element envelope;
 
     /**
      * Session key used as the secret in key derivation
@@ -82,7 +82,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * Symmetric key used in the EncryptedKey.
      */
-    protected SecretKey symmetricKey = null;
+    protected SecretKey symmetricKey;
 
     /**
      * Encrypted bytes of the ephemeral key
@@ -103,24 +103,24 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
      * written out unless it is explicitly configured).
      */
-    private String digestAlgo = null;
+    private String digestAlgo;
 
     /**
      * MGF Algorithm to be used with RSA-OAEP. The default is MGF-SHA-1 (which is not
      * written out unless it is explicitly configured).
      */
-    private String mgfAlgo = null;
+    private String mgfAlgo;
 
     /**
      * xenc:EncryptedKey element
      */
-    protected Element encryptedKeyElement = null;
+    protected Element encryptedKeyElement;
 
     /**
      * The Token identifier of the token that the <code>DerivedKeyToken</code>
      * is (or to be) derived from.
      */
-    protected String encKeyId = null;
+    protected String encKeyId;
 
     /**
      * Custom token value
@@ -136,9 +136,9 @@ public class WSSecEncryptedKey extends WSSecBase {
      * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE
      * is used to refer to the asymmetric encryption cert
      */
-    protected BinarySecurity bstToken = null;
+    protected BinarySecurity bstToken;
     
-    protected X509Certificate useThisCert = null;
+    protected X509Certificate useThisCert;
     
     public WSSecEncryptedKey() {
         super();

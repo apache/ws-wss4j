@@ -51,8 +51,8 @@ import org.w3c.dom.Text;
  */
 public class Timestamp {
     
-    private Element element = null;
-    private List<Element> customElements = null;
+    private Element element;
+    private List<Element> customElements;
     private Date createdDate;
     private Date expiresDate;
     

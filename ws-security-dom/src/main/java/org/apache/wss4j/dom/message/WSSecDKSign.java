@@ -66,11 +66,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private String sigAlgo = WSConstants.HMAC_SHA1;
     private String digestAlgo = WSConstants.SHA1;
     private String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
-    private byte[] signatureValue = null;
+    private byte[] signatureValue;
     
-    private String keyInfoUri = null;
-    private SecurityTokenReference secRef = null;
-    private String strUri = null;
+    private String keyInfoUri;
+    private SecurityTokenReference secRef;
+    private String strUri;
     private WSDocInfo wsDocInfo;
     
     private KeyInfoFactory keyInfoFactory;
@@ -78,7 +78,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private XMLSignature sig;
     private KeyInfo keyInfo;
     private CanonicalizationMethod c14nMethod;
-    private Element securityHeader = null;
+    private Element securityHeader;
 
     public WSSecDKSign() {
         super();

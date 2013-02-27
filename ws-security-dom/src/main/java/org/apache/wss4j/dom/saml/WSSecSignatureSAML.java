@@ -61,15 +61,15 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecSignatureSAML.class);
-    private boolean senderVouches = false;
-    private SecurityTokenReference secRefSaml = null;
-    private String secRefID = null;
-    private Element samlToken = null;
-    private Crypto userCrypto = null;
-    private Crypto issuerCrypto = null;
-    private String issuerKeyName = null;
-    private String issuerKeyPW = null;
-    private boolean useDirectReferenceToAssertion = false;
+    private boolean senderVouches;
+    private SecurityTokenReference secRefSaml;
+    private String secRefID;
+    private Element samlToken;
+    private Crypto userCrypto;
+    private Crypto issuerCrypto;
+    private String issuerKeyName;
+    private String issuerKeyPW;
+    private boolean useDirectReferenceToAssertion;
     
     /**
      * Constructor.

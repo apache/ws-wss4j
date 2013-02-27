@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
  */
 public class AuthenticationStatementBean {
     private SubjectBean subject;
-    DateTime authenticationInstant;
+    private DateTime authenticationInstant;
     private String authenticationMethod;
     private SubjectLocalityBean subjectLocality;
     private String sessionIndex;

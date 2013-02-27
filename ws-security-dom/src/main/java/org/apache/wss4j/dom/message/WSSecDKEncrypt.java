@@ -50,6 +50,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     public WSSecDKEncrypt() {
         super();
     }
+    
     public WSSecDKEncrypt(WSSConfig config) {
         super(config);
     }

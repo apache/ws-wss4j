@@ -45,12 +45,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class WSDocInfo {
-    private Document doc = null;
-    private Crypto crypto = null;
-    private List<Element> tokenList = null;
-    private List<WSSecurityEngineResult> resultsList = null;
-    private CallbackLookup callbackLookup = null;
-    private Element securityHeader = null;
+    private Document doc;
+    private Crypto crypto;
+    private List<Element> tokenList;
+    private List<WSSecurityEngineResult> resultsList;
+    private CallbackLookup callbackLookup;
+    private Element securityHeader;
 
     public WSDocInfo(Document doc) {
         //

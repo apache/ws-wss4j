@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SignatureConfirmationAction implements Action {
-    protected static final org.apache.commons.logging.Log log = 
+    private static final org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")

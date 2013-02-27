@@ -37,16 +37,18 @@ public class WSSecTimestamp extends WSSecBase {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecTimestamp.class);
 
-    private Timestamp ts = null;
+    private Timestamp ts;
 
     private int timeToLive = 300; // time between Created and Expires
     
     public WSSecTimestamp() {
         super();
     }
+    
     public WSSecTimestamp(WSSConfig config) {
         super(config);
     }
+    
     /**
      * Set the time to live. This is the time difference in seconds between the
      * <code>Created</code> and the <code>Expires</code> in

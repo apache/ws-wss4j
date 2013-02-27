@@ -46,7 +46,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  */
 public class CertificateStore extends CryptoBase {
     
-    protected X509Certificate[] trustedCerts;
+    private X509Certificate[] trustedCerts;
     
     /**
      * Constructor

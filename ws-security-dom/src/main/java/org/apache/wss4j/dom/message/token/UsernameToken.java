@@ -79,17 +79,17 @@ public class UsernameToken {
         org.apache.commons.logging.LogFactory.getLog(UsernameToken.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
-    private Element element = null;
-    private Element elementUsername = null;
-    private Element elementPassword = null;
-    private Element elementNonce = null;
-    private Element elementCreated = null;
-    private Element elementSalt = null;
-    private Element elementIteration = null;
-    private String passwordType = null;
+    private Element element ;
+    private Element elementUsername;
+    private Element elementPassword;
+    private Element elementNonce;
+    private Element elementCreated;
+    private Element elementSalt;
+    private Element elementIteration;
+    private String passwordType;
     private boolean hashed = true;
     private String rawPassword;        // enhancement by Alberto Coletti
-    private boolean passwordsAreEncoded = false;
+    private boolean passwordsAreEncoded;
     private Date createdDate;
     
     /**

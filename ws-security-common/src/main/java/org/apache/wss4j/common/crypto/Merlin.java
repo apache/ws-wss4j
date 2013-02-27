@@ -118,7 +118,6 @@ public class Merlin extends CryptoBase {
         org.apache.commons.logging.LogFactory.getLog(Merlin.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
-    protected static CertificateFactory certFact;
     protected Properties properties = null;
     protected KeyStore keystore = null;
     protected KeyStore truststore = null;

@@ -41,7 +41,7 @@ public class JAASUsernameTokenValidator implements Validator {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(JAASUsernameTokenValidator.class);
     
-    private String contextName = null;
+    private String contextName;
     
     public void setContextName(String name) {
         contextName = name;

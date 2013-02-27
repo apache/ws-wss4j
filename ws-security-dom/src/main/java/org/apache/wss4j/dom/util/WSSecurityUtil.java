@@ -72,12 +72,12 @@ public final class WSSecurityUtil {
      * generator is required to overcome punitive
      * overhead.
      */
-    private static SecureRandom random = null;
+    private static SecureRandom random;
     
     /**
      * A cached MessageDigest object
      */
-    private static MessageDigest digest = null;
+    private static MessageDigest digest;
     
     private WSSecurityUtil() {
         // Complete

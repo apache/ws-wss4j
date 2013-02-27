@@ -55,6 +55,7 @@ public class WSSecSignatureBase extends WSSecBase {
     public WSSecSignatureBase() {
         super();
     }
+    
     public WSSecSignatureBase(WSSConfig config) {
         super(config);
     }

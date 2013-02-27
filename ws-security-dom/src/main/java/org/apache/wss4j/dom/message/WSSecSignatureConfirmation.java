@@ -30,18 +30,18 @@ import org.w3c.dom.Element;
  * 
  * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
-
 public class WSSecSignatureConfirmation extends WSSecBase {
     private static org.apache.commons.logging.Log log = 
         org.apache.commons.logging.LogFactory.getLog(WSSecSignatureConfirmation.class);
 
-    private SignatureConfirmation sc = null;
+    private SignatureConfirmation sc;
 
-    private byte[] signatureValue = null;
+    private byte[] signatureValue;
 
     public WSSecSignatureConfirmation() {
         super();
     }
+    
     public WSSecSignatureConfirmation(WSSConfig config) {
         super(config);
     }

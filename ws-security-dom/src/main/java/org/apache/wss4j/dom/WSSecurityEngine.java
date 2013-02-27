@@ -49,13 +49,6 @@ public class WSSecurityEngine {
         org.apache.commons.logging.LogFactory.getLog(WSSecurityEngine.class);
 
     /**
-     * The WSSConfig instance used by this SecurityEngine to
-     * find Processors for processing security headers
-     */
-    private WSSConfig wssConfig = null;
-    private boolean doDebug = false;
-    private CallbackLookup callbackLookup = null;
-    /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
      */
     public static final QName BINARY_TOKEN = 
@@ -134,6 +127,14 @@ public class WSSecurityEngine {
      */
     public static final QName SECURITY_CONTEXT_TOKEN_05_12 = 
         new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+    
+    /**
+     * The WSSConfig instance used by this SecurityEngine to
+     * find Processors for processing security headers
+     */
+    private WSSConfig wssConfig;
+    private boolean doDebug;
+    private CallbackLookup callbackLookup;
     
     /**
      * @return      the WSSConfig object set on this instance

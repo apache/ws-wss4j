@@ -51,7 +51,7 @@ public class BinarySecurity {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(BinarySecurity.class);
     
-    private Element element = null;
+    private Element element;
 
     /**
      * Constructor.

@@ -36,15 +36,15 @@ import java.util.List;
  * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecBase {
-    protected String user = null;
+    protected String user;
 
-    protected String password = null;
+    protected String password;
 
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
 
-    protected List<WSEncryptionPart> parts = null;
+    protected List<WSEncryptionPart> parts;
 
-    protected boolean doDebug = false;
+    protected boolean doDebug;
     
     protected CallbackLookup callbackLookup;
 
@@ -52,6 +52,7 @@ public class WSSecBase {
     
     public WSSecBase() {
     }
+    
     public WSSecBase(WSSConfig config) {
         wssConfig = config;
     }

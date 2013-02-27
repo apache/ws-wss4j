@@ -41,15 +41,15 @@ public class WSSecUsernameToken extends WSSecBase {
         org.apache.commons.logging.LogFactory.getLog(WSSecUsernameToken.class);
 
     private String passwordType = WSConstants.PASSWORD_DIGEST;
-    private UsernameToken ut = null;
-    private boolean nonce = false;
-    private boolean created = false;
-    private boolean useDerivedKey = false;
-    private boolean useMac = false;
+    private UsernameToken ut;
+    private boolean nonce;
+    private boolean created;
+    private boolean useDerivedKey;
+    private boolean useMac;
     private byte[] saltValue;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
     private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
-    private boolean passwordsAreEncoded = false;
+    private boolean passwordsAreEncoded;
 
     public WSSecUsernameToken() {
         super();

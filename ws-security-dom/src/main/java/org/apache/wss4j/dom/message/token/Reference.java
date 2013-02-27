@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
  */
 public class Reference {
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "Reference");
-    private Element element = null;
+    private Element element;
     
     /**
      * Constructor.

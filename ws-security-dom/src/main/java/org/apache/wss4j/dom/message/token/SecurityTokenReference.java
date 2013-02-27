@@ -67,10 +67,10 @@ public class SecurityTokenReference {
     private static org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(SecurityTokenReference.class);
     
-    private Element element = null;
-    private DOMX509IssuerSerial issuerSerial = null;
-    private byte[] skiBytes = null;
-    private Reference reference = null;
+    private Element element;
+    private DOMX509IssuerSerial issuerSerial;
+    private byte[] skiBytes;
+    private Reference reference;
 
     /**
      * Constructor.

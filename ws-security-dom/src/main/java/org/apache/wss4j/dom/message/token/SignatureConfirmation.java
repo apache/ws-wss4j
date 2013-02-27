@@ -43,8 +43,8 @@ import org.w3c.dom.Node;
 public class SignatureConfirmation {
 
     public static final String SC_VALUE_ATTR = "Value"; 
-    private Element element = null;
-    private byte[] signatureValue = null;
+    private Element element;
+    private byte[] signatureValue;
     
     /**
      * Constructs a <code>SignatureConfirmation</code> object and parses the
