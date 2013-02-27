@@ -24,8 +24,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.wss4j.dom.NamePasswordCallbackHandler;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.NamePasswordCallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
