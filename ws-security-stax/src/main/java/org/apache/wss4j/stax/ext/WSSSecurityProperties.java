@@ -52,6 +52,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private final Map<QName, Validator> validators = new HashMap<QName, Validator>();
 
     private Integer timestampTTL = 300;
+    private Integer timeStampFutureTTL = 60;
     private boolean strictTimestampCheck = true;
 
     /**
@@ -110,6 +111,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.ignoredBSPRules.addAll(wssSecurityProperties.ignoredBSPRules);
         this.validators.putAll(wssSecurityProperties.validators);
         this.timestampTTL = wssSecurityProperties.timestampTTL;
+        this.timeStampFutureTTL = wssSecurityProperties.timeStampFutureTTL;
         this.strictTimestampCheck = wssSecurityProperties.strictTimestampCheck;
         this.handleCustomPasswordTypes = wssSecurityProperties.handleCustomPasswordTypes;
         this.usernameTokenPasswordType = wssSecurityProperties.usernameTokenPasswordType;
@@ -598,5 +600,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setCrlCertStore(CertStore crlCertStore) {
         this.crlCertStore = crlCertStore;
+    }
+
+    public Integer getTimeStampFutureTTL() {
+        return timeStampFutureTTL;
+    }
+
+    public void setTimeStampFutureTTL(Integer timeStampFutureTTL) {
+        this.timeStampFutureTTL = timeStampFutureTTL;
     }
 }

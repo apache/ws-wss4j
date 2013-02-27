@@ -252,6 +252,50 @@ public class TimestampTest extends AbstractTestBase {
     }
 
     @Test
+    public void testTimestampInNearFutureInbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.TIMESTAMP;
+            Properties outboundProperties = new Properties();
+            outboundProperties.setProperty(WSHandlerConstants.TTL_TIMESTAMP, "1");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+
+            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+            GregorianCalendar gregorianCalendarCreated = new GregorianCalendar();
+            gregorianCalendarCreated.add(Calendar.SECOND, 40);
+            XMLGregorianCalendar xmlGregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarCreated);
+            created.setTextContent(xmlGregorianCalendarCreated.toXMLFormat());
+
+            GregorianCalendar gregorianCalendarExpires = new GregorianCalendar();
+            gregorianCalendarExpires.add(Calendar.SECOND, 300);
+            XMLGregorianCalendar xmlGregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(gregorianCalendarExpires);
+
+            expires.setTextContent(xmlGregorianCalendarExpires.toXMLFormat());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        //done timestamp; now test timestamp-verification:
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+        }
+    }
+    
+    @Test
     public void testTimestampInFutureInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -298,9 +342,20 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "Invalid timestamp: The security semantics of the message is invalid");
+                Assert.assertEquals(e.getCause().getMessage(), "Invalid timestamp: The security semantics of the message have expired");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
+        }
+        
+        // now allow future TTL of 2 hours +
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setTimeStampFutureTTL((2 * 60 * 60) + 100);
+
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
 
