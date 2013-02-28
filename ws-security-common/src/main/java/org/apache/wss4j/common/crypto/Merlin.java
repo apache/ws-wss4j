@@ -68,62 +68,52 @@ import org.apache.wss4j.common.util.Loader;
  */
 public class Merlin extends CryptoBase {
     
+    public static final String PREFIX = "org.apache.wss4j.crypto.merlin.";
+    public static final String OLD_PREFIX = "org.apache.ws.security.crypto.merlin.";
+    
     /*
      * Deprecated types
      */
-    public static final String OLD_KEYSTORE_FILE = 
-        "org.apache.wss4j.crypto.merlin.file";
+    public static final String OLD_KEYSTORE_FILE = "file";
     
     /*
      * Crypto providers
      */
-    public static final String CRYPTO_KEYSTORE_PROVIDER = 
-        "org.apache.wss4j.crypto.merlin.keystore.provider";
-    public static final String CRYPTO_CERT_PROVIDER =
-        "org.apache.wss4j.crypto.merlin.cert.provider";
+    public static final String CRYPTO_KEYSTORE_PROVIDER = "keystore.provider";
+    public static final String CRYPTO_CERT_PROVIDER = "cert.provider";
     
     /*
      * KeyStore configuration types
      */
-    public static final String KEYSTORE_FILE = 
-        "org.apache.wss4j.crypto.merlin.keystore.file";
-    public static final String KEYSTORE_PASSWORD =
-        "org.apache.wss4j.crypto.merlin.keystore.password";
-    public static final String KEYSTORE_TYPE =
-        "org.apache.wss4j.crypto.merlin.keystore.type";
-    public static final String KEYSTORE_ALIAS =
-        "org.apache.wss4j.crypto.merlin.keystore.alias";
-    public static final String KEYSTORE_PRIVATE_PASSWORD =
-        "org.apache.wss4j.crypto.merlin.keystore.private.password";
+    public static final String KEYSTORE_FILE = "keystore.file";
+    public static final String KEYSTORE_PASSWORD ="keystore.password";
+    public static final String KEYSTORE_TYPE ="keystore.type";
+    public static final String KEYSTORE_ALIAS ="keystore.alias";
+    public static final String KEYSTORE_PRIVATE_PASSWORD ="keystore.private.password";
     
     /*
      * TrustStore configuration types
      */
-    public static final String LOAD_CA_CERTS =
-        "org.apache.wss4j.crypto.merlin.load.cacerts";
-    public static final String TRUSTSTORE_FILE =
-        "org.apache.wss4j.crypto.merlin.truststore.file";
-    public static final String TRUSTSTORE_PASSWORD =
-        "org.apache.wss4j.crypto.merlin.truststore.password";
-    public static final String TRUSTSTORE_TYPE =
-        "org.apache.wss4j.crypto.merlin.truststore.type";
+    public static final String LOAD_CA_CERTS ="load.cacerts";
+    public static final String TRUSTSTORE_FILE ="truststore.file";
+    public static final String TRUSTSTORE_PASSWORD ="truststore.password";
+    public static final String TRUSTSTORE_TYPE = "truststore.type";
     
     /*
      * CRL configuration
      */
-    public static final String X509_CRL_FILE = 
-        "org.apache.wss4j.crypto.merlin.x509crl.file";
+    public static final String X509_CRL_FILE = "x509crl.file";
     
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(Merlin.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
-    protected Properties properties = null;
-    protected KeyStore keystore = null;
-    protected KeyStore truststore = null;
-    protected CertStore crlCertStore = null;
-    protected boolean loadCACerts = false;
-    protected boolean privatePasswordSet = false; 
+    protected Properties properties;
+    protected KeyStore keystore;
+    protected KeyStore truststore;
+    protected CertStore crlCertStore;
+    protected boolean loadCACerts;
+    protected boolean privatePasswordSet; 
     
     public Merlin() {
         // default constructor
@@ -178,39 +168,53 @@ public class Merlin extends CryptoBase {
             return;
         }
         this.properties = properties;
+        
+        String prefix = PREFIX;
+        for (Object key : properties.keySet()) {
+            if (key instanceof String) {
+                String propKey = (String)key;
+                if (propKey.startsWith(PREFIX)) {
+                    break;
+                } else if (propKey.startsWith(OLD_PREFIX)) {
+                    prefix = OLD_PREFIX;
+                    break;
+                }
+            }
+        }
+        
         //
         // Load the provider(s)
         //
-        String provider = properties.getProperty(CRYPTO_KEYSTORE_PROVIDER);
+        String provider = properties.getProperty(prefix + CRYPTO_KEYSTORE_PROVIDER);
         if (provider != null) {
             provider = provider.trim();
         }
-        String certProvider = properties.getProperty(CRYPTO_CERT_PROVIDER);
+        String certProvider = properties.getProperty(prefix + CRYPTO_CERT_PROVIDER);
         if (certProvider != null) {
             setCryptoProvider(certProvider);
         }
         //
         // Load the KeyStore
         //
-        String alias = properties.getProperty(KEYSTORE_ALIAS);
+        String alias = properties.getProperty(prefix + KEYSTORE_ALIAS);
         if (alias != null) {
             alias = alias.trim();
             defaultAlias = alias;
         }
-        String keyStoreLocation = properties.getProperty(KEYSTORE_FILE);
+        String keyStoreLocation = properties.getProperty(prefix + KEYSTORE_FILE);
         if (keyStoreLocation == null) {
-            keyStoreLocation = properties.getProperty(OLD_KEYSTORE_FILE);
+            keyStoreLocation = properties.getProperty(prefix + OLD_KEYSTORE_FILE);
         }
         if (keyStoreLocation != null) {
             keyStoreLocation = keyStoreLocation.trim();
             InputStream is = loadInputStream(loader, keyStoreLocation);
 
             try {
-                String passwd = properties.getProperty(KEYSTORE_PASSWORD, "security");
+                String passwd = properties.getProperty(prefix + KEYSTORE_PASSWORD, "security");
                 if (passwd != null) {
                     passwd = passwd.trim();
                 }
-                String type = properties.getProperty(KEYSTORE_TYPE, KeyStore.getDefaultType());
+                String type = properties.getProperty(prefix + KEYSTORE_TYPE, KeyStore.getDefaultType());
                 if (type != null) {
                     type = type.trim();
                 }
@@ -221,7 +225,7 @@ public class Merlin extends CryptoBase {
                         + " has been loaded"
                     );
                 }
-                String privatePasswd = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
+                String privatePasswd = properties.getProperty(prefix + KEYSTORE_PRIVATE_PASSWORD);
                 if (privatePasswd != null) {
                     privatePasswordSet = true;
                 }
@@ -239,17 +243,17 @@ public class Merlin extends CryptoBase {
         //
         // Load the TrustStore
         //
-        String trustStoreLocation = properties.getProperty(TRUSTSTORE_FILE);
+        String trustStoreLocation = properties.getProperty(prefix + TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
             trustStoreLocation = trustStoreLocation.trim();
             InputStream is = loadInputStream(loader, trustStoreLocation);
 
             try {
-                String passwd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                String passwd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                 if (passwd != null) {
                     passwd = passwd.trim();
                 }
-                String type = properties.getProperty(TRUSTSTORE_TYPE, KeyStore.getDefaultType());
+                String type = properties.getProperty(prefix + TRUSTSTORE_TYPE, KeyStore.getDefaultType());
                 if (type != null) {
                     type = type.trim();
                 }
@@ -267,7 +271,7 @@ public class Merlin extends CryptoBase {
                 }
             }
         } else {
-            String loadCacerts = properties.getProperty(LOAD_CA_CERTS, "false");
+            String loadCacerts = properties.getProperty(prefix + LOAD_CA_CERTS, "false");
             if (loadCacerts != null) {
                 loadCacerts = loadCacerts.trim();
             }
@@ -278,7 +282,7 @@ public class Merlin extends CryptoBase {
                 }
                 InputStream is = new FileInputStream(cacertsPath);
                 try {
-                    String cacertsPasswd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                    String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                     if (cacertsPasswd != null) {
                         cacertsPasswd = cacertsPasswd.trim();
                     }
@@ -297,7 +301,7 @@ public class Merlin extends CryptoBase {
         //
         // Load the CRL file
         //
-        String crlLocation = properties.getProperty(X509_CRL_FILE);
+        String crlLocation = properties.getProperty(prefix + X509_CRL_FILE);
         if (crlLocation != null) {
             crlLocation = crlLocation.trim();
             InputStream is = loadInputStream(loader, crlLocation);

@@ -301,6 +301,10 @@ public abstract class WSHandler {
         );
         
         wssConfig.setSecretKeyLength(reqData.getSecretKeyLength());
+        boolean bspCompliant = decodeBSPCompliance(reqData);
+        if (!bspCompliant) {
+            reqData.setDisableBSPEnforcement(true);
+        }
         reqData.setWssConfig(wssConfig);
 
         if (((doAction & WSConstants.SIGN) == WSConstants.SIGN)
@@ -704,6 +708,13 @@ public abstract class WSHandler {
             reqData, WSHandlerConstants.ADD_INCLUSIVE_PREFIXES, true
         );
     }
+    
+    protected boolean decodeBSPCompliance(RequestData reqData)
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.IS_BSP_COMPLIANT, true
+        );
+    } 
     
     protected String decodePasswordType(RequestData reqData) throws WSSecurityException {
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, reqData.getMsgContext());

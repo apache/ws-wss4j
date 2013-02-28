@@ -99,6 +99,10 @@ public abstract class CryptoFactory {
         ClassLoader classLoader
     ) throws WSSecurityException {
         String cryptoClassName = properties.getProperty("org.apache.wss4j.crypto.provider");
+        if (cryptoClassName == null) {
+            cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
+        }
+        
         Class<? extends Crypto> cryptoClass = null;
         if (cryptoClassName == null 
             || cryptoClassName.equals("org.apache.wss4j.common.crypto.Merlin")

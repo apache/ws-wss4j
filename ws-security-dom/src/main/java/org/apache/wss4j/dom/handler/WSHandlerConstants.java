@@ -363,6 +363,17 @@ public final class WSHandlerConstants {
     public static final String MUST_UNDERSTAND = "mustUnderstand";
     
     /**
+     * Whether to ensure compliance with the Basic Security Profile (BSP) 1.1 or not. The
+     * default value is "true".
+     * <p/>
+     * The application may set this parameter using the following method:
+     * <pre>
+     * call.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+     * </pre>
+     */
+    public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
+    
+    /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
      * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
      * The default is true.

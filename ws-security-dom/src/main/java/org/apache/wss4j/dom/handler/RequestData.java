@@ -96,6 +96,7 @@ public class RequestData {
     private int originalSignatureActionPosition;
     private AlgorithmSuite algorithmSuite;
     private AlgorithmSuite samlAlgorithmSuite;
+    private boolean disableBSPEnforcement;
 
     public void clear() {
         soapConstants = null;
@@ -126,6 +127,7 @@ public class RequestData {
         algorithmSuite = null;
         samlAlgorithmSuite = null;
         setOriginalSignatureActionPosition(0);
+        setDisableBSPEnforcement(false);
     }
 
     public Object getMsgContext() {
@@ -555,6 +557,9 @@ public class RequestData {
     }
     
     public BSPEnforcer getBSPEnforcer() {
+        if (disableBSPEnforcement) {
+            return new BSPEnforcer(true);
+        }
         return new BSPEnforcer(ignoredBSPRules);
     }
 
@@ -588,6 +593,14 @@ public class RequestData {
 
     public void setOriginalSignatureActionPosition(int originalSignatureActionPosition) {
         this.originalSignatureActionPosition = originalSignatureActionPosition;
+    }
+
+    public boolean isDisableBSPEnforcement() {
+        return disableBSPEnforcement;
+    }
+
+    public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
+        this.disableBSPEnforcement = disableBSPEnforcement;
     }
         
 }
