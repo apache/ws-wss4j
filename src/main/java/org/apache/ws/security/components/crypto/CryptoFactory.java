@@ -37,8 +37,6 @@ import java.util.Properties;
 public abstract class CryptoFactory {
     private static final org.apache.commons.logging.Log LOG = 
         org.apache.commons.logging.LogFactory.getLog(CryptoFactory.class);
-    private static final Class<? extends Crypto> DEFAULT_CRYPTO_CLASS = 
-        org.apache.ws.security.components.crypto.Merlin.class;
 
     /**
      * getInstance
@@ -102,7 +100,14 @@ public abstract class CryptoFactory {
         Class<? extends Crypto> cryptoClass = null;
         if (cryptoClassName == null 
             || cryptoClassName.equals("org.apache.ws.security.components.crypto.Merlin")) {
-            cryptoClass = DEFAULT_CRYPTO_CLASS;
+            try {
+                return new Merlin(properties, classLoader);
+            } catch (java.lang.Exception e) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unable to instantiate Merlin", e);
+                }
+                throw new WSSecurityException(cryptoClass + " cannot create instance", e);
+            }
         } else {
             try {
                 // instruct the class loader to load the crypto implementation
