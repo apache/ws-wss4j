@@ -31,7 +31,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.w3c.dom.Document;
 
-public class SAMLTokenUnsignedAction extends SAMLTokenSignedAction {
+public class SAMLTokenUnsignedAction implements Action {
 
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
