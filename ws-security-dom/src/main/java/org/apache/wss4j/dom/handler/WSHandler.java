@@ -1230,6 +1230,9 @@ public abstract class WSHandler {
         if (reqData.getSigVerCrypto() == null) {
             reqData.setSigVerCrypto(loadSignatureVerificationCrypto(reqData));
         }
+        if (reqData.getSigVerCrypto() == null) {
+            reqData.setSigVerCrypto(loadSignatureCrypto(reqData));
+        }
         boolean enableRevocation = 
             decodeBooleanConfigValue(
                 reqData, WSHandlerConstants.ENABLE_REVOCATION, false
