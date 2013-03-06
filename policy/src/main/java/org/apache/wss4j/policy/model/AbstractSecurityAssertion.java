@@ -70,7 +70,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
 
     @Override
     public boolean equal(PolicyComponent policyComponent) {
-        throw new UnsupportedOperationException();
+        return policyComponent == this;
     }
 
     public void setNormalized(boolean normalized) {

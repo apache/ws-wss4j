@@ -21,7 +21,6 @@ package org.apache.wss4j.policy.model;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
-import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
@@ -35,9 +34,8 @@ import java.util.List;
  * @author $Author$
  * @version $Revision$ $Date$
  */
-public class SupportingTokens extends AbstractSecurityAssertion implements PolicyContainingAssertion {
+public class SupportingTokens extends AbstractTokenWrapper {
 
-    private Policy nestedPolicy;
     private SupportingTokenType supportingTokenType;
     private final List<AbstractToken> tokens = new ArrayList<AbstractToken>();
     private AlgorithmSuite algorithmSuite;
@@ -47,16 +45,10 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
     private EncryptedElements encryptedElements;
 
     public SupportingTokens(SPConstants.SPVersion version, SupportingTokenType supportingTokenType, Policy nestedPolicy) {
-        super(version);
-        this.nestedPolicy = nestedPolicy;
+        super(version, nestedPolicy);
         this.supportingTokenType = supportingTokenType;
 
         parseNestedPolicy(nestedPolicy, this);
-    }
-
-    @Override
-    public Policy getPolicy() {
-        return nestedPolicy;
     }
 
     @Override
@@ -194,5 +186,16 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
 
     protected void setEncryptedElements(EncryptedElements encryptedElements) {
         this.encryptedElements = encryptedElements;
+    }
+    
+    /**
+     * @return true if the supporting token should be encrypted
+     */
+    public boolean isEncryptedToken() {
+        QName name = getName();
+        if (name != null && name.getLocalPart().contains("Encrypted")) {
+            return true;
+        }
+        return false;
     }
 }

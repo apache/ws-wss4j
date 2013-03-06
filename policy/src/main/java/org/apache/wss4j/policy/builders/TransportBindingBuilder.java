@@ -43,7 +43,7 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
         if (nestedPolicyElement == null) {
-            throw new IllegalArgumentException("sp:TransnportBinding must have an inner wsp:Policy element");
+            throw new IllegalArgumentException("sp:TransportBinding must have an inner wsp:Policy element");
         }
         final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         TransportBinding transportBinding = new TransportBinding(
