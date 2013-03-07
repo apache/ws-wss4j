@@ -73,6 +73,13 @@ public abstract class CryptoFactory {
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     public static Crypto getInstance(Properties properties) throws WSSecurityException {
+        if (properties == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Cannot load Crypto instance as properties object is null");
+            }
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", null, "Cannot load Crypto instance as properties object is null");
+        }
         return getInstance(properties, Loader.getClassLoader(CryptoFactory.class));
     }
 
@@ -96,6 +103,14 @@ public abstract class CryptoFactory {
         Properties properties, 
         ClassLoader classLoader
     ) throws WSSecurityException {
+        if (properties == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Cannot load Crypto instance as properties object is null");
+            }
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", null, "Cannot load Crypto instance as properties object is null");
+        }
+
         String cryptoClassName = properties.getProperty("org.apache.wss4j.crypto.provider");
         if (cryptoClassName == null) {
             cryptoClassName = properties.getProperty("org.apache.ws.security.crypto.provider");
