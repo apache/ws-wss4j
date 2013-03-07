@@ -233,7 +233,7 @@ public class SP11Constants extends SPConstants {
     public static final QName ONLY_SIGN_ENTIRE_HEADERS_AND_BODY = new QName(
             SP11Constants.SP_NS, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, SP11Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_KEY_IDENTIFIRE_REFERENCE = new QName(
+    public static final QName REQUIRE_KEY_IDENTIFIER_REFERENCE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE, SP11Constants.SP_PREFIX);
 
     public static final QName REQUIRE_ISSUER_SERIAL_REFERENCE = new QName(
@@ -305,8 +305,8 @@ public class SP11Constants extends SPConstants {
     public static final QName REQUIRE_EXTERNAL_REFERNCE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERNCE, SP11Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_INTERNAL_REFERNCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERNCE, SP11Constants.SP_PREFIX);
+    public static final QName REQUIRE_INTERNAL_REFERENCE = new QName(
+            SP11Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERENCE, SP11Constants.SP_PREFIX);
 
     public static final QName REQUEST_SECURITY_TOKEN_TEMPLATE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE, SP11Constants.SP_PREFIX);
@@ -431,7 +431,7 @@ public class SP11Constants extends SPConstants {
 
     @Override
     public QName getRequireInternalReference() {
-        return REQUIRE_INTERNAL_REFERNCE;
+        return REQUIRE_INTERNAL_REFERENCE;
     }
 
     @Override
@@ -506,7 +506,7 @@ public class SP11Constants extends SPConstants {
 
     @Override
     public QName getRequireKeyIdentifierReference() {
-        return REQUIRE_KEY_IDENTIFIRE_REFERENCE;
+        return REQUIRE_KEY_IDENTIFIER_REFERENCE;
     }
 
     @Override

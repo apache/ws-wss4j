@@ -277,7 +277,7 @@ public class SP12Constants extends SPConstants {
     public static final QName PROTECT_TOKENS = new QName(
             SP12Constants.SP_NS, SPConstants.PROTECT_TOKENS, SP12Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_KEY_IDENTIFIRE_REFERENCE = new QName(
+    public static final QName REQUIRE_KEY_IDENTIFIER_REFERENCE = new QName(
             SP12Constants.SP_NS, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE, SP12Constants.SP_PREFIX);
 
     public static final QName REQUIRE_ISSUER_SERIAL_REFERENCE = new QName(
@@ -364,8 +364,8 @@ public class SP12Constants extends SPConstants {
     public static final QName REQUIRE_EXTERNAL_REFERNCE = new QName(
             SP12Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERNCE, SP12Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_INTERNAL_REFERNCE = new QName(
-            SP12Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERNCE, SP12Constants.SP_PREFIX);
+    public static final QName REQUIRE_INTERNAL_REFERENCE = new QName(
+            SP12Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERENCE, SP12Constants.SP_PREFIX);
 
     public static final QName REQUEST_SECURITY_TOKEN_TEMPLATE = new QName(
             SP12Constants.SP_NS, SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE, SP12Constants.SP_PREFIX);
@@ -500,7 +500,7 @@ public class SP12Constants extends SPConstants {
 
     @Override
     public QName getRequireInternalReference() {
-        return REQUIRE_INTERNAL_REFERNCE;
+        return REQUIRE_INTERNAL_REFERENCE;
     }
 
     @Override
@@ -575,7 +575,7 @@ public class SP12Constants extends SPConstants {
 
     @Override
     public QName getRequireKeyIdentifierReference() {
-        return REQUIRE_KEY_IDENTIFIRE_REFERENCE;
+        return REQUIRE_KEY_IDENTIFIER_REFERENCE;
     }
 
     @Override

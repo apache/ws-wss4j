@@ -461,7 +461,7 @@ public abstract class SPConstants {
 
     public static final String REQUIRE_EXTERNAL_REFERNCE = "RequireExternalReference";
 
-    public static final String REQUIRE_INTERNAL_REFERNCE = "RequireInternalReference";
+    public static final String REQUIRE_INTERNAL_REFERENCE = "RequireInternalReference";
 
     public static final String REQUEST_SECURITY_TOKEN_TEMPLATE = "RequestSecurityTokenTemplate";
 

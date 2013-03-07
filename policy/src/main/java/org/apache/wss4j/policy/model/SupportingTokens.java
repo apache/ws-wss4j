@@ -198,4 +198,15 @@ public class SupportingTokens extends AbstractTokenWrapper {
         }
         return false;
     }
+    
+    /**
+     * @return true if the supporting token is endorsing
+     */
+    public boolean isEndorsing() {
+        QName name = getName();
+        if (name != null && name.getLocalPart().contains("Endorsing")) {
+            return true;
+        }
+        return false;
+    }
 }
