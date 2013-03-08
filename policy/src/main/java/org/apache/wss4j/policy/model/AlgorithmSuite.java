@@ -513,4 +513,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     public String getComputedKey() {
         return computedKey;
     }
+    
+    public static Collection<String> getSupportedAlgorithmSuiteNames() {
+        return algorithmSuiteTypes.keySet();
+    }
 }
+
