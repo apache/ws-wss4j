@@ -37,7 +37,11 @@ public abstract class AbstractSecurityAssertion implements Assertion {
 
     private boolean isOptional;
     private boolean isIgnorable;
-    private boolean normalized = false;
+    
+    // if normalized is null, then this policy hasn't been normalized yet
+    // if normalized == this, then this policy is already in normalized form
+    // else, normalized contains the normalized version of this policy
+    private volatile PolicyComponent normalized;
 
     private SPConstants.SPVersion version;
 
@@ -73,69 +77,71 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         return policyComponent == this;
     }
 
-    public void setNormalized(boolean normalized) {
-        this.normalized = normalized;
-    }
-
-    public boolean isNormalized() {
-        return this.normalized;
-    }
-
     @Override
     public PolicyComponent normalize() {
-        Policy policy = new Policy();
-        ExactlyOne exactlyOne = new ExactlyOne();
-        policy.addPolicyComponent(exactlyOne);
-
-        if (isOptional()) {
-            exactlyOne.addPolicyComponent(new All());
-        }
-
-        AbstractSecurityAssertion a = clone(null);
-        a.setNormalized(true);
-        a.setOptional(false);
-
-        All all = new All();
-        all.addPolicyComponent(a);
-        exactlyOne.addPolicyComponent(all);
-
-        return policy;
-    }
-
-    public PolicyComponent normalize(Policy nestedPolicy) {
-        Policy normalizedNestedPolicy = nestedPolicy.normalize(true);
-
-        Policy policy = new Policy();
-        ExactlyOne exactlyOne = new ExactlyOne();
-        policy.addPolicyComponent(exactlyOne);
-
-        if (isOptional()) {
-            exactlyOne.addPolicyComponent(new All());
-        }
-
-        // for all alternatives in normalized nested policy
-        Iterator<List<Assertion>> alternatives = normalizedNestedPolicy.getAlternatives();
-        while (alternatives.hasNext()) {
-            List<Assertion> alternative = alternatives.next();
-
-            Policy ncp = new Policy(nestedPolicy.getPolicyRegistry(), nestedPolicy.getNamespace());
-            ExactlyOne nceo = new ExactlyOne();
-            ncp.addPolicyComponent(nceo);
-
-            All nca = new All();
-            nceo.addPolicyComponent(nca);
-            nca.addPolicyComponents(alternative);
-
-            AbstractSecurityAssertion a = clone(ncp);
-            a.setNormalized(true);
+        if (normalized == null) {
+            Policy policy = new Policy();
+            ExactlyOne exactlyOne = new ExactlyOne();
+            policy.addPolicyComponent(exactlyOne);
+    
+            if (isOptional()) {
+                exactlyOne.addPolicyComponent(new All());
+            }
+    
+            AbstractSecurityAssertion a = clone(null);
+            a.normalized = a;
             a.setOptional(false);
-
+    
             All all = new All();
             all.addPolicyComponent(a);
             exactlyOne.addPolicyComponent(all);
-
+    
+            normalized = policy;
         }
-        return policy;
+        return normalized;
+    }
+    
+    public boolean isNormalized() {
+        return normalized == this;
+    }
+
+    public PolicyComponent normalize(Policy nestedPolicy) {
+        if (normalized == null) {
+            Policy normalizedNestedPolicy = nestedPolicy.normalize(true);
+    
+            Policy policy = new Policy();
+            ExactlyOne exactlyOne = new ExactlyOne();
+            policy.addPolicyComponent(exactlyOne);
+    
+            if (isOptional()) {
+                exactlyOne.addPolicyComponent(new All());
+            }
+    
+            // for all alternatives in normalized nested policy
+            Iterator<List<Assertion>> alternatives = normalizedNestedPolicy.getAlternatives();
+            while (alternatives.hasNext()) {
+                List<Assertion> alternative = alternatives.next();
+    
+                Policy ncp = new Policy(nestedPolicy.getPolicyRegistry(), nestedPolicy.getNamespace());
+                ExactlyOne nceo = new ExactlyOne();
+                ncp.addPolicyComponent(nceo);
+    
+                All nca = new All();
+                nceo.addPolicyComponent(nca);
+                nca.addPolicyComponents(alternative);
+    
+                AbstractSecurityAssertion a = clone(ncp);
+                a.normalized = a;
+                a.setOptional(false);
+    
+                All all = new All();
+                all.addPolicyComponent(a);
+                exactlyOne.addPolicyComponent(all);
+    
+            }
+            normalized = policy;
+        }
+        return normalized;
     }
 
     public SPConstants.SPVersion getVersion() {
@@ -145,7 +151,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
     public void serialize(XMLStreamWriter writer, Policy nestedPolicy) throws XMLStreamException {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
-        if (!isNormalized() && isOptional()) {
+        if (isOptional()) {
             writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
@@ -160,7 +166,6 @@ public abstract class AbstractSecurityAssertion implements Assertion {
     public AbstractSecurityAssertion clone(Policy nestedPolicy) {
         AbstractSecurityAssertion assertion = cloneAssertion(nestedPolicy);
         assertion.setIgnorable(isIgnorable());
-        assertion.setNormalized(isNormalized());
         assertion.setOptional(isOptional());
         return assertion;
     }
