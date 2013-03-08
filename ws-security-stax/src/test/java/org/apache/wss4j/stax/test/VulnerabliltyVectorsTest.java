@@ -28,7 +28,6 @@ import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.testng.Assert;
@@ -332,7 +331,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
-            Document document = doInboundSecurity(securityProperties,
+            doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -367,7 +366,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         try {
             Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
             oldval = changeValueOfMaximumAllowedTransformsPerReference(0);
-            Document document = doInboundSecurity(securityProperties,
+            doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -404,7 +403,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
 
         try {
-            Document document = doInboundSecurity(inboundsecurityProperties,
+            doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -451,6 +450,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Document document = doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
+            Assert.assertNotNull(document);
         } finally {
             switchAllowMD5Algorithm(false);
         }
@@ -484,7 +484,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         try {
             Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
             oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
-            Document document = doInboundSecurity(securityProperties,
+            doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -525,7 +525,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         try {
             Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
             oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
-            Document document = doInboundSecurity(securityProperties,
+            doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -541,6 +541,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testMaximumAllowedDecompressedBytes() throws Exception {
 
         long oldval = 0;
@@ -575,7 +576,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             inboundSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             inboundSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-            Document document = doInboundSecurity(inboundSecurityProperties,
+            doInboundSecurity(inboundSecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -624,7 +625,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inboundsecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         try {
-            Document document = doInboundSecurity(inboundsecurityProperties,
+            doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
@@ -659,7 +660,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
 
         try {
-            Document document = doInboundSecurity(inboundsecurityProperties,
+            doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");

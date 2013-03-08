@@ -20,11 +20,9 @@ package org.apache.wss4j.stax.test;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;

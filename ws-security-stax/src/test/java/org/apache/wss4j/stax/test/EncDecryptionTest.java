@@ -20,8 +20,6 @@ package org.apache.wss4j.stax.test;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.WSSec;
@@ -1408,6 +1406,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCompressedEncDecryption() throws Exception {
 
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());

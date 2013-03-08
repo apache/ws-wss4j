@@ -53,16 +53,16 @@ public class PolicyEnforcerFactory {
 
     protected static final transient Log log = LogFactory.getLog(PolicyEnforcerFactory.class);
 
-    private final List<AssertionBuilder> assertionBuilders;
+    private final List<AssertionBuilder<Element>> assertionBuilders;
 
     private Definition wsdlDefinition;
     private List<OperationPolicy> operationPolicies;
     private final Map<Element, Policy> elementPolicyCache;
 
-    private PolicyEnforcerFactory(List<AssertionBuilder> customAssertionBuilders) {
+    private PolicyEnforcerFactory(List<AssertionBuilder<Element>> customAssertionBuilders) {
         elementPolicyCache = new HashMap<Element, Policy>();
 
-        assertionBuilders = new ArrayList<AssertionBuilder>();
+        assertionBuilders = new ArrayList<AssertionBuilder<Element>>();
         assertionBuilders.add(new AlgorithmSuiteBuilder());
         assertionBuilders.add(new AsymmetricBindingBuilder());
         assertionBuilders.add(new ContentEncryptedElementsBuilder());
@@ -104,7 +104,7 @@ public class PolicyEnforcerFactory {
 
         if (customAssertionBuilders != null) {
             for (int i = 0; i < customAssertionBuilders.size(); i++) {
-                AssertionBuilder customAssertionBuilder = customAssertionBuilders.get(i);
+                AssertionBuilder<Element> customAssertionBuilder = customAssertionBuilders.get(i);
                 assertionBuilders.add(customAssertionBuilder);
             }
         }
@@ -114,7 +114,7 @@ public class PolicyEnforcerFactory {
         return newInstance(wsdlUrl, null);
     }
 
-    public static PolicyEnforcerFactory newInstance(URL wsdlUrl, List<AssertionBuilder> customAssertionBuilders)
+    public static PolicyEnforcerFactory newInstance(URL wsdlUrl, List<AssertionBuilder<Element>> customAssertionBuilders)
             throws WSSPolicyException {
 
         PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory(customAssertionBuilders);
@@ -126,7 +126,7 @@ public class PolicyEnforcerFactory {
         return newInstance(document, null);
     }
 
-    public static PolicyEnforcerFactory newInstance(Document document, List<AssertionBuilder> customAssertionBuilders)
+    public static PolicyEnforcerFactory newInstance(Document document, List<AssertionBuilder<Element>> customAssertionBuilders)
             throws WSSPolicyException {
 
         PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory(customAssertionBuilders);
@@ -163,13 +163,13 @@ public class PolicyEnforcerFactory {
     private List<OperationPolicy> findPoliciesByOperation(Definition wsdlDefinition) throws WSSPolicyException {
 
         List<OperationPolicy> operationPolicyList = new ArrayList<OperationPolicy>();
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         Iterator<Map.Entry> services = wsdlDefinition.getAllServices().entrySet().iterator();
         while (services.hasNext()) {
             @SuppressWarnings("unchecked")
             Map.Entry<QName, Service> serviceEntry = services.next();
             Service service = serviceEntry.getValue();
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({"unchecked", "rawtypes"})
             Iterator<Map.Entry> ports = service.getPorts().entrySet().iterator();
             while (ports.hasNext()) {
                 @SuppressWarnings("unchecked")
@@ -363,7 +363,7 @@ public class PolicyEnforcerFactory {
 
     private void registerDefaultBuilders(AssertionBuilderFactory assertionBuilderFactory) {
         for (int i = 0; i < assertionBuilders.size(); i++) {
-            AssertionBuilder assertionBuilder = assertionBuilders.get(i);
+            AssertionBuilder<Element> assertionBuilder = assertionBuilders.get(i);
             assertionBuilderFactory.registerBuilder(assertionBuilder);
         }
     }

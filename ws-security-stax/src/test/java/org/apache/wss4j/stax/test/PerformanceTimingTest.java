@@ -272,6 +272,7 @@ public class PerformanceTimingTest extends AbstractTestBase {
             }
             inputStream.close();
         }
+        fileOutputStream.close();
         fileWriter = new FileWriter(target, true);
         fileWriter.write("</test></env:Body>\n" +
                 "</env:Envelope>");

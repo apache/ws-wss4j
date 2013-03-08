@@ -353,6 +353,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             }
             inputStream.close();
         }
+        fileOutputStream.close();
         fileWriter = new FileWriter(target, true);
         fileWriter.write("</test></env:Body>\n" +
                 "</env:Envelope>");
@@ -423,7 +424,6 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         private ThreadStopper threadStopper;
         private FileWriter fileWriter;
         private long memoryDiff = 0;
-        private Thread parentThread;
 
         private List<Integer> memory = new LinkedList<Integer>();
 
@@ -431,7 +431,6 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             this.threadStopper = threadStopper;
             this.fileWriter = fileWriter;
             this.memoryDiff = memoryDiff;
-            this.parentThread = Thread.currentThread();
         }
 
         @Override

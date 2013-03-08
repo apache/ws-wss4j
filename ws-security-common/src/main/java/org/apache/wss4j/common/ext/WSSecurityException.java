@@ -29,6 +29,9 @@ import javax.xml.namespace.QName;
  */
 public class WSSecurityException extends XMLSecurityException {
     
+    private static final long serialVersionUID = 4703352039717763655L;
+    
+
     /****************************************************************************
      * Fault codes defined in the WSS 1.1 spec under section 12, Error handling
      */

@@ -33,7 +33,6 @@ import org.apache.wss4j.stax.impl.securityToken.X509SecurityToken;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
-import org.opensaml.common.SAMLVersion;
 import org.testng.annotations.BeforeClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,7 +49,6 @@ import java.io.InputStreamReader;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,7 +74,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     }
 
     protected PolicyEnforcer buildAndStartPolicyEngine(
-            String policyString, boolean replacePolicyElement, List<AssertionBuilder> customAssertionBuilders)
+            String policyString, boolean replacePolicyElement, List<AssertionBuilder<Element>> customAssertionBuilders)
             throws ParserConfigurationException, SAXException, IOException, WSSPolicyException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);

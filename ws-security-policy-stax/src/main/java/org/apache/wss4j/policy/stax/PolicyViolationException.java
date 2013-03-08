@@ -28,6 +28,8 @@ import org.apache.wss4j.policy.WSSPolicyException;
  */
 public class PolicyViolationException extends WSSPolicyException {
 
+    private static final long serialVersionUID = 4162351775688661849L;
+
     public PolicyViolationException(String message) {
         super(message);
     }

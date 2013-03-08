@@ -944,7 +944,7 @@ public class SignatureTest extends AbstractTestBase {
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             securityEventListener.compare();
 
@@ -1029,6 +1029,7 @@ public class SignatureTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
         }
     }
 
@@ -1085,6 +1086,7 @@ public class SignatureTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
         }
     }
 
@@ -1114,7 +1116,8 @@ public class SignatureTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
-                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("Should have thrown XMLStreamException");
             } catch (XMLStreamException e) {
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "cvc-datatype-valid.1.2.1: 'abc' is not a valid value for 'integer'.");

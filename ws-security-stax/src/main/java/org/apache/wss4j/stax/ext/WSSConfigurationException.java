@@ -28,6 +28,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  */
 public class WSSConfigurationException extends WSSecurityException {
 
+    private static final long serialVersionUID = 689628294822027113L;
+
     public WSSConfigurationException(ErrorCode errorCode, String msgId, Throwable exception, Object ... args) {
         super(errorCode, msgId, exception, args);
     }

@@ -380,7 +380,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
 
             if (object instanceof JAXBElement) {
-                object = ((JAXBElement) object).getValue();
+                object = ((JAXBElement<?>) object).getValue();
             }
 
             KeyInfoType keyInfoType = null;

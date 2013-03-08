@@ -35,6 +35,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -252,7 +255,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
             }
         }
 
-        List<AssertionBuilder> customAssertionBuilders = new ArrayList<AssertionBuilder>();
+        List<AssertionBuilder<Element>> customAssertionBuilders = new ArrayList<AssertionBuilder<Element>>();
         customAssertionBuilders.add(new GCMAlgorithmSuiteBuilder());
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString, false, customAssertionBuilders);
 

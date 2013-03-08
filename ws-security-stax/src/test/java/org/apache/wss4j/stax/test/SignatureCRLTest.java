@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.TransformerException;
@@ -32,8 +31,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.WSSec;
