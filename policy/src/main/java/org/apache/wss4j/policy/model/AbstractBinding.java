@@ -23,6 +23,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SPConstants.SPVersion;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -99,7 +100,7 @@ public abstract class AbstractBinding extends AbstractSecurityAssertion implemen
                 }
             }
         }
-        if (binding.getAlgorithmSuite() == null) {
+        if (binding.getAlgorithmSuite() == null && binding.getVersion() != SPVersion.SP11) {
             throw new IllegalArgumentException("sp:" + getName().getLocalPart() + " must have an inner sp:AlgorithmSuite element");
         }
     }

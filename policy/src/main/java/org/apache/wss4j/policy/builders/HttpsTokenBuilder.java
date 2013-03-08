@@ -52,10 +52,13 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
         }
         final Element claims = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getClaims());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
+        Policy nestedPolicy;
         if (nestedPolicyElement == null) {
-            throw new IllegalArgumentException("sp:HttpsToken must have an inner wsp:Policy element");
+            //throw new IllegalArgumentException("sp:HttpsToken must have an inner wsp:Policy element");
+            nestedPolicy = new Policy();
+        } else {
+            nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         }
-        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         HttpsToken httpsToken = new HttpsToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),
