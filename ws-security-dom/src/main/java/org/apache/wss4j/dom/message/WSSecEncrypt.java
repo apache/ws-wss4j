@@ -315,22 +315,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     /**
-     * @deprecated Use encryptForRef(dataRef, references) instead
-     */
-    public Element encryptForInternalRef(Element dataRef, List<WSEncryptionPart> references)
-        throws WSSecurityException {
-        return encryptForRef(dataRef, references);
-    }
-
-    /**
-     * @deprecated Use encryptForRef(dataRef, references) instead
-     */
-    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
-        throws WSSecurityException {
-        return encryptForRef(dataRef, references);
-    }
-
-    /**
      * Adds the internal Reference element to this Encrypt data.
      * 
      * The reference element <i>must</i> be created by the

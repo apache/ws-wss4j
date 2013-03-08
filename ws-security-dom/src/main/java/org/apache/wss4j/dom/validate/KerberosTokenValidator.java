@@ -64,24 +64,6 @@ public class KerberosTokenValidator implements Validator {
     }
     
     /**
-     * @deprecated
-     * Get the JAAS Login module name to use.
-     * @return the JAAS Login module name to use
-     */
-    public String getJaasLoginModuleName() {
-        return contextName;
-    }
-
-    /**
-     * @deprecated
-     * Set the JAAS Login module name to use.
-     * @param jaasLoginModuleName the JAAS Login module name to use
-     */
-    public void setJaasLoginModuleName(String jaasLoginModuleName) {
-        this.contextName = jaasLoginModuleName;
-    }
-
-    /**
      * Get the CallbackHandler to use with the LoginContext
      * @return the CallbackHandler to use with the LoginContext
      */

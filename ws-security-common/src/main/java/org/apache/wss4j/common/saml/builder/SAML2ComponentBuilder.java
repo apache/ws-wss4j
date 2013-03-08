@@ -332,19 +332,6 @@ public final class SAML2ComponentBuilder {
      *
      * @param friendlyName of type String
      * @param name         of type String
-     * @param values       of type ArrayList
-     * @return a SAML2 Attribute
-     * @deprecated
-     */
-    public static Attribute createAttribute(String friendlyName, String name, List<String> values) {
-        return createAttribute(friendlyName, name, null, values);
-    }
-    
-    /**
-     * Create a SAML2 Attribute
-     *
-     * @param friendlyName of type String
-     * @param name         of type String
      * @param nameFormat   of type String
      * @param values       of type ArrayList
      * @return a SAML2 Attribute
@@ -409,30 +396,6 @@ public final class SAML2ComponentBuilder {
         
         subject.getSubjectConfirmations().add(subjectConfirmation);
         return subject;
-    }
-    
-    /**
-     * Create a SubjectConfirmationData object
-     *
-     * @param inResponseTo of type String
-     * @param recipient    of type String
-     * @param notOnOrAfter of type DateTime
-     * @param keyInfoBean of type KeyInfoBean
-     * @return a SubjectConfirmationData object
-     */
-    @Deprecated
-    public static SubjectConfirmationData createSubjectConfirmationData(
-        String inResponseTo, 
-        String recipient, 
-        DateTime notOnOrAfter,
-        KeyInfoBean keyInfoBean
-    ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
-        SubjectConfirmationDataBean subjectConfirmationDataBean = 
-            new SubjectConfirmationDataBean();
-        subjectConfirmationDataBean.setInResponseTo(inResponseTo);
-        subjectConfirmationDataBean.setRecipient(recipient);
-        subjectConfirmationDataBean.setNotAfter(notOnOrAfter);
-        return createSubjectConfirmationData(subjectConfirmationDataBean, keyInfoBean);
     }
     
     /**
@@ -583,21 +546,6 @@ public final class SAML2ComponentBuilder {
         return attributeStatements;
     }
 
-    /**
-     * Create an Attribute object. The name format is of type:
-     *   urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
-     *   urn:oasis:names:tc:SAML:2.0:attrname-format:uri
-     *   urn:oasis:names:tc:SAML:2.0:attrname-format:basic
-     *
-     * @param friendlyName of type String
-     * @param name of type String
-     * @return an Attribute object
-     * @deprecated
-     */
-    public static Attribute createAttribute(String friendlyName, String name) {
-        return createAttribute(friendlyName, name, (String)null);
-    }
-    
     /**
      * Create an Attribute object.
      *

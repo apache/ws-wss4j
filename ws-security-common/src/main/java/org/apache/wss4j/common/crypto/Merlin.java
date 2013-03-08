@@ -768,19 +768,6 @@ public class Merlin extends CryptoBase {
      * Uses the CertPath API to validate a given certificate chain.
      *
      * @param certs Certificate chain to validate
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
-     */
-    @Deprecated
-    public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException {
-        return verifyTrust(certs, false);
-    }
-    
-    /**
-     * Evaluate whether a given certificate chain should be trusted.
-     * Uses the CertPath API to validate a given certificate chain.
-     *
-     * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException

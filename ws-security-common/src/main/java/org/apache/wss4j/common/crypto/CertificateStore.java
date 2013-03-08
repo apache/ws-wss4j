@@ -136,18 +136,6 @@ public class CertificateStore extends CryptoBase {
      * Evaluate whether a given certificate chain should be trusted.
      *
      * @param certs Certificate chain to validate
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
-     */
-    @Deprecated
-    public boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException {
-        return verifyTrust(certs, false);
-    }
-    
-    /**
-     * Evaluate whether a given certificate chain should be trusted.
-     *
-     * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException

@@ -113,18 +113,6 @@ public class SignatureTrustValidator implements Validator {
         }
     }
     
-    @Deprecated
-    protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto) 
-        throws WSSecurityException {
-        return verifyTrustInCert(cert, crypto, new RequestData(), false);
-    }
-    
-    @Deprecated
-    protected boolean verifyTrustInCert(X509Certificate cert, Crypto crypto, boolean enableRevocation) 
-        throws WSSecurityException {
-        return verifyTrustInCert(cert, crypto, new RequestData(), enableRevocation);
-    }
-    
     /**
      * Evaluate whether a given certificate should be trusted.
      * 
@@ -269,23 +257,6 @@ public class SignatureTrustValidator implements Validator {
             );
         }
         return false;
-    }
-    
-    @Deprecated
-    protected boolean verifyTrustInCerts(
-        X509Certificate[] certificates, 
-        Crypto crypto
-    ) throws WSSecurityException {
-        return verifyTrustInCerts(certificates, crypto, new RequestData(), false);
-    }
-    
-    @Deprecated
-    protected boolean verifyTrustInCerts(
-        X509Certificate[] certificates, 
-        Crypto crypto,
-        boolean enableRevocation
-    ) throws WSSecurityException {
-        return verifyTrustInCerts(certificates, crypto, new RequestData(), enableRevocation);
     }
     
     /**

@@ -181,29 +181,6 @@ public class WSDocInfo {
     }
     
     /**
-     * Store a protection element for later retrieval. This is only used for the 
-     * creation/outbound case.
-     * @param element is the protection element to store
-     * @deprecated
-     */
-    public void addProtectionElement(Element element) {
-        if (tokenList == null) {
-            tokenList = new ArrayList<Element>();
-        }
-        tokenList.add(element);
-    }
-    
-    /**
-     * Get a protection element for the given (wsu/SAML) Id.
-     * @param uri is the (relative) uri of the id
-     * @return the protection element or null if nothing found
-     * @deprecated
-     */
-    public Element getProtectionElement(String uri) {
-        return getTokenElement(uri); 
-    }
-    
-    /**
      * Store a WSSecurityEngineResult for later retrieval. 
      * @param result is the WSSecurityEngineResult to store
      */

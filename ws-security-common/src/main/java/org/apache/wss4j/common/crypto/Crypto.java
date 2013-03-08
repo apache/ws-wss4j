@@ -182,16 +182,6 @@ public interface Crypto {
      * Evaluate whether a given certificate chain should be trusted.
      *
      * @param certs Certificate chain to validate
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
-     */
-    @Deprecated
-    boolean verifyTrust(X509Certificate[] certs) throws WSSecurityException;
-    
-    /**
-     * Evaluate whether a given certificate chain should be trusted.
-     *
-     * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
      * @return true if the certificate chain is valid, false otherwise
      * @throws WSSecurityException
