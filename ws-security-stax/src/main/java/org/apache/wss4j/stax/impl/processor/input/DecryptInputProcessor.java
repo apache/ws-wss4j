@@ -56,9 +56,6 @@ import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 
 /**
  * Processor for decryption of EncryptedData XML structures
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
