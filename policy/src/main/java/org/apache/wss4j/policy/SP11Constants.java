@@ -656,12 +656,12 @@ public class SP11Constants extends SPConstants {
 
     @Override
     public QName getInitiatorSignatureToken() {
-        return EMPTY_QNAME;
+        return INITIATOR_SIGNATURE_TOKEN;
     }
 
     @Override
     public QName getInitiatorEncryptionToken() {
-        return EMPTY_QNAME;
+        return INITIATOR_ENCRYPTION_TOKEN;
     }
 
     @Override
@@ -671,12 +671,12 @@ public class SP11Constants extends SPConstants {
 
     @Override
     public QName getRecipientSignatureToken() {
-        return EMPTY_QNAME;
+        return RECIPIENT_SIGNATURE_TOKEN;
     }
 
     @Override
     public QName getRecipientEncryptionToken() {
-        return EMPTY_QNAME;
+        return RECIPIENT_ENCRYPTION_TOKEN;
     }
 
     public enum SupportingTokenTypes implements SupportingTokenType {

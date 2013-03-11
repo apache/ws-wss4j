@@ -39,6 +39,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
 
     static {
         algorithmSuiteTypes.put("Basic256", new AlgorithmSuiteType(
+                "Basic256",
                 SPConstants.SHA1,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
@@ -47,6 +48,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 256, 192, 256, 256, 1024, 4096));
         algorithmSuiteTypes.put("Basic192", new AlgorithmSuiteType(
+                "Basic192",
                 SPConstants.SHA1,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
@@ -55,6 +57,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic128", new AlgorithmSuiteType(
+                "Basic128",
                 SPConstants.SHA1,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
@@ -63,6 +66,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L128,
                 128, 128, 128, 128, 1024, 4096));
         algorithmSuiteTypes.put("TripleDes", new AlgorithmSuiteType(
+                "TripleDes",
                 SPConstants.SHA1,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
@@ -71,6 +75,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic256Rsa15", new AlgorithmSuiteType(
+                "Basic256Rsa15",
                 SPConstants.SHA1,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
@@ -79,6 +84,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 256, 192, 256, 256, 1024, 4096));
         algorithmSuiteTypes.put("Basic192Rsa15", new AlgorithmSuiteType(
+                "Basic192Rsa15",
                 SPConstants.SHA1,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
@@ -87,6 +93,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic128Rsa15", new AlgorithmSuiteType(
+                "Basic128Rsa15",
                 SPConstants.SHA1,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
@@ -95,6 +102,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L128,
                 128, 128, 128, 128, 1024, 4096));
         algorithmSuiteTypes.put("TripleDesRsa15", new AlgorithmSuiteType(
+                "TripleDesRsa15",
                 SPConstants.SHA1,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
@@ -103,6 +111,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic256Sha256", new AlgorithmSuiteType(
+                "Basic256Sha256",
                 SPConstants.SHA256,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
@@ -111,6 +120,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 256, 256, 256, 256, 1024, 4096));
         algorithmSuiteTypes.put("Basic192Sha256", new AlgorithmSuiteType(
+                "Basic192Sha256",
                 SPConstants.SHA256,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
@@ -119,6 +129,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic128Sha256", new AlgorithmSuiteType(
+                "Basic128Sha256",
                 SPConstants.SHA256,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
@@ -127,6 +138,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L128,
                 128, 128, 128, 128, 1024, 4096));
         algorithmSuiteTypes.put("TripleDesSha256", new AlgorithmSuiteType(
+                "TripleDesSha256",
                 SPConstants.SHA256,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
@@ -135,6 +147,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic256Sha256Rsa15", new AlgorithmSuiteType(
+                "Basic256Sha256Rsa15",
                 SPConstants.SHA256,
                 SPConstants.AES256,
                 SPConstants.KW_AES256,
@@ -143,6 +156,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 256, 192, 256, 256, 1024, 4096));
         algorithmSuiteTypes.put("Basic192Sha256Rsa15", new AlgorithmSuiteType(
+                "Basic192Sha256Rsa15",
                 SPConstants.SHA256,
                 SPConstants.AES192,
                 SPConstants.KW_AES192,
@@ -151,6 +165,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L192,
                 192, 192, 192, 192, 1024, 4096));
         algorithmSuiteTypes.put("Basic128Sha256Rsa15", new AlgorithmSuiteType(
+                "Basic128Sha256Rsa15",
                 SPConstants.SHA256,
                 SPConstants.AES128,
                 SPConstants.KW_AES128,
@@ -159,6 +174,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.P_SHA1_L128,
                 128, 128, 128, 192, 1024, 4096));
         algorithmSuiteTypes.put("TripleDesSha256Rsa15", new AlgorithmSuiteType(
+                "TripleDesSha256Rsa15",
                 SPConstants.SHA256,
                 SPConstants.TRIPLE_DES,
                 SPConstants.KW_TRIPLE_DES,
@@ -170,6 +186,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
 
     public static final class AlgorithmSuiteType {
 
+        private String name;
         private String digest;
         private String encryption;
         private String symmetricKeyWrap;
@@ -183,10 +200,11 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private int minimumAsymmetricKeyLength;
         private int maximumAsymmetricKeyLength;
 
-        public AlgorithmSuiteType(String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
+        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
                            String encryptionKeyDerivation, String signatureKeyDerivation, int encryptionDerivedKeyLength,
                            int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
                            int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength, int maximumAsymmetricKeyLength) {
+            this.name = name;
             this.digest = digest;
             this.encryption = encryption;
             this.symmetricKeyWrap = symmetricKeyWrap;
@@ -199,6 +217,10 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.maximumSymmetricKeyLength = maximumSymmetricKeyLength;
             this.minimumAsymmetricKeyLength = minimumAsymmetricKeyLength;
             this.maximumAsymmetricKeyLength = maximumAsymmetricKeyLength;
+        }
+        
+        public String getName() {
+            return name;
         }
 
         public String getDigest() {

@@ -22,6 +22,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPUtils;
@@ -53,6 +54,6 @@ public class InitiatorSignatureTokenBuilder implements AssertionBuilder<Element>
 
     @Override
     public QName[] getKnownElements() {
-        return new QName[]{SP13Constants.INITIATOR_SIGNATURE_TOKEN};
+        return new QName[]{SP13Constants.INITIATOR_SIGNATURE_TOKEN, SP11Constants.INITIATOR_SIGNATURE_TOKEN};
     }
 }

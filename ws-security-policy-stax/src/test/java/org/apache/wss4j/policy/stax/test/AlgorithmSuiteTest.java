@@ -219,6 +219,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
 
                 if ("Basic128GCM".equals(assertionName)) {
                     setAlgorithmSuiteType(new AlgorithmSuiteType(
+                            "Basic128GCM",
                             SPConstants.SHA1,
                             WSSConstants.NS_XENC11_AES128_GCM,
                             SPConstants.KW_AES128,
@@ -228,7 +229,9 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                             128, 128, 128, 256, 1024, 4096
                     ));
                 } else if ("Basic192GCM".equals(assertionName)) {
-                    setAlgorithmSuiteType(new AlgorithmSuiteType(SPConstants.SHA1,
+                    setAlgorithmSuiteType(new AlgorithmSuiteType(
+                            "Basic192GCM",
+                            SPConstants.SHA1,
                             WSSConstants.NS_XENC11_AES192_GCM,
                             SPConstants.KW_AES192,
                             SPConstants.KW_RSA_OAEP,
@@ -237,6 +240,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
                             192, 192, 192, 256, 1024, 4096));
                 } else if ("Basic256GCM".equals(assertionName)) {
                     setAlgorithmSuiteType(new AlgorithmSuiteType(
+                            "Basic256GCM",
                             SPConstants.SHA1,
                             WSSConstants.NS_XENC11_AES256_GCM,
                             SPConstants.KW_AES256,
