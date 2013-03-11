@@ -71,10 +71,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KerberosTest extends AbstractTestBase {
 
     private static boolean kerberosServerStarted = false;

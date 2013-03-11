@@ -23,10 +23,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 @XmlTransient
 public abstract class AbstractAttributedDateTime {
 
