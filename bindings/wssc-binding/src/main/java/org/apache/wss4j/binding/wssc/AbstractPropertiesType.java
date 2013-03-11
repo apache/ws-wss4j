@@ -20,10 +20,6 @@ package org.apache.wss4j.binding.wssc;
 
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractPropertiesType {
     public abstract List<Object> getAny();
 }

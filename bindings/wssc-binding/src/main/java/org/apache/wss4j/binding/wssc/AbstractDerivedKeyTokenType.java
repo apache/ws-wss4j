@@ -22,10 +22,6 @@ import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 
 import java.math.BigInteger;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractDerivedKeyTokenType {
 
     public abstract SecurityTokenReferenceType getSecurityTokenReference();

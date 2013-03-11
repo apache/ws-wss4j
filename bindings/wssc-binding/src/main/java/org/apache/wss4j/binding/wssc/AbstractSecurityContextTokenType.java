@@ -22,10 +22,6 @@ import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractSecurityContextTokenType {
     public abstract List<Object> getAny();
 
