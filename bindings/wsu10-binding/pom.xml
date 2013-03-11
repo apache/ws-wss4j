@@ -38,15 +38,6 @@
     </properties>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>${project.build.directory}/generated-sources/xjc/META-INF</directory>
-                <targetPath>META-INF</targetPath>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>

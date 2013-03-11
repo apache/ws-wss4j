@@ -56,8 +56,7 @@
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
-                <directory>${project.build.directory}/generated-sources/xjc/META-INF</directory>
-                <targetPath>META-INF</targetPath>
+                <directory>${project.build.directory}/generated-sources/episode</directory>
             </resource>
         </resources>
         <plugins>
@@ -130,7 +129,7 @@
                                 <file file="${basedir}/src/etc/bindings.xsl"/>
                             </style>
                         </xslt>
-                        <concat destfile="${project.build.directory}/generated-sources/xjc/META-INF/sun-jaxb.episode"
+                        <concat destfile="${project.build.directory}/generated-sources/episode/META-INF/sun-jaxb.episode"
                                 append="false">
                             <header filtering="no" trimleading="yes">
                                 <![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
