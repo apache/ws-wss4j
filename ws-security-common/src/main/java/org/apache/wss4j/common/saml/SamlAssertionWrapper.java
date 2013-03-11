@@ -65,8 +65,6 @@ import org.w3c.dom.Element;
 /**
  * Class SamlAssertionWrapper can generate, sign, and validate both SAML v1.1
  * and SAML v2.0 assertions.
- * <p/>
- * Created on May 18, 2009
  */
 public class SamlAssertionWrapper {
     /**

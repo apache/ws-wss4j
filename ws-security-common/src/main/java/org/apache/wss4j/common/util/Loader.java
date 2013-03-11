@@ -27,8 +27,6 @@ import java.security.PrivilegedAction;
 /**
  * Load resources (or images) from various sources.
  * <p/>
- *
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Loader {
     private static org.apache.commons.logging.Log log =

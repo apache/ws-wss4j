@@ -19,9 +19,7 @@
 
 package org.apache.wss4j.common.derivedKey;
 
-/**
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
- */
+
 public interface DerivationAlgorithm {
 
     byte[] createKey(byte[] secret, byte[] seed, int offset,

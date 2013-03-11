@@ -33,9 +33,6 @@ import java.io.Writer;
  * uses the <code>DOM Level 2</code> APIs.
  * The main difference between this class and DOMWriter is that this class
  * generates and prints out namespace declarations.
- *
- * @author Matthew J. Duftler (duftler@us.ibm.com)
- * @author Joseph Kesselman
  */
 public final class DOM2Writer {
     public static final char NL = '\n';

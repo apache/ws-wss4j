@@ -72,8 +72,6 @@ import java.util.List;
 /**
  * Class SAML2ComponentBuilder provides builder methods that can be used
  * to construct SAML v2.0 statements using the OpenSaml library.
- * <p/>
- * Created on May 18, 2009
  */
 public final class SAML2ComponentBuilder {
     private static volatile SAMLObjectBuilder<Assertion> assertionBuilder;

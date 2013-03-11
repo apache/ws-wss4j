@@ -23,8 +23,6 @@ package org.apache.wss4j.common.saml.builder;
 /**
  * Class SAML1Constants provides static constant definitions associated with
  * the SAML v1.x specification.
- * <p/>
- * Created on May 18, 2009
  */
 public final class SAML1Constants {
     

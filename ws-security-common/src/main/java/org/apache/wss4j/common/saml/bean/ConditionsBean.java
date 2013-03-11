@@ -25,8 +25,6 @@ import org.joda.time.DateTime;
 /**
  * Class ConditionsBean represents a SAML Conditions object (can be used to create
  * both SAML v1.1 and v2.0 statements)
- *
- * Created on May 20, 2009
  */
 public class ConditionsBean {
     private DateTime notBefore;

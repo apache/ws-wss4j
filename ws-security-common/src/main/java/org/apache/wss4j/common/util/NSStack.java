@@ -39,9 +39,6 @@ import java.util.List;
  * Accordingly, this stack is implemented as a single array, will null
  * values used to indicate frame boundaries.
  *
- * @author James Snell
- * @author Glen Daniels (gdaniels@apache.org)
- * @author Sam Ruby (rubys@us.ibm.com)
  */
 public class NSStack {
     private static final org.apache.commons.logging.Log log =

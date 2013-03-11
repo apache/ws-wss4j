@@ -23,8 +23,6 @@ package org.apache.wss4j.common.saml.bean;
 /**
  * Class SamlAction represents the raw data required by the <code>SamlAssertionWrapper</code> when
  * creating the <code>Action</code> element of the SAML Authorization Decision Statement.
- *
- * Created on May 19, 2009
  */
 public class ActionBean {
 

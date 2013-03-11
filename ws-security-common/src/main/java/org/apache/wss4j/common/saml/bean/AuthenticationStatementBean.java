@@ -25,8 +25,6 @@ import org.joda.time.DateTime;
 /**
  * Class AuthenticationStatementBean represents the raw data required to create
  * a SAML v1.1 or v2.0 authentication statement.
- *
- * Created on May 20, 2009
  */
 public class AuthenticationStatementBean {
     private SubjectBean subject;

@@ -33,8 +33,6 @@ import org.w3c.dom.Element;
 
 /**
  * Class OpenSAMLUtil provides static helper methods for the OpenSaml library
- * <p/>
- * Created on May 18, 2009
  */
 public final class OpenSAMLUtil {
     private static final org.apache.commons.logging.Log LOG = 

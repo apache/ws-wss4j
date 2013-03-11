@@ -37,8 +37,6 @@ package org.apache.wss4j.common.derivedKey;
  <i>Source : RFC 2246 - The TLS Protocol Version 1.0
  Section 5. HMAC and the pseudorandom function</i>
  </pre>
- *
- * @author Ruchith Fernando
  */
 
 import javax.crypto.Mac;

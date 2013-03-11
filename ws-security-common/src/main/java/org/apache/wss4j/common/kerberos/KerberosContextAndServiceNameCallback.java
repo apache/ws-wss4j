@@ -20,10 +20,6 @@ package org.apache.wss4j.common.kerberos;
 
 import javax.security.auth.callback.Callback;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KerberosContextAndServiceNameCallback implements Callback {
 
     private String contextName;

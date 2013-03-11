@@ -24,8 +24,6 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 /**
  * Class SubjectBean represents a SAML subject (can be used to create
  * both SAML v1.1 and v2.0 statements)
- *
- * Created on May 20, 2009
  */
 public class SubjectBean {
     private String subjectName;

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 
 /**
  * Class SamlAttribute represents an instance of a SAML attribute.
- * <p/>
- * Created on May 18, 2009
  */
 public class AttributeBean {
     private String simpleName;

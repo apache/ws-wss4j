@@ -30,9 +30,6 @@ import org.apache.wss4j.common.util.Loader;
 
 /**
  * CryptoFactory.
- * <p/>
- *
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public abstract class CryptoFactory {
     private static final org.apache.commons.logging.Log LOG = 

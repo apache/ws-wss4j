@@ -51,8 +51,6 @@ import javax.security.auth.callback.Callback;
  * <li><code>SECURITY_CONTEXT_TOKEN</code> - need the key to to be associated
  * with a <code>wsc:SecurityContextToken</code>.</li>
  * </ul>
- *
- * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  */
 
 public class WSPasswordCallback implements Callback {

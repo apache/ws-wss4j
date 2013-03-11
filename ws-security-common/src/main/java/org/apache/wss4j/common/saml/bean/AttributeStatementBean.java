@@ -25,8 +25,6 @@ import java.util.ArrayList;
 
 /**
  * Class SamlAttributeStatement represents a SAML attribute statement
- *
- * Created on May 20, 2009
  */
 public class AttributeStatementBean {
     private SubjectBean subject;

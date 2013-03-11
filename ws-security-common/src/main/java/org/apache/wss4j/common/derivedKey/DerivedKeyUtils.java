@@ -20,10 +20,6 @@ package org.apache.wss4j.common.derivedKey;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class DerivedKeyUtils {
 
     /**

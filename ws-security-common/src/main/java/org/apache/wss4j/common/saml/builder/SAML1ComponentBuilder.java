@@ -69,8 +69,6 @@ import java.util.List;
 /**
  * Class SAML1ComponentBuilder provides builder methods that can be used
  * to construct SAML v1.1 statements using the OpenSaml library.
- * <p/>
- * Created on May 18, 2009
  */
 public final class SAML1ComponentBuilder {
     

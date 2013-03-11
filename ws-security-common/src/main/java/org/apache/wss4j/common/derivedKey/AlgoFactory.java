@@ -19,9 +19,6 @@
 
 package org.apache.wss4j.common.derivedKey;
 
-/**
- * @author Ruchith Fernando
- */
 public final class AlgoFactory {
     
     private AlgoFactory() {
