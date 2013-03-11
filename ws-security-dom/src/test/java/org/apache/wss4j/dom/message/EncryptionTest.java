@@ -54,9 +54,6 @@ import java.util.List;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests.
- *
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (werner@apache.org)
  */
 public class EncryptionTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

@@ -40,9 +40,6 @@ import javax.xml.namespace.QName;
 
 /**
  * Binary Security Token.
- * 
- * @author Davanum Srinivas (dims@yahoo.com).
- * @author Werner Dittmann (Werner.Dittmann@t-onile.de).
  */
 public class BinarySecurity {
     public static final QName TOKEN_BST = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");

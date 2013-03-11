@@ -72,9 +72,6 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
  * 
  * The flexibility and fine granular control is required to implement a handler
  * that uses WSSecurityPolicy files to control the setup of a Security header.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSecSignature extends WSSecSignatureBase {
 

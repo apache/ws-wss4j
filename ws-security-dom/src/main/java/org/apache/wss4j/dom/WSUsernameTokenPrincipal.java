@@ -39,8 +39,6 @@ import java.security.Principal;
  * by JAAS documentation 
  * <p/>
  * 
- * @author Davanum Srinivas (dims@yahoo.com).
- * @author Werner Dittmann (Werner.Dittmann@siemens.com).
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  */

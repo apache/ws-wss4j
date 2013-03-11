@@ -30,8 +30,6 @@ import org.w3c.dom.Document;
 /**
  * Builder class to add a <code>wsc:SecurityContextToken</code> into the
  * <code>wsse:Security</code>
- * 
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class WSSecSecurityContextToken {
 

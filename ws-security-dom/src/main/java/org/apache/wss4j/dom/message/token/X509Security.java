@@ -34,8 +34,6 @@ import java.security.cert.X509Certificate;
 
 /**
  * X509 Security Token.
- *
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class X509Security extends BinarySecurity {
     

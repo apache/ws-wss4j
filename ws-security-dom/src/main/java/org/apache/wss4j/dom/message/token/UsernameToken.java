@@ -64,9 +64,6 @@ import java.util.TimeZone;
  * 
  * Enhanced to support digest password type for username token signature
  * Enhanced to support passwordless usernametokens as allowed by spec.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class UsernameToken {
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";

@@ -27,8 +27,6 @@ import org.w3c.dom.Element;
 
 /**
  * Builds a WS SignatureConfirmation and inserts it into the SOAP Envelope.
- * 
- * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public class WSSecSignatureConfirmation extends WSSecBase {
     private static org.apache.commons.logging.Log log = 

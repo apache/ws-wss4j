@@ -28,9 +28,6 @@ import org.w3c.dom.Element;
 /**
  * Builds a WS Timestamp and inserts it into the SOAP Envelope. Refer to the WS
  * specification 1.0. chapter 10 / appendix A.2
- * 
- * @author Christof Soehngen (Christof.Soehngen@syracom.de).
- * @author Werner Dittmann (werner@apache.org).
  */
 
 public class WSSecTimestamp extends WSSecBase {

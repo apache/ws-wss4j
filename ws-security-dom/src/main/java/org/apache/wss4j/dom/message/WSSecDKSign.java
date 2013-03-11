@@ -53,10 +53,6 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
 /**
  * Builder to sign with derived keys
- * 
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSecDKSign extends WSSecDerivedKeyBase {
 

@@ -27,8 +27,6 @@ import java.util.Map;
 /**
  * This class defines the names, actions, and other string for the deployment
  * data of the WS handler.
- *  
- * @author Werner Dittmann (werner@apache.org)
  */
 public final class WSHandlerConstants {
     

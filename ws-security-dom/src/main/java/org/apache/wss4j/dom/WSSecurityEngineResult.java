@@ -30,9 +30,7 @@ import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-/**
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
- */
+
 public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     
     //

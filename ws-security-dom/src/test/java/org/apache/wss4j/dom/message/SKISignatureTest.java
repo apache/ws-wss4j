@@ -35,9 +35,6 @@ import org.w3c.dom.Document;
 
 /**
  * WS-Security Test Case for SubjectKeyIdentifier.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class SKISignatureTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

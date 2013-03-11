@@ -53,8 +53,6 @@ import java.util.List;
 
 /**
  * WS-Security Test Case for UsernameTokens.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class UsernameTokenTest extends org.junit.Assert implements CallbackHandler {
     private static final org.apache.commons.logging.Log LOG = 

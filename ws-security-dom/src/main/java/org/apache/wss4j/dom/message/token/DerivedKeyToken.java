@@ -53,10 +53,6 @@ import org.w3c.dom.Text;
  </DerivedKeyToken>
  */
 
-/**
- * @author Ruchith Fernando
- * @version 1.0
- */
 public class DerivedKeyToken {
 
     private static org.apache.commons.logging.Log log = 

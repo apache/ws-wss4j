@@ -30,9 +30,6 @@ import java.io.Serializable;
  * This might be fleshed out later to encapsulate factories for behavioral
  * objects which act differently depending on the SOAP version, but for now
  * it just supplies common namespaces + QNames.
- *
- * @author Glen Daniels (gdaniels@apache.org)
- * @author Andras Avar (andras.avar@nokia.com)
  */
 public interface SOAPConstants extends Serializable {
     /**

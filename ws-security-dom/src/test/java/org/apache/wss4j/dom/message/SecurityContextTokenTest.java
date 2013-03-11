@@ -38,8 +38,6 @@ import org.w3c.dom.Document;
 
 /**
  * A set of tests for SecurityContextTokens.
- * 
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class SecurityContextTokenTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

@@ -46,8 +46,6 @@ import org.w3c.dom.Text;
 /**
  * Timestamp according to SOAP Message Security 1.0,
  * chapter 10 / appendix A.2
- *
- * @author Christof Soehngen (christof.soehngen@syracom.de)
  */
 public class Timestamp {
     

@@ -30,8 +30,6 @@ import org.w3c.dom.Element;
 /**
  * Builds a WS SAML Assertion and inserts it into the SOAP Envelope. Refer to
  * the WS specification, SAML Token profile
- *
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class WSSecSAMLToken extends WSSecBase {
 

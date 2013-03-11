@@ -51,9 +51,6 @@ import java.util.List;
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
  * and adds the encryption data.
- * 
- * @author Davanum Srinivas (dims@yahoo.com).
- * @author Werner Dittmann (Werner.Dittmann@apache.org).
  */
 public class WSSecEncrypt extends WSSecEncryptedKey {
     private static org.apache.commons.logging.Log log = 
@@ -287,7 +284,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     ) throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
-        //the sun ähm oracle jce provider doesn't like a foreign SecretKey impl.
+        //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
         //this occurs e.g. with a kerberos session-key. It doesn't matter for the bouncy-castle provider
         //so create a new secretKeySpec to make everybody happy.
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());

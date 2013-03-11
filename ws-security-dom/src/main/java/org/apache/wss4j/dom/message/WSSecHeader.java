@@ -32,8 +32,6 @@ import org.w3c.dom.Node;
  * 
  * The defaults for actor and mustunderstand are: empty <code>actor</code> and
  * <code>mustunderstand</code> is true.
- * 
- * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecHeader {
     private String actor;

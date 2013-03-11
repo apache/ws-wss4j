@@ -39,10 +39,6 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Base class for DerivedKey encryption and signature
- *
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (werner@apache.org)
  */
 public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     

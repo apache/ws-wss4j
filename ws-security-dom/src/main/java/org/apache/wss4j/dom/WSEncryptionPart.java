@@ -21,9 +21,7 @@ package org.apache.wss4j.dom;
 
 import org.w3c.dom.Element;
 
-/**
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
- */
+
 public class WSEncryptionPart {
 
     private String name;

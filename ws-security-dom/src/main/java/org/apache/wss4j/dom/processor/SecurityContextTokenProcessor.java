@@ -40,8 +40,6 @@ import java.io.IOException;
 
 /**
  * The processor to process <code>wsc:SecurityContextToken</code>.
- * 
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class SecurityContextTokenProcessor implements Processor {
     

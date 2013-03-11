@@ -31,8 +31,6 @@ import org.w3c.dom.Node;
 
 /**
  * Reference.
- * 
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class Reference {
     public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "Reference");

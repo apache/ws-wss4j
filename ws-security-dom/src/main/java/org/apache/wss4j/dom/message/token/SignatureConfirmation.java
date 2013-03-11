@@ -36,9 +36,6 @@ import org.w3c.dom.Node;
 
 /**
  * Signature Confirmation element.
- *
- *
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class SignatureConfirmation {
 

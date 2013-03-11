@@ -51,8 +51,6 @@ import java.util.Arrays;
 
 /**
  * Security Token Reference.
- *
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public class SecurityTokenReference {
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";

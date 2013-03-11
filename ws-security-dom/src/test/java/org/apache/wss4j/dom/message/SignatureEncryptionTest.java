@@ -45,8 +45,6 @@ import java.util.ArrayList;
 
 /**
  * A set of tests for combined signature/encryption, verification/decryption.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class SignatureEncryptionTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

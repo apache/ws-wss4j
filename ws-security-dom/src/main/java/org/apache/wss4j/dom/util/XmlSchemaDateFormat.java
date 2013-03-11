@@ -31,9 +31,6 @@ import java.util.TimeZone;
  * A {@link DateFormat} for the format of the dateTime simpleType as specified in the
  * XML Schema specification. See <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">
  * XML Schema Part 2: Datatypes, W3C Recommendation 02 May 2001, Section 3.2.7.1</a>.
- *
- * @author Ian P. Springer
- * @author Werner Dittmann
  */
 public class XmlSchemaDateFormat extends DateFormat {
     /**

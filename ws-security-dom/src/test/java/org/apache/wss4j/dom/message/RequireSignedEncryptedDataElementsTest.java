@@ -48,8 +48,6 @@ import org.w3c.dom.Element;
  * Tests for the WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS option.
  * This test verifies some wrapping techniques are properly handled when the afore
  * mentioned option is on.
- * 
- * @author <a href="mailto:alessio.soldano@jboss.com">Alessio Soldano</a>
  */
 public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

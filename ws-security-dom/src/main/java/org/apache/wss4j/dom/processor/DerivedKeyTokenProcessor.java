@@ -36,8 +36,6 @@ import org.apache.wss4j.dom.str.STRParser;
 
 /**
  * The processor to process <code>wsc:DerivedKeyToken</code>.
- * 
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
  */
 public class DerivedKeyTokenProcessor implements Processor {
     

@@ -37,8 +37,6 @@ import java.util.ArrayList;
 /**
  * WS-Security Test Case for signature creation/validation using the
  * SecurityTokenReference transform.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class STRSignatureTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

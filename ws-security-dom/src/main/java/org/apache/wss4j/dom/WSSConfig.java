@@ -44,9 +44,6 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
  * follow the latest OASIS and changing anything might violate the OASIS specs.
  * <p/> <b>WARNING: changing the default settings will break the compliance with
  * the latest specs. Do this only if you know what you are doing.</b> <p/>
- * 
- * @author Rami Jaamour (rjaamour@parasoft.com)
- * @author Werner Dittmann (werner@apache.org)
  */
 public class WSSConfig {
     

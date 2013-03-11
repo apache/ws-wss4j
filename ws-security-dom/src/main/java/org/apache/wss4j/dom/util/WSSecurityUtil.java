@@ -59,8 +59,6 @@ import java.util.Set;
 
 /**
  * WS-Security Utility methods. <p/>
- * 
- * @author Davanum Srinivas (dims@yahoo.com).
  */
 public final class WSSecurityUtil {
     private static org.apache.commons.logging.Log log = 

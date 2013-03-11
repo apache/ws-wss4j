@@ -46,8 +46,6 @@ import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * This class holds per request data.
- *
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 public class RequestData {
     

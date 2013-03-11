@@ -36,8 +36,6 @@ import org.w3c.dom.NodeList;
 /**
  * Applies message transformations to the tests in
  * org.apache.wss4j.dom.message.RequireSignedEncryptedDataElementsTest
- * 
- * @author <a href="mailto:alessio.soldano@jboss.com">Alessio Soldano</a>
  */
 public class TestMessageTransformer extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory

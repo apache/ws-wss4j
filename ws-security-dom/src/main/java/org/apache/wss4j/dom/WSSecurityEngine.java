@@ -39,10 +39,6 @@ import java.util.List;
 
 /**
  * WS-Security Engine.
- * <p/>
- *
- * @author Davanum Srinivas (dims@yahoo.com).
- * @author Werner Dittmann (Werner.Dittmann@t-online.de).
  */
 public class WSSecurityEngine {
     private static org.apache.commons.logging.Log log = 

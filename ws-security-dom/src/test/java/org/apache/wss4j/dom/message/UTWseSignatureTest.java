@@ -36,8 +36,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 /**
  * This a test for deriving a key from a Username Token using a non-standard (WSE) implementation.
- * 
- * @author Werner Dittmann (Wern.erDittmann@siemens.com)
  */
 public class UTWseSignatureTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

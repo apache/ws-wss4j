@@ -22,9 +22,6 @@ package org.apache.wss4j.dom.handler;
 import java.util.List;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 
-/**
- * @author Werner Dittmann (Werner.Dittmann@Siemens.com)
- */
 public class WSHandlerResult {
     private String actor;
     private List<WSSecurityEngineResult> wsSecurityResults;

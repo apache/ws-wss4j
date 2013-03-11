@@ -33,8 +33,6 @@ import org.w3c.dom.Element;
  * Builds a WS UsernameToken.
  * 
  * Refer to the WS specification, UsernameToken profile
- * 
- * @author Werner Dittmann (werner@apache.org).
  */
 public class WSSecUsernameToken extends WSSecBase {
     private static org.apache.commons.logging.Log log = 

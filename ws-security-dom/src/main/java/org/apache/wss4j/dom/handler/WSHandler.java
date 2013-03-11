@@ -55,10 +55,6 @@ import org.w3c.dom.Document;
 /**
  * Extracted from WSDoAllReceiver and WSDoAllSender
  * Extended to all passwordless UsernameTokens and configurable identities.
- *
- * @author Davanum Srinivas (dims@yahoo.com).
- * @author Werner Dittmann (Werner.Dittmann@t-online.de).
- * @author Marcel Ammerlaan (marcel.ammerlaan@gmail.com).
  */
 public abstract class WSHandler {
     private static org.apache.commons.logging.Log log = 

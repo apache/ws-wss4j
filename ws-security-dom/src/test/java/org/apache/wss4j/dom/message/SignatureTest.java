@@ -51,9 +51,6 @@ import org.w3c.dom.Node;
 
 /**
  * A set of test-cases for signing and verifying SOAP requests.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 public class SignatureTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

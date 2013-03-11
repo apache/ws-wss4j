@@ -41,8 +41,6 @@ import org.w3c.dom.Document;
  * 
  * Enhanced by Alberto Coletti to support digest password type for 
  * username token signature
- * 
- * @author Werner Dittmann (Werner.Dittmann@t-online.de)
  */
 
 public class UsernameTokenSignedAction implements Action {

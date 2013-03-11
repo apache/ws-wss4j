@@ -57,8 +57,6 @@ import java.util.List;
 
 /**
  * Test-case for sending and processing an unsigned (sender vouches) SAML Assertion.
- * 
- * @author Davanum Srinivas (dims@yahoo.com)
  */
 public class SamlTokenTest extends org.junit.Assert {
     private static final org.apache.commons.logging.Log LOG = 

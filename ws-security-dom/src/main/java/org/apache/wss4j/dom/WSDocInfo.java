@@ -28,8 +28,6 @@ package org.apache.wss4j.dom;
  * the stored information that me be necessary to process the document.
  * The main usage for this is (are) the transformation functions that
  * are called during Signature/Verification process. 
- * 
- * @author Werner Dittmann (Werner.Dittmann@siemens.com)
  */
 
 import java.util.ArrayList;

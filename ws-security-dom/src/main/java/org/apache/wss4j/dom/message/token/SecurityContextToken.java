@@ -33,11 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import javax.xml.namespace.QName;
-
-/**
- * @author Ruchith Fernando
- * @version 1.0
- */
 public class SecurityContextToken {
 
     /**

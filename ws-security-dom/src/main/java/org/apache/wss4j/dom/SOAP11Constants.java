@@ -23,9 +23,6 @@ import javax.xml.namespace.QName;
 
 /**
  * SOAP 1.1 constants
- *
- * @author Glen Daniels (gdaniels@apache.org)
- * @author Andras Avar (andras.avar@nokia.com)
  */
 public class SOAP11Constants implements SOAPConstants {
     /**

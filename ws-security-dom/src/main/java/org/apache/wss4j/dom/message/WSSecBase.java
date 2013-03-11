@@ -32,8 +32,6 @@ import java.util.List;
  * This is the base class for WS Security messages. It provides common functions
  * and fields used by the specific message classes such as sign, encrypt, and
  * username token.
- * 
- * @author Werner Dittmann (Werner.Dittmann@apache.org)
  */
 public class WSSecBase {
     protected String user;
