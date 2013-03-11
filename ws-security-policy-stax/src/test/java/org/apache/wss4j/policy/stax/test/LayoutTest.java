@@ -18,10 +18,6 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class LayoutTest extends AbstractPolicyTestBase {
 
     /*@Test

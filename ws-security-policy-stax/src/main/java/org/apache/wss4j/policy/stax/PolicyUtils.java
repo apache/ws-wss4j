@@ -25,10 +25,6 @@ import javax.xml.namespace.QName;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class PolicyUtils {
 
     public static List<QName> getElementPath(XPath xPath) {

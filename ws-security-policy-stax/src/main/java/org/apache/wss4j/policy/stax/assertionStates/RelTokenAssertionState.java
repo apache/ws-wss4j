@@ -29,9 +29,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.9 RelToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class RelTokenAssertionState extends TokenAssertionState {

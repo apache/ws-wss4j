@@ -31,10 +31,6 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-/**
- * @author $Author: $
- * @version $Revision: $ $Date: $
- */
 public class WSP13SpecTest extends AbstractPolicyTestBase {
 
     private InboundWSSecurityContextImplTest inboundWSSecurityContextImplTest = new InboundWSSecurityContextImplTest();

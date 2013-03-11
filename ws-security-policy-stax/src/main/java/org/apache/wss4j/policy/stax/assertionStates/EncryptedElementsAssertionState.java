@@ -38,9 +38,6 @@ import java.util.List;
 
 /**
  * WSP1.3, 4.2.2 EncryptedElements Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class EncryptedElementsAssertionState extends AssertionState implements Assertable {
 

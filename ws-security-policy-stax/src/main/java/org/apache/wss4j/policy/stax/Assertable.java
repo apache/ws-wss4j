@@ -23,10 +23,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
-/**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
- */
 public interface Assertable {
 
     SecurityEventConstants.Event[] getSecurityEventType();

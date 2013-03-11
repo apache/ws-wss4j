@@ -33,9 +33,6 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
  * WSP1.3, 5.4.8 SamlToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class SamlTokenAssertionState extends TokenAssertionState {

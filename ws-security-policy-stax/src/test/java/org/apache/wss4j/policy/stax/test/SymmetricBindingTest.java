@@ -35,10 +35,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SymmetricBindingTest extends AbstractPolicyTestBase {
 
     @Test

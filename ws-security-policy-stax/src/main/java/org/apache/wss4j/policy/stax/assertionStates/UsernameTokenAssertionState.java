@@ -32,9 +32,6 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
  * WSP1.3, 5.4.1 UsernameToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class UsernameTokenAssertionState extends TokenAssertionState {

@@ -51,10 +51,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AbstractPolicyTestBase extends AbstractTestBase {
 
     @BeforeClass

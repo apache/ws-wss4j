@@ -36,10 +36,6 @@ import javax.xml.namespace.QName;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecurityContextTokenTest extends AbstractPolicyTestBase {
 
     @Test

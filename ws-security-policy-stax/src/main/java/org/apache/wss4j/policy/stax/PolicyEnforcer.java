@@ -40,9 +40,6 @@ import java.util.*;
 /**
  * The PolicyEnforcer verifies the Policy assertions
  * The Assertion will be validated in realtime as far as possible
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class PolicyEnforcer implements SecurityEventListener {
 

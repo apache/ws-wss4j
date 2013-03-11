@@ -34,10 +34,6 @@ import org.testng.annotations.Test;
 import javax.xml.namespace.QName;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TokenProtectionTest extends AbstractPolicyTestBase {
 
     @Test

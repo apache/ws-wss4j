@@ -20,10 +20,6 @@ package org.apache.wss4j.policy.stax;
 
 import org.apache.neethi.Policy;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class OperationPolicy {
 
     private String operationName;

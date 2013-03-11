@@ -30,10 +30,6 @@ import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class HttpsTokenTest extends AbstractPolicyTestBase {
 
     @Test

@@ -29,9 +29,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.11 KeyValueToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class KeyValueTokenAssertionState extends TokenAssertionState {

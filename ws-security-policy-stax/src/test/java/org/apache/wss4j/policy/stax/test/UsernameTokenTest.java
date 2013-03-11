@@ -37,10 +37,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameTokenTest extends AbstractPolicyTestBase {
 
     @Test

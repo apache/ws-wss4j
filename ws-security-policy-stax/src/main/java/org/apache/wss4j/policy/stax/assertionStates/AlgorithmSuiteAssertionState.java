@@ -31,9 +31,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
 /**
  * WSP1.3, 6.1 Algorithm Suite Property
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class AlgorithmSuiteAssertionState extends AssertionState implements Assertable {
 

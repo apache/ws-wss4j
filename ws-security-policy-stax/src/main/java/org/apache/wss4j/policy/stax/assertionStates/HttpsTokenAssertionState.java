@@ -29,9 +29,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.10 HttpsToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class HttpsTokenAssertionState extends TokenAssertionState {

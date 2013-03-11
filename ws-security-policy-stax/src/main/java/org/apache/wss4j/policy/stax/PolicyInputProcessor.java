@@ -44,9 +44,6 @@ import java.util.List;
 
 /**
  * Processor to generate SecurityEvents regarding not secured elements
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class PolicyInputProcessor extends AbstractInputProcessor {
 

@@ -45,10 +45,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.security.KeyStore;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
 
     @Test

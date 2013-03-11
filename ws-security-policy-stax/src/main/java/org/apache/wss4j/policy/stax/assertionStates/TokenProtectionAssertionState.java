@@ -40,9 +40,6 @@ import java.util.List;
 
 /**
  * WSP1.3, 6.5 Token Protection Property
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class TokenProtectionAssertionState extends AssertionState implements Assertable {
 

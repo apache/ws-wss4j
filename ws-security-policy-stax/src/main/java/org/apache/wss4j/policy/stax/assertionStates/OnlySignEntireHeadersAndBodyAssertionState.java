@@ -32,9 +32,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.6 Entire Header and Body Signatures Property
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState implements Assertable {
 

@@ -38,9 +38,6 @@ import java.util.List;
 
 /**
  * WSP1.3, 6.4 Signature Protection Property
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SignatureProtectionAssertionState extends AssertionState implements Assertable {
 

@@ -22,9 +22,6 @@ import org.apache.wss4j.policy.WSSPolicyException;
 
 /**
  * Exception for PolicyViolation
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class PolicyViolationException extends WSSPolicyException {
 

@@ -34,9 +34,6 @@ import java.security.cert.X509Certificate;
 
 /**
  * WSP1.3, 5.4.3 X509Token Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class X509TokenAssertionState extends TokenAssertionState {

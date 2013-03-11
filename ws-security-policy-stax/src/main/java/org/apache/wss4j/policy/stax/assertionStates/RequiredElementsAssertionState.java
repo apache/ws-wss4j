@@ -39,9 +39,6 @@ import java.util.Map;
 
 /**
  * WSP1.3, 4.3.1 RequiredElements Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class RequiredElementsAssertionState extends AssertionState implements Assertable {
 

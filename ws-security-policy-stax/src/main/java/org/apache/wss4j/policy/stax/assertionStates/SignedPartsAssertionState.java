@@ -37,9 +37,6 @@ import java.util.List;
 
 /**
  * WSP1.3, 4.1.1 SignedParts Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SignedPartsAssertionState extends AssertionState implements Assertable {
 

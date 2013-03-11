@@ -45,9 +45,6 @@ import java.util.*;
 /**
  * PolicyEnforcerFactory builds a map of all the possible effective Policies
  * and caches them for reuse
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class PolicyEnforcerFactory {
 

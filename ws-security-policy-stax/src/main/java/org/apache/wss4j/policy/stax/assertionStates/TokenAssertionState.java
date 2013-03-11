@@ -34,9 +34,6 @@ import java.util.List;
 
 /**
  * WSP1.3, 5 Token Assertions
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public abstract class TokenAssertionState extends AssertionState implements Assertable {
 

@@ -29,9 +29,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.5 SpnegoContextToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class SpnegoContextTokenAssertionState extends TokenAssertionState {

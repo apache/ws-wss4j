@@ -29,9 +29,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.7 SecureConversationToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class SecureConversationTokenAssertionState extends TokenAssertionState {

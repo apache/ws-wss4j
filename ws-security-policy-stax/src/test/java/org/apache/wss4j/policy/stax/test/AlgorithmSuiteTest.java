@@ -41,10 +41,6 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
 
     @Test

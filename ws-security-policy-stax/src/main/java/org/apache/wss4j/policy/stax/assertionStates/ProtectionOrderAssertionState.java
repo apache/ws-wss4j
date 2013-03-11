@@ -37,9 +37,6 @@ import java.util.List;
 
 /**
  * WSP1.3, 6.3 Protection Order Property
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class ProtectionOrderAssertionState extends AssertionState implements Assertable {

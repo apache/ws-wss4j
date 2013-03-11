@@ -18,9 +18,5 @@
  */
 package org.apache.wss4j.policy.stax;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class PolicyConstants {
 }

@@ -31,9 +31,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.4 KerberosToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class KerberosTokenAssertionState extends TokenAssertionState {

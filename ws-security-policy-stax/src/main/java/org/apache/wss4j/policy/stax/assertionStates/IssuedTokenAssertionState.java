@@ -45,9 +45,6 @@ import java.util.Map;
 
 /**
  * WSP1.3, 5.4.2 IssuedToken Assertion
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 
 public class IssuedTokenAssertionState extends TokenAssertionState {

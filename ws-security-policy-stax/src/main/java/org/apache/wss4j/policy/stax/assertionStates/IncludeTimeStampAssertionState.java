@@ -28,9 +28,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.2 Timestamp Property
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class IncludeTimeStampAssertionState extends AssertionState implements Assertable {
 
