@@ -38,9 +38,6 @@ import java.util.List;
 
 /**
  * Processor for the SecurityContextToken XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 

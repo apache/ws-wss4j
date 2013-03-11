@@ -26,9 +26,6 @@ import java.util.List;
 
 /**
  * The document security context
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public interface WSSecurityContext extends SecurityContext {
 

@@ -35,10 +35,6 @@ import javax.xml.stream.XMLStreamException;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignatureConfirmationInputProcessor extends AbstractInputProcessor {
 
     public SignatureConfirmationInputProcessor(WSSSecurityProperties securityProperties) {

@@ -24,10 +24,6 @@ import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurity
 
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignedPartSecurityEvent extends AbstractSecuredElementSecurityEvent {
 
     public SignedPartSecurityEvent(SecurityToken securityToken, boolean signed, List<XMLSecurityConstants.ContentType> protectionOrder) {

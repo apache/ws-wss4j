@@ -21,10 +21,6 @@ package org.apache.wss4j.stax.securityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.wss4j.stax.ext.WSSConstants;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameTokenSecurityEvent extends TokenSecurityEvent {
 
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;

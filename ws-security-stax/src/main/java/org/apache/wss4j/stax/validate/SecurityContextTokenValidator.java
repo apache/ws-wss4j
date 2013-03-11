@@ -22,10 +22,6 @@ import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public interface SecurityContextTokenValidator extends Validator {
 
     AbstractInboundSecurityToken validate(AbstractSecurityContextTokenType securityContextTokenType,

@@ -41,10 +41,6 @@ import javax.xml.stream.XMLStreamException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-/**
- * @author $Author: coheigea $
- * @version $Revision: 1354898 $ $Date: 2012-06-28 11:19:02 +0100 (Thu, 28 Jun 2012) $
- */
 public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOutputProcessor {
 
     private static final List<QName> appendAfterOneOfThisAttributes;

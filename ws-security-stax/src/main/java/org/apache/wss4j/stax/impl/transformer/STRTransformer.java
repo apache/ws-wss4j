@@ -20,9 +20,5 @@ package org.apache.wss4j.stax.impl.transformer;
 
 import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class STRTransformer extends TransformIdentity {
 }

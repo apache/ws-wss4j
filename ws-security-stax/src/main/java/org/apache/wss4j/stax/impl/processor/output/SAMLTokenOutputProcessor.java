@@ -50,10 +50,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {

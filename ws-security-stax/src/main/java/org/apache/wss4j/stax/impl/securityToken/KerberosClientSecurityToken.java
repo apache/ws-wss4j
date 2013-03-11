@@ -39,10 +39,6 @@ import java.security.Key;
 import java.security.Principal;
 import java.util.Set;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
 
     private CallbackHandler callbackHandler;

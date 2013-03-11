@@ -36,9 +36,6 @@ import org.apache.wss4j.stax.ext.WSSecurityContext;
 
 /**
  * Processor for the EncryptedKey XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
 

@@ -45,10 +45,6 @@ import javax.xml.xpath.XPathExpression;
 import java.io.*;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class InteroperabilityTest extends AbstractTestBase {
 
     @Test(invocationCount = 1)

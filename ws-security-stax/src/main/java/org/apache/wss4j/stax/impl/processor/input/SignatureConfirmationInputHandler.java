@@ -33,9 +33,6 @@ import java.util.Deque;
 
 /**
  * Processor for the SignatureConfirmation XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SignatureConfirmationInputHandler extends AbstractInputSecurityHeaderHandler {
 

@@ -44,10 +44,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class PerformanceMemoryTest extends AbstractTestBase {
 
     private FileWriter outSamples;

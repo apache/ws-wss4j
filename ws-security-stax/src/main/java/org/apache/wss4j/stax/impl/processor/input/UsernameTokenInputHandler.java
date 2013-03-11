@@ -51,9 +51,6 @@ import java.util.List;
 
 /**
  * Processor for the UsernameToken XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 

@@ -23,10 +23,6 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignatureTokenValidatorImpl implements SignatureTokenValidator {
 
     @Override

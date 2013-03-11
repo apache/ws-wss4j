@@ -39,9 +39,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
  * This is the central class of the streaming webservice-security framework.<br/>
  * Instances of the inbound and outbound security streams can be retrieved
  * with this class.
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class WSSec {
     

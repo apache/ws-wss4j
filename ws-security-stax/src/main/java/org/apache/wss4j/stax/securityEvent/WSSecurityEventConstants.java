@@ -20,10 +20,6 @@ package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
-/**
- * @author $Author: $
- * @version $Revision: -1 $ $Date: $
- */
 public abstract class WSSecurityEventConstants extends SecurityEventConstants {
     
     public static final Event Operation = new Event("Operation");

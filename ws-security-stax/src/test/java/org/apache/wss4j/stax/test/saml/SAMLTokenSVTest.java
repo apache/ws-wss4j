@@ -49,10 +49,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SAMLTokenSVTest extends AbstractTestBase {
 
     @Test

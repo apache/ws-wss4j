@@ -44,10 +44,6 @@ import javax.xml.stream.XMLStreamConstants;
 import java.util.Deque;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
 
     @Override

@@ -37,10 +37,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class OutputChainTest extends AbstractTestBase {
 
     @Test

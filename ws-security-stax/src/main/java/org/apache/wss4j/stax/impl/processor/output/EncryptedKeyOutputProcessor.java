@@ -51,10 +51,6 @@ import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
     public EncryptedKeyOutputProcessor() throws XMLSecurityException {

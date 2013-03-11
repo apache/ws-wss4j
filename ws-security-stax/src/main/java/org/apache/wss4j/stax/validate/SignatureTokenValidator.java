@@ -22,10 +22,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.SecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public interface SignatureTokenValidator extends Validator {
 
     void validate(SecurityToken securityToken, WSSSecurityProperties wssSecurityProperties) throws WSSecurityException;

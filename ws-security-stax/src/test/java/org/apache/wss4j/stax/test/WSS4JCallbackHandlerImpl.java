@@ -25,10 +25,6 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 import java.io.IOException;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class WSS4JCallbackHandlerImpl implements CallbackHandler {
 
     private byte[] secret;

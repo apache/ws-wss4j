@@ -18,10 +18,6 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class RelTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     //todo implement

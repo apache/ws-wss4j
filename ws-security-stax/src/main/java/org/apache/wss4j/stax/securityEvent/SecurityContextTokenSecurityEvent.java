@@ -18,10 +18,6 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecurityContextTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     private boolean externalUriRef;

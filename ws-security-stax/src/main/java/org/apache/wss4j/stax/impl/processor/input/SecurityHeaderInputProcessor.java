@@ -43,9 +43,6 @@ import java.util.Deque;
 /**
  * Processor for the Security-Header XML Structure.
  * This processor instantiates more processors on demand
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 

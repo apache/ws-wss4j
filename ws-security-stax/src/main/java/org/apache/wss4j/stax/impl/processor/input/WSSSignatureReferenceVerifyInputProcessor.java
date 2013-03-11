@@ -49,12 +49,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-/**/
-
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
     private static final String cacheRegionName = "timestamp";

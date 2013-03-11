@@ -32,10 +32,6 @@ import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
     @Override

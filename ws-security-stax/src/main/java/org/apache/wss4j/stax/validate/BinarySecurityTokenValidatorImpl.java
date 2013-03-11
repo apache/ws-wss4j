@@ -33,10 +33,6 @@ import org.apache.wss4j.stax.impl.securityToken.X509_V3SecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
     private static final transient Log log = LogFactory.getLog(BinarySecurityTokenValidatorImpl.class);

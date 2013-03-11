@@ -41,10 +41,6 @@ import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
     public BinarySecurityTokenOutputProcessor() throws XMLSecurityException {

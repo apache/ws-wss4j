@@ -77,10 +77,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractTestBase {
 
     //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();

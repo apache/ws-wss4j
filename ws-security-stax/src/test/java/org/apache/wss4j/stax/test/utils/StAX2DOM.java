@@ -26,10 +26,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class StAX2DOM {
     static final String XML_NS = "http://www.w3.org/2000/xmlns/";
 

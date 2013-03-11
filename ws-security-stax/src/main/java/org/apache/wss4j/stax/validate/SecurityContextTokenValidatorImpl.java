@@ -31,10 +31,6 @@ import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityTo
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecurityContextTokenValidatorImpl implements SecurityContextTokenValidator {
 
     @Override

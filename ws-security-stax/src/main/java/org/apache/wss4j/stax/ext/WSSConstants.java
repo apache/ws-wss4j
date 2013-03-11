@@ -36,9 +36,6 @@ import java.util.*;
 
 /**
  * WSSConstants for global use
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class WSSConstants extends XMLSecurityConstants {
 

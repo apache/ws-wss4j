@@ -45,10 +45,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TimestampTest extends AbstractTestBase {
 
     @Test

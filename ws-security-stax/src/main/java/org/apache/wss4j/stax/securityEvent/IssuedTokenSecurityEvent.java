@@ -20,10 +20,6 @@ package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class IssuedTokenSecurityEvent extends TokenSecurityEvent {
     public IssuedTokenSecurityEvent(WSSecurityEventConstants.Event securityEventType) {
         super(securityEventType);

@@ -35,10 +35,6 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class X509SecurityToken extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken {
 
     private CallbackHandler callbackHandler;

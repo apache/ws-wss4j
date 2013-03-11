@@ -22,10 +22,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class OperationSecurityEvent extends SecurityEvent {
 
     private QName operation;

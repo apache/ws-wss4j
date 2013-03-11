@@ -48,10 +48,6 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     /**

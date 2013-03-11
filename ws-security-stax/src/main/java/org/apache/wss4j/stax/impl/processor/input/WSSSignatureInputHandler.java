@@ -46,10 +46,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
     @Override

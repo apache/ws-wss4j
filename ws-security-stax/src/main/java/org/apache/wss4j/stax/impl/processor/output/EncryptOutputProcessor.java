@@ -47,9 +47,6 @@ import java.util.List;
 
 /**
  * Processor to encrypt XML structures
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 

@@ -27,9 +27,6 @@ import java.util.List;
 
 /**
  * Concrete security context implementation
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
 

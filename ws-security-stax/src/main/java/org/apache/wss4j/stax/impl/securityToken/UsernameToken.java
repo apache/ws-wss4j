@@ -30,10 +30,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameToken {
 
     private static final long DEFAULT_ITERATION = 1000;

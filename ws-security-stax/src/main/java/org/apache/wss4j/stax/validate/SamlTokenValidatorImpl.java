@@ -24,10 +24,6 @@ import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
     
     /**

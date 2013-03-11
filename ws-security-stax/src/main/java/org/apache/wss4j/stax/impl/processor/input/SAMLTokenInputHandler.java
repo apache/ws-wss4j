@@ -79,9 +79,6 @@ import java.util.*;
 
 /**
  * Processor for the SAML Assertion XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 

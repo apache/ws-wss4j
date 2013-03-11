@@ -31,9 +31,6 @@ import java.util.Deque;
 
 /**
  * Processor for the ReferenceList XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandler {
 

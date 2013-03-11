@@ -20,10 +20,6 @@ package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.AbstractElementSecurityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class RequiredPartSecurityEvent extends AbstractElementSecurityEvent {
 
     public RequiredPartSecurityEvent() {

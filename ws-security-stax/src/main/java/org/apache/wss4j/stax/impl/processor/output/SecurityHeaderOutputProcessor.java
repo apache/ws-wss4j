@@ -39,9 +39,6 @@ import java.util.List;
 
 /**
  * Processor to build the Security Header structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
 

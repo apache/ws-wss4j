@@ -18,9 +18,6 @@
  */
 package org.apache.wss4j.stax.validate;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
+
 public interface Validator {
 }

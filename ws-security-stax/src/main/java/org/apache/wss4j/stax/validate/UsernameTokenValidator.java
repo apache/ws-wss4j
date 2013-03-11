@@ -22,10 +22,6 @@ import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public interface UsernameTokenValidator extends Validator {
 
     AbstractInboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext)

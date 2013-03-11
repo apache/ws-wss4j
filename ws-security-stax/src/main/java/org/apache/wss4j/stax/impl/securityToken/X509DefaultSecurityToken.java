@@ -26,10 +26,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class X509DefaultSecurityToken extends X509SecurityToken {
 
     private String alias = null;

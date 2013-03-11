@@ -42,9 +42,6 @@ import java.util.List;
 
 /**
  * Processor for the BinarySecurityToken XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 

@@ -36,10 +36,6 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SAMLSecurityToken extends AbstractInboundSecurityToken {
 
     private final SamlAssertionWrapper samlAssertionWrapper;

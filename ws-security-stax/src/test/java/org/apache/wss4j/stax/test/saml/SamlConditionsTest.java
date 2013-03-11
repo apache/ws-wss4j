@@ -50,10 +50,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SamlConditionsTest extends AbstractTestBase {
 
     /**

@@ -32,10 +32,6 @@ import java.security.cert.X509Certificate;
 import java.util.Deque;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecurityTokenReference extends AbstractInboundSecurityToken {
 
     private final SecurityToken securityToken;

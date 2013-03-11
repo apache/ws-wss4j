@@ -22,9 +22,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * Exception when configuration errors are detected
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class WSSConfigurationException extends WSSecurityException {
 

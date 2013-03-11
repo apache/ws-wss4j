@@ -36,9 +36,6 @@ import java.util.*;
 
 /**
  * Concrete security context implementation
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class InboundWSSecurityContextImpl extends WSSecurityContextImpl {
 

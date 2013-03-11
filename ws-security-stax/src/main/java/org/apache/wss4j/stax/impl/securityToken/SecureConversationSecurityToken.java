@@ -24,10 +24,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecureConversationSecurityToken extends AbstractInboundSecurityToken {
 
     //todo implement

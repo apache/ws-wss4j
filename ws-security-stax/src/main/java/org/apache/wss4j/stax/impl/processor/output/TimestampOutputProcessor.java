@@ -33,10 +33,6 @@ import javax.xml.stream.XMLStreamException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
     public TimestampOutputProcessor() throws XMLSecurityException {

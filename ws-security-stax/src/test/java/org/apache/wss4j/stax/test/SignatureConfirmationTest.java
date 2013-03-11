@@ -47,10 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignatureConfirmationTest extends AbstractTestBase {
 
     @SuppressWarnings("unchecked")

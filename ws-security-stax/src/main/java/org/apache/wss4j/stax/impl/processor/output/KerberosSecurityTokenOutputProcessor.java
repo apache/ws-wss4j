@@ -40,10 +40,6 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KerberosSecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
     public KerberosSecurityTokenOutputProcessor() throws XMLSecurityException {

@@ -22,10 +22,6 @@ import java.util.Calendar;
 
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TimestampSecurityEvent extends SecurityEvent {
 
     private Calendar created;

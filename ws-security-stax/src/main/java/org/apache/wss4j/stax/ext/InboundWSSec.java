@@ -50,9 +50,6 @@ import java.util.List;
 /**
  * Inbound Streaming-WebService-Security
  * An instance of this class can be retrieved over the WSSec class
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class InboundWSSec {
 

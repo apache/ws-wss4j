@@ -24,10 +24,6 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 
 import javax.xml.stream.events.Attribute;
 
-/**
- * @author $Author: $
- * @version $Revision: $ $Date: $
- */
 public class ResolverSameDocument extends org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument {
 
     public ResolverSameDocument() {

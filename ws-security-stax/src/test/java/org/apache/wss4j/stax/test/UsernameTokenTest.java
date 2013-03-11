@@ -49,10 +49,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameTokenTest extends AbstractTestBase {
 
     @Test

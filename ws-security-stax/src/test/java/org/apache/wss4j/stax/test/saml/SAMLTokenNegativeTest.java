@@ -43,10 +43,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SAMLTokenNegativeTest extends AbstractTestBase {
 
     @Test

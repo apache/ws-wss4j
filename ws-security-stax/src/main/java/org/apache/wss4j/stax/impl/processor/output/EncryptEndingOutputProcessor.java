@@ -34,9 +34,6 @@ import java.util.*;
 
 /**
  * Processor buffers encrypted XMLEvents and forwards them when final is called
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputProcessor {
 

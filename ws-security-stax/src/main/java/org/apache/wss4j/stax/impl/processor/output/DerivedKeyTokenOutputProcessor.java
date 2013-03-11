@@ -46,10 +46,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
     public DerivedKeyTokenOutputProcessor() throws XMLSecurityException {

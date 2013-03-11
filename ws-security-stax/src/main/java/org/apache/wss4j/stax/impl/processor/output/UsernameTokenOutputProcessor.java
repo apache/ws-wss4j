@@ -41,10 +41,6 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
     public UsernameTokenOutputProcessor() throws XMLSecurityException {

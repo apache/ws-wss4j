@@ -22,10 +22,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     public SamlTokenSecurityEvent() {

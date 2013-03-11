@@ -42,10 +42,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class PerformanceTimingTest extends AbstractTestBase {
 
     private FileWriter outSamples;

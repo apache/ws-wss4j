@@ -44,9 +44,6 @@ import java.util.List;
 
 /**
  * Processor for the SecurityTokenReference XML Structure
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHeaderHandler {
 

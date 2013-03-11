@@ -49,10 +49,6 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class CallbackHandlerImpl implements CallbackHandler {
 
     private String username = "default";

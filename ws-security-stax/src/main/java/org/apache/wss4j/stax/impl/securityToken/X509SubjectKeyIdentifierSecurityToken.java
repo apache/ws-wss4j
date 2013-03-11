@@ -28,10 +28,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
 
     private String alias = null;

@@ -24,10 +24,6 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.ResourceResolver;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 
-/**
- * @author $Author: $
- * @version $Revision: $ $Date: $
- */
 public class ResolverXPointer extends org.apache.xml.security.stax.impl.resourceResolvers.ResolverXPointer {
 
     public ResolverXPointer() {

@@ -24,10 +24,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
 
     public enum AuthenticationType {

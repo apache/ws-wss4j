@@ -29,10 +29,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TimestampValidatorImpl implements TimestampValidator {
 
     private static final transient Log log = LogFactory.getLog(TimestampValidatorImpl.class);

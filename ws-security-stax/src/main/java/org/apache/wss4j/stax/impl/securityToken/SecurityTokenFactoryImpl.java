@@ -46,9 +46,6 @@ import java.util.List;
 
 /**
  * Factory to create SecurityToken Objects from keys in XML
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 

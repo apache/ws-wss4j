@@ -21,10 +21,6 @@ package org.apache.wss4j.stax.securityEvent;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityToken;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
     private String issuerName;

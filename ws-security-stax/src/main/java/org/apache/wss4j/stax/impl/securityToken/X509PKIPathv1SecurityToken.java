@@ -35,10 +35,6 @@ import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class X509PKIPathv1SecurityToken extends X509SecurityToken {
 
     private String alias = null;

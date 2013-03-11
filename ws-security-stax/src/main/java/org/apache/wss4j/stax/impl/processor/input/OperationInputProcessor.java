@@ -36,9 +36,6 @@ import java.util.List;
 
 /**
  * Processor which emits the Operation-Security-Event
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class OperationInputProcessor extends AbstractInputProcessor {
 

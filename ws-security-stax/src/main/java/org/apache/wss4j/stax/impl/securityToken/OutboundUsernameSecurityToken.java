@@ -26,10 +26,6 @@ import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityTo
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken {
 
     private final UsernameToken usernameToken;

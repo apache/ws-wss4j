@@ -26,10 +26,6 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 import java.security.cert.X509Certificate;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class HttpsSecurityToken extends AbstractInboundSecurityToken {
 
     private String username;

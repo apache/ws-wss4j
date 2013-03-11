@@ -40,9 +40,6 @@ import javax.xml.namespace.QName;
  * Main configuration class to supply keys etc.
  * This class is subject to change in the future.
  * Probably we will allow to configure the framework per WSDL
- *
- * @author $Author$
- * @version $Revision$ $Date$
  */
 public class WSSSecurityProperties extends XMLSecurityProperties {
 
