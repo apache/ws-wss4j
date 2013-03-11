@@ -25,10 +25,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SP11Constants extends SPConstants {
 
     private static SP11Constants sp11Constants = null;

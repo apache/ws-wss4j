@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.KeyValueToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KeyValueTokenTest extends AbstractTestBase {
 
     public void testKeyValueToken() throws Exception {

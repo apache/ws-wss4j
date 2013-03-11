@@ -18,10 +18,6 @@
  */
 package org.apache.wss4j.policy;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class WSSPolicyException extends Exception {
 
     private static final long serialVersionUID = 5904800255533588133L;

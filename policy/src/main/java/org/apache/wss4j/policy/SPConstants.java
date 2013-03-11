@@ -25,10 +25,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class SPConstants {
 
     public static final String ERR_INVALID_POLICY = "Invalid Policy";

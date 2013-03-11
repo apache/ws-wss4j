@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.SecurityContextToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecurityContextTokenTest extends AbstractTestBase {
 
     public void testSecurityContextToken() throws Exception {

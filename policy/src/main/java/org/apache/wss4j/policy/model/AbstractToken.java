@@ -32,10 +32,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractToken extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     public enum DerivedKeys {

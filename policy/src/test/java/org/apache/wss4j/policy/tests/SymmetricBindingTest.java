@@ -26,10 +26,6 @@ import org.apache.wss4j.policy.model.SymmetricBinding;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SymmetricBindingTest extends AbstractTestBase {
 
     public void testSymmetricBinding() throws Exception {

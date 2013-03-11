@@ -29,10 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     protected static final Map<String, AlgorithmSuiteType> algorithmSuiteTypes = new HashMap<String, AlgorithmSuiteType>();

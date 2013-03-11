@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.Trust10;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author: giger $
- * @version $Revision: 1181995 $ $Date: 2011-10-11 20:03:00 +0200 (Tue, 11 Oct 2011) $
- */
 public class Trust10Test extends AbstractTestBase {
 
     public void testTrust10_11() throws Exception {

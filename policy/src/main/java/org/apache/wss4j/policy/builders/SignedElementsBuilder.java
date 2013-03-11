@@ -37,10 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignedElementsBuilder implements AssertionBuilder<Element> {
 
     @Override

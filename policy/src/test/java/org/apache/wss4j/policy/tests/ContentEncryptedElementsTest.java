@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.ContentEncryptedElements;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class ContentEncryptedElementsTest extends AbstractTestBase {
 
     public void testContentEncryptedElements() throws Exception {

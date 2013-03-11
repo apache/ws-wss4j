@@ -23,10 +23,6 @@ import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class ProtectionToken extends AbstractTokenWrapper {
 
     public ProtectionToken(SPConstants.SPVersion version, Policy nestedPolicy) {

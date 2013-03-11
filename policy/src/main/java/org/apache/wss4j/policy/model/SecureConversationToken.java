@@ -28,10 +28,6 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SecureConversationToken extends SecurityContextToken {
 
     private Policy bootstrapPolicy;

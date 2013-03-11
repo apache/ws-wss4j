@@ -28,10 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class RequiredParts extends AbstractSecurityAssertion {
 
     private final List<Header> headers = new ArrayList<Header>();

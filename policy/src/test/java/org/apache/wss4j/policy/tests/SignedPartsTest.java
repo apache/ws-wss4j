@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.SignedParts;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignedPartsTest extends AbstractTestBase {
 
     public void testSignedParts12() throws Exception {

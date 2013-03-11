@@ -23,10 +23,6 @@ import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class TransportToken extends AbstractTokenWrapper {
 
     public TransportToken(SPConstants.SPVersion version, Policy nestedPolicy) {

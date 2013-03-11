@@ -24,10 +24,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SPUtils {
 
     private SPUtils() {

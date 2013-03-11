@@ -23,10 +23,6 @@ import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class EncryptionToken extends AbstractTokenWrapper {
 
     public EncryptionToken(SPConstants.SPVersion version, Policy nestedPolicy) {

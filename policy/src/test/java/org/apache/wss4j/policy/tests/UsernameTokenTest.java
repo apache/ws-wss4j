@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameTokenTest extends AbstractTestBase {
 
     public void testUsernameToken12() throws Exception {

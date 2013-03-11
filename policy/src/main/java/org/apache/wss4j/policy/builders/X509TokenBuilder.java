@@ -31,10 +31,6 @@ import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class X509TokenBuilder implements AssertionBuilder<Element> {
 
     @Override

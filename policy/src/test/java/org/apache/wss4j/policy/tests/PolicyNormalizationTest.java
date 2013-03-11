@@ -24,10 +24,6 @@ import org.apache.neethi.Policy;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class PolicyNormalizationTest extends AbstractTestBase {
 
     public void testWSP15_432Normalization() throws Exception {

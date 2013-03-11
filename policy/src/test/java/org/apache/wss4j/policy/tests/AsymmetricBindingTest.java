@@ -26,10 +26,6 @@ import org.apache.wss4j.policy.model.AsymmetricBinding;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AsymmetricBindingTest extends AbstractTestBase {
 
     public void testAsymmetricBinding() throws Exception {

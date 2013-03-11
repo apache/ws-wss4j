@@ -20,10 +20,6 @@ package org.apache.wss4j.policy;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SP13Constants extends SP12Constants {
 
     private static SP13Constants sp13Constants = null;

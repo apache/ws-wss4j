@@ -26,10 +26,6 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KeyValueToken extends AbstractToken {
 
     private boolean rsaKeyValue;

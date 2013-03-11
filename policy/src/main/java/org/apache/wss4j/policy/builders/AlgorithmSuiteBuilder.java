@@ -28,10 +28,6 @@ import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
 
     @Override

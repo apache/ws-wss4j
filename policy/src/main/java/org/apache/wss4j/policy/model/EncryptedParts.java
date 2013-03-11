@@ -24,10 +24,6 @@ import org.apache.wss4j.policy.SPConstants;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class EncryptedParts extends SignedParts {
 
     public EncryptedParts(SPConstants.SPVersion version, boolean body, Attachments attachments, List<Header> headers) {

@@ -37,10 +37,6 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractTestBase extends TestCase {
     protected XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 

@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.Wss10;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class Wss10Test extends AbstractTestBase {
 
     public void testWss10() throws Exception {

@@ -29,10 +29,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractTokenWrapper extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     private Policy nestedPolicy;

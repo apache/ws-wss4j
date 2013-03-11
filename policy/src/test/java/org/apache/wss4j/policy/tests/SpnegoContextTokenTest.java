@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SpnegoContextTokenTest extends AbstractTestBase {
 
     public void testSpnegoContextToken() throws Exception {

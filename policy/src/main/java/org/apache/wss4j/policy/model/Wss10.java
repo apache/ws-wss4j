@@ -30,10 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class Wss10 extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     private Policy nestedPolicy;

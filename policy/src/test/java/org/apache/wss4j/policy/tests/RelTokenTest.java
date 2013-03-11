@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.RelToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class RelTokenTest extends AbstractTestBase {
 
     public void testRelToken() throws Exception {

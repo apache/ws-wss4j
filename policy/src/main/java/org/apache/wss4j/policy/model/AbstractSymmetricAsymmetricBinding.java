@@ -24,10 +24,6 @@ import org.apache.wss4j.policy.SPConstants;
 
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding {
 
     public enum ProtectionOrder {

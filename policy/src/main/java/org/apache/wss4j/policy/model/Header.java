@@ -18,10 +18,6 @@
  */
 package org.apache.wss4j.policy.model;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class Header {
 
     private final String name;

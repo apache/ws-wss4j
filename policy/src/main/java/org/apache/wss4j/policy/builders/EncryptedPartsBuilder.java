@@ -32,10 +32,6 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class EncryptedPartsBuilder extends SignedPartsBuilder {
 
     @Override

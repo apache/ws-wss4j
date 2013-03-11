@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.RecipientToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class RecipientTokenTest extends AbstractTestBase {
 
     public void testRecipientToken() throws Exception {

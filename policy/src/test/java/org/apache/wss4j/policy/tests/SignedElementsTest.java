@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.SignedElements;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SignedElementsTest extends AbstractTestBase {
 
     public void testSignedElements12() throws Exception {

@@ -20,10 +20,6 @@ package org.apache.wss4j.policy.model;
 
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class XPath {
 
     public enum Version {

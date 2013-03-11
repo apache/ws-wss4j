@@ -31,10 +31,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class IssuedToken extends AbstractToken {
 
     private Element requestSecurityTokenTemplate;

@@ -26,10 +26,6 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AlgorithmSuiteTest extends AbstractTestBase {
 
     public void testAlgorithmSuite() throws Exception {

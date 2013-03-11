@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.InitiatorToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class InitiatorTokenTest extends AbstractTestBase {
 
     public void testInitiatorToken() throws Exception {

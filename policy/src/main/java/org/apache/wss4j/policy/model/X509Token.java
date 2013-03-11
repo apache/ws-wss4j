@@ -26,10 +26,6 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class X509Token extends AbstractToken {
 
     public enum TokenType {

@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.KerberosToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class KerberosTokenTest extends AbstractTestBase {
 
     public void testKerberosToken() throws Exception {

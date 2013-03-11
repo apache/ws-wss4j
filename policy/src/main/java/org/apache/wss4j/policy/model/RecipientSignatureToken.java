@@ -23,10 +23,6 @@ import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class RecipientSignatureToken extends AbstractTokenWrapper {
 
     public RecipientSignatureToken(SPConstants.SPVersion version, Policy nestedPolicy) {

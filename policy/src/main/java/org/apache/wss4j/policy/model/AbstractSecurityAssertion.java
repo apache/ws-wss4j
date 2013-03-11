@@ -29,10 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class AbstractSecurityAssertion implements Assertion {
 
     private boolean isOptional;

@@ -29,10 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class Layout extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     public enum LayoutType {

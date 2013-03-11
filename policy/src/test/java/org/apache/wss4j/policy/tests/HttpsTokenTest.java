@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.HttpsToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class HttpsTokenTest extends AbstractTestBase {
 
     public void testHttpsToken() throws Exception {

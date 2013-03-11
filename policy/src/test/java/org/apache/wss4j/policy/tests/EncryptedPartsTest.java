@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.EncryptedParts;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class EncryptedPartsTest extends AbstractTestBase {
 
     public void testEncryptedParts12() throws Exception {

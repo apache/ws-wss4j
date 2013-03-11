@@ -24,10 +24,6 @@ import org.apache.wss4j.policy.SPConstants;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class ContentEncryptedElements extends EncryptedElements {
 
     public ContentEncryptedElements(SPConstants.SPVersion version, String xPathVersion, List<XPath> xPaths) {

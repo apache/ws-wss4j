@@ -20,10 +20,6 @@ package org.apache.wss4j.policy;
 
 import org.apache.neethi.Assertion;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class AssertionState {
 
     public enum State {

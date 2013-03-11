@@ -26,10 +26,6 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import java.util.*;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class UsernameToken extends AbstractToken {
 
     public enum PasswordType {

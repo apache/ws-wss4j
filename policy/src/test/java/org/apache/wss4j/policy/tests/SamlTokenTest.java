@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.SamlToken;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class SamlTokenTest extends AbstractTestBase {
 
     public void testSamlToken() throws Exception {

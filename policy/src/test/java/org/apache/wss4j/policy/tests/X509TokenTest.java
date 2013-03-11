@@ -25,10 +25,6 @@ import org.apache.wss4j.policy.model.X509Token;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public class X509TokenTest extends AbstractTestBase {
 
     public void testX509Token() throws Exception {

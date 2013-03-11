@@ -20,10 +20,6 @@ package org.apache.wss4j.policy.model;
 
 import javax.xml.namespace.QName;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public interface SupportingTokenType {
 
     QName getName();
