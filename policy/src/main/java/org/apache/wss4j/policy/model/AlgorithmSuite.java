@@ -195,6 +195,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private int maximumSymmetricKeyLength;
         private int minimumAsymmetricKeyLength;
         private int maximumAsymmetricKeyLength;
+        private String ns;
 
         public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
                            String encryptionKeyDerivation, String signatureKeyDerivation, int encryptionDerivedKeyLength,
@@ -265,6 +266,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
 
         public int getMaximumAsymmetricKeyLength() {
             return maximumAsymmetricKeyLength;
+        }
+        
+        public void setNamespace(String ns) {
+            this.ns = ns;
+        }
+        
+        public String getNamespace() {
+            return ns;
         }
     }
 
@@ -438,6 +447,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                     if (algorithmSuite.getAlgorithmSuiteType() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
+                    algorithmSuiteType.setNamespace(getVersion().getNamespace());
                     algorithmSuite.setAlgorithmSuiteType(algorithmSuiteType);
                     continue;
                 }
