@@ -19,11 +19,16 @@
 
 package org.apache.wss4j.dom.cache;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * A simple in-memory HashSet based cache to prevent against replay attacks. The default TTL is 5 minutes
@@ -33,8 +38,8 @@ public class MemoryReplayCache implements ReplayCache {
     
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private final Set<ReplayCacheIdentifier> cache =
-        Collections.synchronizedSet(new HashSet<ReplayCacheIdentifier>());
+    private SortedMap<Date, List<String>> cache = new TreeMap<Date, List<String>>();
+    private Set<String> ids = Collections.synchronizedSet(new HashSet<String>());
     
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
@@ -53,8 +58,6 @@ public class MemoryReplayCache implements ReplayCache {
         if (identifier == null || "".equals(identifier)) {
             return;
         }
-        ReplayCacheIdentifier cacheIdentifier = new ReplayCacheIdentifier();
-        cacheIdentifier.setIdentifier(identifier);
         
         long ttl = timeToLive;
         if (ttl < 0 || ttl > MAX_TTL) {
@@ -64,9 +67,16 @@ public class MemoryReplayCache implements ReplayCache {
         Date expires = new Date();
         long currentTime = expires.getTime();
         expires.setTime(currentTime + (ttl * 1000L));
-        cacheIdentifier.setExpiry(expires);
         
-        cache.add(cacheIdentifier);
+        synchronized (cache) {
+            List<String> list = cache.get(expires);
+            if (list == null) {
+                list = new ArrayList<String>(1);
+                cache.put(expires, list);
+            }
+            list.add(identifier);
+        }
+        ids.add(identifier);
     }
     
     /**
@@ -77,9 +87,7 @@ public class MemoryReplayCache implements ReplayCache {
         processTokenExpiry();
         
         if (identifier != null && !"".equals(identifier)) {
-            ReplayCacheIdentifier cacheIdentifier = new ReplayCacheIdentifier();
-            cacheIdentifier.setIdentifier(identifier);
-            return cache.contains(cacheIdentifier);
+            return ids.contains(identifier);
         }
         return false;
     }
@@ -87,68 +95,18 @@ public class MemoryReplayCache implements ReplayCache {
     protected void processTokenExpiry() {
         Date current = new Date();
         synchronized (cache) {
-            Iterator<ReplayCacheIdentifier> iterator = cache.iterator();
-            while (iterator.hasNext()) {
-                if (iterator.next().getExpiry().before(current)) {
-                    iterator.remove();
+            Iterator<Entry<Date, List<String>>> it = cache.entrySet().iterator();
+            while (it.hasNext()) {
+                Entry<Date, List<String>> entry = it.next();
+                if (entry.getKey().before(current)) {
+                    for (String id : entry.getValue()) {
+                        ids.remove(id);
+                    }
+                    it.remove();
+                } else {
+                    break;
                 }
             }
         }
     }
-    
-    private static class ReplayCacheIdentifier {
-        
-        private String identifier;
-        private Date expires;
-        
-        /**
-         * Set the (String) identifier
-         * @param identifier the (String) identifier
-         */
-        public void setIdentifier(String identifier) {
-            this.identifier = identifier;
-        }
-        
-        /**
-         * Set when this identifier is to be removed from the cache
-         * @param expires when this identifier is to be removed from the cache
-         */
-        public void setExpiry(Date expires) {
-            this.expires = expires;
-        }
-        
-        /**
-         * Get when this identifier is to be removed from the cache
-         * @return when this identifier is to be removed from the cache
-         */
-        public Date getExpiry() {
-            return expires;
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof ReplayCacheIdentifier)) {
-                return false;
-            }
-            
-            ReplayCacheIdentifier replayCacheIdentifier = (ReplayCacheIdentifier)o;
-            
-            if (identifier == null && replayCacheIdentifier.identifier != null) {
-                return false;
-            } else if (identifier != null && !identifier.equals(replayCacheIdentifier.identifier)) {
-                return false;
-            }
-            
-            return true;
-        }
-        
-        @Override
-        public int hashCode() {
-            return identifier != null ? identifier.hashCode() : 0;
-        }
-    }
-
 }
