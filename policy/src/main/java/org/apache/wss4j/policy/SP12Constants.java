@@ -351,14 +351,14 @@ public class SP12Constants extends SPConstants {
     public static final QName REQUIRE_EXPLICIT_DERIVED_KEYS = new QName(
             SP12Constants.SP_NS, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS, SP12Constants.SP_PREFIX);
 
-    public static final QName REQUIRE_EXTERNAL_URI_REFERNCE = new QName(
-            SP12Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_URI_REFERNCE, SP12Constants.SP_PREFIX);
+    public static final QName REQUIRE_EXTERNAL_URI_REFERENCE = new QName(
+            SP12Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE, SP12Constants.SP_PREFIX);
 
     public static final QName SC13_SECURITY_CONTEXT_TOKEN = new QName(
             SP12Constants.SP_NS, SPConstants.SC13_SECURITY_CONTEXT_TOKEN, SP12Constants.SP_PREFIX);
 
     public static final QName REQUIRE_EXTERNAL_REFERNCE = new QName(
-            SP12Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERNCE, SP12Constants.SP_PREFIX);
+            SP12Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERENCE, SP12Constants.SP_PREFIX);
 
     public static final QName REQUIRE_INTERNAL_REFERENCE = new QName(
             SP12Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERENCE, SP12Constants.SP_PREFIX);
@@ -521,7 +521,7 @@ public class SP12Constants extends SPConstants {
 
     @Override
     public QName getRequireExternalUriReference() {
-        return REQUIRE_EXTERNAL_URI_REFERNCE;
+        return REQUIRE_EXTERNAL_URI_REFERENCE;
     }
 
     @Override

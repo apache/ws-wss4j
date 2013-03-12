@@ -453,9 +453,9 @@ public abstract class SPConstants {
 
     public static final String REQUIRE_EXPLICIT_DERIVED_KEYS = "RequireExplicitDerivedKeys";
 
-    public static final String REQUIRE_EXTERNAL_URI_REFERNCE = "RequireExternalUriReference";
+    public static final String REQUIRE_EXTERNAL_URI_REFERENCE = "RequireExternalUriReference";
 
-    public static final String REQUIRE_EXTERNAL_REFERNCE = "RequireExternalReference";
+    public static final String REQUIRE_EXTERNAL_REFERENCE = "RequireExternalReference";
 
     public static final String REQUIRE_INTERNAL_REFERENCE = "RequireInternalReference";
 

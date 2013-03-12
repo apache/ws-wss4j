@@ -296,10 +296,10 @@ public class SP11Constants extends SPConstants {
             SP11Constants.SP_NS, SPConstants.REQUIRE_DERIVED_KEYS, SP11Constants.SP_PREFIX);
 
     public static final QName REQUIRE_EXTERNAL_URI_REFERNCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_URI_REFERNCE, SP11Constants.SP_PREFIX);
+            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE, SP11Constants.SP_PREFIX);
 
     public static final QName REQUIRE_EXTERNAL_REFERNCE = new QName(
-            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERNCE, SP11Constants.SP_PREFIX);
+            SP11Constants.SP_NS, SPConstants.REQUIRE_EXTERNAL_REFERENCE, SP11Constants.SP_PREFIX);
 
     public static final QName REQUIRE_INTERNAL_REFERENCE = new QName(
             SP11Constants.SP_NS, SPConstants.REQUIRE_INTERNAL_REFERENCE, SP11Constants.SP_PREFIX);
