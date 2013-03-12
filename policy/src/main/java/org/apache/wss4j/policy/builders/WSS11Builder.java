@@ -50,6 +50,6 @@ public class WSS11Builder implements AssertionBuilder<Element> {
 
     @Override
     public QName[] getKnownElements() {
-        return new QName[]{SP13Constants.WSS11, SP11Constants.WSS10};
+        return new QName[]{SP13Constants.WSS11, SP11Constants.WSS11};
     }
 }
