@@ -541,7 +541,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 WSConstants.XMLNS_NS, "xmlns:" + tmpE.getPrefix(), tmpE.getNamespaceURI()
             );
             keyInfo.addUnknownElement(securityTokenReference.getElement());
-        } else {
+        } else if (encKeyId != null) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
             Reference ref = new Reference(document);

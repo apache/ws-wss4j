@@ -577,22 +577,6 @@ public abstract class WSHandler {
     protected void decodeEncryptionParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
-        String encUser = getString(WSHandlerConstants.ENCRYPTION_USER, mc);
-
-        if (encUser != null) {
-            reqData.setEncUser(encUser);
-        } else {
-            reqData.setEncUser(reqData.getUsername());
-        }
-        if (reqData.getEncUser() == null) {
-            throw new WSSecurityException("WSHandler: Encryption: no username");
-        }
-        /*
-         * String msgType = msgContext.getCurrentMessage().getMessageType(); if
-         * (msgType != null && msgType.equals(Message.RESPONSE)) {
-         * handleSpecialUser(encUser); }
-         */
-        handleSpecialUser(reqData);
 
         /*
          * If the following parameters are no used (they return null) then the
@@ -635,6 +619,22 @@ public abstract class WSHandler {
             boolean encSymEndKeyBoolean = Boolean.parseBoolean(encSymEncKey);
             reqData.setEncryptSymmetricEncryptionKey(encSymEndKeyBoolean);
         }
+        
+        String encUser = getString(WSHandlerConstants.ENCRYPTION_USER, mc);
+        if (encUser != null) {
+            reqData.setEncUser(encUser);
+        } else {
+            reqData.setEncUser(reqData.getUsername());
+        }
+        if (reqData.getEncryptSymmetricEncryptionKey() && reqData.getEncUser() == null) {
+            throw new WSSecurityException("WSHandler: Encryption: no username");
+        }
+        /*
+         * String msgType = msgContext.getCurrentMessage().getMessageType(); if
+         * (msgType != null && msgType.equals(Message.RESPONSE)) {
+         * handleSpecialUser(encUser); }
+         */
+        handleSpecialUser(reqData);
 
         String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);
         if (encParts != null) {
