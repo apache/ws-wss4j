@@ -516,7 +516,8 @@ public abstract class WSHandler {
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
                     || tmp == WSConstants.THUMBPRINT_IDENTIFIER
-                    || tmp == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)) {
+                    || tmp == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)
+                    || tmp == WSConstants.KEY_VALUE) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
                         "WSHandler: Signature: illegal key identification"

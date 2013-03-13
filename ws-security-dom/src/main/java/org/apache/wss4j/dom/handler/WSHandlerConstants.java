@@ -523,8 +523,11 @@ public final class WSHandlerConstants {
     /**
      * Defines which key identifier type to use for signature. The WS-Security specifications
      * recommends to use the identifier type <code>IssuerSerial</code>. For possible signature 
-     * key identifier types refer to {@link #keyIdentifier}. 
-     * For signature <code>IssuerSerial</code> and <code>DirectReference</code> are valid only.
+     * key identifier types refer to {@link #getKeyIdentifier(String)}. 
+     * For signature <code>IssuerSerial</code>, <code>DirectReference</code>,
+     * <code>X509KeyIdentifier</code>, <code>Thumbprint</code>, <code>SKIKeyIdentifier</code>
+     * and <code>KeyValue</code> are valid only. 
+     * <p/>
      * The default is <code>IssuerSerial</code>.
      * <p/>
      * The application may set this parameter using the following method:
@@ -607,10 +610,12 @@ public final class WSHandlerConstants {
      * Defines which key identifier type to use for encryption. The WS-Security specifications
      * recommends to use the identifier type <code>IssuerSerial</code>. For
      * possible encryption key identifier types refer to
-     * {@link #keyIdentifier}. For encryption <code>IssuerSerial</code>,
-     * <code>X509KeyIdentifier</code>,  <code>DirectReference</code>, 
-     * <code>Thumbprint</code>, <code>SKIKeyIdentifier</code>, and
-     * <code>EmbeddedKeyName</code> are valid only.
+     * {@link #getKeyIdentifier(String)}. For encryption <code>IssuerSerial</code>,
+     * <code>DirectReference</code>, <code>X509KeyIdentifier</code>, 
+     * <code>Thumbprint</code>, <code>SKIKeyIdentifier</code>, <code>EncryptedKeySHA1</code>
+     * and <code>EmbeddedKeyName</code> are valid only.
+     * <p/>
+     * The default is <code>IssuerSerial</code>.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
@@ -826,10 +831,22 @@ public final class WSHandlerConstants {
                 Integer.valueOf(WSConstants.THUMBPRINT_IDENTIFIER));
         keyIdentifier.put("EncryptedKeySHA1",
                 Integer.valueOf(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER));
+        keyIdentifier.put("KeyValue",
+                Integer.valueOf(WSConstants.KEY_VALUE));
     }
     
     /**
-     * Get the key identifier type corresponding to the parameter
+     * Get the key identifier type corresponding to the parameter. This is intended for internal
+     * use only. Valid values for "parameter" are:
+     *  - "IssuerSerial"
+     *  - "DirectReference"
+     *  - "X509KeyIdentifier"
+     *  - "Thumbprint"
+     *  - "SKIKeyIdentifier"
+     *  - "KeyValue"
+     *  - "EmbeddedKeyName"
+     *  - "EncryptedKeySHA1"
+     * 
      * @param parameter
      * @return the key identifier type corresponding to the parameter
      */
