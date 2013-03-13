@@ -568,6 +568,9 @@ for SIG_KEY_ID and ENC_KEY_ID for more details:
 <tr>
 <td>EncryptedKeySHA1</td>
 </tr>
+<tr>
+<td>KeyValue</td>
+</tr>
 </table>
 </subsection>
 </section>            

@@ -86,7 +86,9 @@ public class WSSecBase {
      * @see WSConstants#ISSUER_SERIAL
      * @see WSConstants#BST_DIRECT_REFERENCE
      * @see WSConstants#X509_KEY_IDENTIFIER
+     * @see WSConstants#THUMBPRINT_IDENTIFIER
      * @see WSConstants#SKI_KEY_IDENTIFIER
+     * @see WSConstants#KEY_VALUE
      */
     public void setKeyIdentifierType(int keyIdType) {
         keyIdentifierType = keyIdType;
