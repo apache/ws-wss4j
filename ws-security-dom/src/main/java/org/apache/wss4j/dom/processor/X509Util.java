@@ -94,7 +94,7 @@ public final class X509Util {
             keyName = builder.toString();
         }
         if (keyName == null || keyName.length() <= 0) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyname");
+            log.debug("No Key Name available");
         }
         WSPasswordCallback pwCb = 
                 new WSPasswordCallback(keyName, WSPasswordCallback.Usage.SECRET_KEY);
