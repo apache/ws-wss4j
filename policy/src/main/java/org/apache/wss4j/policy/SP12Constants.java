@@ -67,13 +67,13 @@ public class SP12Constants extends SPConstants {
             SP12Constants.SP_NS, SPConstants.TRUST_13, SP12Constants.SP_PREFIX);
 
     public static final QName REQUIRE_CLIENT_CERTIFICATE = new QName(
-            SP12Constants.SP_NS, "RequireClientCertificate", SP12Constants.SP_PREFIX);
+            SP12Constants.SP_NS, SPConstants.REQUIRE_CLIENT_CERTIFICATE, SP12Constants.SP_PREFIX);
 
     public static final QName HTTP_BASIC_AUTHENTICATION = new QName(
-            SP12Constants.SP_NS, "HttpBasicAuthentication", SP12Constants.SP_PREFIX);
+            SP12Constants.SP_NS, SPConstants.HTTP_BASIC_AUTHENTICATION, SP12Constants.SP_PREFIX);
 
     public static final QName HTTP_DIGEST_AUTHENTICATION = new QName(
-            SP12Constants.SP_NS, "HttpDigestAuthentication", SP12Constants.SP_PREFIX);
+            SP12Constants.SP_NS, SPConstants.HTTP_DIGEST_AUTHENTICATION, SP12Constants.SP_PREFIX);
 
     public static final QName TRANSPORT_BINDING = new QName(
             SP12Constants.SP_NS, SPConstants.TRANSPORT_BINDING, SP12Constants.SP_PREFIX);

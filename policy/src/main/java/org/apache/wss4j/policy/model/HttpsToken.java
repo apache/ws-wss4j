@@ -90,7 +90,7 @@ public class HttpsToken extends AbstractToken {
         return authenticationType;
     }
 
-    protected void setAuthenticationType(AuthenticationType authenticationType) {
+    public void setAuthenticationType(AuthenticationType authenticationType) {
         this.authenticationType = authenticationType;
     }
 }

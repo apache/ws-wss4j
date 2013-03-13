@@ -186,11 +186,11 @@ public abstract class SPConstants {
 
     public final static String SPNEGO_CONTEXT_TOKEN = "SpnegoContextToken";
 
-    public final static QName REQUIRE_CLIENT_CERTIFICATE = new QName("RequireClientCertificate");
+    public final static String REQUIRE_CLIENT_CERTIFICATE = "RequireClientCertificate";
 
-    public final static QName HTTP_BASIC_AUTHENTICATION = new QName("HttpBasicAuthentication");
+    public final static String HTTP_BASIC_AUTHENTICATION = "HttpBasicAuthentication";
 
-    public final static QName HTTP_DIGEST_AUTHENTICATION = new QName("HttpDigestAuthentication");
+    public final static String HTTP_DIGEST_AUTHENTICATION = "HttpDigestAuthentication";
 
     public final static String SECURITY_CONTEXT_TOKEN = "SecurityContextToken";
 

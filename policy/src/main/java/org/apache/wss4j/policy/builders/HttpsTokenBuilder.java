@@ -63,6 +63,15 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
                 claims,
                 nestedPolicy
         );
+        
+        if (spVersion == SPConstants.SPVersion.SP11) {
+            String attr = 
+                SPUtils.getAttribute(element, new QName(null, SPConstants.REQUIRE_CLIENT_CERTIFICATE));
+            if ("true".equals(attr)) {
+                httpsToken.setAuthenticationType(HttpsToken.AuthenticationType.RequireClientCertificate);
+            }
+        }
+        
         httpsToken.setOptional(SPUtils.isOptional(element));
         httpsToken.setIgnorable(SPUtils.isIgnorable(element));
         return httpsToken;
