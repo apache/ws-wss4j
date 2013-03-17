@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.test;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.wss4j.stax.WSSec;
@@ -78,9 +79,17 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.UsernameToken,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());

@@ -38,6 +38,7 @@ import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.wss4j.stax.test.utils.SOAPUtil;
@@ -146,9 +147,27 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -240,9 +259,25 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -360,9 +395,21 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(callbackHandler);
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.EncryptedElement,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -432,9 +479,21 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              securityProperties.setCallbackHandler(callbackHandler);
 
              InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                     WSSecurityEventConstants.AlgorithmSuite,
+                     WSSecurityEventConstants.AlgorithmSuite,
+                     WSSecurityEventConstants.AlgorithmSuite,
+                     WSSecurityEventConstants.SamlToken,
+                     WSSecurityEventConstants.EncryptedElement,
+                     WSSecurityEventConstants.Operation,
+             };
+             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
              Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+             securityEventListener.compare();
 
              //header element must still be there
              NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -530,9 +589,27 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -625,9 +702,25 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -734,9 +827,25 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            securityEventListener.compare();
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());

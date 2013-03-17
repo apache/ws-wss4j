@@ -32,10 +32,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.KerberosTokenValidator;
 import org.apache.wss4j.integration.test.common.KerberosServiceStarter;
 import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.InboundWSSec;
-import org.apache.wss4j.stax.ext.OutboundWSSec;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.ext.*;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.utils.SOAPUtil;
@@ -267,6 +264,9 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
+            Assert.assertNotNull(((InboundSecurityToken)kerberosTokenSecurityEvents.get(0).getSecurityToken()).getSubject());
+            Assert.assertNotNull(((InboundSecurityToken)kerberosTokenSecurityEvents.get(0).getSecurityToken()).getPrincipal());
+            Assert.assertEquals(((InboundSecurityToken)kerberosTokenSecurityEvents.get(0).getSecurityToken()).getPrincipal().getName(), "alice@service.ws.apache.org");
         }
     }
 
