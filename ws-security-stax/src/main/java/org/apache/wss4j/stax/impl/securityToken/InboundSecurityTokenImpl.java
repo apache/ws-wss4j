@@ -27,10 +27,6 @@ import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityTo
 import javax.security.auth.Subject;
 import java.security.Principal;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public abstract class InboundSecurityTokenImpl extends AbstractInboundSecurityToken implements InboundSecurityToken {
 
     private Subject subject;

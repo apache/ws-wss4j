@@ -24,10 +24,6 @@ import org.apache.xml.security.stax.ext.SecurityToken;
 import javax.security.auth.Subject;
 import java.security.Principal;
 
-/**
- * @author $Author$
- * @version $Revision$ $Date$
- */
 public interface InboundSecurityToken extends SecurityToken {
 
     WSSConstants.KeyIdentifierType getKeyIdentifierType();
