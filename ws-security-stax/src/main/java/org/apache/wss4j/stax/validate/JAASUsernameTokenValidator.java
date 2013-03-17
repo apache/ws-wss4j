@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -29,10 +30,10 @@ import org.apache.wss4j.binding.wss10.PasswordString;
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.common.NamePasswordCallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 /**
  * This class validates a processed UsernameToken, where Username/password validation is delegated
@@ -53,7 +54,7 @@ public class JAASUsernameTokenValidator implements UsernameTokenValidator {
     }
 
     @Override
-    public AbstractInboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
+    public InboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
 
         PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
         WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
@@ -81,12 +82,13 @@ public class JAASUsernameTokenValidator implements UsernameTokenValidator {
             log.warn("User or password empty");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
+        Subject subject;
         try {
             CallbackHandler handler = getCallbackHandler(user, password);  
             LoginContext ctx = new LoginContext(getContextName(), handler);  
             ctx.login();
-            ctx.getSubject();
+            subject = ctx.getSubject();
             // TODO need a way to return the Subject above
         } catch (LoginException ex) {
             log.info("Authentication failed", ex);
@@ -101,6 +103,7 @@ public class JAASUsernameTokenValidator implements UsernameTokenValidator {
                 WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
+        usernameSecurityToken.setSubject(subject);
 
         return usernameSecurityToken;
     }

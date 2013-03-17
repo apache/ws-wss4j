@@ -20,10 +20,10 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 
 public interface UsernameTokenValidator extends Validator {
 
-    AbstractInboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext)
+    InboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext)
             throws WSSecurityException;
 }

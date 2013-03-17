@@ -24,6 +24,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.stax.securityEvent.DerivedKeyTokenSecurityEvent;
@@ -31,7 +32,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 
@@ -66,7 +66,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
 
-            private AbstractInboundSecurityToken derivedKeySecurityToken = null;
+            private InboundSecurityTokenImpl derivedKeySecurityToken = null;
 
             @SuppressWarnings("unchecked")
             @Override
@@ -77,7 +77,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                 }
 
                 //todo implement interface to access all derivedKeys? The same would be needed in UserNameToken
-                this.derivedKeySecurityToken = new AbstractInboundSecurityToken(
+                this.derivedKeySecurityToken = new InboundSecurityTokenImpl(
                         (WSSecurityContext) inputProcessorChain.getSecurityContext(),
                         derivedKeyTokenType.getId(), null) {
 

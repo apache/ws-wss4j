@@ -26,16 +26,16 @@ import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
     @Override
-    public AbstractInboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
+    public InboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
 
         // If the UsernameToken is to be used for key derivation, the (1.1)
         // spec says that it cannot contain a password, and it must contain

@@ -28,7 +28,6 @@ import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
@@ -42,7 +41,7 @@ import java.security.Key;
 import java.security.Principal;
 import java.util.Set;
 
-public class KerberosServiceSecurityToken extends AbstractInboundSecurityToken {
+public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
 
     private CallbackHandler callbackHandler;
     private byte[] binaryContent;
@@ -86,6 +85,8 @@ public class KerberosServiceSecurityToken extends AbstractInboundSecurityToken {
 
             // Get the service name to use - fall back on the principal
             Subject subject = loginContext.getSubject();
+            setSubject(subject);
+
             String service = contextAndServiceNameCallback.getServiceName();
             if (service == null) {
                 Set<Principal> principals = subject.getPrincipals();
@@ -107,6 +108,7 @@ public class KerberosServiceSecurityToken extends AbstractInboundSecurityToken {
                         WSSecurityException.ErrorCode.FAILURE, "kerberosTicketValidationError"
                 );
             }
+            setPrincipal(principal);
 
             KerberosTokenDecoder kerberosTokenDecoder = new KerberosTokenDecoderImpl();
             kerberosTokenDecoder.setToken(binaryContent);

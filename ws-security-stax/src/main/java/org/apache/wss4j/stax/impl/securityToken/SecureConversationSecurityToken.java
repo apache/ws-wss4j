@@ -21,10 +21,9 @@ package org.apache.wss4j.stax.impl.securityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 
-public class SecureConversationSecurityToken extends AbstractInboundSecurityToken {
+public class SecureConversationSecurityToken extends InboundSecurityTokenImpl {
 
     //todo implement
 

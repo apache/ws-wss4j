@@ -19,9 +19,8 @@
 package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
 import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
@@ -61,9 +60,9 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
     public SecurityToken getSecurityToken() {
         SecurityToken securityToken = super.getSecurityToken();
         if (securityToken == null) {
-            securityToken = new AbstractInboundSecurityToken(null, null, null) {
+            securityToken = new InboundSecurityTokenImpl(null, null, null) {
                 @Override
-                public XMLSecurityConstants.TokenType getTokenType() {
+                public WSSConstants.TokenType getTokenType() {
                     return WSSConstants.HttpsToken;
                 }
             };

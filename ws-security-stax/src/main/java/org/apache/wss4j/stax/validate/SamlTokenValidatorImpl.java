@@ -20,9 +20,10 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
+import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
 import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
     
@@ -63,7 +64,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     }
 
     @Override
-    public AbstractInboundSecurityToken validate(final SamlAssertionWrapper samlAssertionWrapper,
+    public InboundSecurityToken validate(final SamlAssertionWrapper samlAssertionWrapper,
                                                  final SecurityToken subjectSecurityToken,
                                                  final TokenContext tokenContext) throws WSSecurityException {
         // Check conditions
@@ -71,7 +72,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
 
-        AbstractInboundSecurityToken securityToken = new SAMLSecurityToken(
+        InboundSecurityTokenImpl securityToken = new SAMLSecurityToken(
                 samlAssertionWrapper, subjectSecurityToken,
                 tokenContext.getWsSecurityContext(),
                 tokenContext.getWssSecurityProperties().getSignatureVerificationCrypto(),

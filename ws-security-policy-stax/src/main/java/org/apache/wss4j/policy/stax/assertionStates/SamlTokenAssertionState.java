@@ -22,12 +22,12 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
@@ -60,7 +60,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
             return false;
         }
-        if (samlToken.isRequireKeyIdentifierReference() && ((AbstractInboundSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
+        if (samlToken.isRequireKeyIdentifierReference() && ((InboundSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
             setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
             return false;
         }

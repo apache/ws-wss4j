@@ -21,12 +21,13 @@ package org.apache.wss4j.stax.validate;
 import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -34,11 +35,11 @@ import java.security.Key;
 public class SecurityContextTokenValidatorImpl implements SecurityContextTokenValidator {
 
     @Override
-    public AbstractInboundSecurityToken validate(final AbstractSecurityContextTokenType securityContextTokenType,
+    public InboundSecurityToken validate(final AbstractSecurityContextTokenType securityContextTokenType,
                                                  final String identifier, final TokenContext tokenContext)
             throws WSSecurityException {
 
-        AbstractInboundSecurityToken securityContextToken = new AbstractInboundSecurityToken(
+        InboundSecurityTokenImpl securityContextToken = new InboundSecurityTokenImpl(
                 tokenContext.getWsSecurityContext(),
                 securityContextTokenType.getId(), null) {
 

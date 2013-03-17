@@ -20,12 +20,12 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 public interface SamlTokenValidator extends SignatureTokenValidator {
 
-    AbstractInboundSecurityToken validate(
+    InboundSecurityToken validate(
             SamlAssertionWrapper samlAssertionWrapper, SecurityToken subjectSecurityToken,
             TokenContext tokenContext) throws WSSecurityException;
 }

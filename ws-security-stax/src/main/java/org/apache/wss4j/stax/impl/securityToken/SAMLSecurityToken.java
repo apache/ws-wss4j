@@ -27,7 +27,6 @@ import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.opensaml.common.SAMLVersion;
 
 import java.security.Key;
@@ -36,7 +35,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-public class SAMLSecurityToken extends AbstractInboundSecurityToken {
+public class SAMLSecurityToken extends InboundSecurityTokenImpl {
 
     private final SamlAssertionWrapper samlAssertionWrapper;
     private SecurityToken subjectSecurityToken;

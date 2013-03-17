@@ -20,10 +20,10 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 
 public interface BinarySecurityTokenValidator extends Validator {
 
-    AbstractInboundSecurityToken validate(BinarySecurityTokenType binarySecurityTokenType, TokenContext tokenContext)
+    InboundSecurityToken validate(BinarySecurityTokenType binarySecurityTokenType, TokenContext tokenContext)
             throws WSSecurityException;
 }

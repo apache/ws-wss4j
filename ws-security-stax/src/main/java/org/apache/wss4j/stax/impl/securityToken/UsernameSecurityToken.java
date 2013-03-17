@@ -24,12 +24,11 @@ import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
-public class UsernameSecurityToken extends AbstractInboundSecurityToken {
+public class UsernameSecurityToken extends InboundSecurityTokenImpl {
 
     private final UsernameToken usernameToken;
     private final WSSecurityContext wsSecurityContext;

@@ -22,10 +22,10 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
@@ -57,7 +57,7 @@ public class X509TokenAssertionState extends TokenAssertionState {
 
         X509Token x509Token = (X509Token) abstractToken;
 
-        AbstractInboundSecurityToken securityToken = (AbstractInboundSecurityToken) tokenSecurityEvent.getSecurityToken();
+        InboundSecurityToken securityToken = (InboundSecurityToken) tokenSecurityEvent.getSecurityToken();
         XMLSecurityConstants.TokenType tokenType = securityToken.getTokenType();
         if (!(WSSConstants.X509V3Token.equals(tokenType)
                 || WSSConstants.X509V1Token.equals(tokenType)

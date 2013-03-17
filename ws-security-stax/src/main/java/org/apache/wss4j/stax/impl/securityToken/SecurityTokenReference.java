@@ -24,7 +24,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 import java.security.Key;
 import java.security.PublicKey;
@@ -32,7 +31,7 @@ import java.security.cert.X509Certificate;
 import java.util.Deque;
 import java.util.Map;
 
-public class SecurityTokenReference extends AbstractInboundSecurityToken {
+public class SecurityTokenReference extends InboundSecurityTokenImpl {
 
     private final SecurityToken securityToken;
     private final Deque<XMLSecEvent> xmlSecEvents;

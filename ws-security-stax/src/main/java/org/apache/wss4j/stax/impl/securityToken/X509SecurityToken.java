@@ -22,20 +22,21 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.ext.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
+import java.security.Principal;
+import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-public abstract class X509SecurityToken extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken {
+public abstract class X509SecurityToken
+        extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken implements InboundSecurityToken {
 
     private CallbackHandler callbackHandler;
     private Crypto crypto;
@@ -105,4 +106,22 @@ public abstract class X509SecurityToken extends org.apache.xml.security.stax.imp
 
     protected abstract String getAlias() throws XMLSecurityException;
 
+    @Override
+    public Subject getSubject() throws XMLSecurityException {
+        return null;
+    }
+
+    @Override
+    public Principal getPrincipal() throws XMLSecurityException {
+        final PublicKey publicKey = getPublicKey();
+        if (publicKey != null) {
+            return new Principal() {
+                @Override
+                public String getName() {
+                    return publicKey.toString();
+                }
+            };
+        }
+        return null;
+    }
 }

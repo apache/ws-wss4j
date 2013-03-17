@@ -29,6 +29,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.validate.SamlTokenValidator;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
@@ -45,7 +46,6 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.XMLSecurityEventReader;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -165,7 +165,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             if (subjectSecretKey != null && subjectSecretKey.length > 0) {
 
-                subjectSecurityToken = new AbstractInboundSecurityToken(
+                subjectSecurityToken = new InboundSecurityTokenImpl(
                         wsSecurityContext, "",
                         XMLSecurityConstants.XMLKeyIdentifierType.NO_KEY_INFO) {
                     @Override
@@ -342,7 +342,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 }
             }
 
-            return new AbstractInboundSecurityToken(
+            return new InboundSecurityTokenImpl(
                     inputProcessorChain.getSecurityContext(), "",
                     XMLSecurityConstants.XMLKeyIdentifierType.NO_KEY_INFO) {
                 @Override
