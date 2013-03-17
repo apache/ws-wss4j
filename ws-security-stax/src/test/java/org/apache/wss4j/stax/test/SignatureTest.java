@@ -1117,7 +1117,7 @@ public class SignatureTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
                 Assert.assertEquals(e.getCause().getMessage(), "cvc-datatype-valid.1.2.1: 'abc' is not a valid value for 'integer'.");
-                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
+                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
             }
         }
     }

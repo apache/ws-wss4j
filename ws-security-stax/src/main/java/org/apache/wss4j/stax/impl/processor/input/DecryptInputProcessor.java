@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -41,7 +40,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 import org.apache.xml.security.stax.impl.util.LimitingInputStream;
@@ -92,30 +90,6 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                     securityContext.handleBSPRule(bspRule);
                 }
             }
-        }
-    }
-
-    @Override
-    public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
-            throws XMLStreamException, XMLSecurityException {
-        try {
-            return super.processNextHeaderEvent(inputProcessorChain);
-        } catch (WSSecurityException e) {
-            throw e;
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
-    }
-
-    @Override
-    public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
-            throws XMLStreamException, XMLSecurityException {
-        try {
-            return super.processNextEvent(inputProcessorChain);
-        } catch (WSSecurityException e) {
-            throw e;
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
     }
 
@@ -237,30 +211,6 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         ) {
             super(securityProperties, encryptionModifier, encryptedHeader, xmlSecStartElement,
                     encryptedDataType, decryptInputProcessor, securityToken);
-        }
-
-        @Override
-        public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain)
-                throws XMLStreamException, WSSecurityException {
-            try {
-                return super.processNextHeaderEvent(inputProcessorChain);
-            } catch (WSSecurityException e) {
-                throw e;
-            } catch (XMLSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-            }
-        }
-
-        @Override
-        public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain)
-                throws XMLStreamException, WSSecurityException {
-            try {
-                return super.processNextEvent(inputProcessorChain);
-            } catch (WSSecurityException e) {
-                throw e;
-            } catch (XMLSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-            }
         }
 
         @Override

@@ -700,7 +700,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     }
                 }
             } catch (XMLSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
                     "empty", "SAML proof-of-possession of the private/secret key failed");

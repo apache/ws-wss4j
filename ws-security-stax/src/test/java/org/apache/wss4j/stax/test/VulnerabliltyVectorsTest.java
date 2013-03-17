@@ -336,7 +336,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertEquals(e.getCause().getMessage(),
                     "43 references are contained in the Manifest, maximum 30 are allowed. You can raise the " +
                     "maximum via the \"MaximumAllowedReferencesPerManifest\" property in the configuration.");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
 

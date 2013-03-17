@@ -140,13 +140,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             replayChecked = true;
             detectReplayAttack(inputProcessorChain);
         }
-        try {
-            return super.processNextEvent(inputProcessorChain);
-        } catch (WSSecurityException e) {
-            throw e;
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
+        return super.processNextEvent(inputProcessorChain);
     }
 
     @Override
@@ -300,19 +294,6 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                            ReferenceType referenceType, XMLSecStartElement startElement) throws XMLSecurityException {
             super(securityProperties, inputProcessorChain, referenceType, startElement);
             this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
-        }
-
-        @Override
-        public void processEvent(XMLSecEvent xmlSecEvent, InputProcessorChain inputProcessorChain)
-                throws XMLStreamException, XMLSecurityException {
-
-            try {
-                super.processEvent(xmlSecEvent, inputProcessorChain);
-            } catch (WSSecurityException e) {
-                throw e;
-            } catch (XMLSecurityException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-            }
         }
     }
 }

@@ -34,7 +34,6 @@ import org.apache.xml.security.binding.xmldsig.ObjectType;
 import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureInputHandler;
 import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
@@ -42,23 +41,10 @@ import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 import java.math.BigInteger;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
 public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
-
-    @Override
-    public void handle(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
-                       Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
-        try {
-            super.handle(inputProcessorChain, securityProperties, eventQueue, index);
-        } catch (WSSecurityException e) {
-            throw e;
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
-    }
 
     @Override
     protected SignatureVerifier newSignatureVerifier(
@@ -137,16 +123,10 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
             SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException {
 
-        try {
-            //add processors to verify references
-            inputProcessorChain.addProcessor(
-                    new WSSSignatureReferenceVerifyInputProcessor(inputProcessorChain, signatureType,
-                            securityToken, securityProperties));
-        } catch (WSSecurityException e) {
-            throw e;
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
+        //add processors to verify references
+        inputProcessorChain.addProcessor(
+                new WSSSignatureReferenceVerifyInputProcessor(inputProcessorChain, signatureType,
+                        securityToken, securityProperties));
     }
 
     public class WSSSignatureVerifier extends SignatureVerifier {
@@ -178,7 +158,6 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             securityContext.registerSecurityEvent(tokenSecurityEvent);
 
             return securityToken;
-
         }
     }
 }

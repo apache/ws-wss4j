@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
+import org.apache.wss4j.stax.impl.WSSecurityStreamReader;
 import org.apache.wss4j.stax.impl.processor.input.OperationInputProcessor;
 import org.apache.wss4j.stax.impl.processor.input.SecurityHeaderInputProcessor;
 import org.apache.wss4j.stax.impl.processor.input.SignatureConfirmationInputProcessor;
@@ -32,7 +33,6 @@ import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.SecurityTokenProvider;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.InputProcessorChainImpl;
-import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
 import org.apache.xml.security.stax.impl.processor.input.LogInputProcessor;
 import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -199,6 +199,6 @@ public class InboundWSSec {
             }
         }
 
-        return new XMLSecurityStreamReader(inputProcessorChain, securityProperties);
+        return new WSSecurityStreamReader(inputProcessorChain, securityProperties);
     }
 }
