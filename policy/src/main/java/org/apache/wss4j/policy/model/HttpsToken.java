@@ -48,10 +48,15 @@ public class HttpsToken extends AbstractToken {
     private AuthenticationType authenticationType;
 
     public HttpsToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
-                      Element issuer, String issuerName, Element claims, Policy nestedPolicy) {
+                      Element issuer, String issuerName, Element claims, Policy nestedPolicy,
+                      boolean requireClientCert) {
         super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
 
         parseNestedPolicy(nestedPolicy, this);
+        
+        if (requireClientCert) {
+            setAuthenticationType(AuthenticationType.RequireClientCertificate);
+        }
     }
 
     @Override
@@ -61,7 +66,8 @@ public class HttpsToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new HttpsToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        boolean requireClientCert = authenticationType == AuthenticationType.RequireClientCertificate;
+        return new HttpsToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy, requireClientCert);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, HttpsToken httpsToken) {
@@ -90,7 +96,7 @@ public class HttpsToken extends AbstractToken {
         return authenticationType;
     }
 
-    public void setAuthenticationType(AuthenticationType authenticationType) {
+    protected void setAuthenticationType(AuthenticationType authenticationType) {
         this.authenticationType = authenticationType;
     }
 }
