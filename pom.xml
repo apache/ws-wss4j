@@ -366,7 +366,7 @@
     </profiles>
 
     <properties>
-        <xmlsec.version>1.5.3</xmlsec.version>
+        <xmlsec.version>1.5.4</xmlsec.version>
         <opensaml.version>2.5.1-1</opensaml.version>
         <xml.apis.version>1.3.04</xml.apis.version>
         <bcprov.version>1.47</bcprov.version>
