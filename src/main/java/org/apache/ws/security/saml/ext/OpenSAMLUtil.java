@@ -135,15 +135,26 @@ public final class OpenSAMLUtil {
         DocumentFragment frag = doc == null ? null : doc.createDocumentFragment();
         try {
             if (frag != null) {
+                String ns = null;
+                String nm = null;
+                if (doc.getDocumentElement() != null) {
+                    ns = doc.getDocumentElement().getNamespaceURI();
+                    nm = doc.getDocumentElement().getLocalName();
+                }
                 while (doc.getFirstChild() != null) {
                     frag.appendChild(doc.removeChild(doc.getFirstChild()));
+                }
+                if (nm != null) {
+                    doc.appendChild(doc.createElementNS(ns, nm));
                 }
             }
             try {
                 if (doc == null) {
                     element = marshaller.marshall(xmlObject);
-                } else {
+                } else if (doc.getDocumentElement() == null) {
                     element = marshaller.marshall(xmlObject, doc);
+                } else {
+                    element = marshaller.marshall(xmlObject, doc.getDocumentElement());
                 } 
             } catch (MarshallingException ex) {
                 throw new WSSecurityException("Error marshalling a SAML assertion", ex);
@@ -154,10 +165,15 @@ public final class OpenSAMLUtil {
             }
         } finally {
             if (frag != null) {
+                if (doc.getDocumentElement() != null
+                    && doc.getDocumentElement() != element) {
+                    doc.getDocumentElement().removeChild(element);
+                }
                 while (doc.getFirstChild() != null) {
                     doc.removeChild(doc.getFirstChild());
                 }
                 doc.appendChild(frag);
+                doc.getDocumentElement();
             }
         }
         return element;
