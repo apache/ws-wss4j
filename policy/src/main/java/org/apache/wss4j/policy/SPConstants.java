@@ -87,14 +87,14 @@ public abstract class SPConstants {
     public final static String LAYOUT_LAX = "Lax";
 
     /**
-     * Security Header Layout : LaxTimestampFirst
+     * Security Header Layout : LaxTsFirst
      */
-    public final static String LAYOUT_LAX_TIMESTAMP_FIRST = "LaxTimestampFirst";
+    public final static String LAYOUT_LAX_TIMESTAMP_FIRST = "LaxTsFirst";
 
     /**
-     * Security Header Layout : LaxTimestampLast
+     * Security Header Layout : LaxTsLast
      */
-    public final static String LAYOUT_LAX_TIMESTAMP_LAST = "LaxTimestampLast";
+    public final static String LAYOUT_LAX_TIMESTAMP_LAST = "LaxTsLast";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
