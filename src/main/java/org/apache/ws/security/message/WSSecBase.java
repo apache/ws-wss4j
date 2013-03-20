@@ -154,7 +154,7 @@ public class WSSecBase {
         ) {
             // If it is an XML-Enc derived element, it may already have an ID,
             // plus it is not schema valid to add an additional ID.
-            id = bodyElement.getAttribute("Id");
+            id = bodyElement.getAttributeNS(null, "Id");
             newAttrPrefix = WSConstants.ENC_PREFIX;
             newAttrNs = WSConstants.ENC_NS;
         }

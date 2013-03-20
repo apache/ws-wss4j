@@ -194,7 +194,7 @@ public class SignatureSTRParser implements STRParser {
                         proc.handleToken(token, data, wsDocInfo);
                     secretKey = 
                         (byte[])encrResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
-                    principal = new CustomTokenPrincipal(token.getAttribute("Id"));
+                    principal = new CustomTokenPrincipal(token.getAttributeNS(null, "Id"));
                 }
             }
         } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {

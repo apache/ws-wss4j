@@ -52,7 +52,7 @@ public class SignatureConfirmation {
      */
     public SignatureConfirmation(Element elem) throws WSSecurityException {
         element = elem;
-        String sv = element.getAttribute(SC_VALUE_ATTR);
+        String sv = element.getAttributeNS(null, SC_VALUE_ATTR);
         if (sv != null) {
             signatureValue = Base64.decode(sv);
         }

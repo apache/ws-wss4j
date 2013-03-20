@@ -144,7 +144,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         Element element,
         WSSConfig config
     ) throws WSSecurityException {
-        String type = element.getAttribute("ValueType");
+        String type = element.getAttributeNS(null, "ValueType");
         BinarySecurity token = null;
         if (X509Security.X509_V3_TYPE.equals(type)) {
             token = new X509Security(element, config.isWsiBSPCompliant());

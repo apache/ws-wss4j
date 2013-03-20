@@ -189,7 +189,7 @@ public class UsernameToken {
         
         if (elementPassword != null) {
             if (elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
-                passwordType = elementPassword.getAttribute(WSConstants.PASSWORD_TYPE_ATTR);
+                passwordType = elementPassword.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
             } else if (elementPassword.hasAttributeNS(
                 WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR)
             ) {
@@ -1148,7 +1148,7 @@ public class UsernameToken {
         
         if (nonceElements.size() == 1) {
             Element nonce = nonceElements.get(0);
-            String encodingType = nonce.getAttribute("EncodingType");
+            String encodingType = nonce.getAttributeNS(null, "EncodingType");
             // Encoding Type must be equal to Base64Binary
             if (encodingType == null || "".equals(encodingType)
                 || !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {

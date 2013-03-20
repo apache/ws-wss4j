@@ -243,7 +243,7 @@ public class EncryptedKeyProcessor implements Processor {
             Element digestElement = 
                 WSSecurityUtil.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
             if (digestElement != null) {
-                return digestElement.getAttribute("Algorithm");
+                return digestElement.getAttributeNS(null, "Algorithm");
             }
         }
         return null;
@@ -339,7 +339,7 @@ public class EncryptedKeyProcessor implements Processor {
                 if (Node.ELEMENT_NODE == node.getNodeType()
                         && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                         && "DataReference".equals(node.getLocalName())) {
-                    String dataRefURI = ((Element) node).getAttribute("URI");
+                    String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
                     if (dataRefURI.charAt(0) == '#') {
                         dataRefURI = dataRefURI.substring(1);
                     }
@@ -427,25 +427,25 @@ public class EncryptedKeyProcessor implements Processor {
      * @throws WSSecurityException
      */
     private void checkBSPCompliance(Element elem, String encAlgo) throws WSSecurityException {
-        String attribute = elem.getAttribute("Type");
+        String attribute = elem.getAttributeNS(null, "Type");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
-        attribute = elem.getAttribute("MimeType");
+        attribute = elem.getAttributeNS(null, "MimeType");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
-        attribute = elem.getAttribute("Encoding");
+        attribute = elem.getAttributeNS(null, "Encoding");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}
             );
         }
-        attribute = elem.getAttribute("Recipient");
+        attribute = elem.getAttributeNS(null, "Recipient");
         if (attribute != null && !"".equals(attribute)) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_CHECK, "badAttribute", new Object[]{attribute}

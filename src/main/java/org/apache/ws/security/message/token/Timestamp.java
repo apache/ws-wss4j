@@ -90,7 +90,7 @@ public class Timestamp {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
-                        String valueType = currentChildElement.getAttribute("ValueType");
+                        String valueType = currentChildElement.getAttributeNS(null, "ValueType");
                         if (bspCompliant && valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             throw new WSSecurityException(
@@ -115,7 +115,7 @@ public class Timestamp {
                             WSSecurityException.INVALID_SECURITY, "invalidTimestamp"
                         ); 
                     } else {
-                        String valueType = currentChildElement.getAttribute("ValueType");
+                        String valueType = currentChildElement.getAttributeNS(null, "ValueType");
                         if (bspCompliant && valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             throw new WSSecurityException(
