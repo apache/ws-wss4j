@@ -43,7 +43,7 @@ public final class X509Util {
 
     public static boolean isContent(Node encBodyData) {
         if (encBodyData != null) {
-            String typeStr = ((Element)encBodyData).getAttribute("Type");
+            String typeStr = ((Element)encBodyData).getAttributeNS(null, "Type");
             if (typeStr != null) {
                  return typeStr.equals(WSConstants.ENC_NS + "Content");
             }
@@ -58,7 +58,7 @@ public final class X509Util {
             );
         String symEncAlgo = null;
         if (tmpE != null) {
-            symEncAlgo = tmpE.getAttribute("Algorithm");
+            symEncAlgo = tmpE.getAttributeNS(null, "Algorithm");
             if (symEncAlgo == null || "".equals(symEncAlgo)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"

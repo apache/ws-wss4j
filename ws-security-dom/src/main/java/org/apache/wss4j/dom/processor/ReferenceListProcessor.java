@@ -99,7 +99,7 @@ public class ReferenceListProcessor implements Processor {
             if (Node.ELEMENT_NODE == node.getNodeType()
                 && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                 && "DataReference".equals(node.getLocalName())) {
-                String dataRefURI = ((Element) node).getAttribute("URI");
+                String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
                 if (dataRefURI.charAt(0) == '#') {
                     dataRefURI = dataRefURI.substring(1);
                 }

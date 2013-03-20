@@ -336,7 +336,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element encryptionMethod = 
             WSSecurityUtil.findElement(body, "EncryptionMethod", WSConstants.ENC_NS);
-        encryptionMethod.setAttribute("Algorithm", "http://new-algorithm");
+        encryptionMethod.setAttributeNS(null, "Algorithm", "http://new-algorithm");
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);

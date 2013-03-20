@@ -704,7 +704,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "SubjectConfirmation");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
         }
 
         //done signature; now test sig-verification:
@@ -750,7 +750,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "SubjectConfirmation");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -822,7 +822,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "SubjectConfirmation");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
         }
 
         //done signature; now test sig-verification:
@@ -868,7 +868,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "SubjectConfirmation");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -936,7 +936,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "SubjectConfirmation");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element)nodeList.item(0)).getAttribute("Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
+            Assert.assertEquals(((Element)nodeList.item(0)).getAttributeNS(null, "Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
         }
 
         //done signature; now test sig-verification:
@@ -983,7 +983,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "SubjectConfirmation");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "Method"), "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

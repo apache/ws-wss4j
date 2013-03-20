@@ -79,7 +79,7 @@ public class Timestamp {
                 if (WSConstants.CREATED_LN.equals(currentChild.getLocalName()) &&
                         WSConstants.WSU_NS.equals(currentChild.getNamespaceURI())) {
                     if (strCreated == null) {
-                        String valueType = currentChildElement.getAttribute("ValueType");
+                        String valueType = currentChildElement.getAttributeNS(null, "ValueType");
                         if (valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3225);
@@ -99,7 +99,7 @@ public class Timestamp {
                         // We can't have multiple Expires elements
                         bspEnforcer.handleBSPRule(BSPRule.R3224);
                     } else {
-                        String valueType = currentChildElement.getAttribute("ValueType");
+                        String valueType = currentChildElement.getAttributeNS(null, "ValueType");
                         if (valueType != null && !"".equals(valueType)) {
                             // We can't have a ValueType attribute as per the BSP spec
                             bspEnforcer.handleBSPRule(BSPRule.R3226);

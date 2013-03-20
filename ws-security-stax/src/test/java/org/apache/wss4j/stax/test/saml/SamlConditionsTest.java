@@ -93,8 +93,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("NotBefore"), Configuration.getSAMLDateFormatter().print(notBefore));
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("NotOnOrAfter"), Configuration.getSAMLDateFormatter().print(notAfter));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), Configuration.getSAMLDateFormatter().print(notBefore));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), Configuration.getSAMLDateFormatter().print(notAfter));
         }
 
         //done signature; now test sig-verification:
@@ -140,8 +140,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("NotBefore"), Configuration.getSAMLDateFormatter().print(notBefore));
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("NotOnOrAfter"), Configuration.getSAMLDateFormatter().print(notAfter));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), Configuration.getSAMLDateFormatter().print(notBefore));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), Configuration.getSAMLDateFormatter().print(notAfter));
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

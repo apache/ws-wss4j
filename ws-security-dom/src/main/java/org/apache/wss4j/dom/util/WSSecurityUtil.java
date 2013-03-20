@@ -410,9 +410,9 @@ public final class WSSecurityUtil {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
-                if ((se.hasAttribute("ID") && value.equals(se.getAttribute("ID")))
+                if ((se.hasAttribute("ID") && value.equals(se.getAttributeNS(null, "ID")))
                     || (se.hasAttribute("AssertionID") 
-                        && value.equals(se.getAttribute("AssertionID")))) {
+                        && value.equals(se.getAttributeNS(null, "AssertionID")))) {
                     if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates
                     } else {
@@ -548,6 +548,22 @@ public final class WSSecurityUtil {
                 if (name.startsWith("xmlns:") && a.getNodeValue().equals(uri)) {
                     return name.substring("xmlns:".length());
                 }
+            }
+            e = e.getParentNode();
+        }
+        return null;
+    }
+
+    public static String getNamespace(String prefix, Node e) {
+        while (e != null && (e.getNodeType() == Node.ELEMENT_NODE)) {
+            Attr attr = null;
+            if (prefix == null) {
+                attr = ((Element) e).getAttributeNodeNS(null, "xmlns");
+            } else {
+                attr = ((Element) e).getAttributeNodeNS(WSConstants.XMLNS_NS, prefix);
+            }
+            if (attr != null) {
+                return attr.getValue();
             }
             e = e.getParentNode();
         }

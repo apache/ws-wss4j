@@ -471,7 +471,7 @@ public class SecurityTokenReference {
      */
     public X509Certificate[] getKeyIdentifier(Crypto crypto) throws WSSecurityException {
         Element elem = getFirstElement();
-        String value = elem.getAttribute("ValueType");
+        String value = elem.getAttributeNS(null, "ValueType");
 
         if (X509Security.X509_V3_TYPE.equals(value)) {
             X509Security token = new X509Security(elem, new BSPEnforcer(true));
@@ -526,7 +526,7 @@ public class SecurityTokenReference {
     public String getKeyIdentifierValueType() {
         if (containsKeyIdentifier()) {
             Element elem = getFirstElement();
-            return elem.getAttribute("ValueType");
+            return elem.getAttributeNS(null, "ValueType");
         } 
         return null;
     }
@@ -534,7 +534,7 @@ public class SecurityTokenReference {
     public String getKeyIdentifierEncodingType() {
         if (containsKeyIdentifier()) {
             Element elem = getFirstElement();
-            return elem.getAttribute("EncodingType");
+            return elem.getAttributeNS(null, "EncodingType");
         } 
         return null;
     }
@@ -810,7 +810,7 @@ public class SecurityTokenReference {
             if (valueType == null || "".equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3054);
             }
-            String encodingType = getFirstElement().getAttribute("EncodingType");
+            String encodingType = getFirstElement().getAttributeNS(null, "EncodingType");
             // Encoding Type must be equal to Base64Binary if it's specified
             if (encodingType != null && !"".equals(encodingType)
                 && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {

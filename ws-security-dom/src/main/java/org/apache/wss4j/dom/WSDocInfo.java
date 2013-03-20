@@ -120,17 +120,17 @@ public class WSDocInfo {
                 return true;
             }
         }
-        if (firstElement.hasAttribute("AssertionID")
-            && secondElement.hasAttribute("AssertionID")) {
-            String id = firstElement.getAttribute("AssertionID");
-            String id2 = secondElement.getAttribute("AssertionID");
+        if (firstElement.hasAttributeNS(null, "AssertionID")
+            && secondElement.hasAttributeNS(null, "AssertionID")) {
+            String id = firstElement.getAttributeNS(null, "AssertionID");
+            String id2 = secondElement.getAttributeNS(null, "AssertionID");
             if (id.equals(id2)) {
                 return true;
             }
         }
-        if (firstElement.hasAttribute("ID") && secondElement.hasAttribute("ID")) {
-            String id = firstElement.getAttribute("ID");
-            String id2 = secondElement.getAttribute("ID");
+        if (firstElement.hasAttributeNS(null, "ID") && secondElement.hasAttributeNS(null, "ID")) {
+            String id = firstElement.getAttributeNS(null, "ID");
+            String id2 = secondElement.getAttributeNS(null, "ID");
             if (id.equals(id2)) {
                 return true;
             }
@@ -154,8 +154,8 @@ public class WSDocInfo {
         if (tokenList != null) {
             for (Element elem : tokenList) {
                 String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-                String samlId = elem.getAttribute("AssertionID");
-                String samlId2 = elem.getAttribute("ID");
+                String samlId = elem.getAttributeNS(null, "AssertionID");
+                String samlId2 = elem.getAttributeNS(null, "ID");
                 if ((elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)) 
                     || (elem.hasAttribute("AssertionID") && id.equals(samlId))
                     || (elem.hasAttribute("ID") && id.equals(samlId2))) {

@@ -67,7 +67,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey");
         Element encryptedKeyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         encryptedKeyElement.removeAttribute("Id");
-        encryptedKeyElement.setAttribute("Id", "G2");
+        encryptedKeyElement.setAttributeNS(null, "Id", "G2");
 
         xPathExpression = getXPath(".//dsig:X509Data");
         Element keyIdentifierElement = (Element) xPathExpression.evaluate(encryptedKeyElement, XPathConstants.NODE);
@@ -75,17 +75,17 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityTokenReferenceElement.removeChild(keyIdentifierElement);
         //wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398"/>
         Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_wsse_Reference.getNamespaceURI(), WSSConstants.TAG_wsse_Reference.getLocalPart());
-        referenceElement.setAttribute("URI", "#G1");
+        referenceElement.setAttributeNS(null, "URI", "#G1");
         securityTokenReferenceElement.appendChild(referenceElement);
 
         Element clonedEncryptedElement = (Element) encryptedKeyElement.cloneNode(true);
         clonedEncryptedElement.removeAttribute("Id");
-        clonedEncryptedElement.setAttribute("Id", "G1");
+        clonedEncryptedElement.setAttributeNS(null, "Id", "G1");
 
         xPathExpression = getXPath(".//wsse:Reference");
         Element newReferenceElement = (Element) xPathExpression.evaluate(clonedEncryptedElement, XPathConstants.NODE);
         newReferenceElement.removeAttribute("URI");
-        newReferenceElement.setAttribute("URI", "#G2");
+        newReferenceElement.setAttributeNS(null, "URI", "#G2");
 
         Element securityHeaderNode = (Element) encryptedKeyElement.getParentNode();
         securityHeaderNode.insertBefore(clonedEncryptedElement, encryptedKeyElement);
@@ -129,7 +129,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey");
         Element encryptedKeyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         encryptedKeyElement.removeAttribute("Id");
-        encryptedKeyElement.setAttribute("Id", "2");
+        encryptedKeyElement.setAttributeNS(null, "Id", "2");
 
         xPathExpression = getXPath(".//dsig:X509Data");
         Element keyIdentifierElement = (Element) xPathExpression.evaluate(encryptedKeyElement, XPathConstants.NODE);
@@ -137,17 +137,17 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         securityTokenReferenceElement.removeChild(keyIdentifierElement);
         //wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398"/>
         Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_wsse_Reference.getNamespaceURI(), WSSConstants.TAG_wsse_Reference.getLocalPart());
-        referenceElement.setAttribute("URI", "#1");
+        referenceElement.setAttributeNS(null, "URI", "#1");
         securityTokenReferenceElement.appendChild(referenceElement);
 
         Element clonedEncryptedElement = (Element) encryptedKeyElement.cloneNode(true);
         clonedEncryptedElement.removeAttribute("Id");
-        clonedEncryptedElement.setAttribute("Id", "1");
+        clonedEncryptedElement.setAttributeNS(null, "Id", "1");
 
         xPathExpression = getXPath(".//wsse:Reference");
         Element newReferenceElement = (Element) xPathExpression.evaluate(clonedEncryptedElement, XPathConstants.NODE);
         newReferenceElement.removeAttribute("URI");
-        newReferenceElement.setAttribute("URI", "#2");
+        newReferenceElement.setAttributeNS(null, "URI", "#2");
 
         Element securityHeaderNode = (Element) encryptedKeyElement.getParentNode();
         securityHeaderNode.insertBefore(clonedEncryptedElement, encryptedKeyElement);

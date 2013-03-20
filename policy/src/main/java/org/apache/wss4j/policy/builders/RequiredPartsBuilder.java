@@ -51,7 +51,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
             if (SPConstants.HEADER.equals(child.getLocalName()) && spVersion.getNamespace().equals(child.getNamespaceURI())) {
-                String headerName = child.getAttribute(SPConstants.NAME);
+                String headerName = child.getAttributeNS(null, SPConstants.NAME);
                 if ("".equals(headerName)) {
                     if (ignoreNameElement) {
                         headerName = null;
@@ -59,7 +59,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
                         throw new IllegalArgumentException("sp:" + element.getLocalName() + "/sp:" + child.getLocalName() + " must have a Name attribute");
                     }
                 }
-                String headerNamespace = child.getAttribute(SPConstants.NAMESPACE);
+                String headerNamespace = child.getAttributeNS(null, SPConstants.NAMESPACE);
                 if (headerNamespace == null || "".equals(headerNamespace)) {
                     throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                 }

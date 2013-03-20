@@ -122,8 +122,8 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertNotSame(((Element) nodeList.item(0)).getAttribute(WSSConstants.ATT_NULL_Value.getLocalPart()), "");
-            Assert.assertNotNull(((Element) nodeList.item(0)).getAttribute(WSSConstants.ATT_wsu_Id.getLocalPart()), "");
+            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Value.getLocalPart()), "");
+            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_wsu_Id.getLocalPart()), "");
             Assert.assertTrue(((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart()).length() > 0);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
@@ -203,8 +203,8 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertNotSame(((Element) nodeList.item(0)).getAttribute(WSSConstants.ATT_NULL_Value.getLocalPart()), "");
-            Assert.assertNotNull(((Element) nodeList.item(0)).getAttribute(WSSConstants.ATT_wsu_Id.getLocalPart()), "");
+            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Value.getLocalPart()), "");
+            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_wsu_Id.getLocalPart()), "");
 
             nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
             Assert.assertEquals(nodeList.getLength(), 1);

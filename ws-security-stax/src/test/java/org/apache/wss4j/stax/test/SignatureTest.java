@@ -89,8 +89,8 @@ public class SignatureTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_c14nExcl_InclusiveNamespaces.getNamespaceURI(), WSSConstants.TAG_c14nExcl_InclusiveNamespaces.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute(WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "env");
-            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute(WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "env");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "");
         }
         //done signature; now test sig-verification:
         {

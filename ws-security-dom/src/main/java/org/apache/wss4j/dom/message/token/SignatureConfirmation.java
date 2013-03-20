@@ -59,7 +59,7 @@ public class SignatureConfirmation {
             bspEnforcer.handleBSPRule(BSPRule.R5441);
         }
         
-        String sv = element.getAttribute(SC_VALUE_ATTR);
+        String sv = element.getAttributeNS(null, SC_VALUE_ATTR);
         if (sv != null) {
             try {
                 signatureValue = Base64.decode(sv);

@@ -310,7 +310,7 @@ public class PolicyEnforcerFactory {
             if (extensibilityElement instanceof UnknownExtensibilityElement) {
                 UnknownExtensibilityElement unknownExtensibilityElement = (UnknownExtensibilityElement) extensibilityElement;
                 if (unknownExtensibilityElement.getElementType().getLocalPart().equals("PolicyReference")) {
-                    String uri = unknownExtensibilityElement.getElement().getAttribute("URI").substring(1);
+                    String uri = unknownExtensibilityElement.getElement().getAttributeNS(null, "URI").substring(1);
                     NodeList policyNodeList = unknownExtensibilityElement.getElement().getOwnerDocument().getElementsByTagNameNS("*", "Policy");
 
                     boolean found = false;

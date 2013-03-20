@@ -98,8 +98,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
-            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier");
         }
 
         //done signature; now test sig-verification:
@@ -135,8 +135,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
-            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -213,7 +213,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
         }
 
         //done signature; now test sig-verification:
@@ -248,7 +248,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -540,8 +540,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
-            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
         }
 
         //done signature; now test sig-verification:
@@ -577,8 +577,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
-            Assert.assertEquals(((Element) nodeList.item(1)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
+            Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -656,7 +656,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
         }
 
         //done signature; now test sig-verification:
@@ -691,7 +691,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttribute("ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "ValueType"), "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLID");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

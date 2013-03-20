@@ -273,7 +273,7 @@ public class EncryptedKeyProcessor implements Processor {
             Element digestElement = 
                 WSSecurityUtil.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
             if (digestElement != null) {
-                return digestElement.getAttribute("Algorithm");
+                return digestElement.getAttributeNS(null, "Algorithm");
             }
         }
         return null;
@@ -288,7 +288,7 @@ public class EncryptedKeyProcessor implements Processor {
             Element mgfElement =
                     WSSecurityUtil.getDirectChildElement(tmpE, "MGF", WSConstants.ENC11_NS);
             if (mgfElement != null) {
-                return mgfElement.getAttribute("Algorithm");
+                return mgfElement.getAttributeNS(null, "Algorithm");
             }
         }
         return null;
@@ -375,7 +375,7 @@ public class EncryptedKeyProcessor implements Processor {
                 if (Node.ELEMENT_NODE == node.getNodeType()
                         && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                         && "DataReference".equals(node.getLocalName())) {
-                    String dataRefURI = ((Element) node).getAttribute("URI");
+                    String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
                     if (dataRefURI.charAt(0) == '#') {
                         dataRefURI = dataRefURI.substring(1);
                     }
@@ -465,19 +465,19 @@ public class EncryptedKeyProcessor implements Processor {
     private void checkBSPCompliance(
         Element elem, String encAlgo, BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
-        String attribute = elem.getAttribute("Type");
+        String attribute = elem.getAttributeNS(null, "Type");
         if (attribute != null && !"".equals(attribute)) {
             bspEnforcer.handleBSPRule(BSPRule.R3209);
         }
-        attribute = elem.getAttribute("MimeType");
+        attribute = elem.getAttributeNS(null, "MimeType");
         if (attribute != null && !"".equals(attribute)) {
             bspEnforcer.handleBSPRule(BSPRule.R5622);
         }
-        attribute = elem.getAttribute("Encoding");
+        attribute = elem.getAttributeNS(null, "Encoding");
         if (attribute != null && !"".equals(attribute)) {
             bspEnforcer.handleBSPRule(BSPRule.R5623);
         }
-        attribute = elem.getAttribute("Recipient");
+        attribute = elem.getAttributeNS(null, "Recipient");
         if (attribute != null && !"".equals(attribute)) {
             bspEnforcer.handleBSPRule(BSPRule.R5602);
         }

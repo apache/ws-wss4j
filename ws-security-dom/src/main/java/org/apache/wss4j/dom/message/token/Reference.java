@@ -95,7 +95,7 @@ public class Reference {
      * @return the ValueType attribute
      */
     public String getValueType() {
-        return element.getAttribute("ValueType");
+        return element.getAttributeNS(null, "ValueType");
     }
 
     /**
@@ -104,7 +104,7 @@ public class Reference {
      * @return the URI
      */
     public String getURI() {
-        return element.getAttribute("URI");
+        return element.getAttributeNS(null, "URI");
     }
 
     /**

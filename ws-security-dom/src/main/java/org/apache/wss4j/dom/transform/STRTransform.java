@@ -145,7 +145,7 @@ public class STRTransform extends TransformService {
                 WSSecurityUtil.getDirectChildElement(
                     transformParams, "CanonicalizationMethod", WSConstants.SIG_NS
                 );
-            canonAlgo = canonElem.getAttribute("Algorithm");
+            canonAlgo = canonElem.getAttributeNS(null, "Algorithm");
         }
         try {
             //
@@ -202,7 +202,7 @@ public class STRTransform extends TransformService {
                 STRTransformUtil.dereferenceSTR(doc, secRef, wsDocInfo);
             
             if (dereferencedToken != null) {
-                String type = dereferencedToken.getAttribute("ValueType");
+                String type = dereferencedToken.getAttributeNS(null, "ValueType");
                 if ((X509Security.X509_V3_TYPE.equals(type) 
                     || PKIPathSecurity.getType().equals(type))) {
                     //

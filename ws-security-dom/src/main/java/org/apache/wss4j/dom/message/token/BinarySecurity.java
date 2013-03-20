@@ -144,7 +144,7 @@ public class BinarySecurity {
      * @return the value type
      */
     public String getValueType() {
-        return element.getAttribute("ValueType");
+        return element.getAttributeNS(null, "ValueType");
     }
 
     /**
@@ -162,7 +162,7 @@ public class BinarySecurity {
      * @return the encoding type.
      */
     public String getEncodingType() {
-        return element.getAttribute("EncodingType");
+        return element.getAttributeNS(null, "EncodingType");
     }
 
     /**
