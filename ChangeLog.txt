@@ -5,6 +5,21 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.10
+=============
+
+Bug
+
+    [WSS-421] - WSSecSignature does not allow access to the internal BinarySecurityToken after it is applied to the security header
+    [WSS-424] - Signature Element is not inserted in the correct place in the header in certain circumstances
+    [WSS-427] - Add support for processing UsernameToken Created Dates
+    [WSS-431] - Performance bottleneck in MemoryReplayCache on high load
+
+Improvement
+
+    [WSS-420] - Add the ability to explicitly allow/disallow UsernameTokens with no passwords
+    [WSS-422] - Move SAML Signature Profile Validation to the SamlAssertionValidator
+
 Release 1.6.9
 =============
 
