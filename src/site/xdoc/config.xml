@@ -541,7 +541,8 @@ with the certificate. </td>
 <p>
 The configuration values for setting the KeyIdentifiers for signature or encryption 
 are shown below. See the <a href="http://ws.apache.org/wss4j/apidocs/org/apache/ws/security/handler/WSHandlerConstants.html">Javadoc</a> 
-for SIG_KEY_ID and ENC_KEY_ID for more details:
+for SIG_KEY_ID and ENC_KEY_ID for more details. For an in depth explanation 
+with examples, see this blog <a href="coheigea.blogspot.com/2013/03/signature-and-encryption-key.html">entry</a>.
 </p>
 <table name="WSHandler KeyIdentifier values">
 <tr>
