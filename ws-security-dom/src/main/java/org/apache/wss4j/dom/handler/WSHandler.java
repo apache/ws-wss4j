@@ -384,8 +384,8 @@ public abstract class WSHandler {
         // the current run of receiver (we can have more than one run: if we
         // have several security header blocks with different actors/roles)
         //
-        List<WSSecurityEngineResult> sigConf = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(resultList, WSConstants.SC, sigConf);
+        List<WSSecurityEngineResult> sigConf = 
+            WSSecurityUtil.fetchAllActionResults(resultList, WSConstants.SC);
         //
         // now loop over all SignatureConfirmation results and check:
         // - if there is a signature value and no Signature value generated in request: error

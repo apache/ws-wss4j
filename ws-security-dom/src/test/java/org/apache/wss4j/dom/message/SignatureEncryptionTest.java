@@ -184,11 +184,11 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(encryptedSignedDoc);
         
-        List<WSSecurityEngineResult> sigSecEngResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, sigSecEngResults);
+        List<WSSecurityEngineResult> sigSecEngResults = 
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN);
         
-        List<WSSecurityEngineResult> encSecEngResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR, encSecEngResults);
+        List<WSSecurityEngineResult> encSecEngResults = 
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR);
         
         assertEquals(1, sigSecEngResults.size());
         assertEquals(1, encSecEngResults.size());
