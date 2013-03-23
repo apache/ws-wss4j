@@ -34,7 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
@@ -182,7 +182,6 @@ public class STRTransform extends TransformService {
             
             Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
 
-            ByteArrayOutputStream bos = null;
             byte[] buf = null;
             
             //
@@ -220,57 +219,16 @@ public class STRTransform extends TransformService {
             //
             // C14n with specified algorithm. According to WSS Specification.
             //
-            buf = canon.canonicalizeSubtree(dereferencedToken, "#default");
+            buf = canon.canonicalizeSubtree(dereferencedToken, "#default", true);
             if (doDebug) {
-                bos = new ByteArrayOutputStream(buf.length);
-                bos.write(buf, 0, buf.length);
-                log.debug("after c14n: " + bos.toString());
+                log.debug("after c14n: " + new String(buf, "UTF-8"));
             }
 
-            //
-            // Alert: Hacks ahead According to WSS spec an Apex node must
-            // contain a default namespace. If none is availabe in the first
-            // node of the c14n output (this is the apex element) then we do
-            // some editing to insert an empty default namespace
-            // 
-            // TODO: Rework theses hacks after c14n was updated and can be
-            // instructed to insert empty default namespace if required
-            //
-            // If the problem with c14n method is solved then just do:
-            // return new XMLSignatureInput(buf);
-            
-            // start of HACK
-            StringBuilder bf = new StringBuilder(new String(buf));
-            String bf1 = bf.toString();
-
-            //
-            // Find start and end of first element <....>, this is the Apex node
-            //
-            int gt = bf1.indexOf('>');
-            //
-            // Lookup the default namespace
-            //
-            int idx = bf1.indexOf("xmlns=");
-            //
-            // If none found or if it is outside of this (Apex) element look for
-            // first blank in, insert default namespace there (this is the
-            // correct place according to c14n specification)
-            //
-            if (idx < 0 || idx > gt) {
-                idx = bf1.indexOf(' ');
-                bf.insert(idx + 1, "xmlns=\"\" ");
-                bf1 = bf.toString();
-            }
-            if (doDebug) {
-                log.debug("last result: ");
-                log.debug(bf1);
-            }
-            XMLSignatureInput output = new XMLSignatureInput(bf1.getBytes());
             if (os != null) {
-                output.updateOutputStream(os);
+                os.write(buf);
                 return null;
             }
-            return new OctetStreamData(output.getOctetStream());
+            return new OctetStreamData(new ByteArrayInputStream(buf));
         } catch (Exception ex) {
             throw new TransformException(ex);
         }
