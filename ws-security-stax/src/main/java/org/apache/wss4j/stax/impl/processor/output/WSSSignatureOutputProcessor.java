@@ -188,17 +188,12 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
         }
 
         List<String> inclusiveNamespacePrefixes = null;
-        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
-            inclusiveNamespacePrefixes = new ArrayList<String>();
-            inclusiveNamespacePrefixes.add("#default");
-        }
 
         Transformer parentTransformer = null;
         for (int i = transforms.length - 1; i >= 0; i--) {
             String transform = transforms[i];
 
-            if (inclusiveNamespacePrefixes == null &&
-                    getSecurityProperties().isAddExcC14NInclusivePrefixes() &&
+            if (getSecurityProperties().isAddExcC14NInclusivePrefixes() &&
                     XMLSecurityConstants.NS_C14N_EXCL.equals(transform)) {
 
                 Set<String> prefixSet = XMLSecurityUtils.getExcC14NInclusiveNamespacePrefixes(xmlSecStartElement, signaturePartDef.isExcludeVisibleC14Nprefixes());

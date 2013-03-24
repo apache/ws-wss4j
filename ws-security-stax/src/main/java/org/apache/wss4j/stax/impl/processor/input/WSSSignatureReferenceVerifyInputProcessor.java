@@ -44,7 +44,6 @@ import org.apache.wss4j.stax.securityEvent.TimestampSecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -232,12 +231,6 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     InclusiveNamespaces inclusiveNamespacesType =
                             XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                     List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
-                    if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transformType.getAlgorithm())) {
-                        if (inclusiveNamespaces == null) {
-                            inclusiveNamespaces = new ArrayList<String>(1);
-                        }
-                        inclusiveNamespaces.add("#default");
-                    }
                     algorithm = canonicalizationMethodType.getAlgorithm();
                     parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm, XMLSecurityConstants.DIRECTION.IN);
                 }

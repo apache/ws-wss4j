@@ -18,7 +18,31 @@
  */
 package org.apache.wss4j.stax.impl.transformer;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.Transformer;
 import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
+import org.apache.xml.security.stax.impl.transformer.canonicalizer.Canonicalizer20010315_Excl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class STRTransformer extends TransformIdentity {
+
+    @Override
+    public void setTransformer(Transformer transformer) throws XMLSecurityException {
+        if (!(transformer instanceof Canonicalizer20010315_Excl)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+        ((Canonicalizer20010315_Excl) transformer).setPropagateDefaultNamespace(true);
+        List<String> inclusiveNamespacesPrefixList = new ArrayList<String>();
+        inclusiveNamespacesPrefixList.add("#default");
+        transformer.setList(inclusiveNamespacesPrefixList);
+        super.setTransformer(transformer);
+    }
+
+    @Override
+    public void setList(List list) throws XMLSecurityException {
+        throw new UnsupportedOperationException();
+    }
 }
