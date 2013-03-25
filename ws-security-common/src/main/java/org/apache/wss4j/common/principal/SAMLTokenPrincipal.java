@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.common.principal;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.common.SAMLVersion;

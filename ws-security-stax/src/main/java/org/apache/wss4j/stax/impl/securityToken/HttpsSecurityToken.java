@@ -23,6 +23,7 @@ import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 
 public class HttpsSecurityToken extends InboundSecurityTokenImpl {
@@ -69,5 +70,14 @@ public class HttpsSecurityToken extends InboundSecurityTokenImpl {
 
     public AuthenticationType getAuthenticationType() {
         return authenticationType;
+    }
+    
+    @Override
+    public Principal getPrincipal() throws XMLSecurityException {
+        X509Certificate[] certs = super.getX509Certificates();
+        if (certs != null && certs.length > 0) {
+            return certs[0].getSubjectX500Principal();
+        }
+        return null;
     }
 }

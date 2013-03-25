@@ -113,6 +113,11 @@ public abstract class X509SecurityToken
 
     @Override
     public Principal getPrincipal() throws XMLSecurityException {
+        X509Certificate[] certs = super.getX509Certificates();
+        if (certs != null && certs.length > 0) {
+            return certs[0].getSubjectX500Principal();
+        }
+        
         final PublicKey publicKey = getPublicKey();
         if (publicKey != null) {
             return new Principal() {

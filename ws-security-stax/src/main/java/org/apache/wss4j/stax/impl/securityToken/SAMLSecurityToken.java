@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -30,6 +31,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.opensaml.common.SAMLVersion;
 
 import java.security.Key;
+import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -143,5 +145,13 @@ public class SAMLSecurityToken extends InboundSecurityTokenImpl {
 
     public SamlAssertionWrapper getSamlAssertionWrapper() {
         return samlAssertionWrapper;
+    }
+    
+    @Override
+    public Principal getPrincipal() {
+        if (samlAssertionWrapper != null) {
+            return new SAMLTokenPrincipal(samlAssertionWrapper);
+        }
+        return null;
     }
 }

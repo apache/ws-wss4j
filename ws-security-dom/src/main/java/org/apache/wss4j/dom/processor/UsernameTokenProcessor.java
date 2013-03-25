@@ -22,20 +22,21 @@ package org.apache.wss4j.dom.processor;
 import java.util.Date;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
 import org.apache.wss4j.dom.cache.ReplayCache;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
-import org.w3c.dom.Element;
 
 public class UsernameTokenProcessor implements Processor {
     private static org.apache.commons.logging.Log log = 

@@ -18,18 +18,24 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.binding.wss10.AttributedString;
+import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
+import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.NamePasswordCallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
 import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
@@ -89,7 +95,6 @@ public class JAASUsernameTokenValidator implements UsernameTokenValidator {
             LoginContext ctx = new LoginContext(getContextName(), handler);  
             ctx.login();
             subject = ctx.getSubject();
-            // TODO need a way to return the Subject above
         } catch (LoginException ex) {
             log.info("Authentication failed", ex);
             throw new WSSecurityException(
@@ -104,6 +109,32 @@ public class JAASUsernameTokenValidator implements UsernameTokenValidator {
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
         usernameSecurityToken.setSubject(subject);
+        
+        WSUsernameTokenPrincipal principal = 
+            new WSUsernameTokenPrincipal(username.getValue(), false);
+        final EncodedString encodedNonce =
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+        if (encodedNonce != null) {
+            byte[] nonceVal = Base64.decodeBase64(encodedNonce.getValue());
+            try {
+                principal.setNonce(new String(nonceVal, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+            }
+        }
+        
+        principal.setPassword(password);
+        final AttributedDateTime attributedDateTimeCreated =
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
+        if (attributedDateTimeCreated != null) {
+            String created = attributedDateTimeCreated.getValue();
+            principal.setCreatedTime(created);
+        }
+        
+        if (passwordType != null && passwordType.getType() != null) {
+            principal.setPasswordType(passwordType.getType().toString());
+        }
+        usernameSecurityToken.setPrincipal(principal);
 
         return usernameSecurityToken;
     }

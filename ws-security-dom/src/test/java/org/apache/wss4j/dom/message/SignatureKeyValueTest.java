@@ -19,22 +19,23 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.PublicKeyPrincipal;
+import java.util.Collections;
+import java.util.List;
+
+import org.w3c.dom.Document;
+
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.principal.PublicKeyPrincipal;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.w3c.dom.Document;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * This class tests signing where the the public key is transmitted in the message via

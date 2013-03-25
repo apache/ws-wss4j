@@ -19,24 +19,33 @@
 
 package org.apache.wss4j.dom.misc;
 
-import org.apache.wss4j.dom.SAMLTokenPrincipal;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
-import org.apache.wss4j.dom.common.SAML1CallbackHandler;
-import org.apache.wss4j.dom.common.SAML2CallbackHandler;
-import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
-import org.apache.wss4j.dom.common.SOAPUtil;
+import java.security.Principal;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Document;
+
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.SAML1CallbackHandler;
+import org.apache.wss4j.dom.common.SAML2CallbackHandler;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
@@ -46,14 +55,6 @@ import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
-import org.w3c.dom.Document;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
-
-import java.security.Principal;
-import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * Test various principal objects after processing a security token.
