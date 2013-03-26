@@ -215,7 +215,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>2.9</version>
                     <configuration>
                         <reportFormat>brief</reportFormat>
                         <useFile>false</useFile>
@@ -249,7 +249,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.1.2</version>
+                    <version>2.2.1</version>
                     <executions>
                         <execution>
                             <goals>
@@ -512,7 +512,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.1</version>
+                <version>2.6</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -528,12 +528,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.7</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.0</version>
+                <version>2.7</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -555,12 +555,6 @@
             <url>https://repository.apache.org/content/repositories/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
-        <site>
-            <id>website</id>
-            <url>
-                scpexe://people.apache.org/www/ws.apache.org/wss4j/
-            </url>
-        </site>
     </distributionManagement>
 
     <!-- Temporarily adding in to get Santuario SNAPSHOT
