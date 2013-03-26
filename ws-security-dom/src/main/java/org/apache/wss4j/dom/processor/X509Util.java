@@ -34,8 +34,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
 public final class X509Util {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(X509Util.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(X509Util.class);
     
     private X509Util() {
         // Complete

@@ -43,8 +43,8 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  * WS-Security, it's necessary to support it for WCF interop.
  */
 public class SignatureKeyValueTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureKeyValueTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureKeyValueTest.class);
     private Crypto crypto = null;
     
     public SignatureKeyValueTest() throws Exception {

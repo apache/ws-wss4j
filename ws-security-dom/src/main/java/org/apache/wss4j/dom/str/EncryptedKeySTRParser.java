@@ -48,8 +48,8 @@ import org.w3c.dom.Element;
  */
 public class EncryptedKeySTRParser implements STRParser {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptedKeySTRParser.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(EncryptedKeySTRParser.class);
     
     private X509Certificate[] certs;
     

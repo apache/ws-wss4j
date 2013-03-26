@@ -46,8 +46,8 @@ import java.util.List;
  * WS-Security Test Case for Timestamps.
  */
 public class TimestampTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(TimestampTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(TimestampTest.class);
 
     /**
      * This is a test for processing a valid Timestamp.

@@ -63,8 +63,8 @@ import org.w3c.dom.Element;
  * -config ca.config -crldays 3650
  */
 public class SignatureCRLTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureCRLTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureCRLTest.class);
     private Crypto crypto = null;
     private Crypto cryptoCA = null;
     

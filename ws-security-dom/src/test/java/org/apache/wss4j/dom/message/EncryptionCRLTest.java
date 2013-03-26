@@ -42,8 +42,8 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
  * This test reuses the revoked certificate from SignatureCRLTest
  */
 public class EncryptionCRLTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptionCRLTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(EncryptionCRLTest.class);
         
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();

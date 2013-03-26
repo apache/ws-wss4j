@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
@@ -32,7 +30,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  */
 public class BSPEnforcer {
     
-    private static final Log LOG = LogFactory.getLog(BSPEnforcer.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(BSPEnforcer.class);
     
     private List<BSPRule> ignoredBSPRules = Collections.emptyList();
     

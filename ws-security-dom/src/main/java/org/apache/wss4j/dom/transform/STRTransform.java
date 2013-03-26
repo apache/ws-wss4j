@@ -66,8 +66,8 @@ public class STRTransform extends TransformService {
     
     private Element transformElement;
     
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(STRTransform.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(STRTransform.class);
 
     private static boolean doDebug = false;
     

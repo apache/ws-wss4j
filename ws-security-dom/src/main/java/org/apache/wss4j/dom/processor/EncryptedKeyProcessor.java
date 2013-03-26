@@ -55,8 +55,8 @@ import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
 
 public class EncryptedKeyProcessor implements Processor {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptedKeyProcessor.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(EncryptedKeyProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

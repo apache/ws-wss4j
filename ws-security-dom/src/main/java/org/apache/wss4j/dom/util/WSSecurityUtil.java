@@ -61,8 +61,8 @@ import java.util.Set;
  * WS-Security Utility methods. <p/>
  */
 public final class WSSecurityUtil {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecurityUtil.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
 
     /**
      * A cached pseudo-random number generator

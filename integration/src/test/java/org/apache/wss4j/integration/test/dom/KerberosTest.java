@@ -62,8 +62,8 @@ import javax.xml.crypto.dsig.SignatureMethod;
  * To see the Kerberos stuff add "-Dsun.security.krb5.debug=true".
  */
 public class KerberosTest {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(KerberosTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(KerberosTest.class);
 
     private static boolean kerberosServerStarted = false;
 

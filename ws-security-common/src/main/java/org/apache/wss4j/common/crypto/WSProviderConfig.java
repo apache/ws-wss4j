@@ -40,8 +40,8 @@ import org.apache.xml.security.utils.XMLUtils;
  */
 public final class WSProviderConfig {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(WSProviderConfig.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(WSProviderConfig.class);
     
     /**
      * a static boolean flag that determines whether default JCE providers

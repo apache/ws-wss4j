@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SignatureConfirmationAction implements Action {
-    private static final org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureConfirmationAction.class);
+    private static final org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)

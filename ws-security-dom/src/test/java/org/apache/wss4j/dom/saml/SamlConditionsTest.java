@@ -45,8 +45,8 @@ import org.w3c.dom.Document;
  * Test-case for sending and processing an a SAML Token with a custom Conditions element.
  */
 public class SamlConditionsTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlConditionsTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlConditionsTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     public SamlConditionsTest() {

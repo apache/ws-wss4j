@@ -35,8 +35,8 @@ import org.w3c.dom.Element;
  * Class OpenSAMLUtil provides static helper methods for the OpenSaml library
  */
 public final class OpenSAMLUtil {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(OpenSAMLUtil.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(OpenSAMLUtil.class);
 
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;

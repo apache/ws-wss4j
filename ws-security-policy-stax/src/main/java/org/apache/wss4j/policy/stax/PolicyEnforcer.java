@@ -18,14 +18,74 @@
  */
 package org.apache.wss4j.policy.stax;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.neethi.*;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.namespace.QName;
+
+import org.apache.neethi.Assertion;
+import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
+import org.apache.neethi.PolicyOperator;
 import org.apache.neethi.builders.PrimitiveAssertion;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.WSSPolicyException;
-import org.apache.wss4j.policy.model.*;
-import org.apache.wss4j.policy.stax.assertionStates.*;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.ContentEncryptedElements;
+import org.apache.wss4j.policy.model.EncryptedElements;
+import org.apache.wss4j.policy.model.EncryptedParts;
+import org.apache.wss4j.policy.model.HttpsToken;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.KerberosToken;
+import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.model.RelToken;
+import org.apache.wss4j.policy.model.RequiredElements;
+import org.apache.wss4j.policy.model.RequiredParts;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SignedElements;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
+import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.policy.stax.assertionStates.AlgorithmSuiteAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.ContentEncryptedElementsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.EncryptedElementsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.EncryptedPartsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.HttpsTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.IncludeTimeStampAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.IssuedTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.KerberosTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.KeyValueTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.OnlySignEntireHeadersAndBodyAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.ProtectionOrderAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.RelTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.RequiredElementsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.RequiredPartsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SamlTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SecureConversationTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SecurityContextTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SignatureProtectionAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SignedElementsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SignedPartsAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SpnegoContextTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.TokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.TokenProtectionAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.UsernameTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.X509TokenAssertionState;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -33,9 +93,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-
-import javax.xml.namespace.QName;
-import java.util.*;
 
 /**
  * The PolicyEnforcer verifies the Policy assertions
@@ -53,7 +110,8 @@ public class PolicyEnforcer implements SecurityEventListener {
     // HttpsToken Algorithms
     //unused tokens must be checked (algorithms etc)
 
-    protected static final transient Log log = LogFactory.getLog(PolicyEnforcer.class);
+    protected static final transient org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(PolicyEnforcer.class);
 
     private final List<OperationPolicy> operationPolicies;
     private OperationPolicy effectivePolicy;

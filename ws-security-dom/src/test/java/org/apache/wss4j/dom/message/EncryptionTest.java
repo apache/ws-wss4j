@@ -56,8 +56,8 @@ import java.util.List;
  * A set of test-cases for encrypting and decrypting SOAP requests.
  */
 public class EncryptionTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptionTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(EncryptionTest.class);
     private static final javax.xml.namespace.QName SOAP_BODY =
         new javax.xml.namespace.QName(
             WSConstants.URI_SOAP11_ENV,

@@ -64,8 +64,8 @@ import org.w3c.dom.Text;
  */
 public class WSSecEncryptedKey extends WSSecBase {
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecEncryptedKey.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
     protected Document document;
 

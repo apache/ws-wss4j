@@ -26,8 +26,6 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.binding.wss10.AttributedString;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
@@ -47,7 +45,8 @@ import org.apache.xml.security.stax.ext.XMLSecurityUtils;
  */
 public class JAASUsernameTokenValidator implements UsernameTokenValidator {
     
-    private static final transient Log log = LogFactory.getLog(JAASUsernameTokenValidator.class);
+    private static final transient org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(JAASUsernameTokenValidator.class);
     
     private String contextName = null;
     

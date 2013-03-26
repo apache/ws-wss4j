@@ -48,8 +48,8 @@ import java.util.List;
  * non-standard implementation.
  */
 public class UTSignatureTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(UTSignatureTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(UTSignatureTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;
     

@@ -18,8 +18,6 @@
  */
 package org.apache.wss4j.stax.test;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -330,7 +328,8 @@ public abstract class AbstractTestBase {
 
     class CustomWSS4JHandler extends WSHandler {
 
-        private final Log log = LogFactory.getLog(CustomWSS4JHandler.class.getName());
+        private final org.slf4j.Logger log = 
+            org.slf4j.LoggerFactory.getLogger(CustomWSS4JHandler.class.getName());
         private final boolean doDebug = log.isDebugEnabled();
 
         /**

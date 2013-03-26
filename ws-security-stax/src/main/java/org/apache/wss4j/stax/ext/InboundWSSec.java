@@ -18,8 +18,6 @@
  */
 package org.apache.wss4j.stax.ext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.wss4j.stax.impl.WSSecurityStreamReader;
@@ -53,7 +51,8 @@ import java.util.List;
  */
 public class InboundWSSec {
 
-    protected static final transient Log log = LogFactory.getLog(InboundWSSec.class);
+    protected static final transient org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(InboundWSSec.class);
 
     private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 

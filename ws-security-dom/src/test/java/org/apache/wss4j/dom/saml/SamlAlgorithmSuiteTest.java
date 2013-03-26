@@ -49,8 +49,8 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  * SAML (HOK) assertion when specifying an AlgorithmSuite policy.
  */
 public class SamlAlgorithmSuiteTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlAlgorithmSuiteTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlAlgorithmSuiteTest.class);
     private Crypto crypto = null;
     
     public SamlAlgorithmSuiteTest() throws Exception {

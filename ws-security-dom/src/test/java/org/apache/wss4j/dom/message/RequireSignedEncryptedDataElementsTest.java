@@ -50,8 +50,8 @@ import org.w3c.dom.Element;
  * mentioned option is on.
  */
 public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(RequireSignedEncryptedDataElementsTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(RequireSignedEncryptedDataElementsTest.class);
     private static ResourceBundle resources = ResourceBundle.getBundle("messages.wss4j_errors");
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 

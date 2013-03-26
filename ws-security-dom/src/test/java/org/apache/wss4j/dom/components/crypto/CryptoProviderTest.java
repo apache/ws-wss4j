@@ -50,8 +50,8 @@ import java.security.cert.X509Certificate;
  * OU=WSS4J,O=Apache,L=Munich,ST=Bayern,C=DE"
  */
 public class CryptoProviderTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(CryptoProviderTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(CryptoProviderTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto;

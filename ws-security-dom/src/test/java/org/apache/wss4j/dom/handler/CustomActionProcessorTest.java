@@ -44,8 +44,8 @@ import java.util.ArrayList;
  * A test for adding custom actions/processors etc.
  */
 public class CustomActionProcessorTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(CustomActionProcessorTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(CustomActionProcessorTest.class);
     private Crypto crypto = null;
     
     public CustomActionProcessorTest() throws Exception {

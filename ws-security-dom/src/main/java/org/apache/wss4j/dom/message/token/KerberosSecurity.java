@@ -42,8 +42,8 @@ import org.w3c.dom.Element;
  */
 public class KerberosSecurity extends BinarySecurity {
     
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(KerberosSecurity.class);
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(KerberosSecurity.class);
     private SecretKey secretKey;
     
     /**

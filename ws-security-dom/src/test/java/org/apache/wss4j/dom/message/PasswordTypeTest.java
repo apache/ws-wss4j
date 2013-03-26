@@ -38,8 +38,8 @@ import javax.security.auth.callback.CallbackHandler;
  * password type. See WSS-255.
  */
 public class PasswordTypeTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(PasswordTypeTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(PasswordTypeTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**

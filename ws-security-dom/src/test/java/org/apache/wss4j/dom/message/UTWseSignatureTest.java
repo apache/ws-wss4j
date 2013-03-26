@@ -38,8 +38,8 @@ import javax.security.auth.callback.CallbackHandler;
  * This a test for deriving a key from a Username Token using a non-standard (WSE) implementation.
  */
 public class UTWseSignatureTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(UTWseSignatureTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(UTWseSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 

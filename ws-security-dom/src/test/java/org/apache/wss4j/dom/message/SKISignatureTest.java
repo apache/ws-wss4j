@@ -37,8 +37,8 @@ import org.w3c.dom.Document;
  * WS-Security Test Case for SubjectKeyIdentifier.
  */
 public class SKISignatureTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SKISignatureTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SKISignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     

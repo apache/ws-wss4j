@@ -88,8 +88,8 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 public class SignatureProcessor implements Processor {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureProcessor.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureProcessor.class);
     
     private XMLSignatureFactory signatureFactory;
     private KeyInfoFactory keyInfoFactory;

@@ -59,8 +59,8 @@ import org.w3c.dom.Element;
 
 public class WSSecSignatureSAML extends WSSecSignature {
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecSignatureSAML.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecSignatureSAML.class);
     private boolean senderVouches;
     private SecurityTokenReference secRefSaml;
     private String secRefID;
@@ -551,7 +551,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             
             signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
-            log.error(ex);
+            log.error(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
             );

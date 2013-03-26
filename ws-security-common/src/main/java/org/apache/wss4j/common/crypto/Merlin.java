@@ -104,8 +104,8 @@ public class Merlin extends CryptoBase {
      */
     public static final String X509_CRL_FILE = "x509crl.file";
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(Merlin.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(Merlin.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     protected Properties properties;
@@ -518,7 +518,7 @@ public class Merlin extends CryptoBase {
                                 mapKeystoreProviderToCertProvider(keyStoreProvider), factory
                             );
                         } catch (Exception ex) {
-                            LOG.debug(ex);
+                            LOG.debug(ex.getMessage(), ex);
                             //Ignore, we'll just use the default since they didn't specify one.
                             //Hopefully that will work for them.
                         }

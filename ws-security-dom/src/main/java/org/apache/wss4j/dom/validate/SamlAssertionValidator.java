@@ -36,8 +36,8 @@ import org.apache.wss4j.dom.handler.RequestData;
  */
 public class SamlAssertionValidator extends SignatureTrustValidator {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlAssertionValidator.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlAssertionValidator.class);
     
     /**
      * The time in seconds in the future within which the NotBefore time of an incoming 

@@ -49,8 +49,8 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
  */
 public class WSSecSignatureBase extends WSSecBase {
     
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecSignatureBase.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecSignatureBase.class);
     
     public WSSecSignatureBase() {
         super();

@@ -47,8 +47,8 @@ import java.util.ArrayList;
  * A set of tests for combined signature/encryption, verification/decryption.
  */
 public class SignatureEncryptionTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureEncryptionTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureEncryptionTest.class);
     private static final String SOAPMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "

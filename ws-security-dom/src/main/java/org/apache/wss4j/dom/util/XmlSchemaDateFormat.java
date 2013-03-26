@@ -41,8 +41,8 @@ public class XmlSchemaDateFormat extends DateFormat {
     /**
      * Logger.
      */
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(XmlSchemaDateFormat.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(XmlSchemaDateFormat.class);
 
     /**
      * DateFormat for Zulu (UTC) form of an XML Schema dateTime string.

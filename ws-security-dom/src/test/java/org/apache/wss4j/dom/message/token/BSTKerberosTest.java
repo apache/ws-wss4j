@@ -54,8 +54,8 @@ import java.util.List;
  * This is a test for the Kerberos Token Profile 1.1
  */
 public class BSTKerberosTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(BSTKerberosTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(BSTKerberosTest.class);
     private static final String AP_REQ = WSConstants.WSS_GSS_KRB_V5_AP_REQ;
     private static final String BASE64_NS = 
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";

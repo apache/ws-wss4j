@@ -45,8 +45,8 @@ import org.w3c.dom.Element;
  * encrypted Timestamp needs to be decrypted or not.
  */
 public class EncryptedDataInHeaderTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptedDataInHeaderTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(EncryptedDataInHeaderTest.class);
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();

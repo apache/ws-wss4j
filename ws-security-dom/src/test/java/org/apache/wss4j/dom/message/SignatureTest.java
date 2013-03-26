@@ -53,8 +53,8 @@ import org.w3c.dom.Node;
  * A set of test-cases for signing and verifying SOAP requests.
  */
 public class SignatureTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureTest.class);
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();

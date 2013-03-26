@@ -41,8 +41,8 @@ import java.util.List;
  * WS-Security Engine.
  */
 public class WSSecurityEngine {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecurityEngine.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecurityEngine.class);
 
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification

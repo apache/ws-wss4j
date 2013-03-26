@@ -39,8 +39,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  */
 public class MerlinDevice extends Merlin {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(MerlinDevice.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(MerlinDevice.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     

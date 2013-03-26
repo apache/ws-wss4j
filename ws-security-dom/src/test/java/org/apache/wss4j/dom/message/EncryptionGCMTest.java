@@ -44,8 +44,8 @@ import java.util.List;
  * https://issues.apache.org/jira/browse/WSS-325
  */
 public class EncryptionGCMTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptionGCMTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(EncryptionGCMTest.class);
     private static final javax.xml.namespace.QName SOAP_BODY =
         new javax.xml.namespace.QName(
             WSConstants.URI_SOAP11_ENV,

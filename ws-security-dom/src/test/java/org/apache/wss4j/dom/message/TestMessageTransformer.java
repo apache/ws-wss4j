@@ -38,8 +38,7 @@ import org.w3c.dom.NodeList;
  * org.apache.wss4j.dom.message.RequireSignedEncryptedDataElementsTest
  */
 public class TestMessageTransformer extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory
-        .getLog(TestMessageTransformer.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(TestMessageTransformer.class);
 
     public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {

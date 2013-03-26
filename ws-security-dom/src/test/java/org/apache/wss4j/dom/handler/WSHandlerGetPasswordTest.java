@@ -35,8 +35,8 @@ import javax.security.auth.callback.CallbackHandler;
  * <p/>
  */
 public class WSHandlerGetPasswordTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(WSHandlerGetPasswordTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(WSHandlerGetPasswordTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     /**

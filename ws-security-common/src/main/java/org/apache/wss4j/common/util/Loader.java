@@ -29,8 +29,8 @@ import java.security.PrivilegedAction;
  * <p/>
  */
 public class Loader {
-    private static org.apache.commons.logging.Log log =
-            org.apache.commons.logging.LogFactory.getLog(Loader.class);
+    private static org.slf4j.Logger log =
+            org.slf4j.LoggerFactory.getLogger(Loader.class);
 
     /**
      * This method will search for <code>resource</code> in different

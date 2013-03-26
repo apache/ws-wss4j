@@ -18,8 +18,13 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -28,17 +33,14 @@ import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.SecurityHeaderHandlerMapper;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractInputProcessor;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Processor for the Security-Header XML Structure.
@@ -46,7 +48,8 @@ import java.util.Deque;
  */
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
-    protected static final transient Log logger = LogFactory.getLog(SecurityHeaderInputProcessor.class);
+    protected static final transient org.slf4j.Logger logger = 
+        org.slf4j.LoggerFactory.getLogger(SecurityHeaderInputProcessor.class);
 
     private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
     private int eventCount = 0;

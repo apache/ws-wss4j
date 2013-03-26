@@ -43,8 +43,8 @@ import org.w3c.dom.Element;
  * verify the signature is validated against a set of cert constraints.
  */
 public class SignatureCertConstraintsTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureCertConstraintsTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureCertConstraintsTest.class);
     private Crypto crypto = null;
     private Crypto cryptoCA = null;
     

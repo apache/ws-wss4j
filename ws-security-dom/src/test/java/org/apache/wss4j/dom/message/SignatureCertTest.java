@@ -67,8 +67,8 @@ import java.util.List;
  * 
  */
 public class SignatureCertTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureCertTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureCertTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     private Crypto cryptoCA = null;

@@ -30,8 +30,8 @@ import org.ietf.jgss.Oid;
  * Kerberos Key Distribution Center.
  */
 public class DefaultSpnegoClientAction implements SpnegoClientAction {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(DefaultSpnegoClientAction.class);
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(DefaultSpnegoClientAction.class);
     
     private String serviceName;
     private GSSContext secContext;

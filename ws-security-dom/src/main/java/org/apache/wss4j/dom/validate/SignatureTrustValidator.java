@@ -39,8 +39,8 @@ import org.apache.wss4j.dom.handler.RequestData;
  */
 public class SignatureTrustValidator implements Validator {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureTrustValidator.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureTrustValidator.class);
     
     /**
      * Validate the credential argument. It must contain a non-null X509Certificate chain

@@ -33,8 +33,8 @@ import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Element;
 
 public class TimestampProcessor implements Processor {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(TimestampProcessor.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(TimestampProcessor.class);
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

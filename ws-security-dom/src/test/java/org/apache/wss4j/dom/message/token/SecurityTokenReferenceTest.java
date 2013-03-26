@@ -34,8 +34,8 @@ import org.w3c.dom.Element;
  * Some tests for the SecurityTokenReference class.
  */
 public class SecurityTokenReferenceTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SecurityTokenReferenceTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SecurityTokenReferenceTest.class);
     
     /**
      * Test for a Reference with no URI

@@ -21,8 +21,6 @@ package org.apache.wss4j.common.crypto;
 
 import java.math.BigInteger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
@@ -39,7 +37,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * </pre>
  */
 public class DERDecoder {
-    private static Log log = LogFactory.getLog(DERDecoder.class);
+    private static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DERDecoder.class);
 
     /** DER type identifier for a bit string value */
     public static final byte TYPE_BIT_STRING = 0x03;

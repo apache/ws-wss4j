@@ -38,8 +38,8 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  */
 public class JAASUsernameTokenValidator implements Validator {
     
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(JAASUsernameTokenValidator.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(JAASUsernameTokenValidator.class);
     
     private String contextName;
     

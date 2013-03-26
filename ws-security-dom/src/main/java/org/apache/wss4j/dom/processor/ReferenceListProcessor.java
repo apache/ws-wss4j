@@ -53,8 +53,8 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 
 public class ReferenceListProcessor implements Processor {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(ReferenceListProcessor.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(ReferenceListProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

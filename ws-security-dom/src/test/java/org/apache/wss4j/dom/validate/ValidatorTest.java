@@ -56,8 +56,8 @@ import org.w3c.dom.Document;
  * Validator implementations.
  */
 public class ValidatorTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(ValidatorTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(ValidatorTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**

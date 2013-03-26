@@ -62,8 +62,8 @@ public class SecurityTokenReference {
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
     public static final String ENC_KEY_SHA1_URI = 
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(SecurityTokenReference.class);
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(SecurityTokenReference.class);
     
     private Element element;
     private DOMX509IssuerSerial issuerSerial;
@@ -852,7 +852,7 @@ public class SecurityTokenReference {
                 result = 31 * result + reference.hashCode();
             }
         } catch (WSSecurityException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
         String keyIdentifierEncodingType = getKeyIdentifierEncodingType();
         if (keyIdentifierEncodingType != null) {
@@ -881,7 +881,7 @@ public class SecurityTokenReference {
             issuer = getIssuerSerial().getIssuer();
             serialNumber = getIssuerSerial().getSerialNumber();
         } catch (WSSecurityException e) {
-           log.error(e);
+           log.error(e.getMessage(), e);
         }
         if (issuer != null) {
             result = 31 * result + issuer.hashCode();
@@ -903,7 +903,7 @@ public class SecurityTokenReference {
                 return false;
             }
         } catch (WSSecurityException e) {
-           log.error(e);
+           log.error(e.getMessage(), e);
            return false;
         }
         if (!compare(getKeyIdentifierEncodingType(), tokenReference.getKeyIdentifierEncodingType())) {
@@ -931,7 +931,7 @@ public class SecurityTokenReference {
                 } 
             }
         } catch (WSSecurityException e) {
-           log.error(e);
+           log.error(e.getMessage(), e);
            return false;
         }
             

@@ -33,8 +33,8 @@ import org.w3c.dom.Element;
  */
 public class WSSecSAMLToken extends WSSecBase {
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecSAMLToken.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecSAMLToken.class);
     
     private Document document;
     

@@ -57,8 +57,8 @@ import org.w3c.dom.Document;
  * Extended to all passwordless UsernameTokens and configurable identities.
  */
 public abstract class WSHandler {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSHandler.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSHandler.class);
     protected WSSecurityEngine secEngine = new WSSecurityEngine();
     protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
 

@@ -30,8 +30,8 @@ import org.ietf.jgss.Oid;
  * to a KDC.
  */
 public class DefaultSpnegoServiceAction implements SpnegoServiceAction {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(DefaultSpnegoServiceAction.class);
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(DefaultSpnegoServiceAction.class);
     
     private byte[] ticket;
     private String serviceName;

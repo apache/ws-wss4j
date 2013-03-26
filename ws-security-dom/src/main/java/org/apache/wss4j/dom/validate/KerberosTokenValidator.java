@@ -39,8 +39,8 @@ import org.apache.wss4j.common.kerberos.KerberosServiceAction;
  */
 public class KerberosTokenValidator implements Validator {
     
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(KerberosTokenValidator.class);
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(KerberosTokenValidator.class);
     
     private String serviceName;
     private CallbackHandler callbackHandler;

@@ -45,8 +45,8 @@ public class BinarySecurity {
     public static final QName TOKEN_BST = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(BinarySecurity.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(BinarySecurity.class);
     
     private Element element;
 

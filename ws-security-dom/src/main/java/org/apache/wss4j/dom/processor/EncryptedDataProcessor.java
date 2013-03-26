@@ -57,8 +57,8 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
  */
 public class EncryptedDataProcessor implements Processor {
     
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptedDataProcessor.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(EncryptedDataProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem,

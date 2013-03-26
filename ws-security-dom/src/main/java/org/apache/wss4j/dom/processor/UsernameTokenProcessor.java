@@ -39,8 +39,8 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 public class UsernameTokenProcessor implements Processor {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(UsernameTokenProcessor.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(UsernameTokenProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
         Element elem, 

@@ -43,8 +43,8 @@ import org.w3c.dom.Document;
  * be different than user name used for UsernameToken".
  */
 public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHandler {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SignatureUTAliasTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SignatureUTAliasTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     /**

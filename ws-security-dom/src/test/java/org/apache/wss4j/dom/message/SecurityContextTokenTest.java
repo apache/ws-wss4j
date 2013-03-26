@@ -40,8 +40,8 @@ import org.w3c.dom.Document;
  * A set of tests for SecurityContextTokens.
  */
 public class SecurityContextTokenTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SecurityContextTokenTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SecurityContextTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
     private Crypto crypto = null;

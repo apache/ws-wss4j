@@ -41,8 +41,8 @@ import java.util.List;
  *
  */
 public class NSStack {
-    private static final org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(NSStack.class);
+    private static final org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(NSStack.class);
 
     private Mapping[] stack;
     private int top = 0;

@@ -18,20 +18,19 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.apache.wss4j.binding.wsu10.TimestampType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 public class TimestampValidatorImpl implements TimestampValidator {
 
-    private static final transient Log log = LogFactory.getLog(TimestampValidatorImpl.class);
+    private static final transient org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TimestampValidatorImpl.class);
 
     @Override
     public void validate(TimestampType timestampType, TokenContext tokenContext) throws WSSecurityException {

@@ -52,8 +52,8 @@ import javax.security.auth.callback.CallbackHandler;
  * Test-case for sending and processing a signed (sender vouches) SAML Assertion.
  */
 public class SamlTokenSVTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlTokenSVTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlTokenSVTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;

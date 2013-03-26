@@ -19,8 +19,6 @@
 package org.apache.wss4j.stax.validate;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -35,7 +33,8 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
-    private static final transient Log log = LogFactory.getLog(BinarySecurityTokenValidatorImpl.class);
+    private static final transient org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenValidatorImpl.class);
 
     @Override
     public InboundSecurityToken validate(final BinarySecurityTokenType binarySecurityTokenType,

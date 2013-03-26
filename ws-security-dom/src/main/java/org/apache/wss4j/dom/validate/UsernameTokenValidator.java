@@ -39,8 +39,8 @@ import org.apache.xml.security.utils.Base64;
  */
 public class UsernameTokenValidator implements Validator {
     
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(UsernameTokenValidator.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(UsernameTokenValidator.class);
     
     /**
      * Validate the credential argument. It must contain a non-null UsernameToken. A 
@@ -169,14 +169,14 @@ public class UsernameTokenValidator implements Validator {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug(e);
+                log.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         } catch (UnsupportedCallbackException e) {
             if (log.isDebugEnabled()) {
-                log.debug(e);
+                log.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e

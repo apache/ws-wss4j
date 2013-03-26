@@ -51,8 +51,8 @@ import org.w3c.dom.Element;
 /**
  */
 public class SamlTokenCustomSignatureTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlTokenCustomSignatureTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlTokenCustomSignatureTest.class);
     
     private Crypto crypto = null;
     

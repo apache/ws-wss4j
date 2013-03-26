@@ -75,8 +75,8 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
  */
 public class WSSecSignature extends WSSecSignatureBase {
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecSignature.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecSignature.class);
 
     protected boolean useSingleCert = true;
     protected String sigAlgo;
@@ -553,7 +553,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             
             signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
-            log.error(ex);
+            log.error(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
             );

@@ -34,8 +34,8 @@ import org.ietf.jgss.Oid;
  * Key Distribution Center.
  */
 public class KerberosClientAction implements PrivilegedAction<byte[]> {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(KerberosClientAction.class);
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(KerberosClientAction.class);
     
     private Principal clientPrincipal;
     private String serviceName;

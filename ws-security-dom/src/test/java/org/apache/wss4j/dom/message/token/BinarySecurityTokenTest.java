@@ -41,8 +41,8 @@ import java.util.List;
  * This is a test for constructing and processing BinarySecurityTokens.
  */
 public class BinarySecurityTokenTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(BinarySecurityTokenTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenTest.class);
     private Crypto crypto = null;
     
     public BinarySecurityTokenTest() throws Exception {

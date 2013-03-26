@@ -35,8 +35,8 @@ import org.w3c.dom.Element;
  * Refer to the WS specification, UsernameToken profile
  */
 public class WSSecUsernameToken extends WSSecBase {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecUsernameToken.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecUsernameToken.class);
 
     private String passwordType = WSConstants.PASSWORD_DIGEST;
     private UsernameToken ut;

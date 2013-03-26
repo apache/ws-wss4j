@@ -36,8 +36,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  */
 public class AlgorithmSuiteValidator {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(AlgorithmSuiteValidator.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(AlgorithmSuiteValidator.class);
     
     private final AlgorithmSuite algorithmSuite;
     

@@ -52,8 +52,8 @@ import org.w3c.dom.Document;
  * calling processSecurityHeader method of WSSecurityEngine.
  */
 public class SymmetricSignatureTest extends org.junit.Assert implements CallbackHandler {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SymmetricSignatureTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SymmetricSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();

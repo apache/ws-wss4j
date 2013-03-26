@@ -49,8 +49,8 @@ import javax.security.auth.callback.CallbackHandler;
  * about Java KeyStores, but just wraps a list of trusted certificates.
  */
 public class CertificateStoreTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(CertificateStoreTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(CertificateStoreTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto senderCrypto = CryptoFactory.getInstance("wss40.properties");
     private Crypto receiverCrypto = null;

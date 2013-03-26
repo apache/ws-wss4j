@@ -35,8 +35,8 @@ import javax.security.auth.callback.CallbackHandler;
  * https://issues.apache.org/jira/browse/WSS-245
  */
 public class CallbackRefTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(CallbackRefTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(CallbackRefTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     
     /**

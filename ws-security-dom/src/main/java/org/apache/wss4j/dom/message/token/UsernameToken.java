@@ -73,8 +73,8 @@ public class UsernameToken {
     public static final QName TOKEN = 
         new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(UsernameToken.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(UsernameToken.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     private Element element ;
@@ -559,14 +559,14 @@ public class UsernameToken {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(e);
+                LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
             );
         } catch (UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(e);
+                LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e

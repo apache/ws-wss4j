@@ -29,8 +29,8 @@ import org.w3c.dom.Element;
  * Builds a WS SignatureConfirmation and inserts it into the SOAP Envelope.
  */
 public class WSSecSignatureConfirmation extends WSSecBase {
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(WSSecSignatureConfirmation.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(WSSecSignatureConfirmation.class);
 
     private SignatureConfirmation sc;
 

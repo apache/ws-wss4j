@@ -63,8 +63,8 @@ import org.w3c.dom.NodeList;
  * we expect an exception to be thrown when processing it.
  */
 public class SamlNegativeTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlNegativeTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlNegativeTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto trustCrypto = null;

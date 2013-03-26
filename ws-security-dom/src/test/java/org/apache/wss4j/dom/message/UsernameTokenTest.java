@@ -55,8 +55,8 @@ import java.util.List;
  * WS-Security Test Case for UsernameTokens.
  */
 public class UsernameTokenTest extends org.junit.Assert implements CallbackHandler {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(UsernameTokenTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(UsernameTokenTest.class);
     private static final String SOAPUTMSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "

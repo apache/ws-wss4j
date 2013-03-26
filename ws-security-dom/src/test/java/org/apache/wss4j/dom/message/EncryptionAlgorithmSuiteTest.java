@@ -48,8 +48,8 @@ import org.apache.xml.security.utils.Base64;
  * AlgorithmSuite policy.
  */
 public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(EncryptionAlgorithmSuiteTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(EncryptionAlgorithmSuiteTest.class);
     
     private Crypto crypto = null;
     

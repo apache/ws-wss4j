@@ -59,8 +59,8 @@ import java.util.List;
  * Test-case for sending and processing an unsigned (sender vouches) SAML Assertion.
  */
 public class SamlTokenTest extends org.junit.Assert {
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlTokenTest.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     public SamlTokenTest() {

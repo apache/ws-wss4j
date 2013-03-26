@@ -57,8 +57,8 @@ public class WSSConfig {
         }
     }
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(WSSConfig.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(WSSConfig.class);
 
     /**
      * The default collection of actions supported by the toolkit.

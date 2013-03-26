@@ -37,8 +37,8 @@ import org.ietf.jgss.MessageProp;
  */
 public class SpnegoTokenContext {
     
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SpnegoTokenContext.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SpnegoTokenContext.class);
     
     private GSSContext secContext;
     private byte[] token;

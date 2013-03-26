@@ -70,8 +70,8 @@ public class SamlAssertionWrapper {
     /**
      * Field log
      */
-    private static final org.apache.commons.logging.Log LOG = 
-        org.apache.commons.logging.LogFactory.getLog(SamlAssertionWrapper.class);
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SamlAssertionWrapper.class);
 
     /**
      * Raw SAML assertion data

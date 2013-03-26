@@ -55,8 +55,8 @@ import org.w3c.dom.Text;
 
 public class DerivedKeyToken {
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(DerivedKeyToken.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(DerivedKeyToken.class);
 
     // These are the elements that are used to create the SecurityContextToken
     private Element element;
@@ -562,7 +562,7 @@ public class DerivedKeyToken {
                 result = 31 * result + tokenReference.hashCode();
             }
         } catch (WSSecurityException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
         
         Map<String, String> properties = getProperties();
@@ -607,7 +607,7 @@ public class DerivedKeyToken {
                 return false;
             }
         } catch (WSSecurityException e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
             return false;
         }
         if (!compare(getProperties(), token.getProperties())) {

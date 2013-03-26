@@ -29,8 +29,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 public class NamePasswordCallbackHandler implements CallbackHandler {  
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(NamePasswordCallbackHandler.class);
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(NamePasswordCallbackHandler.class);
     
     private static final String PASSWORD_CALLBACK_NAME = "setObject";
     private static final Class<?>[] PASSWORD_CALLBACK_TYPES = 
