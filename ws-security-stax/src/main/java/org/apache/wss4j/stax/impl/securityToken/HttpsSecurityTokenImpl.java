@@ -18,18 +18,22 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.securityToken.HttpsSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
+import javax.security.auth.Subject;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
-public class HttpsSecurityToken extends InboundSecurityTokenImpl {
+public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken implements HttpsSecurityToken {
 
     private String username;
     private final AuthenticationType authenticationType;
+    private Principal principal;
 
     private enum AuthenticationType {
         httpsClientAuthentication,
@@ -37,20 +41,18 @@ public class HttpsSecurityToken extends InboundSecurityTokenImpl {
         httpDigestAuthentication,
     }
 
-    //todo the HttpsToken and the HttpsTokenSecEvent will be instantiated outside of wss4j so remove WSSecurityContext?
-    public HttpsSecurityToken(X509Certificate x509Certificate, WSSecurityContext wsSecurityContext)
+    public HttpsSecurityTokenImpl(X509Certificate x509Certificate)
             throws XMLSecurityException {
 
-        super(wsSecurityContext, IDGenerator.generateID(null), null);
+        super(null, IDGenerator.generateID(null), null);
         setX509Certificates(new X509Certificate[]{x509Certificate});
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
-    //todo the HttpsToken and the HttpsTokenSecEvent will be instantiated outside of wss4j so remove WSSecurityContext?
-    public HttpsSecurityToken(boolean basicAuthentication, String username, WSSecurityContext wsSecurityContext)
+    public HttpsSecurityTokenImpl(boolean basicAuthentication, String username)
             throws XMLSecurityException {
 
-        super(wsSecurityContext, IDGenerator.generateID(null), null);
+        super(null, IDGenerator.generateID(null), null);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;
         } else {
@@ -60,10 +62,11 @@ public class HttpsSecurityToken extends InboundSecurityTokenImpl {
     }
 
     @Override
-    public WSSConstants.TokenType getTokenType() {
-        return WSSConstants.HttpsToken;
+    public WSSecurityTokenConstants.TokenType getTokenType() {
+        return WSSecurityTokenConstants.HttpsToken;
     }
 
+    //todo username from principal?
     public String getUsername() {
         return username;
     }
@@ -71,13 +74,25 @@ public class HttpsSecurityToken extends InboundSecurityTokenImpl {
     public AuthenticationType getAuthenticationType() {
         return authenticationType;
     }
-    
+
     @Override
-    public Principal getPrincipal() throws XMLSecurityException {
-        X509Certificate[] certs = super.getX509Certificates();
-        if (certs != null && certs.length > 0) {
-            return certs[0].getSubjectX500Principal();
-        }
+    public Subject getSubject() throws WSSecurityException {
         return null;
+    }
+
+    @Override
+    public Principal getPrincipal() throws WSSecurityException {
+        if (this.principal == null) {
+            try {
+                X509Certificate[] certs = getX509Certificates();
+                if (certs != null && certs.length > 0) {
+                    return this.principal = certs[0].getSubjectX500Principal();
+                }
+
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+            }
+        }
+        return this.principal;
     }
 }

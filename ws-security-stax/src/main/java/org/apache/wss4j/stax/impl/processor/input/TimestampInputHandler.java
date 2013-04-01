@@ -21,9 +21,9 @@ package org.apache.wss4j.stax.impl.processor.input;
 import org.apache.wss4j.binding.wsu10.TimestampType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.wss4j.stax.securityEvent.TimestampSecurityEvent;
 import org.apache.wss4j.stax.validate.TimestampValidator;
 import org.apache.wss4j.stax.validate.TimestampValidatorImpl;
@@ -51,15 +51,15 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                        Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
-        final WSSecurityContext wssecurityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext wssecurityContextInbound = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
 
         //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
-        Boolean alreadyProcessed = wssecurityContext.<Boolean>get(WSSConstants.TIMESTAMP_PROCESSED);
+        Boolean alreadyProcessed = wssecurityContextInbound.<Boolean>get(WSSConstants.TIMESTAMP_PROCESSED);
         if (Boolean.TRUE.equals(alreadyProcessed)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
                     "Message contains two or more timestamps");
         }
-        wssecurityContext.put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
+        wssecurityContextInbound.put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 
         @SuppressWarnings("unchecked")
         final TimestampType timestampType =
@@ -78,7 +78,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         if (timestampValidator == null) {
             timestampValidator = new TimestampValidatorImpl();
         }
-        TokenContext tokenContext = new TokenContext(wssSecurityProperties, wssecurityContext, xmlSecEvents, elementPath);
+        TokenContext tokenContext = new TokenContext(wssSecurityProperties, wssecurityContextInbound, xmlSecEvents, elementPath);
         timestampValidator.validate(timestampType, tokenContext);
 
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
@@ -99,13 +99,13 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             }
         }
         timestampSecurityEvent.setCorrelationID(timestampType.getId());
-        wssecurityContext.registerSecurityEvent(timestampSecurityEvent);
-        wssecurityContext.put(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
+        wssecurityContextInbound.registerSecurityEvent(timestampSecurityEvent);
+        wssecurityContextInbound.put(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT, timestampSecurityEvent);
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, TimestampType timestampType,
                                     List<XMLSecEvent> xmlSecEvents) throws WSSecurityException {
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         if (timestampType.getCreated() == null) {
             securityContext.handleBSPRule(BSPRule.R3203);
         }

@@ -30,13 +30,13 @@ import java.util.Map;
 import javax.security.auth.callback.Callback;
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.w3c.dom.Element;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -290,7 +290,7 @@ public class SignatureSTRParser implements STRParser {
     private Principal createPrincipalFromSAML(
         SamlAssertionWrapper samlAssertion
     ) {
-        SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(samlAssertion);
+        SAMLTokenPrincipalImpl samlPrincipal = new SAMLTokenPrincipalImpl(samlAssertion);
         String confirmMethod = null;
         List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods != null && methods.size() > 0) {

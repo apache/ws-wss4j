@@ -19,12 +19,12 @@
 package org.apache.wss4j.stax.ext;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.impl.WSSecurityContextImpl;
 import org.apache.wss4j.stax.impl.processor.output.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessor;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
+import org.apache.xml.security.stax.impl.OutboundSecurityContextImpl;
 import org.apache.xml.security.stax.impl.OutputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamWriter;
 import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
@@ -106,13 +106,13 @@ public class OutboundWSSec {
     private XMLStreamWriter processOutMessage(
             Object output, String encoding, List<SecurityEvent> requestSecurityEvents,
             SecurityEventListener securityEventListener) throws WSSecurityException {
-        final WSSecurityContextImpl securityContextImpl = new WSSecurityContextImpl();
-        securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
-        securityContextImpl.addSecurityEventListener(securityEventListener);
+        final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
+        outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
+        outboundSecurityContext.addSecurityEventListener(securityEventListener);
         final DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(encoding);
 
-        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(securityContextImpl, documentContext);
+        OutputProcessorChainImpl outputProcessorChain = new OutputProcessorChainImpl(outboundSecurityContext, documentContext);
 
         try {
             final SecurityHeaderOutputProcessor securityHeaderOutputProcessor = new SecurityHeaderOutputProcessor();
@@ -121,11 +121,11 @@ public class OutboundWSSec {
             //todo they use the same signaure parts
             for (int i = 0; i < securityProperties.getOutAction().length; i++) {
                 XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
-                if (action.equals(WSSConstants.TIMESTAMP)) {
+                if (WSSConstants.TIMESTAMP.equals(action)) {
                     final TimestampOutputProcessor timestampOutputProcessor = new TimestampOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, timestampOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.SIGNATURE)) {
+                } else if (WSSConstants.SIGNATURE.equals(action)) {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
@@ -133,7 +133,7 @@ public class OutboundWSSec {
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.ENCRYPT)) {
+                } else if (WSSConstants.ENCRYPT.equals(action)) {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
@@ -144,23 +144,23 @@ public class OutboundWSSec {
                     final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.USERNAMETOKEN)) {
+                } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                     final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.USERNAMETOKEN_SIGNED)) {
+                } else if (WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                     final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
 
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
+                } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
                     final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
                             new SignatureConfirmationOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+                } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
@@ -181,7 +181,7 @@ public class OutboundWSSec {
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
+                } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
@@ -202,24 +202,24 @@ public class OutboundWSSec {
                     final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
+                } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
 
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
-                } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED)) {
+                } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
-                } else if (action.equals(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
+                } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
                     final KerberosSecurityTokenOutputProcessor kerberosTokenOutputProcessor =
                             new KerberosSecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
 
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-                } else if (action.equals(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
+                } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
                     final KerberosSecurityTokenOutputProcessor kerberosTokenOutputProcessor =
                             new KerberosSecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);

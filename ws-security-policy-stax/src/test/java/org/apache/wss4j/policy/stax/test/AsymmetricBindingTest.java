@@ -22,8 +22,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
@@ -64,14 +65,14 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -119,14 +120,14 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
@@ -165,8 +166,8 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -211,14 +212,14 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -266,14 +267,14 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
 
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);

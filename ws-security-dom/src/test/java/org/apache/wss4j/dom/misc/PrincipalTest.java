@@ -33,7 +33,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -85,9 +85,9 @@ public class PrincipalTest extends org.junit.Assert {
         List<WSSecurityEngineResult> results = verify(signedDoc, null);
         
         Principal principal = (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal instanceof WSUsernameTokenPrincipal);
+        assertTrue(principal instanceof UsernameTokenPrincipal);
         assertTrue("wernerd".equals(principal.getName()));
-        WSUsernameTokenPrincipal userPrincipal = (WSUsernameTokenPrincipal)principal;
+        UsernameTokenPrincipal userPrincipal = (UsernameTokenPrincipal)principal;
         assertTrue(userPrincipal.getCreatedTime() != null);
         assertTrue(userPrincipal.getNonce() != null);
         assertTrue(userPrincipal.getPassword() != null);

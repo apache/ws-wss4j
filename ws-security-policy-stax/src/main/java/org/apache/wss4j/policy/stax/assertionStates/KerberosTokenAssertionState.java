@@ -22,8 +22,8 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.KerberosToken;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
@@ -54,15 +54,16 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
 
         KerberosToken kerberosToken = (KerberosToken) abstractToken;
         KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) tokenSecurityEvent;
-        InboundSecurityToken securityToken = (InboundSecurityToken) tokenSecurityEvent.getSecurityToken();
+        KerberosServiceSecurityToken kerberosServiceSecurityToken = kerberosTokenSecurityEvent.getSecurityToken();
 
         if ((kerberosToken.getIssuerName() != null) &&
             !kerberosToken.getIssuerName().equals(kerberosTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + kerberosToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + kerberosTokenSecurityEvent.getIssuerName() + ")");
             return false;
         }
-        if (kerberosToken.isRequireKeyIdentifierReference() && securityToken.getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF) {
-            setErrorMessage("Policy enforces KeyIdentifierReference but we got " + securityToken.getKeyIdentifierType());
+        if (kerberosToken.isRequireKeyIdentifierReference() &&
+                !WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef.equals(kerberosServiceSecurityToken.getKeyIdentifier())) {
+            setErrorMessage("Policy enforces KeyIdentifierReference but we got " + kerberosServiceSecurityToken.getKeyIdentifier());
             return false;
         }
         if (kerberosToken.getApReqTokenType() != null) {

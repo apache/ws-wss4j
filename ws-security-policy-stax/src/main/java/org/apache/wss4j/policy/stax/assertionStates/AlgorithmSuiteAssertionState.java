@@ -50,7 +50,7 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = (AlgorithmSuiteSecurityEvent) securityEvent;
         AlgorithmSuite algorithmSuite = (AlgorithmSuite) getAssertion();
 
-        XMLSecurityConstants.KeyUsage keyUsage = algorithmSuiteSecurityEvent.getKeyUsage();
+        XMLSecurityConstants.AlgorithmUsage keyUsage = algorithmSuiteSecurityEvent.getAlgorithmUsage();
         if (WSSConstants.Sym_Sig.equals(keyUsage)) {
             if (algorithmSuite.getSymmetricSignature() != null
                     && !algorithmSuite.getSymmetricSignature().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {

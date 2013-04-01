@@ -23,11 +23,11 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.*;
 import org.apache.wss4j.policy.stax.Assertable;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import java.util.Iterator;
 import java.util.List;
@@ -58,55 +58,52 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         final AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
 
         int ignoreToken = 0;
-        final List<SecurityToken.TokenUsage> tokenUsages = tokenSecurityEvent.getSecurityToken().getTokenUsages();
-        Iterator<SecurityToken.TokenUsage> tokenUsageIterator = tokenUsages.iterator();
+        final List<WSSecurityTokenConstants.TokenUsage> tokenUsages = tokenSecurityEvent.getSecurityToken().getTokenUsages();
+        Iterator<WSSecurityTokenConstants.TokenUsage> tokenUsageIterator = tokenUsages.iterator();
+        loop:
         while (tokenUsageIterator.hasNext()) {
-            SecurityToken.TokenUsage tokenUsage = tokenUsageIterator.next();
-            switch (tokenUsage) {
-                case MainSignature:
-                    if (!(parentAssertion instanceof InitiatorToken)
-                            && !(parentAssertion instanceof InitiatorSignatureToken)
-                            && !(parentAssertion instanceof SignatureToken)
-                            && !(parentAssertion instanceof ProtectionToken)
-                            && !(parentAssertion instanceof TransportToken)) {
-                        ignoreToken++;
-                        break;
-                    }
-                    break;
-                case Signature:
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsageIterator.next();
+            if (WSSecurityTokenConstants.TokenUsage_MainSignature.equals(tokenUsage)) {
+                if (!(parentAssertion instanceof InitiatorToken)
+                        && !(parentAssertion instanceof InitiatorSignatureToken)
+                        && !(parentAssertion instanceof SignatureToken)
+                        && !(parentAssertion instanceof ProtectionToken)
+                        && !(parentAssertion instanceof TransportToken)) {
+                    ignoreToken++;
+                    continue loop;
+                }
+            } else if (WSSecurityTokenConstants.TokenUsage_Signature.equals(tokenUsage)) {
                     throw new WSSPolicyException("Illegal token usage!");
-                case MainEncryption:
-                    if (!(parentAssertion instanceof RecipientToken)
-                            && !(parentAssertion instanceof RecipientEncryptionToken)
-                            && !(parentAssertion instanceof EncryptionToken)
-                            && !(parentAssertion instanceof ProtectionToken)
-                            && !(parentAssertion instanceof TransportToken)) {
-                        ignoreToken++;
-                        break;
-                    }
-                    break;
-                case Encryption:
+            } else if (WSSecurityTokenConstants.TokenUsage_MainEncryption.equals(tokenUsage)) {
+                if (!(parentAssertion instanceof RecipientToken)
+                        && !(parentAssertion instanceof RecipientEncryptionToken)
+                        && !(parentAssertion instanceof EncryptionToken)
+                        && !(parentAssertion instanceof ProtectionToken)
+                        && !(parentAssertion instanceof TransportToken)) {
+                    ignoreToken++;
+                    continue loop;
+                }
+            } else if (WSSecurityTokenConstants.TokenUsage_Encryption.equals(tokenUsage)) {
                     throw new WSSPolicyException("Illegal token usage!");
-                case SupportingTokens:
-                case SignedSupportingTokens:
-                case EndorsingSupportingTokens:
-                case SignedEndorsingSupportingTokens:
-                case SignedEncryptedSupportingTokens:
-                case EncryptedSupportingTokens:
-                case EndorsingEncryptedSupportingTokens:
-                case SignedEndorsingEncryptedSupportingTokens:
-                    if (!(parentAssertion instanceof SupportingTokens)) {
-                        ignoreToken++;
-                        break;
-                    }
+            } else if (WSSecurityTokenConstants.TokenUsage_SupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens.equals(tokenUsage) ||
+                    WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens.equals(tokenUsage)
+                    ) {
+                if (!(parentAssertion instanceof SupportingTokens)) {
+                    ignoreToken++;
+                    continue loop;
+                }
 
-                    SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
-                    SecurityToken.TokenUsage expectedTokenUsage = SecurityToken.TokenUsage.valueOf(supportingTokens.getName().getLocalPart());
-                    if (expectedTokenUsage != tokenUsage) {
-                        ignoreToken++;
-                        break;
-                    }
-                    break;
+                SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
+                if (!tokenUsage.getName().equals(supportingTokens.getName().getLocalPart())) {
+                    ignoreToken++;
+                    continue loop;
+                }
             }
         }
         if (ignoreToken >= tokenUsages.size()) {
@@ -149,8 +146,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         if (asserted) {
             setAsserted(true);
         }
-        if (!asserted && (tokenUsages.contains(SecurityToken.TokenUsage.MainSignature)
-                || tokenUsages.contains(SecurityToken.TokenUsage.MainEncryption))) {
+        if (!asserted && (tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
+                || tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainEncryption))) {
             //return false if not asserted for the main signature and encryption tokens
             return false;
         } else {
@@ -164,7 +161,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     protected boolean hasDerivedKeys(SecurityToken securityToken) throws XMLSecurityException {
         if (securityToken == null) {
             return false;
-        } else if (securityToken.getTokenType() == WSSConstants.DerivedKeyToken) {
+        } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(securityToken.getTokenType())) {
             return true;
         }
 

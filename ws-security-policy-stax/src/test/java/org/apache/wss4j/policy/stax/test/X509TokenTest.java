@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.stax.test;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -73,25 +75,29 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent initiatorX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorX509TokenSecurityEvent);
 
         X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        SignedPartSecurityEvent signedPartSecurityEvent =
+                new SignedPartSecurityEvent(
+                        (InboundSecurityToken)recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
+                new ContentEncryptedElementSecurityEvent(
+                        (InboundSecurityToken)recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
@@ -139,25 +145,29 @@ public class X509TokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent initiatorX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V1Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V1Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorX509TokenSecurityEvent);
 
         X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        SignedPartSecurityEvent signedPartSecurityEvent =
+                new SignedPartSecurityEvent(
+                        (InboundSecurityToken)recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
+                new ContentEncryptedElementSecurityEvent(
+                        (InboundSecurityToken)recipientX509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 

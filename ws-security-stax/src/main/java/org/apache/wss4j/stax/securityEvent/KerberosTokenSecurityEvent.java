@@ -19,9 +19,9 @@
 package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
 
-public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent {
+public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent<KerberosServiceSecurityToken> {
 
     private String issuerName;
 
@@ -38,7 +38,7 @@ public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent {
     }
 
     public boolean isKerberosV5ApReqToken11() {
-        String type = ((KerberosServiceSecurityToken)getSecurityToken()).getKerberosTokenValueType();
+        String type = getSecurityToken().getKerberosTokenValueType();
         if (WSSConstants.NS_Kerberos5_AP_REQ.equals(type)
                 || WSSConstants.NS_Kerberos5_AP_REQ1510.equals(type)
                 || WSSConstants.NS_Kerberos5_AP_REQ4120.equals(type)) {
@@ -48,7 +48,7 @@ public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent {
     }
 
     public boolean isGssKerberosV5ApReqToken11() {
-        String type = ((KerberosServiceSecurityToken)getSecurityToken()).getKerberosTokenValueType();
+        String type = getSecurityToken().getKerberosTokenValueType();
         if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(type)
                 || WSSConstants.NS_GSS_Kerberos5_AP_REQ1510.equals(type)
                 || WSSConstants.NS_GSS_Kerberos5_AP_REQ4120.equals(type)) {
@@ -58,6 +58,6 @@ public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent {
     }
 
     public String getKerberosTokenValueType() {
-        return ((KerberosServiceSecurityToken)getSecurityToken()).getKerberosTokenValueType();
+        return getSecurityToken().getKerberosTokenValueType();
     }
 }

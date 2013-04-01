@@ -20,9 +20,11 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public interface SignatureTokenValidator extends Validator {
 
-    void validate(SecurityToken securityToken, WSSSecurityProperties wssSecurityProperties) throws WSSecurityException;
+    void validate(
+            InboundSecurityToken inboundSecurityToken, WSSSecurityProperties wssSecurityProperties)
+            throws WSSecurityException;
 }

@@ -22,16 +22,19 @@ import org.apache.wss4j.binding.wss10.KeyIdentifierType;
 import org.apache.wss4j.binding.wss10.ReferenceType;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
-import org.apache.wss4j.stax.impl.securityToken.SecurityTokenReference;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.SecurityTokenReferenceImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -141,26 +144,26 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                         end = true;
                         xmlSecEventList.push(xmlSecEvent);
 
-                        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+                        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =
+                                new SecurityTokenProvider<InboundSecurityToken>() {
 
-                            private SecurityToken securityToken = null;
+                            private InboundSecurityToken securityToken = null;
 
-                            @SuppressWarnings("unchecked")
                             @Override
-                            public SecurityToken getSecurityToken() throws XMLSecurityException {
+                            public InboundSecurityToken getSecurityToken() throws XMLSecurityException {
                                 if (this.securityToken != null) {
                                     return this.securityToken;
                                 }
 
-                                SecurityTokenProvider securityTokenProvider =
+                                SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                                         inputProcessorChain.getSecurityContext().getSecurityTokenProvider(attributeValue);
-                                SecurityToken securityToken = securityTokenProvider.getSecurityToken();
-                                return this.securityToken = new SecurityTokenReference(
+                                InboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                                return this.securityToken = new SecurityTokenReferenceImpl(
                                         securityToken,
                                         xmlSecEventList,
-                                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
+                                        (WSInboundSecurityContext) inputProcessorChain.getSecurityContext(),
                                         securityTokenReferenceId,
-                                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_REFERENCE);
+                                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenReference);
                             }
 
                             @Override

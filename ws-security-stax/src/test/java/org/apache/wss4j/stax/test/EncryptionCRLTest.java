@@ -26,8 +26,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSConstants.WSSKeyIdentifierType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -51,7 +51,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
             securityProperties.setEncryptionUser("wss40rev");
-            securityProperties.setEncryptionKeyIdentifierType(WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -98,7 +98,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
             securityProperties.setEncryptionUser("wss40rev");
-            securityProperties.setEncryptionKeyIdentifierType(WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             securityProperties.loadCRLCertStore(this.getClass().getClassLoader().getResource("wss40CACRL.pem"));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");

@@ -16,71 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.wss4j.common.principal;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.common.SAMLVersion;
 
-import java.io.Serializable;
 import java.security.Principal;
 
-/**
- * A principal that represents a SAML Token. It parses the Subject and returns the Subject 
- * name value as the Principal name.
- */
-public class SAMLTokenPrincipal implements Principal, Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    private String name;
-    private SamlAssertionWrapper samlAssertion;
-    
-    public SAMLTokenPrincipal(SamlAssertionWrapper samlAssertion) {
-        this.samlAssertion = samlAssertion;
-        if (samlAssertion.getSamlVersion() == SAMLVersion.VERSION_20) {
-            org.opensaml.saml2.core.Subject subject = samlAssertion.getSaml2().getSubject();
-            if (subject != null && subject.getNameID() != null) {
-                name = subject.getNameID().getValue();
-            }
-        } else {
-            org.opensaml.saml1.core.Subject samlSubject = null;
-            for (org.opensaml.saml1.core.Statement stmt : samlAssertion.getSaml1().getStatements()) {
-                if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
-                    org.opensaml.saml1.core.AttributeStatement attrStmt = 
-                        (org.opensaml.saml1.core.AttributeStatement) stmt;
-                    samlSubject = attrStmt.getSubject();
-                } else if (stmt instanceof org.opensaml.saml1.core.AuthenticationStatement) {
-                    org.opensaml.saml1.core.AuthenticationStatement authStmt = 
-                        (org.opensaml.saml1.core.AuthenticationStatement) stmt;
-                    samlSubject = authStmt.getSubject();
-                } else {
-                    org.opensaml.saml1.core.AuthorizationDecisionStatement authzStmt =
-                        (org.opensaml.saml1.core.AuthorizationDecisionStatement)stmt;
-                    samlSubject = authzStmt.getSubject();
-                }
-                if (samlSubject != null) {
-                    break;
-                }
-            }
-            if (samlSubject != null && samlSubject.getNameIdentifier() != null) {
-                name = samlSubject.getNameIdentifier().getNameIdentifier();
-            }
-        }
-    }
-    
-    public SamlAssertionWrapper getToken() {
-        return samlAssertion;
-    }
+public interface SAMLTokenPrincipal extends Principal {
+    //todo rename me to getSamlAssertionWrapper?
+    SamlAssertionWrapper getToken();
 
-    public String getName() {
-        return this.name;
-    }
+    String getName();
 
-    public String getId() {
-        if (samlAssertion != null) {
-            return samlAssertion.getId();
-        }
-        return null;
-    }
-    
+    String getId();
 }

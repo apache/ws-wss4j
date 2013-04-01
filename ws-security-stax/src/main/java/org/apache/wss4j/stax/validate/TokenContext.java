@@ -18,8 +18,8 @@
  */
 package org.apache.wss4j.stax.validate;
 
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 import javax.xml.namespace.QName;
@@ -28,15 +28,15 @@ import java.util.List;
 public class TokenContext {
 
     private WSSSecurityProperties wssSecurityProperties;
-    private WSSecurityContext wsSecurityContext;
+    private WSInboundSecurityContext wsInboundSecurityContext;
     private List<XMLSecEvent> xmlSecEvents;
     private List<QName> elementPath;
 
-    public TokenContext(WSSSecurityProperties wssSecurityProperties, WSSecurityContext wsSecurityContext,
+    public TokenContext(WSSSecurityProperties wssSecurityProperties, WSInboundSecurityContext wsInboundSecurityContext,
                         List<XMLSecEvent> xmlSecEvents, List<QName> elementPath) {
 
         this.wssSecurityProperties = wssSecurityProperties;
-        this.wsSecurityContext = wsSecurityContext;
+        this.wsInboundSecurityContext = wsInboundSecurityContext;
         this.xmlSecEvents = xmlSecEvents;
         this.elementPath = elementPath;
     }
@@ -45,8 +45,8 @@ public class TokenContext {
         return wssSecurityProperties;
     }
 
-    public WSSecurityContext getWsSecurityContext() {
-        return wsSecurityContext;
+    public WSInboundSecurityContext getWsSecurityContext() {
+        return wsInboundSecurityContext;
     }
 
     public List<QName> getElementPath() {

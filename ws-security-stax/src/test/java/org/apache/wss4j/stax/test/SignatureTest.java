@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.*;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
@@ -356,7 +357,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -436,7 +437,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -570,7 +571,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
             securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -651,7 +652,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier);
             securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -731,7 +732,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
             securityProperties.setCallbackHandler(new org.apache.wss4j.stax.test.CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -817,7 +818,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setUseSingleCert(false);
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -892,7 +893,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_KeyValue);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -986,7 +987,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter-dsa");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_KeyValue);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
 
@@ -1043,7 +1044,7 @@ public class SignatureTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter-ecdsa");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.KEY_VALUE);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_KeyValue);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512");
 

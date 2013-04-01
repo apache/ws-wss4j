@@ -60,35 +60,35 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
         SecurityEventConstants.Event event = securityEvent.getSecurityEventType();
-        if (event == WSSecurityEventConstants.SignedElement) {
+        if (WSSecurityEventConstants.SignedElement.equals(event)) {
             SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
             if (!signedElementSecurityEvent.isSigned()) {
                 return true;
             }
             List<XMLSecurityConstants.ContentType> contentTypes = signedElementSecurityEvent.getProtectionOrder();
             testProtectionOrder(protectionOrder, contentTypes, signedElementSecurityEvent.getElementPath());
-        } else if (event == WSSecurityEventConstants.SignedPart) {
+        } else if (WSSecurityEventConstants.SignedPart.equals(event)) {
             SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
             if (!signedPartSecurityEvent.isSigned()) {
                 return true;
             }
             List<XMLSecurityConstants.ContentType> contentTypes = signedPartSecurityEvent.getProtectionOrder();
             testProtectionOrder(protectionOrder, contentTypes, signedPartSecurityEvent.getElementPath());
-        } else if (event == WSSecurityEventConstants.EncryptedElement) {
+        } else if (WSSecurityEventConstants.EncryptedElement.equals(event)) {
             EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
             if (!encryptedElementSecurityEvent.isEncrypted()) {
                 return true;
             }
             List<XMLSecurityConstants.ContentType> contentTypes = encryptedElementSecurityEvent.getProtectionOrder();
             testProtectionOrder(protectionOrder, contentTypes, encryptedElementSecurityEvent.getElementPath());
-        } else if (event == WSSecurityEventConstants.EncryptedPart) {
+        } else if (WSSecurityEventConstants.EncryptedPart.equals(event)) {
             EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
             if (!encryptedPartSecurityEvent.isEncrypted()) {
                 return true;
             }
             List<XMLSecurityConstants.ContentType> contentTypes = encryptedPartSecurityEvent.getProtectionOrder();
             testProtectionOrder(protectionOrder, contentTypes, encryptedPartSecurityEvent.getElementPath());
-        } else if (event == WSSecurityEventConstants.ContentEncrypted) {
+        } else if (WSSecurityEventConstants.ContentEncrypted.equals(event)) {
             ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
             if (!contentEncryptedElementSecurityEvent.isEncrypted()) {
                 return true;

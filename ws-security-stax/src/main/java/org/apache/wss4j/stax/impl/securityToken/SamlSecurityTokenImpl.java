@@ -22,14 +22,17 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.opensaml.common.SAMLVersion;
 
+import javax.security.auth.Subject;
 import java.security.Key;
 import java.security.Principal;
 import java.security.PublicKey;
@@ -37,18 +40,19 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-public class SAMLSecurityToken extends InboundSecurityTokenImpl {
+public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implements SamlSecurityToken {
 
     private final SamlAssertionWrapper samlAssertionWrapper;
-    private SecurityToken subjectSecurityToken;
+    private InboundSecurityToken subjectSecurityToken;
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
+    private Principal principal;
 
-    public SAMLSecurityToken(SamlAssertionWrapper samlAssertionWrapper, SecurityToken subjectSecurityToken,
-                             WSSecurityContext wsSecurityContext, Crypto crypto,
-                             String id, WSSConstants.KeyIdentifierType keyIdentifierType,
-                             WSSSecurityProperties securityProperties) {
-        super(wsSecurityContext, id, keyIdentifierType);
+    public SamlSecurityTokenImpl(SamlAssertionWrapper samlAssertionWrapper, InboundSecurityToken subjectSecurityToken,
+                                 WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,
+                                 WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
+                                 WSSSecurityProperties securityProperties) {
+        super(wsInboundSecurityContext, samlAssertionWrapper.getId(), keyIdentifier);
         this.samlAssertionWrapper = samlAssertionWrapper;
         this.crypto = crypto;
         this.subjectSecurityToken = subjectSecurityToken;
@@ -64,19 +68,19 @@ public class SAMLSecurityToken extends InboundSecurityTokenImpl {
     }
 
     @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
-            return subjectSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
+            return subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
         }
-        return super.getKey(algorithmURI, keyUsage, correlationID);
+        return super.getKey(algorithmURI, algorithmUsage, correlationID);
     }
 
     @Override
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage, String correlationID) throws XMLSecurityException {
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
-            return subjectSecurityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
+            return subjectSecurityToken.getPublicKey(algorithmURI, algorithmUsage, correlationID);
         }
-        return super.getPubKey(algorithmURI, keyUsage, correlationID);
+        return super.getPubKey(algorithmURI, algorithmUsage, correlationID);
     }
 
     @Override
@@ -95,10 +99,6 @@ public class SAMLSecurityToken extends InboundSecurityTokenImpl {
         return super.getX509Certificates();
     }
 
-    public Crypto getCrypto() {
-        return crypto;
-    }
-
     @Override
     public void verify() throws XMLSecurityException {
         //todo revisit verify for every security token incl. public-key
@@ -112,11 +112,11 @@ public class SAMLSecurityToken extends InboundSecurityTokenImpl {
                 if (securityProperties != null) {
                     enableRevocation = securityProperties.isEnableRevocation();
                 }
-                getCrypto().verifyTrust(x509Certificates, enableRevocation);
+                crypto.verifyTrust(x509Certificates, enableRevocation);
             }
             PublicKey publicKey = getPublicKey();
             if (publicKey != null) {
-                getCrypto().verifyTrust(publicKey);
+                crypto.verifyTrust(publicKey);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
@@ -126,32 +126,40 @@ public class SAMLSecurityToken extends InboundSecurityTokenImpl {
     }
 
     @Override
-    public XMLSecurityConstants.TokenType getTokenType() {
+    public WSSecurityTokenConstants.TokenType getTokenType() {
         if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_10) {
-            return WSSConstants.Saml10Token;
+            return WSSecurityTokenConstants.Saml10Token;
         } else if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
-            return WSSConstants.Saml11Token;
+            return WSSecurityTokenConstants.Saml11Token;
         }
-        return WSSConstants.Saml20Token;
+        return WSSecurityTokenConstants.Saml20Token;
     }
 
-    public SAMLVersion getSamlVersion() {
-        return samlAssertionWrapper.getSamlVersion();
-    }
-
-    public String getIssuer() {
-        return samlAssertionWrapper.getIssuerString();
-    }
-
-    public SamlAssertionWrapper getSamlAssertionWrapper() {
-        return samlAssertionWrapper;
-    }
-    
     @Override
-    public Principal getPrincipal() {
-        if (samlAssertionWrapper != null) {
-            return new SAMLTokenPrincipal(samlAssertionWrapper);
-        }
+    public Subject getSubject() throws WSSecurityException {
         return null;
+    }
+
+    @Override
+    public Principal getPrincipal() throws WSSecurityException {
+        if (this.principal == null) {
+            this.principal = new SAMLTokenPrincipal() {
+                @Override
+                public SamlAssertionWrapper getToken() {
+                    return samlAssertionWrapper;
+                }
+
+                @Override
+                public String getName() {
+                    return samlAssertionWrapper.getSubjectName();
+                }
+
+                @Override
+                public String getId() {
+                    return samlAssertionWrapper.getId();
+                }
+            };
+        }
+        return this.principal;
     }
 }

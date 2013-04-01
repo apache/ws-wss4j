@@ -22,6 +22,7 @@ import org.apache.wss4j.binding.wss10.ObjectFactory;
 import org.apache.wss4j.binding.wss10.ReferenceType;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.apache.xml.security.binding.xmlenc.EncryptionMethodType;
@@ -32,7 +33,6 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.processor.input.XMLEncryptedKeyInputHandler;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
 
 /**
  * Processor for the EncryptedKey XML Structure
@@ -61,13 +61,13 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
         inputProcessorChain.addProcessor(
                 new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(),
                         (WSSSecurityProperties) securityProperties, 
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext())
+                        (WSInboundSecurityContext) inputProcessorChain.getSecurityContext())
                 );
     }
 
     protected void checkBSPCompliance(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType)
             throws XMLSecurityException {
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         if (encryptedKeyType.getType() != null) {
             securityContext.handleBSPRule(BSPRule.R3209);
         }

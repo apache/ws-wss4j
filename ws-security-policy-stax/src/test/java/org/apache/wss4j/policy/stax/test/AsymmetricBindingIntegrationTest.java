@@ -19,6 +19,7 @@
 package org.apache.wss4j.policy.stax.test;
 
 import org.apache.wss4j.stax.WSSec;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.config.Init;
 import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -2226,7 +2227,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
         outSecurityProperties.setCallbackHandler(callbackHandler);
         outSecurityProperties.setTokenUser("tester");
-        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+        outSecurityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
@@ -2350,7 +2351,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
         outSecurityProperties.setCallbackHandler(callbackHandler);
         outSecurityProperties.setTokenUser("tester");
-        outSecurityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+        outSecurityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));

@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
@@ -71,31 +72,32 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
 
         IssuedToken issuedToken = (IssuedToken) abstractToken;
         IssuedTokenSecurityEvent issuedTokenSecurityEvent = (IssuedTokenSecurityEvent) tokenSecurityEvent;
-        if ((issuedToken.getIssuerName() != null) &&
-                !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
-            return false;
-        }
-        if (issuedToken.getRequestSecurityTokenTemplate() != null) {
-            if (issuedTokenSecurityEvent instanceof SamlTokenSecurityEvent) {
-                SamlTokenSecurityEvent samlTokenSecurityEvent = (SamlTokenSecurityEvent) issuedTokenSecurityEvent;
-                try {
+        try {
+            if ((issuedToken.getIssuerName() != null) &&
+                    !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
+                setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() +
+                        ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
+                return false;
+            }
+            if (issuedToken.getRequestSecurityTokenTemplate() != null) {
+                if (issuedTokenSecurityEvent instanceof SamlTokenSecurityEvent) {
+                    SamlTokenSecurityEvent samlTokenSecurityEvent = (SamlTokenSecurityEvent) issuedTokenSecurityEvent;
                     String errorMsg = checkIssuedTokenTemplate(issuedToken.getRequestSecurityTokenTemplate(), samlTokenSecurityEvent);
                     if (errorMsg != null) {
                         setErrorMessage(errorMsg);
                         return false;
                     }
-                } catch (XMLSecurityException e) {
-                    throw new WSSPolicyException(e.getMessage(), e);
-                }
-            } else if (issuedTokenSecurityEvent instanceof KerberosTokenSecurityEvent) {
-                KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) issuedTokenSecurityEvent;
-                String errorMsg = checkIssuedTokenTemplate(issuedToken.getRequestSecurityTokenTemplate(), kerberosTokenSecurityEvent);
-                if (errorMsg != null) {
-                    setErrorMessage(errorMsg);
-                    return false;
+                } else if (issuedTokenSecurityEvent instanceof KerberosTokenSecurityEvent) {
+                    KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) issuedTokenSecurityEvent;
+                    String errorMsg = checkIssuedTokenTemplate(issuedToken.getRequestSecurityTokenTemplate(), kerberosTokenSecurityEvent);
+                    if (errorMsg != null) {
+                        setErrorMessage(errorMsg);
+                        return false;
+                    }
                 }
             }
+        } catch (XMLSecurityException e) {
+            throw new WSSPolicyException(e.getMessage(), e);
         }
 
         //always return true to prevent false alarm in case additional tokens with the same usage
@@ -115,12 +117,13 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
             }
             if ("TokenType".equals(child.getLocalName())) {
                 String content = child.getTextContent();
+                final SAMLVersion samlVersion = samlTokenSecurityEvent.getSamlAssertionWrapper().getSamlVersion();
                 if (WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(content)
-                        && samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_11) {
-                    return "Policy enforces SAML V1.1 token but got " + samlTokenSecurityEvent.getSamlVersion().toString();
+                        && samlVersion != SAMLVersion.VERSION_11) {
+                    return "Policy enforces SAML V1.1 token but got " + samlVersion.toString();
                 } else if (WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(content)
-                        && samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_20) {
-                    return "Policy enforces SAML V2.0 token but got " + samlTokenSecurityEvent.getSamlVersion().toString();
+                        && samlVersion != SAMLVersion.VERSION_20) {
+                    return "Policy enforces SAML V2.0 token but got " + samlVersion.toString();
                 }
             } else if ("KeyType".equals(child.getLocalName())) {
                 String content = child.getTextContent();
@@ -171,7 +174,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
 
     //todo I think the best is if we allow to set custom AssertionStates object on the policy-engine for
     //custom validation -> task for WSS4j V2.1 ?
-    protected String validateClaims(Element claimsPolicy, SamlTokenSecurityEvent samlTokenSecurityEvent) {
+    protected String validateClaims(Element claimsPolicy, SamlTokenSecurityEvent samlTokenSecurityEvent) throws WSSecurityException {
         Node child = claimsPolicy.getFirstChild();
         while (child != null) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {

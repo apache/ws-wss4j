@@ -37,6 +37,10 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
     private int offset;
     private String basetokenId;
     private byte[] secret;
+
+    public WSDerivedKeyTokenPrincipal(String id) {
+        this.id = id;
+    }
     
     public String getLabel() {
         return label;
@@ -72,10 +76,6 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
 
     public String getNonce() {
         return nonce;
-    }
-
-    public WSDerivedKeyTokenPrincipal(String id) {
-        this.id = id;
     }
 
     public String getName() {

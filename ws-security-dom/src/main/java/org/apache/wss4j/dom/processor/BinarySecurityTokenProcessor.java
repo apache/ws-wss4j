@@ -24,11 +24,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.w3c.dom.Element;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -98,8 +98,8 @@ public class BinarySecurityTokenProcessor implements Processor {
                     WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
                     returnedCredential.getTransformedToken()
                 );
-                SAMLTokenPrincipal samlPrincipal = 
-                    new SAMLTokenPrincipal(credential.getTransformedToken());
+                SAMLTokenPrincipalImpl samlPrincipal =
+                    new SAMLTokenPrincipalImpl(credential.getTransformedToken());
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
             } else if (credential.getPrincipal() != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());

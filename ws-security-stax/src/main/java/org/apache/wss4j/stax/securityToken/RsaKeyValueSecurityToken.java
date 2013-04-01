@@ -16,19 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.ext;
+package org.apache.wss4j.stax.securityToken;
 
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
-
-public interface InboundSecurityToken extends SecurityToken {
-
-    WSSConstants.KeyIdentifierType getKeyIdentifierType();
-
-    Subject getSubject() throws XMLSecurityException;
-
-    Principal getPrincipal() throws XMLSecurityException;
+public interface RsaKeyValueSecurityToken extends KeyValueSecurityToken {
 }

@@ -36,7 +36,9 @@ import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityToken;
+import org.apache.wss4j.stax.securityToken.HttpsSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
@@ -189,7 +191,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -306,7 +308,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -551,8 +553,8 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias("transmitter");
-            HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(
-                    securityProperties.getSignatureVerificationCrypto().getX509Certificates(cryptoType)[0], null);
+            HttpsSecurityToken httpsSecurityToken = new HttpsSecurityTokenImpl(
+                    securityProperties.getSignatureVerificationCrypto().getX509Certificates(cryptoType)[0]);
             httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
             List<SecurityEvent> requestSecurityEvents = new ArrayList<SecurityEvent>();
@@ -679,7 +681,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -797,7 +799,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
-            securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());

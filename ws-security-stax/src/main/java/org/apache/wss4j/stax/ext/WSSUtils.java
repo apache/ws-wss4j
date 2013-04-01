@@ -19,27 +19,18 @@
 package org.apache.wss4j.stax.ext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.EncryptionPartDef;
-import org.apache.xml.security.stax.securityEvent.EncryptedKeyTokenSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.securityEvent.DerivedKeyTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.RelTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SecureConversationTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SpnegoContextTokenSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -72,7 +63,7 @@ public class WSSUtils extends XMLSecurityUtils {
      *
      * @param callbackHandler
      * @param callback
-     * @throws XMLSecurityException if the callback couldn't be executed
+     * @throws WSSecurityException if the callback couldn't be executed
      */
     public static void doPasswordCallback(CallbackHandler callbackHandler, Callback callback)
             throws WSSecurityException {
@@ -94,7 +85,7 @@ public class WSSUtils extends XMLSecurityUtils {
      *
      * @param callbackHandler a CallbackHandler implementation
      * @return An array of bytes corresponding to the secret key (can be null)
-     * @throws XMLSecurityException
+     * @throws WSSecurityException
      */
     public static void doSecretKeyCallback(CallbackHandler callbackHandler, Callback callback, String id)
             throws WSSecurityException {
@@ -323,12 +314,12 @@ public class WSSUtils extends XMLSecurityUtils {
 
     public static void createEmbeddedKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                             OutputProcessorChain outputProcessorChain,
-                                                            XMLSecurityConstants.TokenType tokenType, String referenceId)
+                                                            WSSecurityTokenConstants.TokenType tokenType, String referenceId)
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
-        if (tokenType.equals(WSSConstants.Saml10Token) || tokenType.equals(WSSConstants.Saml11Token)) {
+        if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
-        } else if (tokenType.equals(WSSConstants.Saml20Token)) {
+        } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
         }
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
@@ -389,44 +380,45 @@ public class WSSUtils extends XMLSecurityUtils {
                 outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList);
     }
 
-    public static TokenSecurityEvent createTokenSecurityEvent(final SecurityToken securityToken, String correlationID)
-            throws WSSecurityException {
-        WSSConstants.TokenType tokenType = securityToken.getTokenType();
+    @SuppressWarnings("unchecked")
+    public static TokenSecurityEvent<? extends InboundSecurityToken> createTokenSecurityEvent(
+            final InboundSecurityToken inboundSecurityToken, String correlationID) throws WSSecurityException {
+        WSSecurityTokenConstants.TokenType tokenType = inboundSecurityToken.getTokenType();
 
         TokenSecurityEvent tokenSecurityEvent;
-        if (tokenType == WSSConstants.X509V1Token
-                || tokenType == WSSConstants.X509V3Token
-                || tokenType == WSSConstants.X509Pkcs7Token
-                || tokenType == WSSConstants.X509PkiPathV1Token) {
+        if (WSSecurityTokenConstants.X509V1Token.equals(tokenType) ||
+                WSSecurityTokenConstants.X509V3Token.equals(tokenType) ||
+                WSSecurityTokenConstants.X509Pkcs7Token.equals(tokenType) ||
+                WSSecurityTokenConstants.X509PkiPathV1Token.equals(tokenType)) {
             tokenSecurityEvent = new X509TokenSecurityEvent();
-        } else if (tokenType == WSSConstants.UsernameToken) {
+        } else if (WSSecurityTokenConstants.UsernameToken.equals(tokenType)) {
             tokenSecurityEvent = new UsernameTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.KerberosToken) {
+        } else if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
             tokenSecurityEvent = new KerberosTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.SpnegoContextToken) {
+        } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(tokenType)) {
             tokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.SecurityContextToken) {
+        } else if (WSSecurityTokenConstants.SecurityContextToken.equals(tokenType)) {
             tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.SecureConversationToken) {
+        } else if (WSSecurityTokenConstants.SecureConversationToken.equals(tokenType)) {
             tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.Saml10Token
-                || tokenType == WSSConstants.Saml11Token
-                || tokenType == WSSConstants.Saml20Token) {
+        } else if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) ||
+                WSSecurityTokenConstants.Saml11Token.equals(tokenType) ||
+                WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
             tokenSecurityEvent = new SamlTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.RelToken) {
+        } else if (WSSecurityTokenConstants.RelToken.equals(tokenType)) {
             tokenSecurityEvent = new RelTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.HttpsToken) {
+        } else if (WSSecurityTokenConstants.HttpsToken.equals(tokenType)) {
             tokenSecurityEvent = new HttpsTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.KeyValueToken) {
+        } else if (WSSecurityTokenConstants.KeyValueToken.equals(tokenType)) {
             tokenSecurityEvent = new KeyValueTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.DerivedKeyToken) {
+        } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(tokenType)) {
             tokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
-        } else if (tokenType == WSSConstants.EncryptedKeyToken) {
+        } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(tokenType)) {
             tokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
         }
-        tokenSecurityEvent.setSecurityToken(securityToken);
+        tokenSecurityEvent.setSecurityToken(inboundSecurityToken);
         tokenSecurityEvent.setCorrelationID(correlationID);
         return tokenSecurityEvent;
     }

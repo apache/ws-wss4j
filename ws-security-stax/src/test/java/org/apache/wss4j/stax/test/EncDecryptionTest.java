@@ -25,6 +25,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
@@ -839,7 +840,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
@@ -915,7 +916,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
@@ -1085,7 +1086,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -1161,7 +1162,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
@@ -1237,7 +1238,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
@@ -1313,7 +1314,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setOutAction(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 

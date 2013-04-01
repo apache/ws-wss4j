@@ -41,7 +41,7 @@ import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.SecurityContextImpl;
+import org.apache.xml.security.stax.impl.InboundSecurityContextImpl;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
 import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
@@ -695,7 +695,7 @@ public abstract class AbstractTestBase {
     }
 
     public static void switchAllowMD5Algorithm(Boolean value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = SecurityContextImpl.class.getDeclaredField("allowMD5Algorithm");
+        Field field = InboundSecurityContextImpl.class.getDeclaredField("allowMD5Algorithm");
         field.setAccessible(true);
 
         Field modifiersField = Field.class.getDeclaredField("modifiers");

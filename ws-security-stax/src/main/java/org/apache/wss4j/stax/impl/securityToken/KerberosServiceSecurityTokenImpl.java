@@ -23,11 +23,13 @@ import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.kerberos.KerberosServiceAction;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoderImpl;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
@@ -41,18 +43,20 @@ import java.security.Key;
 import java.security.Principal;
 import java.util.Set;
 
-public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
+public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityToken implements KerberosServiceSecurityToken {
 
     private CallbackHandler callbackHandler;
     private byte[] binaryContent;
     private String kerberosTokenValueType;
 
     private KerberosTokenDecoder kerberosTokenDecoder;
+    private Subject subject;
+    private Principal principal;
 
-    public KerberosServiceSecurityToken(WSSecurityContext wsSecurityContext, CallbackHandler callbackHandler,
-                                        byte[] binaryContent, String kerberosTokenValueType, String id,
-                                        WSSConstants.KeyIdentifierType keyIdentifierType) throws XMLSecurityException {
-        super(wsSecurityContext, id, keyIdentifierType);
+    public KerberosServiceSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, CallbackHandler callbackHandler,
+                                            byte[] binaryContent, String kerberosTokenValueType, String id,
+                                            WSSecurityTokenConstants.KeyIdentifier keyIdentifier) throws XMLSecurityException {
+        super(wsInboundSecurityContext, id, keyIdentifier);
         this.callbackHandler = callbackHandler;
         this.binaryContent = binaryContent;
         this.kerberosTokenValueType = kerberosTokenValueType;
@@ -64,8 +68,8 @@ public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
     }
 
     @Override
-    public XMLSecurityConstants.TokenType getTokenType() {
-        return WSSConstants.KerberosToken;
+    public WSSecurityTokenConstants.TokenType getTokenType() {
+        return WSSecurityTokenConstants.KerberosToken;
     }
 
     protected KerberosTokenDecoder getTGT() throws WSSecurityException {
@@ -84,8 +88,7 @@ public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
             loginContext.login();
 
             // Get the service name to use - fall back on the principal
-            Subject subject = loginContext.getSubject();
-            setSubject(subject);
+            this.subject = loginContext.getSubject();
 
             String service = contextAndServiceNameCallback.getServiceName();
             if (service == null) {
@@ -102,13 +105,12 @@ public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
 
             // Validate the ticket
             KerberosServiceAction action = new KerberosServiceAction(binaryContent, service);
-            Principal principal = Subject.doAs(subject, action);
-            if (principal == null) {
+            this.principal = Subject.doAs(subject, action);
+            if (this.principal == null) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "kerberosTicketValidationError"
                 );
             }
-            setPrincipal(principal);
 
             KerberosTokenDecoder kerberosTokenDecoder = new KerberosTokenDecoderImpl();
             kerberosTokenDecoder.setToken(binaryContent);
@@ -125,7 +127,7 @@ public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
     }
 
     @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                          String correlationID) throws XMLSecurityException {
 
         Key key = getSecretKey().get(algorithmURI);
@@ -150,5 +152,15 @@ public class KerberosServiceSecurityToken extends InboundSecurityTokenImpl {
 
     public String getKerberosTokenValueType() {
         return kerberosTokenValueType;
+    }
+
+    @Override
+    public Subject getSubject() throws WSSecurityException {
+        return subject;
+    }
+
+    @Override
+    public Principal getPrincipal() throws WSSecurityException {
+        return principal;
     }
 }

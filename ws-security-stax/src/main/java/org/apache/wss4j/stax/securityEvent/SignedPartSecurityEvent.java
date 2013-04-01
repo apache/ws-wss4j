@@ -18,15 +18,17 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 import java.util.List;
 
 public class SignedPartSecurityEvent extends AbstractSecuredElementSecurityEvent {
 
-    public SignedPartSecurityEvent(SecurityToken securityToken, boolean signed, List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(WSSecurityEventConstants.SignedPart, securityToken, protectionOrder, signed, false);
+    public SignedPartSecurityEvent(
+            InboundSecurityToken inboundSecurityToken, boolean signed,
+            List<XMLSecurityConstants.ContentType> protectionOrder) {
+        super(WSSecurityEventConstants.SignedPart, inboundSecurityToken, protectionOrder, signed, false);
     }
 }

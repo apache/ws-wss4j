@@ -25,13 +25,14 @@ import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.stax.Assertable;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -114,7 +115,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     return false;
                 }
 
-                if (isMainSignatureToken(securityToken) 
+                if (isMainSignatureToken(securityToken)
                         && !signsSignedSupportingTokens(securityToken)) {
                     setAsserted(false);
                     setErrorMessage("Main signature must sign the Signed*Supporting-Tokens.");
@@ -126,12 +127,12 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     }
 
     private boolean isSignatureToken(SecurityToken securityToken) {
-        List<SecurityToken.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
         for (int i = 0; i < tokenUsages.size(); i++) {
-            SecurityToken.TokenUsage tokenUsage = tokenUsages.get(i);
-            if (tokenUsage == SecurityToken.TokenUsage.Signature
-                    || tokenUsage == SecurityToken.TokenUsage.MainSignature
-                    || tokenUsage.name().contains("Endorsing")) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
+            if (WSSecurityTokenConstants.TokenUsage_Signature.equals(tokenUsage)
+                    || WSSecurityTokenConstants.TokenUsage_MainSignature.equals(tokenUsage)
+                    || tokenUsage.getName().contains("Endorsing")) {
                 return true;
             }
         }
@@ -139,10 +140,10 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     }
 
     private boolean isEndorsingToken(SecurityToken securityToken) {
-        List<SecurityToken.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
         for (int i = 0; i < tokenUsages.size(); i++) {
-            SecurityToken.TokenUsage tokenUsage = tokenUsages.get(i);
-            if (tokenUsage.name().contains("Endorsing")) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
+            if (tokenUsage.getName().contains("Endorsing")) {
                 return true;
             }
         }
@@ -150,10 +151,10 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     }
 
     private boolean isSignedSupportingToken(SecurityToken securityToken) {
-        List<SecurityToken.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
         for (int i = 0; i < tokenUsages.size(); i++) {
-            SecurityToken.TokenUsage tokenUsage = tokenUsages.get(i);
-            if (tokenUsage.name().contains("Signed")) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
+            if (tokenUsage.getName().contains("Signed")) {
                 return true;
             }
         }
@@ -161,8 +162,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     }
 
     private boolean isMainSignatureToken(SecurityToken securityToken) {
-        List<SecurityToken.TokenUsage> tokenUsages = securityToken.getTokenUsages();
-        return tokenUsages.contains(SecurityToken.TokenUsage.MainSignature);
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+        return tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainSignature);
     }
 
     private boolean signsMainSignature(SecurityToken securityToken) throws XMLSecurityException {

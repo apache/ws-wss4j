@@ -21,10 +21,11 @@ package org.apache.wss4j.stax.impl.processor.input;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.SignatureTokenValidator;
 import org.apache.wss4j.stax.validate.SignatureTokenValidatorImpl;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
@@ -35,10 +36,11 @@ import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureInputHandler;
-import org.apache.xml.security.stax.impl.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -56,7 +58,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         }
         checkBSPCompliance(inputProcessorChain, signatureType);
 
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
 
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
         signatureValueSecurityEvent.setSignatureValue(signatureType.getSignatureValue().getValue());
@@ -65,7 +67,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.C14n);
         algorithmSuiteSecurityEvent.setCorrelationID(signatureType.getId());
         securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
 
@@ -74,7 +76,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureType signatureType) throws WSSecurityException {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) && !WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)) {
             securityContext.handleBSPRule(BSPRule.R5421);
         }
@@ -121,43 +123,43 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
     @Override
     protected void addSignatureReferenceInputProcessorToChain(
             InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties,
-            SignatureType signatureType, SecurityToken securityToken) throws XMLSecurityException {
+            SignatureType signatureType, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
 
         //add processors to verify references
         inputProcessorChain.addProcessor(
                 new WSSSignatureReferenceVerifyInputProcessor(inputProcessorChain, signatureType,
-                        securityToken, securityProperties));
+                        inboundSecurityToken, securityProperties));
     }
 
     public class WSSSignatureVerifier extends SignatureVerifier {
 
-        public WSSSignatureVerifier(SignatureType signatureType, SecurityContext securityContext,
+        public WSSSignatureVerifier(SignatureType signatureType, InboundSecurityContext inboundSecurityContext,
                                     XMLSecurityProperties securityProperties) throws XMLSecurityException {
-            super(signatureType, securityContext, securityProperties);
+            super(signatureType, inboundSecurityContext, securityProperties);
         }
 
         @Override
-        protected SecurityToken retrieveSecurityToken(SignatureType signatureType,
+        protected InboundSecurityToken retrieveSecurityToken(SignatureType signatureType,
                                                       XMLSecurityProperties securityProperties,
-                                                      SecurityContext securityContext) throws XMLSecurityException {
+                                                      InboundSecurityContext inboundSecurityContext) throws XMLSecurityException {
 
-            SecurityToken securityToken = SecurityTokenFactory.getInstance().getSecurityToken(
-                    signatureType.getKeyInfo(), SecurityToken.KeyInfoUsage.SIGNATURE_VERIFICATION,
-                    securityProperties, securityContext);
+            InboundSecurityToken inboundSecurityToken = SecurityTokenFactory.getInstance().getSecurityToken(
+                    signatureType.getKeyInfo(), WSSecurityTokenConstants.KeyUsage_Signature_Verification,
+                    securityProperties, inboundSecurityContext);
 
             SignatureTokenValidator signatureTokenValidator = ((WSSSecurityProperties) securityProperties).getValidator(WSSConstants.TAG_dsig_Signature);
             if (signatureTokenValidator == null) {
                 signatureTokenValidator = new SignatureTokenValidatorImpl();
             }
-            signatureTokenValidator.validate(securityToken, (WSSSecurityProperties) securityProperties);
+            signatureTokenValidator.validate(inboundSecurityToken, (WSSSecurityProperties) securityProperties);
 
             //todo element path?
             //we have to emit a TokenSecurityEvent here too since it could be an embedded token
-            securityToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
-            TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(securityToken, signatureType.getId());
-            securityContext.registerSecurityEvent(tokenSecurityEvent);
+            inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
+            TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, signatureType.getId());
+            inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
 
-            return securityToken;
+            return inboundSecurityToken;
         }
     }
 }

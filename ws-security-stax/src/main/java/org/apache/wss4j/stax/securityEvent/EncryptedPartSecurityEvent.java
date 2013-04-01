@@ -18,15 +18,17 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 import java.util.List;
 
 public class EncryptedPartSecurityEvent extends AbstractSecuredElementSecurityEvent {
 
-    public EncryptedPartSecurityEvent(SecurityToken securityToken, boolean encrypted, List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(WSSecurityEventConstants.EncryptedPart, securityToken, protectionOrder, false, encrypted);
+    public EncryptedPartSecurityEvent(
+            InboundSecurityToken inboundSecurityToken, boolean encrypted,
+            List<XMLSecurityConstants.ContentType> protectionOrder) {
+        super(WSSecurityEventConstants.EncryptedPart, inboundSecurityToken, protectionOrder, false, encrypted);
     }
 }

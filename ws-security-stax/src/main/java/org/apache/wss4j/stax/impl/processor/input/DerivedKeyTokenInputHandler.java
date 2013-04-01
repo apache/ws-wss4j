@@ -21,19 +21,25 @@ package org.apache.wss4j.stax.impl.processor.input;
 import org.apache.wss4j.binding.wssc.AbstractDerivedKeyTokenType;
 import org.apache.wss4j.common.derivedKey.DerivedKeyUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
-import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.SecurityTokenFactoryImpl;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.stax.securityEvent.DerivedKeyTokenSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
@@ -64,26 +70,25 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
         final List<QName> elementPath = getElementPath(eventQueue);
         final XMLSecEvent responsibleXMLSecStartXMLEvent = getResponsibleStartXMLEvent(eventQueue, index);
 
-        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider = new SecurityTokenProvider<InboundSecurityToken>() {
 
-            private InboundSecurityTokenImpl derivedKeySecurityToken = null;
+            private AbstractInboundSecurityToken derivedKeySecurityToken = null;
 
-            @SuppressWarnings("unchecked")
             @Override
-            public SecurityToken getSecurityToken() throws XMLSecurityException {
+            public InboundSecurityToken getSecurityToken() throws XMLSecurityException {
 
                 if (this.derivedKeySecurityToken != null) {
                     return this.derivedKeySecurityToken;
                 }
 
                 //todo implement interface to access all derivedKeys? The same would be needed in UserNameToken
-                this.derivedKeySecurityToken = new InboundSecurityTokenImpl(
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext(),
+                this.derivedKeySecurityToken = new AbstractInboundSecurityToken(
+                        (WSInboundSecurityContext) inputProcessorChain.getSecurityContext(),
                         derivedKeyTokenType.getId(), null) {
 
-                    private SecurityToken referencedSecurityToken = null;
+                    private InboundSecurityToken referencedSecurityToken = null;
 
-                    private SecurityToken getReferencedSecurityToken() throws XMLSecurityException {
+                    private InboundSecurityToken getReferencedSecurityToken() throws XMLSecurityException {
                         if (this.referencedSecurityToken != null) {
                             return referencedSecurityToken;
                         }
@@ -100,16 +105,16 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     @Override
-                    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+                    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                                          String correlationID) throws XMLSecurityException {
                         byte[] secret;
-                        SecurityToken referencedSecurityToken = getReferencedSecurityToken();
+                        InboundSecurityToken referencedSecurityToken = getReferencedSecurityToken();
                         if (referencedSecurityToken != null) {
                             if (referencedSecurityToken instanceof UsernameSecurityToken) {
                                 UsernameSecurityToken usernameSecurityToken = (UsernameSecurityToken) referencedSecurityToken;
                                 secret = usernameSecurityToken.generateDerivedKey();
                             } else {
-                                secret = referencedSecurityToken.getSecretKey(algorithmURI, keyUsage, correlationID).getEncoded();
+                                secret = referencedSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID).getEncoded();
                             }
                         } else {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedKeyId");
@@ -130,15 +135,15 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 nonce,
                                 derivedKeyTokenType.getOffset().intValue()
                         );
-                        XMLSecurityConstants.KeyUsage derivedKeyUsage;
-                        if (WSSConstants.Enc.equals(keyUsage)) {
-                            derivedKeyUsage = WSSConstants.Enc_KD;
+                        XMLSecurityConstants.AlgorithmUsage derivedKeyAlgoryithmUsage;
+                        if (WSSConstants.Enc.equals(algorithmUsage)) {
+                            derivedKeyAlgoryithmUsage = WSSConstants.Enc_KD;
                         } else {
-                            derivedKeyUsage = WSSConstants.Sig_KD;
+                            derivedKeyAlgoryithmUsage = WSSConstants.Sig_KD;
                         }
                         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
                         algorithmSuiteSecurityEvent.setAlgorithmURI(derivedKeyAlgorithm);
-                        algorithmSuiteSecurityEvent.setKeyUsage(derivedKeyUsage);
+                        algorithmSuiteSecurityEvent.setAlgorithmUsage(derivedKeyAlgoryithmUsage);
                         algorithmSuiteSecurityEvent.setKeyLength(keyBytes.length * 8);
                         algorithmSuiteSecurityEvent.setCorrelationID(correlationID);
                         inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
@@ -148,13 +153,13 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                     }
 
                     @Override
-                    public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
+                    public InboundSecurityToken getKeyWrappingToken() throws XMLSecurityException {
                         return getReferencedSecurityToken();
                     }
 
                     @Override
-                    public WSSConstants.TokenType getTokenType() {
-                        return WSSConstants.DerivedKeyToken;
+                    public WSSecurityTokenConstants.TokenType getTokenType() {
+                        return WSSecurityTokenConstants.DerivedKeyToken;
                     }
                 };
                 this.derivedKeySecurityToken.setElementPath(elementPath);
@@ -171,7 +176,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         //fire a tokenSecurityEvent
         DerivedKeyTokenSecurityEvent derivedKeyTokenSecurityEvent = new DerivedKeyTokenSecurityEvent();
-        derivedKeyTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
+        derivedKeyTokenSecurityEvent.setSecurityToken(securityTokenProvider.getSecurityToken());
         derivedKeyTokenSecurityEvent.setCorrelationID(derivedKeyTokenType.getId());
         inputProcessorChain.getSecurityContext().registerSecurityEvent(derivedKeyTokenSecurityEvent);
     }

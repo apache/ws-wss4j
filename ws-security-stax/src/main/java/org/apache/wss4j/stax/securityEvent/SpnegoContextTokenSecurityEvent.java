@@ -19,8 +19,9 @@
 package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
-public class SpnegoContextTokenSecurityEvent extends TokenSecurityEvent {
+public class SpnegoContextTokenSecurityEvent extends TokenSecurityEvent<SecurityToken> {
 
     private String issuerName;
 

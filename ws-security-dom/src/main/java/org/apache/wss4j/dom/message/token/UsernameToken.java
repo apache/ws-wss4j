@@ -36,6 +36,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,7 +49,6 @@ import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
@@ -918,8 +918,8 @@ public class UsernameToken {
      * Create a WSUsernameTokenPrincipal from this UsernameToken object
      */
     public Principal createPrincipal() {
-        WSUsernameTokenPrincipal principal = 
-            new WSUsernameTokenPrincipal(getName(), isHashed());
+        WSUsernameTokenPrincipalImpl principal =
+            new WSUsernameTokenPrincipalImpl(getName(), isHashed());
         principal.setNonce(getNonce());
         principal.setPassword(getPassword());
         principal.setCreatedTime(getCreated());

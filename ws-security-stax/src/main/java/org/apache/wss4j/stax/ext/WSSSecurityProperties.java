@@ -29,6 +29,7 @@ import java.util.*;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
@@ -66,7 +67,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String tokenUser;
 
-    private WSSConstants.KeyIdentifierType derivedKeyKeyIdentifierType;
+    private WSSecurityTokenConstants.KeyIdentifier derivedKeyKeyIdentifier;
     private WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference;
 
     private Class<? extends Merlin> signatureCryptoClass;
@@ -92,7 +93,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Crypto cachedEncryptionCrypto;
     private KeyStore cachedEncryptionKeyStore;
     private String encryptionUser;
-    private WSSConstants.KeyIdentifierType encryptionKeyIdentifierType;
+    private WSSecurityTokenConstants.KeyIdentifier encryptionKeyIdentifier;
     private boolean useReqSigCertForEncryption = false;
     private String encryptionCompressionAlgorithm;
     private boolean enableRevocation = false;
@@ -118,7 +119,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.usernameTokenPasswordType = wssSecurityProperties.usernameTokenPasswordType;
         this.allowUsernameTokenNoPassword = wssSecurityProperties.allowUsernameTokenNoPassword;
         this.tokenUser = wssSecurityProperties.tokenUser;
-        this.derivedKeyKeyIdentifierType = wssSecurityProperties.derivedKeyKeyIdentifierType;
+        this.derivedKeyKeyIdentifier = wssSecurityProperties.derivedKeyKeyIdentifier;
         this.derivedKeyTokenReference = wssSecurityProperties.derivedKeyTokenReference;
         this.signatureCryptoClass = wssSecurityProperties.signatureCryptoClass;
         this.cachedSignatureCrypto = wssSecurityProperties.cachedSignatureCrypto;
@@ -139,7 +140,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.cachedEncryptionCrypto = wssSecurityProperties.cachedEncryptionCrypto;
         this.cachedEncryptionKeyStore = wssSecurityProperties.cachedEncryptionKeyStore;
         this.encryptionUser = wssSecurityProperties.encryptionUser;
-        this.encryptionKeyIdentifierType = wssSecurityProperties.encryptionKeyIdentifierType;
+        this.encryptionKeyIdentifier = wssSecurityProperties.encryptionKeyIdentifier;
         this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
         this.encryptionCompressionAlgorithm = wssSecurityProperties.encryptionCompressionAlgorithm;
         this.enableRevocation = wssSecurityProperties.enableRevocation;
@@ -170,17 +171,17 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      *
      * @return The KeyIdentifierType
      */
-    public WSSConstants.KeyIdentifierType getEncryptionKeyIdentifierType() {
-        return encryptionKeyIdentifierType;
+    public WSSecurityTokenConstants.KeyIdentifier getEncryptionKeyIdentifier() {
+        return encryptionKeyIdentifier;
     }
 
     /**
      * Specifies the KeyIdentifierType to use in the secured document
      *
-     * @param encryptionKeyIdentifierType
+     * @param encryptionKeyIdentifier
      */
-    public void setEncryptionKeyIdentifierType(WSSConstants.KeyIdentifierType encryptionKeyIdentifierType) {
-        this.encryptionKeyIdentifierType = encryptionKeyIdentifierType;
+    public void setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier encryptionKeyIdentifier) {
+        this.encryptionKeyIdentifier = encryptionKeyIdentifier;
     }
 
     public Integer getTimestampTTL() {
@@ -256,12 +257,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.actor = actor;
     }
 
-    public WSSConstants.KeyIdentifierType getDerivedKeyKeyIdentifierType() {
-        return derivedKeyKeyIdentifierType;
+    public WSSecurityTokenConstants.KeyIdentifier getDerivedKeyKeyIdentifier() {
+        return derivedKeyKeyIdentifier;
     }
 
-    public void setDerivedKeyKeyIdentifierType(WSSConstants.KeyIdentifierType derivedKeyKeyIdentifierType) {
-        this.derivedKeyKeyIdentifierType = derivedKeyKeyIdentifierType;
+    public void setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier derivedKeyKeyIdentifier) {
+        this.derivedKeyKeyIdentifier = derivedKeyKeyIdentifier;
     }
 
     public WSSConstants.DerivedKeyTokenReference getDerivedKeyTokenReference() {

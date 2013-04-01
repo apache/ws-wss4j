@@ -28,9 +28,11 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyEnforcerFactory;
 import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.X509SecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.*;
 import org.apache.wss4j.stax.test.AbstractTestBase;
+import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
+import org.apache.xml.security.binding.xmldsig11.NamedCurveType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.testng.annotations.BeforeClass;
@@ -94,16 +96,16 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         return policyEnforcer;
     }
 
-    public X509SecurityToken getX509Token(WSSConstants.TokenType tokenType) throws Exception {
+    public X509SecurityTokenImpl getX509Token(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
         return getX509Token(tokenType, "transmitter");
     }
 
-    public X509SecurityToken getX509Token(WSSConstants.TokenType tokenType, final String keyAlias) throws Exception {
+    public X509SecurityTokenImpl getX509Token(WSSecurityTokenConstants.TokenType tokenType, final String keyAlias) throws Exception {
 
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        X509SecurityToken x509SecurityToken = new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER, null) {
+        X509SecurityTokenImpl x509SecurityToken = new X509SecurityTokenImpl(tokenType, null, null, null, "", WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, null) {
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return keyAlias;
@@ -126,6 +128,28 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         }
         x509SecurityToken.setX509Certificates(x509Certificates);
         return x509SecurityToken;
+    }
+
+    public KerberosServiceSecurityTokenImpl getKerberosServiceSecurityToken(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
+        return new KerberosServiceSecurityTokenImpl(null, null, null, null, "", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenReference);
+    }
+
+    public HttpsSecurityTokenImpl getHttpsSecurityToken(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
+        return new HttpsSecurityTokenImpl(getX509Token(tokenType).getX509Certificates()[0]);
+    }
+
+    public RsaKeyValueSecurityTokenImpl getRsaKeyValueSecurityToken() throws Exception {
+        return new RsaKeyValueSecurityTokenImpl(null, null, WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+    }
+
+    public DsaKeyValueSecurityTokenImpl getDsaKeyValueSecurityToken() throws Exception {
+        return new DsaKeyValueSecurityTokenImpl(null, null, WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+    }
+
+    public ECKeyValueSecurityTokenImpl getECKeyValueSecurityToken() throws Exception {
+        ECKeyValueType ecKeyValueType = new ECKeyValueType();
+        ecKeyValueType.setNamedCurve(new NamedCurveType());
+        return new ECKeyValueSecurityTokenImpl(ecKeyValueType, null, WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
     }
 
     protected String loadResourceAsString(String resource, String encoding) throws IOException {

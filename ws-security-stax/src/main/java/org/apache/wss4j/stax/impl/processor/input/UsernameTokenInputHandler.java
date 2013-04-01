@@ -28,9 +28,11 @@ import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.wss4j.stax.validate.UsernameTokenValidator;
@@ -39,6 +41,8 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -102,29 +106,36 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
         }
 
-        final WSSecurityContext wsSecurityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext wsInboundSecurityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<QName> elementPath = getElementPath(eventQueue);
         
         // Verify Created
         verifyCreated(wssSecurityProperties, usernameTokenType);
         
-        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsSecurityContext, xmlSecEvents, elementPath);
+        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         UsernameTokenValidator usernameTokenValidator =
                 wssSecurityProperties.getValidator(WSSConstants.TAG_wsse_UsernameToken);
         if (usernameTokenValidator == null) {
             usernameTokenValidator = new UsernameTokenValidatorImpl();
         }
-        final SecurityToken usernameSecurityToken =
-                usernameTokenValidator.validate(usernameTokenType, tokenContext);
+        //jdk 1.6 compiler bug? http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6302954
+        //type parameters of <T>T cannot be determined; no unique maximal instance exists for type variable T with
+        // upper bounds org.apache.wss4j.stax.securityToken.UsernameSecurityToken,
+        // org.apache.wss4j.stax.securityToken.UsernameSecurityToken,
+        // org.apache.xml.security.stax.ext.securityToken.InboundSecurityToken
+        //works fine on jdk 1.7
+        final UsernameSecurityToken usernameSecurityToken =
+                usernameTokenValidator.</*fake @see above*/UsernameSecurityTokenImpl>
+                        validate(usernameTokenType, tokenContext);
 
-        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =
+                new SecurityTokenProvider<InboundSecurityToken>() {
 
-            @SuppressWarnings("unchecked")
             @Override
-            public SecurityToken getSecurityToken() throws XMLSecurityException {
-                return usernameSecurityToken;
+            public InboundSecurityToken getSecurityToken() throws XMLSecurityException {
+                return (InboundSecurityToken)usernameSecurityToken;
             }
 
             @Override
@@ -134,16 +145,9 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         };
         inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(usernameTokenType.getId(), securityTokenProvider);
 
-        PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
-        WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
-        if (passwordType != null && passwordType.getType() != null) {
-            usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
-        }
-
         //fire a tokenSecurityEvent
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
-        usernameTokenSecurityEvent.setUsernameTokenPasswordType(usernameTokenPasswordType);
-        usernameTokenSecurityEvent.setSecurityToken((SecurityToken) securityTokenProvider.getSecurityToken());
+        usernameTokenSecurityEvent.setSecurityToken((UsernameSecurityToken)securityTokenProvider.getSecurityToken());
         usernameTokenSecurityEvent.setUsernameTokenProfile(WSSConstants.NS_USERNAMETOKEN_PROFILE11);
         usernameTokenSecurityEvent.setCorrelationID(usernameTokenType.getId());
         inputProcessorChain.getSecurityContext().registerSecurityEvent(usernameTokenSecurityEvent);
@@ -152,7 +156,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, UsernameTokenType usernameTokenType,
                                     List<XMLSecEvent> xmlSecEvents) throws WSSecurityException {
 
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         if (usernameTokenType.getAny() == null) {
             securityContext.handleBSPRule(BSPRule.R3031);
         }

@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
@@ -30,8 +31,9 @@ import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
-import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -65,7 +67,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (tokenId == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
@@ -93,13 +95,13 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             final String ekId = IDGenerator.generateID(null);
 
-            final GenericOutboundSecurityToken encryptedKeySecurityToken = new GenericOutboundSecurityToken(ekId, WSSConstants.EncryptedKeyToken, symmetricKey);
+            final GenericOutboundSecurityToken encryptedKeySecurityToken = new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
             encryptedKeySecurityToken.setKeyWrappingToken(wrappingSecurityToken);
             wrappingSecurityToken.addWrappedToken(encryptedKeySecurityToken);
 
-            final SecurityTokenProvider encryptedKeySecurityTokenProvider = new SecurityTokenProvider() {
+            final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
+                    new SecurityTokenProvider<OutboundSecurityToken>() {
 
-                @SuppressWarnings("unchecked")
                 @Override
                 public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
                     return encryptedKeySecurityToken;
@@ -115,21 +117,21 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalEncryptedKeyOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
-            if (action.equals(WSSConstants.ENCRYPT)) {
+            if (WSSConstants.ENCRYPT.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, ekId);
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
-            } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+            } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
-            } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
+            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
@@ -229,7 +231,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo, true, null);
                     createSecurityTokenReferenceStructureForEncryptedKey(
                             subOutputProcessorChain, securityToken,
-                            ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifierType(),
+                            ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier(),
                             getSecurityProperties().isUseSingleCert()
                     );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_KeyInfo);
@@ -296,7 +298,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData);
 
-                    if (getAction() == WSSConstants.ENCRYPT) {
+                    if (WSSConstants.ENCRYPT.equals(getAction())) {
                         WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                     }
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptedKey);
@@ -308,13 +310,13 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
         protected void createSecurityTokenReferenceStructureForEncryptedKey(
                 OutputProcessorChain outputProcessorChain,
                 OutboundSecurityToken securityToken,
-                WSSConstants.KeyIdentifierType keyIdentifierType,
+                WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {
 
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
-            if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE && !useSingleCertificate) {
+            if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
@@ -322,15 +324,15 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             String tokenId = securityToken.getKeyWrappingToken().getId();
 
-            if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL) {
-                createX509IssuerSerialStructure(outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SKI_KEY_IDENTIFIER) {
+            if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
+                WSSUtils.createX509IssuerSerialStructure(this, outputProcessorChain, x509Certificates);
+            } else if (WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
+            } else if (WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER) {
+            } else if (WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (keyIdentifierType == WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE) {
+            } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier)) {
                 String valueType;
                 if (useSingleCertificate) {
                     valueType = WSSConstants.NS_X509_V3_TYPE;

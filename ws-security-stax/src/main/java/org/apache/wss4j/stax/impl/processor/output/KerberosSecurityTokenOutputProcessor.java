@@ -27,13 +27,13 @@ import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
-import org.apache.xml.security.stax.ext.SecurityTokenProvider;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -60,9 +60,9 @@ public class KerberosSecurityTokenOutputProcessor extends AbstractOutputProcesso
                     );
 
 
-            final SecurityTokenProvider kerberosSecurityTokenProvider = new SecurityTokenProvider() {
+            final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
+                    new SecurityTokenProvider<OutboundSecurityToken>() {
 
-                @SuppressWarnings("unchecked")
                 @Override
                 public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return kerberosClientSecurityToken;
@@ -74,7 +74,7 @@ public class KerberosSecurityTokenOutputProcessor extends AbstractOutputProcesso
                 }
             };
 
-            if (action.equals(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
+            if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, bstId);
                 FinalKerberosSecurityTokenOutputProcessor finalKerberosSecurityTokenOutputProcessor =
@@ -84,7 +84,7 @@ public class KerberosSecurityTokenOutputProcessor extends AbstractOutputProcesso
                 finalKerberosSecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 finalKerberosSecurityTokenOutputProcessor.init(outputProcessorChain);
                 kerberosClientSecurityToken.setProcessor(finalKerberosSecurityTokenOutputProcessor);
-            } else if (action.equals(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
+            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, bstId);
                 FinalKerberosSecurityTokenOutputProcessor finalKerberosSecurityTokenOutputProcessor =
                         new FinalKerberosSecurityTokenOutputProcessor(kerberosClientSecurityToken);
@@ -131,7 +131,7 @@ public class KerberosSecurityTokenOutputProcessor extends AbstractOutputProcesso
                             new Base64(76, new byte[]{'\n'}).encodeToString(securityToken.getTicket())
                     );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
-                    if (getAction() == WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN) {
+                    if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())) {
                         WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                     }
                     outputProcessorChain.removeProcessor(this);

@@ -23,7 +23,7 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -76,7 +76,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
             setErrorMessage("UsernameToken must contain a password");
             return false;
         }
-        if (usernameToken.isCreated() && (usernameSecurityToken.getCreated() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
+        if (usernameToken.isCreated() && (usernameSecurityToken.getCreatedTime() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
             setErrorMessage("UsernameToken does not contain a created timestamp or password is not plain text");
             return false;
         }

@@ -21,7 +21,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosClientAction;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
@@ -46,7 +46,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
     private byte[] ticket;
 
     public KerberosClientSecurityToken(CallbackHandler callbackHandler, String id) throws XMLSecurityException {
-        super(id, WSSConstants.KerberosToken);
+        super(id, WSSecurityTokenConstants.KerberosToken);
         this.callbackHandler = callbackHandler;
     }
 

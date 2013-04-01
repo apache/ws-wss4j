@@ -16,20 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.ext;
+package org.apache.wss4j.stax.securityToken;
 
-import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.stax.ext.SecurityContext;
+import org.apache.wss4j.stax.ext.WSSConstants;
 
-import java.util.List;
+public interface UsernameSecurityToken extends SubjectAndPrincipalSecurityToken {
 
-/**
- * The document security context
- */
-public interface WSSecurityContext extends SecurityContext {
+    byte[] generateDerivedKey() throws WSSecurityException;
 
-    public void handleBSPRule(BSPRule bspRule) throws WSSecurityException;
+    WSSConstants.UsernameTokenPasswordType getUsernameTokenPasswordType();
 
-    public void ignoredBSPRules(List<BSPRule> bspRules);
+    String getCreatedTime();
+
+    String getPassword();
+
+    String getUsername();
+
+    String getNonce();
+
+    byte[] getSalt();
+
+    Long getIteration();
 }

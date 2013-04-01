@@ -21,10 +21,13 @@ package org.apache.wss4j.stax.impl.processor.input;
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.X509SecurityToken;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.wss4j.stax.validate.BinarySecurityTokenValidator;
 import org.apache.wss4j.stax.validate.BinarySecurityTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
@@ -33,7 +36,8 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -58,24 +62,24 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             binarySecurityTokenType.setId(IDGenerator.generateID(null));
         }
 
-        final WSSecurityContext wsSecurityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext wsInboundSecurityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<QName> elementPath = getElementPath(eventQueue);
         final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
 
-        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsSecurityContext, xmlSecEvents, elementPath);
+        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         BinarySecurityTokenValidator binarySecurityTokenValidator =
                 wssSecurityProperties.getValidator(WSSConstants.TAG_wsse_BinarySecurityToken);
         if (binarySecurityTokenValidator == null) {
             binarySecurityTokenValidator = new BinarySecurityTokenValidatorImpl();
         }
-        final SecurityToken binarySecurityToken =
+        final InboundSecurityToken binarySecurityToken =
                 binarySecurityTokenValidator.validate(binarySecurityTokenType, tokenContext);
 
-        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider = new SecurityTokenProvider<InboundSecurityToken>() {
             @Override
-            public SecurityToken getSecurityToken() throws XMLSecurityException {
+            public InboundSecurityToken getSecurityToken() throws XMLSecurityException {
                 return binarySecurityToken;
             }
 
@@ -85,28 +89,31 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             }
         };
 
-        wsSecurityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
+        wsInboundSecurityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
 
         TokenSecurityEvent tokenSecurityEvent;
         //fire a tokenSecurityEvent
         if (binarySecurityTokenType.getValueType().startsWith(WSSConstants.NS_X509TOKEN_PROFILE)) {
-            tokenSecurityEvent = new X509TokenSecurityEvent();
+            X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+            x509TokenSecurityEvent.setSecurityToken((X509SecurityToken) binarySecurityToken);
+            tokenSecurityEvent = x509TokenSecurityEvent;
         } else if (binarySecurityTokenType.getValueType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
-            tokenSecurityEvent = new KerberosTokenSecurityEvent();
+            KerberosTokenSecurityEvent kerberosTokenSecurityEvent = new KerberosTokenSecurityEvent();
+            kerberosTokenSecurityEvent.setSecurityToken((KerberosServiceSecurityToken)binarySecurityToken);
+            tokenSecurityEvent = kerberosTokenSecurityEvent;
         } else {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType",
                     binarySecurityTokenType.getValueType());
         }
-        tokenSecurityEvent.setSecurityToken((SecurityToken) binarySecurityToken);
         tokenSecurityEvent.setCorrelationID(binarySecurityTokenType.getId());
-        wsSecurityContext.registerSecurityEvent(tokenSecurityEvent);
+        wsInboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, BinarySecurityTokenType binarySecurityTokenType)
             throws WSSecurityException {
 
-        final WSSecurityContext securityContext = (WSSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         if (binarySecurityTokenType.getEncodingType() == null) {
             securityContext.handleBSPRule(BSPRule.R3029);
         }

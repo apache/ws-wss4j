@@ -27,8 +27,6 @@ import org.apache.wss4j.stax.impl.processor.input.SignatureConfirmationInputProc
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessor;
-import org.apache.xml.security.stax.ext.SecurityToken;
-import org.apache.xml.security.stax.ext.SecurityTokenProvider;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
 import org.apache.xml.security.stax.impl.InputProcessorChainImpl;
 import org.apache.xml.security.stax.impl.processor.input.LogInputProcessor;
@@ -37,6 +35,8 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -134,20 +134,22 @@ public class InboundWSSec {
                 while (securityEventIterator.hasNext()) {
                     SecurityEvent securityEvent = securityEventIterator.next();
                     if (securityEvent instanceof TokenSecurityEvent) {
-                        final TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent)securityEvent;
+                        @SuppressWarnings("unchecked")
+                        final TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent =
+                                (TokenSecurityEvent)securityEvent;
 
-                        if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.HttpsToken) {
+                        if (WSSecurityEventConstants.HttpsToken.equals(securityEvent.getSecurityEventType())) {
                             securityContextImpl.registerSecurityEvent(securityEvent);
                             securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
                         }
 
-                        SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+                        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =
+                                new SecurityTokenProvider<InboundSecurityToken>() {
 
                             private String id;
 
-                            @SuppressWarnings("unchecked")
                             @Override
-                            public SecurityToken getSecurityToken() throws XMLSecurityException {
+                            public InboundSecurityToken getSecurityToken() throws XMLSecurityException {
                                 return tokenSecurityEvent.getSecurityToken();
                             }
 

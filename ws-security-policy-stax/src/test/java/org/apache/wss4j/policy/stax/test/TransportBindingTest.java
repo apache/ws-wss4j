@@ -22,9 +22,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.testng.Assert;
@@ -62,8 +62,8 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
-        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
@@ -110,8 +110,8 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
-        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
@@ -158,8 +158,8 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
-        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
@@ -205,8 +205,8 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        HttpsSecurityToken httpsSecurityToken = new HttpsSecurityToken(true, "username", null);
-        httpsSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 

@@ -16,24 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl.securityToken;
+package org.apache.wss4j.stax.securityToken;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-
-
-public class SecureConversationSecurityToken extends InboundSecurityTokenImpl {
-
-    //todo implement
-
-    public SecureConversationSecurityToken(WSSecurityContext wsSecurityContext, String id,
-                                           WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, id, keyIdentifierType);
-    }
-
-    @Override
-    public XMLSecurityConstants.TokenType getTokenType() {
-        return WSSConstants.SecureConversationToken;
-    }
+public interface DsaKeyValueSecurityToken extends KeyValueSecurityToken {
 }

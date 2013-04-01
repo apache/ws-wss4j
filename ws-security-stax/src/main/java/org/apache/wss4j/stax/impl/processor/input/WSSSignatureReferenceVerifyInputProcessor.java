@@ -24,6 +24,7 @@ import org.apache.jcs.engine.ElementAttributes;
 import org.apache.wss4j.binding.wss10.TransformationParametersType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
 import org.apache.xml.security.binding.xmldsig.ReferenceType;
@@ -37,9 +38,11 @@ import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureRefere
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.impl.securityToken.SecurityTokenReference;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.TimestampSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -64,15 +67,15 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     private boolean replayChecked = false;
 
     public WSSSignatureReferenceVerifyInputProcessor(InputProcessorChain inputProcessorChain,
-            SignatureType signatureType, SecurityToken securityToken,
+            SignatureType signatureType, InboundSecurityToken inboundSecurityToken,
             XMLSecurityProperties securityProperties) throws XMLSecurityException {
-        super(inputProcessorChain, signatureType, securityToken, securityProperties);
+        super(inputProcessorChain, signatureType, inboundSecurityToken, securityProperties);
         this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
 
-        checkBSPCompliance((WSSecurityContext)inputProcessorChain.getSecurityContext());
+        checkBSPCompliance((WSInboundSecurityContext)inputProcessorChain.getSecurityContext());
     }
 
-    private void checkBSPCompliance(WSSecurityContext securityContext) throws WSSecurityException {
+    private void checkBSPCompliance(WSInboundSecurityContext securityContext) throws WSSecurityException {
         List<ReferenceType> references = getSignatureType().getSignedInfo().getReference();
         for (int i = 0; i < references.size(); i++) {
             ReferenceType referenceType = references.get(i);
@@ -150,14 +153,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
         if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)) {
             SignedPartSecurityEvent signedPartSecurityEvent =
-                    new SignedPartSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
+                    new SignedPartSecurityEvent(getInboundSecurityToken(), true, documentContext.getProtectionOrder());
             signedPartSecurityEvent.setElementPath(elementPath);
             signedPartSecurityEvent.setXmlSecEvent(xmlSecEvent);
             signedPartSecurityEvent.setCorrelationID(referenceType.getId());
             inputProcessorChain.getSecurityContext().registerSecurityEvent(signedPartSecurityEvent);
         } else {
             SignedElementSecurityEvent signedElementSecurityEvent =
-                    new SignedElementSecurityEvent(getSecurityToken(), true, documentContext.getProtectionOrder());
+                    new SignedElementSecurityEvent(getInboundSecurityToken(), true, documentContext.getProtectionOrder());
             signedElementSecurityEvent.setElementPath(elementPath);
             signedElementSecurityEvent.setXmlSecEvent(xmlSecEvent);
             signedElementSecurityEvent.setCorrelationID(referenceType.getId());
@@ -238,7 +241,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             algorithm = transformType.getAlgorithm();
             AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
             algorithmSuiteSecurityEvent.setAlgorithmURI(algorithm);
-            algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.C14n);
+            algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.C14n);
             algorithmSuiteSecurityEvent.setCorrelationID(referenceType.getId());
             inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
@@ -256,7 +259,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
             internalSignatureReferenceVerifier.setTransformer(parentTransformer);
 
-            SecurityTokenProvider securityTokenProvider = inputProcessorChain.getSecurityContext().getSecurityTokenProvider(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()));
+            SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
+                    inputProcessorChain.getSecurityContext().getSecurityTokenProvider(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()));
             if (securityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noReference");
             }

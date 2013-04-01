@@ -30,8 +30,9 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamConstants;
@@ -78,9 +79,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     );
             usernameSecurityToken.setProcessor(outputProcessor);
 
-            SecurityTokenProvider securityTokenProvider = new SecurityTokenProvider() {
+            SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
+                    new SecurityTokenProvider<OutboundSecurityToken>() {
 
-                @SuppressWarnings("unchecked")
                 @Override
                 public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return usernameSecurityToken;
@@ -91,7 +92,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     return wsuId;
                 }
             };
-            if (getAction() == WSSConstants.USERNAMETOKEN_SIGNED) {
+            if (WSSConstants.USERNAMETOKEN_SIGNED.equals(getAction())) {
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);

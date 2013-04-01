@@ -27,10 +27,10 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.SecurityHeaderHandlerMapper;
 import org.apache.xml.security.stax.ext.AbstractInputProcessor;
@@ -141,8 +141,8 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                         // Check for multiple timestamps
                         if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsu_Timestamp)) {
                             if (timestampFound) {
-                                WSSecurityContext context = 
-                                    (WSSecurityContext)subInputProcessorChain.getSecurityContext();
+                                WSInboundSecurityContext context =
+                                    (WSInboundSecurityContext)subInputProcessorChain.getSecurityContext();
                                 context.handleBSPRule(BSPRule.R3227);
                             }
                             timestampFound = true;

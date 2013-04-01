@@ -52,6 +52,8 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
+import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,9 +64,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.PublicKeyPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -157,7 +157,7 @@ public class SignatureProcessor implements Processor {
                 if (validator != null) {
                     Credential credential = new Credential();
                     credential.setPublicKey(publicKey);
-                    principal = new PublicKeyPrincipal(publicKey);
+                    principal = new PublicKeyPrincipalImpl(publicKey);
                     credential.setPrincipal(principal);
                     validator.validate(credential, data);
                 }
@@ -244,7 +244,7 @@ public class SignatureProcessor implements Processor {
         }
         
         int actionPerformed = WSConstants.SIGN;
-        if (principal instanceof WSUsernameTokenPrincipal) {
+        if (principal instanceof UsernameTokenPrincipal) {
             actionPerformed = WSConstants.UT_SIGN;
         }
 

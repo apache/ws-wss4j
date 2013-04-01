@@ -21,14 +21,16 @@ package org.apache.wss4j.stax.validate;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class SignatureTokenValidatorImpl implements SignatureTokenValidator {
 
     @Override
-    public void validate(SecurityToken securityToken, WSSSecurityProperties wssSecurityProperties) throws WSSecurityException {
+    public void validate(
+            InboundSecurityToken inboundSecurityToken, WSSSecurityProperties wssSecurityProperties)
+            throws WSSecurityException {
         try {
-            securityToken.verify();
+            inboundSecurityToken.verify();
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
         }

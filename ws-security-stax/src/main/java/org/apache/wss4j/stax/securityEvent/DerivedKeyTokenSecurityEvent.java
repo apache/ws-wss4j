@@ -19,10 +19,9 @@
 package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
-public class DerivedKeyTokenSecurityEvent extends TokenSecurityEvent {
-
-    //todo implement
+public class DerivedKeyTokenSecurityEvent extends TokenSecurityEvent<SecurityToken> {
 
     public DerivedKeyTokenSecurityEvent() {
         super(WSSecurityEventConstants.DerivedKeyToken);

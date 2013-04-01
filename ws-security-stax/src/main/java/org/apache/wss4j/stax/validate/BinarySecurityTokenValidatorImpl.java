@@ -22,14 +22,15 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityToken;
-import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityToken;
-import org.apache.wss4j.stax.impl.securityToken.X509_V3SecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.X509_V3SecurityTokenImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
@@ -53,12 +54,12 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
         try {
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                 Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
-                X509_V3SecurityToken x509V3SecurityToken = new X509_V3SecurityToken(
+                X509_V3SecurityTokenImpl x509V3SecurityToken = new X509_V3SecurityTokenImpl(
                         tokenContext.getWsSecurityContext(),
                         crypto,
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getId(),
-                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE,
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference,
                         tokenContext.getWssSecurityProperties()
                 );
                 x509V3SecurityToken.setElementPath(tokenContext.getElementPath());
@@ -66,24 +67,24 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                 return x509V3SecurityToken;
             } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
                 Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
-                X509PKIPathv1SecurityToken x509PKIPathv1SecurityToken = new X509PKIPathv1SecurityToken(
+                X509PKIPathv1SecurityTokenImpl x509PKIPathv1SecurityToken = new X509PKIPathv1SecurityTokenImpl(
                         tokenContext.getWsSecurityContext(),
                         crypto,
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getId(),
-                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE,
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference,
                         tokenContext.getWssSecurityProperties()
                 );
                 x509PKIPathv1SecurityToken.setElementPath(tokenContext.getElementPath());
                 x509PKIPathv1SecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
                 return x509PKIPathv1SecurityToken;
             } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
-                KerberosServiceSecurityToken kerberosServiceSecurityToken = new KerberosServiceSecurityToken(
+                KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = new KerberosServiceSecurityTokenImpl(
                         tokenContext.getWsSecurityContext(),
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getValueType(),
                         binarySecurityTokenType.getId(),
-                        WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
                 );
                 kerberosServiceSecurityToken.setElementPath(tokenContext.getElementPath());
                 kerberosServiceSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());

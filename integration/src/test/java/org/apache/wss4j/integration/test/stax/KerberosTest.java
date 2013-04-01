@@ -264,9 +264,10 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
-            Assert.assertNotNull(((InboundSecurityToken)kerberosTokenSecurityEvents.get(0).getSecurityToken()).getSubject());
-            Assert.assertNotNull(((InboundSecurityToken)kerberosTokenSecurityEvents.get(0).getSecurityToken()).getPrincipal());
-            Assert.assertEquals(((InboundSecurityToken)kerberosTokenSecurityEvents.get(0).getSecurityToken()).getPrincipal().getName(), "alice@service.ws.apache.org");
+            final KerberosTokenSecurityEvent kerberosTokenSecurityEvent = kerberosTokenSecurityEvents.get(0);
+            Assert.assertNotNull(kerberosTokenSecurityEvent.getSecurityToken().getSubject());
+            Assert.assertTrue(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal() instanceof KerberosPrincipal);
+            Assert.assertEquals(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal().getName(), "alice@service.ws.apache.org");
         }
     }
 

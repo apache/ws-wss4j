@@ -18,8 +18,6 @@
  */
 package org.apache.wss4j.stax.validate;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.AttributedString;
 import org.apache.wss4j.binding.wss10.EncodedString;
@@ -28,17 +26,19 @@ import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
     @Override
-    public InboundSecurityToken validate(UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
+    public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(
+            UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
 
         // If the UsernameToken is to be used for key derivation, the (1.1)
         // spec says that it cannot contain a password, and it must contain
@@ -72,11 +72,10 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         final AttributedDateTime attributedDateTimeCreated =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
-        final String created;
+
+        String created = null;
         if (attributedDateTimeCreated != null) {
             created = attributedDateTimeCreated.getValue();
-        } else {
-            created = null;
         }
 
         if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
@@ -118,32 +117,17 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             password = null;
         }
 
-        UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                username.getValue(), password, created, nonceVal, salt, iteration,
+        UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
+                usernameTokenPasswordType, username.getValue(), password, created,
+                encodedNonce != null ? encodedNonce.getValue() : null, salt, iteration,
                 tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
-                WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
-        
-        boolean hashed = 
-            (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
-        WSUsernameTokenPrincipal principal = 
-            new WSUsernameTokenPrincipal(username.getValue(), hashed);
-        if (nonceVal != null) {
-            try {
-                principal.setNonce(new String(nonceVal, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
-            }
-        }
-        principal.setPassword(password);
-        principal.setCreatedTime(created);
-        if (passwordType != null && passwordType.getType() != null) {
-            principal.setPasswordType(passwordType.getType().toString());
-        }
-        usernameSecurityToken.setPrincipal(principal);
 
-        return usernameSecurityToken;
+        @SuppressWarnings("unchecked")
+        T token = (T)usernameSecurityToken;
+        return token;
     }
     
     /**

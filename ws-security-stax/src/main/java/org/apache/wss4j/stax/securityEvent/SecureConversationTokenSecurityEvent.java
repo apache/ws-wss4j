@@ -19,8 +19,9 @@
 package org.apache.wss4j.stax.securityEvent;
 
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
-public class SecureConversationTokenSecurityEvent extends TokenSecurityEvent {
+public class SecureConversationTokenSecurityEvent extends TokenSecurityEvent<SecurityToken> {
 
     private boolean externalUriRef;
     private String issuerName;

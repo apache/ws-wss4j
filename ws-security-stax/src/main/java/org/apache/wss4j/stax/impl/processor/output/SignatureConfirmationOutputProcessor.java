@@ -60,7 +60,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                 List<SecurityEvent> requestSecurityEvents = outputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
                 for (int i = 0; i < requestSecurityEvents.size(); i++) {
                     SecurityEvent securityEvent = requestSecurityEvents.get(i);
-                    if (securityEvent.getSecurityEventType() == SecurityEventConstants.SignatureValue) {
+                    if (SecurityEventConstants.SignatureValue.equals(securityEvent.getSecurityEventType())) {
                         aSignatureFound = true;
                         SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 

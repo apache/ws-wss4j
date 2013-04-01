@@ -22,9 +22,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.SecureConversationSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.SecureConversationSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.testng.Assert;
@@ -65,14 +65,14 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        SecurityToken securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecureConversationSecurityTokenImpl securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -121,14 +121,14 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        SecurityToken securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecureConversationSecurityTokenImpl securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -167,8 +167,8 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         SecureConversationTokenSecurityEvent secureConversationTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        SecurityToken securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        SecureConversationSecurityTokenImpl securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         secureConversationTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
 
@@ -213,14 +213,14 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        SecurityToken securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecureConversationSecurityTokenImpl securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -267,14 +267,14 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        SecurityToken securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecureConversationSecurityTokenImpl securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
-        securityToken = new SecureConversationSecurityToken(null, "1", null);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        securityToken = new SecureConversationSecurityTokenImpl(null, "1", null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 

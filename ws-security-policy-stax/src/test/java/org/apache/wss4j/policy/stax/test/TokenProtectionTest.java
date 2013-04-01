@@ -22,12 +22,14 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.X509SecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -35,6 +37,23 @@ import javax.xml.namespace.QName;
 import java.util.*;
 
 public class TokenProtectionTest extends AbstractPolicyTestBase {
+
+    private static List<WSSecurityTokenConstants.TokenUsage> tokenUsages = new ArrayList<WSSecurityTokenConstants.TokenUsage>();
+
+    static {
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_Signature);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_Encryption);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens);
+    }
 
     @Test
     public void testPolicy() throws Exception {
@@ -64,9 +83,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
-        for (SecurityToken.TokenUsage tokenUsage : EnumSet.allOf(SecurityToken.TokenUsage.class)) {
+        for (int i = 0; i < tokenUsages.size(); i++) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-            X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+            X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
             securityTokens.add(securityToken);
 
             securityToken.setElementPath(bstPath);
@@ -74,13 +94,13 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
             x509TokenSecurityEvent.setSecurityToken(securityToken);
             policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-            if (tokenUsage.name().contains("Signature") || tokenUsage.name().contains("Endorsing")) {
+            if (tokenUsage.getName().contains("Signature") || tokenUsage.getName().contains("Endorsing")) {
                 SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(bstPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
             }
 
-            if (tokenUsage.name().contains("Endorsing")) {
+            if (tokenUsage.getName().contains("Endorsing")) {
                 SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(sigPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
@@ -91,7 +111,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         Iterator<SecurityToken> securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature)) {
+            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
                 mainSignatureToken = securityToken;
                 break;
             }
@@ -100,8 +120,9 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().get(0).name().contains("Signed")) {
-                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(mainSignatureToken, true, protectionOrder);
+            if (securityToken.getTokenUsages().get(0).getName().contains("Signed")) {
+                SignedElementSecurityEvent signedElementSecurityEvent =
+                        new SignedElementSecurityEvent((InboundSecurityToken)mainSignatureToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(bstPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
             }
@@ -141,9 +162,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
-        for (SecurityToken.TokenUsage tokenUsage : EnumSet.allOf(SecurityToken.TokenUsage.class)) {
+        for (int i = 0; i < tokenUsages.size(); i++) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-            X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+            X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
             securityTokens.add(securityToken);
 
             securityToken.setElementPath(bstPath);
@@ -151,7 +173,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
             x509TokenSecurityEvent.setSecurityToken(securityToken);
             policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-            if (tokenUsage.name().contains("Endorsing")) {
+            if (tokenUsage.getName().contains("Endorsing")) {
                 SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(sigPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
@@ -162,7 +184,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         Iterator<SecurityToken> securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature)) {
+            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
                 mainSignatureToken = securityToken;
                 break;
             }
@@ -171,8 +193,9 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().get(0).name().contains("Signed")) {
-                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(mainSignatureToken, true, protectionOrder);
+            if (securityToken.getTokenUsages().get(0).getName().contains("Signed")) {
+                SignedElementSecurityEvent signedElementSecurityEvent =
+                        new SignedElementSecurityEvent((InboundSecurityToken)mainSignatureToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(bstPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
             }
@@ -206,12 +229,12 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         List<QName> path = new ArrayList<QName>();
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_wsse_BinarySecurityToken);
         securityToken.setElementPath(path);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -252,19 +275,19 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         List<QName> path = new ArrayList<QName>();
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_wsse_BinarySecurityToken);
         securityToken.setElementPath(path);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(getX509Token(WSSConstants.X509V3Token), false, protectionOrder);
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(getX509Token(WSSecurityTokenConstants.X509V3Token), false, protectionOrder);
         signedElementSecurityEvent.setElementPath(path);
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
@@ -298,18 +321,18 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         List<QName> path = new ArrayList<QName>();
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_wsse_BinarySecurityToken);
         securityToken.setElementPath(path);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(getX509Token(WSSConstants.X509V3Token), false, protectionOrder);
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(getX509Token(WSSecurityTokenConstants.X509V3Token), false, protectionOrder);
         signedElementSecurityEvent.setElementPath(path);
         policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
 
@@ -353,9 +376,10 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
-        for (SecurityToken.TokenUsage tokenUsage : EnumSet.allOf(SecurityToken.TokenUsage.class)) {
+        for (int i = 0; i < tokenUsages.size(); i++) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-            X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+            X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
 
             securityTokens.add(securityToken);
 
@@ -364,7 +388,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
             x509TokenSecurityEvent.setSecurityToken(securityToken);
             policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-            if (tokenUsage.name().contains("Signature") || tokenUsage.name().contains("Endorsing")) {
+            if (tokenUsage.getName().contains("Signature") || tokenUsage.getName().contains("Endorsing")) {
                 SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(bstPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
@@ -375,7 +399,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         Iterator<SecurityToken> securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature)) {
+            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
                 mainSignatureToken = securityToken;
                 break;
             }
@@ -384,8 +408,9 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().get(0).name().contains("Signed")) {
-                SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(mainSignatureToken, true, protectionOrder);
+            if (securityToken.getTokenUsages().get(0).getName().contains("Signed")) {
+                SignedElementSecurityEvent signedElementSecurityEvent =
+                        new SignedElementSecurityEvent((InboundSecurityToken)mainSignatureToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(bstPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
             }
@@ -429,22 +454,23 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
-        for (SecurityToken.TokenUsage tokenUsage : EnumSet.allOf(SecurityToken.TokenUsage.class)) {
+        for (int i = 0; i < tokenUsages.size(); i++) {
+            WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-            X509SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
+            X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
 
             securityToken.setElementPath(bstPath);
             securityToken.addTokenUsage(tokenUsage);
             x509TokenSecurityEvent.setSecurityToken(securityToken);
             policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-            if (tokenUsage.name().contains("Signature") || tokenUsage.name().contains("Endorsing")) {
+            if (tokenUsage.getName().contains("Signature") || tokenUsage.getName().contains("Endorsing")) {
                 SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(bstPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
             }
 
-            if (tokenUsage.name().contains("Endorsing")) {
+            if (tokenUsage.getName().contains("Endorsing")) {
                 SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, true, protectionOrder);
                 signedElementSecurityEvent.setElementPath(sigPath);
                 policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);

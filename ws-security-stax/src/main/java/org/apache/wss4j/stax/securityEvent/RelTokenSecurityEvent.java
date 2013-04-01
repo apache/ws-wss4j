@@ -18,9 +18,11 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-public class RelTokenSecurityEvent extends IssuedTokenSecurityEvent {
 
-    //todo implement
+import org.apache.xml.security.stax.securityToken.SecurityToken;
+
+public class RelTokenSecurityEvent extends IssuedTokenSecurityEvent<SecurityToken> {
+
     private String issuerName;
 
     public RelTokenSecurityEvent() {

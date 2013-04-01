@@ -20,10 +20,9 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
-import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
-import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
-import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
     
@@ -64,24 +63,26 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     }
 
     @Override
-    public InboundSecurityToken validate(final SamlAssertionWrapper samlAssertionWrapper,
-                                                 final SecurityToken subjectSecurityToken,
+    public <T extends SamlSecurityToken & InboundSecurityToken> T validate(final SamlAssertionWrapper samlAssertionWrapper,
+                                                 final InboundSecurityToken subjectSecurityToken,
                                                  final TokenContext tokenContext) throws WSSecurityException {
         // Check conditions
         checkConditions(samlAssertionWrapper);
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
 
-        InboundSecurityTokenImpl securityToken = new SAMLSecurityToken(
+        SamlSecurityTokenImpl securityToken = new SamlSecurityTokenImpl(
                 samlAssertionWrapper, subjectSecurityToken,
                 tokenContext.getWsSecurityContext(),
                 tokenContext.getWssSecurityProperties().getSignatureVerificationCrypto(),
-                samlAssertionWrapper.getId(), null,
+                null,
                 tokenContext.getWssSecurityProperties());
 
         securityToken.setElementPath(tokenContext.getElementPath());
         securityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
-        return securityToken;
+        @SuppressWarnings("unchecked")
+        T token = (T)securityToken;
+        return token;
     }
 
     

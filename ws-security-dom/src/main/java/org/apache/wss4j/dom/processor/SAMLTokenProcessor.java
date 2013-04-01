@@ -30,12 +30,12 @@ import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.w3c.dom.Element;
 
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -111,13 +111,13 @@ public class SAMLTokenProcessor implements Processor {
                 result.put(
                     WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
                 );
-                SAMLTokenPrincipal samlPrincipal = 
-                    new SAMLTokenPrincipal(credential.getTransformedToken());
+                SAMLTokenPrincipalImpl samlPrincipal =
+                    new SAMLTokenPrincipalImpl(credential.getTransformedToken());
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
             } else if (credential.getPrincipal() != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
             } else {
-                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipal(samlAssertion));
+                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipalImpl(samlAssertion));
             }
         }
         wsDocInfo.addResult(result);

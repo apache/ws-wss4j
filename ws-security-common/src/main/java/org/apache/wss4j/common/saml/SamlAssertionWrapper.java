@@ -320,6 +320,47 @@ public class SamlAssertionWrapper {
     }
 
     /**
+     * Method getSubjectName returns the Subject name value
+     * @return the subjectName of this SamlAssertionWrapper object
+     */
+    public String getSubjectName() {
+        if (saml2 != null) {
+            org.opensaml.saml2.core.Subject subject = saml2.getSubject();
+            if (subject != null && subject.getNameID() != null) {
+                return subject.getNameID().getValue();
+            }
+        } else if (saml1 != null) {
+            org.opensaml.saml1.core.Subject samlSubject = null;
+            for (org.opensaml.saml1.core.Statement stmt : saml1.getStatements()) {
+                if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
+                    org.opensaml.saml1.core.AttributeStatement attrStmt =
+                            (org.opensaml.saml1.core.AttributeStatement) stmt;
+                    samlSubject = attrStmt.getSubject();
+                } else if (stmt instanceof org.opensaml.saml1.core.AuthenticationStatement) {
+                    org.opensaml.saml1.core.AuthenticationStatement authStmt =
+                            (org.opensaml.saml1.core.AuthenticationStatement) stmt;
+                    samlSubject = authStmt.getSubject();
+                } else {
+                    org.opensaml.saml1.core.AuthorizationDecisionStatement authzStmt =
+                            (org.opensaml.saml1.core.AuthorizationDecisionStatement)stmt;
+                    samlSubject = authzStmt.getSubject();
+                }
+                if (samlSubject != null) {
+                    break;
+                }
+            }
+            if (samlSubject != null && samlSubject.getNameIdentifier() != null) {
+                return samlSubject.getNameIdentifier().getNameIdentifier();
+            }
+        }
+        LOG.error(
+                "SamlAssertionWrapper: unable to return SubjectName - no saml assertion "
+                        + "object or subject is null"
+        );
+        return null;
+    }
+
+    /**
      * Method getConfirmationMethods returns the confirmationMethods of this 
      * SamlAssertionWrapper object.
      *

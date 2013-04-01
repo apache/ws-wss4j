@@ -16,25 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.impl;
+package org.apache.wss4j.stax.securityToken;
 
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
-import org.apache.xml.security.stax.impl.SecurityContextImpl;
-
-import java.util.List;
-
-/**
- * Concrete security context implementation
- */
-public class WSSecurityContextImpl extends SecurityContextImpl implements WSSecurityContext {
-
-    @Override
-    public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
-    }
-
-    @Override
-    public void ignoredBSPRules(List<BSPRule> bspRules) {
-    }
+public interface KeyValueSecurityToken extends SubjectAndPrincipalSecurityToken {
 }

@@ -272,8 +272,6 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final int WSE_DERIVED_KEY_LEN = 16;
     public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
 
-    public static final Action SIGNATURE = new Action(XMLSecurityConstants.SIGNATURE.toString());
-    public static final Action ENCRYPT = new Action(XMLSecurityConstants.ENCRYPT.toString());
     public static final Action TIMESTAMP = new Action("TIMESTAMP");
     public static final Action USERNAMETOKEN = new Action("USERNAMETOKEN");
     public static final Action USERNAMETOKEN_SIGNED = new Action("USERNAMETOKEN_SIGNED");
@@ -285,45 +283,12 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SIGNATURE_WITH_KERBEROS_TOKEN");
     public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("ENCRYPT_WITH_KERBEROS_TOKEN");
 
-    public static class Action extends XMLSecurityConstants.Action {
-        protected Action(String name) {
-            super(name);
-        }
-    }
-
-    //todo rename KeyUsage because C14N, etc are not keys...
-    public static final KeyUsage Comp_Key = new KeyUsage("Comp_Key");
-    public static final KeyUsage Enc_KD = new KeyUsage("Enc_KD");
-    public static final KeyUsage Sig_KD = new KeyUsage("Sig_KD");
-    public static final KeyUsage Soap_Norm = new KeyUsage("Soap_Norm");
-    public static final KeyUsage STR_Trans = new KeyUsage("STR_Trans");
-    public static final KeyUsage XPath = new KeyUsage("XPath");
-
-    public static final TokenType UsernameToken = new TokenType("UsernameToken");
-    public static final TokenType SecurityContextToken = new TokenType("SecurityContextToken");
-    public static final TokenType Saml10Token = new TokenType("Saml10Token");
-    public static final TokenType Saml11Token = new TokenType("Saml11Token");
-    public static final TokenType Saml20Token = new TokenType("Saml20Token");
-    public static final TokenType IssuedToken = new TokenType("IssuedToken");
-    public static final TokenType SecureConversationToken = new TokenType("SecureConversationToken");
-    public static final TokenType HttpsToken = new TokenType("HttpsToken");
-    public static final TokenType KerberosToken = new TokenType("KerberosToken");
-    public static final TokenType SpnegoContextToken = new TokenType("SpnegoContextToken");
-    public static final TokenType RelToken = new TokenType("RelToken");
-    public static final TokenType DerivedKeyToken = new TokenType("DerivedKeyToken");
-
-    //todo correct/cleanup/rename/revisit KeyIdentifierTypes over the whole framework. I messed it up...
-    public enum WSSKeyIdentifierType implements KeyIdentifierType {
-        ISSUER_SERIAL,
-        SECURITY_TOKEN_DIRECT_REFERENCE,
-        X509_KEY_IDENTIFIER,
-        SKI_KEY_IDENTIFIER,
-        THUMBPRINT_IDENTIFIER,
-        EMBEDDED_KEYIDENTIFIER_REF,
-        USERNAMETOKEN_REFERENCE,
-        KEY_VALUE,
-        SECURITY_TOKEN_REFERENCE,
-    }
+    public static final AlgorithmUsage Comp_Key = new AlgorithmUsage("Comp_Key");
+    public static final AlgorithmUsage Enc_KD = new AlgorithmUsage("Enc_KD");
+    public static final AlgorithmUsage Sig_KD = new AlgorithmUsage("Sig_KD");
+    public static final AlgorithmUsage Soap_Norm = new AlgorithmUsage("Soap_Norm");
+    public static final AlgorithmUsage STR_Trans = new AlgorithmUsage("STR_Trans");
+    public static final AlgorithmUsage XPath = new AlgorithmUsage("XPath");
 
     public enum DerivedKeyTokenReference {
         DirectReference,
@@ -372,5 +337,4 @@ public class WSSConstants extends XMLSecurityConstants {
         WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_wsse_Security);
 
     }
-
 }

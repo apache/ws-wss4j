@@ -22,14 +22,16 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
-import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -53,7 +55,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             if (tokenId == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            SecurityTokenProvider wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
@@ -65,7 +67,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             final String wsuId = IDGenerator.generateID(null);
             final String identifier = IDGenerator.generateID(null);
 
-            final GenericOutboundSecurityToken securityContextSecurityToken = new GenericOutboundSecurityToken(wsuId, WSSConstants.SecurityContextToken) {
+            final GenericOutboundSecurityToken securityContextSecurityToken = new GenericOutboundSecurityToken(wsuId, WSSecurityTokenConstants.SecurityContextToken) {
 
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
@@ -84,9 +86,9 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             };
             wrappingSecurityToken.addWrappedToken(securityContextSecurityToken);
 
-            SecurityTokenProvider securityContextSecurityTokenProvider = new SecurityTokenProvider() {
+            SecurityTokenProvider<OutboundSecurityToken> securityContextSecurityTokenProvider =
+                    new SecurityTokenProvider<OutboundSecurityToken>() {
 
-                @SuppressWarnings("unchecked")
                 @Override
                 public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return securityContextSecurityToken;
@@ -103,14 +105,14 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             finalSecurityContextTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalSecurityContextTokenOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
-            if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+            if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalSecurityContextTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
-            } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
+            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, wsuId);
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());

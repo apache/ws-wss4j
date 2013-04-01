@@ -18,26 +18,23 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.opensaml.common.SAMLVersion;
-import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
+import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 
-public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent {
+public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent<SamlSecurityToken> {
 
     public SamlTokenSecurityEvent() {
         super(WSSecurityEventConstants.SamlToken);
     }
 
     @Override
-    public String getIssuerName() {
-        return ((SAMLSecurityToken) getSecurityToken()).getIssuer();
+    public String getIssuerName() throws WSSecurityException {
+        return getSamlAssertionWrapper().getIssuerString();
     }
 
-    public SAMLVersion getSamlVersion() {
-        return ((SAMLSecurityToken) getSecurityToken()).getSamlVersion();
-    }
-
-    public SamlAssertionWrapper getSamlAssertionWrapper() {
-        return ((SAMLSecurityToken) getSecurityToken()).getSamlAssertionWrapper();
+    public SamlAssertionWrapper getSamlAssertionWrapper() throws WSSecurityException {
+        return ((SAMLTokenPrincipal)getSecurityToken().getPrincipal()).getToken();
     }
 }

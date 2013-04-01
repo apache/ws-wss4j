@@ -21,13 +21,13 @@ package org.apache.wss4j.stax.validate;
 import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
-import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -39,7 +39,7 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
                                                  final String identifier, final TokenContext tokenContext)
             throws WSSecurityException {
 
-        InboundSecurityTokenImpl securityContextToken = new InboundSecurityTokenImpl(
+        AbstractInboundSecurityToken securityContextToken = new AbstractInboundSecurityToken(
                 tokenContext.getWsSecurityContext(),
                 securityContextTokenType.getId(), null) {
 
@@ -49,7 +49,7 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
             }
 
             @Override
-            public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+            public Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                               String correlationID) throws XMLSecurityException {
 
                 Key key = getSecretKey().get(algorithmURI);
@@ -72,9 +72,9 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
             }
 
             @Override
-            public WSSConstants.TokenType getTokenType() {
+            public WSSecurityTokenConstants.TokenType getTokenType() {
                 //todo and set externalUriRef
-                return WSSConstants.SecurityContextToken;
+                return WSSecurityTokenConstants.SecurityContextToken;
             }
         };
 

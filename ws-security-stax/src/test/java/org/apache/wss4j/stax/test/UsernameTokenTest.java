@@ -26,7 +26,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
@@ -170,7 +169,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                     if (securityEvent instanceof UsernameTokenSecurityEvent) {
                         UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
-                        if (!"username".equals(((UsernameSecurityToken) usernameTokenSecurityEvent.getSecurityToken()).getUsername())) {
+                        if (!"username".equals(usernameTokenSecurityEvent.getSecurityToken().getPrincipal().getName())) {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "Wrong username");
                         }
                     }

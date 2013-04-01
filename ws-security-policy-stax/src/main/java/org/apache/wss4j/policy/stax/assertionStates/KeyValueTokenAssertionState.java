@@ -22,7 +22,8 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
-import org.apache.xml.security.stax.securityEvent.KeyValueTokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.RsaKeyValueSecurityToken;
+import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -52,8 +53,9 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
 
         KeyValueTokenSecurityEvent keyValueTokenSecurityEvent = (KeyValueTokenSecurityEvent) tokenSecurityEvent;
         KeyValueToken keyValueToken = (KeyValueToken) abstractToken;
-        if (keyValueToken.isRsaKeyValue() && keyValueTokenSecurityEvent.getKeyValueTokenType() != KeyValueTokenSecurityEvent.KeyValueTokenType.RSA) {
-            setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " + keyValueTokenSecurityEvent.getKeyValueTokenType() + "KeyValue");
+        if (keyValueToken.isRsaKeyValue() && !(keyValueTokenSecurityEvent.getSecurityToken() instanceof RsaKeyValueSecurityToken)) {
+            setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " +
+                    keyValueTokenSecurityEvent.getSecurityToken().getClass().getSimpleName());
             return false;
         }
         //always return true to prevent false alarm in case additional tokens with the same usage

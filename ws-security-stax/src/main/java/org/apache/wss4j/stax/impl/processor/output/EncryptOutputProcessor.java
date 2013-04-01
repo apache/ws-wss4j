@@ -37,15 +37,15 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.ext.SecurityTokenProvider;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.EncryptionPartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputProcessor;
-import org.apache.xml.security.stax.impl.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * Processor to encrypt XML structures
@@ -80,7 +80,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     logger.debug("Matched encryptionPart for encryption");
                     InternalEncryptionOutputProcessor internalEncryptionOutputProcessor;
                     String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
-                    SecurityTokenProvider securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+                    SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
                     OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
                     EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
                     encryptionPartDef.setModifier(securePart.getModifier());

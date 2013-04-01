@@ -60,7 +60,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
         algorithmSuiteSecurityEvent.setKeyLength(192);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -82,10 +82,10 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
         algorithmSuiteSecurityEvent.setKeyLength(192);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#sha256");
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Dig);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Dig);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
             Assert.fail("Exception expected");
@@ -114,7 +114,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
         algorithmSuiteSecurityEvent.setKeyLength(128);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
             Assert.fail("Exception expected");
@@ -147,7 +147,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
         algorithmSuiteSecurityEvent.setKeyLength(192);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         policyEnforcer.doFinal();
     }
@@ -172,7 +172,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
         algorithmSuiteSecurityEvent.setKeyLength(128);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
             Assert.fail("Exception expected");
@@ -266,13 +266,13 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI(WSSConstants.NS_XENC11_AES256_GCM);
         algorithmSuiteSecurityEvent.setKeyLength(256);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
 
         algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI(WSSConstants.NS_XENC_AES256);
         algorithmSuiteSecurityEvent.setKeyLength(256);
-        algorithmSuiteSecurityEvent.setKeyUsage(WSSConstants.Enc);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
 
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);

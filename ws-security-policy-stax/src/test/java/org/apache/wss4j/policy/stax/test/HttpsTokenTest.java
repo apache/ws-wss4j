@@ -21,10 +21,10 @@ package org.apache.wss4j.policy.stax.test;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -57,8 +57,8 @@ public class HttpsTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        HttpsSecurityTokenImpl securityToken = getHttpsSecurityToken(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         httpsTokenSecurityEvent.setSecurityToken(securityToken);
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
         httpsTokenSecurityEvent.setIssuerName("xs:anyURI");
@@ -96,8 +96,8 @@ public class HttpsTokenTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+        HttpsSecurityTokenImpl securityToken = getHttpsSecurityToken(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         httpsTokenSecurityEvent.setSecurityToken(securityToken);
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         httpsTokenSecurityEvent.setIssuerName("xs:anyURI");

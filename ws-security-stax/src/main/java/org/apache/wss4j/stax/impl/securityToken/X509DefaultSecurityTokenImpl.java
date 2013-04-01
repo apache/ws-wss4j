@@ -19,35 +19,26 @@
 package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
-import java.security.cert.X509Certificate;
 
-public class X509SubjectKeyIdentifierSecurityToken extends X509SecurityToken {
+public class X509DefaultSecurityTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
-    private final byte[] binaryContent;
 
-    X509SubjectKeyIdentifierSecurityToken(WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                          byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType,
-                                          WSSSecurityProperties securityProperties) {
-        super(WSSConstants.X509V3Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, securityProperties);
-        this.binaryContent = binaryContent;
+    X509DefaultSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+                                 String alias, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
+                                 WSSSecurityProperties securityProperties) {
+        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
+        this.alias = alias;
     }
 
     @Override
     protected String getAlias() throws XMLSecurityException {
-        if (this.alias == null) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
-            cryptoType.setBytes(binaryContent);
-            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
-            this.alias = getCrypto().getX509Identifier(certs[0]);
-        }
         return this.alias;
     }
 }

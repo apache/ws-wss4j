@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.common.principal;
 
-import java.security.Principal;
 
 /**
  * This class implements the <code>Principal</code> interface and
@@ -42,7 +41,7 @@ import java.security.Principal;
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  */
-public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable {
+public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, UsernameTokenPrincipal {
 
     /**
      * 
@@ -56,35 +55,36 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     private boolean digest = false;
 
     /**
-     * Create a WSUsernameTokenPrincipal with a WSUsernameToken username.
+     * Create a WSUsernameTokenPrincipalImpl with a WSUsernameToken username.
      *
      * @param name the WSUsernameToken username for this user.
      */
-    public WSUsernameTokenPrincipal(String name, boolean digest) {
+    public WSUsernameTokenPrincipalImpl(String name, boolean digest) {
         this.name = name;
         this.digest = digest;
     }
 
     /**
-     * Return the WSUsernameToken username for this <code>WSUsernameTokenPrincipal</code>.
+     * Return the WSUsernameToken username for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
-     * @return the WSUsernameToken username for this <code>WSUsernameTokenPrincipal</code>
+     * @return the WSUsernameToken username for this <code>WSUsernameTokenPrincipalImpl</code>
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Return the WSUsernameToken password type for this <code>WSUsernameTokenPrincipal</code>.
+     * Return the WSUsernameToken password type for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
      * @return true if the password type was <code>PassowrdDigest</code>
      */
+    @Override
     public boolean isPasswordDigest() {
         return digest;
     }
 
     /**
-     * Set the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>.
+     * Set the WSUsernameToken password for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
      * @param password
      */
@@ -93,16 +93,17 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     }
 
     /**
-     * Return the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>.
+     * Return the WSUsernameToken password for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
-     * @return the WSUsernameToken password for this <code>WSUsernameTokenPrincipal</code>
+     * @return the WSUsernameToken password for this <code>WSUsernameTokenPrincipalImpl</code>
      */
+    @Override
     public String getPassword() {
         return password;
     }
 
     /**
-     * Set the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>.
+     * Set the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
      * @param nonce
      */
@@ -111,16 +112,17 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     }
 
     /**
-     * Return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>.
+     * Return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
-     * @return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipal</code>
+     * @return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipalImpl</code>
      */
+    @Override
     public String getNonce() {
         return nonce;
     }
 
     /**
-     * Set the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
+     * Set the WSUsernameToken created time for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
      * @param createdTime
      */
@@ -129,26 +131,28 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     }
 
     /**
-     * Return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>.
+     * Return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
-     * @return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipal</code>
+     * @return the WSUsernameToken created time for this <code>WSUsernameTokenPrincipalImpl</code>
      */
+    @Override
     public String getCreatedTime() {
         return createdTime;
     }
 
     /**
-     * Return a string representation of this <code>WSUsernameTokenPrincipal</code>.
+     * Return a string representation of this <code>WSUsernameTokenPrincipalImpl</code>.
      *
-     * @return a string representation of this <code>WSUsernameTokenPrincipal</code>.
+     * @return a string representation of this <code>WSUsernameTokenPrincipalImpl</code>.
      */
     public String toString() {
-        return ("WSUsernameTokenPrincipal:  " + name);
+        return ("WSUsernameTokenPrincipalImpl:  " + name);
     }
 
     /**
      * @return Returns the passwordType.
      */
+    @Override
     public String getPasswordType() {
         return passwordType;
     }
@@ -179,37 +183,37 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
         if (this == o) {
             return true;
         }
-        if (!(o instanceof WSUsernameTokenPrincipal)) {
+        if (!(o instanceof UsernameTokenPrincipal)) {
             return false;
         }
-        WSUsernameTokenPrincipal that = (WSUsernameTokenPrincipal) o;
-        if (this.digest != that.digest) {
+        UsernameTokenPrincipal that = (UsernameTokenPrincipal) o;
+        if (this.digest != that.isPasswordDigest()) {
             return false;
         }
-        if (this.name == null ? that.name != null : !this.name.equals(that.name)) {
+        if (this.name == null ? that.getName() != null : !this.name.equals(that.getName())) {
             return false;
         }
-        if (this.nonce == null ? that.nonce != null : !this.nonce.equals(that.nonce)) {
+        if (this.nonce == null ? that.getNonce() != null : !this.nonce.equals(that.getNonce())) {
             return false;
         }
-        if (this.password == null ? that.password != null : !this.password.equals(that.password)) {
+        if (this.password == null ? that.getPassword() != null : !this.password.equals(that.getPassword())) {
             return false;
         }
-        if (this.createdTime == null ? that.createdTime != null 
-            : !this.createdTime.equals(that.createdTime)) {
+        if (this.createdTime == null ? that.getCreatedTime() != null
+            : !this.createdTime.equals(that.getCreatedTime())) {
             return false;
         }
-        if (this.passwordType == null ? that.passwordType != null 
-            : !this.passwordType.equals(that.passwordType)) {
+        if (this.passwordType == null ? that.getPasswordType() != null
+            : !this.passwordType.equals(that.getPasswordType())) {
             return false;
         }
         return true;
     }
 
     /**
-     * Return a hash code for this <code>WSUsernameTokenPrincipal</code>.
+     * Return a hash code for this <code>WSUsernameTokenPrincipalImpl</code>.
      *
-     * @return a hash code for this <code>WSUsernameTokenPrincipal</code>.
+     * @return a hash code for this <code>WSUsernameTokenPrincipalImpl</code>.
      */
     @Override
     public int hashCode() {

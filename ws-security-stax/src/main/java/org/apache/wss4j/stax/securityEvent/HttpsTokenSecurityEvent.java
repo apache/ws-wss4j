@@ -18,12 +18,10 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.InboundSecurityTokenImpl;
-import org.apache.xml.security.stax.ext.SecurityToken;
+import org.apache.wss4j.stax.securityToken.HttpsSecurityToken;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
-public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
+public class HttpsTokenSecurityEvent extends TokenSecurityEvent<HttpsSecurityToken> {
 
     public enum AuthenticationType {
         HttpBasicAuthentication,
@@ -54,20 +52,5 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent {
 
     public void setIssuerName(String issuerName) {
         this.issuerName = issuerName;
-    }
-
-    @Override
-    public SecurityToken getSecurityToken() {
-        SecurityToken securityToken = super.getSecurityToken();
-        if (securityToken == null) {
-            securityToken = new InboundSecurityTokenImpl(null, null, null) {
-                @Override
-                public WSSConstants.TokenType getTokenType() {
-                    return WSSConstants.HttpsToken;
-                }
-            };
-        }
-        setSecurityToken(securityToken);
-        return securityToken;
     }
 }

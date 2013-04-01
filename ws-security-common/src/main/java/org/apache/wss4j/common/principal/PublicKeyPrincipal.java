@@ -16,39 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.wss4j.common.principal;
 
-import java.io.Serializable;
 import java.security.Principal;
 import java.security.PublicKey;
 
-/**
- * This class encapsulates a principal defined by a Public Key. In particular, this class
- * is used for the ds:KeyInfo/ds:KeyValue case in the SignatureProcessor.
- */
-public class PublicKeyPrincipal implements Principal, Serializable {
+public interface PublicKeyPrincipal extends Principal {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -7662669773454821344L;
-    private PublicKey publicKey;
-
-    public PublicKeyPrincipal(PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
-    
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-    
-    public String getName() {
-        return publicKey.toString();
-    }
-
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
-
+    PublicKey getPublicKey();
 }

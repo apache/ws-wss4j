@@ -21,13 +21,14 @@ package org.apache.wss4j.policy.stax.test;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -76,10 +77,10 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         KerberosTokenSecurityEvent initiatorTokenSecurityEvent = new KerberosTokenSecurityEvent();
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
 
-        KerberosServiceSecurityToken kerberosServiceSecurityToken =
-                new KerberosServiceSecurityToken(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
-                        WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
-        kerberosServiceSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
+                        WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -87,20 +88,24 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
 
         kerberosServiceSecurityToken =
-                new KerberosServiceSecurityToken(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
-                        WSSConstants.WSSKeyIdentifierType.EMBEDDED_KEYIDENTIFIER_REF);
-        kerberosServiceSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
+                        WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        SignedPartSecurityEvent signedPartSecurityEvent =
+                new SignedPartSecurityEvent(
+                        (InboundSecurityToken)recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
+                new ContentEncryptedElementSecurityEvent(
+                        (InboundSecurityToken)recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 
@@ -148,10 +153,10 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         KerberosTokenSecurityEvent initiatorTokenSecurityEvent = new KerberosTokenSecurityEvent();
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
 
-        KerberosServiceSecurityToken kerberosServiceSecurityToken =
-                new KerberosServiceSecurityToken(null, null, null, WSSConstants.NS_GSS_Kerberos5_AP_REQ, null,
-                        WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
-        kerberosServiceSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_GSS_Kerberos5_AP_REQ, null,
+                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -159,20 +164,24 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
 
         kerberosServiceSecurityToken =
-                new KerberosServiceSecurityToken(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
-                        WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER);
-        kerberosServiceSecurityToken.addTokenUsage(SecurityToken.TokenUsage.MainEncryption);
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
+                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        SignedPartSecurityEvent signedPartSecurityEvent =
+                new SignedPartSecurityEvent(
+                        (InboundSecurityToken)recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
-        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
+        ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent =
+                new ContentEncryptedElementSecurityEvent(
+                        (InboundSecurityToken)recipientTokenSecurityEvent.getSecurityToken(), true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
 

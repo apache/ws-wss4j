@@ -45,8 +45,8 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -89,8 +89,8 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -118,8 +118,8 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -145,8 +145,8 @@ public class LayoutTest extends AbstractPolicyTestBase {
                         "</sp:Layout>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
@@ -171,8 +171,8 @@ public class LayoutTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        SecurityToken securityToken = getX509Token(WSSConstants.X509V3Token);
-        securityToken.addTokenUsage(SecurityToken.TokenUsage.MainSignature);
+        SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 

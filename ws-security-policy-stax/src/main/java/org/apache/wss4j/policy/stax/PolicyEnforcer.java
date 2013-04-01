@@ -515,7 +515,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
         }
 
-        if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+        if (WSSecurityEventConstants.Operation.equals(securityEvent.getSecurityEventType())) {
             operationSecurityEventOccured = true;
             final OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
             if (effectivePolicy != null) {

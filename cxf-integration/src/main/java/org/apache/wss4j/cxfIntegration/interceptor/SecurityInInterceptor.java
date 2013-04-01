@@ -79,7 +79,6 @@ public class SecurityInInterceptor extends AbstractSoapInterceptor {
         soapMessage.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
 
         try {
-            @SuppressWarnings("unchecked")
             final List<SecurityEvent> requestSecurityEvents = (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
             newXmlStreamReader = inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);

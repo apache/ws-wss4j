@@ -22,7 +22,10 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.*;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.securityToken.X509SecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
@@ -30,23 +33,23 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import java.security.Key;
 import java.security.Principal;
-import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-public abstract class X509SecurityToken
-        extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken implements InboundSecurityToken {
+public abstract class X509SecurityTokenImpl
+        extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken implements X509SecurityToken {
 
     private CallbackHandler callbackHandler;
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
+    private Principal principal;
 
-    protected X509SecurityToken(XMLSecurityConstants.TokenType tokenType, WSSecurityContext wsSecurityContext,
-                                Crypto crypto, CallbackHandler callbackHandler, String id,
-                                WSSConstants.KeyIdentifierType keyIdentifierType,
-                                WSSSecurityProperties securityProperties) {
-        super(tokenType, wsSecurityContext, id, keyIdentifierType);
+    protected X509SecurityTokenImpl(WSSecurityTokenConstants.TokenType tokenType, WSInboundSecurityContext wsInboundSecurityContext,
+                                    Crypto crypto, CallbackHandler callbackHandler, String id,
+                                    WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
+                                    WSSSecurityProperties securityProperties) {
+        super(tokenType, wsInboundSecurityContext, id, keyIdentifier);
         this.crypto = crypto;
         this.callbackHandler = callbackHandler;
         this.securityProperties = securityProperties;
@@ -61,7 +64,7 @@ public abstract class X509SecurityToken
     }
 
     @Override
-    public Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+    public Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                       String correlationID) throws XMLSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         WSSUtils.doPasswordCallback(getCallbackHandler(), pwCb);
@@ -107,26 +110,23 @@ public abstract class X509SecurityToken
     protected abstract String getAlias() throws XMLSecurityException;
 
     @Override
-    public Subject getSubject() throws XMLSecurityException {
+    public Subject getSubject() throws WSSecurityException {
         return null;
     }
 
     @Override
-    public Principal getPrincipal() throws XMLSecurityException {
-        X509Certificate[] certs = super.getX509Certificates();
-        if (certs != null && certs.length > 0) {
-            return certs[0].getSubjectX500Principal();
-        }
-        
-        final PublicKey publicKey = getPublicKey();
-        if (publicKey != null) {
-            return new Principal() {
-                @Override
-                public String getName() {
-                    return publicKey.toString();
+    public Principal getPrincipal() throws WSSecurityException {
+        if (this.principal == null) {
+            try {
+                X509Certificate[] certs = getX509Certificates();
+                if (certs != null && certs.length > 0) {
+                    return this.principal = certs[0].getSubjectX500Principal();
                 }
-            };
+                return this.principal = new PublicKeyPrincipalImpl(getPublicKey());
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+            }
         }
-        return null;
+        return this.principal;
     }
 }

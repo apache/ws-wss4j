@@ -22,11 +22,11 @@ package org.apache.wss4j.dom.processor;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.w3c.dom.Element;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
@@ -87,12 +87,12 @@ public class UsernameTokenProcessor implements Processor {
                 result.put(
                     WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
                 );
-                SAMLTokenPrincipal samlPrincipal = 
-                    new SAMLTokenPrincipal(credential.getTransformedToken());
+                SAMLTokenPrincipalImpl samlPrincipal =
+                    new SAMLTokenPrincipalImpl(credential.getTransformedToken());
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
             } else {
-                WSUsernameTokenPrincipal principal = 
-                    new WSUsernameTokenPrincipal(token.getName(), token.isHashed());
+                WSUsernameTokenPrincipalImpl principal =
+                    new WSUsernameTokenPrincipalImpl(token.getName(), token.isHashed());
                 principal.setNonce(token.getNonce());
                 principal.setPassword(token.getPassword());
                 principal.setCreatedTime(token.getCreated());

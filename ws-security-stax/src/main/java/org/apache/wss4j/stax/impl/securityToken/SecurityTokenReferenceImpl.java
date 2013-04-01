@@ -18,12 +18,14 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 import java.security.Key;
 import java.security.PublicKey;
@@ -31,15 +33,16 @@ import java.security.cert.X509Certificate;
 import java.util.Deque;
 import java.util.Map;
 
-public class SecurityTokenReference extends InboundSecurityTokenImpl {
+public class SecurityTokenReferenceImpl extends AbstractInboundSecurityToken implements SecurityTokenReference {
 
-    private final SecurityToken securityToken;
+    private final InboundSecurityToken inboundSecurityToken;
     private final Deque<XMLSecEvent> xmlSecEvents;
 
-    public SecurityTokenReference(SecurityToken securityToken, Deque<XMLSecEvent> xmlSecEvents, WSSecurityContext wsSecurityContext,
-                                  String id, WSSConstants.KeyIdentifierType keyIdentifierType) {
-        super(wsSecurityContext, id, keyIdentifierType);
-        this.securityToken = securityToken;
+    public SecurityTokenReferenceImpl(InboundSecurityToken inboundSecurityToken, Deque<XMLSecEvent> xmlSecEvents,
+                                      WSInboundSecurityContext wsInboundSecurityContext, String id,
+                                      WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
+        super(wsInboundSecurityContext, id, keyIdentifier);
+        this.inboundSecurityToken = inboundSecurityToken;
         this.xmlSecEvents = xmlSecEvents;
     }
 
@@ -49,48 +52,48 @@ public class SecurityTokenReference extends InboundSecurityTokenImpl {
 
     @Override
     public boolean isAsymmetric() throws XMLSecurityException {
-        return securityToken.isAsymmetric();
+        return inboundSecurityToken.isAsymmetric();
     }
 
     @Override
     public Map<String, Key> getSecretKey() throws XMLSecurityException {
-        return securityToken.getSecretKey();
+        return inboundSecurityToken.getSecretKey();
     }
 
     @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                          String correlationID) throws XMLSecurityException {
-        return securityToken.getSecretKey(algorithmURI, keyUsage, correlationID);
+        return inboundSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
     }
 
     @Override
     public PublicKey getPublicKey() throws XMLSecurityException {
-        return securityToken.getPublicKey();
+        return inboundSecurityToken.getPublicKey();
     }
 
     @Override
-    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.KeyUsage keyUsage,
+    protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                                   String correlationID) throws XMLSecurityException {
-        return securityToken.getPublicKey(algorithmURI, keyUsage, correlationID);
+        return inboundSecurityToken.getPublicKey(algorithmURI, algorithmUsage, correlationID);
     }
 
     @Override
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
-        return securityToken.getX509Certificates();
+        return inboundSecurityToken.getX509Certificates();
     }
 
     @Override
     public void verify() throws XMLSecurityException {
-        securityToken.verify();
+        inboundSecurityToken.verify();
     }
 
     @Override
-    public SecurityToken getKeyWrappingToken() throws XMLSecurityException {
-        return securityToken.getKeyWrappingToken();
+    public InboundSecurityToken getKeyWrappingToken() throws XMLSecurityException {
+        return inboundSecurityToken.getKeyWrappingToken();
     }
 
     @Override
-    public XMLSecurityConstants.TokenType getTokenType() {
-        return securityToken.getTokenType();
+    public WSSecurityTokenConstants.TokenType getTokenType() {
+        return inboundSecurityToken.getTokenType();
     }
 }

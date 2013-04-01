@@ -18,14 +18,14 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SamlToken;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.opensaml.common.SAMLVersion;
-import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -60,27 +60,29 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
             return false;
         }
-        if (samlToken.isRequireKeyIdentifierReference() && ((InboundSecurityToken) samlTokenSecurityEvent.getSecurityToken()).getKeyIdentifierType() != WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER) {
+        if (samlToken.isRequireKeyIdentifierReference() &&
+                !WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(samlTokenSecurityEvent.getSecurityToken().getKeyIdentifier())) {
             setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
             return false;
         }
         if (samlToken.getSamlTokenType() != null) {
+            final SamlAssertionWrapper samlAssertionWrapper = samlTokenSecurityEvent.getSamlAssertionWrapper();
             switch (samlToken.getSamlTokenType()) {
                 case WssSamlV11Token10:
-                    if (samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_10) {
-                        setErrorMessage("Policy enforces SamlVersion11Profile10 but we got " + samlTokenSecurityEvent.getSamlVersion());
+                    if (samlAssertionWrapper.getSamlVersion() != SAMLVersion.VERSION_10) {
+                        setErrorMessage("Policy enforces SamlVersion11Profile10 but we got " + samlAssertionWrapper.getSamlVersion());
                         return false;
                     }
                     break;
                 case WssSamlV11Token11:
-                    if (samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_11) {
-                        setErrorMessage("Policy enforces SamlVersion11Profile11 but we got " + samlTokenSecurityEvent.getSamlVersion());
+                    if (samlAssertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
+                        setErrorMessage("Policy enforces SamlVersion11Profile11 but we got " + samlAssertionWrapper.getSamlVersion());
                         return false;
                     }
                     break;
                 case WssSamlV20Token11:
-                    if (samlTokenSecurityEvent.getSamlVersion() != SAMLVersion.VERSION_20) {
-                        setErrorMessage("Policy enforces SamlVersion20Profile11 but we got " + samlTokenSecurityEvent.getSamlVersion());
+                    if (samlAssertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
+                        setErrorMessage("Policy enforces SamlVersion20Profile11 but we got " + samlAssertionWrapper.getSamlVersion());
                         return false;
                     }
                     break;

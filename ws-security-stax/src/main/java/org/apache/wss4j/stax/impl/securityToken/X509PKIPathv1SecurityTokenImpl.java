@@ -20,9 +20,9 @@ package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
@@ -35,15 +35,15 @@ import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
 
-public class X509PKIPathv1SecurityToken extends X509SecurityToken {
+public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
 
-    public X509PKIPathv1SecurityToken(
-            WSSecurityContext wsSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-            byte[] binaryContent, String id, WSSConstants.KeyIdentifierType keyIdentifierType,
+    public X509PKIPathv1SecurityTokenImpl(
+            WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+            byte[] binaryContent, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
             WSSSecurityProperties securityProperties) throws XMLSecurityException {
-        super(WSSConstants.X509PkiPathV1Token, wsSecurityContext, crypto, callbackHandler, id, keyIdentifierType, securityProperties);
+        super(WSSecurityTokenConstants.X509PkiPathV1Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
 
         InputStream in = new UnsynchronizedByteArrayInputStream(binaryContent);
         try {

@@ -18,9 +18,9 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSecurityContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
@@ -43,6 +43,6 @@ public class ReferenceListInputHandler extends AbstractInputSecurityHeaderHandle
         //instantiate a new DecryptInputProcessor and add it to the chain
         inputProcessorChain.addProcessor(
                 new DecryptInputProcessor(null, referenceList, (WSSSecurityProperties) securityProperties,
-                        (WSSecurityContext) inputProcessorChain.getSecurityContext()));
+                        (WSInboundSecurityContext) inputProcessorChain.getSecurityContext()));
     }
 }

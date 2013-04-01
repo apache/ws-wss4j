@@ -18,12 +18,12 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.wss4j.stax.ext.WSSConstants;
 
-public class UsernameTokenSecurityEvent extends TokenSecurityEvent {
+public class UsernameTokenSecurityEvent extends TokenSecurityEvent<UsernameSecurityToken> {
 
-    private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String usernameTokenProfile;
 
     public UsernameTokenSecurityEvent() {
@@ -31,11 +31,7 @@ public class UsernameTokenSecurityEvent extends TokenSecurityEvent {
     }
 
     public WSSConstants.UsernameTokenPasswordType getUsernameTokenPasswordType() {
-        return usernameTokenPasswordType;
-    }
-
-    public void setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType) {
-        this.usernameTokenPasswordType = usernameTokenPasswordType;
+        return getSecurityToken().getUsernameTokenPasswordType();
     }
 
     public String getUsernameTokenProfile() {

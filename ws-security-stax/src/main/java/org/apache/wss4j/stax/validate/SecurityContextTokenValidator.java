@@ -20,7 +20,7 @@ package org.apache.wss4j.stax.validate;
 
 import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public interface SecurityContextTokenValidator extends Validator {
 

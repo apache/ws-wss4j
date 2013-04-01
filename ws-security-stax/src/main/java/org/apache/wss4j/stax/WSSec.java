@@ -30,6 +30,7 @@ import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -119,11 +120,11 @@ public class WSSec {
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
             XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
-            if (action.equals(WSSConstants.TIMESTAMP)) {
+            if (WSSConstants.TIMESTAMP.equals(action)) {
                 if (securityProperties.getTimestampTTL() == null) {
                     securityProperties.setTimestampTTL(300);
                 }
-            } else if (action.equals(WSSConstants.SIGNATURE)) {
+            } else if (WSSConstants.SIGNATURE.equals(action)) {
                 if (securityProperties.getSignatureKeyStore() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
                 }
@@ -142,10 +143,10 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
+                if (securityProperties.getSignatureKeyIdentifier() == null) {
+                    securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
                 }
-            } else if (action.equals(WSSConstants.ENCRYPT)) {
+            } else if (WSSConstants.ENCRYPT.equals(action)) {
                 if (securityProperties.getEncryptionUseThisCertificate() == null
                         && securityProperties.getEncryptionKeyStore() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
@@ -165,10 +166,10 @@ public class WSSec {
                     //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
                     securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                 }
-                if (securityProperties.getEncryptionKeyIdentifierType() == null) {
-                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.ISSUER_SERIAL);
+                if (securityProperties.getEncryptionKeyIdentifier() == null) {
+                    securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
                 }
-            } else if (action.equals(WSSConstants.USERNAMETOKEN)) {
+            } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                 if (securityProperties.getTokenUser() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
                 }
@@ -178,7 +179,7 @@ public class WSSec {
                 if (securityProperties.getUsernameTokenPasswordType() == null) {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
-            } else if (action.equals(WSSConstants.USERNAMETOKEN_SIGNED)) {
+            } else if (WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                 if (securityProperties.getTokenUser() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
                 }
@@ -194,13 +195,13 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.USERNAMETOKEN_REFERENCE);
+                securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_UsernameTokenReference);
                 if (securityProperties.getUsernameTokenPasswordType() == null) {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
-            } else if (action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
+            } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
                 securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
-            } else if (action.equals(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+            } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
@@ -213,7 +214,7 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
                 }
@@ -223,19 +224,19 @@ public class WSSec {
                     //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
                     securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                 }
-                if (securityProperties.getEncryptionKeyIdentifierType() == null) {
-                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                if (securityProperties.getEncryptionKeyIdentifier() == null) {
+                    securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
                 }
-                if (securityProperties.getDerivedKeyKeyIdentifierType() == null) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                if (securityProperties.getDerivedKeyKeyIdentifier() == null) {
+                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() == null) {
                     securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.DirectReference);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
-            } else if (action.equals(WSSConstants.ENCRYPT_WITH_DERIVED_KEY)) {
+            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
@@ -258,19 +259,19 @@ public class WSSec {
                     //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
                     securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
                 }
-                if (securityProperties.getEncryptionKeyIdentifierType() == null) {
-                    securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                if (securityProperties.getEncryptionKeyIdentifier() == null) {
+                    securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
                 }
-                if (securityProperties.getDerivedKeyKeyIdentifierType() == null) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER);
+                if (securityProperties.getDerivedKeyKeyIdentifier() == null) {
+                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() == null) {
                     securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.EncryptedKey);
                 }
                 if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
-                    securityProperties.setDerivedKeyKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
-            } else if (action.equals(WSSConstants.SAML_TOKEN_SIGNED)) {
+            } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
@@ -283,13 +284,13 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                if (securityProperties.getSignatureKeyIdentifier() == null) {
+                    securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
-            } else if (action.equals(WSSConstants.SAML_TOKEN_UNSIGNED) && 
+            } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action) &&
                     (securityProperties.getCallbackHandler() == null)) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
-            } else if (action.equals(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
+            } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
@@ -302,18 +303,18 @@ public class WSSec {
                 if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
                     securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
                 }
-                if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                if (securityProperties.getSignatureKeyIdentifier() == null) {
+                    securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
-            } else if (action.equals(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
+            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
                     securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#aes256-cbc");
                 }
-                if (securityProperties.getSignatureKeyIdentifierType() == null) {
-                    securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
+                if (securityProperties.getSignatureKeyIdentifier() == null) {
+                    securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
             }
         }

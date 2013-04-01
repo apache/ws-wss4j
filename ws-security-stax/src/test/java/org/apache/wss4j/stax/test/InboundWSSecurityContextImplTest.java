@@ -24,12 +24,14 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
-import org.apache.wss4j.stax.impl.securityToken.SAMLSecurityToken;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityToken;
-import org.apache.wss4j.stax.impl.securityToken.X509SecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
+import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.SecurityToken;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
@@ -60,16 +62,16 @@ public class InboundWSSecurityContextImplTest {
             if (securityEvent instanceof HttpsTokenSecurityEvent) {
                 HttpsTokenSecurityEvent tokenSecurityEvent = (HttpsTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature));
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainEncryption));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainEncryption));
             } else if (securityEvent instanceof X509TokenSecurityEvent) {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEndorsingSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens));
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens));
             }
         }
     }
@@ -90,7 +92,9 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
-        httpsTokenSecurityEvent.setSecurityToken(getX509Token(WSSConstants.X509V3Token));
+        httpsTokenSecurityEvent.setSecurityToken(
+                new HttpsSecurityTokenImpl(
+                        getX509Token(WSSecurityTokenConstants.X509V3Token).getX509Certificates()[0]));
         inboundWSSecurityContext.registerSecurityEvent(httpsTokenSecurityEvent);
 
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
@@ -111,8 +115,9 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent usernameTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
-        UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+        UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
+                WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
+                "username", "password", new Date().toString(), null, new byte[10], 10L,
                 null, null, null);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
@@ -126,11 +131,11 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent signedEndorsingSupportingTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken signedEndorsingSupportingToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl signedEndorsingSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         signedEndorsingSupportingToken.setElementPath(bstPath);
         signedEndorsingSupportingToken.setXMLSecEvent(signedEndorsingSupportingTokenXmlEvent);
         x509TokenSecurityEvent.setSecurityToken(signedEndorsingSupportingToken);
-        signedEndorsingSupportingToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
+        signedEndorsingSupportingToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         inboundWSSecurityContext.registerSecurityEvent(x509TokenSecurityEvent);
 
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
@@ -175,42 +180,42 @@ public class InboundWSSecurityContextImplTest {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainEncryption));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainEncryption));
                 mainEncryptionTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 1) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEndorsingSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens));
                 signedEndorsingSupportingTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 2) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.EncryptedSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens));
                 encryptedSupportingTokensOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 3) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SupportingTokens));
                 supportingTokensOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 4) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEndorsingEncryptedSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens));
                 signedEndorsingEncryptedSupportingTokenOccured = true;
             } else if (securityEvent instanceof X509TokenSecurityEvent && x509TokenIndex == 5) {
                 x509TokenIndex++;
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature));
                 mainSignatureTokenOccured = true;
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEncryptedSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens));
                 usernameTokenOccured = true;
             }
         }
@@ -255,11 +260,11 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent recipientTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         X509TokenSecurityEvent recipientX509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken recipientToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl recipientToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         recipientX509TokenSecurityEvent.setSecurityToken(recipientToken);
         recipientToken.setElementPath(bstPath);
         recipientToken.setXMLSecEvent(recipientTokenXmlEvent);
-        recipientToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);
+        recipientToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
         inboundWSSecurityContext.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
@@ -300,8 +305,9 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.registerSecurityEvent(encryptedSupportingTokenEncryptedElementSecurityEvent);
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
-        UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+        UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
+                WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
+                "username", "password", new Date().toString(), null, new byte[10], 10L,
                 null, null, null);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
@@ -311,27 +317,27 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent signedEndorsingTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         X509TokenSecurityEvent signedEndorsingSupporting509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken signedEndorsingSupportingToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl signedEndorsingSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         signedEndorsingSupporting509TokenSecurityEvent.setSecurityToken(signedEndorsingSupportingToken);
         signedEndorsingSupportingToken.setElementPath(bstPath);
         signedEndorsingSupportingToken.setXMLSecEvent(signedEndorsingTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(signedEndorsingSupporting509TokenSecurityEvent);
 
         X509TokenSecurityEvent encryptedSupporting509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken encryptedSupportingToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl encryptedSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         encryptedSupporting509TokenSecurityEvent.setSecurityToken(encryptedSupportingToken);
         encryptedSupportingToken.setElementPath(bstPath);
         encryptedSupportingToken.setXMLSecEvent(encryptedSupportingTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(encryptedSupporting509TokenSecurityEvent);
 
         X509TokenSecurityEvent supporting509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken supportingToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl supportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         supporting509TokenSecurityEvent.setSecurityToken(supportingToken);
         supportingToken.setElementPath(bstPath);
         inboundWSSecurityContext.registerSecurityEvent(supporting509TokenSecurityEvent);
 
         X509TokenSecurityEvent signedEndorsingEncryptedSupporting509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken signedEndorsingEncryptedSupportingToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl signedEndorsingEncryptedSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         signedEndorsingEncryptedSupporting509TokenSecurityEvent.setSecurityToken(signedEndorsingEncryptedSupportingToken);
         signedEndorsingEncryptedSupportingToken.setElementPath(bstPath);
         signedEndorsingEncryptedSupportingToken.setXMLSecEvent(signedEndorsingEncryptedTokenXmlEvent);
@@ -340,7 +346,7 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent initiatorTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         X509TokenSecurityEvent initiator509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken initiatorToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl initiatorToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         initiator509TokenSecurityEvent.setSecurityToken(initiatorToken);
         initiatorToken.setElementPath(bstPath);
         initiatorToken.setXMLSecEvent(initiatorTokenXmlEvent);
@@ -348,7 +354,7 @@ public class InboundWSSecurityContextImplTest {
 
         initiator509TokenSecurityEvent = new X509TokenSecurityEvent();
         initiator509TokenSecurityEvent.setSecurityToken(initiatorToken);
-        initiatorToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
+        initiatorToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         inboundWSSecurityContext.registerSecurityEvent(initiator509TokenSecurityEvent);
 
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
@@ -403,7 +409,7 @@ public class InboundWSSecurityContextImplTest {
 
         signedEndorsingSupporting509TokenSecurityEvent = new X509TokenSecurityEvent();
         signedEndorsingSupporting509TokenSecurityEvent.setSecurityToken(signedEndorsingSupportingToken);
-        signedEndorsingSupportingToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
+        signedEndorsingSupportingToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         inboundWSSecurityContext.registerSecurityEvent(signedEndorsingSupporting509TokenSecurityEvent);
 
         SignatureValueSecurityEvent signature2ValueSecurityEvent = new SignatureValueSecurityEvent();
@@ -420,7 +426,7 @@ public class InboundWSSecurityContextImplTest {
 
         signedEndorsingEncryptedSupporting509TokenSecurityEvent = new X509TokenSecurityEvent();
         signedEndorsingEncryptedSupporting509TokenSecurityEvent.setSecurityToken(signedEndorsingEncryptedSupportingToken);
-        signedEndorsingEncryptedSupportingToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
+        signedEndorsingEncryptedSupportingToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         inboundWSSecurityContext.registerSecurityEvent(signedEndorsingEncryptedSupporting509TokenSecurityEvent);
 
         signature2ValueSecurityEvent = new SignatureValueSecurityEvent();
@@ -461,16 +467,16 @@ public class InboundWSSecurityContextImplTest {
             if (securityEvent instanceof X509TokenSecurityEvent) {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEndorsingSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens));
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.SignedEncryptedSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens));
             } else if (securityEvent instanceof SamlTokenSecurityEvent) {
                 SamlTokenSecurityEvent tokenSecurityEvent = (SamlTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 2);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainSignature));
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(SecurityToken.TokenUsage.MainEncryption));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainEncryption));
             }
         }
     }
@@ -512,12 +518,12 @@ public class InboundWSSecurityContextImplTest {
         samlCallback.setSubject(subjectBean);
         SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
 
-        SAMLSecurityToken samlSecurityToken = new SAMLSecurityToken(
-                samlAssertionWrapper, getX509Token(WSSConstants.X509V3Token), null, null, "1", WSSConstants.WSSKeyIdentifierType.X509_KEY_IDENTIFIER,
+        SamlSecurityTokenImpl samlSecurityToken = new SamlSecurityTokenImpl(
+                samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null, WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier,
                 null);
         samlSecurityToken.setElementPath(samlTokenPath);
         samlSecurityToken.setXMLSecEvent(samlTokenXmlEvent);
-        samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Encryption);
+        samlSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
         SamlTokenSecurityEvent samlTokenSecurityEvent = new SamlTokenSecurityEvent();
         samlTokenSecurityEvent.setSecurityToken(samlSecurityToken);
         inboundWSSecurityContext.registerSecurityEvent(samlTokenSecurityEvent);
@@ -542,8 +548,9 @@ public class InboundWSSecurityContextImplTest {
         usernameTokenPath.add(WSSConstants.TAG_wsse_UsernameToken);
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
-        UsernameSecurityToken usernameSecurityToken = new UsernameSecurityToken(
-                "username", "password", new Date().toString(), new byte[10], new byte[10], 10L,
+        UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
+                WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
+                "username", "password", new Date().toString(), null, new byte[10], 10L,
                 null, null, null);
         usernameSecurityToken.setElementPath(usernamePath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
@@ -558,7 +565,7 @@ public class InboundWSSecurityContextImplTest {
         signatureEncryptedElementSecurityEvent.setElementPath(signaturePath);
         inboundWSSecurityContext.registerSecurityEvent(signatureEncryptedElementSecurityEvent);
 
-        samlSecurityToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
+        samlSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         samlTokenSecurityEvent = new SamlTokenSecurityEvent();
         samlTokenSecurityEvent.setSecurityToken(samlSecurityToken);
         inboundWSSecurityContext.registerSecurityEvent(samlTokenSecurityEvent);
@@ -615,11 +622,11 @@ public class InboundWSSecurityContextImplTest {
         inboundWSSecurityContext.registerSecurityEvent(bodySignedPartSecurityEvent);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityToken signedEndorsingSupportingToken = getX509Token(WSSConstants.X509V3Token);
+        X509SecurityTokenImpl signedEndorsingSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509TokenSecurityEvent.setSecurityToken(signedEndorsingSupportingToken);
         signedEndorsingSupportingToken.setElementPath(bstPath);
         signedEndorsingSupportingToken.setXMLSecEvent(bstTokenXmlEvent);
-        signedEndorsingSupportingToken.addTokenUsage(SecurityToken.TokenUsage.Signature);
+        signedEndorsingSupportingToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         inboundWSSecurityContext.registerSecurityEvent(x509TokenSecurityEvent);
 
         SignatureValueSecurityEvent signature2ValueSecurityEvent = new SignatureValueSecurityEvent();
@@ -648,15 +655,17 @@ public class InboundWSSecurityContextImplTest {
         return securityEventList;
     }
 
-    private X509SecurityToken getX509Token(WSSConstants.TokenType tokenType) throws Exception {
+    private X509SecurityTokenImpl getX509Token(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
 
         final KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
-        X509SecurityToken x509SecurityToken = new X509SecurityToken(tokenType, null, null, null, "", WSSConstants.WSSKeyIdentifierType.THUMBPRINT_IDENTIFIER, null) {
+        X509SecurityTokenImpl x509SecurityToken =
+                new X509SecurityTokenImpl(tokenType, null, null, null, "",
+                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, null) {
 
             @Override
-            protected String getAlias() throws XMLSecurityException {
+            protected String getAlias() throws WSSecurityException {
                 return "transmitter";
             }
         };
