@@ -208,11 +208,11 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         assertEquals(1, sigDataRefs.size());
         assertEquals(1, encDataRefs.size());
         
-        assertNull(((WSDataRef) sigDataRefs.get(0))
+        assertNull(sigDataRefs.get(0)
                 .getProtectedElement().getAttributeNodeNS(WSConstants.WSU_NS, "Id"));
         
-        assertTrue(((WSDataRef) sigDataRefs.get(0)).getWsuId().contains(
-                ((WSDataRef) encDataRefs.get(0)).getWsuId()));
+        assertTrue(sigDataRefs.get(0).getWsuId().contains(
+                encDataRefs.get(0).getWsuId()));
     }
     
     

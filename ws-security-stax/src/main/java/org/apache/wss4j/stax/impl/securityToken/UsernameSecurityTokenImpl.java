@@ -46,7 +46,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
     private String username;
     private String password;
     private String createdTime;
-    private String nonce;
+    private byte[] nonce;
     private byte[] salt;
     private Long iteration;
     private final WSInboundSecurityContext wsInboundSecurityContext;
@@ -54,7 +54,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
     private Principal principal;
 
     public UsernameSecurityTokenImpl(WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType,
-                                     String username, String password, String createdTime, String nonce,
+                                     String username, String password, String createdTime, byte[] nonce,
                                      byte[] salt, Long iteration,
                                      WSInboundSecurityContext wsInboundSecurityContext, String id,
                                      WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
@@ -190,7 +190,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
                 }
 
                 @Override
-                public String getNonce() {
+                public byte[] getNonce() {
                     return nonce;
                 }
             };
@@ -214,7 +214,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
         return username;
     }
 
-    public String getNonce() {
+    public byte[] getNonce() {
         return nonce;
     }
 

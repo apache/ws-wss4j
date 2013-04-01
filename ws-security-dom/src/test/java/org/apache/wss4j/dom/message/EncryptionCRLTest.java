@@ -84,7 +84,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
         reqData.setUsername("wss40rev");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.ENCR));
+        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -125,7 +125,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
         reqData.setUsername("wss40rev");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.ENCR));
+        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.setOption(WSHandlerConstants.ENABLE_REVOCATION, "true");

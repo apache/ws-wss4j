@@ -87,8 +87,7 @@ public class X509Security extends BinarySecurity {
         byte[] data = getToken();
         if (data == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", new Object[]{Integer.valueOf(0)}
-            );
+                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
         }
         InputStream in = new ByteArrayInputStream(data);
         cachedCert = crypto.loadCertificate(in);

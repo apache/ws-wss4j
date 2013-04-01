@@ -137,7 +137,7 @@ public class CryptoTest extends org.junit.Assert {
     private static class NullPropertiesCrypto extends Merlin {
         public NullPropertiesCrypto() 
             throws Exception {
-            super((java.util.Properties) null);
+            super(null);
         }
     }
 }

@@ -27,7 +27,6 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Reference.
@@ -131,7 +130,7 @@ public class Reference {
      * @return the string representation.
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node)element);
+        return DOM2Writer.nodeToString(element);
     }
     
     @Override

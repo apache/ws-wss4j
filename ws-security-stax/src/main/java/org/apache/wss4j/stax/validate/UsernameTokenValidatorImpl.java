@@ -119,7 +119,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 usernameTokenPasswordType, username.getValue(), password, created,
-                encodedNonce != null ? encodedNonce.getValue() : null, salt, iteration,
+                nonceVal, salt, iteration,
                 tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
                 WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());

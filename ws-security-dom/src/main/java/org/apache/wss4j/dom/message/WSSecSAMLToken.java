@@ -78,7 +78,7 @@ public class WSSecSAMLToken extends WSSecBase {
      */
     public void prependToHeader(WSSecHeader secHeader) {
         try {
-            Element element = (Element) saml.toDOM(document);
+            Element element = saml.toDOM(document);
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
         } catch (WSSecurityException ex) {
             throw new RuntimeException(ex.toString(), ex);

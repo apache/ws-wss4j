@@ -119,8 +119,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
-        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
+        assertTrue(outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256"));
+        assertTrue(outputString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
         
@@ -141,7 +141,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -183,8 +183,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        /*TODO - Re-enable this when WSS-265 is fixed:
-         * https://issues.apache.org/jira/browse/WSS-265
+        /* https://issues.apache.org/jira/browse/WSS-265 */
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
@@ -203,10 +202,9 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
-        */
     }
     
     /**
@@ -245,8 +243,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug("Signed SAML 2 Authn Assertion (key holder):");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1);
-        assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1);
+        assertTrue(outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256"));
+        assertTrue(outputString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
         
@@ -266,7 +264,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -309,9 +307,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        /*
-         * TODO - Re-enable this when WSS-265 is fixed:
-         * https://issues.apache.org/jira/browse/WSS-265
+        /* https://issues.apache.org/jira/browse/WSS-265 */
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
@@ -330,10 +326,9 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
-        */
     }
     
     /**
@@ -392,7 +387,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -453,7 +448,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -514,7 +509,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -581,7 +576,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }

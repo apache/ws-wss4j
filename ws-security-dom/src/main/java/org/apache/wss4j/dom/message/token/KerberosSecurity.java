@@ -126,9 +126,7 @@ public class KerberosSecurity extends BinarySecurity {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
-                ex,
-                new Object[] {ex.getMessage()}
-            );
+                ex, ex.getMessage());
         }
         if (log.isDebugEnabled()) {
             log.debug("Successfully authenticated to the TGT");
@@ -139,9 +137,8 @@ public class KerberosSecurity extends BinarySecurity {
         if (clientPrincipals.isEmpty()) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
-                "kerberosLoginError", 
-                new Object[] {"No Client principals found after login"}
-            );
+                "kerberosLoginError",
+                "No Client principals found after login");
         }
         // Store the TGT
         KerberosTicket tgt = getKerberosTicket(clientSubject, null);
@@ -149,7 +146,7 @@ public class KerberosSecurity extends BinarySecurity {
         // Get the service ticket
         KerberosClientAction action =
             new KerberosClientAction(clientPrincipals.iterator().next(), serviceName);
-        byte[] ticket = (byte[])Subject.doAs(clientSubject, action);
+        byte[] ticket = Subject.doAs(clientSubject, action);
         if (ticket == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"

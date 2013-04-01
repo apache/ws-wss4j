@@ -154,8 +154,7 @@ public class SAMLTokenProcessor implements Processor {
                 } else {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                        new Object[]{"cannot get certificate or key"}
-                    );
+                        "cannot get certificate or key");
                 }
             
                 // Not checking signature here, just marshalling into an XMLSignature

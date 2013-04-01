@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.processor;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.w3c.dom.Element;
@@ -93,7 +94,7 @@ public class UsernameTokenProcessor implements Processor {
             } else {
                 WSUsernameTokenPrincipalImpl principal =
                     new WSUsernameTokenPrincipalImpl(token.getName(), token.isHashed());
-                principal.setNonce(token.getNonce());
+                principal.setNonce(Base64.decodeBase64(token.getNonce()));
                 principal.setPassword(token.getPassword());
                 principal.setCreatedTime(token.getCreated());
                 principal.setPasswordType(token.getPasswordType());

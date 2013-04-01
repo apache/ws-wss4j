@@ -46,7 +46,7 @@ public class Loader {
      * <p/>
      *
      * @param resource
-     * @return TODO
+     * @return the url to the resource or null if not found
      */
     public static URL getResource(String resource) {
         URL url = null;
@@ -63,8 +63,8 @@ public class Loader {
                     return url;
                 } 
             }
-        } catch (Throwable t) {
-            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", t);
+        } catch (Exception e) {
+            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
         }
     
         ClassLoader cluClassloader = Loader.class.getClassLoader();
@@ -104,7 +104,7 @@ public class Loader {
      * <p/>
      *
      * @param resource
-     * @return TODO
+     * @return the url to the resource or null if not found
      */
     public static URL getResource(ClassLoader loader, String resource) {
         URL url = null;
@@ -120,8 +120,8 @@ public class Loader {
                     return url;
                 }
             }
-        } catch (Throwable t) {
-            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", t);
+        } catch (Exception e) {
+            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
         }
         return getResource(resource);
     }
@@ -173,7 +173,7 @@ public class Loader {
                     return c;
                 }
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
         return loadClass(clazz, true);
@@ -199,7 +199,7 @@ public class Loader {
                     return c.asSubclass(type);
                 }
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
         return loadClass(clazz, true, type);
@@ -212,7 +212,7 @@ public class Loader {
      * <p/>
      *
      * @param clazz
-     * @return TODO
+     * @return the class
      * @throws ClassNotFoundException
      */
     public static Class<?> loadClass(String clazz) throws ClassNotFoundException {
@@ -227,7 +227,7 @@ public class Loader {
      *
      * @param clazz
      * @param type  Type to cast it to
-     * @return TODO
+     * @return the class
      * @throws ClassNotFoundException
      */
     public static <T> Class<? extends T> loadClass(String clazz, Class<T> type)
@@ -251,7 +251,7 @@ public class Loader {
                     return c;
                 }
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (warn) {
                 log.warn(e.getMessage(), e);
             } else {

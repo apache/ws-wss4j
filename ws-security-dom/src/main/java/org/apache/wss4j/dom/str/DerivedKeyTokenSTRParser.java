@@ -90,8 +90,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 getSecretKeyFromToken(uri, null, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN, data);
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
-                );
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
             }
         } else if (secRef.containsKeyIdentifier()) {
             String keyIdentifierValueType = secRef.getKeyIdentifierValueType();
@@ -117,8 +116,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
-                    );
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
                 }
             } else {
                 if (keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
@@ -133,8 +131,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                        ); 
                     if (secretKey == null) {
                         throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", new Object[] {uri}
-                        );
+                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
                     }
                 } else {
                     secretKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler()).getEncoded();
@@ -227,9 +224,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword", 
-                e,
-                new Object[] {id}
-            );
+                e, id);
         }
 
         return null;
@@ -244,7 +239,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION));
         if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
             STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);

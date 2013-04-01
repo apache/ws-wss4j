@@ -51,7 +51,7 @@ public class CertErrorTest extends org.junit.Assert {
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user bob were found for signature";
-            assertTrue(ex.getMessage().indexOf(expectedError) != -1);
+            assertTrue(ex.getMessage().contains(expectedError));
         }
     }
     
@@ -70,7 +70,7 @@ public class CertErrorTest extends org.junit.Assert {
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user alice were found for encryption";
-            assertTrue(ex.getMessage().indexOf(expectedError) != -1);
+            assertTrue(ex.getMessage().contains(expectedError));
         }
     }
 

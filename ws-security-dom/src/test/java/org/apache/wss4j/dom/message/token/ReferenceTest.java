@@ -125,7 +125,7 @@ public class ReferenceTest extends org.junit.Assert {
     @org.junit.Test
     public void testHashcode() throws Exception{
         assertEquals(ref.hashCode(), refEqual.hashCode());
-        assertTrue(!(ref.hashCode() == refNotEqual.hashCode()));
+        assertFalse((ref.hashCode() == refNotEqual.hashCode()));
     }
     
     private static org.w3c.dom.Document

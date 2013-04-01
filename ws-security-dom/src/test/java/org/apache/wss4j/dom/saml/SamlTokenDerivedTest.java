@@ -123,11 +123,11 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 2);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         
-        wsDataRef = (WSDataRef)refs.get(1);
+        wsDataRef = refs.get(1);
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
     }

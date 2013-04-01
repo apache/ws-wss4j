@@ -1248,7 +1248,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter pw = new PrintWriter(stringWriter);
                     ex.printStackTrace(pw);
-                    Assert.assertTrue(!(t instanceof NullPointerException), stringWriter.toString());
+                    Assert.assertFalse((t instanceof NullPointerException), stringWriter.toString());
                     t = t.getCause();
                 }
             }

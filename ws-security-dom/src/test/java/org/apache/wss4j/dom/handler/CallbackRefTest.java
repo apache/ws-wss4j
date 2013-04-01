@@ -60,7 +60,7 @@ public class CallbackRefTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -76,8 +76,8 @@ public class CallbackRefTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("alice") != -1);
-        assertTrue(outputString.indexOf("securityPassword") != -1);
+        assertTrue(outputString.contains("alice"));
+        assertTrue(outputString.contains("securityPassword"));
     }
     
     /**
@@ -96,7 +96,7 @@ public class CallbackRefTest extends org.junit.Assert {
         reqData.setMsgContext(new java.util.TreeMap<String, String>());
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
@@ -113,8 +113,8 @@ public class CallbackRefTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("alice") != -1);
-        assertTrue(outputString.indexOf("securityPassword") != -1);
+        assertTrue(outputString.contains("alice"));
+        assertTrue(outputString.contains("securityPassword"));
     }
     
 }

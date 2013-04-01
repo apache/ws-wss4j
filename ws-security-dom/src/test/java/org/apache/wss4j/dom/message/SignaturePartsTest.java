@@ -143,7 +143,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
         assertEquals(WSConstants.RSA_SHA1, wsDataRef.getAlgorithm());
@@ -239,7 +239,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         final List<WSDataRef> refs =
             (List<WSDataRef>) signActionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/wsse:Security/saml1:Assertion", xpath);
     }

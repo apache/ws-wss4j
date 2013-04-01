@@ -97,7 +97,7 @@ public class X509NameTokenizerTest extends org.junit.Assert {
             assertTrue(tokenizer.hasMoreTokens());
             assertEquals(tokenizer.nextToken(), expected[i]);
         }
-        assertTrue(!tokenizer.hasMoreTokens());
+        assertFalse(tokenizer.hasMoreTokens());
         assertEquals(tokenizer.nextToken(), "");
     }
 }

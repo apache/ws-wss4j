@@ -225,9 +225,7 @@ public class SecurityTokenReference {
         if (tokElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
-                "noToken",
-                new Object[]{uri}
-            );
+                "noToken", uri);
         }
         return tokElement;
     }
@@ -366,9 +364,7 @@ public class SecurityTokenReference {
         if (cert.getVersion() != 3) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                "invalidCertForSKI",
-                new Object[]{Integer.valueOf(cert.getVersion())}
-            );
+                "invalidCertForSKI", cert.getVersion());
         }
         
         Document doc = element.getOwnerDocument();
@@ -475,10 +471,8 @@ public class SecurityTokenReference {
 
         if (X509Security.X509_V3_TYPE.equals(value)) {
             X509Security token = new X509Security(elem, new BSPEnforcer(true));
-            if (token != null) {
-                X509Certificate cert = token.getX509Certificate(crypto);
-                return new X509Certificate[]{cert};
-            }
+            X509Certificate cert = token.getX509Certificate(crypto);
+            return new X509Certificate[]{cert};
         } else if (SKI_URI.equals(value)) {
             X509Certificate cert = getX509SKIAlias(crypto);
             if (cert != null) {
@@ -780,7 +774,7 @@ public class SecurityTokenReference {
      * @return a representation of this SecurityTokenReference element as a String
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node) element);
+        return DOM2Writer.nodeToString(element);
     }
     
     /**

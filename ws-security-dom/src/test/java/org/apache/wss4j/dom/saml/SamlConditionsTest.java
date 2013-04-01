@@ -97,7 +97,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
-        assertTrue(!receivedSamlAssertion.isSigned());
+        assertFalse(receivedSamlAssertion.isSigned());
         assertTrue(receivedSamlAssertion.getSignatureValue() == null);
     }
     

@@ -189,7 +189,7 @@ public final class WSHandlerConstants {
      * The callback function
      * {@link javax.security.auth.callback.CallbackHandler#handle(
      * javax.security.auth.callback.Callback[])} gets an array of 
-     * {@link org.apache.wss4j.dom.WSPasswordCallback} objects. Only the first entry of the 
+     * {@link org.apache.wss4j.common.ext.WSPasswordCallback} objects. Only the first entry of the
      * array is used. This object contains the username/keyname as identifier. The callback
      * handler must set the password or key associated with this identifier before it returns.
      * <p/>
@@ -243,7 +243,7 @@ public final class WSHandlerConstants {
      * loads this file. Therefore it must be accessible via the classpath.
      * <p/>
      * To locate the implementation of the
-     * {@link org.apache.wss4j.dom.components.crypto.Crypto Crypto}
+     * {@link org.apache.wss4j.common.crypto.Crypto Crypto}
      * interface implementation the property file must contain the property
      * <code>org.apache.wss4j.crypto.provider</code>. The value of
      * this property is the classname of the implementation class.
@@ -253,7 +253,7 @@ public final class WSHandlerConstants {
      * org.apache.wss4j.crypto.provider=org.apache.wss4j.common.crypto.Merlin
      * </pre>
      * The other contents of the property file depend on the implementation
-     * of the {@link org.apache.wss4j.dom.components.crypto.Crypto Crypto}
+     * of the {@link org.apache.wss4j.common.crypto.Crypto Crypto}
      * interface. Please see the WSS4J website for more information on the Merlin property 
      * tags and values.
      * </p>
@@ -817,22 +817,14 @@ public final class WSHandlerConstants {
     private static Map<String, Integer> keyIdentifier = new HashMap<String, Integer>();
 
     static {
-        keyIdentifier.put("DirectReference",
-                Integer.valueOf(WSConstants.BST_DIRECT_REFERENCE));
-        keyIdentifier.put("IssuerSerial",
-                Integer.valueOf(WSConstants.ISSUER_SERIAL));
-        keyIdentifier.put("X509KeyIdentifier",
-                Integer.valueOf(WSConstants.X509_KEY_IDENTIFIER));
-        keyIdentifier.put("SKIKeyIdentifier",
-                Integer.valueOf(WSConstants.SKI_KEY_IDENTIFIER));
-        keyIdentifier.put("EmbeddedKeyName",
-                Integer.valueOf(WSConstants.EMBEDDED_KEYNAME));
-        keyIdentifier.put("Thumbprint",
-                Integer.valueOf(WSConstants.THUMBPRINT_IDENTIFIER));
-        keyIdentifier.put("EncryptedKeySHA1",
-                Integer.valueOf(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER));
-        keyIdentifier.put("KeyValue",
-                Integer.valueOf(WSConstants.KEY_VALUE));
+        keyIdentifier.put("DirectReference", WSConstants.BST_DIRECT_REFERENCE);
+        keyIdentifier.put("IssuerSerial", WSConstants.ISSUER_SERIAL);
+        keyIdentifier.put("X509KeyIdentifier", WSConstants.X509_KEY_IDENTIFIER);
+        keyIdentifier.put("SKIKeyIdentifier", WSConstants.SKI_KEY_IDENTIFIER);
+        keyIdentifier.put("EmbeddedKeyName", WSConstants.EMBEDDED_KEYNAME);
+        keyIdentifier.put("Thumbprint", WSConstants.THUMBPRINT_IDENTIFIER);
+        keyIdentifier.put("EncryptedKeySHA1", WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        keyIdentifier.put("KeyValue", WSConstants.KEY_VALUE);
     }
     
     /**

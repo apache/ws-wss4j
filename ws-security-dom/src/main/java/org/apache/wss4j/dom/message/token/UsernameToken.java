@@ -682,7 +682,7 @@ public class UsernameToken {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node)element);
+        return DOM2Writer.nodeToString(element);
     }
 
     /**
@@ -917,13 +917,19 @@ public class UsernameToken {
     /**
      * Create a WSUsernameTokenPrincipal from this UsernameToken object
      */
-    public Principal createPrincipal() {
-        WSUsernameTokenPrincipalImpl principal =
-            new WSUsernameTokenPrincipalImpl(getName(), isHashed());
-        principal.setNonce(getNonce());
-        principal.setPassword(getPassword());
-        principal.setCreatedTime(getCreated());
-        return principal;
+    public Principal createPrincipal() throws WSSecurityException {
+        try {
+            WSUsernameTokenPrincipalImpl principal =
+                new WSUsernameTokenPrincipalImpl(getName(), isHashed());
+            principal.setNonce(Base64.decode(getNonce()));
+            principal.setPassword(getPassword());
+            principal.setCreatedTime(getCreated());
+            return principal;
+        } catch (Base64DecodingException e) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+            );
+        }
     }
     
     /**

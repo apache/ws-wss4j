@@ -26,9 +26,7 @@ public interface UsernameTokenPrincipal extends Principal {
 
     String getPassword();
 
-    //todo shouldn't we return the raw bytes of the nonce instead of the Base64Encoded string?
-    //otherwise every user of the nonce has to decode it first.
-    String getNonce();
+    byte[] getNonce();
 
     String getCreatedTime();
 

@@ -136,10 +136,9 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
         boolean found = false;
                 
         for (int i = 0; i < wsResults.size(); i++) {
-            WSSecurityEngineResult wsSecEngineResult = 
-                (WSSecurityEngineResult)wsResults.get(i);           
-            int action = ((java.lang.Integer) 
-                wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            WSSecurityEngineResult wsSecEngineResult = wsResults.get(i);
+            int action = (Integer)
+                    wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION);
             
             // We want to filter only encryption results
             if (action != WSConstants.ENCR) {

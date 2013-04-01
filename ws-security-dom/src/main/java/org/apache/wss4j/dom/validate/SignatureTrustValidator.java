@@ -190,9 +190,7 @@ public class SignatureTrustValidator implements Validator {
         //
         X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
         x509certs[0] = cert;
-        for (int j = 0; j < foundCerts.length; j++) {
-            x509certs[j + 1] = (X509Certificate)foundCerts[j];
-        }
+        System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
 
         //
         // Use the validation method from the crypto to check whether the subjects' 

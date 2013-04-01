@@ -75,8 +75,8 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         reqData.setMsgContext(messageContext);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
-        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(WSConstants.UT);
+        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

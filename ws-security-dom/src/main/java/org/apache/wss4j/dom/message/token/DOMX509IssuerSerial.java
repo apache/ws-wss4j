@@ -126,7 +126,7 @@ public final class DOMX509IssuerSerial {
      * @return the string representation of the token.
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node)element);
+        return DOM2Writer.nodeToString(element);
     }
     
     

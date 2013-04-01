@@ -163,7 +163,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         
         final List<Integer> actions = new ArrayList<Integer>();
-        actions.add(Integer.valueOf(action));
+        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
@@ -193,7 +193,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         
         final List<Integer> actions = new ArrayList<Integer>();
-        actions.add(Integer.valueOf(action));
+        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");

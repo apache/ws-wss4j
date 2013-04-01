@@ -197,7 +197,7 @@ public class EncryptedKeySTRParser implements STRParser {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        int action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
         if (WSConstants.BST == action) {
             BinarySecurity token = 
                 (BinarySecurity)result.get(

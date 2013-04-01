@@ -76,8 +76,7 @@ public class SpnegoTokenContext {
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 ex,
-                new Object[] {ex.getMessage()}
-            );
+                ex.getMessage());
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully authenticated to the TGT");
@@ -88,15 +87,14 @@ public class SpnegoTokenContext {
         if (clientPrincipals.isEmpty()) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
-                "kerberosLoginError", 
-                new Object[] {"No Client principals found after login"}
-            );
+                "kerberosLoginError",
+                "No Client principals found after login");
         }
         
         // Get the service ticket
         clientAction.setServiceName(serviceName);
         clientAction.setMutualAuth(mutualAuth);
-        token = (byte[])Subject.doAs(clientSubject, clientAction);
+        token = Subject.doAs(clientSubject, clientAction);
         if (token == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
@@ -141,8 +139,7 @@ public class SpnegoTokenContext {
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 ex,
-                new Object[] {ex.getMessage()}
-            );
+                ex.getMessage());
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully authenticated to the TGT");
@@ -156,9 +153,8 @@ public class SpnegoTokenContext {
             if (principals.isEmpty()) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, 
-                    "kerberosLoginError", 
-                    new Object[] {"No Client principals found after login"}
-                );
+                    "kerberosLoginError",
+                    "No Client principals found after login");
             }
             service = principals.iterator().next().getName();
         }
@@ -166,7 +162,7 @@ public class SpnegoTokenContext {
         // Validate the ticket
         serviceAction.setTicket(ticket);
         serviceAction.setServiceName(service);
-        token = (byte[])Subject.doAs(subject, serviceAction);
+        token = Subject.doAs(subject, serviceAction);
         
         secContext = serviceAction.getContext();
         if (LOG.isDebugEnabled()) {

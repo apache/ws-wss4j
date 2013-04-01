@@ -95,7 +95,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
     
@@ -124,7 +124,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
 
@@ -161,7 +161,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") > 0);
         assertTrue(outputString.indexOf("http://www.w3.org/2009/xmlenc11#aes192-gcm") > 0);
         assertTrue(outputString.indexOf("http://www.w3.org/2009/xmlenc11#mgf1sha256") > 0);
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
 
@@ -202,7 +202,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             assertNotNull(action);
-            if ((action.intValue() & WSConstants.ENCR) != 0) {
+            if ((action & WSConstants.ENCR) != 0) {
                 final java.util.List<WSDataRef> refs =
                     (java.util.List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 assertNotNull(refs);

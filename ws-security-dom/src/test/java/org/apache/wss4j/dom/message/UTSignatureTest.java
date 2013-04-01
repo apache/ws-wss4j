@@ -83,10 +83,10 @@ public class UTSignatureTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -96,7 +96,7 @@ public class UTSignatureTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal.getName().indexOf("bob") != -1);
+        assertTrue(principal.getName().contains("bob"));
         
         try {
             verify(signedDoc, false);
@@ -163,7 +163,7 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setUsername("bob");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT_SIGN));
+        actions.add(WSConstants.UT_SIGN);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
@@ -177,10 +177,10 @@ public class UTSignatureTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -190,7 +190,7 @@ public class UTSignatureTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal.getName().indexOf("bob") != -1);
+        assertTrue(principal.getName().contains("bob"));
     }
     
     /**
@@ -210,7 +210,7 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setUsername("bob");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT_SIGN));
+        actions.add(WSConstants.UT_SIGN);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
@@ -224,11 +224,11 @@ public class UTSignatureTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("1234") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertTrue(outputString.contains("1234"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -238,13 +238,13 @@ public class UTSignatureTest extends org.junit.Assert {
             WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(principal.getName().indexOf("bob") != -1);
+        assertTrue(principal.getName().contains("bob"));
     }
     
     /**
      * Verifies the soap envelope.
      * 
-     * @param env soap envelope
+     * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {

@@ -25,7 +25,6 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * An X509Data token.
@@ -93,7 +92,7 @@ public final class DOMX509Data {
      * @return the string representation of the token.
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node)element);
+        return DOM2Writer.nodeToString(element);
     }
     
 }

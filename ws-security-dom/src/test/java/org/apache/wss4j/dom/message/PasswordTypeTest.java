@@ -158,7 +158,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);
         

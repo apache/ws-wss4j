@@ -23,6 +23,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
@@ -100,6 +101,13 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         final EncodedString encodedNonce =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+        byte[] nonceVal = null;
+        if (encodedNonce != null) {
+            if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "badTokenType01");
+            }
+            nonceVal = Base64.decodeBase64(encodedNonce.getValue());
+        }
 
         final AttributedDateTime attributedDateTimeCreated =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
@@ -107,8 +115,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 usernameTokenPasswordType, username, password,
                 attributedDateTimeCreated != null ? attributedDateTimeCreated.getValue() : null,
-                encodedNonce != null ? encodedNonce.getValue() : null,
-                null, null,
+                nonceVal, null, null,
                 tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
                 WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());

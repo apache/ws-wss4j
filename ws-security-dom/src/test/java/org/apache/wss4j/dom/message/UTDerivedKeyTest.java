@@ -90,10 +90,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         
         byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 500);
         assertTrue(derivedKey.length == 20);
@@ -151,11 +151,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("testMethod") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertFalse(outputString.contains("testMethod"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -202,11 +202,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("testMethod") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertFalse(outputString.contains("testMethod"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -254,11 +254,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("testMethod") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertFalse(outputString.contains("testMethod"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -305,11 +305,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("testMethod") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertFalse(outputString.contains("testMethod"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -355,10 +355,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -369,7 +369,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         // System.out.println(principal.getName());
-        assertTrue(principal.getName().indexOf("DK") != -1);
+        assertTrue(principal.getName().contains("DK"));
     }
     
     /**
@@ -405,10 +405,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -424,7 +424,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         // System.out.println(principal.getName());
-        assertTrue(principal.getName().indexOf("DK") != -1);
+        assertTrue(principal.getName().contains("DK"));
     }
     
     /**
@@ -560,10 +560,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") == -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertFalse(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -609,10 +609,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertFalse(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -659,10 +659,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -719,11 +719,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("testMethod") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertFalse(outputString.contains("testMethod"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -786,11 +786,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         String outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("wsse:Username") != -1);
-        assertTrue(outputString.indexOf("wsse:Password") == -1);
-        assertTrue(outputString.indexOf("wsse11:Salt") != -1);
-        assertTrue(outputString.indexOf("wsse11:Iteration") != -1);
-        assertTrue(outputString.indexOf("testMethod") == -1);
+        assertTrue(outputString.contains("wsse:Username"));
+        assertFalse(outputString.contains("wsse:Password"));
+        assertTrue(outputString.contains("wsse11:Salt"));
+        assertTrue(outputString.contains("wsse11:Iteration"));
+        assertFalse(outputString.contains("testMethod"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

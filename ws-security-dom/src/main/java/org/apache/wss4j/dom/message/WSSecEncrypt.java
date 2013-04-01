@@ -171,9 +171,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 if (certs == null || certs.length <= 0) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
-                        "noUserCertsFound", 
-                        new Object[] { user, "encryption" }
-                    );
+                        "noUserCertsFound",
+                        user, "encryption");
                 }
                 remoteCert = certs[0];
             }
@@ -382,9 +381,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (elementsToEncrypt == null || elementsToEncrypt.size() == 0) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "noEncElement", 
-                    new Object[] {"{" + encPart.getNamespace() + "}" + encPart.getName()}
-                );
+                    "noEncElement",
+                    "{" + encPart.getNamespace() + "}" + encPart.getName());
             }
 
             String modifier = encPart.getEncModifier();
@@ -422,7 +420,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         KeyInfo keyInfo
     ) throws WSSecurityException {
 
-        boolean content = "Content".equals(modifier) ? true : false;
+        boolean content = "Content".equals(modifier);
         //
         // Encrypt data, and set necessary attributes in xenc:EncryptedData
         //

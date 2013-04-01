@@ -70,7 +70,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("RSAKeyValue") != -1);
+        assertTrue(outputString.contains("RSAKeyValue"));
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
@@ -113,7 +113,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("RSAKeyValue") != -1);
+        assertTrue(outputString.contains("RSAKeyValue"));
         
         try {
             WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -147,7 +147,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("DSAKeyValue") != -1);
+        assertTrue(outputString.contains("DSAKeyValue"));
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();

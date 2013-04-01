@@ -116,7 +116,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
 
         /*
@@ -147,7 +147,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-15 keytransport, AES 128:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         List<WSSecurityEngineResult> results = verify(
             encryptedDoc,
             keystoreCallbackHandler,
@@ -193,7 +193,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         
@@ -286,7 +286,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("#ThumbprintSHA1") != -1);
+        assertTrue(outputString.contains("#ThumbprintSHA1"));
     
         LOG.info("After Encrypting ThumbprintSHA1....");
         List<WSSecurityEngineResult> results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
@@ -326,7 +326,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
+        assertTrue(outputString.contains("#EncryptedKeySHA1"));
      
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
@@ -361,10 +361,10 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
+        assertTrue(outputString.contains("#EncryptedKeySHA1"));
      
         LOG.info("After Encrypting EncryptedKeySHA1....");
-        verify(encryptedDoc, (Crypto)null, secretKeyCallbackHandler);
+        verify(encryptedDoc, null, secretKeyCallbackHandler);
     }
     
     /**
@@ -396,7 +396,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("#EncryptedKeySHA1") != -1);
+        assertTrue(outputString.contains("#EncryptedKeySHA1"));
      
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc, crypto, secretKeyCallbackHandler);
@@ -424,7 +424,7 @@ public class EncryptionTest extends org.junit.Assert {
         reqData.setUsername("");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.ENCR));
+        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -441,7 +441,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        verify(doc, (Crypto)null, secretKeyCallbackHandler);
+        verify(doc, null, secretKeyCallbackHandler);
     }
     
     /**
@@ -508,14 +508,12 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true
-                : false);
+        assertFalse(outputString.contains("counter_port_type"));
         List<WSSecurityEngineResult> results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
-        assertTrue(outputString.indexOf("counter_port_type") > 0 ? true
-                : false);
+        assertTrue(outputString.contains("counter_port_type"));
         
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
@@ -656,7 +654,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
+        assertTrue(!outputString.contains("counter_port_type") ? true : false);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         List<WSSecurityEngineResult> results = 
@@ -719,7 +717,7 @@ public class EncryptionTest extends org.junit.Assert {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             assertNotNull(action);
-            if ((action.intValue() & WSConstants.ENCR) != 0) {
+            if ((action & WSConstants.ENCR) != 0) {
                 final java.util.List<WSDataRef> refs =
                     (java.util.List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 assertNotNull(refs);

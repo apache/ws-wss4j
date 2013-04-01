@@ -831,7 +831,7 @@ public final class WSSecurityUtil {
         } else {
             keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
         }
-        return (SecretKey)keySpec;
+        return keySpec;
     }
 
 
@@ -847,8 +847,7 @@ public final class WSSecurityUtil {
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
-                ex, new Object[] { "No such padding: " + cipherAlgo }
-            );
+                ex, "No such padding: " + cipherAlgo);
         } catch (NoSuchAlgorithmException ex) {
             // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
             // Some JDKs don't support RSA/ECB/OAEPPadding
@@ -858,14 +857,12 @@ public final class WSSecurityUtil {
                 } catch (Exception e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        e, new Object[] { "No such algorithm: " + cipherAlgo }
-                    );
+                        e, "No such algorithm: " + cipherAlgo);
                 }
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                    ex, new Object[] { "No such algorithm: " + cipherAlgo }
-                );
+                    ex, "No such algorithm: " + cipherAlgo);
             }
         }
     }
@@ -889,8 +886,8 @@ public final class WSSecurityUtil {
             //
             // Check the result of every action whether it matches the given action
             //
-            int resultAction = 
-                ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            int resultAction =
+                    (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             if (resultAction == action) {
                 returnResult = result;
             }
@@ -934,8 +931,8 @@ public final class WSSecurityUtil {
             //
             // Check the result of every action whether it matches the given action
             //
-            int resultAction = 
-                ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            int resultAction =
+                    (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actions.contains(resultAction)) {
                 if (actionResultList.isEmpty()) {
                     actionResultList = new ArrayList<WSSecurityEngineResult>();
@@ -962,31 +959,31 @@ public final class WSSecurityUtil {
                 return doAction;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 doAction |= WSConstants.UT;
-                actions.add(Integer.valueOf(WSConstants.UT));
+                actions.add(WSConstants.UT);
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_NO_PASSWORD)) {
                 doAction |= WSConstants.UT_NOPASSWORD;
-                actions.add(Integer.valueOf(WSConstants.UT_NOPASSWORD));
+                actions.add(WSConstants.UT_NOPASSWORD);
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 doAction |= WSConstants.SIGN;
-                actions.add(Integer.valueOf(WSConstants.SIGN));
+                actions.add(WSConstants.SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 doAction |= WSConstants.ENCR;
-                actions.add(Integer.valueOf(WSConstants.ENCR));
+                actions.add(WSConstants.ENCR);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 doAction |= WSConstants.ST_UNSIGNED;
-                actions.add(Integer.valueOf(WSConstants.ST_UNSIGNED));
+                actions.add(WSConstants.ST_UNSIGNED);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
                 doAction |= WSConstants.ST_SIGNED;
-                actions.add(Integer.valueOf(WSConstants.ST_SIGNED));
+                actions.add(WSConstants.ST_SIGNED);
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
-                actions.add(Integer.valueOf(WSConstants.TS));
+                actions.add(WSConstants.TS);
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
-                actions.add(Integer.valueOf(WSConstants.UT_SIGN));
+                actions.add(WSConstants.UT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
                 doAction |= WSConstants.SC;
-                actions.add(Integer.valueOf(WSConstants.SC));
+                actions.add(WSConstants.SC);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "Unknown action defined: " + single[i]
@@ -1022,28 +1019,28 @@ public final class WSSecurityUtil {
                 return doAction;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
                 doAction |= WSConstants.UT;
-                actions.add(Integer.valueOf(WSConstants.UT));
+                actions.add(WSConstants.UT);
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
                 doAction |= WSConstants.SIGN;
-                actions.add(Integer.valueOf(WSConstants.SIGN));
+                actions.add(WSConstants.SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 doAction |= WSConstants.ENCR;
-                actions.add(Integer.valueOf(WSConstants.ENCR));
+                actions.add(WSConstants.ENCR);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 doAction |= WSConstants.ST_UNSIGNED;
-                actions.add(Integer.valueOf(WSConstants.ST_UNSIGNED));
+                actions.add(WSConstants.ST_UNSIGNED);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
                 doAction |= WSConstants.ST_SIGNED;
-                actions.add(Integer.valueOf(WSConstants.ST_SIGNED));
+                actions.add(WSConstants.ST_SIGNED);
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
-                actions.add(Integer.valueOf(WSConstants.TS));
+                actions.add(WSConstants.TS);
             } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
                 doAction |= WSConstants.UT_SIGN;
-                actions.add(Integer.valueOf(WSConstants.UT_SIGN));
+                actions.add(WSConstants.UT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
                 doAction |= WSConstants.SC;
-                actions.add(Integer.valueOf(WSConstants.SC));
+                actions.add(WSConstants.SC);
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
@@ -1052,7 +1049,7 @@ public final class WSSecurityUtil {
                                 "Unknown action defined: " + single[i]
                         );
                     }
-                    actions.add(Integer.valueOf(parsedAction));
+                    actions.add(parsedAction);
                 } catch (NumberFormatException ex) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                             "Unknown action defined: " + single[i]
@@ -1164,8 +1161,8 @@ public final class WSSecurityUtil {
                 for (Iterator<WSSecurityEngineResult> iter = results.iterator(); 
                     iter.hasNext() && !found;) {
                     WSSecurityEngineResult result = iter.next();
-                    int resultAction = 
-                        ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                    int resultAction =
+                            (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
                     if (resultAction != action) {
                         continue;
                     }
@@ -1184,8 +1181,7 @@ public final class WSSecurityUtil {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_CHECK,
                         "requiredElementNotProtected",
-                        new Object[] {requiredPart}
-                    );
+                        requiredPart);
                 }
             }
             log.debug("All required elements are protected");
@@ -1205,8 +1201,8 @@ public final class WSSecurityUtil {
         WSSecurityEngineResult resultItem, 
         String[] requiredIDs
     ) throws WSSecurityException {
-        int resultAction = 
-            ((java.lang.Integer)resultItem.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        int resultAction =
+                (Integer) resultItem.get(WSSecurityEngineResult.TAG_ACTION);
         if (resultAction != WSConstants.SIGN) {
             throw new IllegalArgumentException("Not a SIGN result");
         }
@@ -1223,7 +1219,7 @@ public final class WSSecurityUtil {
         for (int i = 0; i < requiredIDs.length; i++) {
             boolean found = false;
             for (int j = 0; j < signedElemsRefList.size(); j++) {
-                WSDataRef dataRef = (WSDataRef)signedElemsRefList.get(j);
+                WSDataRef dataRef = signedElemsRefList.get(j);
                 String wsuId = dataRef.getWsuId();
                 if (wsuId.charAt(0) == '#') {
                     wsuId = wsuId.substring(1);
@@ -1236,8 +1232,7 @@ public final class WSSecurityUtil {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILED_CHECK,
                     "requiredElementNotSigned",
-                    new Object[] {requiredIDs[i]}
-                );
+                    requiredIDs[i]);
             }
             log.debug("Element with ID " + requiredIDs[i] + " was correctly signed");
         }
@@ -1377,7 +1372,7 @@ public final class WSSecurityUtil {
                     if (WSConstants.SIG_LN.equals(cur.getLocalName())
                         && WSConstants.SIG_NS.equals(cur.getNamespaceURI())) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK,
-                            "requiredElementNotSigned", new Object[] {elem});
+                        "requiredElementNotSigned", elem);
                     } else if (isLinkedBySignatureRefs((Element)cur, signatureRefIDs)) {
                         return;
                     }
@@ -1386,7 +1381,7 @@ public final class WSSecurityUtil {
             }
         }
         throw new WSSecurityException(
-            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", new Object[] {elem});
+            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", elem);
     }
     
     private static boolean isLinkedBySignatureRefs(Element elem, Set<String> allIDs) {

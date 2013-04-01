@@ -43,7 +43,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
  */
 public class WSSec {
     
-    //todo crl check
     //todo outgoing client setup per policy
 
     static {

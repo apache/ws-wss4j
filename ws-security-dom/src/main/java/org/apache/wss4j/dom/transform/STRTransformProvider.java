@@ -34,9 +34,9 @@ public class STRTransformProvider extends Provider {
     public STRTransformProvider() {
        super("STRTransform", 1.6, "Security Token Reference Transform Provider");
        put(
-           (String)"TransformService." + STRTransform.TRANSFORM_URI, 
+           "TransformService." + STRTransform.TRANSFORM_URI,
            "org.apache.wss4j.dom.transform.STRTransform"
        );
-       put((String)"TransformService." + STRTransform.TRANSFORM_URI + " MechanismType", "DOM");
+       put("TransformService." + STRTransform.TRANSFORM_URI + " MechanismType", "DOM");
    }
 }

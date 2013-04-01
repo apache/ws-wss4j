@@ -68,35 +68,35 @@ public class WSSConfig {
         final Map<Integer, Class<?>> tmp = new HashMap<Integer, Class<?>>();
         try {
             tmp.put(
-                Integer.valueOf(WSConstants.UT),
+                WSConstants.UT,
                 org.apache.wss4j.dom.action.UsernameTokenAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.ENCR),
+                WSConstants.ENCR,
                 org.apache.wss4j.dom.action.EncryptionAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.SIGN),
+                WSConstants.SIGN,
                 org.apache.wss4j.dom.action.SignatureAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.ST_SIGNED),
+                WSConstants.ST_SIGNED,
                 org.apache.wss4j.dom.action.SAMLTokenSignedAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.ST_UNSIGNED),
+                WSConstants.ST_UNSIGNED,
                 org.apache.wss4j.dom.action.SAMLTokenUnsignedAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.TS),
+                WSConstants.TS,
                 org.apache.wss4j.dom.action.TimestampAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.UT_SIGN),
+                WSConstants.UT_SIGN,
                 org.apache.wss4j.dom.action.UsernameTokenSignedAction.class
             );
             tmp.put(
-                Integer.valueOf(WSConstants.SC),
+                WSConstants.SC,
                 org.apache.wss4j.dom.action.SignatureConfirmationAction.class
             );
         } catch (final Exception ex) {
@@ -558,7 +558,7 @@ public class WSSConfig {
      * it is up to the implementing class to ensure that it is thread-safe.
      */
     public Class<?> setAction(int code, Action action) {
-        Object result = actionMap.put(Integer.valueOf(code), action);
+        Object result = actionMap.put(code, action);
         if (result instanceof Class<?>) {
             return (Class<?>)result;
         } else if (result instanceof Action) {
@@ -574,7 +574,7 @@ public class WSSConfig {
      * actions for well-known operations.
      */
     public Class<?> setAction(int code, Class<?> clazz) {
-        Object result = actionMap.put(Integer.valueOf(code), clazz);
+        Object result = actionMap.put(code, clazz);
         if (result instanceof Class<?>) {
             return (Class<?>)result;
         } else if (result instanceof Action) {
@@ -591,7 +591,7 @@ public class WSSConfig {
      * @throws WSSecurityException
      */
     public Action getAction(int action) throws WSSecurityException {
-        final Object actionObject = actionMap.get(Integer.valueOf(action));
+        final Object actionObject = actionMap.get(action);
         
         if (actionObject instanceof Class<?>) {
             try {

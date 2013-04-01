@@ -491,7 +491,7 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(action));
+        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -508,10 +508,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(
-            outputString.indexOf("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256") != -1
+                outputString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")
         );
         assertTrue(
-            outputString.indexOf("http://www.w3.org/2001/04/xmlenc#sha256") != -1
+                outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256")
         );
         
         verify(doc);
@@ -701,8 +701,8 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.SIGN));
-        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(WSConstants.SIGN);
+        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -742,9 +742,9 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.SIGN));
-        actions.add(Integer.valueOf(WSConstants.ENCR));
-        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(WSConstants.SIGN);
+        actions.add(WSConstants.ENCR);
+        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -781,9 +781,9 @@ public class SignatureTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.ENCR));
-        actions.add(Integer.valueOf(WSConstants.SIGN));
-        actions.add(Integer.valueOf(WSConstants.TS));
+        actions.add(WSConstants.ENCR);
+        actions.add(WSConstants.SIGN);
+        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

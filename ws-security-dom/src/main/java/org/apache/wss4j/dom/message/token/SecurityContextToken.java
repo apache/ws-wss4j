@@ -215,7 +215,7 @@ public class SecurityContextToken {
      * @return a XML string representation
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node)element);
+        return DOM2Writer.nodeToString(element);
     }
 
     /**

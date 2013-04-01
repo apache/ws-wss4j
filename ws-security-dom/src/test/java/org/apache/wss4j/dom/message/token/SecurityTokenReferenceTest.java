@@ -111,7 +111,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
-        str.setKeyIdentifier((String)null, "#123");
+        str.setKeyIdentifier(null, "#123");
         Element strElement = str.getElement();
 
         if (LOG.isDebugEnabled()) {

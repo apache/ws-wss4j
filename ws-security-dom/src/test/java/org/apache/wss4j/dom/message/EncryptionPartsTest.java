@@ -140,7 +140,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
         assertEquals(WSConstants.AES_128, wsDataRef.getAlgorithm());
@@ -177,8 +177,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("wsse11:EncryptedHeader") != -1);
-        assertTrue(outputString.indexOf("foo:foobar") == -1);
+        assertTrue(outputString.contains("wsse11:EncryptedHeader"));
+        assertFalse(outputString.contains("foo:foobar"));
         
         List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
@@ -192,7 +192,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
     }
@@ -410,7 +410,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(!outputString.contains("testMethod"));
+        assertFalse(outputString.contains("testMethod"));
         
         verify(encryptedDoc);
         

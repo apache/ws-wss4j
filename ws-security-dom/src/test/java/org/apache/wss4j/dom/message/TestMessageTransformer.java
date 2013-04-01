@@ -260,7 +260,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         Element childElement = null;
         Iterator<Element> it = getChildElements(node, nodeName, recursive).iterator();
         if (it.hasNext()) {
-            childElement = (Element)it.next();
+            childElement = it.next();
         }
         return childElement;
     }

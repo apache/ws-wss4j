@@ -350,9 +350,7 @@ public class EncryptedKeyProcessor implements Processor {
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "noCertsFound", 
-                    new Object[] {"decryption (KeyId)"}
-                );
+                    "noCertsFound", "decryption (KeyId)");
             }
             return certs;
         } else {
@@ -439,8 +437,7 @@ public class EncryptedKeyProcessor implements Processor {
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
-                ex, new Object[]{symEncAlgo}
-            );
+                ex, symEncAlgo);
         }
         
         // Check for compliance against the defined AlgorithmSuite

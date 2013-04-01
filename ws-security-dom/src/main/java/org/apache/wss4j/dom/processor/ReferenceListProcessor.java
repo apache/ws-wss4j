@@ -141,10 +141,10 @@ public class ReferenceListProcessor implements Processor {
         // Prepare the SecretKey object to decrypt EncryptedData
         //
         String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
-        Element keyInfoElement = 
-            (Element)WSSecurityUtil.getDirectChildElement(
-                encryptedDataElement, "KeyInfo", WSConstants.SIG_NS
-            );
+        Element keyInfoElement =
+                WSSecurityUtil.getDirectChildElement(
+                    encryptedDataElement, "KeyInfo", WSConstants.SIG_NS
+                );
         // KeyInfo cannot be null
         if (keyInfoElement == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
@@ -272,8 +272,7 @@ public class ReferenceListProcessor implements Processor {
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", new Object[] {dataRefURI}
-            );
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", dataRefURI);
         }
         if (encryptedDataElement.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
             && encryptedDataElement.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {

@@ -33,7 +33,7 @@ public interface UsernameSecurityToken extends SubjectAndPrincipalSecurityToken 
 
     String getUsername();
 
-    String getNonce();
+    byte[] getNonce();
 
     byte[] getSalt();
 

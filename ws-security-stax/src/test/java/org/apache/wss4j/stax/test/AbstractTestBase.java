@@ -511,7 +511,7 @@ public abstract class AbstractTestBase {
             for (WSSecurityEngineResult result : wsResult) {
                 boolean found = false;
                 for (WSSecurityEngineResult res : wsSecurityEngineResults) {
-                    if (((Integer) result.get(WSSecurityEngineResult.TAG_ACTION)).equals((Integer) res.get(WSSecurityEngineResult.TAG_ACTION))) {
+                    if (result.get(WSSecurityEngineResult.TAG_ACTION).equals(res.get(WSSecurityEngineResult.TAG_ACTION))) {
                         found = true;
                         break;
                     }

@@ -69,8 +69,6 @@ public class STRTransform extends TransformService {
     private static org.slf4j.Logger log = 
         org.slf4j.LoggerFactory.getLogger(STRTransform.class);
 
-    private static boolean doDebug = false;
-    
     public final AlgorithmParameterSpec getParameterSpec() {
         return params;
     }
@@ -131,8 +129,8 @@ public class STRTransform extends TransformService {
     
     private Data transformIt(Data data, XMLCryptoContext xc, OutputStream os) 
         throws TransformException {
-        doDebug = log.isDebugEnabled();
-        // 
+
+        //
         // First step: Get the required c14n argument and get the specified
         // Canonicalizer
         //
@@ -192,7 +190,7 @@ public class STRTransform extends TransformService {
             if (wsDocInfoObject instanceof WSDocInfo) {
                 wsDocInfo = (WSDocInfo)wsDocInfoObject;
             }
-            if (wsDocInfo == null && doDebug) {
+            if (wsDocInfo == null) {
                 log.debug("STRTransform: no WSDocInfo found");
             }
 
@@ -220,7 +218,7 @@ public class STRTransform extends TransformService {
             // C14n with specified algorithm. According to WSS Specification.
             //
             buf = canon.canonicalizeSubtree(dereferencedToken, "#default", true);
-            if (doDebug) {
+            if (log.isDebugEnabled()) {
                 log.debug("after c14n: " + new String(buf, "UTF-8"));
             }
 

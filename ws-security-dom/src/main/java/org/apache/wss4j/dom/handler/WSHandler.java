@@ -322,12 +322,12 @@ public abstract class WSHandler {
         int ai = 0;
         for (WSSecurityEngineResult result : wsResult) {
             final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-            int act = actInt.intValue();
+            int act = actInt;
             if (act == WSConstants.SC || act == WSConstants.BST) {
                 continue;
             }
             
-            if (ai >= size || actions.get(ai++).intValue() != act) {
+            if (ai >= size || actions.get(ai++) != act) {
                 return false;
             }
         }
@@ -349,7 +349,7 @@ public abstract class WSHandler {
         
         for (WSSecurityEngineResult result : wsResult) {
             final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-            int act = actInt.intValue();
+            int act = actInt;
             if (act == WSConstants.SC || act == WSConstants.BST) {
                 continue;
             }
@@ -415,7 +415,7 @@ public abstract class WSHandler {
                 } else {
                     boolean found = false;
                     for (int j = 0; j < savedSignatures.size(); j++) {
-                        byte[] storedValue = (byte[]) savedSignatures.get(j);
+                        byte[] storedValue = savedSignatures.get(j);
                         if (Arrays.equals(sigVal, storedValue)) {
                             found = true;
                             savedSignatures.remove(j);
@@ -503,14 +503,14 @@ public abstract class WSHandler {
         
         String keyId = getString(WSHandlerConstants.SIG_KEY_ID, mc);
         if (keyId != null) {
-            Integer id = (Integer) WSHandlerConstants.getKeyIdentifier(keyId);
+            Integer id = WSHandlerConstants.getKeyIdentifier(keyId);
             if (id == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
                         "WSHandler: Signature: unknown key identification"
                 );
             }
-            int tmp = id.intValue();
+            int tmp = id;
             if (!(tmp == WSConstants.ISSUER_SERIAL
                     || tmp == WSConstants.BST_DIRECT_REFERENCE
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
@@ -585,14 +585,14 @@ public abstract class WSHandler {
          */
         String encKeyId = getString(WSHandlerConstants.ENC_KEY_ID, mc);
         if (encKeyId != null) {
-            Integer id = (Integer) WSHandlerConstants.getKeyIdentifier(encKeyId);
+            Integer id = WSHandlerConstants.getKeyIdentifier(encKeyId);
             if (id == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
                         "WSHandler: Encryption: unknown key identification"
                 );
             }
-            int tmp = id.intValue();
+            int tmp = id;
             reqData.setEncKeyId(tmp);
             if (!(tmp == WSConstants.ISSUER_SERIAL
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
@@ -1032,7 +1032,7 @@ public abstract class WSHandler {
             );
         }
         try {
-            cbHandler = (CallbackHandler) cbClass.newInstance();
+            cbHandler = cbClass.newInstance();
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", e,
@@ -1210,8 +1210,8 @@ public abstract class WSHandler {
              * encryption action :-).
              */
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                int wserAction = 
-                    ((java.lang.Integer)wser.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+                int wserAction =
+                        (Integer) wser.get(WSSecurityEngineResult.TAG_ACTION);
                 if (wserAction == WSConstants.SIGN) {
                     X509Certificate cert = 
                         (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);

@@ -166,7 +166,7 @@ public class SignatureProcessor implements Processor {
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
                 parameters.put(
-                    SignatureSTRParser.SECRET_KEY_LENGTH, Integer.valueOf(data.getWssConfig().getSecretKeyLength())
+                    SignatureSTRParser.SECRET_KEY_LENGTH, data.getWssConfig().getSecretKeyLength()
                 );
                 strParser.parseSecurityTokenReference(
                     child, data, wsDocInfo, parameters
@@ -478,7 +478,7 @@ public class SignatureProcessor implements Processor {
                 element = wsDocInfo.getTokenElement(uri);
             }
             if (element != null) {
-                WSSecurityUtil.storeElementInContext(((DOMValidateContext)context), uri, element);
+                WSSecurityUtil.storeElementInContext(context, uri, element);
             }
         }
     }
@@ -652,8 +652,8 @@ public class SignatureProcessor implements Processor {
             Node sibling = signatureElement.getNextSibling();
             while (sibling != null) {
                 if (sibling instanceof Element 
-                    && WSConstants.TIMESTAMP_TOKEN_LN.equals(((Element)sibling).getLocalName())
-                    && WSConstants.WSU_NS.equals(((Element)sibling).getNamespaceURI())) {
+                    && WSConstants.TIMESTAMP_TOKEN_LN.equals(sibling.getLocalName())
+                    && WSConstants.WSU_NS.equals(sibling.getNamespaceURI())) {
                     timeStamp = new Timestamp((Element)sibling, requestData.getBSPEnforcer());
                     break;
                 }
@@ -675,8 +675,7 @@ public class SignatureProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY,
                 "invalidTimestamp",
-                new Object[] {"A replay attack has been detected"}
-            );
+                "A replay attack has been detected");
         }
 
         // Store the Timestamp/SignatureValue combination in the cache

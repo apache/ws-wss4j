@@ -82,7 +82,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -98,8 +98,8 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("alice") != -1);
-        assertTrue(outputString.indexOf("securityPassword") != -1);
+        assertTrue(outputString.contains("alice"));
+        assertTrue(outputString.contains("securityPassword"));
     }
     
     /**
@@ -123,7 +123,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -139,8 +139,8 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("alice") != -1);
-        assertTrue(outputString.indexOf("securityPassword") != -1);
+        assertTrue(outputString.contains("alice"));
+        assertTrue(outputString.contains("securityPassword"));
     }
     
 }

@@ -208,7 +208,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         issuerKeyName = iKeyName;
         issuerKeyPW = iKeyPW;
         
-        samlToken = (Element) samlAssertion.toDOM(doc);
+        samlToken = samlAssertion.toDOM(doc);
 
         //
         // Get some information about the SAML token content. This controls how
@@ -250,8 +250,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "invalidSAMLsecurity",
-                    new Object[] { "for SAML Signature (Key Holder)" }
-                );
+                    "for SAML Signature (Key Holder)");
             }
             if (secretKey == null) {
                 RequestData data = new RequestData();
@@ -272,8 +271,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noCertsFound",
-                new Object[] { "SAML signature" }
-            );
+                "SAML signature");
         }
         
         if (sigAlgo == null) {
@@ -298,10 +296,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "unknownSignatureAlgorithm",
-                    new Object[] {
-                        pubKeyAlgo
-                    }
-                );
+                    pubKeyAlgo);
             }
         }
         sig = null;
@@ -417,7 +412,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
             default:
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId", new Object[]{}
+                    WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId"
                 );
             }
         } else if (useDirectReferenceToAssertion) {

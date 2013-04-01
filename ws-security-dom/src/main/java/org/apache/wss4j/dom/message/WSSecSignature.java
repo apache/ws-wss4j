@@ -788,9 +788,8 @@ public class WSSecSignature extends WSSecSignatureBase {
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
-                        "noUserCertsFound", 
-                        new Object[] { user, "signature" }
-                );
+                        "noUserCertsFound",
+                        user, "signature");
             }
             certUri = getWsConfig().getIdAllocator().createSecureId("X509-", certs[0]);  
             //
@@ -808,8 +807,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
                         "unknownSignatureAlgorithm",
-                        new Object[] {pubKeyAlgo}
-                    );
+                        pubKeyAlgo);
                 }
             }
         }

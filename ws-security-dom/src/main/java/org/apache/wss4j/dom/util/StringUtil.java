@@ -114,6 +114,6 @@ public final class StringUtil {
         if (match) {
             list.add(str.substring(start, i));
         }
-        return (String[]) list.toArray(new String[list.size()]);
+        return list.toArray(new String[list.size()]);
     }
 }

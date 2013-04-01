@@ -162,8 +162,7 @@ public class KerberosTokenValidator implements Validator {
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 ex,
-                new Object[] {ex.getMessage()}
-            );
+                ex.getMessage());
         }
         if (log.isDebugEnabled()) {
             log.debug("Successfully authenticated to the TGT");
@@ -179,9 +178,8 @@ public class KerberosTokenValidator implements Validator {
             if (principals.isEmpty()) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, 
-                    "kerberosLoginError", 
-                    new Object[] {"No Client principals found after login"}
-                );
+                    "kerberosLoginError",
+                    "No Client principals found after login");
             }
             service = principals.iterator().next().getName();
         }

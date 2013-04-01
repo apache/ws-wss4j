@@ -80,7 +80,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) && !WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)) {
             securityContext.handleBSPRule(BSPRule.R5421);
         }
-        //todo test:
+
         BigInteger hmacOutputLength = XMLSecurityUtils.getQNameType(
                 signatureType.getSignedInfo().getSignatureMethod().getContent(),
                 WSSConstants.TAG_dsig_HMACOutputLength);
@@ -153,7 +153,6 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             }
             signatureTokenValidator.validate(inboundSecurityToken, (WSSSecurityProperties) securityProperties);
 
-            //todo element path?
             //we have to emit a TokenSecurityEvent here too since it could be an embedded token
             inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
             TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, signatureType.getId());

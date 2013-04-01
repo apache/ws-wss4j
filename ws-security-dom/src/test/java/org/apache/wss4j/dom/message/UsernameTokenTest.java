@@ -213,7 +213,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             fail("Failure expected on a bad username");
         } catch (WSSecurityException ex) {
             String message = ex.getMessage();
-            assertTrue(message.indexOf("badusername") == -1);
+            assertFalse(message.contains("badusername"));
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
@@ -775,7 +775,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
-        assertTrue(outputString.indexOf("EncodingType") != -1);
+        assertTrue(outputString.contains("EncodingType"));
     }
     
     /**
@@ -794,7 +794,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setMsgContext(config);
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);
         
@@ -821,7 +821,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setMsgContext(config);
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);
         
@@ -849,7 +849,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setMsgContext(config);
         
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.UT));
+        actions.add(WSConstants.UT);
         
         handler.send(WSConstants.UT, doc, reqData, actions, true);
         

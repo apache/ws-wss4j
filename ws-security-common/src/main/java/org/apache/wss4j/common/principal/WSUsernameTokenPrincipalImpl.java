@@ -20,6 +20,8 @@
 package org.apache.wss4j.common.principal;
 
 
+import java.util.Arrays;
+
 /**
  * This class implements the <code>Principal</code> interface and
  * represents a UsernameToken user. 
@@ -43,12 +45,9 @@ package org.apache.wss4j.common.principal;
  */
 public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, UsernameTokenPrincipal {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 5608648208455259722L;
     private String name;
-    private String nonce;
+    private byte[] nonce;
     private String password;
     private String createdTime;
     private String passwordType;
@@ -107,7 +106,7 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
      *
      * @param nonce
      */
-    public void setNonce(String nonce) {
+    public void setNonce(byte[] nonce) {
         this.nonce = nonce;
     }
 
@@ -117,7 +116,7 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
      * @return the WSUsernameToken nonce for this <code>WSUsernameTokenPrincipalImpl</code>
      */
     @Override
-    public String getNonce() {
+    public byte[] getNonce() {
         return nonce;
     }
 
@@ -193,7 +192,7 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
         if (this.name == null ? that.getName() != null : !this.name.equals(that.getName())) {
             return false;
         }
-        if (this.nonce == null ? that.getNonce() != null : !this.nonce.equals(that.getNonce())) {
+        if (this.nonce == null ? that.getNonce() != null : !Arrays.equals(this.nonce, that.getNonce())) {
             return false;
         }
         if (this.password == null ? that.getPassword() != null : !this.password.equals(that.getPassword())) {
@@ -220,7 +219,7 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
         int hashcode = 17;
         hashcode = 31 * hashcode + (digest ? 1 : 0);
         hashcode = 31 * hashcode + (name == null ? 0 : name.hashCode());
-        hashcode = 31 * hashcode + (nonce == null ? 0 : nonce.hashCode());
+        hashcode = 31 * hashcode + (nonce == null ? 0 : Arrays.hashCode(nonce));
         hashcode = 31 * hashcode + (password == null ? 0 : password.hashCode());
         hashcode = 31 * hashcode + (createdTime == null ? 0 : createdTime.hashCode());
         hashcode = 31 * hashcode + (passwordType == null ? 0 : passwordType.hashCode());

@@ -138,11 +138,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 2);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         
-        wsDataRef = (WSDataRef)refs.get(1);
+        wsDataRef = refs.get(1);
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
     }
@@ -202,11 +202,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 2);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         
-        wsDataRef = (WSDataRef)refs.get(1);
+        wsDataRef = refs.get(1);
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
     }
@@ -268,7 +268,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -333,7 +333,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -468,7 +468,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
         
@@ -545,7 +545,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
     }
@@ -603,11 +603,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 2);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         
-        wsDataRef = (WSDataRef)refs.get(1);
+        wsDataRef = refs.get(1);
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml2:Assertion", xpath);
     }
@@ -648,7 +648,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML2 message Direct Reference (sender vouches):");
             LOG.debug(outputString);
         }
-        assertTrue(!outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertFalse(outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
         assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, crypto, null);
@@ -666,11 +666,11 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 2);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
         
-        wsDataRef = (WSDataRef)refs.get(1);
+        wsDataRef = refs.get(1);
         xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml2:Assertion", xpath);
     }
@@ -732,7 +732,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -778,7 +778,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Signed SAML2 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
         }
-        assertTrue(!outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertFalse(outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
         assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto, null);
@@ -797,7 +797,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
@@ -873,7 +873,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
         
@@ -931,7 +931,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             LOG.debug("Encrypted SAML 2 message Direct Reference (holder-of-key):");
             LOG.debug(outputString);
         }
-        assertTrue(!outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
+        assertFalse(outputString.contains(WSConstants.WSS_SAML2_KI_VALUE_TYPE));
         assertTrue(outputString.contains(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         List<WSSecurityEngineResult> results = verify(doc, trustCrypto, userCrypto);
@@ -950,7 +950,7 @@ public class SamlReferenceTest extends org.junit.Assert {
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
-        WSDataRef wsDataRef = (WSDataRef)refs.get(0);
+        WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body/add", xpath);
         

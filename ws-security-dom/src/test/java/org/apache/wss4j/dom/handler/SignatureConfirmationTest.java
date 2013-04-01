@@ -73,7 +73,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -90,7 +90,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         List<byte[]> savedSignatures = 
             (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
-        byte[] signatureValue = (byte[])savedSignatures.get(0);
+        byte[] signatureValue = savedSignatures.get(0);
         assertTrue(signatureValue != null && signatureValue.length > 0);
     }
     
@@ -112,7 +112,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -149,7 +149,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(WSConstants.SIGN);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
@@ -166,7 +166,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         List<byte[]> savedSignatures = 
             (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
-        byte[] signatureValue = (byte[])savedSignatures.get(0);
+        byte[] signatureValue = savedSignatures.get(0);
         assertTrue(signatureValue != null && signatureValue.length > 0);
         
         //
@@ -189,8 +189,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             LOG.debug("Signature Confirmation response....");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.indexOf("SignatureConfirmation") != -1);
-        assertTrue(outputString.indexOf(Base64.encode(signatureValue)) != -1);
+        assertTrue(outputString.contains("SignatureConfirmation"));
+        assertTrue(outputString.contains(Base64.encode(signatureValue)));
     }
     
     
@@ -210,7 +210,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(WSConstants.SIGN));
+        actions.add(WSConstants.SIGN);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

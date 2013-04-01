@@ -38,7 +38,6 @@ public class SAMLTokenPrincipalImpl implements Serializable, SAMLTokenPrincipal 
         this.name = samlAssertion.getSubjectName();
     }
 
-    //todo rename me?
     @Override
     public SamlAssertionWrapper getToken() {
         return samlAssertion;

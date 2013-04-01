@@ -23,7 +23,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import java.security.Principal;
 
 public interface SAMLTokenPrincipal extends Principal {
-    //todo rename me to getSamlAssertionWrapper?
+
     SamlAssertionWrapper getToken();
 
     String getName();

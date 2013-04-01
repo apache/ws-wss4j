@@ -221,9 +221,7 @@ public class SignatureSTRParser implements STRParser {
         } else {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "unsupportedKeyInfo", 
-                    new Object[]{strElement.toString()}
-            );
+                    "unsupportedKeyInfo", strElement.toString());
         }
         
         if (certs != null && certs.length > 0 && principal == null) {
@@ -306,7 +304,6 @@ public class SignatureSTRParser implements STRParser {
      * Get the Secret Key from a CallbackHandler
      * @param id The id of the element
      * @param type The type of the element (can be null)
-     * @param cb The CallbackHandler object
      * @return A Secret Key
      * @throws WSSecurityException
      */
@@ -330,9 +327,7 @@ public class SignatureSTRParser implements STRParser {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword", 
-                e,
-                new Object[] {id} 
-            );
+                e, id);
         }
 
         return null;
@@ -465,7 +460,7 @@ public class SignatureSTRParser implements STRParser {
         RequestData data,
         Map<String, Object> parameters
     ) throws WSSecurityException {
-        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+        int action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
         if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
             STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
             
@@ -476,7 +471,7 @@ public class SignatureSTRParser implements STRParser {
             if (usernameToken.isDerivedKey()) {
                 secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             } else {
-                int keyLength = ((Integer)parameters.get(SECRET_KEY_LENGTH)).intValue();
+                int keyLength = (Integer) parameters.get(SECRET_KEY_LENGTH);
                 secretKey = usernameToken.getSecretKey(keyLength);
             }
             principal = usernameToken.createPrincipal();
@@ -492,7 +487,7 @@ public class SignatureSTRParser implements STRParser {
             secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             Boolean validatedToken = 
                 (Boolean)result.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
-            if (validatedToken.booleanValue()) {
+            if (validatedToken) {
                 trustedCredential = true;
             }
         } else if (WSConstants.ENCR == action) {

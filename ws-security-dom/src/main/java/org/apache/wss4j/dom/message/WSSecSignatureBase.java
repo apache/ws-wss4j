@@ -161,8 +161,7 @@ public class WSSecSignatureBase extends WSSecBase {
                         throw new WSSecurityException(
                             WSSecurityException.ErrorCode.FAILURE, 
                             "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName}
-                        );
+                            nmSpace + ", " + elemName);
                     }
                     for (Element elementToSign : elementsToSign) {
                         TransformParameterSpec transformSpec = null;

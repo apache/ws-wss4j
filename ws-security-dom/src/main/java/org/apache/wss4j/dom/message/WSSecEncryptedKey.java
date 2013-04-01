@@ -211,9 +211,8 @@ public class WSSecEncryptedKey extends WSSecBase {
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "noUserCertsFound", 
-                    new Object[] {user, "encryption"}
-                );
+                    "noUserCertsFound",
+                    user, "encryption");
             }
             remoteCert = certs[0];
         }

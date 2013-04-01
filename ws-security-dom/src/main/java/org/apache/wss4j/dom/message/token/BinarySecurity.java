@@ -62,9 +62,7 @@ public class BinarySecurity {
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
-                "unhandledToken",
-                new Object[] {el}
-            );
+                "unhandledToken", el);
         }
         String encoding = getEncodingType();
         if (encoding == null || "".equals(encoding)) {
@@ -255,7 +253,7 @@ public class BinarySecurity {
      * @return the string representation of the token.
      */
     public String toString() {
-        return DOM2Writer.nodeToString((Node)element);
+        return DOM2Writer.nodeToString(element);
     }
     
     @Override

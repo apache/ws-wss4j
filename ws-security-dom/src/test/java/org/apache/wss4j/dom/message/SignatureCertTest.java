@@ -110,7 +110,7 @@ public class SignatureCertTest extends org.junit.Assert {
         assertTrue (cert != null);
     }
     
-    // TODO disabling this test as the certs are expired
+    //disabling this test as the certs are expired
     @org.junit.Test
     @org.junit.Ignore
     public void testBSTCertChain() throws Exception {
@@ -275,7 +275,7 @@ public class SignatureCertTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(Integer.valueOf(action));
+        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(

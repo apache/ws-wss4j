@@ -62,8 +62,7 @@ public class TimestampValidator implements Validator {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.MESSAGE_EXPIRED,
                 "invalidTimestamp",
-                new Object[] {"The security semantics of the message have expired"}
-            );
+                "The security semantics of the message have expired");
         }
         return credential;
     }
