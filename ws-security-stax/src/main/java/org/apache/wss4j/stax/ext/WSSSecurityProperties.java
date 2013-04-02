@@ -24,18 +24,22 @@ import java.security.cert.CertStore;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509CRL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
-import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
 
 /**
  * Main configuration class to supply keys etc.
@@ -70,28 +74,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private WSSecurityTokenConstants.KeyIdentifier derivedKeyKeyIdentifier;
     private WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference;
 
-    private Class<? extends Merlin> signatureCryptoClass;
-    private Crypto cachedSignatureCrypto;
-    private KeyStore cachedSignatureKeyStore;
-    private KeyStore signatureKeyStore;
+    private WSSCrypto signatureWSSCrypto;
     private String signatureUser;
     private boolean enableSignatureConfirmationVerification = false;
-
-    private Class<? extends Merlin> signatureVerificationCryptoClass;
-    private KeyStore signatureVerificationKeyStore;
+    private WSSCrypto signatureVerificationWSSCrypto;
     private CertStore crlCertStore;
-    private Crypto cachedSignatureVerificationCrypto;
-    private KeyStore cachedSignatureVerificationKeyStore;
-    private Class<? extends Merlin> decryptionCryptoClass;
-
-    private KeyStore decryptionKeyStore;
-    private Crypto cachedDecryptionCrypto;
-    private KeyStore cachedDecryptionKeyStore;
-    private Class<? extends Merlin> encryptionCryptoClass;
-
-    private KeyStore encryptionKeyStore;
-    private Crypto cachedEncryptionCrypto;
-    private KeyStore cachedEncryptionKeyStore;
+    private WSSCrypto decryptionWSSCrypto;
+    private WSSCrypto encryptionWSSCrypto;
     private String encryptionUser;
     private WSSecurityTokenConstants.KeyIdentifier encryptionKeyIdentifier;
     private boolean useReqSigCertForEncryption = false;
@@ -121,30 +110,18 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.tokenUser = wssSecurityProperties.tokenUser;
         this.derivedKeyKeyIdentifier = wssSecurityProperties.derivedKeyKeyIdentifier;
         this.derivedKeyTokenReference = wssSecurityProperties.derivedKeyTokenReference;
-        this.signatureCryptoClass = wssSecurityProperties.signatureCryptoClass;
-        this.cachedSignatureCrypto = wssSecurityProperties.cachedSignatureCrypto;
-        this.cachedSignatureKeyStore = wssSecurityProperties.cachedSignatureKeyStore;
-        this.signatureKeyStore = wssSecurityProperties.signatureKeyStore;
+        this.signatureWSSCrypto = wssSecurityProperties.signatureWSSCrypto;
         this.signatureUser = wssSecurityProperties.signatureUser;
         this.enableSignatureConfirmationVerification = wssSecurityProperties.enableSignatureConfirmationVerification;
-        this.signatureVerificationCryptoClass = wssSecurityProperties.signatureVerificationCryptoClass;
-        this.signatureVerificationKeyStore = wssSecurityProperties.signatureVerificationKeyStore;
-        this.cachedSignatureVerificationCrypto = wssSecurityProperties.cachedSignatureVerificationCrypto;
-        this.cachedSignatureVerificationKeyStore = wssSecurityProperties.cachedSignatureVerificationKeyStore;
-        this.decryptionCryptoClass = wssSecurityProperties.decryptionCryptoClass;
-        this.decryptionKeyStore = wssSecurityProperties.decryptionKeyStore;
-        this.cachedDecryptionCrypto = wssSecurityProperties.cachedDecryptionCrypto;
-        this.cachedDecryptionKeyStore = wssSecurityProperties.cachedDecryptionKeyStore;
-        this.encryptionCryptoClass = wssSecurityProperties.encryptionCryptoClass;
-        this.encryptionKeyStore = wssSecurityProperties.encryptionKeyStore;
-        this.cachedEncryptionCrypto = wssSecurityProperties.cachedEncryptionCrypto;
-        this.cachedEncryptionKeyStore = wssSecurityProperties.cachedEncryptionKeyStore;
+        this.signatureVerificationWSSCrypto = wssSecurityProperties.signatureVerificationWSSCrypto;
+        this.crlCertStore = wssSecurityProperties.crlCertStore;
+        this.decryptionWSSCrypto = wssSecurityProperties.decryptionWSSCrypto;
+        this.encryptionWSSCrypto = wssSecurityProperties.encryptionWSSCrypto;
         this.encryptionUser = wssSecurityProperties.encryptionUser;
         this.encryptionKeyIdentifier = wssSecurityProperties.encryptionKeyIdentifier;
         this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
         this.encryptionCompressionAlgorithm = wssSecurityProperties.encryptionCompressionAlgorithm;
         this.enableRevocation = wssSecurityProperties.enableRevocation;
-        this.crlCertStore = wssSecurityProperties.crlCertStore;
     }
 
     /**
@@ -299,60 +276,71 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     }
 
     public KeyStore getSignatureKeyStore() {
-        return signatureKeyStore;
+        if (signatureWSSCrypto != null) {
+            return signatureWSSCrypto.getKeyStore();
+        }
+        return null;
     }
 
     public void loadSignatureKeyStore(URL url, char[] keyStorePassword) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(url.openStream(), keyStorePassword);
-        this.signatureKeyStore = keyStore;
+        if (signatureWSSCrypto == null) {
+            signatureWSSCrypto = new WSSCrypto();
+        }
+        signatureWSSCrypto.setKeyStore(keyStore);
+    }
+    
+    public Properties getSignatureCryptoProperties() {
+        if (signatureWSSCrypto != null) {
+            return signatureWSSCrypto.getCryptoProperties();
+        }
+        return null;
+    }
+    
+    public void setSignatureCryptoProperties(Properties cryptoProperties) {
+        if (signatureWSSCrypto == null) {
+            signatureWSSCrypto = new WSSCrypto();
+        }
+        signatureWSSCrypto.setCryptoProperties(cryptoProperties);
     }
 
     public Class<? extends Merlin> getSignatureCryptoClass() {
-        if (signatureCryptoClass != null) {
-            return signatureCryptoClass;
+        if (signatureWSSCrypto != null) {
+            return signatureWSSCrypto.getCryptoClass();
         }
-        signatureCryptoClass = org.apache.wss4j.common.crypto.Merlin.class;
-        return signatureCryptoClass;
+        return org.apache.wss4j.common.crypto.Merlin.class;
     }
 
     public void setSignatureCryptoClass(Class<? extends Merlin> signatureCryptoClass) {
-        this.signatureCryptoClass = signatureCryptoClass;
+        if (signatureWSSCrypto == null) {
+            signatureWSSCrypto = new WSSCrypto();
+        }
+        this.signatureWSSCrypto.setCryptoClass(signatureCryptoClass);
     }
 
     public Crypto getSignatureCrypto() throws WSSConfigurationException {
-
-        if (this.getSignatureKeyStore() == null) {
+        if (signatureWSSCrypto == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
         }
 
-        if (this.getSignatureKeyStore() == cachedSignatureKeyStore) {
-            return cachedSignatureCrypto;
-        }
-
-        Class<? extends Merlin> signatureCryptoClass = this.getSignatureCryptoClass();
-
-        try {
-            Merlin signatureCrypto = signatureCryptoClass.newInstance();
-            signatureCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
-            signatureCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
-            signatureCrypto.setKeyStore(this.getSignatureKeyStore());
-            cachedSignatureCrypto = signatureCrypto;
-            cachedSignatureKeyStore = this.getSignatureKeyStore();
-            return signatureCrypto;
-        } catch (Exception e) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
-        }
+        return signatureWSSCrypto.getCrypto();
     }
 
     public KeyStore getSignatureVerificationKeyStore() {
-        return signatureVerificationKeyStore;
+        if (signatureVerificationWSSCrypto != null) {
+            return signatureVerificationWSSCrypto.getKeyStore();
+        }
+        return null;
     }
 
     public void loadSignatureVerificationKeystore(URL url, char[] keyStorePassword) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(url.openStream(), keyStorePassword);
-        this.signatureVerificationKeyStore = keyStore;
+        if (signatureVerificationWSSCrypto == null) {
+            signatureVerificationWSSCrypto = new WSSCrypto();
+        }
+        signatureVerificationWSSCrypto.setKeyStore(keyStore);
     }
     
     public void loadCRLCertStore(URL url) throws Exception {
@@ -364,43 +352,43 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
                 new CollectionCertStoreParameters(Collections.singletonList(crl))
             );
     }
+    
+    public Properties getSignatureVerificationCryptoProperties() {
+        if (signatureVerificationWSSCrypto != null) {
+            return signatureVerificationWSSCrypto.getCryptoProperties();
+        }
+        return null;
+    }
+    
+    public void setSignatureVerificationCryptoProperties(Properties cryptoProperties) {
+        if (signatureVerificationWSSCrypto == null) {
+            signatureVerificationWSSCrypto = new WSSCrypto();
+        }
+        signatureVerificationWSSCrypto.setCryptoProperties(cryptoProperties);
+    }
 
     public Class<? extends Merlin> getSignatureVerificationCryptoClass() {
-        if (signatureVerificationCryptoClass != null) {
-            return signatureVerificationCryptoClass;
+        if (signatureVerificationWSSCrypto != null) {
+            return signatureVerificationWSSCrypto.getCryptoClass();
         }
-        signatureVerificationCryptoClass = Merlin.class;
-        return signatureVerificationCryptoClass;
+        return org.apache.wss4j.common.crypto.Merlin.class;
     }
 
     public void setSignatureVerificationCryptoClass(Class<? extends Merlin> signatureVerificationCryptoClass) {
-        this.signatureVerificationCryptoClass = signatureVerificationCryptoClass;
+        if (signatureVerificationWSSCrypto == null) {
+            signatureVerificationWSSCrypto = new WSSCrypto();
+        }
+        this.signatureVerificationWSSCrypto.setCryptoClass(signatureVerificationCryptoClass);
+        
     }
 
     public Crypto getSignatureVerificationCrypto() throws WSSConfigurationException {
 
-        if (this.getSignatureVerificationKeyStore() == null) {
+        if (signatureVerificationWSSCrypto == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
         }
-
-        if (this.getSignatureVerificationKeyStore() == cachedSignatureVerificationKeyStore) {
-            return cachedSignatureVerificationCrypto;
-        }
-
-        Class<? extends Merlin> signatureVerificationCryptoClass = this.getSignatureVerificationCryptoClass();
-
-        try {
-            Merlin signatureVerificationCrypto = signatureVerificationCryptoClass.newInstance();
-            signatureVerificationCrypto.setKeyStore(this.getSignatureVerificationKeyStore());
-            signatureVerificationCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
-            signatureVerificationCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
-            signatureVerificationCrypto.setCRLCertStore(this.getCrlCertStore());
-            cachedSignatureVerificationCrypto = signatureVerificationCrypto;
-            cachedSignatureVerificationKeyStore = this.getSignatureVerificationKeyStore();
-            return signatureVerificationCrypto;
-        } catch (Exception e) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureVerificationCryptoFailure", e);
-        }
+        signatureVerificationWSSCrypto.setCrlCertStore(crlCertStore);
+        return signatureVerificationWSSCrypto.getCrypto();
     }
 
     /**
@@ -409,7 +397,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @return A keystore for decryption operation
      */
     public KeyStore getDecryptionKeyStore() {
-        return decryptionKeyStore;
+        if (decryptionWSSCrypto != null) {
+            return decryptionWSSCrypto.getKeyStore();
+        }
+        return null;
     }
 
     /**
@@ -422,7 +413,24 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void loadDecryptionKeystore(URL url, char[] keyStorePassword) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(url.openStream(), keyStorePassword);
-        this.decryptionKeyStore = keyStore;
+        if (decryptionWSSCrypto == null) {
+            decryptionWSSCrypto = new WSSCrypto();
+        }
+        decryptionWSSCrypto.setKeyStore(keyStore);
+    }
+    
+    public Properties getDecryptionCryptoProperties() {
+        if (decryptionWSSCrypto != null) {
+            return decryptionWSSCrypto.getCryptoProperties();
+        }
+        return null;
+    }
+    
+    public void setDecryptionCryptoProperties(Properties cryptoProperties) {
+        if (decryptionWSSCrypto == null) {
+            decryptionWSSCrypto = new WSSCrypto();
+        }
+        decryptionWSSCrypto.setCryptoProperties(cryptoProperties);
     }
 
     /**
@@ -431,11 +439,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @return
      */
     public Class<? extends Merlin> getDecryptionCryptoClass() {
-        if (decryptionCryptoClass != null) {
-            return decryptionCryptoClass;
+        if (decryptionWSSCrypto != null) {
+            return decryptionWSSCrypto.getCryptoClass();
         }
-        decryptionCryptoClass = Merlin.class;
-        return decryptionCryptoClass;
+        return org.apache.wss4j.common.crypto.Merlin.class;
     }
 
     /**
@@ -444,7 +451,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @param decryptionCryptoClass
      */
     public void setDecryptionCryptoClass(Class<? extends Merlin> decryptionCryptoClass) {
-        this.decryptionCryptoClass = decryptionCryptoClass;
+        if (decryptionWSSCrypto == null) {
+            decryptionWSSCrypto = new WSSCrypto();
+        }
+        decryptionWSSCrypto.setCryptoClass(decryptionCryptoClass);
     }
 
     /**
@@ -455,27 +465,11 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public Crypto getDecryptionCrypto() throws WSSConfigurationException {
 
-        if (this.getDecryptionKeyStore() == null) {
+        if (decryptionWSSCrypto == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "decryptionKeyStoreNotSet");
         }
 
-        if (this.getDecryptionKeyStore() == cachedDecryptionKeyStore) {
-            return cachedDecryptionCrypto;
-        }
-
-        Class<? extends Merlin> decryptionCryptoClass = this.getDecryptionCryptoClass();
-
-        try {
-            Merlin decryptionCrypto = decryptionCryptoClass.newInstance();
-            decryptionCrypto.setKeyStore(this.getDecryptionKeyStore());
-            decryptionCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
-            decryptionCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
-            cachedDecryptionCrypto = decryptionCrypto;
-            cachedDecryptionKeyStore = this.getDecryptionKeyStore();
-            return decryptionCrypto;
-        } catch (Exception e) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "decryptionCryptoFailure", e);
-        }
+        return decryptionWSSCrypto.getCrypto();
     }
 
     /**
@@ -484,7 +478,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @return A keystore for encryption operation
      */
     public KeyStore getEncryptionKeyStore() {
-        return encryptionKeyStore;
+        if (encryptionWSSCrypto != null) {
+            return encryptionWSSCrypto.getKeyStore();
+        }
+        return null;
     }
 
     /**
@@ -497,7 +494,24 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void loadEncryptionKeystore(URL url, char[] keyStorePassword) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("jks");
         keyStore.load(url.openStream(), keyStorePassword);
-        this.encryptionKeyStore = keyStore;
+        if (encryptionWSSCrypto == null) {
+            encryptionWSSCrypto = new WSSCrypto();
+        }
+        encryptionWSSCrypto.setKeyStore(keyStore);
+    }
+
+    public Properties getEncryptionCryptoProperties() {
+        if (encryptionWSSCrypto != null) {
+            return encryptionWSSCrypto.getCryptoProperties();
+        }
+        return null;
+    }
+    
+    public void setEncryptionCryptoProperties(Properties cryptoProperties) {
+        if (encryptionWSSCrypto == null) {
+            encryptionWSSCrypto = new WSSCrypto();
+        }
+        encryptionWSSCrypto.setCryptoProperties(cryptoProperties);
     }
 
     /**
@@ -506,11 +520,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @return
      */
     public Class<? extends Merlin> getEncryptionCryptoClass() {
-        if (encryptionCryptoClass != null) {
-            return encryptionCryptoClass;
+        if (encryptionWSSCrypto != null) {
+            return encryptionWSSCrypto.getCryptoClass();
         }
-        encryptionCryptoClass = Merlin.class;
-        return encryptionCryptoClass;
+        return org.apache.wss4j.common.crypto.Merlin.class;
     }
 
     /**
@@ -519,7 +532,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @param encryptionCryptoClass
      */
     public void setEncryptionCryptoClass(Class<? extends Merlin> encryptionCryptoClass) {
-        this.encryptionCryptoClass = encryptionCryptoClass;
+        if (encryptionWSSCrypto == null) {
+            encryptionWSSCrypto = new WSSCrypto();
+        }
+        encryptionWSSCrypto.setCryptoClass(encryptionCryptoClass);
     }
 
     /**
@@ -530,28 +546,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public Crypto getEncryptionCrypto() throws WSSConfigurationException {
 
-        if (this.getEncryptionKeyStore() == null) {
+        if (encryptionWSSCrypto == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
         }
 
-        if (this.getEncryptionKeyStore() == cachedEncryptionKeyStore) {
-            return cachedEncryptionCrypto;
-        }
-
-        Class<? extends Merlin> encryptionCryptoClass = this.getEncryptionCryptoClass();
-
-        try {
-            Merlin encryptionCrypto = encryptionCryptoClass.newInstance();
-            encryptionCrypto.setKeyStore(this.getEncryptionKeyStore());
-            encryptionCrypto.setDefaultX509Identifier(ConfigurationProperties.getProperty("DefaultX509Alias"));
-            encryptionCrypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
-            encryptionCrypto.setCRLCertStore(this.getCrlCertStore());
-            cachedEncryptionCrypto = encryptionCrypto;
-            cachedEncryptionKeyStore = this.getEncryptionKeyStore();
-            return encryptionCrypto;
-        } catch (Exception e) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionCryptoFailure", e);
-        }
+        encryptionWSSCrypto.setCrlCertStore(this.getCrlCertStore());
+        return encryptionWSSCrypto.getCrypto();
     }
     
     /**

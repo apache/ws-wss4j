@@ -258,7 +258,7 @@ public abstract class CryptoFactory {
      * @return
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
-    private static Properties getProperties(
+    public static Properties getProperties(
         String propFilename, 
         ClassLoader loader
     ) throws WSSecurityException {

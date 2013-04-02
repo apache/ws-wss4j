@@ -124,7 +124,8 @@ public class WSSec {
                     securityProperties.setTimestampTTL(300);
                 }
             } else if (WSSConstants.SIGNATURE.equals(action)) {
-                if (securityProperties.getSignatureKeyStore() == null) {
+                if (securityProperties.getSignatureKeyStore() == null
+                    && securityProperties.getSignatureCryptoProperties() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
                 }
                 if (securityProperties.getSignatureUser() == null) {
@@ -148,6 +149,7 @@ public class WSSec {
             } else if (WSSConstants.ENCRYPT.equals(action)) {
                 if (securityProperties.getEncryptionUseThisCertificate() == null
                         && securityProperties.getEncryptionKeyStore() == null
+                        && securityProperties.getEncryptionCryptoProperties() == null
                         && !securityProperties.isUseReqSigCertForEncryption()) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
