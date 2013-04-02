@@ -97,6 +97,7 @@ public abstract class AbstractTestBase extends TestCase {
         assertionBuilderFactory.registerBuilder(new RequiredPartsBuilder());
         assertionBuilderFactory.registerBuilder(new SamlTokenBuilder());
         assertionBuilderFactory.registerBuilder(new SecureConversationTokenBuilder());
+        assertionBuilderFactory.registerBuilder(new BootstrapPolicyBuilder());
         assertionBuilderFactory.registerBuilder(new SecurityContextTokenBuilder());
         assertionBuilderFactory.registerBuilder(new SignatureTokenBuilder());
         assertionBuilderFactory.registerBuilder(new SignedElementsBuilder());

@@ -49,6 +49,7 @@ import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
+import org.apache.wss4j.policy.builders.BootstrapPolicyBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedPartsBuilder;
@@ -132,6 +133,7 @@ public class PolicyEnforcerFactory {
         assertionBuilders.add(new RequiredPartsBuilder());
         assertionBuilders.add(new SamlTokenBuilder());
         assertionBuilders.add(new SecureConversationTokenBuilder());
+        assertionBuilders.add(new BootstrapPolicyBuilder());
         assertionBuilders.add(new SecurityContextTokenBuilder());
         assertionBuilders.add(new SignatureTokenBuilder());
         assertionBuilders.add(new SignedElementsBuilder());

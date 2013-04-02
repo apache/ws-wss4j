@@ -16,39 +16,10 @@
                             <sp:MustNotSendAmend/>
                             <sp:MustNotSendRenew/>
                             <sp:BootstrapPolicy>
-                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                                <wsp:Policy>
                                     <wsp:ExactlyOne>
-                                        <wsp:All>
-                                            <Test1 xmlns=""></Test1>
-                                        </wsp:All>
-                                    </wsp:ExactlyOne>
-                                </wsp:Policy>
-                            </sp:BootstrapPolicy>
-                        </wsp:All>
-                    </wsp:ExactlyOne>
-                </wsp:Policy>
-            </sp:SecureConversationToken>
-        </wsp:All>
-        <wsp:All>
-            <sp:SecureConversationToken xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-                                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once"
-                                        wsp:Ignorable="true">
-                <sp:IssuerName>issuerName</sp:IssuerName>
-                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
-                    <wsp:ExactlyOne>
-                        <wsp:All>
-                            <sp:RequireDerivedKeys/>
-                            <sp:RequireExternalUriReference/>
-                            <sp:SC13SecurityContextToken/>
-                            <sp:MustNotSendCancel/>
-                            <sp:MustNotSendAmend/>
-                            <sp:MustNotSendRenew/>
-                            <sp:BootstrapPolicy>
-                                <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
-                                    <wsp:ExactlyOne>
-                                        <wsp:All>
-                                            <Test2 xmlns=""></Test2>
-                                        </wsp:All>
+                                        <Test1 xmlns=""></Test1>
+                                        <Test2 xmlns=""></Test2>
                                     </wsp:ExactlyOne>
                                 </wsp:Policy>
                             </sp:BootstrapPolicy>
@@ -59,3 +30,12 @@
         </wsp:All>
     </wsp:ExactlyOne>
 </wsp:Policy>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

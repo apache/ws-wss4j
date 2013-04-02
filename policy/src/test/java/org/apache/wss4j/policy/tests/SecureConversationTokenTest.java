@@ -68,7 +68,7 @@ public class SecureConversationTokenTest extends AbstractTestBase {
         assertEquals(1, policyComponents.size());
         PolicyOperator policyOperator = (PolicyOperator) policyComponents.get(0);
         policyComponents = policyOperator.getPolicyComponents();
-        assertEquals(3, policyComponents.size());
+        assertEquals(2, policyComponents.size());
         All all = (All) policyComponents.get(0);
         List<PolicyComponent> policyComponentsAll = all.getAssertions();
         assertEquals(0, policyComponentsAll.size());

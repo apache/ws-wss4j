@@ -20,7 +20,6 @@ package org.apache.wss4j.policy.model;
 
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
 import org.apache.wss4j.policy.SPConstants;
 import org.w3c.dom.Element;
 
@@ -30,7 +29,7 @@ import java.util.List;
 
 public class SecureConversationToken extends SecurityContextToken {
 
-    private Policy bootstrapPolicy;
+    private BootstrapPolicy bootstrapPolicy;
 
     private boolean mustNotSendCancel;
     private boolean mustNotSendAmend;
@@ -93,8 +92,8 @@ public class SecureConversationToken extends SecurityContextToken {
                     if (secureConversationToken.getBootstrapPolicy() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    PolicyContainingPrimitiveAssertion policyContainingPrimitiveAssertion = (PolicyContainingPrimitiveAssertion) assertion;
-                    secureConversationToken.setBootstrapPolicy(policyContainingPrimitiveAssertion.getPolicy());
+                    BootstrapPolicy bootstrap = (BootstrapPolicy) assertion;
+                    secureConversationToken.setBootstrapPolicy(bootstrap);
                     continue;
                 }
             }
@@ -125,11 +124,11 @@ public class SecureConversationToken extends SecurityContextToken {
         this.mustNotSendRenew = mustNotSendRenew;
     }
 
-    public Policy getBootstrapPolicy() {
+    public BootstrapPolicy getBootstrapPolicy() {
         return bootstrapPolicy;
     }
 
-    protected void setBootstrapPolicy(Policy bootstrapPolicy) {
+    protected void setBootstrapPolicy(BootstrapPolicy bootstrapPolicy) {
         this.bootstrapPolicy = bootstrapPolicy;
     }
 }
