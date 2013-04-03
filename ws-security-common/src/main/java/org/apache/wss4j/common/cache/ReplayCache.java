@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.cache;
+package org.apache.wss4j.common.cache;
 
 
 /**

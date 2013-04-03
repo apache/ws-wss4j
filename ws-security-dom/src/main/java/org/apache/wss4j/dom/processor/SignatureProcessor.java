@@ -59,6 +59,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -71,7 +72,6 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.cache.ReplayCache;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.wss4j.dom.message.DOMCallbackLookup;

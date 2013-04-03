@@ -27,13 +27,13 @@ import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.w3c.dom.Element;
 
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.cache.ReplayCache;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;

@@ -36,6 +36,7 @@
     <url>http://ws.apache.org/wss4j/</url>
 
     <properties>
+        <ehcache.version>2.5.1</ehcache.version>
         <log4j.version>1.2.17</log4j.version>
         <neethi.version>3.0.2</neethi.version>
         <slf4j.version>1.7.5</slf4j.version>
@@ -133,6 +134,11 @@
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
                 <version>${xmlunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-core</artifactId>
+                <version>${ehcache.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
