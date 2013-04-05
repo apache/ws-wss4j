@@ -35,11 +35,15 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * Main configuration class to supply keys etc.
@@ -86,6 +90,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean useReqSigCertForEncryption = false;
     private String encryptionCompressionAlgorithm;
     private boolean enableRevocation = false;
+    private ReplayCache timestampReplayCache;
+    private ReplayCache nonceReplayCache;
 
     public WSSSecurityProperties() {
         super();
@@ -122,6 +128,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
         this.encryptionCompressionAlgorithm = wssSecurityProperties.encryptionCompressionAlgorithm;
         this.enableRevocation = wssSecurityProperties.enableRevocation;
+        this.timestampReplayCache = wssSecurityProperties.timestampReplayCache;
+        this.nonceReplayCache = wssSecurityProperties.nonceReplayCache;
     }
 
     /**
@@ -627,4 +635,51 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setUtFutureTTL(Integer utFutureTTL) {
         this.utFutureTTL = utFutureTTL;
     }
+    
+    /**
+     * Set the replay cache for Timestamps
+     */
+    public void setTimestampReplayCache(ReplayCache newCache) {
+        timestampReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for Timestamps
+     * @throws WSSecurityException 
+     */
+    public ReplayCache getTimestampReplayCache() throws WSSecurityException {
+        if (timestampReplayCache == null) {
+            timestampReplayCache = createCache("wss4j-timestamp-cache-");
+        }
+        
+        return timestampReplayCache;
+    }
+    
+    private synchronized ReplayCache createCache(String key) throws WSSecurityException {
+        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
+        byte[] nonceValue = new byte[10];
+        WSSConstants.secureRandom.nextBytes(nonceValue);
+        String cacheKey = key + Base64.encode(nonceValue);
+        return replayCacheFactory.newReplayCache(cacheKey, null);
+    }
+    
+    /**
+     * Set the replay cache for Nonces
+     */
+    public void setNonceReplayCache(ReplayCache newCache) {
+        nonceReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for Nonces
+     * @throws WSSecurityException 
+     */
+    public ReplayCache getNonceReplayCache() throws WSSecurityException {
+        if (nonceReplayCache == null) {
+            nonceReplayCache = createCache("wss4j-nonce-cache-");
+        }
+        
+        return nonceReplayCache;
+    }
+    
 }

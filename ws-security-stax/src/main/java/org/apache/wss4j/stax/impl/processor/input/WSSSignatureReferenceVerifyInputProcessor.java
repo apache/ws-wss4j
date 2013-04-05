@@ -18,11 +18,9 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
-import org.apache.jcs.JCS;
-import org.apache.jcs.access.exception.CacheException;
-import org.apache.jcs.engine.ElementAttributes;
 import org.apache.wss4j.binding.wss10.TransformationParametersType;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
@@ -48,21 +46,12 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
-
-    private static final String cacheRegionName = "timestamp";
-    private static final JCS cache;
-
-    static {
-        try {
-            cache = JCS.getInstance(cacheRegionName);
-        } catch (CacheException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private boolean replayChecked = false;
 
@@ -179,24 +168,25 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
         TimestampSecurityEvent timestampSecurityEvent =
                 inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
-        if (timestampSecurityEvent != null) {
+        ReplayCache replayCache = 
+            ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
+        if (timestampSecurityEvent != null && replayCache != null) {
             final String cacheKey = String.valueOf(
                     timestampSecurityEvent.getCreated().getTimeInMillis()) +
                     "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
-            if (cache.get(cacheKey) != null) {
+            if (replayCache.contains(cacheKey)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
-            ElementAttributes elementAttributes = new ElementAttributes();
-            if (timestampSecurityEvent.getExpires() != null) {
-                long lifeTime = timestampSecurityEvent.getExpires().getTimeInMillis() - System.currentTimeMillis();
-                elementAttributes.setMaxLifeSeconds(lifeTime / 1000);
+            
+            // Store the Timestamp/SignatureValue combination in the cache
+            Calendar expiresCal = timestampSecurityEvent.getExpires();
+            if (expiresCal != null) {
+                Date rightNow = new Date();
+                long currentTime = rightNow.getTime();
+                long expiresTime = expiresCal.getTimeInMillis();
+                replayCache.add(cacheKey, ((expiresTime - currentTime) / 1000L));
             } else {
-                elementAttributes.setMaxLifeSeconds(300);
-            }
-            try {
-                cache.put(cacheKey, timestampSecurityEvent.getCreated(), elementAttributes);
-            } catch (CacheException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+                replayCache.add(cacheKey);
             }
         }
     }

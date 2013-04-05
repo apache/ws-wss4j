@@ -209,7 +209,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
             <scope>runtime</scope>

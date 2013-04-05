@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.policy.stax;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wss4j.policy.model.XPath;
 
 import javax.xml.namespace.QName;
@@ -32,7 +31,7 @@ public class PolicyUtils {
         String[] xPathElements = xPath.getXPath().split("/");
         for (int j = 0; j < xPathElements.length; j++) {
             String xPathElement = xPathElements[j];
-            if (StringUtils.isEmpty(xPathElement)) {
+            if (xPathElement == null || "".equals(xPathElement)) {
                 continue;
             }
             String[] elementParts = xPathElement.split(":");

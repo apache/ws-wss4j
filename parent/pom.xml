@@ -45,7 +45,6 @@
         <xerces.version>2.9.1</xerces.version>
         <xmlsec.version>2.0.0-SNAPSHOT</xmlsec.version>
         <opensaml.version>2.5.3</opensaml.version>
-        <jcs.version>1.3</jcs.version>
         <testng.version>6.5.2</testng.version>
         <junit.version>4.8.2</junit.version>
         <xml.apis.version>1.3.04</xml.apis.version>
@@ -74,11 +73,6 @@
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>woodstox-core-asl</artifactId>
                 <version>${woodstox.core.asl.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jcs</groupId>
-                <artifactId>jcs</artifactId>
-                <version>${jcs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.opensaml</groupId>

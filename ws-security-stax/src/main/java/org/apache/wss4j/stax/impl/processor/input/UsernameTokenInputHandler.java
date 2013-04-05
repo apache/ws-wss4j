@@ -18,14 +18,12 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
-import org.apache.jcs.JCS;
-import org.apache.jcs.access.exception.CacheException;
-import org.apache.jcs.engine.ElementAttributes;
 import org.apache.wss4j.binding.wss10.EncodedString;
 import org.apache.wss4j.binding.wss10.PasswordString;
 import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
@@ -58,17 +56,6 @@ import java.util.List;
  */
 public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private static final String cacheRegionName = "usernameToken";
-    private static final JCS cache;
-
-    static {
-        try {
-            cache = JCS.getInstance(cacheRegionName);
-        } catch (CacheException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
@@ -84,34 +71,34 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         if (usernameTokenType.getId() == null) {
             usernameTokenType.setId(IDGenerator.generateID(null));
         }
+        
+        // Verify Created
+        final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
+        Date createdDate = verifyCreated(wssSecurityProperties, usernameTokenType);
 
+        ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();
         final EncodedString encodedNonce =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
-        if (encodedNonce != null) {
+        if (encodedNonce != null && replayCache != null) {
+            // Check for replay attacks
             String nonce = encodedNonce.getValue();
-            /*
-                It is RECOMMENDED that used nonces be cached for a period at least as long as
-                the timestamp freshness limitation period, above, and that UsernameToken with
-                nonces that have already been used (and are thus in the cache) be rejected
-            */
-            if (cache.get(nonce) != null) {
+            if (replayCache.contains(nonce)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
-            ElementAttributes elementAttributes = new ElementAttributes();
-            elementAttributes.setMaxLifeSeconds(300);
-            try {
-                cache.put(nonce, nonce, elementAttributes);
-            } catch (CacheException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            
+            // If no Created, then just cache for the default time
+            // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
+            // older token will just get rejected anyway
+            int utTTL = wssSecurityProperties.getUtTTL();
+            if (createdDate == null || utTTL <= 0) {
+                replayCache.add(nonce);
+            } else {
+                replayCache.add(nonce, utTTL + 1L);
             }
         }
 
         final WSInboundSecurityContext wsInboundSecurityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
-        final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         final List<QName> elementPath = getElementPath(eventQueue);
-        
-        // Verify Created
-        verifyCreated(wssSecurityProperties, usernameTokenType);
         
         final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
@@ -206,7 +193,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
     }
     
-    private void verifyCreated(
+    private Date verifyCreated(
         WSSSecurityProperties wssSecurityProperties,
         UsernameTokenType usernameTokenType
     ) throws WSSecurityException {
@@ -231,6 +218,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             if (!DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
+            return createdDate;
         }
+        return null;
     }
 }
