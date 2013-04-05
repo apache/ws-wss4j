@@ -529,7 +529,7 @@ public class SignatureProcessor implements Processor {
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<WSDataRef> protectedRefs = new java.util.ArrayList<WSDataRef>();
+        List<WSDataRef> protectedRefs = new ArrayList<WSDataRef>();
         List<?> referencesList = signedInfo.getReferences();
         for (int i = 0; i < referencesList.size(); i++) {
             Reference siRef = (Reference)referencesList.get(i);

@@ -37,12 +37,15 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * This class holds per request data.
@@ -64,7 +67,7 @@ public class RequestData {
     private String sigAlgorithm;
     private String signatureDigestAlgorithm;
     private String encryptionDigestAlgorithm;
-    private String encryptionMGFAlgorithm ;
+    private String encryptionMGFAlgorithm;
     private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
     private int encKeyId;
     private String encSymmAlgo;
@@ -510,9 +513,20 @@ public class RequestData {
 
     /**
      * Get the replay cache for Timestamps
+     * @throws WSSecurityException 
      */
-    public ReplayCache getTimestampReplayCache() {
+    public ReplayCache getTimestampReplayCache() throws WSSecurityException {
+        if (timestampReplayCache == null) {
+            timestampReplayCache = createCache("wss4j-timestamp-cache-");
+        }
+        
         return timestampReplayCache;
+    }
+    
+    private synchronized ReplayCache createCache(String key) throws WSSecurityException {
+        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
+        String cacheKey = key + Base64.encode(WSSecurityUtil.generateNonce(10));
+        return replayCacheFactory.newReplayCache(cacheKey, null);
     }
     
     /**
@@ -524,8 +538,13 @@ public class RequestData {
 
     /**
      * Get the replay cache for Nonces
+     * @throws WSSecurityException 
      */
-    public ReplayCache getNonceReplayCache() {
+    public ReplayCache getNonceReplayCache() throws WSSecurityException {
+        if (nonceReplayCache == null) {
+            nonceReplayCache = createCache("wss4j-nonce-cache-");
+        }
+        
         return nonceReplayCache;
     }
     
