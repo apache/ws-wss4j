@@ -73,11 +73,11 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Implementation-Title>Apache WSS4J</Implementation-Title>
+                        <Implementation-Title>Apache WSS4J WS-Security Common</Implementation-Title>
                         <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                         <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
                         <Implementation-Version>${project.version}</Implementation-Version>
-                        <Specification-Title>Apache WSS4J</Specification-Title>
+                        <Specification-Title>Apache WSS4J WS-Security Common</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${project.version}</Specification-Version>
 
@@ -87,10 +87,12 @@
                         <Import-Package>
                               !org.apache.wss4j.common.*,
                               javax.xml.crypto.*,
-                              org.apache.xml.security.*,
+                              org.slf4j.*;version="[1.7,2)",
+                              org.apache.xml.security.*;version="[2.0.0,3)",
                               org.bouncycastle.*;resolution:=optional,
                               org.apache.jcp.xml.dsig.internal.*,
-                              org.opensaml.*;resolution:=optional,
+                              org.opensaml.*;resolution:=optional;version="[2.5.0,3)",
+                              net.sf.ehcache.*;resolution:=optional;version="2.5, 3.0.0)",
                               *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>
