@@ -32,6 +32,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -49,7 +50,6 @@ import javax.xml.namespace.QName;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -64,14 +64,6 @@ public final class WSSecurityUtil {
     private static org.slf4j.Logger log = 
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
 
-    /**
-     * A cached pseudo-random number generator
-     * NB. On some JVMs, caching this random number
-     * generator is required to overcome punitive
-     * overhead.
-     */
-    private static SecureRandom random;
-    
     /**
      * A cached MessageDigest object
      */
@@ -1103,13 +1095,10 @@ public final class WSSecurityUtil {
      * @return a nonce of the given length
      * @throws WSSecurityException
      */
-    public static synchronized byte[] generateNonce(int length) throws WSSecurityException {
+    public static byte[] generateNonce(int length) throws WSSecurityException {
         try {
-            if (random == null) {
-                random = SecureRandom.getInstance("SHA1PRNG");
-            }
             byte[] temp = new byte[length];
-            random.nextBytes(temp);
+            XMLSecurityConstants.secureRandom.nextBytes(temp);
             return temp;
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
