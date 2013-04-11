@@ -55,6 +55,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private String actor;
     private CallbackHandler callbackHandler;
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
+    private boolean disableBSPEnforcement;
     private final Map<QName, Validator> validators = new HashMap<QName, Validator>();
 
     private Integer timestampTTL = 300;
@@ -104,6 +105,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.actor = wssSecurityProperties.actor;
         this.callbackHandler = wssSecurityProperties.callbackHandler;
         this.ignoredBSPRules.addAll(wssSecurityProperties.ignoredBSPRules);
+        this.disableBSPEnforcement = wssSecurityProperties.disableBSPEnforcement;
         this.validators.putAll(wssSecurityProperties.validators);
         this.timestampTTL = wssSecurityProperties.timestampTTL;
         this.timeStampFutureTTL = wssSecurityProperties.timeStampFutureTTL;
@@ -680,6 +682,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
         
         return nonceReplayCache;
+    }
+
+    public boolean isDisableBSPEnforcement() {
+        return disableBSPEnforcement;
+    }
+
+    public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
+        this.disableBSPEnforcement = disableBSPEnforcement;
     }
     
 }

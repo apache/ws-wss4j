@@ -127,6 +127,7 @@ public class InboundWSSec {
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
         securityContextImpl.addSecurityEventListener(securityEventListener);
         securityContextImpl.ignoredBSPRules(this.securityProperties.getIgnoredBSPRules());
+        securityContextImpl.setDisableBSPEnforcement(this.securityProperties.isDisableBSPEnforcement());
 
         if (!requestSecurityEvents.isEmpty()) {
             try {

@@ -49,6 +49,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     private final Deque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
     private boolean messageEncryptionTokenOccured = false;
+    private boolean disableBSPEnforcement;
 
     private List<BSPRule> ignoredBSPRules = Collections.emptyList();
 
@@ -533,6 +534,9 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     @Override
     public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
+        if (disableBSPEnforcement) {
+            return;
+        }
         if (!ignoredBSPRules.contains(bspRule)) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
@@ -546,5 +550,13 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     @Override
     public void ignoredBSPRules(List<BSPRule> bspRules) {
         ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
+    }
+
+    public boolean isDisableBSPEnforcement() {
+        return disableBSPEnforcement;
+    }
+
+    public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
+        this.disableBSPEnforcement = disableBSPEnforcement;
     }
 }

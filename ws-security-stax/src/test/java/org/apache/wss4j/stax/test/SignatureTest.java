@@ -431,6 +431,53 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
+    
+    /**
+     * Since WSS4J hardcoded the C14N algo for References, we test against our framework
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSignatureC14NInclusivePartsInbound_DisableAllBSPRules() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
+            securityProperties.addSignaturePart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
+            securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+        }
+
+        //done signature; now test sig-verification:
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setDisableBSPEnforcement(true);
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+        }
+    }
 
     @Test
     public void testSignatureKeyIdentifierIssuerSerialOutbound() throws Exception {
