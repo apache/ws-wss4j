@@ -278,10 +278,9 @@ public abstract class WSHandler {
             enableSigConf || ((doAction & WSConstants.SC) != 0)
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
-        if (decodePasswordTypeStrict(reqData)) {
-            String passwordType = decodePasswordType(reqData);
-            wssConfig.setRequiredPasswordType(passwordType);
-        }
+        String passwordType = decodePasswordType(reqData);
+        wssConfig.setRequiredPasswordType(passwordType);
+            
         wssConfig.setTimeStampTTL(decodeTimeToLive(reqData, true));
         wssConfig.setTimeStampFutureTTL(decodeFutureTimeToLive(reqData, true));
         wssConfig.setUtTTL(decodeTimeToLive(reqData, false));
@@ -782,13 +781,6 @@ public abstract class WSHandler {
         throws WSSecurityException {
         return decodeBooleanConfigValue(
             reqData, WSHandlerConstants.TIMESTAMP_STRICT, true
-        );
-    }
-    
-    protected boolean decodePasswordTypeStrict(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.PASSWORD_TYPE_STRICT, false
         );
     }
     

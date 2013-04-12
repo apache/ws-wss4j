@@ -170,22 +170,14 @@ public class PasswordTypeTest extends org.junit.Assert {
         }
         
         //
-        // It should pass even on a different password type, as we haven't set the
-        // processing to be strict
+        // It should fail on a different password type
         //
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         reqData.setMsgContext(config);
         handler.receive(WSConstants.UT, reqData);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(reqData.getWssConfig());
-        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
-        //
-        // It should fail on strict password type processing
-        //
-        config.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
-        reqData.setMsgContext(config);
-        handler.receive(WSConstants.UT, reqData);
         try {
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");

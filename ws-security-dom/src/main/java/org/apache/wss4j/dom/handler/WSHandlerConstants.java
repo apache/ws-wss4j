@@ -392,15 +392,6 @@ public final class WSHandlerConstants {
     public static final String ALLOW_USERNAMETOKEN_NOPASSWORD = "allowUsernameTokenNoPassword";
     
     /**
-     * Set the value of this parameter to true to enable strict Username Token password type
-     * handling. The default value is "false".
-     * 
-     * If this parameter is set to true, it throws an exception if the password type of 
-     * the Username Token does not match that of the configured PASSWORD_TYPE parameter.
-     */
-    public static final String PASSWORD_TYPE_STRICT = "passwordTypeStrict";
-    
-    /**
      * This variable controls whether (wsse) namespace qualified password types are
      * accepted when processing UsernameTokens. The default value is "false".
      */
@@ -492,17 +483,17 @@ public final class WSHandlerConstants {
     public static final String ENC_KEY_NAME = "embeddedKeyName";
 
     /**
-     * Specific parameter for UsernameToken action to define the encoding
-     * of the password.
-     * <p/>
-     * The parameter can be set to either {@link WSConstants#PW_DIGEST}
-     * or to {@link WSConstants#PW_TEXT}.
-     * <p/>
-     * The application may set this parameter using the following method:
-     * <pre>
-     * call.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-     * </pre>
-     * The default setting is PW_DIGEST.
+     * Specific parameter for UsernameTokens to define the encoding of the password. It can
+     * be used on either the outbound or inbound side. The valid values are:
+     * 
+     * - {@link WSConstants#PW_DIGEST}
+     * - {@link WSConstants#PW_TEXT}
+     * - {@link WSConstants#PW_NONE}
+     * 
+     * On the Outbound side, the default value is PW_DIGEST. There is no default value on
+     * the inbound side. If a value is specified on the inbound side, the password type of
+     * the received UsernameToken must match the specified type, or an exception will be
+     * thrown.
      */
     public static final String PASSWORD_TYPE = "passwordType";
     

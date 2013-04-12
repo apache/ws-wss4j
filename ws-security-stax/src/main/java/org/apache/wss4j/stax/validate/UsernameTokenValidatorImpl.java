@@ -35,6 +35,8 @@ import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
+    
+    private static final transient org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UsernameTokenValidatorImpl.class);
 
     @Override
     public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(
@@ -57,6 +59,28 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         final byte[] nonceVal;
 
+        // Check received password type against required type
+        WSSConstants.UsernameTokenPasswordType requiredPasswordType = 
+            tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
+        if (requiredPasswordType != null) {
+            if (passwordType == null || passwordType.getType() == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Authentication failed as the received password type does not " 
+                        + "match the required password type of: " + requiredPasswordType);
+                }
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+            WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType =
+                WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
+            if (requiredPasswordType != usernameTokenPasswordType) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Authentication failed as the received password type does not " 
+                        + "match the required password type of: " + requiredPasswordType);
+                }
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+        }
+        
         WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
         if (passwordType != null && passwordType.getType() != null) {
             usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
