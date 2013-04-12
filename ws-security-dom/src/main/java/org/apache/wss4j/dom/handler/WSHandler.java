@@ -925,6 +925,11 @@ public abstract class WSHandler {
                     cryptos.put(refId, crypto);
                 }
             }
+            if (crypto == null) {
+                log.warn("The Crypto reference " + refId + " specified by "
+                    + cryptoPropertyRefId + " could not be loaded"
+                );
+            }
         }
         
         //
@@ -939,7 +944,21 @@ public abstract class WSHandler {
                     cryptos.put(propFile, crypto);
                 }
             } 
+            if (crypto == null) {
+                if (propFile == null) {
+                    log.warn(
+                         "The Crypto properties file specified by "
+                         + cryptoPropertyFile + " is null"
+                    );
+                } else {
+                    log.warn(
+                         "The Crypto properties file " + propFile + " specified by "
+                         + cryptoPropertyFile + " could not be loaded or found"
+                    );
+                }
+            }
         }
+
         return crypto;
     }
 
