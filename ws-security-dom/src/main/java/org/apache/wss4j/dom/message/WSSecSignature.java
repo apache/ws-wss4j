@@ -782,7 +782,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(user);
                 if (crypto == null) {
-                    throw new WSSecurityException(WSSecurityException.FAILURE, "noSigCryptoFile");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
                 }
                 certs = crypto.getX509Certificates(cryptoType);
             } else {
