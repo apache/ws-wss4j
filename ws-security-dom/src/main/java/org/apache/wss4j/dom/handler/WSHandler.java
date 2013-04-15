@@ -935,20 +935,13 @@ public abstract class WSHandler {
                     crypto = loadCryptoFromPropertiesFile(propFile, requestData);
                     cryptos.put(propFile, crypto);
                 }
-            } 
-            if (crypto == null) {
-                if (propFile == null) {
-                    log.warn(
-                         "The Crypto properties file specified by "
-                         + cryptoPropertyFile + " is null"
-                    );
-                } else {
+                if (crypto == null) {
                     log.warn(
                          "The Crypto properties file " + propFile + " specified by "
                          + cryptoPropertyFile + " could not be loaded or found"
                     );
                 }
-            }
+            } 
         }
 
         return crypto;
