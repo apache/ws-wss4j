@@ -18,23 +18,34 @@
  */
 package org.apache.wss4j.stax.impl;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.impl.InboundSecurityContextImpl;
-import org.apache.xml.security.stax.securityEvent.*;
+import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
-
-import javax.xml.namespace.QName;
-import java.util.*;
 
 /**
  * Concrete security context implementation
@@ -43,12 +54,11 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     private static final transient org.slf4j.Logger logger =
             org.slf4j.LoggerFactory.getLogger(InboundWSSecurityContextImpl.class);
-    private static final Boolean allowRSA15KeyTransportAlgorithm =
-            Boolean.valueOf(ConfigurationProperties.getProperty("AllowRSA15KeyTransportAlgorithm"));
 
     private final Deque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
     private boolean messageEncryptionTokenOccured = false;
+    private boolean allowRSA15KeyTransportAlgorithm = false;
     private boolean disableBSPEnforcement;
 
     private List<BSPRule> ignoredBSPRules = Collections.emptyList();
@@ -558,5 +568,13 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
         this.disableBSPEnforcement = disableBSPEnforcement;
+    }
+
+    public boolean isAllowRSA15KeyTransportAlgorithm() {
+        return allowRSA15KeyTransportAlgorithm;
+    }
+
+    public void setAllowRSA15KeyTransportAlgorithm(boolean allowRSA15KeyTransportAlgorithm) {
+        this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
     }
 }

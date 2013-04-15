@@ -1276,6 +1276,12 @@ public abstract class WSHandler {
         if (reqData.getDecCrypto() == null) {
             reqData.setDecCrypto(loadDecryptionCrypto(reqData));
         }
+        
+        boolean allowRsa15 = 
+            decodeBooleanConfigValue(
+                reqData, WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, false
+            );
+        reqData.setAllowRSA15KeyTransportAlgorithm(allowRsa15);
     }
 
     /**

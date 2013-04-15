@@ -91,6 +91,14 @@ public class EncryptedKeyProcessor implements Processor {
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncAlgo"
             );
         }
+        if (WSConstants.KEYTRANSPORT_RSA15.equals(encryptedKeyTransportMethod)
+            && !data.isAllowRSA15KeyTransportAlgorithm()
+            && !algorithmSuite.getKeyWrapAlgorithms().contains(WSConstants.KEYTRANSPORT_RSA15)) {
+            log.debug(
+                "The Key transport method does not match the requirement"
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
             
         // Check BSP Compliance
         checkBSPCompliance(elem, encryptedKeyTransportMethod, data.getBSPEnforcer());

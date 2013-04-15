@@ -98,6 +98,7 @@ public class RequestData {
     private AlgorithmSuite algorithmSuite;
     private AlgorithmSuite samlAlgorithmSuite;
     private boolean disableBSPEnforcement;
+    private boolean allowRSA15KeyTransportAlgorithm;
 
     public void clear() {
         soapConstants = null;
@@ -129,6 +130,7 @@ public class RequestData {
         samlAlgorithmSuite = null;
         setOriginalSignatureActionPosition(0);
         setDisableBSPEnforcement(false);
+        allowRSA15KeyTransportAlgorithm = false;
     }
 
     public Object getMsgContext() {
@@ -618,6 +620,14 @@ public class RequestData {
 
     public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
         this.disableBSPEnforcement = disableBSPEnforcement;
+    }
+
+    public boolean isAllowRSA15KeyTransportAlgorithm() {
+        return allowRSA15KeyTransportAlgorithm;
+    }
+
+    public void setAllowRSA15KeyTransportAlgorithm(boolean allowRSA15KeyTransportAlgorithm) {
+        this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
     }
         
 }

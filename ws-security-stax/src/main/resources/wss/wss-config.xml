@@ -4,7 +4,6 @@
     <Properties>
         <Property NAME="securityTokenFactory" VAL="org.apache.wss4j.stax.impl.securityToken.SecurityTokenFactoryImpl"/>
         <Property NAME="MaximumAllowedDecompressedBytes" VAL="104857600"/>
-        <Property NAME="AllowRSA15KeyTransportAlgorithm" VAL="false"/>
         <xi:include href="security-config.xml" xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:Properties/c:Property[@NAME!='securityTokenFactory'])"/>
     </Properties>
     <SecurityHeaderHandlers>

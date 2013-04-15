@@ -73,6 +73,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     private boolean handleCustomPasswordTypes = false;
     private boolean allowUsernameTokenNoPassword = false;
+    private boolean allowRSA15KeyTransportAlgorithm = false;
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String tokenUser;
 
@@ -132,6 +133,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.enableRevocation = wssSecurityProperties.enableRevocation;
         this.timestampReplayCache = wssSecurityProperties.timestampReplayCache;
         this.nonceReplayCache = wssSecurityProperties.nonceReplayCache;
+        this.allowRSA15KeyTransportAlgorithm = wssSecurityProperties.allowRSA15KeyTransportAlgorithm;
     }
 
     /**
@@ -690,6 +692,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setDisableBSPEnforcement(boolean disableBSPEnforcement) {
         this.disableBSPEnforcement = disableBSPEnforcement;
+    }
+
+    public boolean isAllowRSA15KeyTransportAlgorithm() {
+        return allowRSA15KeyTransportAlgorithm;
+    }
+
+    public void setAllowRSA15KeyTransportAlgorithm(boolean allowRSA15KeyTransportAlgorithm) {
+        this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
     }
     
 }

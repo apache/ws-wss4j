@@ -472,6 +472,12 @@ public final class WSHandlerConstants {
      * protection is selected.
      */
     public static final String REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS = "requireSignedEncryptedDataElements";
+    
+    /**
+     * Whether to allow the RSA v1.5 Key Transport Algorithm or not. Use of this algorithm
+     * is discouraged, and so the default is "false".
+     */
+    public static final String ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM = "allowRSA15KeyTransportAlgorithm";
 
     //
     // (Non-boolean) Configuration parameters for the actions/processors
