@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -46,7 +47,6 @@ public class WSSecUsernameToken extends WSSecBase {
     private boolean useMac;
     private byte[] saltValue;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
-    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
     private boolean passwordsAreEncoded;
 
     public WSSecUsernameToken() {
@@ -85,20 +85,6 @@ public class WSSecUsernameToken extends WSSecBase {
     }
     
     /**
-     * Set the secret key length
-     */
-    public void setSecretKeyLength(int length) {
-        secretKeyLength = length;
-    }
-    
-    /**
-     * Get the secret key length
-     */
-    public int getSecretKeyLength() {
-        return secretKeyLength;
-    }
-    
-    /**
      * Add a derived key to the UsernameToken
      * @param useMac whether the derived key is to be used for a MAC or not
      * @param saltValue The salt value to use
@@ -114,38 +100,6 @@ public class WSSecUsernameToken extends WSSecBase {
         }
     }
 
-    
-    /**
-     * Get the derived secret key.
-     * 
-     * After the <code>prepare()</code> method was called use this method
-     * to compute a derived secret key. If "useDerivedKey" is set, then the returned secret
-     * key is derived as per the UsernameToken 1.1 specification. Otherwise, the generation 
-     * of this secret key is according to the WS-Trust specifications.
-     * 
-     * @return Return the derived secret key of this token or null if <code>prepare()</code>
-     * was not called before.
-     */
-    public byte[] getSecretKey() throws WSSecurityException {
-        if (ut == null) {
-            return null;
-        }
-        if (useDerivedKey) {
-            if (passwordsAreEncoded) {
-                try {
-                    return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
-                } catch (Base64DecodingException e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
-                    );
-                }
-            } else {
-                return UsernameToken.generateDerivedKey(password, saltValue, iteration);
-            }
-        }
-        return ut.getSecretKey(secretKeyLength);
-    }
-    
     /**
      * Get the derived key.
      * 
@@ -162,14 +116,14 @@ public class WSSecUsernameToken extends WSSecBase {
         }
         if (passwordsAreEncoded) {
             try {
-                return UsernameToken.generateDerivedKey(Base64.decode(password), saltValue, iteration);
+                return UsernameTokenUtil.generateDerivedKey(Base64.decode(password), saltValue, iteration);
             } catch (Base64DecodingException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
                 );
             }
         } else {
-            return UsernameToken.generateDerivedKey(password, saltValue, iteration);
+            return UsernameTokenUtil.generateDerivedKey(password, saltValue, iteration);
         }
     }
 

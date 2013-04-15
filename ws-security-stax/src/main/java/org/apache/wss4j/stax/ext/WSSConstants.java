@@ -266,12 +266,6 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final String PROP_TIMESTAMP_SECURITYEVENT = "PROP_TIMESTAMP";
 
-    /**
-     * Length of UsernameToken derived key used by .NET WSE to sign a message.
-     */
-    public static final int WSE_DERIVED_KEY_LEN = 16;
-    public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
-
     public static final Action TIMESTAMP = new Action("TIMESTAMP");
     public static final Action USERNAMETOKEN = new Action("USERNAMETOKEN");
     public static final Action USERNAMETOKEN_SIGNED = new Action("USERNAMETOKEN_SIGNED");

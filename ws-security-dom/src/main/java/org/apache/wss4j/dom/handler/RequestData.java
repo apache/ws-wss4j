@@ -81,8 +81,6 @@ public class RequestData {
     private List<byte[]> signatureValues = new ArrayList<byte[]>();
     private WSSecHeader secHeader;
     private boolean encSymmetricEncryptionKey = true;
-    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
-    private boolean useDerivedKey = true;
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
     private boolean useSingleCert = true;
@@ -113,9 +111,7 @@ public class RequestData {
         signatureDigestAlgorithm = null;
         encryptionDigestAlgorithm = null;
         encSymmetricEncryptionKey = true;
-        secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
         signatureUser = null;
-        useDerivedKey = true;
         derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
         useDerivedKeyForMAC = true;
         useSingleCert = true;
@@ -165,14 +161,6 @@ public class RequestData {
         this.actor = actor;
     }
     
-    public void setSecretKeyLength(int length) {
-        secretKeyLength = length;
-    }
-    
-    public int getSecretKeyLength() {
-        return secretKeyLength;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -374,22 +362,6 @@ public class RequestData {
      */
     public void setSecHeader(WSSecHeader secHeader) {
         this.secHeader = secHeader;
-    }
-    
-    /**
-     * @param derivedKey Set whether to derive keys as per the 
-     *        UsernameTokenProfile 1.1 spec. Default is true.
-     */
-    public void setUseDerivedKey(boolean derivedKey) {
-        useDerivedKey = derivedKey;
-    }
-    
-    /**
-     * Return whether to derive keys as per the UsernameTokenProfile 
-     * 1.1 spec. Default is true.
-     */
-    public boolean isUseDerivedKey() {
-        return useDerivedKey;
     }
     
     /**

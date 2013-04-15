@@ -31,6 +31,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -95,11 +96,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         assertTrue(outputString.contains("wsse11:Salt"));
         assertTrue(outputString.contains("wsse11:Iteration"));
         
-        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 500);
+        byte[] derivedKey = UsernameTokenUtil.generateDerivedKey("security", salt, 500);
         assertTrue(derivedKey.length == 20);
         
         // "c2VjdXJpdHk=" is the Base64 encoding of "security"
-        derivedKey = UsernameToken.generateDerivedKey(Base64.decode("c2VjdXJpdHk="), salt, 500);
+        derivedKey = UsernameTokenUtil.generateDerivedKey(Base64.decode("c2VjdXJpdHk="), salt, 500);
         assertTrue(derivedKey.length == 20);
     }
 
@@ -115,7 +116,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         byte[] salt = Base64.decode("LKpycbfgRzwDnBz6kkhAAQ==");
         int iteration = 1049;
         byte[] expectedDerivedKey = Base64.decode("C7Ll/OY4TECb6hZuMMiX/5hzszo=");
-        byte[] derivedKey = UsernameToken.generateDerivedKey(passwordHash, salt, iteration);
+        byte[] derivedKey = UsernameTokenUtil.generateDerivedKey(passwordHash, salt, iteration);
         assertTrue("the derived key is not as expected", Arrays.equals(expectedDerivedKey, derivedKey));
     }
 
@@ -540,10 +541,10 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         usernameToken.setID(config.getIdAllocator().createId("UsernameToken-", usernameToken));
         
-        byte[] salt = UsernameToken.generateSalt(false);
+        byte[] salt = UsernameTokenUtil.generateSalt(false);
         usernameToken.addIteration(doc, 1000);
         
-        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 1000);
+        byte[] derivedKey = UsernameTokenUtil.generateDerivedKey("security", salt, 1000);
         
         //
         // Derived key encryption
@@ -592,7 +593,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         usernameToken.setID(config.getIdAllocator().createId("UsernameToken-", usernameToken));
         
         byte[] salt = usernameToken.addSalt(doc, null, false);
-        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 1000);
+        byte[] derivedKey = UsernameTokenUtil.generateDerivedKey("security", salt, 1000);
         
         //
         // Derived key encryption
@@ -642,7 +643,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         usernameToken.addIteration(doc, 500);
         byte[] salt = usernameToken.addSalt(doc, null, false);
-        byte[] derivedKey = UsernameToken.generateDerivedKey("security", salt, 500);
+        byte[] derivedKey = UsernameTokenUtil.generateDerivedKey("security", salt, 500);
         
         //
         // Derived key encryption

@@ -70,12 +70,6 @@ public class SignatureSTRParser implements STRParser {
      */
     public static final String SIGNATURE_METHOD = "signature_method";
     
-    /**
-     * The secret key length. This is used when deriving a key from a Username token for the
-     * non-standard WSE implementation.
-     */
-    public static final String SECRET_KEY_LENGTH = "secret_key_length";
-    
     private X509Certificate[] certs;
     
     private byte[] secretKey;
@@ -468,12 +462,8 @@ public class SignatureSTRParser implements STRParser {
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
             usernameToken.setRawPassword(data);
-            if (usernameToken.isDerivedKey()) {
-                secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
-            } else {
-                int keyLength = (Integer) parameters.get(SECRET_KEY_LENGTH);
-                secretKey = usernameToken.getSecretKey(keyLength);
-            }
+            secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+           
             principal = usernameToken.createPrincipal();
         } else if (WSConstants.BST == action) {
             BinarySecurity token = 

@@ -474,12 +474,6 @@ public final class WSConstants {
     public static final int BST = 0x1000; //BinarySecurityToken
     public static final int UT_NOPASSWORD = 0x2000; // perform UsernameToken
 
-    /**
-     * Length of UsernameToken derived key used by .NET WSE to sign a message.
-     */
-    public static final int WSE_DERIVED_KEY_LEN = 16;
-    public static final String LABEL_FOR_DERIVED_KEY = "WS-Security";
-    
     private WSConstants() {
         // Complete
     }

@@ -60,6 +60,11 @@ public final class WSHandlerConstants {
     public static final String USERNAME_TOKEN = "UsernameToken";
     
     /**
+     * Perform a UsernameTokenSignature action.
+     */
+    public static final String USERNAME_TOKEN_SIGNATURE = "UsernameTokenSignature";
+    
+    /**
      * Perform a UsernameToken action with no password.
      */
     public static final String USERNAME_TOKEN_NO_PASSWORD = "UsernameTokenNoPassword";
@@ -90,13 +95,6 @@ public final class WSHandlerConstants {
      * Add a timestamp to the security header.
      */
     public static final String TIMESTAMP = "Timestamp";
-    
-    /**
-     * Use this to use a specific signature mechanism for .Net. This signature mechanism 
-     * uses data from the username token and  a well defined constant string and constructs
-     * a signature key. Please note that this action is NOT spec-compliant.
-     */
-    public static final String SIGN_WITH_UT_KEY = "UsernameTokenSignature";
     
     //
     // User properties
@@ -424,13 +422,6 @@ public final class WSHandlerConstants {
     public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
     
     /**
-     * This parameter sets whether to use UsernameToken Key Derivation, as defined 
-     * in the UsernameTokenProfile 1.1 specification. The default is "true". If false,
-     * then it falls back to the old behaviour of WSE derived key functionality.
-     */
-    public static final String USE_DERIVED_KEY = "useDerivedKey";
-    
-    /**
      * This parameter sets whether to use the Username Token derived key for a MAC
      * or not. The default is "true".
      */
@@ -588,14 +579,6 @@ public final class WSHandlerConstants {
      * (<code>{}</code>).
      */
     public static final String SIGNATURE_PARTS = "signatureParts";
-    
-    /**
-     * This parameter sets the length of the secret (derived) key to use for the
-     * WSE UT_SIGN functionality.
-     * 
-     * The default value is 16 bytes.
-     */
-    public static final String WSE_SECRET_KEY_LENGTH = "wseSecretKeyLength";
     
     /**
      * This parameter sets the number of iterations to use when deriving a key

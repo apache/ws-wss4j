@@ -241,6 +241,8 @@ public abstract class AbstractTestBase {
         if (properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD) != null) {
             messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, 
                                properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD));
+        } else if (WSHandlerConstants.USERNAME_TOKEN_SIGNATURE.equals(action)) {
+            messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
         }
 
         // Disable PrefixList checking as the stax code doesn't support this yet

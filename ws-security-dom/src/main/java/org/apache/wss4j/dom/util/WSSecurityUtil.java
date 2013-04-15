@@ -970,7 +970,7 @@ public final class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
                 actions.add(WSConstants.TS);
-            } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_SIGNATURE)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(WSConstants.UT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
@@ -1027,7 +1027,7 @@ public final class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
                 doAction |= WSConstants.TS;
                 actions.add(WSConstants.TS);
-            } else if (single[i].equals(WSHandlerConstants.SIGN_WITH_UT_KEY)) {
+            } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_SIGNATURE)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(WSConstants.UT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {

@@ -74,7 +74,7 @@ public class UTSignatureTest extends org.junit.Assert {
         WSSecSignature sign = new WSSecSignature();
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
-        sign.setSecretKey(builder.getSecretKey());
+        sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
@@ -125,7 +125,7 @@ public class UTSignatureTest extends org.junit.Assert {
         WSSecSignature sign = new WSSecSignature();
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
-        sign.setSecretKey(builder.getSecretKey());
+        sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         
@@ -158,7 +158,6 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
@@ -204,7 +203,6 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        messageContext.put(WSHandlerConstants.USE_DERIVED_KEY, "true");
         messageContext.put(WSHandlerConstants.DERIVED_KEY_ITERATIONS, "1234");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");

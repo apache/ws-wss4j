@@ -18,29 +18,6 @@
  */
 package org.apache.wss4j.stax.test;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
-import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -48,6 +25,33 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Properties;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.stax.WSSec;
+import org.apache.wss4j.stax.ext.InboundWSSec;
+import org.apache.wss4j.stax.ext.OutboundWSSec;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.test.utils.StAX2DOM;
+import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class UsernameTokenTest extends AbstractTestBase {
 
@@ -538,8 +542,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_Password.getNamespaceURI(), WSSConstants.TAG_wsse_Password.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Type.getLocalPart()), WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace());
+            Assert.assertEquals(nodeList.getLength(), 0);
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -553,7 +556,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         //done UsernameToken; now verification:
         {
-            String action = WSHandlerConstants.SIGN_WITH_UT_KEY + " " + WSHandlerConstants.USERNAME_TOKEN;
+            String action = WSHandlerConstants.USERNAME_TOKEN_SIGNATURE;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

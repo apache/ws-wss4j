@@ -295,7 +295,6 @@ public abstract class WSHandler {
             decodeAllowUsernameTokenNoPassword(reqData)
         );
         
-        wssConfig.setSecretKeyLength(reqData.getSecretKeyLength());
         boolean bspCompliant = decodeBSPCompliance(reqData);
         if (!bspCompliant) {
             reqData.setDisableBSPEnforcement(true);
@@ -470,12 +469,6 @@ public abstract class WSHandler {
             reqData.setUtElements(StringUtil.split(add, ' '));
         }
         
-        String derived = getString(WSHandlerConstants.USE_DERIVED_KEY, mc);
-        if (derived != null) {
-            boolean useDerivedKey = Boolean.parseBoolean(derived);
-            reqData.setUseDerivedKey(useDerivedKey);
-        }
-        
         String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY_FOR_MAC, mc);
         boolean useDerivedKeyForMAC = Boolean.parseBoolean(derivedMAC);
         if (useDerivedKeyForMAC) {
@@ -533,12 +526,6 @@ public abstract class WSHandler {
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
         if (parts != null) {
             splitEncParts(parts, reqData.getSignatureParts(), reqData);
-        }
-        
-        String secretKeyLength = getString(WSHandlerConstants.WSE_SECRET_KEY_LENGTH, mc);
-        if (secretKeyLength != null) {
-            int iSecretKeyLength = Integer.parseInt(secretKeyLength);
-            reqData.setSecretKeyLength(iSecretKeyLength);
         }
         
         boolean useSingleCert = decodeUseSingleCertificate(reqData);

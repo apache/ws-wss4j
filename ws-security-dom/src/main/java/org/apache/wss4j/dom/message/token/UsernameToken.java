@@ -21,8 +21,6 @@ package org.apache.wss4j.dom.message.token;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -36,12 +34,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
-
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -49,8 +41,10 @@ import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -59,6 +53,10 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /**
  * UsernameToken according to WS Security specifications, UsernameToken profile.
@@ -353,7 +351,7 @@ public class UsernameToken {
      */
     public byte[] addSalt(Document doc, byte[] saltValue, boolean mac) {
         if (saltValue == null) {
-            saltValue = generateSalt(mac);
+            saltValue = UsernameTokenUtil.generateSalt(mac);
         }
         elementSalt = 
             doc.createElementNS(
@@ -707,30 +705,6 @@ public class UsernameToken {
     }
 
     /**
-     * Gets the secret key as per WS-Trust spec. This method uses default setting
-     * to generate the secret key. These default values are suitable for .NET
-     * WSE.
-     * 
-     * @return a secret key constructed from information contained in this
-     *         username token
-     */
-    public byte[] getSecretKey() throws WSSecurityException {
-        return getSecretKey(WSConstants.WSE_DERIVED_KEY_LEN, WSConstants.LABEL_FOR_DERIVED_KEY);
-    }
-    
-    /**
-     * Gets the secret key as per WS-Trust spec. This method uses default setting
-     * to generate the secret key. These default values are suitable for .NET
-     * WSE.
-     * 
-     * @return a secret key constructed from information contained in this
-     *         username token
-     */
-    public byte[] getSecretKey(int keylen) throws WSSecurityException {
-        return getSecretKey(keylen, WSConstants.LABEL_FOR_DERIVED_KEY);
-    }
-
-    /**
      * Gets the secret key as per WS-Trust spec.
      * 
      * @param keylen How many bytes to generate for the key
@@ -783,81 +757,6 @@ public class UsernameToken {
     }
     
     
-    /**
-     * This static method generates a derived key as defined in WSS Username
-     * Token Profile.
-     * 
-     * @param password The password to include in the key generation
-     * @param salt The Salt value
-     * @param iteration The Iteration value. If zero (0) is given the method uses the
-     *                  default value
-     * @return Returns the derived key a byte array
-     * @throws WSSecurityException
-     */
-    public static byte[] generateDerivedKey(
-        byte[] password, 
-        byte[] salt, 
-        int iteration
-    ) throws WSSecurityException {
-        if (iteration == 0) {
-            iteration = DEFAULT_ITERATION;
-        }
-
-        byte[] pwSalt = new byte[salt.length + password.length];
-        System.arraycopy(password, 0, pwSalt, 0, password.length);
-        System.arraycopy(salt, 0, pwSalt, password.length, salt.length);
-
-        MessageDigest sha = null;
-        try {
-            sha = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e
-            );
-        }
-        //
-        // Make the first hash round with start value
-        //
-        byte[] k = sha.digest(pwSalt);
-        //
-        // Perform the 1st up to iteration-1 hash rounds
-        //
-        for (int i = 1; i < iteration; i++) {
-            k = sha.digest(k);
-        }
-        return k;
-    }
-    
-    /**
-     * This static method generates a derived key as defined in WSS Username
-     * Token Profile.
-     * 
-     * @param password The password to include in the key generation
-     * @param salt The Salt value
-     * @param iteration The Iteration value. If zero (0) is given the method uses the
-     *                  default value
-     * @return Returns the derived key a byte array
-     * @throws WSSecurityException
-     */
-    public static byte[] generateDerivedKey(
-        String password, 
-        byte[] salt, 
-        int iteration
-    ) throws WSSecurityException {
-        try {
-            return generateDerivedKey(password.getBytes("UTF-8"), salt, iteration);
-        } catch (final java.io.UnsupportedEncodingException e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e, "Unable to convert password to UTF-8");
-        }
-    }
-    
     
     /**
      * This method gets a derived key as defined in WSS Username Token Profile.
@@ -889,14 +788,14 @@ public class UsernameToken {
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {
             try {
-                return generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
+                return UsernameTokenUtil.generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
             } catch (Base64DecodingException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
                 );
             }
         } else {
-            return generateDerivedKey(rawPassword, salt, iteration);
+            return UsernameTokenUtil.generateDerivedKey(rawPassword, salt, iteration);
         }
     }
     
@@ -947,29 +846,6 @@ public class UsernameToken {
         return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
     
-    /**
-     * This static method generates a 128 bit salt value as defined in WSS
-     * Username Token Profile.
-     * 
-     * @param useForMac If <code>true</code> define the Salt for use in a MAC
-     * @return Returns the 128 bit salt value as byte array
-     */
-    public static byte[] generateSalt(boolean useForMac) {
-        byte[] saltValue = null;
-        try {
-            saltValue = WSSecurityUtil.generateNonce(16);
-        } catch (WSSecurityException ex) {
-            LOG.debug(ex.getMessage(), ex);
-            return null;
-        }
-        if (useForMac) {
-            saltValue[0] = 0x01;
-        } else {
-            saltValue[0] = 0x02;
-        }
-        return saltValue;
-    }
-
     @Override
     public int hashCode() {
         int result = 17;

@@ -63,6 +63,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean strictTimestampCheck = true;
     private Integer utTTL = 300;
     private Integer utFutureTTL = 60;
+    private Integer derivedKeyIterations = 1000;
 
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
@@ -74,6 +75,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean handleCustomPasswordTypes = false;
     private boolean allowUsernameTokenNoPassword = false;
     private boolean allowRSA15KeyTransportAlgorithm = false;
+    private boolean useDerivedKeyForMAC = true;
     private WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType;
     private String tokenUser;
 
@@ -134,6 +136,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.timestampReplayCache = wssSecurityProperties.timestampReplayCache;
         this.nonceReplayCache = wssSecurityProperties.nonceReplayCache;
         this.allowRSA15KeyTransportAlgorithm = wssSecurityProperties.allowRSA15KeyTransportAlgorithm;
+        this.derivedKeyIterations = wssSecurityProperties.derivedKeyIterations;
+        this.useDerivedKeyForMAC = wssSecurityProperties.useDerivedKeyForMAC;
     }
 
     /**
@@ -700,6 +704,22 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setAllowRSA15KeyTransportAlgorithm(boolean allowRSA15KeyTransportAlgorithm) {
         this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
+    }
+
+    public Integer getDerivedKeyIterations() {
+        return derivedKeyIterations;
+    }
+
+    public void setDerivedKeyIterations(Integer derivedKeyIterations) {
+        this.derivedKeyIterations = derivedKeyIterations;
+    }
+
+    public boolean isUseDerivedKeyForMAC() {
+        return useDerivedKeyForMAC;
+    }
+
+    public void setUseDerivedKeyForMAC(boolean useDerivedKeyForMAC) {
+        this.useDerivedKeyForMAC = useDerivedKeyForMAC;
     }
     
 }

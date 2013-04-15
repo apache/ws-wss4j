@@ -165,9 +165,6 @@ public class SignatureProcessor implements Processor {
                 STRParser strParser = new SignatureSTRParser();
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
-                parameters.put(
-                    SignatureSTRParser.SECRET_KEY_LENGTH, data.getWssConfig().getSecretKeyLength()
-                );
                 strParser.parseSecurityTokenReference(
                     child, data, wsDocInfo, parameters
                 );

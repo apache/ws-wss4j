@@ -18,20 +18,15 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.common.derivedKey.AlgoFactory;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
-import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import java.security.Key;
+
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
-
-import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
-import java.security.Key;
 
 public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken {
 
@@ -39,13 +34,18 @@ public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken 
     private String password;
     private String createdTime;
     private byte[] nonce;
+    private byte[] salt;
+    private int iterations;
 
-    public OutboundUsernameSecurityToken(String username, String password, String createdTime, byte[] nonce, String id) {
+    public OutboundUsernameSecurityToken(String username, String password, String createdTime, 
+                                         byte[] nonce, String id, byte[] salt, int iterations) {
         super(id, WSSecurityTokenConstants.UsernameToken);
         this.username = username;
         this.password = password;
         this.createdTime = createdTime;
         this.nonce = nonce;
+        this.salt = salt;
+        this.iterations = iterations;
     }
 
     public String getUsername() {
@@ -70,47 +70,15 @@ public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken 
         if (key != null) {
             return key;
         }
-
-        byte[] secretToken = getSecretKey(getPassword(), WSSConstants.WSE_DERIVED_KEY_LEN, WSSConstants.LABEL_FOR_DERIVED_KEY);
+        
+        byte[] secretToken = 
+            UsernameTokenUtil.generateDerivedKey(getPassword(), salt, iterations);
+        
         String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
         key = new SecretKeySpec(secretToken, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;
+
     }
 
-    /**
-     * Gets the secret key as per WS-Trust spec.
-     *
-     * @param keylen      How many bytes to generate for the key
-     * @param labelString the label used to generate the seed
-     * @return a secret key constructed from information contained in this
-     *         username token
-     */
-    protected byte[] getSecretKey(String rawPassword, int keylen, String labelString) throws WSSecurityException {
-        try {
-            byte[] password = rawPassword.getBytes("UTF-8");
-            byte[] label = labelString.getBytes("UTF-8");
-            byte[] nonce = getNonce();
-            byte[] created = getCreated().getBytes("UTF-8");
-            byte[] seed = new byte[label.length + nonce.length + created.length];
-
-            int offset = 0;
-            System.arraycopy(label, 0, seed, offset, label.length);
-            offset += label.length;
-
-            System.arraycopy(nonce, 0, seed, offset, nonce.length);
-            offset += nonce.length;
-
-            System.arraycopy(created, 0, seed, offset, created.length);
-
-            DerivationAlgorithm algo =
-                    AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
-            return algo.createKey(password, seed, 0, keylen);
-
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-        } catch (ConversationException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-        }
-    }
 }

@@ -293,11 +293,6 @@ public class WSSConfig {
     private boolean allowNamespaceQualifiedPasswordTypes;
     
     /**
-     * The secret key length to be used for UT_SIGN.
-     */
-    private int secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
-
-    /**
      * Whether the password should be treated as a binary value.  This
      * is needed to properly handle password equivalence for UsernameToken
      * passwords.  Binary passwords are Base64 encoded so they can be
@@ -506,20 +501,6 @@ public class WSSConfig {
      */
     public void setTimeStampFutureTTL(int timeStampFutureTTL) {
         this.timeStampFutureTTL = timeStampFutureTTL;
-    }
-    
-    /**
-     * Set the secret key length to be used for UT_SIGN.
-     */
-    public void setSecretKeyLength(int length) {
-        secretKeyLength = length;
-    }
-    
-    /**
-     * Get the secret key length to be used for UT_SIGN.
-     */
-    public int getSecretKeyLength() {
-        return secretKeyLength;
     }
     
     /**
