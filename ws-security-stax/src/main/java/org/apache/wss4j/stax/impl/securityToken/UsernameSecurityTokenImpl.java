@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
@@ -32,10 +33,7 @@ import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityTo
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
-import java.io.UnsupportedEncodingException;
 import java.security.Key;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 
 public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken implements UsernameSecurityToken {
@@ -125,37 +123,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
             }
         }
 
-        Long iters = iteration;
-        if (iters == null || iters == 0) {
-            iters = DEFAULT_ITERATION;
-        }
-        byte[] pwBytes;
-        try {
-            pwBytes = password.getBytes("UTF-8");
-        } catch (final UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-        }
-
-        byte[] pwSalt = new byte[salt.length + pwBytes.length];
-        System.arraycopy(pwBytes, 0, pwSalt, 0, pwBytes.length);
-        System.arraycopy(salt, 0, pwSalt, pwBytes.length, salt.length);
-
-        MessageDigest sha;
-        try {
-            sha = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noSHA1availabe", e);
-        }
-        sha.reset();
-
-        // Make the first hash round with start value
-        byte[] k = sha.digest(pwSalt);
-
-        // Perform the 1st up to iteration-1 hash rounds
-        for (int i = 1; i < iters; i++) {
-            k = sha.digest(k);
-        }
-        return k;
+        return UsernameTokenUtil.generateDerivedKey(password, salt, iteration.intValue());
     }
 
     @Override

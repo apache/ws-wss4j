@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,10 +34,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.derivedKey.AlgoFactory;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
-import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
@@ -704,60 +699,6 @@ public class UsernameToken {
         element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
-    /**
-     * Gets the secret key as per WS-Trust spec.
-     * 
-     * @param keylen How many bytes to generate for the key
-     * @param labelString the label used to generate the seed
-     * @return a secret key constructed from information contained in this
-     *         username token
-     */
-    public byte[] getSecretKey(int keylen, String labelString) throws WSSecurityException {
-        try {
-            byte[] password;
-            if (passwordsAreEncoded) {
-                password = Base64.decode(rawPassword);
-            } else {
-                password = rawPassword.getBytes("UTF-8"); // enhancement by Alberto Coletti
-            }
-            byte[] label = labelString.getBytes("UTF-8");
-            byte[] nonce = Base64.decode(getNonce());
-            byte[] created = getCreated().getBytes("UTF-8");
-            byte[] seed = new byte[label.length + nonce.length + created.length];
-
-            int offset = 0;
-            System.arraycopy(label, 0, seed, offset, label.length);
-            offset += label.length;
-            
-            System.arraycopy(nonce, 0, seed, offset, nonce.length);
-            offset += nonce.length;
-
-            System.arraycopy(created, 0, seed, offset, created.length);
-
-            DerivationAlgorithm algo =
-                    AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
-            byte[] key = algo.createKey(password, seed, 0, keylen);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("label      :" + Base64.encode(label));
-                LOG.debug("nonce      :" + Base64.encode(nonce));
-                LOG.debug("created    :" + Base64.encode(created));
-                LOG.debug("seed       :" + Base64.encode(seed));
-                LOG.debug("Key        :" + Base64.encode(key));
-            }
-            return key;
-
-        } catch (Base64DecodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        } catch (ConversationException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
-    }
-    
-    
-    
     /**
      * This method gets a derived key as defined in WSS Username Token Profile.
      * 

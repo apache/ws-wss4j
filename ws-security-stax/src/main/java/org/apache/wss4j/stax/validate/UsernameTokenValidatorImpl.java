@@ -137,6 +137,15 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         final String password;
         if (passwordType != null) {
             password = passwordType.getValue();
+        } else if (salt != null) {
+            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
+                   WSPasswordCallback.Usage.USERNAME_TOKEN);
+            try {
+                WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
+            } catch (WSSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+            }
+            password = pwCb.getPassword();
         } else {
             password = null;
         }
