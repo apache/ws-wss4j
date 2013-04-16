@@ -48,18 +48,14 @@ public class UsernameTokenAction implements Action {
         builder.setPasswordsAreEncoded(reqData.getWssConfig().getPasswordsAreEncoded());
         builder.setUserInfo(username, password);
 
-        if (reqData.getUtElements() != null && reqData.getUtElements().length > 0) {
-            for (int j = 0; j < reqData.getUtElements().length; j++) {
-                String utElement = reqData.getUtElements()[j].trim();
-                if (utElement.equals("Nonce")) {
-                    builder.addNonce();
-                }
-                if (utElement.equals("Created")) {
-                    builder.addCreated();
-                }
-                reqData.getUtElements()[j] = null;
-            }
+        if (reqData.isAddUsernameTokenNonce()) {
+            builder.addNonce();
         }
+        
+        if (reqData.isAddUsernameTokenCreated()) {
+            builder.addCreated();
+        }
+
         builder.build(doc, reqData.getSecHeader());        
     }
 }

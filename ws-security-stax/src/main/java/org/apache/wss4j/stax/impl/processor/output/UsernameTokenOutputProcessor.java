@@ -61,8 +61,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             
-            XMLGregorianCalendar created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
-
             final String wsuId = IDGenerator.generateID(null);
             
             boolean useDerivedKeyForMAC = 
@@ -70,12 +68,23 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             int derivedIterations = 
                 ((WSSSecurityProperties)getSecurityProperties()).getDerivedKeyIterations();
             byte[] salt = null;
-            byte[] nonceValue = null;
             if (WSSConstants.USERNAMETOKEN_SIGNED.equals(getAction())) {
                 salt = UsernameTokenUtil.generateSalt(useDerivedKeyForMAC);
-            } else {
+            }
+            
+            byte[] nonceValue = null;
+            if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST)
+                || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenNonce()) {
                 nonceValue = new byte[16];
                 WSSConstants.secureRandom.nextBytes(nonceValue);
+            }
+            
+            XMLGregorianCalendar created = null;
+            String createdStr = "";
+            if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST)
+                || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenCreated()) {
+                created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
+                createdStr = created.toXMLFormat();
             }
 
             final OutputProcessor outputProcessor = this;
@@ -83,7 +92,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             final OutboundUsernameSecurityToken usernameSecurityToken =
                     new OutboundUsernameSecurityToken(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(),
                             password,
-                            created.toXMLFormat(),
+                            createdStr,
                             nonceValue,
                             wsuId,
                             salt,
@@ -189,8 +198,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                         }
                     }
 
-                    if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
-                        && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
+                    if (nonceValue != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                         attributes = new ArrayList<XMLSecAttribute>(1);
                         attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
@@ -198,11 +206,16 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce);
+                        
+                    }
+                    
+                    if (created != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
 
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, this.created.toXMLFormat());
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
                     }
+                    
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_UsernameToken);
 
                     outputProcessorChain.removeProcessor(this);

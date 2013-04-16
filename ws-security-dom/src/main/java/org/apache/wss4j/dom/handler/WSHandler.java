@@ -464,10 +464,13 @@ public abstract class WSHandler {
             }
         }
         
-        String add = getString(WSHandlerConstants.ADD_UT_ELEMENTS, mc);
-        if (add != null) {
-            reqData.setUtElements(StringUtil.split(add, ' '));
-        }
+        boolean addNonce = 
+            decodeBooleanConfigValue(reqData, WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, false);
+        reqData.setAddUsernameTokenNonce(addNonce);
+        
+        boolean addCreated = 
+            decodeBooleanConfigValue(reqData, WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, false);
+        reqData.setAddUsernameTokenCreated(addCreated);
         
         String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY_FOR_MAC, mc);
         boolean useDerivedKeyForMAC = Boolean.parseBoolean(derivedMAC);

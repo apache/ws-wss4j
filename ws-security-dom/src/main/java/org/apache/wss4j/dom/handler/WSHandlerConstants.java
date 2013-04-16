@@ -377,6 +377,20 @@ public final class WSHandlerConstants {
     public static final String ADD_INCLUSIVE_PREFIXES = "addInclusivePrefixes";
     
     /**
+     * Whether to add a Nonce Element to a UsernameToken. This only applies when the
+     * password type is of type "text". A Nonce is automatically added for the "digest"
+     * case. The default is false.
+     */
+    public static final String ADD_USERNAMETOKEN_NONCE = "addUsernameTokenNonce";
+    
+    /**
+     * Whether to add a Created Element to a UsernameToken. This only applies when the
+     * password type is of type "text". A Created is automatically added for the "digest"
+     * case. The default is false.
+     */
+    public static final String ADD_USERNAMETOKEN_CREATED = "addUsernameTokenCreated";
+    
+    /**
      * This variable controls whether types other than PasswordDigest or PasswordText
      * are allowed when processing UsernameTokens. The default value is "false".
      */
@@ -494,20 +508,6 @@ public final class WSHandlerConstants {
      */
     public static final String PASSWORD_TYPE = "passwordType";
     
-    /**
-     * Parameter to generate additional elements (nonce and created) in a 
-     * <code>UsernameToken</code>.
-     * <p/>
-     * The value of this parameter is a list of element names that are added
-     * to the UsernameToken. The names of the list a separated by spaces.
-     * <p/>
-     * The list may contain the names <code>nonce</code> and
-     * <code>created</code> only. Use this option if the password type is
-     * <code>passwordText</code> and the handler shall add the <code>Nonce</code>
-     * and/or <code>Created</code> elements.
-     */
-    public static final String ADD_UT_ELEMENTS = "addUTElements";
-
     /**
      * Defines which key identifier type to use for signature. The WS-Security specifications
      * recommends to use the identifier type <code>IssuerSerial</code>. For possible signature 

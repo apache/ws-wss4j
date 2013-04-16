@@ -58,7 +58,6 @@ public class RequestData {
     private String actor;
     private String username ;
     private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
-    private String[] utElements;
     private Crypto sigCrypto;
     private Crypto sigVerCrypto;
     private Crypto encCrypto;
@@ -97,6 +96,8 @@ public class RequestData {
     private AlgorithmSuite samlAlgorithmSuite;
     private boolean disableBSPEnforcement;
     private boolean allowRSA15KeyTransportAlgorithm;
+    private boolean addUsernameTokenNonce;
+    private boolean addUsernameTokenCreated;
 
     public void clear() {
         soapConstants = null;
@@ -105,7 +106,6 @@ public class RequestData {
         signatureParts.clear();
         encryptParts.clear();
         encCert = null;
-        utElements = null;
         wssConfig = null;
         signatureValues.clear();
         signatureDigestAlgorithm = null;
@@ -127,6 +127,8 @@ public class RequestData {
         setOriginalSignatureActionPosition(0);
         setDisableBSPEnforcement(false);
         allowRSA15KeyTransportAlgorithm = false;
+        setAddUsernameTokenNonce(false);
+        setAddUsernameTokenCreated(false);
     }
 
     public Object getMsgContext() {
@@ -183,14 +185,6 @@ public class RequestData {
 
     public void setPwType(String pwType) {
         this.pwType = pwType;
-    }
-
-    public String[] getUtElements() {
-        return utElements;
-    }
-
-    public void setUtElements(String[] utElements) {
-        this.utElements = utElements;
     }
 
     public Crypto getSigCrypto() {
@@ -600,6 +594,22 @@ public class RequestData {
 
     public void setAllowRSA15KeyTransportAlgorithm(boolean allowRSA15KeyTransportAlgorithm) {
         this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
+    }
+
+    public boolean isAddUsernameTokenNonce() {
+        return addUsernameTokenNonce;
+    }
+
+    public void setAddUsernameTokenNonce(boolean addUsernameTokenNonce) {
+        this.addUsernameTokenNonce = addUsernameTokenNonce;
+    }
+
+    public boolean isAddUsernameTokenCreated() {
+        return addUsernameTokenCreated;
+    }
+
+    public void setAddUsernameTokenCreated(boolean addUsernameTokenCreated) {
+        this.addUsernameTokenCreated = addUsernameTokenCreated;
     }
         
 }

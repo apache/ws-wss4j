@@ -1034,6 +1034,33 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         newEngine.processSecurityHeader(doc, "", data);
     }
     
+    @org.junit.Test
+    public void testUsernameTokenWSHandlerNonceCreated() throws Exception {
+        CustomHandler handler = new CustomHandler();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        RequestData reqData = new RequestData();
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put("password", "verySecret");
+        config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        config.put(WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, "true");
+        config.put(WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, "true");
+        reqData.setUsername("wernerd");
+        reqData.setMsgContext(config);
+        
+        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(WSConstants.UT);
+        
+        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Username Token via WSHandler");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+    }
+    
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return verify(doc, false);
     }

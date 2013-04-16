@@ -64,6 +64,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Integer utTTL = 300;
     private Integer utFutureTTL = 60;
     private Integer derivedKeyIterations = 1000;
+    private boolean addUsernameTokenNonce;
+    private boolean addUsernameTokenCreated;
 
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
@@ -138,6 +140,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.allowRSA15KeyTransportAlgorithm = wssSecurityProperties.allowRSA15KeyTransportAlgorithm;
         this.derivedKeyIterations = wssSecurityProperties.derivedKeyIterations;
         this.useDerivedKeyForMAC = wssSecurityProperties.useDerivedKeyForMAC;
+        this.addUsernameTokenNonce = wssSecurityProperties.addUsernameTokenNonce;
+        this.addUsernameTokenCreated = wssSecurityProperties.addUsernameTokenCreated;
     }
 
     /**
@@ -720,6 +724,22 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setUseDerivedKeyForMAC(boolean useDerivedKeyForMAC) {
         this.useDerivedKeyForMAC = useDerivedKeyForMAC;
+    }
+
+    public boolean isAddUsernameTokenNonce() {
+        return addUsernameTokenNonce;
+    }
+
+    public void setAddUsernameTokenNonce(boolean addUsernameTokenNonce) {
+        this.addUsernameTokenNonce = addUsernameTokenNonce;
+    }
+
+    public boolean isAddUsernameTokenCreated() {
+        return addUsernameTokenCreated;
+    }
+
+    public void setAddUsernameTokenCreated(boolean addUsernameTokenCreated) {
+        this.addUsernameTokenCreated = addUsernameTokenCreated;
     }
     
 }
