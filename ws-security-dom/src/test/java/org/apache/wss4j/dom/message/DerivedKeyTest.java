@@ -155,7 +155,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Encrypted message: 3DES  + DerivedKeys");
+            LOG.debug("Signed message: 3DES  + DerivedKeys");
             String outputString = 
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);

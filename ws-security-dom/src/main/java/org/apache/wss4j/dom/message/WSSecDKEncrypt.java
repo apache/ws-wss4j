@@ -23,10 +23,12 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+
 import org.apache.xml.security.keys.KeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -108,6 +110,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         throws WSSecurityException {
         
         KeyInfo keyInfo = createKeyInfo();
+
         SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, derivedKeyBytes);
 
         List<String> encDataRefs = 
@@ -125,6 +128,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     /**
      * Create a KeyInfo object
+     * @throws ConversationException 
      */
     private KeyInfo createKeyInfo() throws WSSecurityException {
         KeyInfo keyInfo = new KeyInfo(document);
@@ -132,6 +136,10 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         secToken.addWSSENamespace();
         Reference ref = new Reference(document);
         ref.setURI("#" + dktId);
+        String ns = 
+            ConversationConstants.getWSCNs(getWscVersion()) 
+                + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
+        ref.setValueType(ns);
         secToken.setReference(ref);
 
         keyInfo.addUnknownElement(secToken.getElement());

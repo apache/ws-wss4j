@@ -175,23 +175,19 @@ public final class ConversationConstants {
             "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
     }
     
-    public static String getWSCNs(int version) throws ConversationException {
+    public static String getWSCNs(int version) {
         if (VERSION_05_02 == version) {
             return WSC_NS_05_02;
-        } else if (VERSION_05_12 == version) {
-            return WSC_NS_05_12;
         } else {
-            throw new ConversationException("unsupportedSecConvVersion");
+            return WSC_NS_05_12;
         }
     }
     
-    public static int getWSTVersion(String ns) throws ConversationException {
+    public static int getWSTVersion(String ns) {
         if (WSC_NS_05_02.equals(ns)) {
             return VERSION_05_02;
-        } else if (WSC_NS_05_12.equals(ns)) {
-            return VERSION_05_12;
         } else {
-            throw new ConversationException("unsupportedSecConvVersion");
+            return VERSION_05_12;
         }
     }
 }
