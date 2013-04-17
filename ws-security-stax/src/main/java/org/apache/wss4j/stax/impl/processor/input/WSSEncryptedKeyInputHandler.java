@@ -22,6 +22,7 @@ import org.apache.wss4j.binding.wss10.ObjectFactory;
 import org.apache.wss4j.binding.wss10.ReferenceType;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
@@ -39,9 +40,26 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
  */
 public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
 
+    private static final transient org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(WSSEncryptedKeyInputHandler.class);
+    
     @Override
     public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType, XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties) throws XMLSecurityException {
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
+        
+        // Check encryption algorithm against the required algorithm, if defined
+        EncryptionMethodType encryptionMethodType = encryptedKeyType.getEncryptionMethod();
+        if (securityProperties.getEncryptionKeyTransportAlgorithm() != null 
+            && encryptionMethodType != null) {
+            String encryptionMethod = encryptionMethodType.getAlgorithm();
+            if (!securityProperties.getEncryptionKeyTransportAlgorithm().equals(encryptionMethod)) {
+                log.debug(
+                    "The Key transport method does not match the requirement"
+                );
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            }
+        }
+        
         super.handle(inputProcessorChain, encryptedKeyType, responsibleXMLSecStartXMLEvent, securityProperties);
     }
 

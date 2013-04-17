@@ -59,6 +59,9 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
  */
 public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
+    private static final transient org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(DecryptInputProcessor.class);
+        
     private static final Long maximumAllowedDecompressedBytes =
             Long.valueOf(ConfigurationProperties.getProperty("MaximumAllowedDecompressedBytes"));
 
@@ -160,7 +163,16 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             boolean encryptedHeader, XMLSecStartElement xmlSecStartElement, EncryptedDataType encryptedDataType,
             InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext) throws XMLSecurityException {
 
+        // Check encryption algorithm against the required algorithm, if defined
         String encryptionAlgorithm = encryptedDataType.getEncryptionMethod().getAlgorithm();
+        if (this.getSecurityProperties().getEncryptionSymAlgorithm() != null
+            && !this.getSecurityProperties().getEncryptionSymAlgorithm().equals(encryptionAlgorithm)) {
+            log.debug(
+                "The Key encryption method does not match the requirement"
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
+        
         if (!WSSConstants.NS_XENC_TRIPLE_DES.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC_AES128.equals(encryptionAlgorithm)
                 && !WSSConstants.NS_XENC11_AES128_GCM.equals(encryptionAlgorithm)

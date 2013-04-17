@@ -47,6 +47,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
+    
+    private static final transient org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(WSSSignatureInputHandler.class);
 
     @Override
     protected SignatureVerifier newSignatureVerifier(
@@ -57,6 +60,15 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         checkBSPCompliance(inputProcessorChain, signatureType);
+        
+        String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
+        if (securityProperties.getSignatureAlgorithm() != null
+            && !securityProperties.getSignatureAlgorithm().equals(algorithm)) {
+            log.debug(
+                "The Signature method does not match the requirement"
+            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
 
         final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
 
