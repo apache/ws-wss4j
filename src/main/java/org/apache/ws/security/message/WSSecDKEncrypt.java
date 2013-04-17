@@ -23,6 +23,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -108,7 +109,12 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
         
-        KeyInfo keyInfo = createKeyInfo();
+        KeyInfo keyInfo = null;
+        try {
+            keyInfo = createKeyInfo();
+        } catch (ConversationException ex) {
+            throw new WSSecurityException(ex.getMessage(), ex);
+        }
         SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, derivedKeyBytes);
 
         List<String> encDataRefs = 
@@ -126,13 +132,18 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     /**
      * Create a KeyInfo object
+     * @throws ConversationException 
      */
-    private KeyInfo createKeyInfo() throws WSSecurityException {
+    private KeyInfo createKeyInfo() throws WSSecurityException, ConversationException {
         KeyInfo keyInfo = new KeyInfo(document);
         SecurityTokenReference secToken = new SecurityTokenReference(document);
         secToken.addWSSENamespace();
         Reference ref = new Reference(document);
         ref.setURI("#" + dktId);
+        String ns = 
+            ConversationConstants.getWSCNs(getWscVersion()) 
+                + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
+        ref.setValueType(ns);
         secToken.setReference(ref);
 
         keyInfo.addUnknownElement(secToken.getElement());

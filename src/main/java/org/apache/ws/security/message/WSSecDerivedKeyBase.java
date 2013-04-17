@@ -305,6 +305,10 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         this.wscVersion = wscVersion;
     }
     
+    public int getWscVersion() {
+        return wscVersion;
+    }
+    
     public Element getdktElement() {
         return dkt.getElement();
     }

@@ -24,6 +24,7 @@ import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
@@ -168,9 +169,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
         
-        Reference refUt = new Reference(document);
-        refUt.setURI("#" + dktId);
-        secRef.setReference(refUt);
+        Reference ref = new Reference(document);
+        ref.setURI("#" + dktId);
+        String ns = 
+            ConversationConstants.getWSCNs(getWscVersion()) 
+            + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
+        ref.setValueType(ns);
+        secRef.setReference(ref);
         
         XMLStructure structure = new DOMStructure(secRef.getElement());
         wsDocInfo.addTokenElement(secRef.getElement(), false);
