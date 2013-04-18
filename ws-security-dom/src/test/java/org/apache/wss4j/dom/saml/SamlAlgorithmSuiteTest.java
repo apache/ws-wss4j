@@ -201,6 +201,10 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         boolean saml2
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
+        
         RequestData data = new RequestData();
         data.setSigVerCrypto(sigVerCrypto);
         data.setSamlAlgorithmSuite(algorithmSuite);

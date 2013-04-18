@@ -308,8 +308,11 @@ public class PrincipalTest extends org.junit.Assert {
         Crypto crypto
     ) throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(config);
+        
         if (validator != null && validatorName != null) {
             config.setValidator(validatorName, validator);
         }

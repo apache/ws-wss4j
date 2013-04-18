@@ -294,6 +294,9 @@ public abstract class WSHandler {
         wssConfig.setAllowUsernameTokenNoPassword(
             decodeAllowUsernameTokenNoPassword(reqData)
         );
+        wssConfig.setValidateSamlSubjectConfirmation(
+            decodeSamlSubjectConfirmationValidation(reqData)
+        );
         
         boolean bspCompliant = decodeBSPCompliance(reqData);
         if (!bspCompliant) {
@@ -692,6 +695,13 @@ public abstract class WSHandler {
         throws WSSecurityException {
         return decodeBooleanConfigValue(
             reqData, WSHandlerConstants.ADD_INCLUSIVE_PREFIXES, true
+        );
+    }
+    
+    protected boolean decodeSamlSubjectConfirmationValidation(RequestData reqData)
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
         );
     }
     

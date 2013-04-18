@@ -72,7 +72,10 @@ public class SamlNegativeTest extends org.junit.Assert {
     private Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
     
     public SamlNegativeTest() throws Exception {
-        WSSConfig.init();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
+        
         // Load the issuer keystore
         issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());

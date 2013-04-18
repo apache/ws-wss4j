@@ -62,7 +62,9 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SamlTokenDerivedTest() throws Exception {
-        WSSConfig.init();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
     

@@ -176,6 +176,10 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
      */
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
+        
         List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(
                 doc, null, null, crypto

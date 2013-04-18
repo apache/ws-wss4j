@@ -19,23 +19,24 @@
 
 package org.apache.wss4j.dom;
 
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * WS-Security Engine.
@@ -439,6 +440,14 @@ public class WSSecurityEngine {
             } else {
                 node = node.getNextSibling();
             }
+        }
+        
+        // Validate SAML Subject Confirmation requirements
+        if (wssConfig.isValidateSamlSubjectConfirmation()) {
+            Element bodyElement = 
+                WSSecurityUtil.findBodyElement(securityHeader.getOwnerDocument());
+            
+            DOMSAMLUtil.validateSAMLResults(returnResults, requestData.getTlsCerts(), bodyElement);
         }
         
         return returnResults;

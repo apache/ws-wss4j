@@ -55,7 +55,10 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     private Crypto crypto = null;
     
     public SamlTokenHOKTest() throws Exception {
-        WSSConfig.init();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
+        
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
 

@@ -484,6 +484,13 @@ public final class WSHandlerConstants {
      */
     public static final String ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM = "allowRSA15KeyTransportAlgorithm";
 
+    /**
+     * Whether to validate the SubjectConfirmation requirements of a received SAML Token
+     * (sender-vouches or holder-of-key). The default is true.
+     */
+    public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
+        "validateSamlSubjectConfirmation";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //

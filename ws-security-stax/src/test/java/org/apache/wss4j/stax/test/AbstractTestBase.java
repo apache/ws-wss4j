@@ -220,6 +220,7 @@ public abstract class AbstractTestBase {
             messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new WSS4JCallbackHandlerImpl());
         }
 
+        messageContext.put(WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
         Enumeration<?> enumeration = properties.propertyNames();
         while (enumeration.hasMoreElements()) {
             String s = (String) enumeration.nextElement();
@@ -244,7 +245,7 @@ public abstract class AbstractTestBase {
         } else if (WSHandlerConstants.USERNAME_TOKEN_SIGNATURE.equals(action)) {
             messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
         }
-
+        
         // Disable PrefixList checking as the stax code doesn't support this yet
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
         ignoredRules.add(BSPRule.R5404);
@@ -428,8 +429,8 @@ public abstract class AbstractTestBase {
             org.apache.wss4j.dom.SOAPConstants soapConstants =
                     WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             if (WSSecurityUtil.findElement(
-                    doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
-                    ) {
+                doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
+            ) {
                 return false;
             }
 

@@ -53,6 +53,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
     }
     

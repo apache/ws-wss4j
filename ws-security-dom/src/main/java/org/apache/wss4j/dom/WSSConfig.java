@@ -306,6 +306,12 @@ public class WSSConfig {
     private boolean passwordsAreEncoded;
     
     /**
+     * Whether to validate the SubjectConfirmation requirements of a received SAML Token
+     * (sender-vouches or holder-of-key). The default is true.
+     */
+    private boolean validateSamlSubjectConfirmation = true;
+    
+    /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
      * thing that is very fast.
      */
@@ -748,6 +754,14 @@ public class WSSConfig {
 
     public void setUtFutureTTL(int utFutureTTL) {
         this.utFutureTTL = utFutureTTL;
+    }
+
+    public boolean isValidateSamlSubjectConfirmation() {
+        return validateSamlSubjectConfirmation;
+    }
+
+    public void setValidateSamlSubjectConfirmation(boolean validateSamlSubjectConfirmation) {
+        this.validateSamlSubjectConfirmation = validateSamlSubjectConfirmation;
     }
     
 }

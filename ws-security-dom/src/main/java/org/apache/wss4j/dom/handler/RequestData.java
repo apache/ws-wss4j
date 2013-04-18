@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.handler;
 
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,6 +99,7 @@ public class RequestData {
     private boolean allowRSA15KeyTransportAlgorithm;
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
+    private Certificate[] tlsCerts;
 
     public void clear() {
         soapConstants = null;
@@ -129,6 +131,7 @@ public class RequestData {
         allowRSA15KeyTransportAlgorithm = false;
         setAddUsernameTokenNonce(false);
         setAddUsernameTokenCreated(false);
+        setTlsCerts(null);
     }
 
     public Object getMsgContext() {
@@ -610,6 +613,14 @@ public class RequestData {
 
     public void setAddUsernameTokenCreated(boolean addUsernameTokenCreated) {
         this.addUsernameTokenCreated = addUsernameTokenCreated;
+    }
+
+    public Certificate[] getTlsCerts() {
+        return tlsCerts;
+    }
+
+    public void setTlsCerts(Certificate[] tlsCerts) {
+        this.tlsCerts = tlsCerts;
     }
         
 }
