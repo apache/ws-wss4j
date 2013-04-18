@@ -76,15 +76,16 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -184,8 +185,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
             KeyStore keyStore = KeyStore.getInstance("jks");
@@ -195,10 +196,11 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias("transmitter");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -510,9 +512,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
@@ -523,10 +525,11 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias("transmitter");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -626,9 +629,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
             KeyStore keyStore = KeyStore.getInstance("jks");
@@ -638,10 +641,11 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias("transmitter");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -740,9 +744,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
             KeyStore keyStore = KeyStore.getInstance("jks");
@@ -750,10 +754,11 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Merlin crypto = new Merlin();
             crypto.setKeyStore(keyStore);
             callbackHandler.setCerts(crypto.getCertificates("transmitter"));
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             securityProperties.setSignatureKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());

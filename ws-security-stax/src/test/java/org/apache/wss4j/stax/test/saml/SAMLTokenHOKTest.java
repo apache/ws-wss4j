@@ -75,11 +75,11 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -89,6 +89,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -176,12 +177,12 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setCertIdentifier(KeyInfoBean.CERT_IDENTIFIER.X509_ISSUER_SERIAL);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -192,6 +193,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -293,12 +295,12 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setCertIdentifier(KeyInfoBean.CERT_IDENTIFIER.KEY_VALUE);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -309,6 +311,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -412,11 +415,11 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -427,6 +430,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#hmac-sha256");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -546,7 +550,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
@@ -580,12 +584,12 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -595,6 +599,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -665,13 +670,13 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setCertIdentifier(KeyInfoBean.CERT_IDENTIFIER.X509_ISSUER_SERIAL);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -682,6 +687,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -783,13 +789,13 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setCertIdentifier(KeyInfoBean.CERT_IDENTIFIER.KEY_VALUE);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -800,6 +806,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -903,12 +910,12 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
@@ -919,6 +926,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#hmac-sha256");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());

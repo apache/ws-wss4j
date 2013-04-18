@@ -26,7 +26,6 @@ import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.AbstractTestBase;
-import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -65,11 +64,11 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -117,7 +116,7 @@ public class SAMLTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -137,11 +136,11 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -189,7 +188,7 @@ public class SAMLTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -209,12 +208,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHZ);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setResource("http://resource.org");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -263,7 +262,7 @@ public class SAMLTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -283,12 +282,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -336,7 +335,7 @@ public class SAMLTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -356,12 +355,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -409,7 +408,7 @@ public class SAMLTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -429,13 +428,13 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHZ);
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setResource("http://resource.org");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -484,7 +483,7 @@ public class SAMLTokenTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -508,12 +507,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -545,13 +544,13 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -583,12 +582,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -620,13 +619,13 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -658,12 +657,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHZ);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setResource("http://resource.org");
             callbackHandler.setSignAssertion(false);
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -697,8 +696,8 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.ATTR);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
@@ -719,7 +718,7 @@ public class SAMLTokenTest extends AbstractTestBase {
 
             callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
 
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());

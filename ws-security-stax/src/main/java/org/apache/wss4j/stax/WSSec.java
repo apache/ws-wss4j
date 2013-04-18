@@ -276,6 +276,9 @@ public class WSSec {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
+                if (securityProperties.getSamlCallbackHandler() == null) {
+                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSAMLCallbackHandler");
+                }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
                 }
@@ -289,8 +292,8 @@ public class WSSec {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
             } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action) &&
-                    (securityProperties.getCallbackHandler() == null)) {
-                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+                    (securityProperties.getSamlCallbackHandler() == null)) {
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSAMLCallbackHandler");
             } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");

@@ -54,6 +54,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     private String actor;
     private CallbackHandler callbackHandler;
+    private CallbackHandler samlCallbackHandler;
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
     private boolean disableBSPEnforcement;
     private final Map<QName, Validator> validators = new HashMap<QName, Validator>();
@@ -109,6 +110,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
         this.actor = wssSecurityProperties.actor;
         this.callbackHandler = wssSecurityProperties.callbackHandler;
+        this.samlCallbackHandler = wssSecurityProperties.samlCallbackHandler;
         this.ignoredBSPRules.addAll(wssSecurityProperties.ignoredBSPRules);
         this.disableBSPEnforcement = wssSecurityProperties.disableBSPEnforcement;
         this.validators.putAll(wssSecurityProperties.validators);
@@ -740,6 +742,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setAddUsernameTokenCreated(boolean addUsernameTokenCreated) {
         this.addUsernameTokenCreated = addUsernameTokenCreated;
+    }
+
+    public CallbackHandler getSamlCallbackHandler() {
+        return samlCallbackHandler;
+    }
+
+    public void setSamlCallbackHandler(CallbackHandler samlCallbackHandler) {
+        this.samlCallbackHandler = samlCallbackHandler;
     }
     
 }

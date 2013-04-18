@@ -64,8 +64,8 @@ public class SamlConditionsTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
             securityProperties.setOutAction(actions);
-            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
-            callbackHandler.setStatement(CallbackHandlerImpl.Statement.AUTHN);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
 
             ConditionsBean conditions = new ConditionsBean();
@@ -75,9 +75,10 @@ public class SamlConditionsTest extends AbstractTestBase {
             conditions.setNotAfter(notAfter);
             callbackHandler.setConditions(conditions);
 
-            securityProperties.setCallbackHandler(callbackHandler);
+            securityProperties.setSamlCallbackHandler(callbackHandler);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());

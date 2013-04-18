@@ -64,7 +64,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
         try {
             final SAMLCallback samlCallback = new SAMLCallback();
-            SAMLUtil.doSAMLCallback(((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(), samlCallback);
+            SAMLUtil.doSAMLCallback(((WSSSecurityProperties) getSecurityProperties()).getSamlCallbackHandler(), samlCallback);
             SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
 
             if (samlCallback.isSignAssertion()) {
