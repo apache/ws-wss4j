@@ -290,7 +290,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                 securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
                     }
                     outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
-                    if (senderVouches) {
+                    if (senderVouches && isSignedSamlAction()) {
                         outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
                                 securityTokenReferenceId, samlAssertionWrapper.getId());
                     }
@@ -298,6 +298,16 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
             }
         }
+    }
+    
+    private boolean isSignedSamlAction() {
+        WSSSecurityProperties properties = (WSSSecurityProperties) getSecurityProperties();
+        for (int i = 0; i < properties.getOutAction().length; i++) {
+            if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void outputSecurityTokenReference(
