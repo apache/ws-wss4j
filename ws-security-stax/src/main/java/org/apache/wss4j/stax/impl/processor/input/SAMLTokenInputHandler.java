@@ -253,11 +253,13 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         samlTokenSecurityEvent.setCorrelationID(samlAssertionWrapper.getId());
         wsInboundSecurityContext.registerSecurityEvent(samlTokenSecurityEvent);
 
-        SAMLTokenVerifierInputProcessor samlTokenVerifierInputProcessor =
-                new SAMLTokenVerifierInputProcessor(
-                        securityProperties, samlAssertionWrapper, subjectSecurityTokenProvider, subjectSecurityToken);
-        wsInboundSecurityContext.addSecurityEventListener(samlTokenVerifierInputProcessor);
-        inputProcessorChain.addProcessor(samlTokenVerifierInputProcessor);
+        if (wssSecurityProperties.isValidateSamlSubjectConfirmation()) {
+            SAMLTokenVerifierInputProcessor samlTokenVerifierInputProcessor =
+                    new SAMLTokenVerifierInputProcessor(
+                            securityProperties, samlAssertionWrapper, subjectSecurityTokenProvider, subjectSecurityToken);
+            wsInboundSecurityContext.addSecurityEventListener(samlTokenVerifierInputProcessor);
+            inputProcessorChain.addProcessor(samlTokenVerifierInputProcessor);
+        }
     }
 
     private int getSubjectKeyInfoIndex(Deque<XMLSecEvent> eventQueue) {

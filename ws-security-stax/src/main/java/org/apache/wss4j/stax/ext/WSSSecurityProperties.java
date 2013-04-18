@@ -99,6 +99,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean enableRevocation = false;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
+    private boolean validateSamlSubjectConfirmation = true;
 
     public WSSSecurityProperties() {
         super();
@@ -144,6 +145,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.useDerivedKeyForMAC = wssSecurityProperties.useDerivedKeyForMAC;
         this.addUsernameTokenNonce = wssSecurityProperties.addUsernameTokenNonce;
         this.addUsernameTokenCreated = wssSecurityProperties.addUsernameTokenCreated;
+        this.validateSamlSubjectConfirmation = wssSecurityProperties.validateSamlSubjectConfirmation;
     }
 
     /**
@@ -750,6 +752,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setSamlCallbackHandler(CallbackHandler samlCallbackHandler) {
         this.samlCallbackHandler = samlCallbackHandler;
+    }
+
+    public boolean isValidateSamlSubjectConfirmation() {
+        return validateSamlSubjectConfirmation;
+    }
+
+    public void setValidateSamlSubjectConfirmation(boolean validateSamlSubjectConfirmation) {
+        this.validateSamlSubjectConfirmation = validateSamlSubjectConfirmation;
     }
     
 }
