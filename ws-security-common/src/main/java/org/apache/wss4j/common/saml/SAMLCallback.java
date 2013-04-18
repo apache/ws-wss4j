@@ -81,7 +81,7 @@ public class SAMLCallback implements Callback {
      */
     private Element assertionElement;
     
-    private boolean signAssertion = true;
+    private boolean signAssertion;
 
     private String issuerKeyName;
 
