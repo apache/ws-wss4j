@@ -178,7 +178,36 @@ public class SAMLCallback implements Callback {
      * @return the subject (type SubjectBean) of this SAMLCallback object.
      */
     public SubjectBean getSubject() {
-        return subject;
+        if (subject != null) {
+            return subject;
+        }
+        
+        // SAML 1.1 case
+        if (authenticationStatementData != null) {
+            for (AuthenticationStatementBean bean : authenticationStatementData) {
+                if (bean.getSubject() != null) {
+                    return bean.getSubject();
+                }
+            }
+        }
+        
+        if (attributeStatementData != null) {
+            for (AttributeStatementBean bean : attributeStatementData) {
+                if (bean.getSubject() != null) {
+                    return bean.getSubject();
+                }
+            }
+        }
+        
+        if (authDecisionStatementData != null) {
+            for (AuthDecisionStatementBean bean : authDecisionStatementData) {
+                if (bean.getSubject() != null) {
+                    return bean.getSubject();
+                }
+            }
+        }
+        
+        return null;
     }
 
     /**
