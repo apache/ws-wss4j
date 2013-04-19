@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -39,6 +40,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implements SamlSecurityToken {
 
@@ -104,19 +106,28 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         //todo revisit verify for every security token incl. public-key
         //todo should we call verify implicit when accessing the keys?
         try {
-            X509Certificate[] x509Certificates = getX509Certificates();
-            if (x509Certificates != null && x509Certificates.length > 0) {
-                //todo I don't think the checkValidity is necessary because the CertPathChecker
-                x509Certificates[0].checkValidity();
-                boolean enableRevocation = false;
-                if (securityProperties != null) {
-                    enableRevocation = securityProperties.isEnableRevocation();
-                }
-                crypto.verifyTrust(x509Certificates, enableRevocation);
+            String confirmMethod = null;
+            List<String> methods = samlAssertionWrapper.getConfirmationMethods();
+            if (methods != null && methods.size() > 0) {
+                confirmMethod = methods.get(0);
             }
-            PublicKey publicKey = getPublicKey();
-            if (publicKey != null) {
-                crypto.verifyTrust(publicKey);
+            // If HOK + Token is signed then we don't need to verify the subject cert, as we
+            // indirectly trust it
+            if (!OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && !samlAssertionWrapper.isSigned()) {
+                X509Certificate[] x509Certificates = getX509Certificates();
+                if (x509Certificates != null && x509Certificates.length > 0) {
+                    //todo I don't think the checkValidity is necessary because the CertPathChecker
+                    x509Certificates[0].checkValidity();
+                    boolean enableRevocation = false;
+                    if (securityProperties != null) {
+                        enableRevocation = securityProperties.isEnableRevocation();
+                    }
+                    crypto.verifyTrust(x509Certificates, enableRevocation);
+                }
+                PublicKey publicKey = getPublicKey();
+                if (publicKey != null) {
+                    crypto.verifyTrust(publicKey);
+                }
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
