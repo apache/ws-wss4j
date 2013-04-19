@@ -405,8 +405,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
         }
     }
 
-    /*
-    todo: test commented until we get clarification from Colm to the encryptedKey case...
     @Test
     public void testSAML1AttrAssertionOutbound() throws Exception {
 
@@ -421,11 +419,11 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             securityProperties.setSamlCallbackHandler(callbackHandler);
             KeyStore keyStore = KeyStore.getInstance("jks");
-            keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
+            keyStore.load(this.getClass().getClassLoader().getResourceAsStream("receiver.jks"), "default".toCharArray());
             Merlin crypto = new Merlin();
             crypto.setKeyStore(keyStore);
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias("transmitter");
+            cryptoType.setAlias("receiver");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
@@ -459,7 +457,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
-    */
 
     @Test
     public void testSAML1AttrAssertionInbound() throws Exception {
@@ -900,8 +897,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
         }
     }
 
-    /*
-    todo: test commented until we get clarification from Colm to the encryptedKey case...
     @Test
     public void testSAML2AttrAssertionOutbound() throws Exception {
 
@@ -921,10 +916,10 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             Merlin crypto = new Merlin();
             crypto.setKeyStore(keyStore);
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias("transmitter");
+            cryptoType.setAlias("receiver");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            securityProperties.setSignatureUser("transmitter");
+            securityProperties.setSignatureUser("receiver");
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#hmac-sha256");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
@@ -934,7 +929,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
-            System.out.println(baos.toString());
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
@@ -956,7 +950,6 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
         }
     }
-*/
 
     @Test
     public void testSAML2AttrAssertionInbound() throws Exception {
