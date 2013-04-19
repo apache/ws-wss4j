@@ -20,7 +20,6 @@
 package org.apache.wss4j.common.ext;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.utils.I18n;
 
 import javax.xml.namespace.QName;
 
@@ -158,7 +157,7 @@ public class WSSecurityException extends XMLSecurityException {
      * @param errorCode
      */
     public WSSecurityException(ErrorCode errorCode) {
-        this(errorCode, "empty", I18n.getExceptionMessage(errorCode.name()));
+        this(errorCode, errorCode.name());
     }
 
     /**

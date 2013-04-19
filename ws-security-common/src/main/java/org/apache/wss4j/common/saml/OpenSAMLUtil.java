@@ -21,6 +21,7 @@ package org.apache.wss4j.common.saml;
 
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.opensaml.xml.*;
 import org.opensaml.xml.io.*;
@@ -56,6 +57,7 @@ public final class OpenSAMLUtil {
                 LOG.debug("Initializing the opensaml2 library...");
             }
             try {
+                WSProviderConfig.init();
                 OpenSAMLBootstrap.bootstrap();
                 builderFactory = Configuration.getBuilderFactory();
                 marshallerFactory = Configuration.getMarshallerFactory();
