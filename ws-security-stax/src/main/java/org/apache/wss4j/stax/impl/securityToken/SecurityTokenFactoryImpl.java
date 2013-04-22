@@ -156,6 +156,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
                             securityTokenReferenceType.getId(), WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier,
                             securityProperties);
+                } else if (WSSConstants.NS_ENCRYPTED_KEY_SHA1.equals(valueType)) {
+                    return new EncryptedKeySha1SecurityTokenImpl(
+                            (WSInboundSecurityContext) inboundSecurityContext, callbackHandler, keyIdentifierType.getValue(),
+                            securityTokenReferenceType.getId(), WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
                 } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
                     if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);

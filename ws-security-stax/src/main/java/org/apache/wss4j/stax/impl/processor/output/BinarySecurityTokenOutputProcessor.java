@@ -27,6 +27,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
@@ -37,6 +38,7 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.security.Key;
@@ -65,15 +67,22 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
                 WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), pwCb);
                 String password = pwCb.getPassword();
-                if (password == null) {
+                byte[] secretKey = pwCb.getKey();
+                if (password == null && secretKey == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
                 }
-                key = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
-                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                cryptoType.setAlias(alias);
-                x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
-                if (x509Certificates == null || x509Certificates.length == 0) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
+                if (password != null) {
+                    key = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
+                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                    cryptoType.setAlias(alias);
+                    x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
+                    if (x509Certificates == null || x509Certificates.length == 0) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
+                    }
+                } else {
+                    x509Certificates = null;
+                    String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(getSecurityProperties().getSignatureAlgorithm());
+                    key = new SecretKeySpec(secretKey, algoFamily);
                 }
             } else if (WSSConstants.ENCRYPT.equals(action) ||
                     WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
@@ -98,20 +107,15 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound",
                                 ((WSSSecurityProperties) getSecurityProperties()).getEncryptionUser());
                     }
-                    if (securityProperties.isEnableRevocation()) {
-                        crypto.verifyTrust(x509Certificates, true);
-                    }
                 }
                 
                 // Check for Revocation
-                if (x509Certificates != null) {
-                    WSSSecurityProperties securityProperties = ((WSSSecurityProperties) getSecurityProperties());
-                    if (securityProperties.isEnableRevocation()) {
-                        Crypto crypto = securityProperties.getEncryptionCrypto();
-                        crypto.verifyTrust(x509Certificates, true);
-                    }
+                WSSSecurityProperties securityProperties = ((WSSSecurityProperties) getSecurityProperties());
+                if (securityProperties.isEnableRevocation()) {
+                    Crypto crypto = securityProperties.getEncryptionCrypto();
+                    crypto.verifyTrust(x509Certificates, true);
                 }
-                
+
                 key = null;
             } else {
                 x509Certificates = null;

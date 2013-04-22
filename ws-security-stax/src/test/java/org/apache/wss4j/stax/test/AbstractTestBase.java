@@ -120,21 +120,27 @@ public abstract class AbstractTestBase {
         return doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(inputStream), securityEventList, securityEventListener);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader) throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader)
+            throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlStreamReader, null);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, SecurityEventListener securityEventListener) throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader,
+                                      SecurityEventListener securityEventListener)
+            throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         return doInboundSecurity(securityProperties, xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
     }
 
-    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader, List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener) throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
+    public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader,
+                                      List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener)
+            throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
         XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventList, securityEventListener);
         return StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
     }
 
-    protected ByteArrayOutputStream doOutboundSecurity(WSSSecurityProperties securityProperties, InputStream sourceDocument) throws Exception {
+    protected ByteArrayOutputStream doOutboundSecurity(WSSSecurityProperties securityProperties, InputStream sourceDocument)
+            throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -144,7 +150,8 @@ public abstract class AbstractTestBase {
         return baos;
     }
 
-    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties) throws WSSecurityException, TransformerException {
+    protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties)
+            throws WSSecurityException, TransformerException {
         Map<String, Object> context = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
         return (Document) context.get(SECURED_DOCUMENT);
     }

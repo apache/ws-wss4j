@@ -1,0 +1,85 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.wss4j.stax.impl.securityToken;
+
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityToken.EncryptedKeySha1SecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.callback.CallbackHandler;
+import java.security.Key;
+
+public class EncryptedKeySha1SecurityTokenImpl
+        extends AbstractInboundSecurityToken implements EncryptedKeySha1SecurityToken {
+
+    private CallbackHandler callbackHandler;
+    private String sha1Identifier;
+
+    public EncryptedKeySha1SecurityTokenImpl(WSInboundSecurityContext inboundSecurityContext,
+                                             CallbackHandler callbackHandler, String sha1Identifier,
+                                             String id, SecurityTokenConstants.KeyIdentifier keyIdentifier) {
+
+        super(inboundSecurityContext, id, keyIdentifier);
+        this.callbackHandler = callbackHandler;
+        this.sha1Identifier = sha1Identifier;
+    }
+
+    @Override
+    public boolean isAsymmetric() throws XMLSecurityException {
+        return false;
+    }
+
+    @Override
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
+                         String correlationID) throws XMLSecurityException {
+
+        Key key = getSecretKey().get(algorithmURI);
+        if (key != null) {
+            return key;
+        }
+
+        WSPasswordCallback secretKeyCallback =
+                new WSPasswordCallback(getId(), null,
+                        WSSConstants.NS_ENCRYPTED_KEY_SHA1, WSPasswordCallback.Usage.SECRET_KEY);
+        WSSUtils.doSecretKeyCallback(callbackHandler, secretKeyCallback, sha1Identifier);
+        if (secretKeyCallback.getKey() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", sha1Identifier);
+        }
+
+        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+        key = new SecretKeySpec(secretKeyCallback.getKey(), algoFamily);
+        setSecretKey(algorithmURI, key);
+        return key;
+    }
+
+    @Override
+    public SecurityTokenConstants.TokenType getTokenType() {
+        return WSSecurityTokenConstants.EncryptedKeyToken;
+    }
+}

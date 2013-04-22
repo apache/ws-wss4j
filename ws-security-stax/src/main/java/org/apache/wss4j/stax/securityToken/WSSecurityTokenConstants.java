@@ -40,6 +40,7 @@ public class WSSecurityTokenConstants extends SecurityTokenConstants {
     public static final KeyIdentifier KeyIdentifier_X509KeyIdentifier = new KeyIdentifier("X509KeyIdentifier");
     public static final KeyIdentifier KeyIdentifier_SkiKeyIdentifier = new KeyIdentifier("SkiKeyIdentifier");
     public static final KeyIdentifier KeyIdentifier_ThumbprintIdentifier = new KeyIdentifier("ThumbprintIdentifier");
+    public static final KeyIdentifier KeyIdentifier_EncryptedKeySha1Identifier = new KeyIdentifier("EncryptedKeySha1Identifier");
     public static final KeyIdentifier KeyIdentifier_EmbeddedKeyIdentifierRef = new KeyIdentifier("EmbeddedKeyIdentifierRef");
     public static final KeyIdentifier KeyIdentifier_UsernameTokenReference = new KeyIdentifier("UsernameTokenReference");
     public static final KeyIdentifier KeyIdentifier_SecurityTokenReference = new KeyIdentifier("SecurityTokenReference");

@@ -180,6 +180,8 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
     public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE_SECURITY + "#ThumbprintSHA1";
 
+    public static final String NS_ENCRYPTED_KEY_SHA1 = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKeySHA1";
+
     public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE_SECURITY + "#Base64Binary";
 
     public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken", PREFIX_WSSE);

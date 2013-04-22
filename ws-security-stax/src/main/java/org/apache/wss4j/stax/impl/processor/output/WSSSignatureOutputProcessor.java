@@ -19,8 +19,6 @@
 package org.apache.wss4j.stax.impl.processor.output;
 
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +29,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 
-import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -77,58 +74,49 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                 if (securePart != null) {
 
                     logger.debug("Matched securePart for signature");
-                    InternalSignatureOutputProcessor internalSignatureOutputProcessor;
-                    try {
-                        SignaturePartDef signaturePartDef = new SignaturePartDef();
-                        signaturePartDef.setTransforms(securePart.getTransforms());
-                        signaturePartDef.setExcludeVisibleC14Nprefixes(true);
-                        String digestMethod = securePart.getDigestMethod();
-                        if (digestMethod == null) {
-                            digestMethod = getSecurityProperties().getSignatureDigestAlgorithm();
-                        }
-                        signaturePartDef.setDigestAlgo(digestMethod);
 
-                        if (securePart.getIdToSign() == null) {
-                            signaturePartDef.setGenerateXPointer(securePart.isGenerateXPointer());
-                            signaturePartDef.setSigRefId(IDGenerator.generateID(null));
-
-                            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
-                            if (attribute != null) {
-                                signaturePartDef.setSigRefId(attribute.getValue());
-                            } else {
-                                List<XMLSecAttribute> attributeList = new ArrayList<XMLSecAttribute>(1);
-                                attributeList.add(createAttribute(WSSConstants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
-                                xmlSecEvent = addAttributes(xmlSecStartElement, attributeList);
-                            }
-                        } else {
-                            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName().getLocalPart())) {
-                                signaturePartDef.setSigRefId(securePart.getIdToReference());
-                                String[] transforms = new String[]{
-                                        WSSConstants.SOAPMESSAGE_NS10_STRTransform,
-                                        WSSConstants.NS_C14N_EXCL
-                                };
-                                signaturePartDef.setTransforms(transforms);
-                            } else {
-                                signaturePartDef.setSigRefId(securePart.getIdToSign());
-                            }
-                        }
-
-                        getSignaturePartDefList().add(signaturePartDef);
-                        internalSignatureOutputProcessor = new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement);
-                        internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                        internalSignatureOutputProcessor.setAction(getAction());
-                        internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
-                        internalSignatureOutputProcessor.addBeforeProcessor(WSSSignatureEndingOutputProcessor.class.getName());
-                        internalSignatureOutputProcessor.init(outputProcessorChain);
-
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedKeyTransp",
-                                e, "No such algorithm: " + getSecurityProperties().getSignatureAlgorithm()
-                        );
-                    } catch (NoSuchProviderException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noSecProvider", e);
+                    SignaturePartDef signaturePartDef = new SignaturePartDef();
+                    signaturePartDef.setTransforms(securePart.getTransforms());
+                    signaturePartDef.setExcludeVisibleC14Nprefixes(true);
+                    String digestMethod = securePart.getDigestMethod();
+                    if (digestMethod == null) {
+                        digestMethod = getSecurityProperties().getSignatureDigestAlgorithm();
                     }
+                    signaturePartDef.setDigestAlgo(digestMethod);
+
+                    if (securePart.getIdToSign() == null) {
+                        signaturePartDef.setGenerateXPointer(securePart.isGenerateXPointer());
+                        signaturePartDef.setSigRefId(IDGenerator.generateID(null));
+
+                        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+                        if (attribute != null) {
+                            signaturePartDef.setSigRefId(attribute.getValue());
+                        } else {
+                            List<XMLSecAttribute> attributeList = new ArrayList<XMLSecAttribute>(1);
+                            attributeList.add(createAttribute(WSSConstants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                            xmlSecEvent = addAttributes(xmlSecStartElement, attributeList);
+                        }
+                    } else {
+                        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName().getLocalPart())) {
+                            signaturePartDef.setSigRefId(securePart.getIdToReference());
+                            String[] transforms = new String[]{
+                                    WSSConstants.SOAPMESSAGE_NS10_STRTransform,
+                                    WSSConstants.NS_C14N_EXCL
+                            };
+                            signaturePartDef.setTransforms(transforms);
+                        } else {
+                            signaturePartDef.setSigRefId(securePart.getIdToSign());
+                        }
+                    }
+
+                    getSignaturePartDefList().add(signaturePartDef);
+                    InternalSignatureOutputProcessor internalSignatureOutputProcessor =
+                            new InternalWSSSignatureOutputProcessor(signaturePartDef, xmlSecStartElement);
+                    internalSignatureOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    internalSignatureOutputProcessor.setAction(getAction());
+                    internalSignatureOutputProcessor.addAfterProcessor(WSSSignatureOutputProcessor.class.getName());
+                    internalSignatureOutputProcessor.addBeforeProcessor(WSSSignatureEndingOutputProcessor.class.getName());
+                    internalSignatureOutputProcessor.init(outputProcessorChain);
 
                     setActiveInternalSignatureOutputProcessor(internalSignatureOutputProcessor);
                     //we can remove this processor when the whole body will be signed since there is
@@ -234,7 +222,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {
 
-        public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement) throws XMLSecurityException, NoSuchProviderException, NoSuchAlgorithmException {
+        public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement) throws XMLSecurityException {
             super(signaturePartDef, xmlSecStartElement);
             this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class.getName());
         }

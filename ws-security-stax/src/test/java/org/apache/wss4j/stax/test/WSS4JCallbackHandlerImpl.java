@@ -50,7 +50,8 @@ public class WSS4JCallbackHandlerImpl implements CallbackHandler {
             throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
         }
 */
-        if (pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN) {
+        if (pc.getUsage() == WSPasswordCallback.Usage.SECRET_KEY ||
+                pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN) {
             pc.setKey(secret);
         }
     }
