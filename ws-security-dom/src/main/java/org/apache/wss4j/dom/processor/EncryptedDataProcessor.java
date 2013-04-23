@@ -181,6 +181,13 @@ public class EncryptedDataProcessor implements Processor {
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         
+        List<WSSecurityEngineResult> completeResults = 
+            new ArrayList<WSSecurityEngineResult>();
+        if (encrKeyResults != null) {
+            completeResults.addAll(encrKeyResults);
+        }
+        completeResults.add(result);
+        
         WSSConfig wssConfig = request.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
@@ -198,18 +205,11 @@ public class EncryptedDataProcessor implements Processor {
                 }
                 List<WSSecurityEngineResult> results = 
                     proc.handleToken(decryptedElem, request, wsDocInfo);
-                List<WSSecurityEngineResult> completeResults = 
-                    new ArrayList<WSSecurityEngineResult>();
-                if (encrKeyResults != null) {
-                    completeResults.addAll(encrKeyResults);
-                }
-                completeResults.add(result);
                 completeResults.addAll(0, results);
                 return completeResults;
             }
         }
-        encrKeyResults.add(result);
-        return encrKeyResults;
+        return completeResults;
     }
     
     /**
