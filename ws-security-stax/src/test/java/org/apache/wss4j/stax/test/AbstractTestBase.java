@@ -159,6 +159,12 @@ public abstract class AbstractTestBase {
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
             InputStream sourceDocument, String action, final Properties properties
     ) throws WSSecurityException, TransformerException {
+        return doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, true);
+    }
+
+    protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
+            InputStream sourceDocument, String action, final Properties properties, boolean isRequest
+    ) throws WSSecurityException, TransformerException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);
@@ -195,7 +201,7 @@ public abstract class AbstractTestBase {
         requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
         requestData.setWssConfig(WSSConfig.getNewInstance());
   
-        wss4JHandler.doSender(messageContext, requestData, true);
+        wss4JHandler.doSender(messageContext, requestData, isRequest);
 
         return messageContext;
     }

@@ -973,9 +973,6 @@ public final class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_SIGNATURE)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(WSConstants.UT_SIGN);
-            } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
-                doAction |= WSConstants.SC;
-                actions.add(WSConstants.SC);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "Unknown action defined: " + single[i]
@@ -1030,9 +1027,6 @@ public final class WSSecurityUtil {
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_SIGNATURE)) {
                 doAction |= WSConstants.UT_SIGN;
                 actions.add(WSConstants.UT_SIGN);
-            } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
-                doAction |= WSConstants.SC;
-                actions.add(WSConstants.SC);
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);

@@ -19,17 +19,10 @@
 package org.apache.wss4j.stax;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.InboundWSSec;
-import org.apache.wss4j.stax.ext.OutboundWSSec;
-import org.apache.wss4j.stax.ext.WSSConfigurationException;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.ext.*;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
@@ -108,13 +101,8 @@ public class WSSec {
         }
 
         //todo encrypt sigconf when original signature was encrypted
-        int pos = Arrays.binarySearch(securityProperties.getOutAction(), WSSConstants.SIGNATURE_CONFIRMATION);
-        if ((pos >= 0) 
-                && (Arrays.binarySearch(securityProperties.getOutAction(), WSSConstants.SIGNATURE) < 0)) {
-            List<XMLSecurityConstants.Action> actionList = new ArrayList<XMLSecurityConstants.Action>(securityProperties.getOutAction().length);
-            actionList.addAll(Arrays.asList(securityProperties.getOutAction()));
-            actionList.add(pos, WSSConstants.SIGNATURE);
-            securityProperties.setOutAction(actionList.toArray(new XMLSecurityConstants.Action[securityProperties.getOutAction().length + 1]));
+        if (securityProperties.isEnableSignatureConfirmation()) {
+            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
         }
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {
@@ -200,8 +188,6 @@ public class WSSec {
                 if (securityProperties.getUsernameTokenPasswordType() == null) {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
-            } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
-                securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");

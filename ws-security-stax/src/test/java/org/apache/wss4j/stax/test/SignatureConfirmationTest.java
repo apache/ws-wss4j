@@ -100,11 +100,12 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION};
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
             securityProperties.setOutAction(actions);
             securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
+            securityProperties.setEnableSignatureConfirmation(true);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -191,10 +192,11 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION + " " + WSHandlerConstants.SIGNATURE;
+            String action = WSHandlerConstants.SIGNATURE;
             Properties properties = new Properties();
+            properties.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
             properties.put(WSHandlerConstants.RECV_RESULTS, wsHandlerResult);
-            Map<String, Object> messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
+            Map<String, Object> messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties, false);
             Document securedDocument = (Document) messageContext.get(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
@@ -304,7 +306,6 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        //verify SigConf response:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setEnableSignatureConfirmationVerification(true);

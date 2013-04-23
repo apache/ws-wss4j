@@ -106,9 +106,11 @@ public class OutboundWSSec {
     private XMLStreamWriter processOutMessage(
             Object output, String encoding, List<SecurityEvent> requestSecurityEvents,
             SecurityEventListener securityEventListener) throws WSSecurityException {
+
         final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
         outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
         outboundSecurityContext.addSecurityEventListener(securityEventListener);
+
         final DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(encoding);
 
@@ -154,11 +156,6 @@ public class OutboundWSSec {
 
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-
-                } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
-                    final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
-                            new SignatureConfirmationOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
 
                 } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
