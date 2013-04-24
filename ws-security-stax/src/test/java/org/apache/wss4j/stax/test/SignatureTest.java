@@ -59,6 +59,7 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
@@ -271,6 +272,34 @@ public class SignatureTest extends AbstractTestBase {
         {
             String action = WSHandlerConstants.SIGNATURE;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testExceptionOnElementToSignNotFound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
+            securityProperties.addSignaturePart(new SecurePart(new QName("http://www.wrongnamespace.org", "complexType"), SecurePart.Modifier.Element));
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+
+            try {
+                XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+                xmlStreamWriter.close();
+                Assert.fail("Exception expected");
+            } catch (XMLStreamException e) {
+                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                org.junit.Assert.assertEquals("Part to sign not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
+            }
         }
     }
 

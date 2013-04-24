@@ -32,6 +32,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.*;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -921,6 +922,29 @@ public class EncDecryptionTest extends AbstractTestBase {
             org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
             org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
+        }
+    }
+
+    @Test
+    public void testExceptionOnElementToEncryptNotFound() throws Exception {
+
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.wrongnamespace.org", "complexType"), SecurePart.Modifier.Content));
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            try {
+                baos = doOutboundSecurity(securityProperties, sourceDocument);
+                Assert.fail("Exception expected");
+            } catch (XMLStreamException e) {
+                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                org.junit.Assert.assertEquals("Part to encrypt not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
+            }
         }
     }
 

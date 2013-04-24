@@ -83,10 +83,10 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             if (getActiveInternalSignatureOutputProcessor() == null) {
                 SecurePart securePart = securePartMatches(xmlSecStartElement, outputProcessorChain, WSSConstants.SIGNATURE_PARTS);
                 if (securePart != null) {
-
                     logger.debug("Matched securePart for signature");
 
                     SignaturePartDef signaturePartDef = new SignaturePartDef();
+                    signaturePartDef.setSecurePart(securePart);
                     signaturePartDef.setTransforms(securePart.getTransforms());
                     signaturePartDef.setExcludeVisibleC14Nprefixes(true);
                     String digestMethod = securePart.getDigestMethod();

@@ -84,6 +84,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
                     OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
                     EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
+                    encryptionPartDef.setSecurePart(securePart);
                     encryptionPartDef.setModifier(securePart.getModifier());
                     encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
                     encryptionPartDef.setKeyId(securityTokenProvider.getId());
