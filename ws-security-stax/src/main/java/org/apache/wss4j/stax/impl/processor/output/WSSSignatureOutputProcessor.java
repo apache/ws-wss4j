@@ -134,6 +134,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     //nothing more which can be signed.
                     if (WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
                             && WSSUtils.isInSOAPBody(xmlSecStartElement)) {
+                        doFinalInternal(outputProcessorChain);
                         outputProcessorChain.removeProcessor(this);
                     }
                 }

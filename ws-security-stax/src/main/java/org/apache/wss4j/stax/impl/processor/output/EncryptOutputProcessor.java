@@ -106,6 +106,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     //nothing more which can be encrypted.
                     if (WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
                             && WSSUtils.isInSOAPBody(xmlSecStartElement)) {
+                        doFinalInternal(outputProcessorChain);
                         outputProcessorChain.removeProcessor(this);
                     }
                 }
