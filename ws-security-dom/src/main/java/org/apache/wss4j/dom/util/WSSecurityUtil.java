@@ -28,6 +28,7 @@ import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.StringUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.CallbackLookup;

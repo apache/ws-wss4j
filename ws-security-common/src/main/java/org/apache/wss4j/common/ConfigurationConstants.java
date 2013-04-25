@@ -16,88 +16,73 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.wss4j.dom.handler;
-
-import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.dom.WSConstants;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.apache.wss4j.common;
 
 /**
- * This class defines the names, actions, and other string for the deployment
- * data of the WS handler.
+ * This class defines Configuration Constants that are shared between the DOM + StAX code. This
+ * allows a user to configure both layers in the same way (e.g. via a Map).
  */
-public final class WSHandlerConstants {
+public final class ConfigurationConstants {  
+
+    private ConfigurationConstants() {
+        // complete
+    }
     
     //
     // Action configuration tags
     //
     
-    private WSHandlerConstants() {
-        // Complete
-    }
-    
     /**
-     * The action parameter. The handlers use the value of this parameter to determine how
-     * to process the SOAP Envelope. It is a blank separated list of actions to perform.
+     * The action parameter. It is a blank separated list of actions to perform.
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+     * call.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
      * </pre>
      */
-    public static final String ACTION = ConfigurationConstants.ACTION;
-
-    /**
-     * Perform no action.
-     */
-    public static final String NO_SECURITY = "NoSecurity";
+    public static final String ACTION = "action";
 
     /**
      * Perform a UsernameToken action.
      */
-    public static final String USERNAME_TOKEN = ConfigurationConstants.USERNAME_TOKEN;
+    public static final String USERNAME_TOKEN = "UsernameToken";
     
     /**
      * Perform a UsernameTokenSignature action.
      */
-    public static final String USERNAME_TOKEN_SIGNATURE = 
-        ConfigurationConstants.USERNAME_TOKEN_SIGNATURE;
+    public static final String USERNAME_TOKEN_SIGNATURE = "UsernameTokenSignature";
     
     /**
      * Perform a UsernameToken action with no password.
      */
-    public static final String USERNAME_TOKEN_NO_PASSWORD = 
-        ConfigurationConstants.USERNAME_TOKEN_NO_PASSWORD;
+    public static final String USERNAME_TOKEN_NO_PASSWORD = "UsernameTokenNoPassword";
 
     /**
      * Perform an unsigned SAML Token action.
      */
-    public static final String SAML_TOKEN_UNSIGNED = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
+    public static final String SAML_TOKEN_UNSIGNED = "SAMLTokenUnsigned";
     
     /**
      * Perform a signed SAML Token action.
      */
-    public static final String SAML_TOKEN_SIGNED = ConfigurationConstants.SAML_TOKEN_SIGNED;
+    public static final String SAML_TOKEN_SIGNED = "SAMLTokenSigned";
 
     /**
      * Perform a Signature action. The signature specific parameters define how
      * to sign, which keys to use, and so on.
      */
-    public static final String SIGNATURE = ConfigurationConstants.SIGNATURE;
+    public static final String SIGNATURE = "Signature";
 
     /**
      * Perform an Encryption action. The encryption specific parameters define how 
      * to encrypt, which keys to use, and so on.
      */
-    public static final String ENCRYPT = ConfigurationConstants.ENCRYPT;
+    public static final String ENCRYPT = "Encrypt";
 
     /**
      * Add a timestamp to the security header.
      */
-    public static final String TIMESTAMP = ConfigurationConstants.TIMESTAMP;
+    public static final String TIMESTAMP = "Timestamp";
     
     //
     // User properties
@@ -112,10 +97,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ACTOR, "ActorName");
+     * call.setProperty(ConfigurationConstants.ACTOR, "ActorName");
      * </pre>
      */
-    public static final String ACTOR = ConfigurationConstants.ACTOR;
+    public static final String ACTOR = "actor";
 
     /**
      * The user's name. It is used differently by each of the WS-Security functions.
@@ -133,7 +118,7 @@ public final class WSHandlerConstants {
      * </li>
      * </ul>
      */
-    public static final String USER = ConfigurationConstants.USER;
+    public static final String USER = "user";
     
     /**
      * The user's name for encryption. The encryption functions use the public key of 
@@ -148,10 +133,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENCRYPTION_USER, "encryptionUser");
+     * call.setProperty(ConfigurationConstants.ENCRYPTION_USER, "encryptionUser");
      * </pre>
      */
-    public static final String ENCRYPTION_USER = ConfigurationConstants.ENCRYPTION_USER;
+    public static final String ENCRYPTION_USER = "encryptionUser";
     
     /**
      * The user's name for signature. This name is used as the alias name in the keystore 
@@ -162,10 +147,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.SIGNATURE_USER, "signatureUser");
+     * call.setProperty(ConfigurationConstants.SIGNATURE_USER, "signatureUser");
      * </pre>
      */
-    public static final String SIGNATURE_USER = ConfigurationConstants.SIGNATURE_USER;
+    public static final String SIGNATURE_USER = "signatureUser";
 
     /**
      * Specifying this name as {@link #ENCRYPTION_USER}
@@ -175,8 +160,7 @@ public final class WSHandlerConstants {
      * way to define an encryption key simplifies certificate management to
      * a large extend.
      */
-    public static final String USE_REQ_SIG_CERT = ConfigurationConstants.USE_REQ_SIG_CERT;
-
+    public static final String USE_REQ_SIG_CERT = "useReqSigCert";
     
     //
     // Callback class and property file properties
@@ -196,10 +180,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
+     * call.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, "PWCallbackClass");
      * </pre>
      */
-    public static final String PW_CALLBACK_CLASS = ConfigurationConstants.PW_CALLBACK_CLASS;
+    public static final String PW_CALLBACK_CLASS = "passwordCallbackClass";
     
     /**
      * This tag refers to the CallbackHandler implementation object used to obtain
@@ -209,35 +193,35 @@ public final class WSHandlerConstants {
      * Refer to {@link #PW_CALLBACK_CLASS} for further information about password callback 
      * handling.
      */
-    public static final String PW_CALLBACK_REF = ConfigurationConstants.PW_CALLBACK_REF;
+    public static final String PW_CALLBACK_REF = "passwordCallbackRef";
     
     /**
      * This tag refers to the SAML CallbackHandler implementation class used to construct
      * SAML Assertions. The value of this tag must be the class name of a 
      * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
-    public static final String SAML_CALLBACK_CLASS = ConfigurationConstants.SAML_CALLBACK_CLASS;
+    public static final String SAML_CALLBACK_CLASS = "samlCallbackClass";
     
     /**
      * This tag refers to the SAML CallbackHandler implementation object used to construct
      * SAML Assertions. The value of this tag must be a
      * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
-    public static final String SAML_CALLBACK_REF = ConfigurationConstants.SAML_CALLBACK_REF;
+    public static final String SAML_CALLBACK_REF = "samlCallbackRef";
 
     /**
      * This tag refers to the CallbackHandler implementation class used to get the key
      * associated with a key name. The value of this tag must be the class name of a 
      * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
-    public static final String ENC_CALLBACK_CLASS = ConfigurationConstants.ENC_CALLBACK_CLASS;
+    public static final String ENC_CALLBACK_CLASS = "embeddedKeyCallbackClass";
 
     /**
      * This tag refers to the  CallbackHandler implementation object used to get the key
      * associated with a key name. The value of this tag must be a
      * {@link javax.security.auth.callback.CallbackHandler} instance.
      */
-    public static final String ENC_CALLBACK_REF = ConfigurationConstants.ENC_CALLBACK_REF;
+    public static final String ENC_CALLBACK_REF = "embeddedKeyCallbackRef";
     
     /**
      * The path of the crypto property file to use for Signature creation. The classloader 
@@ -260,10 +244,10 @@ public final class WSHandlerConstants {
      * </p>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.SIG_PROP_FILE, "myCrypto.properties");
+     * call.setProperty(ConfigurationConstants.SIG_PROP_FILE, "myCrypto.properties");
      * </pre>
      */
-    public static final String SIG_PROP_FILE = ConfigurationConstants.SIG_PROP_FILE;
+    public static final String SIG_PROP_FILE = "signaturePropFile";
 
     /**
      * The key that holds a reference to the object holding complete information about 
@@ -274,7 +258,7 @@ public final class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      */
-    public static final String SIG_PROP_REF_ID = ConfigurationConstants.SIG_PROP_REF_ID;
+    public static final String SIG_PROP_REF_ID = "signaturePropRefId";
     
     /**
      * The path of the crypto property file to use for Signature verification. The 
@@ -282,7 +266,7 @@ public final class WSHandlerConstants {
      * <p/>
      * Refer to documentation of {@link #SIG_PROP_FILE}.
      */
-    public static final String SIG_VER_PROP_FILE = ConfigurationConstants.SIG_VER_PROP_FILE;
+    public static final String SIG_VER_PROP_FILE = "signatureVerificationPropFile";
     
     /**
      * The key that holds a reference to the object holding complete information about 
@@ -293,7 +277,7 @@ public final class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #SIG_VER_PROP_FILE}.
      */
-    public static final String SIG_VER_PROP_REF_ID = ConfigurationConstants.SIG_VER_PROP_REF_ID;
+    public static final String SIG_VER_PROP_REF_ID = "signatureVerificationPropRefId";
     
     /**
      * The path of the crypto property file to use for Decryption. The classloader loads this 
@@ -302,10 +286,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.DEC_PROP_FILE, "myCrypto.properties");
+     * call.setProperty(ConfigurationConstants.DEC_PROP_FILE, "myCrypto.properties");
      * </pre>
      */
-    public static final String DEC_PROP_FILE = ConfigurationConstants.DEC_PROP_FILE;
+    public static final String DEC_PROP_FILE = "decryptionPropFile";
     
     /**
      * The key that holds a reference to the object holding complete information about 
@@ -316,7 +300,7 @@ public final class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #DEC_PROP_FILE}.
      */
-    public static final String DEC_PROP_REF_ID = ConfigurationConstants.DEC_PROP_REF_ID;
+    public static final String DEC_PROP_REF_ID = "decryptionPropRefId";
     
     /**
      * The path of the crypto property file to use for Encryption. The classloader loads this 
@@ -325,10 +309,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_PROP_FILE, "myCrypto.properties");
+     * call.setProperty(ConfigurationConstants.ENC_PROP_FILE, "myCrypto.properties");
      * </pre>
      */
-    public static final String ENC_PROP_FILE = ConfigurationConstants.ENC_PROP_FILE;
+    public static final String ENC_PROP_FILE = "encryptionPropFile";
     
     /**
      * The key that holds a reference to the object holding complete information about 
@@ -339,7 +323,7 @@ public final class WSHandlerConstants {
      * 
      * Refer to documentation of {@link #ENC_PROP_FILE}.
      */
-    public static final String ENC_PROP_REF_ID = ConfigurationConstants.ENC_PROP_REF_ID;
+    public static final String ENC_PROP_REF_ID = "encryptionPropRefId";
     
     //
     // Boolean configuration tags, e.g. the value should be "true" or "false".
@@ -348,8 +332,7 @@ public final class WSHandlerConstants {
     /**
      * Whether to enable signatureConfirmation or not. The default value is "false".
      */
-    public static final String ENABLE_SIGNATURE_CONFIRMATION = 
-        ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION;
+    public static final String ENABLE_SIGNATURE_CONFIRMATION = "enableSignatureConfirmation";
     
     /**
      * Whether to set the mustUnderstand flag on an outbound message or not. The default 
@@ -357,10 +340,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.MUST_UNDERSTAND, "false");
+     * call.setProperty(ConfigurationConstants.MUST_UNDERSTAND, "false");
      * </pre>
      */
-    public static final String MUST_UNDERSTAND = ConfigurationConstants.MUST_UNDERSTAND;
+    public static final String MUST_UNDERSTAND = "mustUnderstand";
     
     /**
      * Whether to ensure compliance with the Basic Security Profile (BSP) 1.1 or not. The
@@ -368,93 +351,76 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+     * call.setProperty(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
      * </pre>
      */
-    public static final String IS_BSP_COMPLIANT = ConfigurationConstants.IS_BSP_COMPLIANT;
+    public static final String IS_BSP_COMPLIANT = "isBSPCompliant";
     
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
      * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
      * The default is true.
      */
-    public static final String ADD_INCLUSIVE_PREFIXES = 
-        ConfigurationConstants.ADD_INCLUSIVE_PREFIXES;
+    public static final String ADD_INCLUSIVE_PREFIXES = "addInclusivePrefixes";
     
     /**
      * Whether to add a Nonce Element to a UsernameToken. This only applies when the
      * password type is of type "text". A Nonce is automatically added for the "digest"
      * case. The default is false.
      */
-    public static final String ADD_USERNAMETOKEN_NONCE = 
-        ConfigurationConstants.ADD_USERNAMETOKEN_NONCE;
+    public static final String ADD_USERNAMETOKEN_NONCE = "addUsernameTokenNonce";
     
     /**
      * Whether to add a Created Element to a UsernameToken. This only applies when the
      * password type is of type "text". A Created is automatically added for the "digest"
      * case. The default is false.
      */
-    public static final String ADD_USERNAMETOKEN_CREATED = 
-        ConfigurationConstants.ADD_USERNAMETOKEN_CREATED;
+    public static final String ADD_USERNAMETOKEN_CREATED = "addUsernameTokenCreated";
     
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
      * are allowed when processing UsernameTokens. The default value is "false".
      */
-    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = 
-        ConfigurationConstants.HANDLE_CUSTOM_PASSWORD_TYPES;
+    public static final String HANDLE_CUSTOM_PASSWORD_TYPES = "handleCustomPasswordTypes";
     
     /**
      * This variable controls whether a UsernameToken with no password element is allowed. 
      * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
      * or to support UsernameTokens for purposes other than authentication.
      */
-    public static final String ALLOW_USERNAMETOKEN_NOPASSWORD = 
-        ConfigurationConstants.ALLOW_USERNAMETOKEN_NOPASSWORD;
+    public static final String ALLOW_USERNAMETOKEN_NOPASSWORD = "allowUsernameTokenNoPassword";
     
     /**
      * This variable controls whether (wsse) namespace qualified password types are
      * accepted when processing UsernameTokens. The default value is "false".
      */
     public static final String ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES 
-        = ConfigurationConstants.ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES;
+        = "allowNamespaceQualifiedPasswordTypes";
     
     /**
      * This variable controls whether to enable Certificate Revocation List (CRL) checking
      * or not when verifying trust in a certificate. The default value is "false".
      */
-    public static final String ENABLE_REVOCATION = ConfigurationConstants.ENABLE_REVOCATION;
-    
-    /**
-     * Set the value of this parameter to true to treat passwords as binary values
-     * for Username Tokens. The default value is "false".
-     * 
-     * This is needed to properly handle password equivalence for UsernameToken
-     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
-     * strings in most places, but when the password digest is calculated or a key
-     * is derived from the password, the password will be Base64 decoded before 
-     * being used. This is most useful for hashed passwords as password equivalents.
-     */
-    public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
+    public static final String ENABLE_REVOCATION = "enableRevocation";
     
     /**
      * This parameter sets whether to use a single certificate or a whole certificate
      * chain when constructing a BinarySecurityToken used for direct reference in
      * signature. The default is "true", meaning that only a single certificate is used.
      */
-    public static final String USE_SINGLE_CERTIFICATE = ConfigurationConstants.USE_SINGLE_CERTIFICATE;
+    public static final String USE_SINGLE_CERTIFICATE = "useSingleCertificate";
     
     /**
      * This parameter sets whether to use the Username Token derived key for a MAC
      * or not. The default is "true".
      */
-    public static final String USE_DERIVED_KEY_FOR_MAC = ConfigurationConstants.USE_DERIVED_KEY_FOR_MAC;
+    public static final String USE_DERIVED_KEY_FOR_MAC = "useDerivedKeyForMAC";
     
     /**
      * Set whether Timestamps have precision in milliseconds. This applies to the
      * creation of Timestamps only. The default value is "true".
      */
-    public static final String TIMESTAMP_PRECISION = ConfigurationConstants.TIMESTAMP_PRECISION;
+    public static final String TIMESTAMP_PRECISION = "precisionInMilliseconds";
     
     /**
      * Set the value of this parameter to true to enable strict timestamp
@@ -464,7 +430,7 @@ public final class WSHandlerConstants {
      * an <code>Expires</code> element and the semantics of the request are
      * expired, i.e. the current time at the receiver is past the expires time.
      */
-    public static final String TIMESTAMP_STRICT = ConfigurationConstants.TIMESTAMP_STRICT;
+    public static final String TIMESTAMP_STRICT = "timestampStrict";
     
     /**
      * Defines whether to encrypt the symmetric encryption key or not. If true
@@ -474,10 +440,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_SYM_ENC_KEY, "false");
+     * call.setProperty(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
      * </pre>
      */
-    public static final String ENC_SYM_ENC_KEY = ConfigurationConstants.ENC_SYM_ENC_KEY;
+    public static final String ENC_SYM_ENC_KEY = "encryptSymmetricEncryptionKey";
     
     /**
      * Whether the engine needs to enforce EncryptedData elements are
@@ -485,32 +451,25 @@ public final class WSHandlerConstants {
      * some wrapping based attacks when encrypt-before-sign token
      * protection is selected.
      */
-    public static final String REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS = 
-        ConfigurationConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS;
+    public static final String REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS = "requireSignedEncryptedDataElements";
     
     /**
      * Whether to allow the RSA v1.5 Key Transport Algorithm or not. Use of this algorithm
      * is discouraged, and so the default is "false".
      */
-    public static final String ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM = 
-        ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM;
+    public static final String ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM = "allowRSA15KeyTransportAlgorithm";
 
     /**
      * Whether to validate the SubjectConfirmation requirements of a received SAML Token
      * (sender-vouches or holder-of-key). The default is true.
      */
     public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
-        ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION;
+        "validateSamlSubjectConfirmation";
     
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //
     
-    /**
-     * Text of the embedded key name to be sent in the KeyInfo for encryption.
-     */
-    public static final String ENC_KEY_NAME = "embeddedKeyName";
-
     /**
      * Specific parameter for UsernameTokens to define the encoding of the password. It can
      * be used on either the outbound or inbound side. The valid values are:
@@ -524,7 +483,7 @@ public final class WSHandlerConstants {
      * the received UsernameToken must match the specified type, or an exception will be
      * thrown.
      */
-    public static final String PASSWORD_TYPE = ConfigurationConstants.PASSWORD_TYPE;
+    public static final String PASSWORD_TYPE = "passwordType";
     
     /**
      * Defines which key identifier type to use for signature. The WS-Security specifications
@@ -538,10 +497,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+     * call.setProperty(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
      * </pre>
      */
-    public static final String SIG_KEY_ID = ConfigurationConstants.SIG_KEY_ID;
+    public static final String SIG_KEY_ID = "signatureKeyIdentifier";
 
     /**
      * Defines which signature algorithm to use. The default is set by the data in the 
@@ -554,12 +513,12 @@ public final class WSHandlerConstants {
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(
-     *     WSHandlerConstants.SIG_ALGO, 
+     *     ConfigurationConstants.SIG_ALGO, 
      *     "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
      * );
      * </pre>
      */
-    public static final String SIG_ALGO = ConfigurationConstants.SIG_ALGO;
+    public static final String SIG_ALGO = "signatureAlgorithm";
     
     /**
      * Defines which signature digest algorithm to use. The default is:
@@ -570,11 +529,11 @@ public final class WSHandlerConstants {
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(
-     *    WSHandlerConstants.SIG_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
+     *    ConfigurationConstants.SIG_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
      * );
      * </pre>
      */
-    public static final String SIG_DIGEST_ALGO = ConfigurationConstants.SIG_DIGEST_ALGO;
+    public static final String SIG_DIGEST_ALGO = "signatureDigestAlgorithm";
 
     /**
      * Parameter to define which parts of the request shall be signed.
@@ -596,13 +555,13 @@ public final class WSHandlerConstants {
      * <code>Body</code> then the SOAP namespace identifier can be empty
      * (<code>{}</code>).
      */
-    public static final String SIGNATURE_PARTS = ConfigurationConstants.SIGNATURE_PARTS;
+    public static final String SIGNATURE_PARTS = "signatureParts";
     
     /**
      * This parameter sets the number of iterations to use when deriving a key
      * from a Username Token. The default is 1000. 
      */
-    public static final String DERIVED_KEY_ITERATIONS = ConfigurationConstants.DERIVED_KEY_ITERATIONS;
+    public static final String DERIVED_KEY_ITERATIONS = "derivedKeyIterations";
 
     /**
      * Defines which key identifier type to use for encryption. The WS-Security specifications
@@ -617,10 +576,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
+     * call.setProperty(ConfigurationConstants.ENC_KEY_ID, "X509KeyIdentifier");
      * </pre>
      */
-    public static final String ENC_KEY_ID = ConfigurationConstants.ENC_KEY_ID;
+    public static final String ENC_KEY_ID = "encryptionKeyIdentifier";
 
     /**
      * Defines which symmetric encryption algorithm to use. WSS4J supports the
@@ -635,10 +594,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_SYM_ALGO, WSConstants.AES_256);
+     * call.setProperty(ConfigurationConstants.ENC_SYM_ALGO, WSConstants.AES_256);
      * </pre>
      */
-    public static final String ENC_SYM_ALGO = ConfigurationConstants.ENC_SYM_ALGO;
+    public static final String ENC_SYM_ALGO = "encryptionSymAlgorithm";
 
     /**
      * Defines which algorithm to use to encrypt the generated symmetric key.
@@ -649,10 +608,10 @@ public final class WSHandlerConstants {
      * <p/>
      * The application may set this parameter using the following method:
      * <pre>
-     * call.setProperty(WSHandlerConstants.ENC_KEY_TRANSPORT, WSConstants.KEYTRANSPORT_RSA15);
+     * call.setProperty(ConfigurationConstants.ENC_KEY_TRANSPORT, WSConstants.KEYTRANSPORT_RSA15);
      * </pre>
      */
-    public static final String ENC_KEY_TRANSPORT = ConfigurationConstants.ENC_KEY_TRANSPORT;
+    public static final String ENC_KEY_TRANSPORT = "encryptionKeyTransportAlgorithm";
     
     /**
      * Parameter to define which parts of the request shall be encrypted.
@@ -695,7 +654,7 @@ public final class WSHandlerConstants {
      * If no list is specified, the handler encrypts the SOAP Body in
      * <code>Content</code> mode by default.
      */
-    public static final String ENCRYPTION_PARTS = ConfigurationConstants.ENCRYPTION_PARTS;
+    public static final String ENCRYPTION_PARTS = "encryptionParts";
     
     /**
      * Defines which encryption digest algorithm to use with the RSA OAEP Key Transport 
@@ -704,11 +663,11 @@ public final class WSHandlerConstants {
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(
-     *    WSHandlerConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
+     *    ConfigurationConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmlenc#sha256"
      * );
      * </pre>
      */
-    public static final String ENC_DIGEST_ALGO = ConfigurationConstants.ENC_DIGEST_ALGO;
+    public static final String ENC_DIGEST_ALGO = "encryptionDigestAlgorithm";
 
     /**
      * Defines which encryption mgf algorithm to use with the RSA OAEP Key Transport
@@ -717,11 +676,11 @@ public final class WSHandlerConstants {
      * The application may set this parameter using the following method:
      * <pre>
      * call.setProperty(
-     *    WSHandlerConstants.ENC_MGF_ALGO, "http://www.w3.org/2009/xmlenc11#mgf1sha256"
+     *    ConfigurationConstants.ENC_MGF_ALGO, "http://www.w3.org/2009/xmlenc11#mgf1sha256"
      * );
      * </pre>
      */
-    public static final String ENC_MGF_ALGO = ConfigurationConstants.ENC_MGF_ALGO;
+    public static final String ENC_MGF_ALGO = "encryptionMGFAlgorithm";
 
     /**
      * Time-To-Live is the time difference between creation and expiry time in
@@ -732,7 +691,7 @@ public final class WSHandlerConstants {
      * zero, or an illegal format the handlers use a default TTL of
      * 300 seconds (5 minutes).
      */
-    public static final String TTL_USERNAMETOKEN = ConfigurationConstants.TTL_USERNAMETOKEN;
+    public static final String TTL_USERNAMETOKEN = "utTimeToLive";
     
     /**
      * This configuration tag specifies the time in seconds in the future within which
@@ -740,7 +699,7 @@ public final class WSHandlerConstants {
      * to avoid problems where clocks are slightly askew. To reject all future-created
      * UsernameTokens, set this value to "0". 
      */
-    public static final String TTL_FUTURE_USERNAMETOKEN = ConfigurationConstants.TTL_FUTURE_USERNAMETOKEN;
+    public static final String TTL_FUTURE_USERNAMETOKEN = "utFutureTimeToLive";
     
     /**
      * This configuration tag is a comma separated String of regular expressions which
@@ -749,7 +708,7 @@ public final class WSHandlerConstants {
      * certificate. These constraints are not used when the certificate is contained in
      * the keystore (direct trust).
      */
-    public static final String SIG_SUBJECT_CERT_CONSTRAINTS = ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS;
+    public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
     
     /**
      * Time-To-Live is the time difference between creation and expiry time in
@@ -760,7 +719,7 @@ public final class WSHandlerConstants {
      * zero, or an illegal format the handlers use a default TTL of
      * 300 seconds (5 minutes).
      */
-    public static final String TTL_TIMESTAMP = ConfigurationConstants.TTL_TIMESTAMP;
+    public static final String TTL_TIMESTAMP = "timeToLive";
     
     /**
      * This configuration tag specifies the time in seconds in the future within which
@@ -768,80 +727,8 @@ public final class WSHandlerConstants {
      * to avoid problems where clocks are slightly askew. To reject all future-created
      * Timestamps, set this value to "0". 
      */
-    public static final String TTL_FUTURE_TIMESTAMP = ConfigurationConstants.TTL_FUTURE_TIMESTAMP;
+    public static final String TTL_FUTURE_TIMESTAMP = "futureTimeToLive";
     
     
-    //
-    // Internal storage constants
-    //
-    
-    /**
-     * The WSHandler stores a result <code>List</code> in this property.
-     */
-    public static final String RECV_RESULTS = "RECV_RESULTS";
-    
-    /**
-     * internally used property names to store values inside the message context
-     * that must have the same lifetime as a message (request/response model).
-     */
-    public static final String SEND_SIGV = "_sendSignatureValues_";
-    
-    /**
-     * 
-     */
-    public static final String SIG_CONF_DONE = "_sigConfDone_";
-
-
-    /**
-     * Define the parameter values to set the key identifier types. These are:
-     * <ul>
-     * <li><code>DirectReference</code> for {@link WSConstants#BST_DIRECT_REFERENCE}
-     * </li>
-     * <li><code>IssuerSerial</code> for {@link WSConstants#ISSUER_SERIAL}
-     * </li>
-     * <li><code>X509KeyIdentifier</code> for {@link WSConstants#X509_KEY_IDENTIFIER}
-     * </li>
-     * <li><code>SKIKeyIdentifier</code> for {@link WSConstants#SKI_KEY_IDENTIFIER}
-     * </li>
-     * <li><code>EmbeddedKeyName</code> for {@link WSConstants#EMBEDDED_KEYNAME}
-     * </li>
-     * <li><code>Thumbprint</code> for {@link WSConstants#THUMBPRINT}
-     * </li>
-     * <li><code>EncryptedKeySHA1</code> for {@link WSConstants#ENCRYPTED_KEY_SHA1_IDENTIFIER}
-     * </li>
-     * </ul>
-     * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
-     */
-    private static Map<String, Integer> keyIdentifier = new HashMap<String, Integer>();
-
-    static {
-        keyIdentifier.put("DirectReference", WSConstants.BST_DIRECT_REFERENCE);
-        keyIdentifier.put("IssuerSerial", WSConstants.ISSUER_SERIAL);
-        keyIdentifier.put("X509KeyIdentifier", WSConstants.X509_KEY_IDENTIFIER);
-        keyIdentifier.put("SKIKeyIdentifier", WSConstants.SKI_KEY_IDENTIFIER);
-        keyIdentifier.put("EmbeddedKeyName", WSConstants.EMBEDDED_KEYNAME);
-        keyIdentifier.put("Thumbprint", WSConstants.THUMBPRINT_IDENTIFIER);
-        keyIdentifier.put("EncryptedKeySHA1", WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        keyIdentifier.put("KeyValue", WSConstants.KEY_VALUE);
-    }
-    
-    /**
-     * Get the key identifier type corresponding to the parameter. This is intended for internal
-     * use only. Valid values for "parameter" are:
-     *  - "IssuerSerial"
-     *  - "DirectReference"
-     *  - "X509KeyIdentifier"
-     *  - "Thumbprint"
-     *  - "SKIKeyIdentifier"
-     *  - "KeyValue"
-     *  - "EmbeddedKeyName"
-     *  - "EncryptedKeySHA1"
-     * 
-     * @param parameter
-     * @return the key identifier type corresponding to the parameter
-     */
-    public static Integer getKeyIdentifier(String parameter) {
-        return keyIdentifier.get(parameter);
-    }
 }
 

@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax;
 
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -67,6 +68,26 @@ public class WSSec {
         securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
         return new OutboundWSSec(securityProperties);
     }
+    
+    /**
+     * Creates and configures an outbound streaming security engine
+     *
+     * @param config The user-defined security configuration
+     * @return A new OutboundWSSec
+     * @throws WSSecurityException
+     *          if the initialisation failed
+     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     *          if the configuration is invalid
+     */
+    public static OutboundWSSec getOutboundWSSec(Map<String, Object> config) throws WSSecurityException {
+        if (config == null) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "missingSecurityProperties");
+        }
+
+        WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+        securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
+        return new OutboundWSSec(securityProperties);
+    }
 
     /**
      * Creates and configures an inbound streaming security engine
@@ -83,6 +104,26 @@ public class WSSec {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
 
+        securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
+        return new InboundWSSec(securityProperties);
+    }
+    
+    /**
+     * Creates and configures an inbound streaming security engine
+     *
+     * @param config The user-defined security configuration
+     * @return A new InboundWSSec
+     * @throws WSSecurityException
+     *          if the initialisation failed
+     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     *          if the configuration is invalid
+     */
+    public static InboundWSSec getInboundWSSec(Map<String, Object> config) throws WSSecurityException {
+        if (config == null) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "missingSecurityProperties");
+        }
+
+        WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
         securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
         return new InboundWSSec(securityProperties);
     }

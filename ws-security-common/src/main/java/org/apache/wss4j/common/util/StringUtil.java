@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.util;
+package org.apache.wss4j.common.util;
 
 import java.util.ArrayList;
 import java.util.List;

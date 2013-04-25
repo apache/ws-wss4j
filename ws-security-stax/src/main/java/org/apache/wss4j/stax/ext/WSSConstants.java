@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.ext;
 
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.ConcreteLSInput;
 import org.w3c.dom.ls.LSInput;
@@ -268,15 +269,15 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final String PROP_TIMESTAMP_SECURITYEVENT = "PROP_TIMESTAMP";
 
-    public static final Action TIMESTAMP = new Action("TIMESTAMP");
-    public static final Action USERNAMETOKEN = new Action("USERNAMETOKEN");
-    public static final Action USERNAMETOKEN_SIGNED = new Action("USERNAMETOKEN_SIGNED");
-    public static final Action SIGNATURE_WITH_DERIVED_KEY = new Action("SIGNATURE_WITH_DERIVED_KEY");
-    public static final Action ENCRYPT_WITH_DERIVED_KEY = new Action("ENCRYPT_WITH_DERIVED_KEY");
-    public static final Action SAML_TOKEN_SIGNED = new Action("SAML_TOKEN_SIGNED");
-    public static final Action SAML_TOKEN_UNSIGNED = new Action("SAML_TOKEN_UNSIGNED");
-    public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SIGNATURE_WITH_KERBEROS_TOKEN");
-    public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("ENCRYPT_WITH_KERBEROS_TOKEN");
+    public static final Action TIMESTAMP = new Action(ConfigurationConstants.TIMESTAMP);
+    public static final Action USERNAMETOKEN = new Action(ConfigurationConstants.USERNAME_TOKEN);
+    public static final Action USERNAMETOKEN_SIGNED = new Action(ConfigurationConstants.USERNAME_TOKEN_SIGNATURE);
+    public static final Action SIGNATURE_WITH_DERIVED_KEY = new Action("SignatureWithDerivedKey");
+    public static final Action ENCRYPT_WITH_DERIVED_KEY = new Action("EncryptWithDerivedKey");
+    public static final Action SAML_TOKEN_SIGNED = new Action(ConfigurationConstants.SAML_TOKEN_SIGNED);
+    public static final Action SAML_TOKEN_UNSIGNED = new Action(ConfigurationConstants.SAML_TOKEN_UNSIGNED);
+    public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SignatureWithKerberosToken");
+    public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("EncryptWithKerberosToken");
 
     public static final AlgorithmUsage Comp_Key = new AlgorithmUsage("Comp_Key");
     public static final AlgorithmUsage Enc_KD = new AlgorithmUsage("Enc_KD");
