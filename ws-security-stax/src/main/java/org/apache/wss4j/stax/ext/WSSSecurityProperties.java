@@ -52,6 +52,7 @@ import org.apache.xml.security.utils.Base64;
  */
 public class WSSSecurityProperties extends XMLSecurityProperties {
 
+    private boolean mustUnderstand = true;
     private String actor;
     private CallbackHandler callbackHandler;
     private CallbackHandler samlCallbackHandler;
@@ -110,6 +111,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public WSSSecurityProperties(WSSSecurityProperties wssSecurityProperties) {
         super(wssSecurityProperties);
 
+        this.mustUnderstand = wssSecurityProperties.mustUnderstand;
         this.actor = wssSecurityProperties.actor;
         this.callbackHandler = wssSecurityProperties.callbackHandler;
         this.samlCallbackHandler = wssSecurityProperties.samlCallbackHandler;
@@ -360,6 +362,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
         return signatureWSSCrypto.getCrypto();
     }
+    
+    public void setSignatureCrypto(Crypto sigCrypto) {
+        if (signatureWSSCrypto == null) {
+            signatureWSSCrypto = new WSSCrypto();
+        }
+        signatureWSSCrypto.setCrypto(sigCrypto);
+    }
 
     public KeyStore getSignatureVerificationKeyStore() {
         if (signatureVerificationWSSCrypto != null) {
@@ -423,6 +432,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
         signatureVerificationWSSCrypto.setCrlCertStore(crlCertStore);
         return signatureVerificationWSSCrypto.getCrypto();
+    }
+    
+    public void setSignatureVerificationCrypto(Crypto sigVerCrypto) {
+        if (signatureVerificationWSSCrypto == null) {
+            signatureVerificationWSSCrypto = new WSSCrypto();
+        }
+        signatureVerificationWSSCrypto.setCrypto(sigVerCrypto);
     }
 
     /**
@@ -505,6 +521,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
         return decryptionWSSCrypto.getCrypto();
     }
+    
+    public void setDecryptionCrypto(Crypto decCrypto) {
+        if (decryptionWSSCrypto == null) {
+            decryptionWSSCrypto = new WSSCrypto();
+        }
+        decryptionWSSCrypto.setCrypto(decCrypto);
+    }
 
     /**
      * Returns the encryption keystore
@@ -586,6 +609,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
         encryptionWSSCrypto.setCrlCertStore(this.getCrlCertStore());
         return encryptionWSSCrypto.getCrypto();
+    }
+    
+    public void setEncryptionCrypto(Crypto encCrypto) {
+        if (encryptionWSSCrypto == null) {
+            encryptionWSSCrypto = new WSSCrypto();
+        }
+        encryptionWSSCrypto.setCrypto(encCrypto);
     }
     
     /**
@@ -770,6 +800,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setValidateSamlSubjectConfirmation(boolean validateSamlSubjectConfirmation) {
         this.validateSamlSubjectConfirmation = validateSamlSubjectConfirmation;
+    }
+
+    public boolean isMustUnderstand() {
+        return mustUnderstand;
+    }
+
+    public void setMustUnderstand(boolean mustUnderstand) {
+        this.mustUnderstand = mustUnderstand;
     }
     
 }

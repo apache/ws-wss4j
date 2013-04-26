@@ -74,6 +74,14 @@ class WSSCrypto {
         return crypto;
     }
     
+    public void setCrypto(Crypto crypto) {
+        cachedCrypto = crypto;
+        if (crypto instanceof Merlin) {
+            keyStore = ((Merlin)crypto).getKeyStore();
+            cachedKeyStore = keyStore;
+        }
+    }
+    
     public Class<? extends Merlin> getCryptoClass() {
         return cryptoClass;
     }

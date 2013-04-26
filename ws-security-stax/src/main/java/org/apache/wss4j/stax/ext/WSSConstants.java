@@ -140,11 +140,13 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final QName TAG_soap11_Header = new QName(NS_SOAP11, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
     public static final QName TAG_soap11_Body = new QName(NS_SOAP11, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
     public static final QName ATT_soap11_Actor = new QName(NS_SOAP11, "actor", PREFIX_SOAPENV);
+    public static final QName ATT_soap11_MustUnderstand = new QName(NS_SOAP11, "mustUnderstand", PREFIX_SOAPENV);
 
     public static final QName TAG_soap12_Envelope = new QName(NS_SOAP12, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
     public static final QName TAG_soap12_Header = new QName(NS_SOAP12, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
     public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
     public static final QName ATT_soap12_Role = new QName(NS_SOAP12, "role", PREFIX_SOAPENV);
+    public static final QName ATT_soap12_MustUnderstand = new QName(NS_SOAP12, "mustUnderstand", PREFIX_SOAPENV);
 
     public static final String PREFIX_WSSE = "wsse";
     public static final String PREFIX_WSSE11 = "wsse11";

@@ -21,10 +21,16 @@ package org.apache.wss4j.stax;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.StringUtil;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
@@ -38,6 +44,9 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants.Action;
  */
 public final class ConfigurationConverter {
     
+    private static org.slf4j.Logger log = 
+        org.slf4j.LoggerFactory.getLogger(ConfigurationConverter.class);
+                                          
     private ConfigurationConverter() {
         // complete
     }
@@ -51,7 +60,8 @@ public final class ConfigurationConverter {
         
         parseActions(config, properties);
         parseUserProperties(config, properties);
-        // parseCallbackCrypto(config, properties);
+        parseCrypto(config, properties);
+        parseCallback(config, properties);
         parseBooleanProperties(config, properties);
         parseNonBooleanProperties(config, properties);
         
@@ -105,32 +115,174 @@ public final class ConfigurationConverter {
         properties.setActor(actor);
         
         String encUser = getString(ConfigurationConstants.ENCRYPTION_USER, config);
+        if (encUser == null) {
+            encUser = user;
+        }
         properties.setEncryptionUser(encUser);
         if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(encUser)) {
             properties.setUseReqSigCertForEncryption(true);
         }
         
         String sigUser = getString(ConfigurationConstants.SIGNATURE_USER, config);
+        if (sigUser == null) {
+            sigUser = user;
+        }
         properties.setSignatureUser(sigUser);
     }
     
-    // TODO
-    /*
-    private static void parseCallbackCrypto(
+    private static void parseCrypto(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
-        String sigPropRef = getString(ConfigurationConstants.SIG_PROP_REF_ID, config);
-        if (sigPropRef != null) {
-            
+        Object sigPropRef = config.get(ConfigurationConstants.SIG_PROP_REF_ID);
+        if (sigPropRef instanceof Crypto) {
+            properties.setSignatureCrypto((Crypto)sigPropRef);
+        } else if (sigPropRef instanceof Properties) {
+            properties.setSignatureCryptoProperties((Properties)sigPropRef);
+        } else {
+            String sigPropFile = getString(ConfigurationConstants.SIG_PROP_FILE, config);
+            if (sigPropFile != null) {
+                try {
+                    Properties sigProperties = 
+                        CryptoFactory.getProperties(sigPropFile, getClassLoader());
+                    properties.setSignatureCryptoProperties(sigProperties);
+                } catch (WSSecurityException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
         }
         
-        String sigPropFile = getString(ConfigurationConstants.SIG_PROP_FILE, config);
-        if (sigPropFile != null) {
-            
+        Object sigVerPropRef = config.get(ConfigurationConstants.SIG_VER_PROP_REF_ID);
+        if (sigVerPropRef instanceof Crypto) {
+            properties.setSignatureVerificationCrypto((Crypto)sigVerPropRef);
+        } else if (sigVerPropRef instanceof Properties) {
+            properties.setSignatureVerificationCryptoProperties((Properties)sigVerPropRef);
+        } else {
+            String sigPropFile = getString(ConfigurationConstants.SIG_VER_PROP_FILE, config);
+            if (sigPropFile != null) {
+                try {
+                    Properties sigProperties = 
+                        CryptoFactory.getProperties(sigPropFile, getClassLoader());
+                    properties.setSignatureVerificationCryptoProperties(sigProperties);
+                } catch (WSSecurityException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        
+        Object encPropRef = config.get(ConfigurationConstants.ENC_PROP_REF_ID);
+        if (encPropRef instanceof Crypto) {
+            properties.setEncryptionCrypto((Crypto)encPropRef);
+        } else if (encPropRef instanceof Properties) {
+            properties.setEncryptionCryptoProperties((Properties)encPropRef);
+        } else {
+            String encPropFile = getString(ConfigurationConstants.ENC_PROP_FILE, config);
+            if (encPropFile != null) {
+                try {
+                    Properties encProperties = 
+                        CryptoFactory.getProperties(encPropFile, getClassLoader());
+                    properties.setEncryptionCryptoProperties(encProperties);
+                } catch (WSSecurityException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        
+        Object decPropRef = config.get(ConfigurationConstants.DEC_PROP_REF_ID);
+        if (decPropRef instanceof Crypto) {
+            properties.setDecryptionCrypto((Crypto)decPropRef);
+        } else if (encPropRef instanceof Properties) {
+            properties.setDecryptionCryptoProperties((Properties)decPropRef);
+        } else {
+            String encPropFile = getString(ConfigurationConstants.DEC_PROP_FILE, config);
+            if (encPropFile != null) {
+                try {
+                    Properties encProperties = 
+                        CryptoFactory.getProperties(encPropFile, getClassLoader());
+                    properties.setDecryptionCryptoProperties(encProperties);
+                } catch (WSSecurityException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
         }
     }
-    */
+    
+    private static void parseCallback(
+        Map<String, Object> config, 
+        WSSSecurityProperties properties
+    ) {
+        Object pwPropRef = config.get(ConfigurationConstants.PW_CALLBACK_REF);
+        if (pwPropRef instanceof CallbackHandler) {
+            properties.setCallbackHandler((CallbackHandler)pwPropRef);
+        } else {
+            String pwCallback = getString(ConfigurationConstants.PW_CALLBACK_CLASS, config);
+            if (pwCallback != null) {
+                try {
+                    CallbackHandler pwCallbackHandler = loadCallbackHandler(pwCallback);
+                    properties.setCallbackHandler(pwCallbackHandler);
+                } catch (WSSecurityException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        
+        Object samlPropRef = config.get(ConfigurationConstants.SAML_CALLBACK_REF);
+        if (samlPropRef instanceof CallbackHandler) {
+            properties.setSamlCallbackHandler((CallbackHandler)samlPropRef);
+        } else {
+            String samlCallback = getString(ConfigurationConstants.SAML_CALLBACK_CLASS, config);
+            if (samlCallback != null) {
+                try {
+                    CallbackHandler samlCallbackHandler = loadCallbackHandler(samlCallback);
+                    properties.setSamlCallbackHandler(samlCallbackHandler);
+                } catch (WSSecurityException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Load a CallbackHandler instance.
+     * @param callbackHandlerClass The class name of the CallbackHandler instance
+     * @return a CallbackHandler instance
+     * @throws WSSecurityException
+     */
+    private static CallbackHandler loadCallbackHandler(
+        String callbackHandlerClass
+    ) throws WSSecurityException {
+
+        Class<? extends CallbackHandler> cbClass = null;
+        CallbackHandler cbHandler = null;
+        try {
+            cbClass = 
+                Loader.loadClass(getClassLoader(), 
+                                 callbackHandlerClass,
+                                 CallbackHandler.class);
+        } catch (ClassNotFoundException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e,
+                    "WSHandler: cannot load callback handler class: " + callbackHandlerClass
+            );
+        }
+        try {
+            cbHandler = cbClass.newInstance();
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e,
+                    "WSHandler: cannot create instance of callback handler: " + callbackHandlerClass
+            );
+        }
+        return cbHandler;
+    }
+    
+    private static ClassLoader getClassLoader() {
+        try {
+            return Loader.getTCL();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
     
     private static void parseBooleanProperties(
         Map<String, Object> config, 
@@ -139,7 +291,11 @@ public final class ConfigurationConverter {
         boolean sigConf = 
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, false, config);
         properties.setEnableSignatureConfirmation(sigConf);
-        // TODO verification as well?
+        properties.setEnableSignatureConfirmationVerification(sigConf);
+        
+        boolean mustUnderstand = 
+            decodeBooleanConfigValue(ConfigurationConstants.MUST_UNDERSTAND, true, config);
+        properties.setMustUnderstand(mustUnderstand);
         
         boolean bspCompliant = 
             decodeBooleanConfigValue(ConfigurationConstants.IS_BSP_COMPLIANT, true, config);
@@ -219,8 +375,7 @@ public final class ConfigurationConverter {
         String sigParts = getString(ConfigurationConstants.SIGNATURE_PARTS, config);
         if (sigParts != null) {
             List<SecurePart> parts = new ArrayList<SecurePart>();
-            // TODO Soap NS
-            splitEncParts(sigParts, parts, "http://schemas.xmlsoap.org/soap/envelope/");
+            splitEncParts(sigParts, parts, WSSConstants.NS_SOAP11);
             for (SecurePart part : parts) {
                 properties.addSignaturePart(part);
             }
@@ -242,8 +397,7 @@ public final class ConfigurationConverter {
         String encParts = getString(ConfigurationConstants.ENCRYPTION_PARTS, config);
         if (encParts != null) {
             List<SecurePart> parts = new ArrayList<SecurePart>();
-            // TODO Soap NS
-            splitEncParts(encParts, parts, "http://schemas.xmlsoap.org/soap/envelope/");
+            splitEncParts(encParts, parts, WSSConstants.NS_SOAP11);
             for (SecurePart part : parts) {
                 properties.addEncryptionPart(part);
             }
