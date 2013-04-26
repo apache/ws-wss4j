@@ -76,8 +76,11 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                         for (int i = 0; i < encryptionParts.size(); i++) {
                             SecurePart securePart = encryptionParts.get(i);
                             // Check to see if the wrong SOAP NS was used
-                            QName secureName = securePart.getName();
-                            securePart.setName(convertQName(secureName, soapMessageVersion));
+                            SecurePart convertedPart = convertSecurePart(securePart, soapMessageVersion);
+                            if (securePart != convertedPart) {
+                                securePart = convertedPart;
+                                encryptionParts.set(i, securePart);
+                            }
                             
                             if (securePart.getIdToSign() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
@@ -107,8 +110,11 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                         for (int i = 0; i < signatureParts.size(); i++) {
                             SecurePart securePart = signatureParts.get(i);
                             // Check to see if the wrong SOAP NS was used
-                            QName secureName = securePart.getName();
-                            securePart.setName(convertQName(secureName, soapMessageVersion));
+                            SecurePart convertedPart = convertSecurePart(securePart, soapMessageVersion);
+                            if (securePart != convertedPart) {
+                                securePart = convertedPart;
+                                signatureParts.set(i, securePart);
+                            }
                             
                             if (securePart.getIdToSign() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
@@ -176,15 +182,29 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         }
     }
     
-    private QName convertQName(QName secureName, String soapVersion) {
+    private SecurePart convertSecurePart(SecurePart securePart, String soapVersion) {
+        QName secureName = securePart.getName();
+        QName newName = secureName;
+        
         if (WSSConstants.NS_SOAP11.equals(secureName.getNamespaceURI())
             && WSSConstants.NS_SOAP12.equals(soapVersion)) {
-            return new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
+            newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
         } else if (WSSConstants.NS_SOAP12.equals(secureName.getNamespaceURI())
             && WSSConstants.NS_SOAP11.equals(soapVersion)) {
-            return new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
+            newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
         }
-        return secureName;
+        
+        if (!secureName.equals(newName)) {
+            SecurePart newPart = 
+                new SecurePart(newName, securePart.isGenerateXPointer(), securePart.getModifier(),
+                               securePart.getTransforms(), securePart.getDigestMethod());
+            newPart.setExternalReference(securePart.getExternalReference());
+            newPart.setIdToReference(securePart.getIdToReference());
+            newPart.setIdToSign(securePart.getIdToSign());
+            return newPart;
+        }
+        
+        return securePart;
     }
 
     private void buildSecurityHeader(
