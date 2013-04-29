@@ -149,6 +149,17 @@ public abstract class AbstractTestBase {
         xmlStreamWriter.close();
         return baos;
     }
+    
+    protected ByteArrayOutputStream doOutboundSecurity(Map<String, Object> config, InputStream sourceDocument)
+        throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
+        XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+        xmlStreamWriter.close();
+        return baos;
+    }
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties)
             throws WSSecurityException, TransformerException {

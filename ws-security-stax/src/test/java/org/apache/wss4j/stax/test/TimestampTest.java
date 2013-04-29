@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.test;
 
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -597,6 +598,82 @@ public class TimestampTest extends AbstractTestBase {
                 Assert.assertEquals(throwable.getMessage(), "Invalid timestamp: Message contains two or more timestamps");
                 Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
             }
+        }
+    }
+    
+    @Test
+    public void testTimestampPropertiesOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            Map<String, Object> config = new HashMap<String, Object>();
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
+            
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+
+            DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
+            GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
+            GregorianCalendar gregorianCalendarExpires = datatypeFactory.newXMLGregorianCalendar(expires.getTextContent()).toGregorianCalendar();
+
+            Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
+            GregorianCalendar now = new GregorianCalendar();
+            Assert.assertTrue(now.after(gregorianCalendarCreated));
+            Assert.assertTrue(now.before(gregorianCalendarExpires));
+
+            gregorianCalendarCreated.add(Calendar.SECOND, 301);
+            Assert.assertTrue(gregorianCalendarCreated.after(gregorianCalendarExpires));
+        }
+
+        //done timestamp; now test timestamp verification:
+        {
+            String action = WSHandlerConstants.TIMESTAMP;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testTimestampPropertiesInbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.TIMESTAMP;
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        //done timestamp; now test timestamp-verification:
+        {
+            Map<String, Object> config = new HashMap<String, Object>();
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
 }

@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.test;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -28,10 +29,12 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.stax.WSSec;
+import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.*;
+import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
@@ -51,6 +54,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -65,6 +69,7 @@ import java.lang.reflect.Field;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -2307,6 +2312,153 @@ public class EncDecryptionTest extends AbstractTestBase {
             }  catch (XMLStreamException e) {
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             }
+        }
+    }
+    
+    @Test
+    public void testEncDecryptionPropertiesOutbound() throws Exception {
+
+        ByteArrayOutputStream baos;
+        {
+            Map<String, Object> config = new HashMap<String, Object>();
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+            config.put(ConfigurationConstants.ENCRYPTION_USER, "receiver");
+            config.put(ConfigurationConstants.ENC_PROP_FILE, "transmitter-crypto.properties");
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            baos = doOutboundSecurity(config, sourceDocument);
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_DataReference.getNamespaceURI(), WSSConstants.TAG_xenc_DataReference.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            xPathExpression = getXPath("/env:Envelope/env:Body/xenc:EncryptedData/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#aes256-cbc']");
+            node = (Node) xPathExpression.evaluate(document, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            Assert.assertEquals(node.getParentNode().getParentNode().getLocalName(), "Body");
+            NodeList childNodes = node.getParentNode().getParentNode().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeType() == Node.TEXT_NODE) {
+                    Assert.assertEquals(child.getTextContent().trim(), "");
+                } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                    Assert.assertEquals(child, nodeList.item(0));
+                } else {
+                    Assert.fail("Unexpected Node encountered");
+                }
+            }
+        }
+
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testEncDecryptionPropertiesInbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.ENCRYPT;
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
+
+            //some test that we can really sure we get what we want from WSS4J
+            XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey/xenc:EncryptionMethod[@Algorithm='http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p']");
+            Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
+            Assert.assertNotNull(node);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+        //test streaming decryption
+        {
+            Map<String, Object> config = new HashMap<String, Object>();
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+            config.put(ConfigurationConstants.DEC_PROP_FILE, "receiver-crypto.properties");
+            config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.EncryptedPart,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            XMLStreamReader outXmlStreamReader = 
+                wsSecIn.processInMessage(
+                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), 
+                    new ArrayList<SecurityEvent>(), 
+                    securityEventListener);
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+
+            //no encrypted content
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < receivedSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = receivedSecurityEvents.get(i);
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                    OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+                    Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
+                    EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
+                    Assert.assertNotNull(encryptedPartSecurityEvent.getElementPath());
+                    final QName expectedElementName = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
+                    Assert.assertEquals(encryptedPartSecurityEvent.getXmlSecEvent().asStartElement().getName(), expectedElementName);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().size(), 2);
+                    Assert.assertEquals(encryptedPartSecurityEvent.getElementPath().get(encryptedPartSecurityEvent.getElementPath().size() - 1), expectedElementName);
+                }
+            }
+
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
     
