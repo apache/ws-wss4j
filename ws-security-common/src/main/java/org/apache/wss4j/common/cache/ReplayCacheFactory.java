@@ -36,8 +36,7 @@ public abstract class ReplayCacheFactory {
     
     static {
         try {
-            Class<?> cacheManagerClass = 
-                Loader.loadClass("net.sf.ehcache.CacheManager");
+            Class<?> cacheManagerClass = Class.forName("net.sf.ehcache.CacheManager");
             if (cacheManagerClass != null) {
                 ehCacheInstalled = true;
             }

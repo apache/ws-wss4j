@@ -729,6 +729,25 @@ public final class ConfigurationConstants {
      */
     public static final String TTL_FUTURE_TIMESTAMP = "futureTimeToLive";
     
+    /**
+     * This tag refers to a Map of QName, Object (Validator) instances to be used to 
+     * validate tokens identified by their QName. For the DOM layer, the Object should
+     * be a org.apache.wss4j.dom.validate.Validator instance. For the StAX layer, it
+     * should be a org.apache.wss4j.stax.validate.Validator instance.
+     */
+    public static final String VALIDATOR_MAP = "validatorMap";
+    
+    /**
+     * This holds a reference to a ReplayCache instance used to cache UsernameToken nonces. The
+     * default instance that is used is the EHCacheReplayCache.
+     */
+    public static final String NONCE_CACHE_INSTANCE = "nonceCacheInstance";
+    
+    /**
+     * This holds a reference to a ReplayCache instance used to cache Timestamp Created Strings. The
+     * default instance that is used is the EHCacheReplayCache.
+     */
+    public static final String TIMESTAMP_CACHE_INSTANCE = "timestampCacheInstance";
     
 }
 

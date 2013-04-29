@@ -27,6 +27,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -36,6 +37,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants.Action;
 
@@ -134,12 +136,20 @@ public final class ConfigurationConverter {
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
-        Object sigPropRef = config.get(ConfigurationConstants.SIG_PROP_REF_ID);
-        if (sigPropRef instanceof Crypto) {
-            properties.setSignatureCrypto((Crypto)sigPropRef);
-        } else if (sigPropRef instanceof Properties) {
-            properties.setSignatureCryptoProperties((Properties)sigPropRef);
-        } else {
+        String sigPropRef = getString(ConfigurationConstants.SIG_PROP_REF_ID, config);
+        boolean foundSigRef = false;
+        if (sigPropRef != null) {
+            Object sigRef = config.get(sigPropRef);
+            if (sigRef instanceof Crypto) {
+                foundSigRef = true;
+                properties.setSignatureCrypto((Crypto)sigRef);
+            } else if (sigRef instanceof Properties) {
+                foundSigRef = true;
+                properties.setSignatureCryptoProperties((Properties)sigRef);
+            }
+        }
+        
+        if (!foundSigRef) {
             String sigPropFile = getString(ConfigurationConstants.SIG_PROP_FILE, config);
             if (sigPropFile != null) {
                 try {
@@ -152,12 +162,20 @@ public final class ConfigurationConverter {
             }
         }
         
-        Object sigVerPropRef = config.get(ConfigurationConstants.SIG_VER_PROP_REF_ID);
-        if (sigVerPropRef instanceof Crypto) {
-            properties.setSignatureVerificationCrypto((Crypto)sigVerPropRef);
-        } else if (sigVerPropRef instanceof Properties) {
-            properties.setSignatureVerificationCryptoProperties((Properties)sigVerPropRef);
-        } else {
+        String sigVerPropRef = getString(ConfigurationConstants.SIG_VER_PROP_REF_ID, config);
+        boolean foundSigVerRef = false;
+        if (sigVerPropRef != null) {
+            Object sigVerRef = config.get(sigVerPropRef);
+            if (sigVerRef instanceof Crypto) {
+                foundSigVerRef = true;
+                properties.setSignatureVerificationCrypto((Crypto)sigVerRef);
+            } else if (sigVerRef instanceof Properties) {
+                foundSigVerRef = true;
+                properties.setSignatureVerificationCryptoProperties((Properties)sigVerRef);
+            } 
+        }
+        
+        if (!foundSigVerRef) {
             String sigPropFile = getString(ConfigurationConstants.SIG_VER_PROP_FILE, config);
             if (sigPropFile != null) {
                 try {
@@ -170,12 +188,20 @@ public final class ConfigurationConverter {
             }
         }
         
-        Object encPropRef = config.get(ConfigurationConstants.ENC_PROP_REF_ID);
-        if (encPropRef instanceof Crypto) {
-            properties.setEncryptionCrypto((Crypto)encPropRef);
-        } else if (encPropRef instanceof Properties) {
-            properties.setEncryptionCryptoProperties((Properties)encPropRef);
-        } else {
+        String encPropRef = getString(ConfigurationConstants.ENC_PROP_REF_ID, config);
+        boolean foundEncRef = false;
+        if (encPropRef != null) {
+            Object encRef = config.get(encPropRef);
+            if (encRef instanceof Crypto) {
+                foundEncRef = true;
+                properties.setEncryptionCrypto((Crypto)encRef);
+            } else if (encRef instanceof Properties) {
+                foundEncRef = true;
+                properties.setEncryptionCryptoProperties((Properties)encRef);
+            } 
+        }
+        
+        if (!foundEncRef) {
             String encPropFile = getString(ConfigurationConstants.ENC_PROP_FILE, config);
             if (encPropFile != null) {
                 try {
@@ -188,12 +214,20 @@ public final class ConfigurationConverter {
             }
         }
         
-        Object decPropRef = config.get(ConfigurationConstants.DEC_PROP_REF_ID);
-        if (decPropRef instanceof Crypto) {
-            properties.setDecryptionCrypto((Crypto)decPropRef);
-        } else if (encPropRef instanceof Properties) {
-            properties.setDecryptionCryptoProperties((Properties)decPropRef);
-        } else {
+        String decPropRef = getString(ConfigurationConstants.DEC_PROP_REF_ID, config);
+        boolean foundDecRef = false;
+        if (decPropRef != null) {
+            Object decRef = config.get(decPropRef);
+            if (decRef instanceof Crypto) {
+                foundDecRef = true;
+                properties.setDecryptionCrypto((Crypto)decRef);
+            } else if (decRef instanceof Properties) {
+                foundDecRef = true;
+                properties.setDecryptionCryptoProperties((Properties)decRef);
+            } 
+        }
+        
+        if (!foundDecRef) {
             String encPropFile = getString(ConfigurationConstants.DEC_PROP_FILE, config);
             if (encPropFile != null) {
                 try {
@@ -421,6 +455,27 @@ public final class ConfigurationConverter {
         properties.setUtFutureTTL(decodeFutureTimeToLive(config, false));
         properties.setTimestampTTL(decodeTimeToLive(config, true));
         properties.setTimeStampFutureTTL(decodeFutureTimeToLive(config, true));
+        
+        @SuppressWarnings("unchecked")
+        final Map<QName, Validator> validatorMap = 
+            (Map<QName, Validator>)config.get(ConfigurationConstants.VALIDATOR_MAP);
+        if (validatorMap != null) {
+            for (QName key : validatorMap.keySet()) {
+                properties.addValidator(key, validatorMap.get(key));
+            }
+        }
+        
+        ReplayCache nonceCache = 
+            (ReplayCache)config.get(ConfigurationConstants.NONCE_CACHE_INSTANCE);
+        if (nonceCache != null) {
+            properties.setNonceReplayCache(nonceCache);
+        }
+        
+        ReplayCache timestampCache = 
+            (ReplayCache)config.get(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE);
+        if (timestampCache != null) {
+            properties.setTimestampReplayCache(timestampCache);
+        }
     }
     
     private static WSSecurityTokenConstants.KeyIdentifier convertKeyIdentifier(String keyIdentifier) {
