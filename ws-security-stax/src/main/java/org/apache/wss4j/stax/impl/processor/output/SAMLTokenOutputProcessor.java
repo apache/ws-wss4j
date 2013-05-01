@@ -234,11 +234,12 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, tokenId);
             }
 
+            XMLSecurityConstants.Action action = getAction();
+
             finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            finalSAMLTokenOutputProcessor.setAction(getAction());
+            finalSAMLTokenOutputProcessor.setAction(action);
             finalSAMLTokenOutputProcessor.init(outputProcessorChain);
 
-            XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && senderVouches) {
                 SecurePart securePart =
                         new SecurePart(
@@ -290,7 +291,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                 securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
                     }
                     outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
-                    if (senderVouches && isSignedSamlAction()) {
+                    if (senderVouches && WSSConstants.SAML_TOKEN_SIGNED.equals(getAction())) {
                         outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
                                 securityTokenReferenceId, samlAssertionWrapper.getId());
                     }
@@ -300,16 +301,6 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
     }
     
-    private boolean isSignedSamlAction() {
-        WSSSecurityProperties properties = (WSSSecurityProperties) getSecurityProperties();
-        for (int i = 0; i < properties.getOutAction().length; i++) {
-            if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void outputSecurityTokenReference(
             OutputProcessorChain outputProcessorChain, SamlAssertionWrapper samlAssertionWrapper,
             String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
