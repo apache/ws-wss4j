@@ -31,6 +31,7 @@ import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -153,7 +154,8 @@ public abstract class AbstractTestBase {
     protected ByteArrayOutputStream doOutboundSecurity(Map<String, Object> config, InputStream sourceDocument)
         throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+        WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+        OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);

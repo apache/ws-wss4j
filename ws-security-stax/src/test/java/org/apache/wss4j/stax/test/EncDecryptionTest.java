@@ -28,6 +28,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -2401,7 +2402,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader outXmlStreamReader = 
                 wsSecIn.processInMessage(
                     xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), 

@@ -52,6 +52,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -1474,7 +1475,8 @@ public class SignatureTest extends AbstractTestBase {
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
             config.put(ConfigurationConstants.SIG_PROP_FILE, "transmitter-crypto.properties");
 
-            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -1528,7 +1530,8 @@ public class SignatureTest extends AbstractTestBase {
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
             config.put(ConfigurationConstants.SIG_VER_PROP_FILE, "transmitter-crypto.properties");
 
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);

@@ -40,6 +40,7 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -825,7 +826,8 @@ public class UsernameTokenTest extends AbstractTestBase {
             config.put(ConfigurationConstants.USER, "transmitter");
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
 
-            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -873,7 +875,8 @@ public class UsernameTokenTest extends AbstractTestBase {
             Map<String, Object> config = new HashMap<String, Object>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
             config.put(ConfigurationConstants.PW_CALLBACK_REF, new CallbackHandlerImpl());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.UsernameToken,

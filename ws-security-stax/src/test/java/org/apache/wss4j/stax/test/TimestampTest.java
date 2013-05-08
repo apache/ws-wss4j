@@ -23,6 +23,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.*;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
@@ -609,7 +610,8 @@ public class TimestampTest extends AbstractTestBase {
             Map<String, Object> config = new HashMap<String, Object>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
             
-            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -664,7 +666,8 @@ public class TimestampTest extends AbstractTestBase {
         {
             Map<String, Object> config = new HashMap<String, Object>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 

@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.test.saml;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -755,7 +756,8 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setSignAssertion(false);
             config.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
-            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -803,7 +805,8 @@ public class SAMLTokenTest extends AbstractTestBase {
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
             config.put(ConfigurationConstants.SIG_VER_PROP_FILE, "receiver-crypto.properties");
 
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(config);
+            WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
