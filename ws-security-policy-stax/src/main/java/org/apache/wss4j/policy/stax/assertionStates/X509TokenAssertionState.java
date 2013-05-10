@@ -76,7 +76,8 @@ public class X509TokenAssertionState extends TokenAssertionState {
                 }
             }
             if (x509Token.isRequireKeyIdentifierReference() &&
-                    !WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(securityToken.getKeyIdentifier())) {
+                    !(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(securityToken.getKeyIdentifier())
+                        || WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier.equals(securityToken.getKeyIdentifier()))) {
                 setErrorMessage("Policy enforces KeyIdentifierReference but we got " + securityToken.getKeyIdentifier());
                 return false;
             } else if (x509Token.isRequireIssuerSerialReference() &&
