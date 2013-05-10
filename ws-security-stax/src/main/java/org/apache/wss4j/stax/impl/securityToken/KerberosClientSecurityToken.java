@@ -45,7 +45,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
     private Key secretKey;
     private byte[] ticket;
 
-    public KerberosClientSecurityToken(CallbackHandler callbackHandler, String id) throws XMLSecurityException {
+    public KerberosClientSecurityToken(CallbackHandler callbackHandler, String id) {
         super(id, WSSecurityTokenConstants.KerberosToken);
         this.callbackHandler = callbackHandler;
     }

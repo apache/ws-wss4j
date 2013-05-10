@@ -41,16 +41,14 @@ public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken impleme
         httpDigestAuthentication,
     }
 
-    public HttpsSecurityTokenImpl(X509Certificate x509Certificate)
-            throws XMLSecurityException {
+    public HttpsSecurityTokenImpl(X509Certificate x509Certificate) {
 
         super(null, IDGenerator.generateID(null), null);
         setX509Certificates(new X509Certificate[]{x509Certificate});
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
-    public HttpsSecurityTokenImpl(boolean basicAuthentication, String username)
-            throws XMLSecurityException {
+    public HttpsSecurityTokenImpl(boolean basicAuthentication, String username) {
 
         super(null, IDGenerator.generateID(null), null);
         if (basicAuthentication) {

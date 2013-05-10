@@ -55,7 +55,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
 
     public KerberosServiceSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, CallbackHandler callbackHandler,
                                             byte[] binaryContent, String kerberosTokenValueType, String id,
-                                            WSSecurityTokenConstants.KeyIdentifier keyIdentifier) throws XMLSecurityException {
+                                            WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
         super(wsInboundSecurityContext, id, keyIdentifier);
         this.callbackHandler = callbackHandler;
         this.binaryContent = binaryContent;
