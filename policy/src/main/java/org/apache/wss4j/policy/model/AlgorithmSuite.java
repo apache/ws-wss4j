@@ -545,5 +545,13 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     public static Collection<String> getSupportedAlgorithmSuiteNames() {
         return algorithmSuiteTypes.keySet();
     }
+
+    public void setSymmetricSignature(String symmetricSignature) {
+        this.symmetricSignature = symmetricSignature;
+    }
+
+    public void setAsymmetricSignature(String asymmetricSignature) {
+        this.asymmetricSignature = asymmetricSignature;
+    }
 }
 
