@@ -22,14 +22,10 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
-import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
-    
-    private static final transient org.slf4j.Logger log =
-        org.slf4j.LoggerFactory.getLogger(SamlTokenValidatorImpl.class);
     
     /**
      * The time in seconds in the future within which the NotBefore time of an incoming
@@ -77,11 +73,8 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         validateAssertion(samlAssertionWrapper);
 
         Crypto sigVerCrypto = null;
-        try {
+        if (samlAssertionWrapper.isSigned()) {
             sigVerCrypto = tokenContext.getWssSecurityProperties().getSignatureVerificationCrypto();
-        } catch (WSSConfigurationException ex) {
-            // A Signature Verification Crypto instance may not be required
-            log.warn(ex.getMessage(), ex);
         }
         SamlSecurityTokenImpl securityToken = new SamlSecurityTokenImpl(
                 samlAssertionWrapper, subjectSecurityToken,
