@@ -137,7 +137,8 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
             }
         } else if (WSSConstants.C14n.equals(keyUsage)) {
             if (algorithmSuite.getC14n() != null
-                    && !algorithmSuite.getC14n().getValue().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
+                    && !algorithmSuite.getC14n().getValue().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())
+                    && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
                 setAsserted(false);
                 setErrorMessage("C14N algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
             }
