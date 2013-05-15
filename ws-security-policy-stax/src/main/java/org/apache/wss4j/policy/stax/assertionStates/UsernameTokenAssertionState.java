@@ -84,7 +84,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
             setErrorMessage("UsernameToken does not contain a nonce or password is not plain text");
             return false;
         }
-        if (usernameToken.getUsernameTokenType() != null) {
+        if (usernameToken.getUsernameTokenType() != null && usernameTokenSecurityEvent.getUsernameTokenProfile() != null) {
             switch (usernameToken.getUsernameTokenType()) {
                 case WssUsernameToken10:
                     if (usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
