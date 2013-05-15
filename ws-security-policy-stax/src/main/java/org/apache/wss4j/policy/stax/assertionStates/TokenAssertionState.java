@@ -100,9 +100,10 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 }
 
                 SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
-                // Allow SupportingToken policies which are processed as SignedSupportingTokens
-                if (!(WSSecurityTokenConstants.TokenUsage_SupportingTokens.getName().equals(supportingTokens.getName().getLocalPart())
-                    && !tokenUsage.getName().contains("Endorsing"))
+                
+                // Allow *SupportingToken policies which are processed as Signed*SupportingTokens
+                if (!(tokenUsage.getName().startsWith("Signed")
+                    && !supportingTokens.getName().getLocalPart().contains("Signed"))
                     && !tokenUsage.getName().equals(supportingTokens.getName().getLocalPart())) {
                     ignoreToken++;
                     continue loop;
