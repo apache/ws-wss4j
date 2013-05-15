@@ -21,8 +21,6 @@ package org.apache.wss4j.stax.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
@@ -31,6 +29,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
