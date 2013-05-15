@@ -57,8 +57,6 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword() 
                 || Boolean.parseBoolean((String)tokenContext.getWsSecurityContext().get(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD));
 
-        final byte[] nonceVal;
-
         // Check received password type against required type
         WSSConstants.UsernameTokenPasswordType requiredPasswordType = 
             tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
@@ -93,6 +91,10 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         final EncodedString encodedNonce =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+        byte[] nonceVal = null;
+        if (encodedNonce != null && encodedNonce.getValue() != null) {
+            nonceVal = Base64.decodeBase64(encodedNonce.getValue());
+        }
 
         final AttributedDateTime attributedDateTimeCreated =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
@@ -111,27 +113,21 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "badTokenType01");
             }
 
-            nonceVal = Base64.decodeBase64(encodedNonce.getValue());
-
             verifyDigestPassword(username.getValue(), passwordType, nonceVal, created, tokenContext);
         } else if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)
                 || (passwordType != null && passwordType.getValue() != null
                 && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE)) {
-            nonceVal = null;
             
             verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
         } else if (passwordType != null && passwordType.getValue() != null) {
             if (!handleCustomPasswordTypes) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
-            nonceVal = null;
-            
             verifyCustomPassword(username.getValue(), passwordType, tokenContext);
         } else {
             if (!allowUsernameTokenNoPassword) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
-            nonceVal = null;
         }
 
         final String password;
