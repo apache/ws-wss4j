@@ -139,6 +139,10 @@
                     <artifactId>velocity</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.owasp.esapi</groupId>
                     <artifactId>esapi</artifactId>
                 </exclusion>
@@ -179,12 +183,24 @@
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.xerces</groupId>
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>xalan</groupId>
                     <artifactId>xalan</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.xerces</groupId>
+                    <artifactId>serializer</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>commons-codec</groupId>
