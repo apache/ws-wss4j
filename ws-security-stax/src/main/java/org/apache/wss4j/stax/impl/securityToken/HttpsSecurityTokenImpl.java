@@ -39,8 +39,14 @@ public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken impleme
         httpsClientAuthentication,
         httpBasicAuthentication,
         httpDigestAuthentication,
+        noAuthentication
     }
 
+    public HttpsSecurityTokenImpl() {
+        super(null, IDGenerator.generateID(null), null);
+        this.authenticationType = AuthenticationType.noAuthentication;
+    }
+    
     public HttpsSecurityTokenImpl(X509Certificate x509Certificate) {
 
         super(null, IDGenerator.generateID(null), null);

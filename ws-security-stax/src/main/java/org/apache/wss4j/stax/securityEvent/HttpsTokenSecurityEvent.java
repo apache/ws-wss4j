@@ -26,7 +26,8 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent<HttpsSecurityTok
     public enum AuthenticationType {
         HttpBasicAuthentication,
         HttpDigestAuthentication,
-        HttpsClientCertificateAuthentication
+        HttpsClientCertificateAuthentication,
+        HttpsNoAuthentication
     }
 
     private AuthenticationType authenticationType;
