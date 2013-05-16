@@ -656,30 +656,31 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                             } else if (httpsCertificate.getPublicKey().equals(subjectPublicKey)) {
                                 return;
                             }
-                        } else {
-                            for (int j = 0; j < securityTokenProviders.size(); j++) {
-                                SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider = securityTokenProviders.get(j);
-                                InboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
-                                if (securityToken == httpsSecurityToken) {
-                                    continue;
-                                }
-                                X509Certificate[] x509Certificates = securityToken.getX509Certificates();
-                                PublicKey publicKey = securityToken.getPublicKey();
-                                Map<String, Key> keyMap = securityToken.getSecretKey();
-                                if (x509Certificates != null && x509Certificates.length > 0
-                                        && subjectCertificates != null && subjectCertificates.length > 0 &&
-                                        subjectCertificates[0].equals(x509Certificates[0])) {
+                        }
+                        
+                        // Now try message signatures
+                        for (int j = 0; j < securityTokenProviders.size(); j++) {
+                            SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider = securityTokenProviders.get(j);
+                            InboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                            if (securityToken == httpsSecurityToken) {
+                                continue;
+                            }
+                            X509Certificate[] x509Certificates = securityToken.getX509Certificates();
+                            PublicKey publicKey = securityToken.getPublicKey();
+                            Map<String, Key> keyMap = securityToken.getSecretKey();
+                            if (x509Certificates != null && x509Certificates.length > 0
+                                && subjectCertificates != null && subjectCertificates.length > 0 &&
+                                subjectCertificates[0].equals(x509Certificates[0])) {
+                                return;
+                            }
+                            if (publicKey != null && publicKey.equals(subjectPublicKey)) {
+                                return;
+                            }
+                            Iterator<Map.Entry<String, Key>> iterator = keyMap.entrySet().iterator();
+                            while (iterator.hasNext()) {
+                                Map.Entry<String, Key> next = iterator.next();
+                                if (next.getValue().equals(subjectSecretKey)) {
                                     return;
-                                }
-                                if (publicKey != null && publicKey.equals(subjectPublicKey)) {
-                                    return;
-                                }
-                                Iterator<Map.Entry<String, Key>> iterator = keyMap.entrySet().iterator();
-                                while (iterator.hasNext()) {
-                                    Map.Entry<String, Key> next = iterator.next();
-                                    if (next.getValue().equals(subjectSecretKey)) {
-                                        return;
-                                    }
                                 }
                             }
                         }
